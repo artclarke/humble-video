@@ -95,7 +95,6 @@ static void ff_acelp_interpolatef_mips(float *out, const float *in,
                   [fc_val_p] "=&f" (fc_val_p), [fc_val_m] "=&f" (fc_val_m),
                   [p_filter_coeffs_m] "+r" (p_filter_coeffs_m)
                 : [prec] "r" (prec)
-                : "memory"
             );
         }
         out[n] = v;
@@ -202,7 +201,7 @@ static void ff_acelp_apply_order_2_transfer_function_mips(float *out, const floa
            [pole_coeffs] "r" (pole_coeffs)
          : "$f0", "$f1", "$f2", "$f3", "$f4", "$f5",
            "$f6", "$f7",  "$f8", "$f9", "$f10", "$f11",
-           "$f12", "$f13", "$f14", "$f15", "$f16", "memory"
+           "$f12", "$f13", "$f14", "$f15", "$f16"
     );
 }
 #endif /* HAVE_INLINE_ASM */

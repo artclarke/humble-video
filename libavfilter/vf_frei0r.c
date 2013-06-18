@@ -22,6 +22,8 @@
  * frei0r wrapper
  */
 
+/* #define DEBUG */
+
 #include <dlfcn.h>
 #include <frei0r.h>
 #include <stdio.h>
@@ -33,7 +35,6 @@
 #include "libavutil/internal.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/mem.h"
-#include "libavutil/opt.h"
 #include "libavutil/parseutils.h"
 #include "avfilter.h"
 #include "formats.h"
@@ -52,7 +53,6 @@ typedef void (*f0r_set_param_value_f)(f0r_instance_t instance, f0r_param_t param
 typedef void (*f0r_get_param_value_f)(f0r_instance_t instance, f0r_param_t param, int param_index);
 
 typedef struct Frei0rContext {
-    const AVClass *class;
     f0r_update_f update;
     void *dl_handle;            /* dynamic library handle   */
     f0r_instance_t instance;
@@ -64,11 +64,7 @@ typedef struct Frei0rContext {
     f0r_construct_f       construct;
     f0r_destruct_f        destruct;
     f0r_deinit_f          deinit;
-
-    char *dl_name;
-    char *params;
-    char *size;
-    char *framerate;
+    char params[256];
 
     /* only used by the source */
     int w, h;
@@ -78,8 +74,8 @@ typedef struct Frei0rContext {
 
 static void *load_sym(AVFilterContext *ctx, const char *sym_name)
 {
-    Frei0rContext *s = ctx->priv;
-    void *sym = dlsym(s->dl_handle, sym_name);
+    Frei0rContext *frei0r = ctx->priv;
+    void *sym = dlsym(frei0r->dl_handle, sym_name);
     if (!sym)
         av_log(ctx, AV_LOG_ERROR, "Could not find symbol '%s' in loaded module\n", sym_name);
     return sym;
@@ -87,7 +83,7 @@ static void *load_sym(AVFilterContext *ctx, const char *sym_name)
 
 static int set_param(AVFilterContext *ctx, f0r_param_info_t info, int index, char *param)
 {
-    Frei0rContext *s = ctx->priv;
+    Frei0rContext *frei0r = ctx->priv;
     union {
         double d;
         f0r_param_color_t col;
@@ -125,7 +121,7 @@ static int set_param(AVFilterContext *ctx, f0r_param_info_t info, int index, cha
         break;
     }
 
-    s->set_param_value(s->instance, &val, index);
+    frei0r->set_param_value(frei0r->instance, &val, index);
     return 0;
 
 fail:
@@ -136,21 +132,18 @@ fail:
 
 static int set_params(AVFilterContext *ctx, const char *params)
 {
-    Frei0rContext *s = ctx->priv;
+    Frei0rContext *frei0r = ctx->priv;
     int i;
 
-    if (!params)
-        return 0;
-
-    for (i = 0; i < s->plugin_info.num_params; i++) {
+    for (i = 0; i < frei0r->plugin_info.num_params; i++) {
         f0r_param_info_t info;
         char *param;
         int ret;
 
-        s->get_param_info(&info, i);
+        frei0r->get_param_info(&info, i);
 
         if (*params) {
-            if (!(param = av_get_token(&params, "|")))
+            if (!(param = av_get_token(&params, ":")))
                 return AVERROR(ENOMEM);
             params++;               /* skip ':' */
             ret = set_param(ctx, info, i, param);
@@ -180,27 +173,27 @@ static int set_params(AVFilterContext *ctx, const char *params)
 
         case F0R_PARAM_BOOL:
             v = &d;
-            s->get_param_value(s->instance, v, i);
+            frei0r->get_param_value(frei0r->instance, v, i);
             av_log(ctx, AV_LOG_DEBUG, "%s", d >= 0.5 && d <= 1.0 ? "y" : "n");
             break;
         case F0R_PARAM_DOUBLE:
             v = &d;
-            s->get_param_value(s->instance, v, i);
+            frei0r->get_param_value(frei0r->instance, v, i);
             av_log(ctx, AV_LOG_DEBUG, "%f", d);
             break;
         case F0R_PARAM_COLOR:
             v = &col;
-            s->get_param_value(s->instance, v, i);
+            frei0r->get_param_value(frei0r->instance, v, i);
             av_log(ctx, AV_LOG_DEBUG, "%f/%f/%f", col.r, col.g, col.b);
             break;
         case F0R_PARAM_POSITION:
             v = &pos;
-            s->get_param_value(s->instance, v, i);
+            frei0r->get_param_value(frei0r->instance, v, i);
             av_log(ctx, AV_LOG_DEBUG, "%f/%f", pos.x, pos.y);
             break;
         default: /* F0R_PARAM_STRING */
             v = s;
-            s->get_param_value(s->instance, v, i);
+            frei0r->get_param_value(frei0r->instance, v, i);
             av_log(ctx, AV_LOG_DEBUG, "'%s'\n", s);
             break;
         }
@@ -225,17 +218,12 @@ static int load_path(AVFilterContext *ctx, void **handle_ptr, const char *prefix
 static av_cold int frei0r_init(AVFilterContext *ctx,
                                const char *dl_name, int type)
 {
-    Frei0rContext *s = ctx->priv;
+    Frei0rContext *frei0r = ctx->priv;
     f0r_init_f            f0r_init;
     f0r_get_plugin_info_f f0r_get_plugin_info;
     f0r_plugin_info_t *pi;
     char *path;
     int ret = 0;
-
-    if (!dl_name) {
-        av_log(ctx, AV_LOG_ERROR, "No filter name provided.\n");
-        return AVERROR(EINVAL);
-    }
 
     /* see: http://frei0r.dyne.org/codedoc/html/group__pluglocations.html */
     if ((path = av_strdup(getenv("FREI0R_PATH")))) {
@@ -252,11 +240,11 @@ static av_cold int frei0r_init(AVFilterContext *ctx,
                 ret = AVERROR(ENOMEM);
                 goto check_path_end;
             }
-            ret = load_path(ctx, &s->dl_handle, p1, dl_name);
+            ret = load_path(ctx, &frei0r->dl_handle, p1, dl_name);
             av_free(p1);
             if (ret < 0)
                 goto check_path_end;
-            if (s->dl_handle)
+            if (frei0r->dl_handle)
                 break;
         }
 
@@ -265,39 +253,39 @@ static av_cold int frei0r_init(AVFilterContext *ctx,
         if (ret < 0)
             return ret;
     }
-    if (!s->dl_handle && (path = getenv("HOME"))) {
+    if (!frei0r->dl_handle && (path = getenv("HOME"))) {
         char *prefix = av_asprintf("%s/.frei0r-1/lib/", path);
         if (!prefix)
             return AVERROR(ENOMEM);
-        ret = load_path(ctx, &s->dl_handle, prefix, dl_name);
+        ret = load_path(ctx, &frei0r->dl_handle, prefix, dl_name);
         av_free(prefix);
         if (ret < 0)
             return ret;
     }
-    if (!s->dl_handle) {
-        ret = load_path(ctx, &s->dl_handle, "/usr/local/lib/frei0r-1/", dl_name);
+    if (!frei0r->dl_handle) {
+        ret = load_path(ctx, &frei0r->dl_handle, "/usr/local/lib/frei0r-1/", dl_name);
         if (ret < 0)
             return ret;
     }
-    if (!s->dl_handle) {
-        ret = load_path(ctx, &s->dl_handle, "/usr/lib/frei0r-1/", dl_name);
+    if (!frei0r->dl_handle) {
+        ret = load_path(ctx, &frei0r->dl_handle, "/usr/lib/frei0r-1/", dl_name);
         if (ret < 0)
             return ret;
     }
-    if (!s->dl_handle) {
+    if (!frei0r->dl_handle) {
         av_log(ctx, AV_LOG_ERROR, "Could not find module '%s'\n", dl_name);
         return AVERROR(EINVAL);
     }
 
     if (!(f0r_init                = load_sym(ctx, "f0r_init"           )) ||
         !(f0r_get_plugin_info     = load_sym(ctx, "f0r_get_plugin_info")) ||
-        !(s->get_param_info  = load_sym(ctx, "f0r_get_param_info" )) ||
-        !(s->get_param_value = load_sym(ctx, "f0r_get_param_value")) ||
-        !(s->set_param_value = load_sym(ctx, "f0r_set_param_value")) ||
-        !(s->update          = load_sym(ctx, "f0r_update"         )) ||
-        !(s->construct       = load_sym(ctx, "f0r_construct"      )) ||
-        !(s->destruct        = load_sym(ctx, "f0r_destruct"       )) ||
-        !(s->deinit          = load_sym(ctx, "f0r_deinit"         )))
+        !(frei0r->get_param_info  = load_sym(ctx, "f0r_get_param_info" )) ||
+        !(frei0r->get_param_value = load_sym(ctx, "f0r_get_param_value")) ||
+        !(frei0r->set_param_value = load_sym(ctx, "f0r_set_param_value")) ||
+        !(frei0r->update          = load_sym(ctx, "f0r_update"         )) ||
+        !(frei0r->construct       = load_sym(ctx, "f0r_construct"      )) ||
+        !(frei0r->destruct        = load_sym(ctx, "f0r_destruct"       )) ||
+        !(frei0r->deinit          = load_sym(ctx, "f0r_deinit"         )))
         return AVERROR(EINVAL);
 
     if (f0r_init() < 0) {
@@ -305,8 +293,8 @@ static av_cold int frei0r_init(AVFilterContext *ctx,
         return AVERROR(EINVAL);
     }
 
-    f0r_get_plugin_info(&s->plugin_info);
-    pi = &s->plugin_info;
+    f0r_get_plugin_info(&frei0r->plugin_info);
+    pi = &frei0r->plugin_info;
     if (pi->plugin_type != type) {
         av_log(ctx, AV_LOG_ERROR,
                "Invalid type '%s' for the plugin\n",
@@ -329,48 +317,53 @@ static av_cold int frei0r_init(AVFilterContext *ctx,
     return 0;
 }
 
-static av_cold int filter_init(AVFilterContext *ctx)
+static av_cold int filter_init(AVFilterContext *ctx, const char *args)
 {
-    Frei0rContext *s = ctx->priv;
+    Frei0rContext *frei0r = ctx->priv;
+    char dl_name[1024], c;
+    *frei0r->params = 0;
 
-    return frei0r_init(ctx, s->dl_name, F0R_PLUGIN_TYPE_FILTER);
+    if (args)
+        sscanf(args, "%1023[^:=]%c%255c", dl_name, &c, frei0r->params);
+
+    return frei0r_init(ctx, dl_name, F0R_PLUGIN_TYPE_FILTER);
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
 {
-    Frei0rContext *s = ctx->priv;
+    Frei0rContext *frei0r = ctx->priv;
 
-    if (s->destruct && s->instance)
-        s->destruct(s->instance);
-    if (s->deinit)
-        s->deinit();
-    if (s->dl_handle)
-        dlclose(s->dl_handle);
+    if (frei0r->destruct && frei0r->instance)
+        frei0r->destruct(frei0r->instance);
+    if (frei0r->deinit)
+        frei0r->deinit();
+    if (frei0r->dl_handle)
+        dlclose(frei0r->dl_handle);
+
+    memset(frei0r, 0, sizeof(*frei0r));
 }
 
 static int config_input_props(AVFilterLink *inlink)
 {
     AVFilterContext *ctx = inlink->dst;
-    Frei0rContext *s = ctx->priv;
+    Frei0rContext *frei0r = ctx->priv;
 
-    if (s->destruct && s->instance)
-        s->destruct(s->instance);
-    if (!(s->instance = s->construct(inlink->w, inlink->h))) {
+    if (!(frei0r->instance = frei0r->construct(inlink->w, inlink->h))) {
         av_log(ctx, AV_LOG_ERROR, "Impossible to load frei0r instance\n");
         return AVERROR(EINVAL);
     }
 
-    return set_params(ctx, s->params);
+    return set_params(ctx, frei0r->params);
 }
 
 static int query_formats(AVFilterContext *ctx)
 {
-    Frei0rContext *s = ctx->priv;
+    Frei0rContext *frei0r = ctx->priv;
     AVFilterFormats *formats = NULL;
 
-    if        (s->plugin_info.color_model == F0R_COLOR_MODEL_BGRA8888) {
+    if        (frei0r->plugin_info.color_model == F0R_COLOR_MODEL_BGRA8888) {
         ff_add_format(&formats, AV_PIX_FMT_BGRA);
-    } else if (s->plugin_info.color_model == F0R_COLOR_MODEL_RGBA8888) {
+    } else if (frei0r->plugin_info.color_model == F0R_COLOR_MODEL_RGBA8888) {
         ff_add_format(&formats, AV_PIX_FMT_RGBA);
     } else {                                   /* F0R_COLOR_MODEL_PACKED32 */
         static const enum AVPixelFormat pix_fmts[] = {
@@ -386,37 +379,27 @@ static int query_formats(AVFilterContext *ctx)
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *in)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *in)
 {
-    Frei0rContext *s = inlink->dst->priv;
+    Frei0rContext *frei0r = inlink->dst->priv;
     AVFilterLink *outlink = inlink->dst->outputs[0];
-    AVFrame *out;
+    AVFilterBufferRef *out;
 
-    out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+    out = ff_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
     if (!out) {
-        av_frame_free(&in);
+        avfilter_unref_bufferp(&in);
         return AVERROR(ENOMEM);
     }
-    av_frame_copy_props(out, in);
+    avfilter_copy_buffer_ref_props(out, in);
 
-    s->update(s->instance, in->pts * av_q2d(inlink->time_base) * 1000,
+    frei0r->update(frei0r->instance, in->pts * av_q2d(inlink->time_base) * 1000,
                    (const uint32_t *)in->data[0],
                    (uint32_t *)out->data[0]);
 
-    av_frame_free(&in);
+    avfilter_unref_bufferp(&in);
 
     return ff_filter_frame(outlink, out);
 }
-
-#define OFFSET(x) offsetof(Frei0rContext, x)
-#define FLAGS AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_FILTERING_PARAM
-static const AVOption frei0r_options[] = {
-    { "filter_name",   NULL, OFFSET(dl_name), AV_OPT_TYPE_STRING, .flags = FLAGS },
-    { "filter_params", NULL, OFFSET(params),  AV_OPT_TYPE_STRING, .flags = FLAGS },
-    { NULL },
-};
-
-AVFILTER_DEFINE_CLASS(frei0r);
 
 static const AVFilterPad avfilter_vf_frei0r_inputs[] = {
     {
@@ -424,6 +407,7 @@ static const AVFilterPad avfilter_vf_frei0r_inputs[] = {
         .type         = AVMEDIA_TYPE_VIDEO,
         .config_props = config_input_props,
         .filter_frame = filter_frame,
+        .min_perms    = AV_PERM_READ
     },
     { NULL }
 };
@@ -445,81 +429,78 @@ AVFilter avfilter_vf_frei0r = {
     .uninit = uninit,
 
     .priv_size = sizeof(Frei0rContext),
-    .priv_class = &frei0r_class,
 
     .inputs    = avfilter_vf_frei0r_inputs,
 
     .outputs   = avfilter_vf_frei0r_outputs,
 };
 
-static av_cold int source_init(AVFilterContext *ctx)
+static av_cold int source_init(AVFilterContext *ctx, const char *args)
 {
-    Frei0rContext *s = ctx->priv;
+    Frei0rContext *frei0r = ctx->priv;
+    char dl_name[1024], c;
+    char frame_size[128] = "";
+    char frame_rate[128] = "";
     AVRational frame_rate_q;
 
-    if (av_parse_video_size(&s->w, &s->h, s->size) < 0) {
-        av_log(ctx, AV_LOG_ERROR, "Invalid frame size: '%s'\n", s->size);
+    memset(frei0r->params, 0, sizeof(frei0r->params));
+
+    if (args)
+        sscanf(args, "%127[^:]:%127[^:]:%1023[^:=]%c%255c",
+               frame_size, frame_rate, dl_name, &c, frei0r->params);
+
+    if (av_parse_video_size(&frei0r->w, &frei0r->h, frame_size) < 0) {
+        av_log(ctx, AV_LOG_ERROR, "Invalid frame size: '%s'\n", frame_size);
         return AVERROR(EINVAL);
     }
 
-    if (av_parse_video_rate(&frame_rate_q, s->framerate) < 0) {
-        av_log(ctx, AV_LOG_ERROR, "Invalid frame rate: '%s'\n", s->framerate);
+    if (av_parse_video_rate(&frame_rate_q, frame_rate) < 0) {
+        av_log(ctx, AV_LOG_ERROR, "Invalid frame rate: '%s'\n", frame_rate);
         return AVERROR(EINVAL);
     }
-    s->time_base.num = frame_rate_q.den;
-    s->time_base.den = frame_rate_q.num;
+    frei0r->time_base.num = frame_rate_q.den;
+    frei0r->time_base.den = frame_rate_q.num;
 
-    return frei0r_init(ctx, s->dl_name, F0R_PLUGIN_TYPE_SOURCE);
+    return frei0r_init(ctx, dl_name, F0R_PLUGIN_TYPE_SOURCE);
 }
 
 static int source_config_props(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
-    Frei0rContext *s = ctx->priv;
+    Frei0rContext *frei0r = ctx->priv;
 
-    if (av_image_check_size(s->w, s->h, 0, ctx) < 0)
+    if (av_image_check_size(frei0r->w, frei0r->h, 0, ctx) < 0)
         return AVERROR(EINVAL);
-    outlink->w = s->w;
-    outlink->h = s->h;
-    outlink->time_base = s->time_base;
+    outlink->w = frei0r->w;
+    outlink->h = frei0r->h;
+    outlink->time_base = frei0r->time_base;
     outlink->sample_aspect_ratio = (AVRational){1,1};
 
-    if (s->destruct && s->instance)
-        s->destruct(s->instance);
-    if (!(s->instance = s->construct(outlink->w, outlink->h))) {
+    if (!(frei0r->instance = frei0r->construct(outlink->w, outlink->h))) {
         av_log(ctx, AV_LOG_ERROR, "Impossible to load frei0r instance\n");
         return AVERROR(EINVAL);
     }
 
-    return set_params(ctx, s->params);
+    return set_params(ctx, frei0r->params);
 }
 
 static int source_request_frame(AVFilterLink *outlink)
 {
-    Frei0rContext *s = outlink->src->priv;
-    AVFrame *frame = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+    Frei0rContext *frei0r = outlink->src->priv;
+    AVFilterBufferRef *picref = ff_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
 
-    if (!frame)
+    if (!picref)
         return AVERROR(ENOMEM);
 
-    frame->sample_aspect_ratio = (AVRational) {1, 1};
-    frame->pts = s->pts++;
+    picref->video->sample_aspect_ratio = (AVRational) {1, 1};
+    picref->pts = frei0r->pts++;
+    picref->pos = -1;
 
-    s->update(s->instance, av_rescale_q(frame->pts, s->time_base, (AVRational){1,1000}),
-                   NULL, (uint32_t *)frame->data[0]);
+    frei0r->update(frei0r->instance, av_rescale_q(picref->pts, frei0r->time_base, (AVRational){1,1000}),
+                   NULL, (uint32_t *)picref->data[0]);
 
-    return ff_filter_frame(outlink, frame);
+    return ff_filter_frame(outlink, picref);
 }
-
-static const AVOption frei0r_src_options[] = {
-    { "size",          "Dimensions of the generated video.", OFFSET(size),      AV_OPT_TYPE_STRING, { .str = "" },   .flags = FLAGS },
-    { "framerate",     NULL,                                 OFFSET(framerate), AV_OPT_TYPE_STRING, { .str = "25" }, .flags = FLAGS },
-    { "filter_name",   NULL,                                 OFFSET(dl_name),   AV_OPT_TYPE_STRING,                  .flags = FLAGS },
-    { "filter_params", NULL,                                 OFFSET(params),    AV_OPT_TYPE_STRING,                  .flags = FLAGS },
-    { NULL },
-};
-
-AVFILTER_DEFINE_CLASS(frei0r_src);
 
 static const AVFilterPad avfilter_vsrc_frei0r_src_outputs[] = {
     {
@@ -536,7 +517,6 @@ AVFilter avfilter_vsrc_frei0r_src = {
     .description = NULL_IF_CONFIG_SMALL("Generate a frei0r source."),
 
     .priv_size = sizeof(Frei0rContext),
-    .priv_class = &frei0r_src_class,
     .init      = source_init,
     .uninit    = uninit,
 

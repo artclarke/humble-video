@@ -1,6 +1,6 @@
 /*
  * RTMP network protocol
- * Copyright (c) 2009 Konstantin Shishkov
+ * Copyright (c) 2009 Kostya Shishkov
  *
  * This file is part of FFmpeg.
  *
@@ -47,6 +47,8 @@
 #if CONFIG_ZLIB
 #include <zlib.h>
 #endif
+
+//#define DEBUG
 
 #define APP_MAX_LENGTH 1024
 #define PLAYPATH_MAX_LENGTH 256
@@ -1688,7 +1690,7 @@ static int handle_connect_error(URLContext *s, const char *desc)
     }
 
     if (!strcmp(authmod, "adobe")) {
-        if ((ret = do_adobe_auth(rt, user, salt, opaque, challenge)) < 0)
+        if ((ret = do_adobe_auth(rt, user, salt, challenge, opaque)) < 0)
             return ret;
     } else {
         if ((ret = do_llnw_auth(rt, user, nonce)) < 0)

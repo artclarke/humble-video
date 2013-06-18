@@ -29,7 +29,6 @@
 
 #include "rtpdec_formats.h"
 #include "internal.h"
-#include "libavutil/attributes.h"
 #include "libavutil/avstring.h"
 #include "libavcodec/get_bits.h"
 
@@ -253,8 +252,7 @@ static int parse_sdp_line(AVFormatContext *s, int st_index,
     return 0;
 }
 
-static av_cold int init_video(AVFormatContext *s, int st_index,
-                              PayloadContext *data)
+static int init_video(AVFormatContext *s, int st_index, PayloadContext *data)
 {
     if (st_index < 0)
         return 0;

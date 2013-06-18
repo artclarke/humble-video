@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+//#define DEBUG
+
 #include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
@@ -881,7 +883,7 @@ static int asf_read_header(AVFormatContext *s)
  * @param pb context to read data from
  * @return 0 on success, <0 on error
  */
-static int asf_get_packet(AVFormatContext *s, AVIOContext *pb)
+static int ff_asf_get_packet(AVFormatContext *s, AVIOContext *pb)
 {
     ASFContext *asf = s->priv_data;
     uint32_t packet_length, padsize;
@@ -1108,7 +1110,7 @@ static int asf_read_frame_header(AVFormatContext *s, AVIOContext *pb)
  * @return 0 if data was stored in pkt, <0 on error or 1 if more ASF
  *          packets need to be loaded (through asf_get_packet())
  */
-static int asf_parse_packet(AVFormatContext *s, AVIOContext *pb, AVPacket *pkt)
+static int ff_asf_parse_packet(AVFormatContext *s, AVIOContext *pb, AVPacket *pkt)
 {
     ASFContext *asf   = s->priv_data;
     ASFStream *asf_st = 0;
@@ -1280,10 +1282,9 @@ static int asf_parse_packet(AVFormatContext *s, AVIOContext *pb, AVPacket *pkt)
                            asf_st->ds_span);
                 } else {
                     /* packet descrambling */
-                    AVBufferRef *buf = av_buffer_alloc(asf_st->pkt.size +
-                                                       FF_INPUT_BUFFER_PADDING_SIZE);
-                    if (buf) {
-                        uint8_t *newdata = buf->data;
+                    uint8_t *newdata = av_malloc(asf_st->pkt.size +
+                                                 FF_INPUT_BUFFER_PADDING_SIZE);
+                    if (newdata) {
                         int offset = 0;
                         memset(newdata + asf_st->pkt.size, 0,
                                FF_INPUT_BUFFER_PADDING_SIZE);
@@ -1299,18 +1300,13 @@ static int asf_parse_packet(AVFormatContext *s, AVIOContext *pb, AVPacket *pkt)
                                    asf_st->ds_chunk_size);
                             offset += asf_st->ds_chunk_size;
                         }
-                        av_buffer_unref(&asf_st->pkt.buf);
-                        asf_st->pkt.buf  = buf;
-                        asf_st->pkt.data = buf->data;
+                        av_free(asf_st->pkt.data);
+                        asf_st->pkt.data = newdata;
                     }
                 }
             }
             asf_st->frag_offset         = 0;
             *pkt                        = asf_st->pkt;
-#if FF_API_DESTRUCT_PACKET
-            asf_st->pkt.destruct        = NULL;
-#endif
-            asf_st->pkt.buf             = 0;
             asf_st->pkt.size            = 0;
             asf_st->pkt.data            = 0;
             asf_st->pkt.side_data_elems = 0;
@@ -1329,9 +1325,9 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
         int ret;
 
         /* parse cached packets, if any */
-        if ((ret = asf_parse_packet(s, s->pb, pkt)) <= 0)
+        if ((ret = ff_asf_parse_packet(s, s->pb, pkt)) <= 0)
             return ret;
-        if ((ret = asf_get_packet(s, s->pb)) < 0)
+        if ((ret = ff_asf_get_packet(s, s->pb)) < 0)
             assert(asf->packet_size_left < FRAME_HEADER_SIZE ||
                    asf->packet_segments < 1);
         asf->packet_time_start = 0;

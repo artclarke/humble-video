@@ -1,6 +1,6 @@
 /*
  * Bink DSP routines
- * Copyright (c) 2009 Konstantin Shishkov
+ * Copyright (c) 2009 Kostya Shishkov
  *
  * This file is part of Libav.
  *

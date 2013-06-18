@@ -45,6 +45,9 @@ static av_cold int Faac_encode_close(AVCodecContext *avctx)
 {
     FaacAudioContext *s = avctx->priv_data;
 
+#if FF_API_OLD_ENCODE_AUDIO
+    av_freep(&avctx->coded_frame);
+#endif
     av_freep(&avctx->extradata);
     ff_af_queue_close(&s->afq);
 
@@ -129,6 +132,14 @@ static av_cold int Faac_encode_init(AVCodecContext *avctx)
 
     avctx->frame_size = samples_input / avctx->channels;
 
+#if FF_API_OLD_ENCODE_AUDIO
+    avctx->coded_frame= avcodec_alloc_frame();
+    if (!avctx->coded_frame) {
+        ret = AVERROR(ENOMEM);
+        goto error;
+    }
+#endif
+
     /* Set decoder specific info */
     avctx->extradata_size = 0;
     if (avctx->flags & CODEC_FLAG_GLOBAL_HEADER) {
@@ -151,20 +162,9 @@ static av_cold int Faac_encode_init(AVCodecContext *avctx)
     }
 
     if (!faacEncSetConfiguration(s->faac_handle, faac_cfg)) {
-        int i;
-        for (i = avctx->bit_rate/1000; i ; i--) {
-            faac_cfg->bitRate = 1000*i / avctx->channels;
-            if (faacEncSetConfiguration(s->faac_handle, faac_cfg))
-                break;
-        }
-        if (!i) {
-            av_log(avctx, AV_LOG_ERROR, "libfaac doesn't support this output format!\n");
-            ret = AVERROR(EINVAL);
-            goto error;
-        } else {
-            avctx->bit_rate = 1000*i;
-            av_log(avctx, AV_LOG_WARNING, "libfaac doesn't support the specified bitrate, using %dkbit/s instead\n", i);
-        }
+        av_log(avctx, AV_LOG_ERROR, "libfaac doesn't support this output format!\n");
+        ret = AVERROR(EINVAL);
+        goto error;
     }
 
     avctx->delay = FAAC_DELAY_SAMPLES;

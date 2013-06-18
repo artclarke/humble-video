@@ -34,7 +34,6 @@
 #include "libavutil/avstring.h"
 #include "libavutil/opt.h"
 #include "libavutil/log.h"
-#include "libavutil/time.h"
 #include "internal.h"
 #include "network.h"
 #include "os_support.h"

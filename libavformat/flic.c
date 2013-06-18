@@ -80,7 +80,7 @@ static int flic_probe(AVProbeData *p)
         return 0;
 
 
-    return AVPROBE_SCORE_MAX - 1;
+    return AVPROBE_SCORE_MAX;
 }
 
 static int flic_read_header(AVFormatContext *s)

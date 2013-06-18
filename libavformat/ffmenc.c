@@ -277,5 +277,4 @@ AVOutputFormat ff_ffm_muxer = {
     .write_header      = ffm_write_header,
     .write_packet      = ffm_write_packet,
     .write_trailer     = ffm_write_trailer,
-    .flags             = AVFMT_TS_NEGATIVE,
 };

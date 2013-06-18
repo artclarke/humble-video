@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "network.h"
+#include "internal.h"
 
 static void test(const char *pattern, const char *host)
 {

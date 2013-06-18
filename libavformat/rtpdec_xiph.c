@@ -27,7 +27,6 @@
  * @author Josh Allmann <joshua.allmann@gmail.com>
  */
 
-#include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
 #include "libavutil/base64.h"
@@ -70,8 +69,8 @@ static void xiph_free_context(PayloadContext * data)
     av_free(data);
 }
 
-static av_cold int xiph_vorbis_init(AVFormatContext *ctx, int st_index,
-                                    PayloadContext *data)
+static int xiph_vorbis_init(AVFormatContext *ctx, int st_index,
+                            PayloadContext *data)
 {
     if (st_index < 0)
         return 0;

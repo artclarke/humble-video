@@ -303,23 +303,23 @@ static int config_output(AVFilterLink *outlink)
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *inpicref)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *inpicref)
 {
     AVFilterLink *outlink = inlink->dst->outputs[0];
-    AVFrame *outpicref = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+    AVFilterBufferRef *outpicref = ff_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
     if (!outpicref) {
-        av_frame_free(&inpicref);
+        avfilter_unref_bufferp(&inpicref);
         return AVERROR(ENOMEM);
     }
-    av_frame_copy_props(outpicref, inpicref);
-    outpicref->width  = outlink->w;
-    outpicref->height = outlink->h;
+    avfilter_copy_buffer_ref_props(outpicref, inpicref);
+    outpicref->video->w = outlink->w;
+    outpicref->video->h = outlink->h;
 
     super2xsai(inlink->dst, inpicref->data[0], inpicref->linesize[0],
                outpicref->data[0], outpicref->linesize[0],
                inlink->w, inlink->h);
 
-    av_frame_free(&inpicref);
+    avfilter_unref_bufferp(&inpicref);
     return ff_filter_frame(outlink, outpicref);
 }
 
@@ -329,6 +329,7 @@ static const AVFilterPad super2xsai_inputs[] = {
         .type         = AVMEDIA_TYPE_VIDEO,
         .config_props = config_input,
         .filter_frame = filter_frame,
+        .min_perms    = AV_PERM_READ,
     },
     { NULL }
 };

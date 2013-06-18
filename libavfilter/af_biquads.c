@@ -116,9 +116,15 @@ typedef struct {
                    double b0, double b1, double b2, double a1, double a2);
 } BiquadsContext;
 
-static av_cold int init(AVFilterContext *ctx)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     BiquadsContext *p = ctx->priv;
+    int ret;
+
+    av_opt_set_defaults(p);
+
+    if ((ret = av_set_options_string(p, args, "=", ":")) < 0)
+        return ret;
 
     if (p->filter_type != biquad) {
         if (p->frequency <= 0 || p->width <= 0) {
@@ -386,24 +392,24 @@ static int config_output(AVFilterLink *outlink)
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *buf)
 {
     BiquadsContext *p       = inlink->dst->priv;
     AVFilterLink *outlink   = inlink->dst->outputs[0];
-    AVFrame *out_buf;
-    int nb_samples = buf->nb_samples;
+    AVFilterBufferRef *out_buf;
+    int nb_samples = buf->audio->nb_samples;
     int ch;
 
-    if (av_frame_is_writable(buf)) {
+    if (buf->perms & AV_PERM_WRITE) {
         out_buf = buf;
     } else {
-        out_buf = ff_get_audio_buffer(inlink, nb_samples);
+        out_buf = ff_get_audio_buffer(inlink, AV_PERM_WRITE, nb_samples);
         if (!out_buf)
             return AVERROR(ENOMEM);
-        av_frame_copy_props(out_buf, buf);
+        out_buf->pts = buf->pts;
     }
 
-    for (ch = 0; ch < av_frame_get_channels(buf); ch++)
+    for (ch = 0; ch < buf->audio->channels; ch++)
         p->filter(buf->extended_data[ch],
                   out_buf->extended_data[ch], nb_samples,
                   &p->cache[ch].i1, &p->cache[ch].i2,
@@ -411,7 +417,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
                   p->b0, p->b1, p->b2, p->a1, p->a2);
 
     if (buf != out_buf)
-        av_frame_free(&buf);
+        avfilter_unref_buffer(buf);
 
     return ff_filter_frame(outlink, out_buf);
 }
@@ -421,6 +427,7 @@ static av_cold void uninit(AVFilterContext *ctx)
     BiquadsContext *p = ctx->priv;
 
     av_freep(&p->cache);
+    av_opt_free(p);
 }
 
 static const AVFilterPad inputs[] = {
@@ -446,12 +453,12 @@ static const AVFilterPad outputs[] = {
 
 #define DEFINE_BIQUAD_FILTER(name_, description_)                       \
 AVFILTER_DEFINE_CLASS(name_);                                           \
-static av_cold int name_##_init(AVFilterContext *ctx) \
+static av_cold int name_##_init(AVFilterContext *ctx, const char *args) \
 {                                                                       \
     BiquadsContext *p = ctx->priv;                                      \
     p->class = &name_##_class;                                          \
     p->filter_type = name_;                                             \
-    return init(ctx);                                             \
+    return init(ctx, args);                                             \
 }                                                                       \
                                                          \
 AVFilter avfilter_af_##name_ = {                         \
@@ -607,12 +614,12 @@ DEFINE_BIQUAD_FILTER(allpass, "Apply a two-pole all-pass filter.");
 #endif  /* CONFIG_ALLPASS_FILTER */
 #if CONFIG_BIQUAD_FILTER
 static const AVOption biquad_options[] = {
-    {"a0", NULL, OFFSET(a0), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MIN, INT16_MAX, FLAGS},
-    {"a1", NULL, OFFSET(a1), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MIN, INT16_MAX, FLAGS},
-    {"a2", NULL, OFFSET(a2), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MIN, INT16_MAX, FLAGS},
-    {"b0", NULL, OFFSET(b0), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MIN, INT16_MAX, FLAGS},
-    {"b1", NULL, OFFSET(b1), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MIN, INT16_MAX, FLAGS},
-    {"b2", NULL, OFFSET(b2), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MIN, INT16_MAX, FLAGS},
+    {"a0", NULL, OFFSET(a0), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MAX, INT16_MAX, FLAGS},
+    {"a1", NULL, OFFSET(a1), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MAX, INT16_MAX, FLAGS},
+    {"a2", NULL, OFFSET(a2), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MAX, INT16_MAX, FLAGS},
+    {"b0", NULL, OFFSET(b0), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MAX, INT16_MAX, FLAGS},
+    {"b1", NULL, OFFSET(b1), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MAX, INT16_MAX, FLAGS},
+    {"b2", NULL, OFFSET(b2), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MAX, INT16_MAX, FLAGS},
     {NULL},
 };
 

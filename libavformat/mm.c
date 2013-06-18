@@ -79,7 +79,7 @@ static int probe(AVProbeData *p)
         return 0;
 
     /* only return half certainty since this check is a bit sketchy */
-    return AVPROBE_SCORE_EXTENSION;
+    return AVPROBE_SCORE_MAX / 2;
 }
 
 static int read_header(AVFormatContext *s)

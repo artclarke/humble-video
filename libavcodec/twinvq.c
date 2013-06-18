@@ -832,8 +832,10 @@ static int twin_decode_frame(AVCodecContext * avctx, void *data,
     /* get output buffer */
     if (tctx->discarded_packets >= 2) {
         frame->nb_samples = mtab->size;
-        if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+        if ((ret = ff_get_buffer(avctx, frame)) < 0) {
+            av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
             return ret;
+        }
         out = (float **)frame->extended_data;
     }
 

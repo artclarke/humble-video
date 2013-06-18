@@ -39,7 +39,6 @@
 
 #include <alsa/asoundlib.h>
 
-#include "libavutil/time.h"
 #include "libavformat/internal.h"
 #include "avdevice.h"
 #include "alsa-audio.h"

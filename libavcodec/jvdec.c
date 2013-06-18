@@ -28,7 +28,6 @@
 #include "avcodec.h"
 #include "dsputil.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "libavutil/intreadwrite.h"
 
 typedef struct JvContext {
@@ -43,7 +42,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
     JvContext *s = avctx->priv_data;
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
     ff_dsputil_init(&s->dsp, avctx);
-    avcodec_get_frame_defaults(&s->frame);
     return 0;
 }
 
@@ -137,7 +135,7 @@ static int decode_frame(AVCodecContext *avctx,
     JvContext *s           = avctx->priv_data;
     const uint8_t *buf     = avpkt->data;
     const uint8_t *buf_end = buf + avpkt->size;
-    int video_size, video_type, i, j, ret;
+    int video_size, video_type, ret, i, j;
 
     if (avpkt->size < 6)
         return AVERROR_INVALIDDATA;
@@ -151,8 +149,10 @@ static int decode_frame(AVCodecContext *avctx,
             av_log(avctx, AV_LOG_ERROR, "video size %d invalid\n", video_size);
             return AVERROR_INVALIDDATA;
         }
-        if ((ret = ff_reget_buffer(avctx, &s->frame)) < 0)
+        if ((ret = avctx->reget_buffer(avctx, &s->frame)) < 0) {
+            av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
             return ret;
+        }
 
         if (video_type == 0 || video_type == 1) {
             GetBitContext gb;
@@ -190,9 +190,8 @@ static int decode_frame(AVCodecContext *avctx,
         s->palette_has_changed       = 0;
         memcpy(s->frame.data[1], s->palette, AVPALETTE_SIZE);
 
-        if ((ret = av_frame_ref(data, &s->frame)) < 0)
-            return ret;
         *got_frame = 1;
+        *(AVFrame*)data = s->frame;
     }
 
     return avpkt->size;
@@ -202,7 +201,8 @@ static av_cold int decode_close(AVCodecContext *avctx)
 {
     JvContext *s = avctx->priv_data;
 
-    av_frame_unref(&s->frame);
+    if(s->frame.data[0])
+        avctx->release_buffer(avctx, &s->frame);
 
     return 0;
 }

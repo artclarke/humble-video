@@ -24,6 +24,7 @@
  * MPEG Audio header decoder.
  */
 
+//#define DEBUG
 #include "avcodec.h"
 #include "mpegaudio.h"
 #include "mpegaudiodata.h"

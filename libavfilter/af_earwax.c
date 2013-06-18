@@ -98,10 +98,10 @@ static inline int16_t *scalarproduct(const int16_t *in, const int16_t *endin, in
     int16_t j;
 
     while (in < endin) {
-        sample = 0;
+        sample = 32;
         for (j = 0; j < NUMTAPS; j++)
             sample += in[j] * filt[j];
-        *out = av_clip_int16(sample >> 6);
+        *out = sample >> 6;
         out++;
         in++;
     }
@@ -109,17 +109,18 @@ static inline int16_t *scalarproduct(const int16_t *in, const int16_t *endin, in
     return out;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *insamples)
 {
     AVFilterLink *outlink = inlink->dst->outputs[0];
     int16_t *taps, *endin, *in, *out;
-    AVFrame *outsamples = ff_get_audio_buffer(inlink, insamples->nb_samples);
+    AVFilterBufferRef *outsamples =
+        ff_get_audio_buffer(inlink, AV_PERM_WRITE,
+                                  insamples->audio->nb_samples);
+    int ret;
 
-    if (!outsamples) {
-        av_frame_free(&insamples);
+    if (!outsamples)
         return AVERROR(ENOMEM);
-    }
-    av_frame_copy_props(outsamples, insamples);
+    avfilter_copy_buffer_ref_props(outsamples, insamples);
 
     taps  = ((EarwaxContext *)inlink->dst->priv)->taps;
     out   = (int16_t *)outsamples->data[0];
@@ -130,14 +131,15 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
     out   = scalarproduct(taps, taps + NUMTAPS, out);
 
     // process current input
-    endin = in + insamples->nb_samples * 2 - NUMTAPS;
+    endin = in + insamples->audio->nb_samples * 2 - NUMTAPS;
     scalarproduct(in, endin, out);
 
     // save part of input for next round
     memcpy(taps, endin, NUMTAPS * sizeof(*taps));
 
-    av_frame_free(&insamples);
-    return ff_filter_frame(outlink, outsamples);
+    ret = ff_filter_frame(outlink, outsamples);
+    avfilter_unref_buffer(insamples);
+    return ret;
 }
 
 static const AVFilterPad earwax_inputs[] = {
@@ -145,6 +147,7 @@ static const AVFilterPad earwax_inputs[] = {
         .name         = "default",
         .type         = AVMEDIA_TYPE_AUDIO,
         .filter_frame = filter_frame,
+        .min_perms    = AV_PERM_READ,
     },
     { NULL }
 };

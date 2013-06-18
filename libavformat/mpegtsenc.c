@@ -22,11 +22,10 @@
 #include "libavutil/bswap.h"
 #include "libavutil/crc.h"
 #include "libavutil/dict.h"
-#include "libavutil/intreadwrite.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/opt.h"
 #include "libavutil/avassert.h"
-#include "libavcodec/internal.h"
+#include "libavcodec/mpegvideo.h"
 #include "avformat.h"
 #include "internal.h"
 #include "mpegts.h"
@@ -289,9 +288,6 @@ static void mpegts_write_pmt(AVFormatContext *s, MpegTSService *service)
         case AV_CODEC_ID_H264:
             stream_type = STREAM_TYPE_VIDEO_H264;
             break;
-        case AV_CODEC_ID_CAVS:
-            stream_type = STREAM_TYPE_VIDEO_CAVS;
-            break;
         case AV_CODEC_ID_DIRAC:
             stream_type = STREAM_TYPE_VIDEO_DIRAC;
             break;
@@ -395,16 +391,6 @@ static void mpegts_write_pmt(AVFormatContext *s, MpegTSService *service)
                 *q++ = 'r';
                 *q++ = 'a';
                 *q++ = 'c';
-            }
-            break;
-        case AVMEDIA_TYPE_DATA:
-            if (st->codec->codec_id == AV_CODEC_ID_SMPTE_KLV) {
-                *q++ = 0x05; /* MPEG-2 registration descriptor */
-                *q++ = 4;
-                *q++ = 'K';
-                *q++ = 'L';
-                *q++ = 'V';
-                *q++ = 'A';
             }
             break;
         }
@@ -987,8 +973,8 @@ static void mpegts_write_pes(AVFormatContext *s, AVStream *st,
             *q++ = len >> 8;
             *q++ = len;
             val = 0x80;
-            /* data alignment indicator is required for subtitle and data streams */
-            if (st->codec->codec_type == AVMEDIA_TYPE_SUBTITLE || st->codec->codec_type == AVMEDIA_TYPE_DATA)
+            /* data alignment indicator is required for subtitle data */
+            if (st->codec->codec_type == AVMEDIA_TYPE_SUBTITLE)
                 val |= 0x04;
             *q++ = val;
             *q++ = flags;
@@ -1105,16 +1091,13 @@ static int mpegts_write_packet_internal(AVFormatContext *s, AVPacket *pkt)
         uint32_t state = -1;
 
         if (pkt->size < 5 || AV_RB32(pkt->data) != 0x0000001) {
-            if (!st->nb_frames) {
             av_log(s, AV_LOG_ERROR, "H.264 bitstream malformed, "
                    "no startcode found, use the h264_mp4toannexb bitstream filter (-bsf h264_mp4toannexb)\n");
             return AVERROR(EINVAL);
-            }
-            av_log(s, AV_LOG_WARNING, "H.264 bitstream error, startcode missing\n");
         }
 
         do {
-            p = avpriv_find_start_code(p, buf_end, &state);
+            p = avpriv_mpv_find_start_code(p, buf_end, &state);
             av_dlog(s, "nal %d\n", state & 0x1f);
         } while (p < buf_end && (state & 0x1f) != 9 &&
                  (state & 0x1f) != 5 && (state & 0x1f) != 1);

@@ -63,12 +63,10 @@ static int64_t get_pts(const char **buf, int *duration,
             int64_t start = (hh1*3600LL + mm1*60LL + ss1) * 1000LL + ms1;
             int64_t end   = (hh2*3600LL + mm2*60LL + ss2) * 1000LL + ms2;
             *duration = end - start;
-            *buf += strcspn(*buf, "\n");
-            *buf += !!**buf;
+            *buf += strcspn(*buf, "\n") + 1;
             return start;
         }
-        *buf += strcspn(*buf, "\n");
-        *buf += !!**buf;
+        *buf += strcspn(*buf, "\n") + 1;
     }
     return AV_NOPTS_VALUE;
 }

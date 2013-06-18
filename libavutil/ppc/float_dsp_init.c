@@ -19,12 +19,11 @@
  */
 
 #include "config.h"
-#include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
 #include "libavutil/float_dsp.h"
 #include "float_dsp_altivec.h"
 
-av_cold void ff_float_dsp_init_ppc(AVFloatDSPContext *fdsp, int bit_exact)
+void ff_float_dsp_init_ppc(AVFloatDSPContext *fdsp, int bit_exact)
 {
 #if HAVE_ALTIVEC
     int mm_flags = av_get_cpu_flags();

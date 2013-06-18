@@ -24,7 +24,6 @@
 #include <math.h>
 
 #include "sipr.h"
-#include "libavutil/attributes.h"
 #include "libavutil/common.h"
 #include "libavutil/float_dsp.h"
 #include "libavutil/mathematics.h"
@@ -269,7 +268,7 @@ void ff_sipr_decode_frame_16k(SiprContext *ctx, SiprParameters *params,
     memcpy(ctx->iir_mem, Az[1], LP_FILTER_ORDER_16k * sizeof(float));
 }
 
-av_cold void ff_sipr_init_16k(SiprContext *ctx)
+void ff_sipr_init_16k(SiprContext *ctx)
 {
     int i;
 

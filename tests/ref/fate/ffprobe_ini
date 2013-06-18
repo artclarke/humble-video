@@ -67,6 +67,7 @@ display_picture_number=0
 interlaced_frame=0
 top_field_first=0
 repeat_pict=0
+reference=0
 
 [packets_and_frames.packet.2]
 codec_type=video
@@ -104,6 +105,7 @@ display_picture_number=0
 interlaced_frame=0
 top_field_first=0
 repeat_pict=0
+reference=0
 
 [packets_and_frames.packet.3]
 codec_type=audio
@@ -172,6 +174,7 @@ display_picture_number=0
 interlaced_frame=0
 top_field_first=0
 repeat_pict=0
+reference=0
 
 [packets_and_frames.packet.5]
 codec_type=video
@@ -209,6 +212,7 @@ display_picture_number=0
 interlaced_frame=0
 top_field_first=0
 repeat_pict=0
+reference=0
 
 [packets_and_frames.packet.6]
 codec_type=audio
@@ -308,6 +312,7 @@ display_picture_number=0
 interlaced_frame=0
 top_field_first=0
 repeat_pict=0
+reference=0
 
 [packets_and_frames.packet.9]
 codec_type=video
@@ -345,6 +350,7 @@ display_picture_number=0
 interlaced_frame=0
 top_field_first=0
 repeat_pict=0
+reference=0
 
 [packets_and_frames.packet.10]
 codec_type=audio
@@ -444,6 +450,7 @@ display_picture_number=0
 interlaced_frame=0
 top_field_first=0
 repeat_pict=0
+reference=0
 
 [packets_and_frames.packet.13]
 codec_type=video
@@ -481,6 +488,7 @@ display_picture_number=0
 interlaced_frame=0
 top_field_first=0
 repeat_pict=0
+reference=0
 
 [streams.stream.0]
 index=0
@@ -500,8 +508,8 @@ avg_frame_rate=0/0
 time_base=1/44100
 start_pts=0
 start_time=0.000000
-duration_ts=N/A
-duration=N/A
+duration_ts=527406
+duration=11.959320
 bit_rate=705600
 nb_frames=N/A
 nb_read_frames=6
@@ -545,8 +553,8 @@ avg_frame_rate=25/1
 time_base=1/51200
 start_pts=0
 start_time=0.000000
-duration_ts=N/A
-duration=N/A
+duration_ts=612317
+duration=11.959316
 bit_rate=N/A
 nb_frames=N/A
 nb_read_frames=4
@@ -591,8 +599,8 @@ avg_frame_rate=25/1
 time_base=1/51200
 start_pts=0
 start_time=0.000000
-duration_ts=N/A
-duration=N/A
+duration_ts=612317
+duration=11.959316
 bit_rate=N/A
 nb_frames=N/A
 nb_read_frames=4
@@ -616,9 +624,9 @@ filename=tests/data/ffprobe-test.nut
 nb_streams=3
 format_name=nut
 start_time=0.000000
-duration=0.120000
+duration=11.959320
 size=1054812
-bit_rate=70320800
+bit_rate=705599
 
 [format.tags]
 title=ffprobe test file

@@ -21,8 +21,7 @@
 /**
  * @file
  * Known FOURCCs:
- *     'ULY0' (YCbCr 4:2:0), 'ULY2' (YCbCr 4:2:2), 'ULRG' (RGB), 'ULRA' (RGBA),
- *     'ULH0' (YCbCr 4:2:0 BT.709), 'ULH2' (YCbCr 4:2:2 BT.709)
+ *     'ULY0' (YCbCr 4:2:0), 'ULY2' (YCbCr 4:2:2), 'ULRG' (RGB), 'ULRA' (RGBA)
  */
 
 extern "C" {
@@ -52,18 +51,6 @@ static av_cold int utvideo_decode_init(AVCodecContext *avctx)
 
     /* Pick format based on FOURCC */
     switch (avctx->codec_tag) {
-#ifdef UTV_BT709
-    case MKTAG('U', 'L', 'H', '0'):
-        avctx->pix_fmt = AV_PIX_FMT_YUV420P;
-        avctx->colorspace = AVCOL_SPC_BT709;
-        format = UTVF_YV12;
-        break;
-    case MKTAG('U', 'L', 'H', '2'):
-        avctx->pix_fmt = AV_PIX_FMT_YUYV422;
-        avctx->colorspace = AVCOL_SPC_BT709;
-        format = UTVF_YUY2;
-        break;
-#endif
     case MKTAG('U', 'L', 'Y', '0'):
         avctx->pix_fmt = AV_PIX_FMT_YUV420P;
         format = UTVF_YV12;
@@ -74,11 +61,11 @@ static av_cold int utvideo_decode_init(AVCodecContext *avctx)
         break;
     case MKTAG('U', 'L', 'R', 'G'):
         avctx->pix_fmt = AV_PIX_FMT_BGR24;
-        format = UTVF_NFCC_BGR_BU;
+        format = UTVF_RGB24_WIN;
         break;
     case MKTAG('U', 'L', 'R', 'A'):
         avctx->pix_fmt = AV_PIX_FMT_RGB32;
-        format = UTVF_NFCC_BGRA_BU;
+        format = UTVF_RGB32_WIN;
         break;
     default:
         av_log(avctx, AV_LOG_ERROR,

@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/common.h"
 #include "videodsp.h"
@@ -35,7 +34,7 @@ static void just_return(uint8_t *buf, ptrdiff_t stride, int h)
 {
 }
 
-av_cold void ff_videodsp_init(VideoDSPContext *ctx, int bpc)
+void ff_videodsp_init(VideoDSPContext *ctx, int bpc)
 {
     ctx->prefetch = just_return;
     if (bpc <= 8) {

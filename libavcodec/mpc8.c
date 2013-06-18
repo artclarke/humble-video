@@ -134,7 +134,7 @@ static av_cold int mpc8_decode_init(AVCodecContext * avctx)
     }
     channels = get_bits(&gb, 4) + 1;
     if (channels > 2) {
-        avpriv_request_sample(avctx, "Multichannel MPC SV8");
+        av_log_missing_feature(avctx, "Multichannel MPC SV8", 1);
         return AVERROR_PATCHWELCOME;
     }
     c->MSS = get_bits1(&gb);
@@ -254,8 +254,10 @@ static int mpc8_decode_frame(AVCodecContext * avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = MPC_FRAME_SIZE;
-    if ((res = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((res = ff_get_buffer(avctx, frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return res;
+    }
 
     keyframe = c->cur_frame == 0;
 

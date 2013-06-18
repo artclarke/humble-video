@@ -47,9 +47,9 @@ typedef struct {
 
     uint8_t history[HIST_SIZE];
 
-    AVFrame *cur;
-    AVFrame *next;
-    AVFrame *prev;
+    AVFilterBufferRef *cur;
+    AVFilterBufferRef *next;
+    AVFilterBufferRef *prev;
     int (*filter_line)(const uint8_t *prev, const uint8_t *cur, const uint8_t *next, int w);
 
     const AVPixFmtDescriptor *csp;
@@ -113,13 +113,13 @@ static void filter(AVFilterContext *ctx)
     int match = 0;
 
     for (i = 0; i < idet->csp->nb_components; i++) {
-        int w = idet->cur->width;
-        int h = idet->cur->height;
+        int w = idet->cur->video->w;
+        int h = idet->cur->video->h;
         int refs = idet->cur->linesize[i];
 
         if (i && i<3) {
-            w = FF_CEIL_RSHIFT(w, idet->csp->log2_chroma_w);
-            h = FF_CEIL_RSHIFT(h, idet->csp->log2_chroma_h);
+            w >>= idet->csp->log2_chroma_w;
+            h >>= idet->csp->log2_chroma_h;
         }
 
         for (y = 2; y < h - 2; y++) {
@@ -165,13 +165,13 @@ static void filter(AVFilterContext *ctx)
     }
 
     if      (idet->last_type == TFF){
-        idet->cur->top_field_first = 1;
-        idet->cur->interlaced_frame = 1;
+        idet->cur->video->top_field_first = 1;
+        idet->cur->video->interlaced = 1;
     }else if(idet->last_type == BFF){
-        idet->cur->top_field_first = 0;
-        idet->cur->interlaced_frame = 1;
+        idet->cur->video->top_field_first = 0;
+        idet->cur->video->interlaced = 1;
     }else if(idet->last_type == PROGRSSIVE){
-        idet->cur->interlaced_frame = 0;
+        idet->cur->video->interlaced = 0;
     }
 
     idet->prestat [           type] ++;
@@ -179,13 +179,13 @@ static void filter(AVFilterContext *ctx)
     av_log(ctx, AV_LOG_DEBUG, "Single frame:%s, Multi frame:%s\n", type2str(type), type2str(idet->last_type));
 }
 
-static int filter_frame(AVFilterLink *link, AVFrame *picref)
+static int filter_frame(AVFilterLink *link, AVFilterBufferRef *picref)
 {
     AVFilterContext *ctx = link->dst;
     IDETContext *idet = ctx->priv;
 
     if (idet->prev)
-        av_frame_free(&idet->prev);
+        avfilter_unref_buffer(idet->prev);
     idet->prev = idet->cur;
     idet->cur  = idet->next;
     idet->next = picref;
@@ -194,7 +194,7 @@ static int filter_frame(AVFilterLink *link, AVFrame *picref)
         return 0;
 
     if (!idet->prev)
-        idet->prev = av_frame_clone(idet->cur);
+        idet->prev = avfilter_ref_buffer(idet->cur, ~0);
 
     if (!idet->csp)
         idet->csp = av_pix_fmt_desc_get(link->format);
@@ -203,7 +203,22 @@ static int filter_frame(AVFilterLink *link, AVFrame *picref)
 
     filter(ctx);
 
-    return ff_filter_frame(ctx->outputs[0], av_frame_clone(idet->cur));
+    return ff_filter_frame(ctx->outputs[0], avfilter_ref_buffer(idet->cur, ~0));
+}
+
+static int request_frame(AVFilterLink *link)
+{
+    AVFilterContext *ctx = link->src;
+    IDETContext *idet = ctx->priv;
+
+    do {
+        int ret;
+
+        if ((ret = ff_request_frame(link->src->inputs[0])))
+            return ret;
+    } while (!idet->cur);
+
+    return 0;
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -223,9 +238,9 @@ static av_cold void uninit(AVFilterContext *ctx)
            idet->poststat[UNDETERMINED]
     );
 
-    av_frame_free(&idet->prev);
-    av_frame_free(&idet->cur );
-    av_frame_free(&idet->next);
+    avfilter_unref_bufferp(&idet->prev);
+    avfilter_unref_bufferp(&idet->cur );
+    avfilter_unref_bufferp(&idet->next);
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -258,15 +273,17 @@ static int query_formats(AVFilterContext *ctx)
     return 0;
 }
 
-static int config_output(AVFilterLink *outlink)
-{
-    outlink->flags |= FF_LINK_FLAG_REQUEST_LOOP;
-    return 0;
-}
-
-static av_cold int init(AVFilterContext *ctx)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     IDETContext *idet = ctx->priv;
+    static const char *shorthand[] = { "intl_thres", "prog_thres", NULL };
+    int ret;
+
+    idet->class = &idet_class;
+    av_opt_set_defaults(idet);
+
+    if ((ret = av_opt_set_from_string(idet, args, shorthand, "=", ":")) < 0)
+        return ret;
 
     idet->last_type = UNDETERMINED;
     memset(idet->history, UNDETERMINED, HIST_SIZE);
@@ -282,6 +299,7 @@ static const AVFilterPad idet_inputs[] = {
         .name         = "default",
         .type         = AVMEDIA_TYPE_VIDEO,
         .filter_frame = filter_frame,
+        .min_perms    = AV_PERM_PRESERVE,
     },
     { NULL }
 };
@@ -290,7 +308,8 @@ static const AVFilterPad idet_outputs[] = {
     {
         .name          = "default",
         .type          = AVMEDIA_TYPE_VIDEO,
-        .config_props  = config_output,
+        .rej_perms     = AV_PERM_WRITE,
+        .request_frame = request_frame,
     },
     { NULL }
 };

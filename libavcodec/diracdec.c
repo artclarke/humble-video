@@ -365,7 +365,7 @@ static void free_sequence_buffers(DiracContext *s)
 
     for (i = 0; i < MAX_FRAMES; i++) {
         if (s->all_frames[i].avframe.data[0]) {
-            av_frame_unref(&s->all_frames[i].avframe);
+            s->avctx->release_buffer(s->avctx, &s->all_frames[i].avframe);
             memset(s->all_frames[i].interpolated, 0, sizeof(s->all_frames[i].interpolated));
         }
 
@@ -1671,7 +1671,7 @@ static int dirac_decode_picture_header(DiracContext *s)
             for (j = 0; j < MAX_FRAMES; j++)
                 if (!s->all_frames[j].avframe.data[0]) {
                     s->ref_pics[i] = &s->all_frames[j];
-                    ff_get_buffer(s->avctx, &s->ref_pics[i]->avframe, AV_GET_BUFFER_FLAG_REF);
+                    ff_get_buffer(s->avctx, &s->ref_pics[i]->avframe);
                     break;
                 }
     }
@@ -1712,7 +1712,6 @@ static int get_delayed_pic(DiracContext *s, AVFrame *picture, int *got_frame)
 {
     DiracFrame *out = s->delay_frames[0];
     int i, out_idx  = 0;
-    int ret;
 
     /* find frame with lowest picture number */
     for (i = 1; s->delay_frames[i]; i++)
@@ -1727,8 +1726,7 @@ static int get_delayed_pic(DiracContext *s, AVFrame *picture, int *got_frame)
     if (out) {
         out->avframe.reference ^= DELAYED_PIC_REF;
         *got_frame = 1;
-        if((ret = av_frame_ref(picture, &out->avframe)) < 0)
-            return ret;
+        *(AVFrame *)picture = out->avframe;
     }
 
     return 0;
@@ -1747,7 +1745,7 @@ static int dirac_decode_data_unit(AVCodecContext *avctx, const uint8_t *buf, int
 {
     DiracContext *s   = avctx->priv_data;
     DiracFrame *pic   = NULL;
-    int ret, i, parse_code = buf[4];
+    int i, parse_code = buf[4];
     unsigned tmp;
 
     if (size < DATA_UNIT_HEADER_SIZE)
@@ -1811,8 +1809,10 @@ static int dirac_decode_data_unit(AVCodecContext *avctx, const uint8_t *buf, int
         pic->avframe.key_frame = s->num_refs == 0;             /* [DIRAC_STD] is_intra()      */
         pic->avframe.pict_type = s->num_refs + 1;              /* Definition of AVPictureType in avutil.h */
 
-        if ((ret = ff_get_buffer(avctx, &pic->avframe, (parse_code & 0x0C) == 0x0C ? AV_GET_BUFFER_FLAG_REF : 0)) < 0)
-            return ret;
+        if (ff_get_buffer(avctx, &pic->avframe) < 0) {
+            av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+            return -1;
+        }
         s->current_picture = pic;
         s->plane[0].stride = pic->avframe.linesize[0];
         s->plane[1].stride = pic->avframe.linesize[1];
@@ -1836,12 +1836,11 @@ static int dirac_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     uint8_t *buf        = pkt->data;
     int buf_size        = pkt->size;
     int i, data_unit_size, buf_idx = 0;
-    int ret;
 
     /* release unused frames */
     for (i = 0; i < MAX_FRAMES; i++)
         if (s->all_frames[i].avframe.data[0] && !s->all_frames[i].avframe.reference) {
-            av_frame_unref(&s->all_frames[i].avframe);
+            avctx->release_buffer(avctx, &s->all_frames[i].avframe);
             memset(s->all_frames[i].interpolated, 0, sizeof(s->all_frames[i].interpolated));
         }
 
@@ -1907,14 +1906,12 @@ static int dirac_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 
         if (delayed_frame) {
             delayed_frame->avframe.reference ^= DELAYED_PIC_REF;
-            if((ret=av_frame_ref(data, &delayed_frame->avframe)) < 0)
-                return ret;
+            *(AVFrame*)data = delayed_frame->avframe;
             *got_frame = 1;
         }
     } else if (s->current_picture->avframe.display_picture_number == s->frame_number) {
         /* The right frame at the right time :-) */
-        if((ret=av_frame_ref(data, &s->current_picture->avframe)) < 0)
-            return ret;
+        *(AVFrame*)data = s->current_picture->avframe;
         *got_frame = 1;
     }
 

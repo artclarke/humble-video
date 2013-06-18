@@ -232,6 +232,7 @@ static int yuv4_write_packet(AVFormatContext *s, AVPacket *pkt)
         }
     }
 
+    avio_flush(pb);
     return 0;
 }
 

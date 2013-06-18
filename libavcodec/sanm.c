@@ -46,7 +46,7 @@ typedef struct {
     int aligned_width, aligned_height;
     int prev_seq;
 
-    AVFrame *frame;
+    AVFrame frame, *output;
     uint16_t *frm0, *frm1, *frm2;
     uint8_t *stored_frame;
     uint32_t frm0_size, frm1_size, frm2_size;
@@ -274,6 +274,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "error allocating buffers\n");
         return AVERROR(ENOMEM);
     }
+    ctx->output          = &ctx->frame;
+    ctx->output->data[0] = 0;
 
     make_glyphs(ctx->p4x4glyphs[0], glyph4_x, glyph4_y, 4);
     make_glyphs(ctx->p8x8glyphs[0], glyph8_x, glyph8_y, 8);
@@ -299,6 +301,11 @@ static av_cold int decode_end(AVCodecContext *avctx)
     SANMVideoContext *ctx = avctx->priv_data;
 
     destroy_buffers(ctx);
+
+    if (ctx->frame.data[0]) {
+        avctx->release_buffer(avctx, &ctx->frame);
+        ctx->frame.data[0] = 0;
+    }
 
     return 0;
 }
@@ -765,7 +772,7 @@ static int process_frame_obj(SANMVideoContext *ctx)
         return old_codec47(ctx, top, left, w, h);
         break;
     default:
-        avpriv_request_sample(ctx->avctx, "unknown subcodec %d", codec);
+        av_log_ask_for_sample(ctx->avctx, "unknown subcodec %d\n", codec);
         return AVERROR_PATCHWELCOME;
     }
 }
@@ -789,7 +796,7 @@ static int decode_0(SANMVideoContext *ctx)
 
 static int decode_nop(SANMVideoContext *ctx)
 {
-    avpriv_request_sample(ctx->avctx, "unknown/unsupported compression type");
+    av_log_ask_for_sample(ctx->avctx, "unknown/unsupported compression type\n");
     return AVERROR_PATCHWELCOME;
 }
 
@@ -1149,11 +1156,13 @@ static int copy_output(SANMVideoContext *ctx, SANMFrameHeader *hdr)
     int ret, dstpitch, height = ctx->height;
     int srcpitch = ctx->pitch * (hdr ? sizeof(ctx->frm0[0]) : 1);
 
-    if ((ret = ff_get_buffer(ctx->avctx, ctx->frame, 0)) < 0)
+    if ((ret = ff_get_buffer(ctx->avctx, ctx->output)) < 0) {
+        av_log(ctx->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
 
-    dst      = ctx->frame->data[0];
-    dstpitch = ctx->frame->linesize[0];
+    dst      = ctx->output->data[0];
+    dstpitch = ctx->output->linesize[0];
 
     while (height--) {
         memcpy(dst, src, srcpitch);
@@ -1170,8 +1179,9 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     SANMVideoContext *ctx = avctx->priv_data;
     int i, ret;
 
-    ctx->frame = data;
     bytestream2_init(&ctx->gb, pkt->data, pkt->size);
+    if (ctx->output->data[0])
+        avctx->release_buffer(avctx, ctx->output);
 
     if (!ctx->version) {
         int to_store = 0;
@@ -1253,7 +1263,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
             memcpy(ctx->stored_frame, ctx->frm0, ctx->buf_size);
         if ((ret = copy_output(ctx, NULL)))
             return ret;
-        memcpy(ctx->frame->data[1], ctx->pal, 1024);
+        memcpy(ctx->output->data[1], ctx->pal, 1024);
     } else {
         SANMFrameHeader header;
 
@@ -1261,12 +1271,12 @@ static int decode_frame(AVCodecContext *avctx, void *data,
             return ret;
 
         ctx->rotate_code = header.rotate_code;
-        if ((ctx->frame->key_frame = !header.seq_num)) {
-            ctx->frame->pict_type = AV_PICTURE_TYPE_I;
+        if ((ctx->output->key_frame = !header.seq_num)) {
+            ctx->output->pict_type = AV_PICTURE_TYPE_I;
             fill_frame(ctx->frm1, ctx->npixels, header.bg_color);
             fill_frame(ctx->frm2, ctx->npixels, header.bg_color);
         } else {
-            ctx->frame->pict_type = AV_PICTURE_TYPE_P;
+            ctx->output->pict_type = AV_PICTURE_TYPE_P;
         }
 
         if (header.codec < FF_ARRAY_ELEMS(v1_decoders)) {
@@ -1276,7 +1286,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
                 return ret;
             }
         } else {
-            avpriv_request_sample(avctx, "subcodec %d",
+            av_log_ask_for_sample(avctx, "subcodec %d is not implemented\n",
                    header.codec);
             return AVERROR_PATCHWELCOME;
         }
@@ -1288,6 +1298,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
         rotate_bufs(ctx, ctx->rotate_code);
 
     *got_frame_ptr  = 1;
+    *(AVFrame*)data = *ctx->output;
 
     return pkt->size;
 }

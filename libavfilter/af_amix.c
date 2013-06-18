@@ -28,7 +28,6 @@
  * output.
  */
 
-#include "libavutil/attributes.h"
 #include "libavutil/audio_fifo.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
@@ -271,18 +270,18 @@ static int output_frame(AVFilterLink *outlink, int nb_samples)
 {
     AVFilterContext *ctx = outlink->src;
     MixContext      *s = ctx->priv;
-    AVFrame *out_buf, *in_buf;
+    AVFilterBufferRef *out_buf, *in_buf;
     int i;
 
     calculate_scales(s, nb_samples);
 
-    out_buf = ff_get_audio_buffer(outlink, nb_samples);
+    out_buf = ff_get_audio_buffer(outlink, AV_PERM_WRITE, nb_samples);
     if (!out_buf)
         return AVERROR(ENOMEM);
 
-    in_buf = ff_get_audio_buffer(outlink, nb_samples);
+    in_buf = ff_get_audio_buffer(outlink, AV_PERM_WRITE, nb_samples);
     if (!in_buf) {
-        av_frame_free(&out_buf);
+        avfilter_unref_buffer(out_buf);
         return AVERROR(ENOMEM);
     }
 
@@ -304,7 +303,7 @@ static int output_frame(AVFilterLink *outlink, int nb_samples)
             }
         }
     }
-    av_frame_free(&in_buf);
+    avfilter_unref_buffer(in_buf);
 
     out_buf->pts = s->next_pts;
     if (s->next_pts != AV_NOPTS_VALUE)
@@ -451,7 +450,7 @@ static int request_frame(AVFilterLink *outlink)
     return output_frame(outlink, available_samples);
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *buf)
 {
     AVFilterContext  *ctx = inlink->dst;
     MixContext       *s = ctx->priv;
@@ -470,24 +469,31 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
     if (i == 0) {
         int64_t pts = av_rescale_q(buf->pts, inlink->time_base,
                                    outlink->time_base);
-        ret = frame_list_add_frame(s->frame_list, buf->nb_samples, pts);
+        ret = frame_list_add_frame(s->frame_list, buf->audio->nb_samples, pts);
         if (ret < 0)
             goto fail;
     }
 
     ret = av_audio_fifo_write(s->fifos[i], (void **)buf->extended_data,
-                              buf->nb_samples);
+                              buf->audio->nb_samples);
 
 fail:
-    av_frame_free(&buf);
+    avfilter_unref_buffer(buf);
 
     return ret;
 }
 
-static av_cold int init(AVFilterContext *ctx)
+static int init(AVFilterContext *ctx, const char *args)
 {
     MixContext *s = ctx->priv;
-    int i;
+    int i, ret;
+
+    s->class = &amix_class;
+    av_opt_set_defaults(s);
+
+    if ((ret = av_set_options_string(s, args, "=", ":")) < 0)
+        return ret;
+    av_opt_free(s);
 
     for (i = 0; i < s->nb_inputs; i++) {
         char name[32];
@@ -506,7 +512,7 @@ static av_cold int init(AVFilterContext *ctx)
     return 0;
 }
 
-static av_cold void uninit(AVFilterContext *ctx)
+static void uninit(AVFilterContext *ctx)
 {
     int i;
     MixContext *s = ctx->priv;
@@ -550,7 +556,6 @@ AVFilter avfilter_af_amix = {
     .name          = "amix",
     .description   = NULL_IF_CONFIG_SMALL("Audio mixing."),
     .priv_size     = sizeof(MixContext),
-    .priv_class    = &amix_class,
 
     .init           = init,
     .uninit         = uninit,
@@ -558,6 +563,5 @@ AVFilter avfilter_af_amix = {
 
     .inputs    = NULL,
     .outputs   = avfilter_af_amix_outputs,
-
-    .flags     = AVFILTER_FLAG_DYNAMIC_INPUTS,
+    .priv_class = &amix_class,
 };

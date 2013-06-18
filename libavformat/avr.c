@@ -27,7 +27,7 @@
 static int avr_probe(AVProbeData *p)
 {
     if (AV_RL32(p->buf) == MKTAG('2', 'B', 'I', 'T'))
-        return AVPROBE_SCORE_EXTENSION;
+        return AVPROBE_SCORE_MAX / 2;
     return 0;
 }
 
@@ -51,7 +51,7 @@ static int avr_read_header(AVFormatContext *s)
     } else if (chan == 0xFFFFu) {
         st->codec->channels = 2;
     } else {
-        avpriv_request_sample(s, "chan %d", chan);
+        av_log_ask_for_sample(s, "unknown number of channels\n");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -78,7 +78,7 @@ static int avr_read_header(AVFormatContext *s)
     } else if (sign == 0xFFFFu && bps == 16) {
         st->codec->codec_id = AV_CODEC_ID_PCM_S16BE;
     } else {
-        avpriv_request_sample(s, "bits per sample %d", bps);
+        av_log_ask_for_sample(s, "unknown bits per sample\n");
         return AVERROR_PATCHWELCOME;
     }
 

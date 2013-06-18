@@ -27,6 +27,8 @@
  * @see http://linux-fbdev.sourceforge.net/
  */
 
+/* #define DEBUG */
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>

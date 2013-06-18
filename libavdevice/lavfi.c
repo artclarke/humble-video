@@ -51,7 +51,6 @@ typedef struct {
     int *sink_stream_map;
     int *sink_eof;
     int *stream_sink_map;
-    AVFrame *decoded_frame;
 } LavfiContext;
 
 static int *create_all_formats(int n)
@@ -60,7 +59,7 @@ static int *create_all_formats(int n)
 
     for (i = 0; i < n; i++) {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(i);
-        if (!(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
+        if (!(desc->flags & PIX_FMT_HWACCEL))
             count++;
     }
 
@@ -68,7 +67,7 @@ static int *create_all_formats(int n)
         return NULL;
     for (j = 0, i = 0; i < n; i++) {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(i);
-        if (!(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
+        if (!(desc->flags & PIX_FMT_HWACCEL))
             fmts[j++] = i;
     }
     fmts[j] = -1;
@@ -84,7 +83,6 @@ av_cold static int lavfi_read_close(AVFormatContext *avctx)
     av_freep(&lavfi->stream_sink_map);
     av_freep(&lavfi->sinks);
     avfilter_graph_free(&lavfi->graph);
-    av_frame_free(&lavfi->decoded_frame);
 
     return 0;
 }
@@ -105,8 +103,8 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
 
     avfilter_register_all();
 
-    buffersink = avfilter_get_by_name("buffersink");
-    abuffersink = avfilter_get_by_name("abuffersink");
+    buffersink = avfilter_get_by_name("ffbuffersink");
+    abuffersink = avfilter_get_by_name("ffabuffersink");
 
     if (lavfi->graph_filename && lavfi->graph_str) {
         av_log(avctx, AV_LOG_ERROR,
@@ -227,11 +225,14 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
         }
 
         if (type == AVMEDIA_TYPE_VIDEO) {
+            AVBufferSinkParams *buffersink_params = av_buffersink_params_alloc();
+
+            buffersink_params->pixel_fmts = pix_fmts;
             ret = avfilter_graph_create_filter(&sink, buffersink,
                                                inout->name, NULL,
-                                               NULL, lavfi->graph);
-            if (ret >= 0)
-                ret = av_opt_set_int_list(sink, "pix_fmts", pix_fmts,  AV_PIX_FMT_NONE, AV_OPT_SEARCH_CHILDREN);
+                                               buffersink_params, lavfi->graph);
+            av_freep(&buffersink_params);
+
             if (ret < 0)
                 goto end;
         } else if (type == AVMEDIA_TYPE_AUDIO) {
@@ -240,12 +241,13 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
                                                   AV_SAMPLE_FMT_S32,
                                                   AV_SAMPLE_FMT_FLT,
                                                   AV_SAMPLE_FMT_DBL, -1 };
+            AVABufferSinkParams *abuffersink_params = av_abuffersink_params_alloc();
+            abuffersink_params->sample_fmts = sample_fmts;
 
             ret = avfilter_graph_create_filter(&sink, abuffersink,
                                                inout->name, NULL,
-                                               NULL, lavfi->graph);
-            if (ret >= 0)
-                ret = av_opt_set_int_list(sink, "sample_fmts", sample_fmts,  AV_SAMPLE_FMT_NONE, AV_OPT_SEARCH_CHILDREN);
+                                               abuffersink_params, lavfi->graph);
+            av_free(abuffersink_params);
             if (ret < 0)
                 goto end;
         }
@@ -298,9 +300,6 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
         }
     }
 
-    if (!(lavfi->decoded_frame = av_frame_alloc()))
-        FAIL(AVERROR(ENOMEM));
-
 end:
     av_free(pix_fmts);
     avfilter_inout_free(&input_links);
@@ -315,9 +314,8 @@ static int lavfi_read_packet(AVFormatContext *avctx, AVPacket *pkt)
     LavfiContext *lavfi = avctx->priv_data;
     double min_pts = DBL_MAX;
     int stream_idx, min_pts_sink_idx = 0;
-    AVFrame *frame = lavfi->decoded_frame;
+    AVFilterBufferRef *ref;
     AVPicture pict;
-    AVDictionary *frame_metadata;
     int ret, i;
     int size = 0;
 
@@ -331,17 +329,16 @@ static int lavfi_read_packet(AVFormatContext *avctx, AVPacket *pkt)
         if (lavfi->sink_eof[i])
             continue;
 
-        ret = av_buffersink_get_frame_flags(lavfi->sinks[i], frame,
-                                            AV_BUFFERSINK_FLAG_PEEK);
+        ret = av_buffersink_get_buffer_ref(lavfi->sinks[i],
+                                       &ref, AV_BUFFERSINK_FLAG_PEEK);
         if (ret == AVERROR_EOF) {
             av_dlog(avctx, "EOF sink_idx:%d\n", i);
             lavfi->sink_eof[i] = 1;
             continue;
         } else if (ret < 0)
             return ret;
-        d = av_rescale_q(frame->pts, tb, AV_TIME_BASE_Q);
+        d = av_rescale_q(ref->pts, tb, AV_TIME_BASE_Q);
         av_dlog(avctx, "sink_idx:%d time:%f\n", i, d);
-        av_frame_unref(frame);
 
         if (d < min_pts) {
             min_pts = d;
@@ -353,35 +350,35 @@ static int lavfi_read_packet(AVFormatContext *avctx, AVPacket *pkt)
 
     av_dlog(avctx, "min_pts_sink_idx:%i\n", min_pts_sink_idx);
 
-    av_buffersink_get_frame_flags(lavfi->sinks[min_pts_sink_idx], frame, 0);
+    av_buffersink_get_buffer_ref(lavfi->sinks[min_pts_sink_idx], &ref, 0);
     stream_idx = lavfi->sink_stream_map[min_pts_sink_idx];
 
-    if (frame->width /* FIXME best way of testing a video */) {
-        size = avpicture_get_size(frame->format, frame->width, frame->height);
+    if (ref->video) {
+        size = avpicture_get_size(ref->format, ref->video->w, ref->video->h);
         if ((ret = av_new_packet(pkt, size)) < 0)
             return ret;
 
-        memcpy(pict.data,     frame->data,     4*sizeof(frame->data[0]));
-        memcpy(pict.linesize, frame->linesize, 4*sizeof(frame->linesize[0]));
+        memcpy(pict.data,     ref->data,     4*sizeof(ref->data[0]));
+        memcpy(pict.linesize, ref->linesize, 4*sizeof(ref->linesize[0]));
 
-        avpicture_layout(&pict, frame->format, frame->width, frame->height,
-                         pkt->data, size);
-    } else if (av_frame_get_channels(frame) /* FIXME test audio */) {
-        size = frame->nb_samples * av_get_bytes_per_sample(frame->format) *
-                                   av_frame_get_channels(frame);
+        avpicture_layout(&pict, ref->format, ref->video->w,
+                         ref->video->h, pkt->data, size);
+    } else if (ref->audio) {
+        size = ref->audio->nb_samples *
+            av_get_bytes_per_sample(ref->format) *
+            av_get_channel_layout_nb_channels(ref->audio->channel_layout);
         if ((ret = av_new_packet(pkt, size)) < 0)
             return ret;
-        memcpy(pkt->data, frame->data[0], size);
+        memcpy(pkt->data, ref->data[0], size);
     }
 
-    frame_metadata = av_frame_get_metadata(frame);
-    if (frame_metadata) {
+    if (ref->metadata) {
         uint8_t *metadata;
         AVDictionaryEntry *e = NULL;
         AVBPrint meta_buf;
 
         av_bprint_init(&meta_buf, 0, AV_BPRINT_SIZE_UNLIMITED);
-        while ((e = av_dict_get(frame_metadata, "", e, AV_DICT_IGNORE_SUFFIX))) {
+        while ((e = av_dict_get(ref->metadata, "", e, AV_DICT_IGNORE_SUFFIX))) {
             av_bprintf(&meta_buf, "%s", e->key);
             av_bprint_chars(&meta_buf, '\0', 1);
             av_bprintf(&meta_buf, "%s", e->value);
@@ -398,10 +395,10 @@ static int lavfi_read_packet(AVFormatContext *avctx, AVPacket *pkt)
     }
 
     pkt->stream_index = stream_idx;
-    pkt->pts = frame->pts;
-    pkt->pos = av_frame_get_pkt_pos(frame);
+    pkt->pts = ref->pts;
+    pkt->pos = ref->pos;
     pkt->size = size;
-    av_frame_unref(frame);
+    avfilter_unref_buffer(ref);
     return size;
 }
 

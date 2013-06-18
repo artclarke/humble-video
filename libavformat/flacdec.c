@@ -34,8 +34,7 @@ static int parse_picture(AVFormatContext *s, uint8_t *buf, int buf_size)
 {
     const CodecMime *mime = ff_id3v2_mime_tags;
     enum  AVCodecID      id = AV_CODEC_ID_NONE;
-    AVBufferRef *data = NULL;
-    uint8_t mimetype[64], *desc = NULL;
+    uint8_t mimetype[64], *desc = NULL, *data = NULL;
     AVIOContext *pb = NULL;
     AVStream *st;
     int type, width, height;
@@ -111,10 +110,10 @@ static int parse_picture(AVFormatContext *s, uint8_t *buf, int buf_size)
             ret = AVERROR_INVALIDDATA;
         goto fail;
     }
-    if (!(data = av_buffer_alloc(len))) {
+    if (!(data = av_malloc(len))) {
         RETURN_ERROR(AVERROR(ENOMEM));
     }
-    if (avio_read(pb, data->data, len) != len) {
+    if (avio_read(pb, data, len) != len) {
         av_log(s, AV_LOG_ERROR, "Error reading attached picture data.\n");
         if (s->error_recognition & AV_EF_EXPLODE)
             ret = AVERROR(EIO);
@@ -127,9 +126,9 @@ static int parse_picture(AVFormatContext *s, uint8_t *buf, int buf_size)
     }
 
     av_init_packet(&st->attached_pic);
-    st->attached_pic.buf          = data;
-    st->attached_pic.data         = data->data;
+    st->attached_pic.data         = data;
     st->attached_pic.size         = len;
+    st->attached_pic.destruct     = av_destruct_packet;
     st->attached_pic.stream_index = st->index;
     st->attached_pic.flags       |= AV_PKT_FLAG_KEY;
 
@@ -147,8 +146,8 @@ static int parse_picture(AVFormatContext *s, uint8_t *buf, int buf_size)
     return 0;
 
 fail:
-    av_buffer_unref(&data);
     av_freep(&desc);
+    av_freep(&data);
     av_freep(&pb);
     return ret;
 
@@ -278,9 +277,11 @@ fail:
 
 static int flac_probe(AVProbeData *p)
 {
-    if (p->buf_size < 4 || memcmp(p->buf, "fLaC", 4))
-        return 0;
-    return AVPROBE_SCORE_EXTENSION;
+    const uint8_t *bufptr = p->buf;
+    const uint8_t *end    = p->buf + p->buf_size;
+
+    if(bufptr > end-4 || memcmp(bufptr, "fLaC", 4)) return 0;
+    else                                            return AVPROBE_SCORE_MAX/2;
 }
 
 AVInputFormat ff_flac_demuxer = {

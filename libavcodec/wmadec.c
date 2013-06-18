@@ -33,7 +33,6 @@
  * should be 4 extra bytes for v1 data and 6 extra bytes for v2 data.
  */
 
-#include "libavutil/attributes.h"
 #include "avcodec.h"
 #include "internal.h"
 #include "wma.h"
@@ -67,16 +66,11 @@ static void dump_floats(WMACodecContext *s, const char *name, int prec, const fl
 }
 #endif
 
-static av_cold int wma_decode_init(AVCodecContext * avctx)
+static int wma_decode_init(AVCodecContext * avctx)
 {
     WMACodecContext *s = avctx->priv_data;
     int i, flags2;
     uint8_t *extradata;
-
-    if (!avctx->block_align) {
-        av_log(avctx, AV_LOG_ERROR, "block_align is not set\n");
-        return AVERROR(EINVAL);
-    }
 
     s->avctx = avctx;
 
@@ -151,7 +145,7 @@ static inline float pow_m1_4(WMACodecContext *s, float x)
     return s->lsp_pow_e_table[e] * (a + b * t.f);
 }
 
-static av_cold void wma_lsp_to_curve_init(WMACodecContext *s, int frame_len)
+static void wma_lsp_to_curve_init(WMACodecContext *s, int frame_len)
 {
     float wdel, a, b;
     int i, e, m;
@@ -843,8 +837,10 @@ static int wma_decode_superframe(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = nb_frames * s->frame_len;
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
     samples = (float **)frame->extended_data;
     samples_offset = 0;
 

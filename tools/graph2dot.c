@@ -28,7 +28,7 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
-#include "libavfilter/avfilter.h"
+#include "libavfilter/avfiltergraph.h"
 
 #if !HAVE_GETOPT
 #include "compat/getopt.c"
@@ -58,7 +58,7 @@ static void print_digraph(FILE *outfile, AVFilterGraph *graph)
     fprintf(outfile, "node [shape=box]\n");
     fprintf(outfile, "rankdir=LR\n");
 
-    for (i = 0; i < graph->nb_filters; i++) {
+    for (i = 0; i < graph->filter_count; i++) {
         char filter_ctx_label[128];
         const AVFilterContext *filter_ctx = graph->filters[i];
 

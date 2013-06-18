@@ -21,7 +21,6 @@
 
 #include "avcodec.h"
 #include "get_bits.h"
-#include "internal.h"
 
 
 typedef struct {
@@ -60,8 +59,11 @@ avs_decode_frame(AVCodecContext * avctx,
     AvsBlockType type;
     GetBitContext change_map = {0}; //init to silence warning
 
-    if ((ret = ff_reget_buffer(avctx, p)) < 0)
+    if ((ret = avctx->reget_buffer(avctx, p)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
         return ret;
+    }
+    p->reference = 3;
     p->pict_type = AV_PICTURE_TYPE_P;
     p->key_frame = 0;
 
@@ -149,8 +151,7 @@ avs_decode_frame(AVCodecContext * avctx,
             align_get_bits(&change_map);
     }
 
-    if ((ret = av_frame_ref(picture, &avs->picture)) < 0)
-        return ret;
+    *picture   = avs->picture;
     *got_frame = 1;
 
     return buf_size;
@@ -158,17 +159,18 @@ avs_decode_frame(AVCodecContext * avctx,
 
 static av_cold int avs_decode_init(AVCodecContext * avctx)
 {
-    AvsContext *s = avctx->priv_data;
+    AvsContext *const avs = avctx->priv_data;
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
+    avcodec_get_frame_defaults(&avs->picture);
     avcodec_set_dimensions(avctx, 318, 198);
-    avcodec_get_frame_defaults(&s->picture);
     return 0;
 }
 
 static av_cold int avs_decode_end(AVCodecContext *avctx)
 {
     AvsContext *s = avctx->priv_data;
-    av_frame_unref(&s->picture);
+    if (s->picture.data[0])
+        avctx->release_buffer(avctx, &s->picture);
     return 0;
 }
 

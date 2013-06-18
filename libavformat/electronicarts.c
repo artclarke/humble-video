@@ -184,7 +184,7 @@ static int process_audio_header_elements(AVFormatContext *s)
         case  3: ea->audio_codec = AV_CODEC_ID_ADPCM_EA_R3; break;
         case -1: break;
         default:
-            avpriv_request_sample(s, "stream type; revision=%i", revision);
+            av_log_ask_for_sample(s, "unsupported stream type; revision=%i\n", revision);
             return 0;
         }
         switch (revision2) {
@@ -195,7 +195,7 @@ static int process_audio_header_elements(AVFormatContext *s)
             case  2: ea->audio_codec = AV_CODEC_ID_ADPCM_EA_R1; break;
             case  3: ea->audio_codec = AV_CODEC_ID_ADPCM_EA_R2; break;
             default:
-                avpriv_request_sample(s, "stream type; revision=%i, revision2=%i", revision, revision2);
+                av_log_ask_for_sample(s, "unsupported stream type; revision=%i, revision2=%i\n", revision, revision2);
                 return 0;
             }
             break;
@@ -203,12 +203,12 @@ static int process_audio_header_elements(AVFormatContext *s)
         case -1: break;
         default:
             ea->audio_codec = AV_CODEC_ID_NONE;
-            avpriv_request_sample(s, "stream type; revision2=%i", revision2);
+            av_log_ask_for_sample(s, "unsupported stream type; revision2=%i\n", revision2);
             return 0;
         }
         break;
     default:
-        avpriv_request_sample(s, "stream type; compression_type=%i", compression_type);
+        av_log_ask_for_sample(s, "unsupported stream type; compression_type=%i\n", compression_type);
         return 0;
     }
 
@@ -244,7 +244,7 @@ static int process_audio_header_eacs(AVFormatContext *s)
     case 1: ea->audio_codec = AV_CODEC_ID_PCM_MULAW; ea->bytes = 1; break;
     case 2: ea->audio_codec = AV_CODEC_ID_ADPCM_IMA_EA_EACS; break;
     default:
-        avpriv_request_sample(s, "stream type; audio compression_type=%i", compression_type);
+        av_log_ask_for_sample(s, "unsupported stream type; audio compression_type=%i\n", compression_type);
     }
 
     return 1;
@@ -289,10 +289,6 @@ static int process_video_header_vp6(AVFormatContext *s)
     avio_skip(pb, 4);
     ea->time_base.den = avio_rl32(pb);
     ea->time_base.num = avio_rl32(pb);
-    if (ea->time_base.den <= 0 || ea->time_base.num <= 0) {
-        av_log(s, AV_LOG_ERROR, "Timebase is invalid\n");
-        return AVERROR_INVALIDDATA;
-    }
     ea->video_codec = AV_CODEC_ID_VP6;
 
     return 1;
@@ -336,7 +332,7 @@ static int process_ea_header(AVFormatContext *s) {
         switch (blockid) {
             case ISNh_TAG:
                 if (avio_rl32(pb) != EACS_TAG) {
-                    avpriv_request_sample(s, "unknown 1SNh headerid");
+                    av_log_ask_for_sample(s, "unknown 1SNh headerid\n");
                     return 0;
                 }
                 err = process_audio_header_eacs(s);
@@ -348,7 +344,7 @@ static int process_ea_header(AVFormatContext *s) {
                 if (blockid == GSTR_TAG) {
                     avio_skip(pb, 4);
                 } else if ((blockid & 0xFFFF)!=PT00_TAG) {
-                    avpriv_request_sample(s, "unknown SCHl headerid");
+                    av_log_ask_for_sample(s, "unknown SCHl headerid\n");
                     return 0;
                 }
                 err = process_audio_header_elements(s);
@@ -535,7 +531,7 @@ static int ea_read_packet(AVFormatContext *s,
                 chunk_size -= 12;
             }
             if (partial_packet) {
-                avpriv_request_sample(s, "video header followed by audio packet");
+                av_log_ask_for_sample(s, "video header followed by audio packet not supported.\n");
                 av_free_packet(pkt);
                 partial_packet = 0;
             }

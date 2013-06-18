@@ -27,19 +27,29 @@
 static av_cold int avui_decode_init(AVCodecContext *avctx)
 {
     avctx->pix_fmt = AV_PIX_FMT_YUVA422P;
+
+    avctx->coded_frame = avcodec_alloc_frame();
+
+    if (!avctx->coded_frame) {
+        av_log(avctx, AV_LOG_ERROR, "Could not allocate frame.\n");
+        return AVERROR(ENOMEM);
+    }
+
     return 0;
 }
 
 static int avui_decode_frame(AVCodecContext *avctx, void *data,
                              int *got_frame, AVPacket *avpkt)
 {
-    int ret;
-    AVFrame *pic = data;
+    AVFrame *pic = avctx->coded_frame;
     const uint8_t *src = avpkt->data, *extradata = avctx->extradata;
     const uint8_t *srca;
     uint8_t *y, *u, *v, *a;
     int transparent, interlaced = 1, skip, opaque_length, i, j, k;
     uint32_t extradata_size = avctx->extradata_size;
+
+    if (pic->data[0])
+        avctx->release_buffer(avctx, pic);
 
     while (extradata_size >= 24) {
         uint32_t atom_size = AV_RB32(extradata);
@@ -68,8 +78,12 @@ static int avui_decode_frame(AVCodecContext *avctx, void *data,
                   avpkt->size >= opaque_length * 2 + 4;
     srca = src + opaque_length + 5;
 
-    if ((ret = ff_get_buffer(avctx, pic, 0)) < 0)
-        return ret;
+    pic->reference = 0;
+
+    if (ff_get_buffer(avctx, pic) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Could not allocate buffer.\n");
+        return AVERROR(ENOMEM);
+    }
 
     pic->key_frame = 1;
     pic->pict_type = AV_PICTURE_TYPE_I;
@@ -115,8 +129,19 @@ static int avui_decode_frame(AVCodecContext *avctx, void *data,
         srca += 4;
     }
     *got_frame       = 1;
+    *(AVFrame *)data = *pic;
 
     return avpkt->size;
+}
+
+static av_cold int avui_decode_close(AVCodecContext *avctx)
+{
+    if (avctx->coded_frame->data[0])
+        avctx->release_buffer(avctx, avctx->coded_frame);
+
+    av_freep(&avctx->coded_frame);
+
+    return 0;
 }
 
 AVCodec ff_avui_decoder = {
@@ -125,6 +150,7 @@ AVCodec ff_avui_decoder = {
     .id           = AV_CODEC_ID_AVUI,
     .init         = avui_decode_init,
     .decode       = avui_decode_frame,
+    .close        = avui_decode_close,
     .capabilities = CODEC_CAP_DR1,
     .long_name    = NULL_IF_CONFIG_SMALL("Avid Meridien Uncompressed"),
 };

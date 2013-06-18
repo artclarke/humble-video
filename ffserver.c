@@ -308,7 +308,7 @@ static int rtp_new_av_stream(HTTPContext *c,
 
 static const char *my_program_name;
 
-static const char *config_filename;
+static const char *config_filename = "/etc/ffserver.conf";
 
 static int ffserver_debug;
 static int no_launch;
@@ -396,14 +396,14 @@ static int resolve_host(struct in_addr *sin_addr, const char *hostname)
     return 0;
 }
 
-static char *ctime1(char *buf2, int buf_size)
+static char *ctime1(char *buf2)
 {
     time_t ti;
     char *p;
 
     ti = time(NULL);
     p = ctime(&ti);
-    av_strlcpy(buf2, p, buf_size);
+    strcpy(buf2, p);
     p = buf2 + strlen(p) - 1;
     if (*p == '\n')
         *p = '\0';
@@ -416,7 +416,7 @@ static void http_vlog(const char *fmt, va_list vargs)
     if (logfile) {
         if (print_prefix) {
             char buf[32];
-            ctime1(buf, sizeof(buf));
+            ctime1(buf);
             fprintf(logfile, "%s ", buf);
         }
         print_prefix = strstr(fmt, "\n") != NULL;
@@ -3974,7 +3974,6 @@ static void load_module(const char *filename)
                 "%s: init function 'ffserver_module_init()' not found\n",
                 filename);
         dlclose(dll);
-        return;
     }
 
     init_func();
@@ -4152,7 +4151,7 @@ static int parse_ffconfig(const char *filename)
         } else if (!av_strcasecmp(cmd, "MaxBandwidth")) {
             int64_t llval;
             get_arg(arg, sizeof(arg), &p);
-            llval = strtoll(arg, NULL, 10);
+            llval = atoll(arg);
             if (llval < 10 || llval > 10000000) {
                 ERROR("Invalid MaxBandwidth: %s\n", arg);
             } else
@@ -4546,6 +4545,14 @@ static int parse_ffconfig(const char *filename)
                     ERROR("VideoQMin out of range\n");
                 }
             }
+        } else if (!av_strcasecmp(cmd, "LumaElim")) {
+            get_arg(arg, sizeof(arg), &p);
+            if (stream)
+                video_enc.luma_elim_threshold = atoi(arg);
+        } else if (!av_strcasecmp(cmd, "ChromaElim")) {
+            get_arg(arg, sizeof(arg), &p);
+            if (stream)
+                video_enc.chroma_elim_threshold = atoi(arg);
         } else if (!av_strcasecmp(cmd, "LumiMask")) {
             get_arg(arg, sizeof(arg), &p);
             if (stream)
@@ -4717,9 +4724,6 @@ int main(int argc, char **argv)
 
     parse_options(NULL, argc, argv, options, NULL);
 
-    if (!config_filename)
-        config_filename = av_strdup("/etc/ffserver.conf");
-
     unsetenv("http_proxy");             /* Kill the http_proxy */
 
     av_lfg_init(&random_state, av_get_random_seed());
@@ -4732,7 +4736,6 @@ int main(int argc, char **argv)
         fprintf(stderr, "Incorrect config file - exiting.\n");
         exit(1);
     }
-    av_freep(&config_filename);
 
     /* open log file if needed */
     if (logfilename[0] != '\0') {

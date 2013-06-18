@@ -22,6 +22,9 @@
 #ifndef AVFORMAT_NUT_H
 #define AVFORMAT_NUT_H
 
+//#include <limits.h>
+//#include "libavutil/adler32.h"
+//#include "libavcodec/mpegaudio.h"
 #include "avformat.h"
 #include "internal.h"
 #include "metadata.h"
@@ -35,8 +38,6 @@
 #define ID_STRING "nut/multimedia container\0"
 
 #define MAX_DISTANCE (1024*32-1)
-
-#define NUT_VERSION 3
 
 typedef enum{
     FLAG_KEY        =   1, ///<if set, frame is keyframe

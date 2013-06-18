@@ -78,9 +78,6 @@ Duration of the file. This information can be specified from the file;
 specifying it here may be more efficient or help if the information from the
 file is not available or accurate.
 
-If the duration is set for all files, then it is possible to seek in the
-whole concatenated video.
-
 @end table
 
 @subsection Options
@@ -103,18 +100,6 @@ probed and 0 otherwise.
 
 @end table
 
-@section libquvi
-
-Play media from Internet services using the quvi project.
-
-The demuxer accepts a @option{format} option to request a specific quality. It
-is by default set to @var{best}.
-
-See @url{http://quvi.sourceforge.net/} for more information.
-
-FFmpeg needs to be built with @code{--enable-libquvi} for this demuxer to be
-enabled.
-
 @section image2
 
 Image file demuxer.
@@ -132,7 +117,7 @@ same for all the files in the sequence.
 This demuxer accepts the following options:
 @table @option
 @item framerate
-Set the frame rate for the video stream. It defaults to 25.
+Set the framerate for the video stream. It defaults to 25.
 @item loop
 If set to 1, loop over the input. Default value is 0.
 @item pattern_type
@@ -210,10 +195,6 @@ to read from. Default value is 0.
 Set the index interval range to check when looking for the first image
 file in the sequence, starting from @var{start_number}. Default value
 is 5.
-@item ts_from_file
-If set to 1, will set frame timestamp to modification time of image file. Note
-that monotonity of timestamps is not provided: images go in the same order as
-without this option. Default value is 0.
 @item video_size
 Set the video size of the images to read. If not specified the video
 size is guessed from the first image file in the sequence.

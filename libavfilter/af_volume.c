@@ -24,7 +24,7 @@
  * audio volume filter
  */
 
-#include "libavutil/channel_layout.h"
+#include "libavutil/audioconvert.h"
 #include "libavutil/common.h"
 #include "libavutil/eval.h"
 #include "libavutil/float_dsp.h"
@@ -56,9 +56,17 @@ static const AVOption volume_options[] = {
 
 AVFILTER_DEFINE_CLASS(volume);
 
-static av_cold int init(AVFilterContext *ctx)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     VolumeContext *vol = ctx->priv;
+    static const char *shorthand[] = { "volume", "precision", NULL };
+    int ret;
+
+    vol->class = &volume_class;
+    av_opt_set_defaults(vol);
+
+    if ((ret = av_opt_set_from_string(vol, args, shorthand, "=", ":")) < 0)
+        return ret;
 
     if (vol->precision == PRECISION_FIXED) {
         vol->volume_i = (int)(vol->volume * 256 + 0.5);
@@ -71,7 +79,8 @@ static av_cold int init(AVFilterContext *ctx)
                precision_str[vol->precision]);
     }
 
-    return 0;
+    av_opt_free(vol);
+    return ret;
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -80,7 +89,8 @@ static int query_formats(AVFilterContext *ctx)
     AVFilterFormats *formats = NULL;
     AVFilterChannelLayouts *layouts;
     static const enum AVSampleFormat sample_fmts[][7] = {
-        [PRECISION_FIXED] = {
+        /* PRECISION_FIXED */
+        {
             AV_SAMPLE_FMT_U8,
             AV_SAMPLE_FMT_U8P,
             AV_SAMPLE_FMT_S16,
@@ -89,12 +99,14 @@ static int query_formats(AVFilterContext *ctx)
             AV_SAMPLE_FMT_S32P,
             AV_SAMPLE_FMT_NONE
         },
-        [PRECISION_FLOAT] = {
+        /* PRECISION_FLOAT */
+        {
             AV_SAMPLE_FMT_FLT,
             AV_SAMPLE_FMT_FLTP,
             AV_SAMPLE_FMT_NONE
         },
-        [PRECISION_DOUBLE] = {
+        /* PRECISION_DOUBLE */
+        {
             AV_SAMPLE_FMT_DBL,
             AV_SAMPLE_FMT_DBLP,
             AV_SAMPLE_FMT_NONE
@@ -165,7 +177,7 @@ static inline void scale_samples_s32(uint8_t *dst, const uint8_t *src,
         smp_dst[i] = av_clipl_int32((((int64_t)smp_src[i] * volume + 128) >> 8));
 }
 
-static av_cold void volume_init(VolumeContext *vol)
+static void volume_init(VolumeContext *vol)
 {
     vol->samples_align = 1;
 
@@ -214,24 +226,24 @@ static int config_output(AVFilterLink *outlink)
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *buf)
 {
     VolumeContext *vol    = inlink->dst->priv;
     AVFilterLink *outlink = inlink->dst->outputs[0];
-    int nb_samples        = buf->nb_samples;
-    AVFrame *out_buf;
+    int nb_samples        = buf->audio->nb_samples;
+    AVFilterBufferRef *out_buf;
 
     if (vol->volume == 1.0 || vol->volume_i == 256)
         return ff_filter_frame(outlink, buf);
 
     /* do volume scaling in-place if input buffer is writable */
-    if (av_frame_is_writable(buf)) {
+    if (buf->perms & AV_PERM_WRITE) {
         out_buf = buf;
     } else {
-        out_buf = ff_get_audio_buffer(inlink, nb_samples);
+        out_buf = ff_get_audio_buffer(inlink, AV_PERM_WRITE, nb_samples);
         if (!out_buf)
             return AVERROR(ENOMEM);
-        av_frame_copy_props(out_buf, buf);
+        out_buf->pts = buf->pts;
     }
 
     if (vol->precision != PRECISION_FIXED || vol->volume_i > 0) {
@@ -264,7 +276,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
     }
 
     if (buf != out_buf)
-        av_frame_free(&buf);
+        avfilter_unref_buffer(buf);
 
     return ff_filter_frame(outlink, out_buf);
 }
@@ -292,9 +304,8 @@ AVFilter avfilter_af_volume = {
     .description    = NULL_IF_CONFIG_SMALL("Change input volume."),
     .query_formats  = query_formats,
     .priv_size      = sizeof(VolumeContext),
-    .priv_class     = &volume_class,
     .init           = init,
     .inputs         = avfilter_af_volume_inputs,
     .outputs        = avfilter_af_volume_outputs,
-    .flags          = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
+    .priv_class     = &volume_class,
 };

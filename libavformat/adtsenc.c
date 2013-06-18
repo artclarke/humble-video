@@ -158,6 +158,7 @@ static int adts_write_packet(AVFormatContext *s, AVPacket *pkt)
         }
     }
     avio_write(pb, pkt->data, pkt->size);
+    avio_flush(pb);
 
     return 0;
 }

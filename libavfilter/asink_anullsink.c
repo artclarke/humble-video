@@ -22,9 +22,9 @@
 #include "avfilter.h"
 #include "internal.h"
 
-static int null_filter_frame(AVFilterLink *link, AVFrame *frame)
+static int null_filter_frame(AVFilterLink *link, AVFilterBufferRef *samplesref)
 {
-    av_frame_free(&frame);
+    avfilter_unref_bufferp(&samplesref);
     return 0;
 }
 

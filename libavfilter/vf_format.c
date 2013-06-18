@@ -28,8 +28,6 @@
 #include "libavutil/internal.h"
 #include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
-#include "libavutil/opt.h"
-
 #include "avfilter.h"
 #include "internal.h"
 #include "formats.h"
@@ -37,8 +35,6 @@
 #include "video.h"
 
 typedef struct {
-    const AVClass *class;
-    char *pix_fmts;
     /**
      * List of flags telling if a given image format has been listed
      * as argument to the filter.
@@ -48,17 +44,17 @@ typedef struct {
 
 #define AV_PIX_FMT_NAME_MAXSIZE 32
 
-static av_cold int init(AVFilterContext *ctx)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
-    FormatContext *s = ctx->priv;
+    FormatContext *format = ctx->priv;
     const char *cur, *sep;
     char             pix_fmt_name[AV_PIX_FMT_NAME_MAXSIZE];
     int              pix_fmt_name_len, ret;
     enum AVPixelFormat pix_fmt;
 
     /* parse the list of formats */
-    for (cur = s->pix_fmts; cur; cur = sep ? sep + 1 : NULL) {
-        if (!(sep = strchr(cur, '|')))
+    for (cur = args; cur; cur = sep ? sep+1 : NULL) {
+        if (!(sep = strchr(cur, ':')))
             pix_fmt_name_len = strlen(cur);
         else
             pix_fmt_name_len = sep - cur;
@@ -73,34 +69,26 @@ static av_cold int init(AVFilterContext *ctx)
         if ((ret = ff_parse_pixel_format(&pix_fmt, pix_fmt_name, ctx)) < 0)
             return ret;
 
-        s->listed_pix_fmt_flags[pix_fmt] = 1;
+        format->listed_pix_fmt_flags[pix_fmt] = 1;
     }
 
     return 0;
 }
 
-static AVFilterFormats *make_format_list(FormatContext *s, int flag)
+static AVFilterFormats *make_format_list(FormatContext *format, int flag)
 {
-    AVFilterFormats *formats = NULL;
+    AVFilterFormats *formats;
     enum AVPixelFormat pix_fmt;
 
+    formats = av_mallocz(sizeof(AVFilterFormats));
+    formats->formats = av_malloc(sizeof(enum AVPixelFormat) * AV_PIX_FMT_NB);
+
     for (pix_fmt = 0; pix_fmt < AV_PIX_FMT_NB; pix_fmt++)
-        if (s->listed_pix_fmt_flags[pix_fmt] == flag) {
-            int ret = ff_add_format(&formats, pix_fmt);
-            if (ret < 0) {
-                ff_formats_unref(&formats);
-                return NULL;
-            }
-        }
+        if (format->listed_pix_fmt_flags[pix_fmt] == flag)
+            formats->formats[formats->format_count++] = pix_fmt;
 
     return formats;
 }
-
-#define OFFSET(x) offsetof(FormatContext, x)
-static const AVOption options[] = {
-    { "pix_fmts", "A '|'-separated list of pixel formats", OFFSET(pix_fmts), AV_OPT_TYPE_STRING, .flags = AV_OPT_FLAG_VIDEO_PARAM },
-    { NULL },
-};
 
 #if CONFIG_FORMAT_FILTER
 static int query_formats_format(AVFilterContext *ctx)
@@ -108,9 +96,6 @@ static int query_formats_format(AVFilterContext *ctx)
     ff_set_common_formats(ctx, make_format_list(ctx->priv, 1));
     return 0;
 }
-
-#define format_options options
-AVFILTER_DEFINE_CLASS(format);
 
 static const AVFilterPad avfilter_vf_format_inputs[] = {
     {
@@ -138,7 +123,6 @@ AVFilter avfilter_vf_format = {
     .query_formats = query_formats_format,
 
     .priv_size = sizeof(FormatContext),
-    .priv_class = &format_class,
 
     .inputs    = avfilter_vf_format_inputs,
     .outputs   = avfilter_vf_format_outputs,
@@ -151,9 +135,6 @@ static int query_formats_noformat(AVFilterContext *ctx)
     ff_set_common_formats(ctx, make_format_list(ctx->priv, 0));
     return 0;
 }
-
-#define noformat_options options
-AVFILTER_DEFINE_CLASS(noformat);
 
 static const AVFilterPad avfilter_vf_noformat_inputs[] = {
     {
@@ -181,7 +162,6 @@ AVFilter avfilter_vf_noformat = {
     .query_formats = query_formats_noformat,
 
     .priv_size = sizeof(FormatContext),
-    .priv_class = &noformat_class,
 
     .inputs    = avfilter_vf_noformat_inputs,
     .outputs   = avfilter_vf_noformat_outputs,

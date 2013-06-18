@@ -25,7 +25,6 @@
  * Rate control for video encoders.
  */
 
-#include "libavutil/attributes.h"
 #include "avcodec.h"
 #include "ratecontrol.h"
 #include "mpegvideo.h"
@@ -84,7 +83,7 @@ static inline double bits2qp(RateControlEntry *rce, double bits)
     return rce->qscale * (double)(rce->i_tex_bits + rce->p_tex_bits + 1) / bits;
 }
 
-av_cold int ff_rate_control_init(MpegEncContext *s)
+int ff_rate_control_init(MpegEncContext *s)
 {
     RateControlContext *rcc = &s->rc_context;
     int i, res;
@@ -297,7 +296,7 @@ av_cold int ff_rate_control_init(MpegEncContext *s)
     return 0;
 }
 
-av_cold void ff_rate_control_uninit(MpegEncContext *s)
+void ff_rate_control_uninit(MpegEncContext *s)
 {
     RateControlContext *rcc = &s->rc_context;
     emms_c();
@@ -920,7 +919,7 @@ static int init_pass2(MpegEncContext *s)
     double rate_factor          = 0;
     double step;
     const int filter_size = (int)(a->qblur * 4) | 1;
-    double expected_bits = 0; // init to silence gcc warning
+    double expected_bits;
     double *qscale, *blurred_qscale, qscale_sum;
 
     /* find complexity & const_bits & decide the pict_types */

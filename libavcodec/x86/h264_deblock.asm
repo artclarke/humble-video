@@ -28,7 +28,6 @@
 
 SECTION_RODATA
 
-pb_A1: times 16 db 0xA1
 pb_3_1: times 4 db 3, 1
 
 SECTION .text
@@ -36,6 +35,7 @@ SECTION .text
 cextern pb_0
 cextern pb_1
 cextern pb_3
+cextern pb_A1
 
 ; expands to [base],...,[base+7*stride]
 %define PASS8ROWS(base, base3, stride, stride3) \
