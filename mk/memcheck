@@ -1,0 +1,102 @@
+#!/bin/sh
+
+# Copyright (c) 2009 by Xuggle Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# It is REQUESTED BUT NOT REQUIRED if you use this library, that you let 
+# us know by sending e-mail to info\@xuggle.com telling us briefly how you're
+# using the library and what you like or don't like about it.
+
+# Runs Valgrind on any native test objects.
+#
+# To have this work, you need to run this from the output
+# directory where tests are supposed to run.  Specifically
+# build/test/output
+# relative to the root of the build path.
+#
+# Unfortunately this script can't easily detect where that is relative
+# to where you are... so go to the right directory, and call this.
+
+#echo "VS_MEMCHECK_LOGFILE=$VS_MEMCHECK_LOGFILE"
+#echo "VALGRIND_SUPPRESSIONS=$VALGRIND_SUPPRESSIONS"
+#echo "VS_TEST_FIXTUREDIR=$VS_TEST_FIXTUREDIR"
+#echo "MEMCHECK command: $*"
+# if VS_MEMCHECK_LOGFILE is not specified, then create a log file.
+if [ "x$VS_MEMCHECK_LOGFILE" = "x" ]; then
+VS_MEMCHECK_LOGFILE=$1_memcheck.log
+fi
+
+if [ "x$VALGRIND" = "x" ]; then
+  export VALGRIND=valgrind
+fi
+
+if [ "x$VALGRIND_SUPPRESSIONS" = "x" ]; then
+  export VALGRIND_SUPPRESSIONS=../../../mk/Valgrind.suppressions
+fi
+
+if [ "x$LIBTOOL" = "x" ]; then
+  LIBTOOL_CMD=""
+else
+# If we're running with LIBTOOL defined, use it
+  LIBTOOL_CMD="$LIBTOOL --mode=execute"
+fi
+
+# This is the string that valgrind outputs if no leaks are found
+VS_MEMCHECK_NOLEAK_STRING="All heap blocks were freed -- no leaks are possible"
+
+TIME_NOW=`date +"%Y-%m-%d %H:%M:%S"`
+echo "$TIME_NOW Logging memcheck output to $VS_MEMCHECK_LOGFILE for: $*"
+echo "$TIME_NOW Logging memcheck output to $VS_MEMCHECK_LOGFILE for: $*" > $VS_MEMCHECK_LOGFILE
+
+process_status(){
+  ERROR_CODE=$1
+  if [ ${ERROR_CODE} -ne 0 ]; then
+    echo "FAIL!!!!"
+    cat $VS_MEMCHECK_LOGFILE
+    echo "FAIL!!!! see $VS_MEMCHECK_LOGFILE"
+    exit 255;
+  fi
+}
+check_leaks(){
+  ERROR_CODE=$1
+  if [ ${ERROR_CODE} -ne 0 ]; then
+# if Valgrind did not say no leaks are possible, make sure all
+# leaks are suppressed
+    echo -n "Ensuring no unsuppressed leaks"
+    grep -q "definitely lost: 0 bytes in 0 blocks" $VS_MEMCHECK_LOGFILE
+    process_status $?
+    grep -q "possibly lost: 0 bytes in 0 blocks" $VS_MEMCHECK_LOGFILE
+    process_status $?
+    grep -q "still reachable: 0 bytes in 0 blocks" $VS_MEMCHECK_LOGFILE
+    process_status $?
+  fi
+}
+
+$LIBTOOL_CMD $VALGRIND --tool=memcheck --error-exitcode=255 --leak-check=full --show-reachable=yes --smc-check=all --suppressions=$VALGRIND_SUPPRESSIONS --gen-suppressions=all $* >> $VS_MEMCHECK_LOGFILE 2>&1
+
+process_status $?
+
+TIME_NOW=`date +"%Y-%m-%d %H:%M:%S"`
+echo "$TIME_NOW No errors found..."
+grep -q "$VS_MEMCHECK_NOLEAK_STRING" $VS_MEMCHECK_LOGFILE
+check_leaks $?
+TIME_NOW=`date +"%Y-%m-%d %H:%M:%S"`
+echo "$TIME_NOW No leaks found"
