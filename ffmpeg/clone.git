@@ -7,4 +7,4 @@
 # branch that the current version is tied to.
 # branch name is output of 'git describe release/1.2'
 # n1.2.1-10-g9af68f8
-git subtree add --prefix=ffmpeg/csrc --squash git://git.ffmpeg.org/ffmpeg.git 9af68f8
+git subtree add --prefix=ffmpeg/csrc --squash git://git.ffmpeg.org/ffmpeg.git 9af68f8d1f3df12a32574e003e065bc565695b52
