@@ -5,4 +5,4 @@
 # is to add all remote origins; each captive library will
 # have its own pull.git script which will be used to pull the
 # branch that the current version is tied to.
-git subtree add --prefix=captive/librtmp/csrc/src --squash git://git.ffmpeg.org/rtmpdump master
+git subtree add --prefix=librtmp/csrc/src --squash git://git.ffmpeg.org/rtmpdump master

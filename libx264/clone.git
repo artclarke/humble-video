@@ -6,4 +6,4 @@
 # have its own pull.git script which will be used to pull the
 # branch that the current version is tied to.
 
-git subtree add --prefix=captive/libx264/csrc --squash git://git.videolan.org/x264.git master
+git subtree add --prefix=libx264/csrc --squash git://git.videolan.org/x264.git master
