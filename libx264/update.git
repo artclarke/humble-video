@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# This script is here to update the branch to the latest version
+git subtree pull --prefix=captive/libx264/csrc --squash git://git.videolan.org/x264.git

@@ -1,0 +1,32 @@
+Index: testsuite/stack_align.c
+===================================================================
+--- testsuite/stack_align.c	(revision 2328)
++++ testsuite/stack_align.c	(working copy)
+@@ -25,9 +25,7 @@
+  * POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
+-#ifdef HAVE_CONFIG_H
+ #include "config.h"
+-#endif
+ 
+ #include <stdio.h>
+ #include <liboil/liboil.h>
+@@ -239,7 +237,7 @@
+ #ifdef HAVE_I386
+   __asm__ __volatile__ (
+       "  sub %%edi, %%esp\n"
+-#ifdef HAVE_SYMBOL_UNDERSCORE
++#if defined(HAVE_SYMBOL_UNDERSCORE) || defined(HAVE_OS_WIN32)
+       "  call _check_class_with_alignment\n"
+ #else
+       "  call check_class_with_alignment\n"
+@@ -251,7 +249,7 @@
+ #ifdef HAVE_AMD64
+   __asm__ __volatile__ (
+       "  sub %%rbx, %%rsp\n"
+-#ifdef HAVE_SYMBOL_UNDERSCORE
++#if defined(HAVE_SYMBOL_UNDERSCORE) || defined(HAVE_OS_WIN32)
+       "  call _check_class_with_alignment\n"
+ #else
+       "  call check_class_with_alignment\n"

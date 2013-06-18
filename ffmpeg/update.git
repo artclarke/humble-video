@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# This script is here to update the branch to the latest version
+git subtree pull --prefix=captive/ffmpeg/csrc --squash git://source.ffmpeg.org/ffmpeg.git master

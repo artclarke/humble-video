@@ -1,0 +1,59 @@
+#!/bin/sh
+
+# Modify this script to pass the necessary parameters to 
+# the configure of the captive package you're configuring
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+CPPFLAGS="@CPPFLAGS@"
+LDFLAGS="@LDFLAGS@"
+CFLAGS="@CFLAGS@"
+HOST_TYPE=@HOST_TYPE@
+HOST_OS=@HOST_OS@
+
+if [ "@VS_CROSS_COMPILE@" = "1" ]; then
+  CROSS="--host ${HOST_OS}"
+else
+  CROSS=
+fi
+VS_DEBUG=@VS_DEBUG@
+
+if test ! "x$VS_DEBUG" = "x"; then
+  CFLAGS="-DLIBSPANDSP_EXPORTS=1 -g -O0 @CFLAGS@"
+  echo "Creating debug version of spandsp: ${VS_DEBUG}; ${CFLAGS}"
+else
+  CFLAGS="-DLIBSPANDSP_EXPORTS=1 -g -O2 @CFLAGS@"
+  echo "Creating release version of spandsp: ${VS_DEBUG}; ${CFLAGS}"
+fi
+export ac_cv_func_malloc_0_nonnull=yes
+export ac_cv_func_realloc_0_nonnull=yes
+LDFLAGS="-L@abs_top_builddir@/stage@libdir@ @LDFLAGS@" 
+LIBS=-lz
+case ${HOST_OS} in
+  *mingw*|*cygwin*)
+  LIBS="-lws2_32 -lmingw32 -lmingwex ${LIBS}"
+  ;;
+esac
+export LIBS
+
+LIBS="${LIBS}" \
+CC="@CC@" \
+CFLAGS="-I@abs_top_builddir@/stage@includedir@ $CFLAGS" \
+LD="@LD@" \
+LDFLAGS="${LDFLAGS}"
+CPP="@CPP@" \
+CPPFLAGS="@CPPFLAGS@" \
+CXX="@CXX@" \
+CXXFLAGS="@CXXFLAGS@" \
+NM="@NM@" \
+AS="@AS@" \
+ASFLAGS="@ASFLAGS@" \
+STRIP="@STRIP@" \
+RANLIB="@RANLIB@" \
+AR="@AR@" \
+DLLTOOL="@DLLTOOL@" \
+PATH="$PATH:@abs_top_builddir@@bindir@@" sh @abs_srcdir@/csrc/configure \
+  ${CROSS} \
+  --disable-shared \
+  --with-pic \
+  --prefix="${prefix}" || \
+  (echo "Could not configure library: \"@abs_srcdir@\"; you may want to try disabling it or installing your own version" && exit 1)

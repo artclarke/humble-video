@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# Modify this script to pass the necessary parameters to 
+# the configure of the captive package you're configuring
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+CPPFLAGS="@CPPFLAGS@"
+LDFLAGS="@LDFLAGS@"
+CFLAGS="@CFLAGS@"
+CXXFLAGS="@CXXFLAGS@"
+HOST_TYPE=@HOST_TYPE@
+HOST_OS=@HOST_OS@
+
+if [ "@VS_CROSS_COMPILE@" = "1" ]; then
+  CROSS="--host ${HOST_OS}"
+else
+  CROSS=
+fi
+
+CC="@CC@" \
+CFLAGS="-I@abs_top_builddir@/stage@includedir@ @CFLAGS@" \
+LD="@LD@" \
+LDFLAGS="-L@abs_top_builddir@/stage@libdir@ @LDFLAGS@" \
+CPP="@CPP@" \
+CPPFLAGS="@CPPFLAGS@" \
+CXX="@CXX@" \
+CXXFLAGS="@CXXFLAGS@" \
+NM="@NM@" \
+AS="@AS@" \
+ASFLAGS="@ASFLAGS@" \
+STRIP="@STRIP@" \
+RANLIB="@RANLIB@" \
+AR="@AR@" \
+DLLTOOL="@DLLTOOL@" \
+PATH="$PATH:@abs_top_builddir@@bindir@@" sh @abs_srcdir@/csrc/configure \
+  --disable-dependency-tracking \
+  --with-pic \
+  --disable-shared \
+  --enable-sse \
+  ${CROSS} \
+  --prefix="${prefix}" || \
+  (echo "Could not configure library: \"@abs_srcdir@\"; you may want to try disabling it or installing your own version" && exit 1)

@@ -1,0 +1,106 @@
+#!/bin/sh
+
+# Modify this script to pass the necessary parameters to 
+# the configure of the captive package you're configuring
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+HOST_TYPE=@HOST_TYPE@
+HOST_OS=@HOST_OS@
+HOST_CPU=@HOST_CPU@
+HOST_VENDOR=@HOST_VENDOR@
+HOST_OS_C=@HOST_OS_C@
+
+VS_DEBUG=@VS_DEBUG@
+
+CAPTIVE_ENABLE_FFMPEG_GPL=@VS_ENABLE_GPL@
+
+FFMPEG_OPTIONS=
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-version=xuggle-@LIB_MAJOR_VERSION@.@LIB_MINOR_VERSION@"
+
+# Tell FFMPEG about the captive libraries already built and fake
+# installed
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-cflags=-I@abs_top_builddir@/stage@includedir@"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-ldflags=-L@abs_top_builddir@/stage@libdir@"
+# Set up a place where pkg-config looks for installed packages
+export PKG_CONFIG_PATH="@abs_top_builddir@/stage@libdir@/pkgconfig"
+
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --disable-shared"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-pic"
+#FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-runtime-cpudetect"
+
+if test "x$CAPTIVE_ENABLE_FFMPEG_GPL" = "xyes"; then
+  FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-gpl --enable-nonfree"
+  # x264 can only be used in GPL mode
+  FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libx264"
+fi
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-version3"
+
+case $HOST_OS in
+  *darwin*)
+    # GNU Configure sometimes adds darwin version numbers; this strips them
+    HOST_OS_C=darwin
+    # Sigh; but on Xcode 4.2 there is a compiler bug with register allocation.  
+    # Rather than expensively detect the compiler version, I'm going to hard-code
+    # darwin builds for now to debug (no assembly) and wait for a compiler or ffmpeg
+    # fix
+    VS_DEBUG=1
+  ;;
+esac
+if [ "@VS_CROSS_COMPILE@" = "1" ]; then
+  FFMPEG_OPTIONS="${FFMPEG_OPTIONS} --enable-cross-compile --cross-prefix=@VS_CROSS_PREFIX@ --arch=${HOST_CPU} --target-os=${HOST_OS_C}"
+  # Override the cross setting for PKG-CONFIG since that is not usually set up to
+  # be cross-compile friendly
+  if ! "@VS_CROSS_PREFIX@pkg-config" --version > /dev/null 2>&1; then
+    # default to pkg-config WITHOUT a prefix; we don't really care since
+    # we're faking out pkg-config anyway
+    FFMPEG_OPTIONS="$FFMPEG_OPTIONS --pkg-config=pkg-config"
+  fi
+fi
+
+if test ! "x$VS_DEBUG" = "x"; then
+  FFMPEG_OPTIONS="$FFMPEG_OPTIONS --disable-stripping"
+  FFMPEG_OPTIONS="$FFMPEG_OPTIONS --disable-asm"
+  FFMPEG_OPTIONS="$FFMPEG_OPTIONS --disable-optimizations"
+fi
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libmp3lame"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libvorbis"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libtheora"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libspeex"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libvo-aacenc"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libopencore-amrnb --enable-libopencore-amrwb"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-librtmp"
+case $HOST_OS in
+  *mingw*|*cygwin*)
+   # ffmpeg configure doesn't handle pkg-config files correctly when
+   # static linking, so we fix librtmp here.
+   FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-libs=-lwinmm"
+  ;;
+esac
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-openssl"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-zlib"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libvpx"
+
+echo "Configuring FFMPEG with these options: $FFMPEG_OPTIONS"
+cd @abs_builddir@/csrc
+CC="@CC@" \
+LD="@LD@" \
+CPP="@CPP@" \
+CPPFLAGS="@CPPFLAGS@" \
+CXX="@CXX@" \
+CXXFLAGS="@CXXFLAGS@" \
+NM="@NM@" \
+AS="@AS@" \
+ASFLAGS="@ASFLAGS@" \
+STRIP="@STRIP@" \
+RANLIB="@RANLIB@" \
+AR="@AR@" \
+DLLTOOL="@DLLTOOL@" \
+PATH="$PATH:@abs_top_builddir@@bindir@@" sh @abs_srcdir@/csrc/configure \
+  --prefix="${prefix}" $FFMPEG_OPTIONS || \
+  (echo "Could not configure library: \"@abs_srcdir@\"; you may want to try disabling it or installing your own version" && exit 1)
+# Attempt to stop unnecessary re-configs by touching this
+MAKEFILE="@abs_builddir@/csrc/Makefile"
+if [ -f "${MAKEFILE}" ]; then
+  echo "Updating ${MAKEFILE} to stop unnecessary builds"
+  touch "${MAKEFILE}"
+fi

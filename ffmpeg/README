@@ -1,0 +1,9 @@
+FFMPEG
+Software Homepage: http://ffmpeg.org/
+Source Download URL: n/a
+
+Currently we actually link into tip of tree, so if you checkout
+AAFFMPEG you'll compile (assuming you're using the captives)
+against the FFMPEG tip of tree.
+
+Distributions will have a specific FFMPEG they hold captive.

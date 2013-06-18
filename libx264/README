@@ -1,0 +1,3 @@
+x264 version: see git status in csrc directory
+Software Homepage: http://www.videolan.org/developers/x264.html
+Source Download URL: git clone git://git.videolan.org/x264.git

@@ -1,0 +1,31 @@
+Liboil Version 0.3.17
+Software Homepage: http://liboil.freedesktop.org/wiki/
+Source Download URL: http://liboil.freedesktop.org/download/liboil-0.3.17.tar.gz
+Patches Applied: 
+ - applied patch below for cross-compiling
+ - ran autoreconf --force --install
+ - Addded macros as detected until autoreconf ran clean
+
+diff --git a/captive/liboil/csrc/configure.ac b/captive/liboil/csrc/configure.ac
+index a657101..bba180c 100644
+--- a/captive/liboil/csrc/configure.ac
++++ b/captive/liboil/csrc/configure.ac
+@@ -4,6 +4,17 @@ AC_INIT(liboil,0.3.16)
+ AS_NANO(LIBOIL_CVS=no,LIBOIL_CVS=yes)
+ 
+ AC_CANONICAL_HOST([])
++# Patch applied by Art Clarke to make cross-compiling work
++AC_MSG_CHECKING([for xuggle-overrode aligned memory settings])
++case $host in
++      *i?86*|*x86_64*|*amd64*|*powerpc*|*m68k*|*cris*)
++      as_cv_unaligned_access=yes
++      AC_MSG_RESULT([yes])
++      ;;
++      *)
++      AC_MSG_RESULT([no])
++      ;;
++esac
+ AM_INIT_AUTOMAKE(1.6)
+ 
+ AM_MAINTAINER_MODE
+

@@ -1,0 +1,94 @@
+#!/bin/sh
+# @configure_input@
+
+# Modify this script to pass the necessary parameters to 
+# the configure of the captive package you're configuring
+
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+VPX_OPTIONS=
+LDFLAGS="@LDFLAGS@"
+CFLAGS="@CFLAGS@"
+YASM="@YASM@"
+HOST_TYPE=@HOST_TYPE@
+HOST_OS=@HOST_OS@
+VS_DEBUG=@VS_DEBUG@
+
+if [ "@VS_CROSS_COMPILE@" = "1" -o "${HOST_TYPE}" = "Mac" ]; then
+  case ${HOST_OS} in
+    *darwin*)
+      case ${HOST_OS} in
+        *ppc64*|*powerpc64*)
+        VPX_HOST=ppc64-darwin10-gcc
+        ;;
+        *ppc*|*powerpc*)
+        VPX_HOST=ppc32-darwin10-gcc
+        ;;
+        *x86_64*|*amd64*)
+        VPX_HOST=x86_64-darwin10-gcc
+        ;;
+        *)
+        VPX_OPTIONS="$VPX_OPTIONS --disable-mmx --disable-sse --disable-sse2 --disable-sse3 --disable-ssse3 --disable-sse4_1"
+        VPX_HOST=x86-darwin10-gcc
+        ;;
+      esac
+    ;;
+    *mingw*|*cygwin*)
+      case ${HOST_OS} in
+        *x86_64*|*amd64*)
+        VPX_HOST=x86_64-win64-gcc
+        ;;
+        *)
+        VPX_HOST=x86-win32-gcc
+        ;;
+      esac
+    ;;
+    *linux*)
+      VPX_OPTIONS="$VPX_OPTIONS --enable-pic"
+      case ${HOST_OS} in
+        *x86_64*|*amd64*)
+        VPX_HOST=generic-gnu
+        ;;
+        *)
+        VPX_HOST=x86-linux-gcc
+        ;;
+      esac
+    ;;
+    *)
+      VPX_OPTIONS="$VPX_OPTIONS --enable-pic"
+      case ${HOST_OS} in
+        *x86_64*|*amd64*)
+        VPX_HOST=generic-gnu
+        ;;
+        *)
+        VPX_HOST=generic-gnu
+        ;;
+      esac
+    ;;
+  esac
+  VPX_OPTIONS="${VPX_OPTIONS} --target=${VPX_HOST}"
+else
+  VPX_OPTIONS="$VPX_OPTIONS --enable-pic"
+fi
+# Tell VPX about the captive libraries already built and fake
+# installed
+
+# shared support on vpx is limited at best
+VPX_OPTIONS="$VPX_OPTIONS --disable-shared --enable-runtime-cpu-detect"
+
+if test ! "x$VS_DEBUG" = "x"; then
+  echo "Creating debug version of libvpx: $VS_DEBUG"
+  VPX_OPTIONS="$VPX_OPTIONS --enable-debug"
+  VPX_OPTIONS="$VPX_OPTIONS --disable-optimizations"
+else
+  echo "Creating release version of libvpx: $VS_DEBUG"
+fi
+
+echo "Configuring VPX with these options: $VPX_OPTIONS"
+CROSS="@VS_CROSS_PREFIX@" \
+LDFLAGS="-L@abs_top_builddir@/stage@libdir@ @LDFLAGS@" \
+ASFLAGS="@ASFLAGS@" \
+PATH="$PATH:@abs_top_builddir@@bindir@@" bash @abs_srcdir@/csrc/configure \
+  --extra-cflags="$CFLAGS -I'@abs_top_builddir@/stage@includedir@'" \
+  --prefix="${prefix}" $VPX_OPTIONS || \
+  (echo "Could not configure library: \"@abs_srcdir@\"; you may want to try disabling it or installing your own version" && exit 1)

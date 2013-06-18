@@ -1,0 +1,5 @@
+#!/bin/sh
+prefix="@prefix@"
+includedir="@includedir@"
+echo "Moving liboil-0.3 include files to right place"
+cp -r ${DESTDIR}${includedir}/liboil-0.3/liboil ${DESTDIR}${includedir}/liboil

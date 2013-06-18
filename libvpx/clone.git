@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# This script is meant to be run after you clone IF you want to be
+# a developer and integrate from upstream projects.  It's purpose
+# is to add all remote origins; each captive library will
+# have its own pull.git script which will be used to pull the
+# branch that the current version is tied to.
+git subtree add --prefix=captive/libvpx/csrc --squash http://git.chromium.org/webm/libvpx.git master

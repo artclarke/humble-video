@@ -1,0 +1,79 @@
+#!/bin/sh
+
+# Modify this script to pass the necessary parameters to 
+# the configure of the captive package you're configuring
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+X264_OPTIONS=
+LDFLAGS="@LDFLAGS@"
+CFLAGS="@CFLAGS@"
+YASM="@YASM@"
+HOST_TYPE=@HOST_TYPE@
+HOST_OS=@HOST_OS@
+VS_DEBUG=@VS_DEBUG@
+
+if [ "@VS_CROSS_COMPILE@" = "1" -o "${HOST_TYPE}" = "Mac" ]; then
+  X264_OPTIONS="${X264_OPTIONS} --host=${HOST_OS} --cross-prefix=@VS_CROSS_PREFIX@"
+fi
+
+# Tell X264 about the captive libraries already built and fake
+# installed
+
+X264_OPTIONS="$X264_OPTIONS --enable-static"
+X264_OPTIONS="$X264_OPTIONS --enable-pic"
+
+if test "${HOST_TYPE}" = "Mac" ; then
+  echo "Forcing debug build on Mac OS X due to text relocation in x264_cabac_encode_decision_asm; remove when x264 fixes that"
+  VS_DEBUG=1 
+fi
+if test ! "x$VS_DEBUG" = "x"; then
+  echo "Creating debug version of libx264: $VS_DEBUG"
+  X264_OPTIONS="$X264_OPTIONS --disable-asm"
+  X264_OPTIONS="$X264_OPTIONS --enable-debug"
+else
+  echo "Creating release version of libx264: $VS_DEBUG"
+fi
+
+if test "x$YASM" = "x"; then
+# no assembly for us :(
+  X264_OPTIONS="$X264_OPTIONS --disable-asm"
+fi
+
+# X264, despite claiming it, does not support in-tree builds,
+# and so we copy the entire source
+# directory to the build directory, and then build in place.
+# copy over all the source
+if [ ! -f "@abs_builddir@/csrc/configure" ]; then
+  echo "Copying @abs_srcdir@/csrc to @abs_builddir@/csrc"
+  # create the directory
+  mkdir -p "@abs_builddir@/csrc"
+  # copy over all the source
+  cp -r "@abs_srcdir@/csrc/"* "@abs_builddir@/csrc/"
+  # and make everything user writeable so distcheck will pass
+  chmod -R u+w "@abs_builddir@/csrc/"*
+fi
+
+echo "Configuring X264 with these options: $X264_OPTIONS"
+CC="@CC@" \
+CFLAGS="-I@abs_top_builddir@/stage@includedir@ @CFLAGS@" \
+LD="@LD@" \
+LDFLAGS="-L@abs_top_builddir@/stage@libdir@ @LDFLAGS@" \
+CPP="@CPP@" \
+CPPFLAGS="@CPPFLAGS@" \
+CXX="@CXX@" \
+CXXFLAGS="@CXXFLAGS@" \
+NM="@NM@" \
+AS="@AS@" \
+ASFLAGS="@ASFLAGS@" \
+STRIP="@STRIP@" \
+RANLIB="@RANLIB@" \
+AR="@AR@" \
+DLLTOOL="@DLLTOOL@" \
+PATH="$PATH:@abs_top_builddir@@bindir@@" bash @abs_builddir@/csrc/configure \
+  --extra-cflags="$CFLAGS -I'@abs_top_builddir@/stage@includedir@'" \
+  --extra-ldflags="$LDFLAGS -L'@abs_top_builddir@/stage@libdir@'" \
+  --prefix="${prefix}" $X264_OPTIONS || \
+  (echo "Could not configure library: \"@abs_srcdir@\"; you may want to try disabling it or installing your own version" && exit 1)
+# for reasons I don't understand, on Mac this can end up being a link; nuke it
+rm -f "@abs_builddir@/csrc/Makefile"
+cp -f "@abs_srcdir@/csrc/Makefile" "@abs_builddir@/csrc/Makefile"

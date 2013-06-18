@@ -1,0 +1,10 @@
+This directory contains a series of software packages
+that FFmpeg will use, along with FFmpeg itself.
+
+The system works by building all the other projects,
+and installing them in a fake location, and then building
+FFmpeg.  In that way, you can be sure that FFmpeg sees
+the exact versions of libraries included in this package.
+
+Finally, a "make install" will install FFmpeg and all dependent
+libraries into the location you specify.

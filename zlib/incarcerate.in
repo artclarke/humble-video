@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# Modify this script to pass the necessary parameters to 
+# the configure of the captive package you're configuring
+prefix="@prefix@"
+HOST_OS="@HOST_OS@"
+CROSS_PREFIX="@VS_CROSS_PREFIX@"
+
+# zlib does not support in-tree builds, and so we copy the entire source
+# directory to the build directory, and then build in place.
+echo "Copying @abs_srcdir@/csrc to @abs_builddir@/csrc"
+# create the directory
+mkdir -p "@abs_builddir@/csrc"
+# copy over all the source
+cp -r "@abs_srcdir@/csrc/"* "@abs_builddir@/csrc/"
+# and make everything user writeable so distcheck will pass
+chmod -R u+w "@abs_builddir@/csrc/"*
+
+# Check for 64 bit compiling
+FLAG64=
+case $HOST_OS in
+  *64*)
+    FLAG64="--64"
+  ;;
+esac
+
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+libdir="@libdir@"
+includedir="@includedir@"
+mandir="@mandir@"
+case $HOST_OS in
+  *mingw*)
+  # windows build requires special make instructions which will be done
+  # from Makefile.am
+  cp "@abs_srcdir@/csrc/win32/Makefile.gcc" "@abs_builddir@/csrc/Makefile"
+  ;;
+  *)
+  CHOST="@HOST_OS@" \
+  CC="@CC@" \
+  CFLAGS="-fPIC -I@abs_top_builddir@/stage@includedir@ @CFLAGS@" \
+  LD="@LD@" \
+  LDFLAGS="-fPIC -L@abs_top_builddir@/stage@libdir@ @LDFLAGS@" \
+  CPP="@CPP@" \
+  CPPFLAGS="@CPPFLAGS@" \
+  CXX="@CXX@" \
+  CXXFLAGS="@CXXFLAGS@" \
+  NM="@NM@" \
+  AS="@AS@" \
+  ASFLAGS="@ASFLAGS@" \
+  STRIP="@STRIP@" \
+  RANLIB="@RANLIB@" \
+  AR="@AR@" \
+  DLLTOOL="@DLLTOOL@" \
+  prefix="${prefix}" \
+  exec_prefix="${exec_prefix}" \
+  libdir="${libdir}" \
+  includedir="${includedir}" \
+  mandir="${mandir}" \
+  sh "@abs_builddir@/csrc/configure" ${FLAG64} \
+    --static \
+    --prefix="${prefix}" || \
+    (echo "Could not configure library: \"@abs_srcdir@\"; you may want to try disabling it or installing your own version" && exit 1)
+  ;;
+esac

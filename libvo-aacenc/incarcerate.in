@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# Modify this script to pass the necessary parameters to 
+# the configure of the captive package you're configuring
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+LIBRARY=libvo-aacenc
+LIBRARY_OPTIONS=
+HOST_TYPE=@HOST_TYPE@
+HOST_OS=@HOST_OS@
+
+if [ "@VS_CROSS_COMPILE@" = "1" ]; then
+  CROSS="--host ${HOST_OS}"
+else
+  CROSS=
+fi
+
+# LIBRARY doesn't support VPATH builds, so we fake it
+echo "Copying @abs_srcdir@/csrc to @abs_builddir@/csrc"
+# create the directory
+mkdir -p @abs_builddir@/csrc
+# copy over all the source
+cp -r @abs_srcdir@/csrc/* @abs_builddir@/csrc/
+# and make everything user writeable so distcheck will pass
+chmod -R u+w @abs_builddir@/csrc/*
+
+echo "Configuring ${LIBRARY} with these options: $LIBRARY_OPTIONS"
+CC="@CC@" \
+CFLAGS="-I@abs_top_builddir@/stage@includedir@ @CFLAGS@" \
+LD="@LD@" \
+LDFLAGS="-L@abs_top_builddir@/stage@libdir@ @LDFLAGS@" \
+CPP="@CPP@" \
+CPPFLAGS="@CPPFLAGS@" \
+CXX="@CXX@" \
+CXXFLAGS="@CXXFLAGS@" \
+NM="@NM@" \
+AS="@AS@" \
+ASFLAGS="@ASFLAGS@" \
+STRIP="@STRIP@" \
+RANLIB="@RANLIB@" \
+AR="@AR@" \
+DLLTOOL="@DLLTOOL@" \
+PATH="$PATH:@abs_top_builddir@@bindir@@" \
+   sh @abs_builddir@/csrc/configure \
+   --enable-silent-rules \
+   --disable-dependency-tracking \
+   --with-pic \
+   --disable-shared \
+   ${CROSS} \
+  --prefix="${prefix}" $LIBRARY_OPTIONS || \
+  (echo "Could not configure library: \"@abs_srcdir@\"; you may want to try disabling it or installing your own version" && exit 1)
