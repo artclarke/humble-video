@@ -1,0 +1,9 @@
+*.[oa]
+*.exe
+*.so
+*.so.[0-9]
+*.dylib
+rtmpdump
+rtmpgw
+rtmpsrv
+rtmpsuck
