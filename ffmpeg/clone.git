@@ -5,4 +5,4 @@
 # is to add all remote origins; each captive library will
 # have its own pull.git script which will be used to pull the
 # branch that the current version is tied to.
-git subtree add --prefix=ffmpeg/csrc --squash git://git.ffmpeg.org/ffmpeg.git remotes/origin/release/1.2
+git subtree add --prefix=ffmpeg/csrc --squash git://git.ffmpeg.org/ffmpeg.git origin/release/1.2
