@@ -35,7 +35,6 @@
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 #include "bytestream.h"
-#include "internal.h"
 
 #define CPAIR 2
 #define CQUAD 4
@@ -402,7 +401,7 @@ static void smc_decode_stream(SmcContext *s)
             break;
 
         case 0xF0:
-            avpriv_request_sample(s->avctx, "0xF0 opcode");
+            av_log_missing_feature(s->avctx, "0xF0 opcode", 1);
             break;
         }
     }
@@ -418,6 +417,7 @@ static av_cold int smc_decode_init(AVCodecContext *avctx)
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
 
     avcodec_get_frame_defaults(&s->frame);
+    s->frame.data[0] = NULL;
 
     return 0;
 }
@@ -430,12 +430,16 @@ static int smc_decode_frame(AVCodecContext *avctx,
     int buf_size = avpkt->size;
     SmcContext *s = avctx->priv_data;
     const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, NULL);
-    int ret;
 
     bytestream2_init(&s->gb, buf, buf_size);
 
-    if ((ret = ff_reget_buffer(avctx, &s->frame)) < 0)
-        return ret;
+    s->frame.reference = 3;
+    s->frame.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE |
+                            FF_BUFFER_HINTS_REUSABLE | FF_BUFFER_HINTS_READABLE;
+    if (avctx->reget_buffer(avctx, &s->frame)) {
+        av_log(s->avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+        return -1;
+    }
 
     if (pal) {
         s->frame.palette_has_changed = 1;
@@ -445,8 +449,7 @@ static int smc_decode_frame(AVCodecContext *avctx,
     smc_decode_stream(s);
 
     *got_frame      = 1;
-    if ((ret = av_frame_ref(data, &s->frame)) < 0)
-        return ret;
+    *(AVFrame*)data = s->frame;
 
     /* always report that the buffer was completely consumed */
     return buf_size;
@@ -456,7 +459,8 @@ static av_cold int smc_decode_end(AVCodecContext *avctx)
 {
     SmcContext *s = avctx->priv_data;
 
-    av_frame_unref(&s->frame);
+    if (s->frame.data[0])
+        avctx->release_buffer(avctx, &s->frame);
 
     return 0;
 }

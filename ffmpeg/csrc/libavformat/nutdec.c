@@ -196,7 +196,7 @@ static int nut_probe(AVProbeData *p)
         tmp = ffio_read_varlen(bc);                                           \
         if (!(check)) {                                                       \
             av_log(s, AV_LOG_ERROR, "Error " #dst " is (%"PRId64")\n", tmp);  \
-            return AVERROR_INVALIDDATA;                                       \
+            return -1;                                                        \
         }                                                                     \
         dst = tmp;                                                            \
     } while (0)
@@ -206,7 +206,7 @@ static int skip_reserved(AVIOContext *bc, int64_t pos)
     pos -= avio_tell(bc);
     if (pos < 0) {
         avio_seek(bc, pos, SEEK_CUR);
-        return AVERROR_INVALIDDATA;
+        return -1;
     } else {
         while (pos--)
             avio_r8(bc);
@@ -226,13 +226,7 @@ static int decode_main_header(NUTContext *nut)
     end  = get_packetheader(nut, bc, 1, MAIN_STARTCODE);
     end += avio_tell(bc);
 
-    tmp = ffio_read_varlen(bc);
-    if (tmp < 2 && tmp > NUT_VERSION) {
-        av_log(s, AV_LOG_ERROR, "Version %"PRId64" not supported.\n",
-               tmp);
-        return AVERROR(ENOSYS);
-    }
-
+    GET_V(tmp, tmp >= 2 && tmp <= 3);
     GET_V(stream_count, tmp > 0 && tmp <= NUT_MAX_STREAMS);
 
     nut->max_distance = ffio_read_varlen(bc);
@@ -395,7 +389,7 @@ static int decode_stream_header(NUTContext *nut)
         break;
     default:
         av_log(s, AV_LOG_ERROR, "unknown stream class (%d)\n", class);
-        return AVERROR(ENOSYS);
+        return -1;
     }
     if (class < 3 && st->codec->codec_id == AV_CODEC_ID_NONE)
         av_log(s, AV_LOG_ERROR,
@@ -424,7 +418,7 @@ static int decode_stream_header(NUTContext *nut)
         if ((!st->sample_aspect_ratio.num) != (!st->sample_aspect_ratio.den)) {
             av_log(s, AV_LOG_ERROR, "invalid aspect ratio %d/%d\n",
                    st->sample_aspect_ratio.num, st->sample_aspect_ratio.den);
-            return AVERROR_INVALIDDATA;
+            return -1;
         }
         ffio_read_varlen(bc); /* csp type */
     } else if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
@@ -435,7 +429,7 @@ static int decode_stream_header(NUTContext *nut)
     if (skip_reserved(bc, end) || ffio_get_checksum(bc)) {
         av_log(s, AV_LOG_ERROR,
                "stream header %d checksum mismatch\n", stream_id);
-        return AVERROR_INVALIDDATA;
+        return -1;
     }
     stc->time_base = &nut->time_base[stc->time_base_id];
     avpriv_set_pts_info(s->streams[stream_id], 63, stc->time_base->num,
@@ -543,7 +537,7 @@ static int decode_info_header(NUTContext *nut)
 
     if (skip_reserved(bc, end) || ffio_get_checksum(bc)) {
         av_log(s, AV_LOG_ERROR, "info header checksum mismatch\n");
-        return AVERROR_INVALIDDATA;
+        return -1;
     }
     return 0;
 }
@@ -607,9 +601,8 @@ static int find_and_decode_index(NUTContext *nut)
     int i, j, syncpoint_count;
     int64_t filesize = avio_size(bc);
     int64_t *syncpoints;
-    uint64_t max_pts;
     int8_t *has_keyframe;
-    int ret = AVERROR_INVALIDDATA;
+    int ret = -1;
 
     if(filesize <= 0)
         return -1;
@@ -621,18 +614,13 @@ static int find_and_decode_index(NUTContext *nut)
 
         if(s->duration<=0)
             s->duration = find_duration(nut, filesize);
-        return ret;
+        return -1;
     }
 
     end  = get_packetheader(nut, bc, 1, INDEX_STARTCODE);
     end += avio_tell(bc);
 
-    max_pts = ffio_read_varlen(bc);
-    s->duration = av_rescale_q(max_pts / nut->time_base_count,
-                               nut->time_base[max_pts % nut->time_base_count],
-                               AV_TIME_BASE_Q);
-    s->duration_estimation_method = AVFMT_DURATION_FROM_PTS;
-
+    ffio_read_varlen(bc); // max_pts
     GET_V(syncpoint_count, tmp < INT_MAX / 8 && tmp > 0);
     syncpoints   = av_malloc(sizeof(int64_t) *  syncpoint_count);
     has_keyframe = av_malloc(sizeof(int8_t)  * (syncpoint_count + 1));
@@ -903,7 +891,7 @@ static int nut_read_packet(AVFormatContext *s, AVPacket *pkt)
         } else {
             frame_code = avio_r8(bc);
             if (url_feof(bc))
-                return AVERROR_EOF;
+                return -1;
             if (frame_code == 'N') {
                 tmp = frame_code;
                 for (i = 1; i < 8; i++)

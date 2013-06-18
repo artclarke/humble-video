@@ -19,7 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/buffer.h"
 #include "libavutil/crc.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
@@ -177,7 +176,7 @@ typedef struct PESContext {
     int64_t pts, dts;
     int64_t ts_packet_pos; /**< position of first TS packet of this PES packet */
     uint8_t header[MAX_PES_HEADER_SIZE];
-    AVBufferRef *buffer;
+    uint8_t *buffer;
     SLConfigDescr sl;
 } PESContext;
 
@@ -404,7 +403,7 @@ static void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter)
         av_freep(&filter->u.section_filter.section_buf);
     else if (filter->type == MPEGTS_PES) {
         PESContext *pes = filter->u.pes_filter.opaque;
-        av_buffer_unref(&pes->buffer);
+        av_freep(&pes->buffer);
         /* referenced private data will be freed later in
          * avformat_close_input */
         if (!((PESContext *)filter->u.pes_filter.opaque)->st) {
@@ -566,7 +565,6 @@ static const StreamType ISO_types[] = {
     { 0x11, AVMEDIA_TYPE_AUDIO,   AV_CODEC_ID_AAC_LATM }, /* LATM syntax */
 #endif
     { 0x1b, AVMEDIA_TYPE_VIDEO,       AV_CODEC_ID_H264 },
-    { 0x42, AVMEDIA_TYPE_VIDEO,       AV_CODEC_ID_CAVS },
     { 0xd1, AVMEDIA_TYPE_VIDEO,      AV_CODEC_ID_DIRAC },
     { 0xea, AVMEDIA_TYPE_VIDEO,        AV_CODEC_ID_VC1 },
     { 0 },
@@ -702,8 +700,8 @@ static void new_pes_packet(PESContext *pes, AVPacket *pkt)
 {
     av_init_packet(pkt);
 
-    pkt->buf  = pes->buffer;
-    pkt->data = pes->buffer->data;
+    pkt->destruct = av_destruct_packet;
+    pkt->data = pes->buffer;
     pkt->size = pes->data_index;
 
     if(pes->total_size != MAX_PES_PAYLOAD &&
@@ -868,8 +866,7 @@ static int mpegts_push_data(MpegTSFilter *filter,
                         pes->total_size = MAX_PES_PAYLOAD;
 
                     /* allocate pes buffer */
-                    pes->buffer = av_buffer_alloc(pes->total_size +
-                                                  FF_INPUT_BUFFER_PADDING_SIZE);
+                    pes->buffer = av_malloc(pes->total_size+FF_INPUT_BUFFER_PADDING_SIZE);
                     if (!pes->buffer)
                         return AVERROR(ENOMEM);
 
@@ -971,7 +968,7 @@ static int mpegts_push_data(MpegTSFilter *filter,
                 if (pes->data_index > 0 && pes->data_index+buf_size > pes->total_size) {
                     new_pes_packet(pes, ts->pkt);
                     pes->total_size = MAX_PES_PAYLOAD;
-                    pes->buffer = av_buffer_alloc(pes->total_size + FF_INPUT_BUFFER_PADDING_SIZE);
+                    pes->buffer = av_malloc(pes->total_size+FF_INPUT_BUFFER_PADDING_SIZE);
                     if (!pes->buffer)
                         return AVERROR(ENOMEM);
                     ts->stop_parse = 1;
@@ -980,7 +977,7 @@ static int mpegts_push_data(MpegTSFilter *filter,
                     // not sure if this is legal in ts but see issue #2392
                     buf_size = pes->total_size;
                 }
-                memcpy(pes->buffer->data + pes->data_index, p, buf_size);
+                memcpy(pes->buffer+pes->data_index, p, buf_size);
                 pes->data_index += buf_size;
             }
             buf_size = 0;
@@ -1165,7 +1162,7 @@ static int parse_MP4SLDescrTag(MP4DescrParseContext *d, int64_t off, int len)
         descr->sl.au_seq_num_len     = (lengths >> 7) & 0x1f;
         descr->sl.packet_seq_num_len = (lengths >> 2) & 0x1f;
     } else {
-        avpriv_report_missing_feature(d->s, "Predefined SLConfigDescriptor");
+        av_log_missing_feature(d->s, "Predefined SLConfigDescriptor", 0);
     }
     return 0;
 }
@@ -1389,7 +1386,7 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_type
         }
         if (st->codec->extradata) {
             if (st->codec->extradata_size == 4 && memcmp(st->codec->extradata, *pp, 4))
-                avpriv_request_sample(fc, "DVB sub with multiple IDs");
+                av_log_ask_for_sample(fc, "DVB sub with multiple IDs\n");
         } else {
             st->codec->extradata = av_malloc(4 + FF_INPUT_BUFFER_PADDING_SIZE);
             if (st->codec->extradata) {
@@ -1891,7 +1888,7 @@ static int handle_packets(MpegTSContext *ts, int nb_packets)
             if (ts->pids[i]) {
                 if (ts->pids[i]->type == MPEGTS_PES) {
                    PESContext *pes = ts->pids[i]->u.pes_filter.opaque;
-                   av_buffer_unref(&pes->buffer);
+                   av_freep(&pes->buffer);
                    pes->data_index = 0;
                    pes->state = MPEGTS_SKIP; /* skip until pes header */
                 }

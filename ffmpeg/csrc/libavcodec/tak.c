@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/bswap.h"
 #include "libavutil/crc.h"
 #include "libavutil/intreadwrite.h"
 #include "tak.h"
@@ -96,7 +97,7 @@ int ff_tak_check_crc(const uint8_t *buf, unsigned int buf_size)
         return AVERROR_INVALIDDATA;
     buf_size -= 3;
 
-    CRC = AV_RB24(buf + buf_size);
+    CRC = av_bswap32(AV_RL24(buf + buf_size)) >> 8;
     crc = av_crc(crc_24, 0xCE04B7U, buf, buf_size);
     if (CRC != crc)
         return AVERROR_INVALIDDATA;

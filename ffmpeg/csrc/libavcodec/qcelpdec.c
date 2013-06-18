@@ -635,8 +635,8 @@ static qcelp_packet_rate determine_bitrate(AVCodecContext *avctx,
         return I_F_Q;
 
     if (bitrate == SILENCE) {
-        // FIXME: Remove this warning when tested with samples.
-        avpriv_request_sample(avctx, "Blank frame handling");
+        //FIXME: Remove experimental warning when tested with samples.
+        av_log_ask_for_sample(avctx, "'Blank frame handling is experimental.");
     }
     return bitrate;
 }
@@ -695,8 +695,10 @@ static int qcelp_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = 160;
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
     outbuffer = (float *)frame->data[0];
 
     if ((q->bitrate = determine_bitrate(avctx, buf_size, &buf)) == I_F_Q) {

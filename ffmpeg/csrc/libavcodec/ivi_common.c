@@ -100,7 +100,7 @@ static int ivi_create_huff_from_desc(const IVIHuffDesc *cb, VLC *vlc, int flag)
                     (flag ? INIT_VLC_USE_NEW_STATIC : 0) | INIT_VLC_LE);
 }
 
-av_cold void ff_ivi_init_static_vlc(void)
+void ff_ivi_init_static_vlc(void)
 {
     int i;
     static VLC_TYPE table_data[8192 * 16][2];
@@ -425,11 +425,7 @@ static int ivi_decode_blocks(GetBitContext *gb, IVIBandDesc *band, IVITile *tile
         cbp      = mb->cbp;
         buf_offs = mb->buf_offs;
 
-        quant = band->glob_quant + mb->q_delta;
-        if (avctx->codec_id == AV_CODEC_ID_INDEO4)
-            quant = av_clip(quant, 0, 31);
-        else
-            quant = av_clip(quant, 0, 23);
+        quant = av_clip(band->glob_quant + mb->q_delta, 0, 23);
 
         base_tab  = is_intra ? band->intra_base  : band->inter_base;
         scale_tab = is_intra ? band->intra_scale : band->inter_scale;
@@ -542,8 +538,8 @@ static int ivi_decode_blocks(GetBitContext *gb, IVIBandDesc *band, IVITile *tile
                 /* for intra blocks apply the dc slant transform */
                 /* for inter - perform the motion compensation without delta */
                 if (is_intra) {
-                        band->dc_transform(&prev_dc, band->buf + buf_offs,
-                                           band->pitch, blk_size);
+                    band->dc_transform(&prev_dc, band->buf + buf_offs,
+                                       band->pitch, blk_size);
                 } else
                     mc_no_delta_func(band->buf + buf_offs,
                                      band->ref_buf + buf_offs + mv_y * band->pitch + mv_x,
@@ -850,7 +846,6 @@ int ff_ivi_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 {
     IVI45DecContext *ctx = avctx->priv_data;
     const uint8_t   *buf = avpkt->data;
-    AVFrame       *frame = data;
     int             buf_size = avpkt->size;
     int             result, p, b;
 
@@ -908,23 +903,30 @@ int ff_ivi_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     if (!ctx->is_nonnull_frame(ctx))
         return buf_size;
 
+    if (ctx->frame.data[0])
+        avctx->release_buffer(avctx, &ctx->frame);
+
+    ctx->frame.reference = 0;
     avcodec_set_dimensions(avctx, ctx->planes[0].width, ctx->planes[0].height);
-    if ((result = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((result = ff_get_buffer(avctx, &ctx->frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return result;
+    }
 
     if (ctx->is_scalable) {
         if (avctx->codec_id == AV_CODEC_ID_INDEO4)
-            ff_ivi_recompose_haar(&ctx->planes[0], frame->data[0], frame->linesize[0]);
+            ff_ivi_recompose_haar(&ctx->planes[0], ctx->frame.data[0], ctx->frame.linesize[0]);
         else
-            ff_ivi_recompose53   (&ctx->planes[0], frame->data[0], frame->linesize[0]);
+            ff_ivi_recompose53   (&ctx->planes[0], ctx->frame.data[0], ctx->frame.linesize[0]);
     } else {
-        ivi_output_plane(&ctx->planes[0], frame->data[0], frame->linesize[0]);
+        ivi_output_plane(&ctx->planes[0], ctx->frame.data[0], ctx->frame.linesize[0]);
     }
 
-    ivi_output_plane(&ctx->planes[2], frame->data[1], frame->linesize[1]);
-    ivi_output_plane(&ctx->planes[1], frame->data[2], frame->linesize[2]);
+    ivi_output_plane(&ctx->planes[2], ctx->frame.data[1], ctx->frame.linesize[1]);
+    ivi_output_plane(&ctx->planes[1], ctx->frame.data[2], ctx->frame.linesize[2]);
 
     *got_frame = 1;
+    *(AVFrame*)data = ctx->frame;
 
     return buf_size;
 }
@@ -940,6 +942,9 @@ av_cold int ff_ivi_decode_close(AVCodecContext *avctx)
 
     if (ctx->mb_vlc.cust_tab.table)
         ff_free_vlc(&ctx->mb_vlc.cust_tab);
+
+    if (ctx->frame.data[0])
+        avctx->release_buffer(avctx, &ctx->frame);
 
 #if IVI4_STREAM_ANALYSER
     if (avctx->codec_id == AV_CODEC_ID_INDEO4) {

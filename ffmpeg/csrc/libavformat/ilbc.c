@@ -56,6 +56,7 @@ static int ilbc_write_header(AVFormatContext *s)
 static int ilbc_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     avio_write(s->pb, pkt->data, pkt->size);
+    avio_flush(s->pb);
     return 0;
 }
 

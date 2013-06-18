@@ -50,7 +50,7 @@ static int ast_read_header(AVFormatContext *s)
 
     depth = avio_rb16(s->pb);
     if (depth != 16) {
-        avpriv_request_sample(s, "depth %d", depth);
+        av_log_ask_for_sample(s, "unsupported depth %d\n", depth);
         return AVERROR_INVALIDDATA;
     }
 

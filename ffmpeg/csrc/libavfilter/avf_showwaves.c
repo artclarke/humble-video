@@ -41,9 +41,10 @@ enum ShowWavesMode {
 typedef struct {
     const AVClass *class;
     int w, h;
+    char *rate_str;
     AVRational rate;
     int buf_idx;
-    AVFrame *outpicref;
+    AVFilterBufferRef *outpicref;
     int req_fullfilled;
     int n;
     int sample_count_mod;
@@ -54,24 +55,41 @@ typedef struct {
 #define FLAGS AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM
 
 static const AVOption showwaves_options[] = {
+    { "rate", "set video rate", OFFSET(rate_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
+    { "r",    "set video rate", OFFSET(rate_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
     { "size", "set video size", OFFSET(w), AV_OPT_TYPE_IMAGE_SIZE, {.str = "600x240"}, 0, 0, FLAGS },
     { "s",    "set video size", OFFSET(w), AV_OPT_TYPE_IMAGE_SIZE, {.str = "600x240"}, 0, 0, FLAGS },
-    { "mode", "select display mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64=MODE_POINT}, 0, MODE_NB-1, FLAGS, "mode"},
-        { "point", "draw a point for each sample", 0, AV_OPT_TYPE_CONST, {.i64=MODE_POINT}, .flags=FLAGS, .unit="mode"},
-        { "line",  "draw a line for each sample",  0, AV_OPT_TYPE_CONST, {.i64=MODE_LINE},  .flags=FLAGS, .unit="mode"},
     { "n",    "set how many samples to show in the same point", OFFSET(n), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, FLAGS },
-    { "rate", "set video rate", OFFSET(rate), AV_OPT_TYPE_VIDEO_RATE, {.str = "25"}, 0, 0, FLAGS },
-    { "r",    "set video rate", OFFSET(rate), AV_OPT_TYPE_VIDEO_RATE, {.str = "25"}, 0, 0, FLAGS },
+
+    {"mode",  "select display mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64=MODE_POINT}, 0, MODE_NB-1, FLAGS, "mode"},
+    {"point", "draw a point for each sample", 0, AV_OPT_TYPE_CONST, {.i64=MODE_POINT}, .flags=FLAGS, .unit="mode"},
+    {"line",  "draw a line for each sample",  0, AV_OPT_TYPE_CONST, {.i64=MODE_LINE},  .flags=FLAGS, .unit="mode"},
     { NULL },
 };
 
 AVFILTER_DEFINE_CLASS(showwaves);
 
+static av_cold int init(AVFilterContext *ctx, const char *args)
+{
+    ShowWavesContext *showwaves = ctx->priv;
+    int err;
+
+    showwaves->class = &showwaves_class;
+    av_opt_set_defaults(showwaves);
+    showwaves->buf_idx = 0;
+
+    if ((err = av_set_options_string(showwaves, args, "=", ":")) < 0)
+        return err;
+
+    return 0;
+}
+
 static av_cold void uninit(AVFilterContext *ctx)
 {
     ShowWavesContext *showwaves = ctx->priv;
 
-    av_frame_free(&showwaves->outpicref);
+    av_freep(&showwaves->rate_str);
+    avfilter_unref_bufferp(&showwaves->outpicref);
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -113,11 +131,23 @@ static int config_output(AVFilterLink *outlink)
     AVFilterContext *ctx = outlink->src;
     AVFilterLink *inlink = ctx->inputs[0];
     ShowWavesContext *showwaves = ctx->priv;
+    int err;
 
-    if (!showwaves->n)
+    if (showwaves->n && showwaves->rate_str) {
+        av_log(ctx, AV_LOG_ERROR, "Options 'n' and 'rate' cannot be set at the same time\n");
+        return AVERROR(EINVAL);
+    }
+
+    if (!showwaves->n) {
+        if (!showwaves->rate_str)
+            showwaves->rate = (AVRational){25,1}; /* set default value */
+        else if ((err = av_parse_video_rate(&showwaves->rate, showwaves->rate_str)) < 0) {
+            av_log(ctx, AV_LOG_ERROR, "Invalid frame rate: '%s'\n", showwaves->rate_str);
+            return err;
+        }
         showwaves->n = FFMAX(1, ((double)inlink->sample_rate / (showwaves->w * av_q2d(showwaves->rate))) + 0.5);
+    }
 
-    showwaves->buf_idx = 0;
     outlink->w = showwaves->w;
     outlink->h = showwaves->h;
     outlink->sample_aspect_ratio = (AVRational){1,1};
@@ -160,16 +190,16 @@ static int request_frame(AVFilterLink *outlink)
 
 #define MAX_INT16 ((1<<15) -1)
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *insamples)
 {
     AVFilterContext *ctx = inlink->dst;
     AVFilterLink *outlink = ctx->outputs[0];
     ShowWavesContext *showwaves = ctx->priv;
-    const int nb_samples = insamples->nb_samples;
-    AVFrame *outpicref = showwaves->outpicref;
+    const int nb_samples = insamples->audio->nb_samples;
+    AVFilterBufferRef *outpicref = showwaves->outpicref;
     int linesize = outpicref ? outpicref->linesize[0] : 0;
     int16_t *p = (int16_t *)insamples->data[0];
-    int nb_channels = av_get_channel_layout_nb_channels(insamples->channel_layout);
+    int nb_channels = av_get_channel_layout_nb_channels(insamples->audio->channel_layout);
     int i, j, k, h, ret = 0;
     const int n = showwaves->n;
     const int x = 255 / (nb_channels * n); /* multiplication factor, pre-computed to avoid in-loop divisions */
@@ -178,18 +208,18 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
     for (i = 0; i < nb_samples; i++) {
         if (!showwaves->outpicref) {
             showwaves->outpicref = outpicref =
-                ff_get_video_buffer(outlink, outlink->w, outlink->h);
+                ff_get_video_buffer(outlink, AV_PERM_WRITE|AV_PERM_ALIGN,
+                                    outlink->w, outlink->h);
             if (!outpicref)
                 return AVERROR(ENOMEM);
-            outpicref->width  = outlink->w;
-            outpicref->height = outlink->h;
+            outpicref->video->w = outlink->w;
+            outpicref->video->h = outlink->h;
             outpicref->pts = insamples->pts +
                              av_rescale_q((p - (int16_t *)insamples->data[0]) / nb_channels,
                                           (AVRational){ 1, inlink->sample_rate },
                                           outlink->time_base);
             linesize = outpicref->linesize[0];
-            for (j = 0; j < outlink->h; j++)
-                memset(outpicref->data[0] + j * linesize, 0, outlink->w);
+            memset(outpicref->data[0], 0, showwaves->h*linesize);
         }
         for (j = 0; j < nb_channels; j++) {
             h = showwaves->h/2 - av_rescale(*p++, showwaves->h/2, MAX_INT16);
@@ -221,7 +251,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
         outpicref = showwaves->outpicref;
     }
 
-    av_frame_free(&insamples);
+    avfilter_unref_buffer(insamples);
     return ret;
 }
 
@@ -230,6 +260,7 @@ static const AVFilterPad showwaves_inputs[] = {
         .name         = "default",
         .type         = AVMEDIA_TYPE_AUDIO,
         .filter_frame = filter_frame,
+        .min_perms    = AV_PERM_READ,
     },
     { NULL }
 };
@@ -247,6 +278,7 @@ static const AVFilterPad showwaves_outputs[] = {
 AVFilter avfilter_avf_showwaves = {
     .name           = "showwaves",
     .description    = NULL_IF_CONFIG_SMALL("Convert input audio to a video output."),
+    .init           = init,
     .uninit         = uninit,
     .query_formats  = query_formats,
     .priv_size      = sizeof(ShowWavesContext),

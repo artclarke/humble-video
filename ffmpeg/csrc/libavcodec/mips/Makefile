@@ -17,5 +17,3 @@ OBJS-$(CONFIG_AAC_DECODER)                += mips/aacdec_mips.o            \
                                              mips/aacsbr_mips.o            \
                                              mips/sbrdsp_mips.o            \
                                              mips/aacpsdsp_mips.o
-MIPSDSPR1-OBJS-$(CONFIG_AAC_ENCODER)      += mips/aaccoder_mips.o
-MIPSFPU-OBJS-$(CONFIG_AAC_ENCODER)        += mips/iirfilter_mips.o

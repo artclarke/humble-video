@@ -52,7 +52,6 @@ static int do_count_frames = 0;
 static int do_count_packets = 0;
 static int do_read_frames  = 0;
 static int do_read_packets = 0;
-static int do_show_chapters = 0;
 static int do_show_error   = 0;
 static int do_show_format  = 0;
 static int do_show_frames  = 0;
@@ -94,9 +93,6 @@ struct section {
 
 typedef enum {
     SECTION_ID_NONE = -1,
-    SECTION_ID_CHAPTER,
-    SECTION_ID_CHAPTER_TAGS,
-    SECTION_ID_CHAPTERS,
     SECTION_ID_ERROR,
     SECTION_ID_FORMAT,
     SECTION_ID_FORMAT_TAGS,
@@ -117,9 +113,6 @@ typedef enum {
 } SectionID;
 
 static struct section sections[] = {
-    [SECTION_ID_CHAPTERS] =           { SECTION_ID_CHAPTERS, "chapters", SECTION_FLAG_IS_ARRAY, { SECTION_ID_CHAPTER, -1 } },
-    [SECTION_ID_CHAPTER] =            { SECTION_ID_CHAPTER, "chapter", 0, { SECTION_ID_CHAPTER_TAGS, -1 } },
-    [SECTION_ID_CHAPTER_TAGS] =       { SECTION_ID_CHAPTER_TAGS, "tags", SECTION_FLAG_HAS_VARIABLE_FIELDS, { -1 }, .element_name = "tag", .unique_name = "chapter_tags" },
     [SECTION_ID_ERROR] =              { SECTION_ID_ERROR, "error", 0, { -1 } },
     [SECTION_ID_FORMAT] =             { SECTION_ID_FORMAT, "format", 0, { SECTION_ID_FORMAT_TAGS, -1 } },
     [SECTION_ID_FORMAT_TAGS] =        { SECTION_ID_FORMAT_TAGS, "tags", SECTION_FLAG_HAS_VARIABLE_FIELDS, { -1 }, .element_name = "tag", .unique_name = "format_tags" },
@@ -133,7 +126,7 @@ static struct section sections[] = {
     [SECTION_ID_PACKET] =             { SECTION_ID_PACKET, "packet", 0, { -1 } },
     [SECTION_ID_PROGRAM_VERSION] =    { SECTION_ID_PROGRAM_VERSION, "program_version", 0, { -1 } },
     [SECTION_ID_ROOT] =               { SECTION_ID_ROOT, "root", SECTION_FLAG_IS_WRAPPER,
-                                        { SECTION_ID_CHAPTERS, SECTION_ID_FORMAT, SECTION_ID_FRAMES, SECTION_ID_STREAMS, SECTION_ID_PACKETS,
+                                        { SECTION_ID_FORMAT, SECTION_ID_FRAMES, SECTION_ID_STREAMS, SECTION_ID_PACKETS,
                                           SECTION_ID_ERROR, SECTION_ID_PROGRAM_VERSION, SECTION_ID_LIBRARY_VERSIONS, -1} },
     [SECTION_ID_STREAMS] =            { SECTION_ID_STREAMS, "streams", SECTION_FLAG_IS_ARRAY, { SECTION_ID_STREAM, -1 } },
     [SECTION_ID_STREAM] =             { SECTION_ID_STREAM, "stream", 0, { SECTION_ID_STREAM_DISPOSITION, SECTION_ID_STREAM_TAGS, -1 } },
@@ -307,7 +300,7 @@ static int writer_open(WriterContext **wctx, const Writer *writer, const char *a
 {
     int i, ret = 0;
 
-    if (!(*wctx = av_mallocz(sizeof(WriterContext)))) {
+    if (!(*wctx = av_malloc(sizeof(WriterContext)))) {
         ret = AVERROR(ENOMEM);
         goto fail;
     }
@@ -1507,6 +1500,7 @@ static void show_frame(WriterContext *w, AVFrame *frame, AVStream *stream,
         print_int("interlaced_frame",       frame->interlaced_frame);
         print_int("top_field_first",        frame->top_field_first);
         print_int("repeat_pict",            frame->repeat_pict);
+        print_int("reference",              frame->reference);
         break;
 
     case AVMEDIA_TYPE_AUDIO:
@@ -1758,27 +1752,6 @@ static void show_streams(WriterContext *w, AVFormatContext *fmt_ctx)
     writer_print_section_footer(w);
 }
 
-static void show_chapters(WriterContext *w, AVFormatContext *fmt_ctx)
-{
-    int i;
-
-    writer_print_section_header(w, SECTION_ID_CHAPTERS);
-    for (i = 0; i < fmt_ctx->nb_chapters; i++) {
-        AVChapter *chapter = fmt_ctx->chapters[i];
-
-        writer_print_section_header(w, SECTION_ID_CHAPTER);
-        print_int("id", chapter->id);
-        print_q  ("time_base", chapter->time_base, '/');
-        print_int("start", chapter->start);
-        print_time("start_time", chapter->start, &chapter->time_base);
-        print_int("end", chapter->end);
-        print_time("end_time", chapter->end, &chapter->time_base);
-        show_tags(w, chapter->metadata, SECTION_ID_CHAPTER_TAGS);
-        writer_print_section_footer(w);
-    }
-    writer_print_section_footer(w);
-}
-
 static void show_format(WriterContext *w, AVFormatContext *fmt_ctx)
 {
     char val_str[128];
@@ -1820,10 +1793,9 @@ static void show_error(WriterContext *w, int err)
 
 static int open_input_file(AVFormatContext **fmt_ctx_ptr, const char *filename)
 {
-    int err, i, orig_nb_streams;
+    int err, i;
     AVFormatContext *fmt_ctx = NULL;
     AVDictionaryEntry *t;
-    AVDictionary **opts;
 
     if ((err = avformat_open_input(&fmt_ctx, filename,
                                    iformat, &format_opts)) < 0) {
@@ -1835,17 +1807,12 @@ static int open_input_file(AVFormatContext **fmt_ctx_ptr, const char *filename)
         return AVERROR_OPTION_NOT_FOUND;
     }
 
-    /* fill the streams in the format context */
-    opts = setup_find_stream_info_opts(fmt_ctx, codec_opts);
-    orig_nb_streams = fmt_ctx->nb_streams;
 
-    if ((err = avformat_find_stream_info(fmt_ctx, opts)) < 0) {
+    /* fill the streams in the format context */
+    if ((err = avformat_find_stream_info(fmt_ctx, NULL)) < 0) {
         print_error(filename, err);
         return err;
     }
-    for (i = 0; i < orig_nb_streams; i++)
-        av_dict_free(&opts[i]);
-    av_freep(&opts);
 
     av_dump_format(fmt_ctx, 0, filename, 0);
 
@@ -1862,18 +1829,9 @@ static int open_input_file(AVFormatContext **fmt_ctx_ptr, const char *filename)
             av_log(NULL, AV_LOG_ERROR,
                     "Unsupported codec with id %d for input stream %d\n",
                     stream->codec->codec_id, stream->index);
-        } else {
-            AVDictionary *opts = filter_codec_opts(codec_opts, stream->codec->codec_id,
-                                                   fmt_ctx, stream, codec);
-            if (avcodec_open2(stream->codec, codec, &opts) < 0) {
-                av_log(NULL, AV_LOG_ERROR, "Error while opening codec for input stream %d\n",
-                       stream->index);
-            }
-            if ((t = av_dict_get(opts, "", NULL, AV_DICT_IGNORE_SUFFIX))) {
-                av_log(NULL, AV_LOG_ERROR, "Option %s for input stream %d not found\n",
-                       t->key, stream->index);
-                return AVERROR_OPTION_NOT_FOUND;
-            }
+        } else if (avcodec_open2(stream->codec, codec, NULL) < 0) {
+            av_log(NULL, AV_LOG_ERROR, "Error while opening codec for input stream %d\n",
+                   stream->index);
         }
     }
 
@@ -1939,8 +1897,6 @@ static int probe_file(WriterContext *wctx, const char *filename)
         }
         if (do_show_streams)
             show_streams(wctx, fmt_ctx);
-        if (do_show_chapters)
-            show_chapters(wctx, fmt_ctx);
         if (do_show_format)
             show_format(wctx, fmt_ctx);
 
@@ -2195,7 +2151,6 @@ static int opt_show_versions(const char *opt, const char *arg)
         return 0;                                                       \
     }
 
-DEFINE_OPT_SHOW_SECTION(chapters,         CHAPTERS);
 DEFINE_OPT_SHOW_SECTION(error,            ERROR);
 DEFINE_OPT_SHOW_SECTION(format,           FORMAT);
 DEFINE_OPT_SHOW_SECTION(frames,           FRAMES);
@@ -2230,7 +2185,6 @@ static const OptionDef real_options[] = {
       "show a set of specified entries", "entry_list" },
     { "show_packets", 0, {(void*)&opt_show_packets}, "show packets info" },
     { "show_streams", 0, {(void*)&opt_show_streams}, "show streams info" },
-    { "show_chapters", 0, {(void*)&opt_show_chapters}, "show chapters info" },
     { "count_frames", OPT_BOOL, {(void*)&do_count_frames}, "count the number of frames per stream" },
     { "count_packets", OPT_BOOL, {(void*)&do_count_packets}, "count the number of packets per stream" },
     { "show_program_version",  0, {(void*)&opt_show_program_version},  "show ffprobe version" },
@@ -2285,7 +2239,6 @@ int main(int argc, char **argv)
     parse_options(NULL, argc, argv, options, opt_input_file);
 
     /* mark things to show, based on -show_entries */
-    SET_DO_SHOW(CHAPTERS, chapters);
     SET_DO_SHOW(ERROR, error);
     SET_DO_SHOW(FORMAT, format);
     SET_DO_SHOW(FRAMES, frames);
@@ -2331,7 +2284,7 @@ int main(int argc, char **argv)
             ffprobe_show_library_versions(wctx);
 
         if (!input_filename &&
-            ((do_show_format || do_show_streams || do_show_chapters || do_show_packets || do_show_error) ||
+            ((do_show_format || do_show_streams || do_show_packets || do_show_error) ||
              (!do_show_program_version && !do_show_library_versions))) {
             show_usage();
             av_log(NULL, AV_LOG_ERROR, "You have to specify one input file.\n");

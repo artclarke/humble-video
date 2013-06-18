@@ -26,9 +26,7 @@
  */
 
 #include <stdint.h>
-#include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
-
 #include "avcodec.h"
 #include "h264dsp.h"
 #include "h264idct.h"
@@ -62,8 +60,7 @@
 #include "h264addpx_template.c"
 #undef BIT_DEPTH
 
-av_cold void ff_h264dsp_init(H264DSPContext *c, const int bit_depth,
-                             const int chroma_format_idc)
+void ff_h264dsp_init(H264DSPContext *c, const int bit_depth, const int chroma_format_idc)
 {
 #undef FUNC
 #define FUNC(a, depth) a ## _ ## depth ## _c
@@ -151,6 +148,6 @@ av_cold void ff_h264dsp_init(H264DSPContext *c, const int bit_depth,
     }
 
     if (ARCH_ARM) ff_h264dsp_init_arm(c, bit_depth, chroma_format_idc);
-    if (ARCH_PPC) ff_h264dsp_init_ppc(c, bit_depth, chroma_format_idc);
+    if (HAVE_ALTIVEC) ff_h264dsp_init_ppc(c, bit_depth, chroma_format_idc);
     if (ARCH_X86) ff_h264dsp_init_x86(c, bit_depth, chroma_format_idc);
 }

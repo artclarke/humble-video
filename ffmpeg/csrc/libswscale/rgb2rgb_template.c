@@ -26,8 +26,6 @@
 
 #include <stddef.h>
 
-#include "libavutil/attributes.h"
-
 static inline void rgb24tobgr32_c(const uint8_t *src, uint8_t *dst,
                                   int src_size)
 {
@@ -614,13 +612,10 @@ static inline void uyvytoyv12_c(const uint8_t *src, uint8_t *ydst,
  * others are ignored in the C version.
  * FIXME: Write HQ version.
  */
-void ff_rgb24toyv12_c(const uint8_t *src, uint8_t *ydst, uint8_t *udst,
+void rgb24toyv12_c(const uint8_t *src, uint8_t *ydst, uint8_t *udst,
                    uint8_t *vdst, int width, int height, int lumStride,
-                   int chromStride, int srcStride, int32_t *rgb2yuv)
+                   int chromStride, int srcStride)
 {
-    int32_t ry = rgb2yuv[RY_IDX], gy = rgb2yuv[GY_IDX], by = rgb2yuv[BY_IDX];
-    int32_t ru = rgb2yuv[RU_IDX], gu = rgb2yuv[GU_IDX], bu = rgb2yuv[BU_IDX];
-    int32_t rv = rgb2yuv[RV_IDX], gv = rgb2yuv[GV_IDX], bv = rgb2yuv[BV_IDX];
     int y;
     const int chromWidth = width >> 1;
 
@@ -631,9 +626,9 @@ void ff_rgb24toyv12_c(const uint8_t *src, uint8_t *ydst, uint8_t *udst,
             unsigned int g = src[6 * i + 1];
             unsigned int r = src[6 * i + 2];
 
-            unsigned int Y = ((ry * r + gy * g + by * b) >> RGB2YUV_SHIFT) +  16;
-            unsigned int V = ((rv * r + gv * g + bv * b) >> RGB2YUV_SHIFT) + 128;
-            unsigned int U = ((ru * r + gu * g + bu * b) >> RGB2YUV_SHIFT) + 128;
+            unsigned int Y = ((RY * r + GY * g + BY * b) >> RGB2YUV_SHIFT) +  16;
+            unsigned int V = ((RV * r + GV * g + BV * b) >> RGB2YUV_SHIFT) + 128;
+            unsigned int U = ((RU * r + GU * g + BU * b) >> RGB2YUV_SHIFT) + 128;
 
             udst[i]     = U;
             vdst[i]     = V;
@@ -643,7 +638,7 @@ void ff_rgb24toyv12_c(const uint8_t *src, uint8_t *ydst, uint8_t *udst,
             g = src[6 * i + 4];
             r = src[6 * i + 5];
 
-            Y = ((ry * r + gy * g + by * b) >> RGB2YUV_SHIFT) + 16;
+            Y = ((RY * r + GY * g + BY * b) >> RGB2YUV_SHIFT) + 16;
             ydst[2 * i + 1] = Y;
         }
         ydst += lumStride;
@@ -657,7 +652,7 @@ void ff_rgb24toyv12_c(const uint8_t *src, uint8_t *ydst, uint8_t *udst,
             unsigned int g = src[6 * i + 1];
             unsigned int r = src[6 * i + 2];
 
-            unsigned int Y = ((ry * r + gy * g + by * b) >> RGB2YUV_SHIFT) + 16;
+            unsigned int Y = ((RY * r + GY * g + BY * b) >> RGB2YUV_SHIFT) + 16;
 
             ydst[2 * i] = Y;
 
@@ -665,7 +660,7 @@ void ff_rgb24toyv12_c(const uint8_t *src, uint8_t *ydst, uint8_t *udst,
             g = src[6 * i + 4];
             r = src[6 * i + 5];
 
-            Y = ((ry * r + gy * g + by * b) >> RGB2YUV_SHIFT) + 16;
+            Y = ((RY * r + GY * g + BY * b) >> RGB2YUV_SHIFT) + 16;
             ydst[2 * i + 1] = Y;
         }
         udst += chromStride;
@@ -823,7 +818,7 @@ static void yuyvtoyuv420_c(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                            int lumStride, int chromStride, int srcStride)
 {
     int y;
-    const int chromWidth = FF_CEIL_RSHIFT(width, 1);
+    const int chromWidth = -((-width) >> 1);
 
     for (y = 0; y < height; y++) {
         extract_even_c(src, ydst, width);
@@ -843,7 +838,7 @@ static void yuyvtoyuv422_c(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                            int lumStride, int chromStride, int srcStride)
 {
     int y;
-    const int chromWidth = FF_CEIL_RSHIFT(width, 1);
+    const int chromWidth = -((-width) >> 1);
 
     for (y = 0; y < height; y++) {
         extract_even_c(src, ydst, width);
@@ -861,7 +856,7 @@ static void uyvytoyuv420_c(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                            int lumStride, int chromStride, int srcStride)
 {
     int y;
-    const int chromWidth = FF_CEIL_RSHIFT(width, 1);
+    const int chromWidth = -((-width) >> 1);
 
     for (y = 0; y < height; y++) {
         extract_even_c(src + 1, ydst, width);
@@ -881,7 +876,7 @@ static void uyvytoyuv422_c(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                            int lumStride, int chromStride, int srcStride)
 {
     int y;
-    const int chromWidth = FF_CEIL_RSHIFT(width, 1);
+    const int chromWidth = -((-width) >> 1);
 
     for (y = 0; y < height; y++) {
         extract_even_c(src + 1, ydst, width);
@@ -894,7 +889,7 @@ static void uyvytoyuv422_c(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
     }
 }
 
-static av_cold void rgb2rgb_init_c(void)
+static inline void rgb2rgb_init_c(void)
 {
     rgb15to16          = rgb15to16_c;
     rgb15tobgr24       = rgb15tobgr24_c;
@@ -920,7 +915,7 @@ static av_cold void rgb2rgb_init_c(void)
     yuv422ptouyvy      = yuv422ptouyvy_c;
     yuy2toyv12         = yuy2toyv12_c;
     planar2x           = planar2x_c;
-    ff_rgb24toyv12     = ff_rgb24toyv12_c;
+    rgb24toyv12        = rgb24toyv12_c;
     interleaveBytes    = interleaveBytes_c;
     vu9_to_vu12        = vu9_to_vu12_c;
     yvu9_to_yuy2       = yvu9_to_yuy2_c;

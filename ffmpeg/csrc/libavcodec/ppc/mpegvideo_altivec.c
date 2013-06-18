@@ -24,15 +24,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "config.h"
 #include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
 #include "libavutil/ppc/types_altivec.h"
 #include "libavutil/ppc/util_altivec.h"
 #include "libavcodec/mpegvideo.h"
-#include "dsputil_altivec.h"
 
-#if HAVE_ALTIVEC
+#include "dsputil_altivec.h"
 
 /* AltiVec version of dct_unquantize_h263
    this code assumes `block' is 16 bytes-aligned */
@@ -113,11 +111,9 @@ static void dct_unquantize_h263_altivec(MpegEncContext *s,
     }
 }
 
-#endif /* HAVE_ALTIVEC */
 
-av_cold void ff_MPV_common_init_ppc(MpegEncContext *s)
+av_cold void ff_MPV_common_init_altivec(MpegEncContext *s)
 {
-#if HAVE_ALTIVEC
     if (!(av_get_cpu_flags() & AV_CPU_FLAG_ALTIVEC)) return;
 
     if ((s->avctx->dct_algo == FF_DCT_AUTO) ||
@@ -125,5 +121,4 @@ av_cold void ff_MPV_common_init_ppc(MpegEncContext *s)
         s->dct_unquantize_h263_intra = dct_unquantize_h263_altivec;
         s->dct_unquantize_h263_inter = dct_unquantize_h263_altivec;
     }
-#endif /* HAVE_ALTIVEC */
 }

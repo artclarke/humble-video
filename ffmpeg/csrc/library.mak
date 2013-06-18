@@ -1,3 +1,5 @@
+SRC_DIR := $(SRC_PATH)/lib$(NAME)
+
 include $(SRC_PATH)/common.mak
 
 LIBVERSION := $(lib$(NAME)_VERSION)

@@ -28,11 +28,10 @@
 #include <math.h>
 #include <string.h>
 
-#include "attributes.h"
 #include "version.h"
 #include "lls.h"
 
-av_cold void avpriv_init_lls(LLSModel *m, int indep_count)
+void avpriv_init_lls(LLSModel *m, int indep_count)
 {
     memset(m, 0, sizeof(LLSModel));
     m->indep_count = indep_count;
@@ -119,7 +118,7 @@ double avpriv_evaluate_lls(LLSModel *m, double *param, int order)
 }
 
 #if FF_API_LLS_PRIVATE
-av_cold void av_init_lls(LLSModel *m, int indep_count)
+void av_init_lls(LLSModel *m, int indep_count)
 {
     avpriv_init_lls(m, indep_count);
 }

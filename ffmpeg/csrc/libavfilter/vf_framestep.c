@@ -23,25 +23,32 @@
  * Daniele Fornighieri <guru AT digitalfantasy it>.
  */
 
-#include "libavutil/opt.h"
 #include "avfilter.h"
 #include "internal.h"
 #include "video.h"
 
 typedef struct {
-    const AVClass *class;
-    int frame_step;
+    int frame_step, frame_count, frame_selected;
 } FrameStepContext;
 
-#define OFFSET(x) offsetof(FrameStepContext, x)
-#define FLAGS AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM
+static av_cold int init(AVFilterContext *ctx, const char *args)
+{
+    FrameStepContext *framestep = ctx->priv;
+    char *tailptr;
+    long int n = 1;
 
-static const AVOption framestep_options[] = {
-    { "step", "set frame step",  OFFSET(frame_step), AV_OPT_TYPE_INT, {.i64=1}, 1, INT_MAX, FLAGS},
-    {NULL},
-};
+    if (args) {
+        n = strtol(args, &tailptr, 10);
+        if (*tailptr || n <= 0 || n >= INT_MAX) {
+            av_log(ctx, AV_LOG_ERROR,
+                   "Invalid argument '%s', must be a positive integer <= INT_MAX\n", args);
+            return AVERROR(EINVAL);
+        }
+    }
 
-AVFILTER_DEFINE_CLASS(framestep);
+    framestep->frame_step = n;
+    return 0;
+}
 
 static int config_output_props(AVFilterLink *outlink)
 {
@@ -49,7 +56,6 @@ static int config_output_props(AVFilterLink *outlink)
     FrameStepContext *framestep = ctx->priv;
     AVFilterLink *inlink = ctx->inputs[0];
 
-    outlink->flags |= FF_LINK_FLAG_REQUEST_LOOP;
     outlink->frame_rate =
         av_div_q(inlink->frame_rate, (AVRational){framestep->frame_step, 1});
 
@@ -60,22 +66,39 @@ static int config_output_props(AVFilterLink *outlink)
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *ref)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *ref)
 {
     FrameStepContext *framestep = inlink->dst->priv;
 
-    if (!(inlink->frame_count % framestep->frame_step)) {
+    if (!(framestep->frame_count++ % framestep->frame_step)) {
+        framestep->frame_selected = 1;
         return ff_filter_frame(inlink->dst->outputs[0], ref);
     } else {
-        av_frame_free(&ref);
+        framestep->frame_selected = 0;
+        avfilter_unref_buffer(ref);
         return 0;
     }
+}
+
+static int request_frame(AVFilterLink *outlink)
+{
+    FrameStepContext *framestep = outlink->src->priv;
+    AVFilterLink *inlink = outlink->src->inputs[0];
+    int ret;
+
+    framestep->frame_selected = 0;
+    do {
+        ret = ff_request_frame(inlink);
+    } while (!framestep->frame_selected && ret >= 0);
+
+    return ret;
 }
 
 static const AVFilterPad framestep_inputs[] = {
     {
         .name             = "default",
         .type             = AVMEDIA_TYPE_VIDEO,
+        .get_video_buffer = ff_null_get_video_buffer,
         .filter_frame     = filter_frame,
     },
     { NULL }
@@ -86,16 +109,16 @@ static const AVFilterPad framestep_outputs[] = {
         .name          = "default",
         .type          = AVMEDIA_TYPE_VIDEO,
         .config_props  = config_output_props,
+        .request_frame = request_frame,
     },
     { NULL }
 };
 
 AVFilter avfilter_vf_framestep = {
-    .name        = "framestep",
+    .name      = "framestep",
     .description = NULL_IF_CONFIG_SMALL("Select one frame every N frames."),
-    .priv_size   = sizeof(FrameStepContext),
-    .priv_class  = &framestep_class,
-    .inputs      = framestep_inputs,
-    .outputs     = framestep_outputs,
-    .flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
+    .init      = init,
+    .priv_size = sizeof(FrameStepContext),
+    .inputs    = framestep_inputs,
+    .outputs   = framestep_outputs,
 };

@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2008 Affine Systems, Inc (Michael Sullivan, Bobby Impollonia)
- * Copyright (c) 2013 Andrey Utkin <andrey.krieger.utkin gmail com>
  *
  * This file is part of FFmpeg.
  *
@@ -21,8 +20,8 @@
 
 /**
  * @file
- * Box and grid drawing filters. Also a nice template for a filter
- * that needs to write in the input frame.
+ * Box drawing filter. Also a nice template for a filter that needs to
+ * write in the input frame.
  */
 
 #include "libavutil/colorspace.h"
@@ -39,32 +38,64 @@ enum { Y, U, V, A };
 
 typedef struct {
     const AVClass *class;
-    int x, y, w_opt, h_opt, w, h;
-    int thickness;
+    int x, y, w, h, thickness;
     char *color_str;
     unsigned char yuv_color[4];
     int invert_color; ///< invert luma color
     int vsub, hsub;   ///< chroma subsampling
 } DrawBoxContext;
 
-static av_cold int init(AVFilterContext *ctx)
-{
-    DrawBoxContext *s = ctx->priv;
-    uint8_t rgba_color[4];
+#define OFFSET(x) offsetof(DrawBoxContext, x)
+#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
 
-    if (!strcmp(s->color_str, "invert"))
-        s->invert_color = 1;
-    else if (av_parse_color(rgba_color, s->color_str, -1, ctx) < 0)
+static const AVOption drawbox_options[] = {
+    { "x",           "set the box top-left corner x position", OFFSET(x), AV_OPT_TYPE_INT, {.i64=0}, INT_MIN, INT_MAX, FLAGS },
+    { "y",           "set the box top-left corner y position", OFFSET(y), AV_OPT_TYPE_INT, {.i64=0}, INT_MIN, INT_MAX, FLAGS },
+    { "width",       "set the box width",  OFFSET(w), AV_OPT_TYPE_INT, {.i64=0}, 0, INT_MAX, FLAGS },
+    { "w",           "set the box width",  OFFSET(w), AV_OPT_TYPE_INT, {.i64=0}, 0, INT_MAX, FLAGS },
+    { "height",      "set the box height", OFFSET(h), AV_OPT_TYPE_INT, {.i64=0}, 0, INT_MAX, FLAGS },
+    { "h",           "set the box height", OFFSET(h), AV_OPT_TYPE_INT, {.i64=0}, 0, INT_MAX, FLAGS },
+    { "color",       "set the box edge color", OFFSET(color_str), AV_OPT_TYPE_STRING, {.str="black"}, CHAR_MIN, CHAR_MAX, FLAGS },
+    { "c",           "set the box edge color", OFFSET(color_str), AV_OPT_TYPE_STRING, {.str="black"}, CHAR_MIN, CHAR_MAX, FLAGS },
+    { "thickness",   "set the box maximum thickness", OFFSET(thickness), AV_OPT_TYPE_INT, {.i64=4}, 0, INT_MAX, FLAGS },
+    { "t",           "set the box maximum thickness", OFFSET(thickness), AV_OPT_TYPE_INT, {.i64=4}, 0, INT_MAX, FLAGS },
+    {NULL},
+};
+
+AVFILTER_DEFINE_CLASS(drawbox);
+
+static av_cold int init(AVFilterContext *ctx, const char *args)
+{
+    DrawBoxContext *drawbox = ctx->priv;
+    uint8_t rgba_color[4];
+    static const char *shorthand[] = { "x", "y", "w", "h", "color", "thickness", NULL };
+    int ret;
+
+    drawbox->class = &drawbox_class;
+    av_opt_set_defaults(drawbox);
+
+    if ((ret = av_opt_set_from_string(drawbox, args, shorthand, "=", ":")) < 0)
+        return ret;
+
+    if (!strcmp(drawbox->color_str, "invert"))
+        drawbox->invert_color = 1;
+    else if (av_parse_color(rgba_color, drawbox->color_str, -1, ctx) < 0)
         return AVERROR(EINVAL);
 
-    if (!s->invert_color) {
-        s->yuv_color[Y] = RGB_TO_Y_CCIR(rgba_color[0], rgba_color[1], rgba_color[2]);
-        s->yuv_color[U] = RGB_TO_U_CCIR(rgba_color[0], rgba_color[1], rgba_color[2], 0);
-        s->yuv_color[V] = RGB_TO_V_CCIR(rgba_color[0], rgba_color[1], rgba_color[2], 0);
-        s->yuv_color[A] = rgba_color[3];
+    if (!drawbox->invert_color) {
+        drawbox->yuv_color[Y] = RGB_TO_Y_CCIR(rgba_color[0], rgba_color[1], rgba_color[2]);
+        drawbox->yuv_color[U] = RGB_TO_U_CCIR(rgba_color[0], rgba_color[1], rgba_color[2], 0);
+        drawbox->yuv_color[V] = RGB_TO_V_CCIR(rgba_color[0], rgba_color[1], rgba_color[2], 0);
+        drawbox->yuv_color[A] = rgba_color[3];
     }
 
     return 0;
+}
+
+static av_cold void uninit(AVFilterContext *ctx)
+{
+    DrawBoxContext *drawbox = ctx->priv;
+    av_opt_free(drawbox);
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -83,49 +114,49 @@ static int query_formats(AVFilterContext *ctx)
 
 static int config_input(AVFilterLink *inlink)
 {
-    DrawBoxContext *s = inlink->dst->priv;
+    DrawBoxContext *drawbox = inlink->dst->priv;
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(inlink->format);
 
-    s->hsub = desc->log2_chroma_w;
-    s->vsub = desc->log2_chroma_h;
+    drawbox->hsub = desc->log2_chroma_w;
+    drawbox->vsub = desc->log2_chroma_h;
 
-    s->w = (s->w_opt > 0) ? s->w_opt : inlink->w;
-    s->h = (s->h_opt > 0) ? s->h_opt : inlink->h;
+    if (drawbox->w == 0) drawbox->w = inlink->w;
+    if (drawbox->h == 0) drawbox->h = inlink->h;
 
     av_log(inlink->dst, AV_LOG_VERBOSE, "x:%d y:%d w:%d h:%d color:0x%02X%02X%02X%02X\n",
-           s->x, s->y, s->w, s->h,
-           s->yuv_color[Y], s->yuv_color[U], s->yuv_color[V], s->yuv_color[A]);
+           drawbox->x, drawbox->y, drawbox->w, drawbox->h,
+           drawbox->yuv_color[Y], drawbox->yuv_color[U], drawbox->yuv_color[V], drawbox->yuv_color[A]);
 
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *frame)
 {
-    DrawBoxContext *s = inlink->dst->priv;
-    int plane, x, y, xb = s->x, yb = s->y;
+    DrawBoxContext *drawbox = inlink->dst->priv;
+    int plane, x, y, xb = drawbox->x, yb = drawbox->y;
     unsigned char *row[4];
 
-    for (y = FFMAX(yb, 0); y < frame->height && y < (yb + s->h); y++) {
+    for (y = FFMAX(yb, 0); y < frame->video->h && y < (yb + drawbox->h); y++) {
         row[0] = frame->data[0] + y * frame->linesize[0];
 
         for (plane = 1; plane < 3; plane++)
             row[plane] = frame->data[plane] +
-                 frame->linesize[plane] * (y >> s->vsub);
+                 frame->linesize[plane] * (y >> drawbox->vsub);
 
-        if (s->invert_color) {
-            for (x = FFMAX(xb, 0); x < xb + s->w && x < frame->width; x++)
-                if ((y - yb < s->thickness) || (yb + s->h - 1 - y < s->thickness) ||
-                    (x - xb < s->thickness) || (xb + s->w - 1 - x < s->thickness))
+        if (drawbox->invert_color) {
+            for (x = FFMAX(xb, 0); x < xb + drawbox->w && x < frame->video->w; x++)
+                if ((y - yb < drawbox->thickness-1) || (yb + drawbox->h - y < drawbox->thickness) ||
+                    (x - xb < drawbox->thickness-1) || (xb + drawbox->w - x < drawbox->thickness))
                     row[0][x] = 0xff - row[0][x];
         } else {
-            for (x = FFMAX(xb, 0); x < xb + s->w && x < frame->width; x++) {
-                double alpha = (double)s->yuv_color[A] / 255;
+            for (x = FFMAX(xb, 0); x < xb + drawbox->w && x < frame->video->w; x++) {
+                double alpha = (double)drawbox->yuv_color[A] / 255;
 
-                if ((y - yb < s->thickness) || (yb + s->h - 1 - y < s->thickness) ||
-                    (x - xb < s->thickness) || (xb + s->w - 1 - x < s->thickness)) {
-                    row[0][x                 ] = (1 - alpha) * row[0][x                 ] + alpha * s->yuv_color[Y];
-                    row[1][x >> s->hsub] = (1 - alpha) * row[1][x >> s->hsub] + alpha * s->yuv_color[U];
-                    row[2][x >> s->hsub] = (1 - alpha) * row[2][x >> s->hsub] + alpha * s->yuv_color[V];
+                if ((y - yb < drawbox->thickness-1) || (yb + drawbox->h - y < drawbox->thickness) ||
+                    (x - xb < drawbox->thickness-1) || (xb + drawbox->w - x < drawbox->thickness)) {
+                    row[0][x                 ] = (1 - alpha) * row[0][x                 ] + alpha * drawbox->yuv_color[Y];
+                    row[1][x >> drawbox->hsub] = (1 - alpha) * row[1][x >> drawbox->hsub] + alpha * drawbox->yuv_color[U];
+                    row[2][x >> drawbox->hsub] = (1 - alpha) * row[2][x >> drawbox->hsub] + alpha * drawbox->yuv_color[V];
                 }
             }
         }
@@ -134,40 +165,19 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     return ff_filter_frame(inlink->dst->outputs[0], frame);
 }
 
-#define OFFSET(x) offsetof(DrawBoxContext, x)
-#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
-
-#if CONFIG_DRAWBOX_FILTER
-
-static const AVOption drawbox_options[] = {
-    { "x",         "set horizontal position of the left box edge", OFFSET(x),         AV_OPT_TYPE_INT, { .i64 = 0 }, INT_MIN, INT_MAX, FLAGS },
-    { "y",         "set vertical position of the top box edge",    OFFSET(y),         AV_OPT_TYPE_INT, { .i64 = 0 }, INT_MIN, INT_MAX, FLAGS },
-    { "width",     "set width of the box",                         OFFSET(w_opt),     AV_OPT_TYPE_INT, { .i64 = 0 }, 0,       INT_MAX, FLAGS },
-    { "w",         "set width of the box",                         OFFSET(w_opt),     AV_OPT_TYPE_INT, { .i64 = 0 }, 0,       INT_MAX, FLAGS },
-    { "height",    "set height of the box",                        OFFSET(h_opt),     AV_OPT_TYPE_INT, { .i64 = 0 }, 0,       INT_MAX, FLAGS },
-    { "h",         "set height of the box",                        OFFSET(h_opt),     AV_OPT_TYPE_INT, { .i64 = 0 }, 0,       INT_MAX, FLAGS },
-    { "color",     "set color of the box",                         OFFSET(color_str), AV_OPT_TYPE_STRING, { .str = "black" }, CHAR_MIN, CHAR_MAX, FLAGS },
-    { "c",         "set color of the box",                         OFFSET(color_str), AV_OPT_TYPE_STRING, { .str = "black" }, CHAR_MIN, CHAR_MAX, FLAGS },
-    { "thickness", "set the box thickness",                        OFFSET(thickness), AV_OPT_TYPE_INT, { .i64 = 3 }, 0,       INT_MAX, FLAGS },
-    { "t",         "set the box thickness",                        OFFSET(thickness), AV_OPT_TYPE_INT, { .i64 = 3 }, 0,       INT_MAX, FLAGS },
-    { NULL }
-};
-
-AVFILTER_DEFINE_CLASS(drawbox);
-
-static const AVFilterPad drawbox_inputs[] = {
+static const AVFilterPad avfilter_vf_drawbox_inputs[] = {
     {
         .name             = "default",
         .type             = AVMEDIA_TYPE_VIDEO,
         .config_props     = config_input,
         .get_video_buffer = ff_null_get_video_buffer,
         .filter_frame     = filter_frame,
-        .needs_writable   = 1,
+        .min_perms        = AV_PERM_WRITE | AV_PERM_READ,
     },
     { NULL }
 };
 
-static const AVFilterPad drawbox_outputs[] = {
+static const AVFilterPad avfilter_vf_drawbox_outputs[] = {
     {
         .name = "default",
         .type = AVMEDIA_TYPE_VIDEO,
@@ -179,119 +189,11 @@ AVFilter avfilter_vf_drawbox = {
     .name      = "drawbox",
     .description = NULL_IF_CONFIG_SMALL("Draw a colored box on the input video."),
     .priv_size = sizeof(DrawBoxContext),
-    .priv_class = &drawbox_class,
     .init      = init,
+    .uninit    = uninit,
 
     .query_formats   = query_formats,
-    .inputs    = drawbox_inputs,
-    .outputs   = drawbox_outputs,
-    .flags     = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
+    .inputs    = avfilter_vf_drawbox_inputs,
+    .outputs   = avfilter_vf_drawbox_outputs,
+    .priv_class = &drawbox_class,
 };
-#endif /* CONFIG_DRAWBOX_FILTER */
-
-#if CONFIG_DRAWGRID_FILTER
-static av_pure av_always_inline int pixel_belongs_to_grid(DrawBoxContext *drawgrid, int x, int y)
-{
-    // x is horizontal (width) coord,
-    // y is vertical (height) coord
-    int x_modulo;
-    int y_modulo;
-
-    // Abstract from the offset
-    x -= drawgrid->x;
-    y -= drawgrid->y;
-
-    x_modulo = x % drawgrid->w;
-    y_modulo = y % drawgrid->h;
-
-    // If x or y got negative, fix values to preserve logics
-    if (x_modulo < 0)
-        x_modulo += drawgrid->w;
-    if (y_modulo < 0)
-        y_modulo += drawgrid->h;
-
-    return x_modulo < drawgrid->thickness  // Belongs to vertical line
-        || y_modulo < drawgrid->thickness;  // Belongs to horizontal line
-}
-
-static int drawgrid_filter_frame(AVFilterLink *inlink, AVFrame *frame)
-{
-    DrawBoxContext *drawgrid = inlink->dst->priv;
-    int plane, x, y;
-    uint8_t *row[4];
-
-    for (y = 0; y < frame->height; y++) {
-        row[0] = frame->data[0] + y * frame->linesize[0];
-
-        for (plane = 1; plane < 3; plane++)
-            row[plane] = frame->data[plane] +
-                 frame->linesize[plane] * (y >> drawgrid->vsub);
-
-        if (drawgrid->invert_color) {
-            for (x = 0; x < frame->width; x++)
-                if (pixel_belongs_to_grid(drawgrid, x, y))
-                    row[0][x] = 0xff - row[0][x];
-        } else {
-            for (x = 0; x < frame->width; x++) {
-                double alpha = (double)drawgrid->yuv_color[A] / 255;
-
-                if (pixel_belongs_to_grid(drawgrid, x, y)) {
-                    row[0][x                  ] = (1 - alpha) * row[0][x                  ] + alpha * drawgrid->yuv_color[Y];
-                    row[1][x >> drawgrid->hsub] = (1 - alpha) * row[1][x >> drawgrid->hsub] + alpha * drawgrid->yuv_color[U];
-                    row[2][x >> drawgrid->hsub] = (1 - alpha) * row[2][x >> drawgrid->hsub] + alpha * drawgrid->yuv_color[V];
-                }
-            }
-        }
-    }
-
-    return ff_filter_frame(inlink->dst->outputs[0], frame);
-}
-
-static const AVOption drawgrid_options[] = {
-    { "x",         "set horizontal offset",   OFFSET(x),         AV_OPT_TYPE_INT,    { .i64 = 0 },       INT_MIN,  INT_MAX,  FLAGS },
-    { "y",         "set vertical offset",     OFFSET(y),         AV_OPT_TYPE_INT,    { .i64 = 0 },       INT_MIN,  INT_MAX,  FLAGS },
-    { "width",     "set width of grid cell",  OFFSET(w_opt),     AV_OPT_TYPE_INT,    { .i64 = 0 },       0,        INT_MAX,  FLAGS },
-    { "w",         "set width of grid cell",  OFFSET(w_opt),     AV_OPT_TYPE_INT,    { .i64 = 0 },       0,        INT_MAX,  FLAGS },
-    { "height",    "set height of grid cell", OFFSET(h_opt),     AV_OPT_TYPE_INT,    { .i64 = 0 },       0,        INT_MAX,  FLAGS },
-    { "h",         "set height of grid cell", OFFSET(h_opt),     AV_OPT_TYPE_INT,    { .i64 = 0 },       0,        INT_MAX,  FLAGS },
-    { "color",     "set color of the grid",   OFFSET(color_str), AV_OPT_TYPE_STRING, { .str = "black" }, CHAR_MIN, CHAR_MAX, FLAGS },
-    { "c",         "set color of the grid",   OFFSET(color_str), AV_OPT_TYPE_STRING, { .str = "black" }, CHAR_MIN, CHAR_MAX, FLAGS },
-    { "thickness", "set grid line thickness", OFFSET(thickness), AV_OPT_TYPE_INT,    {.i64=1},           0,        INT_MAX,  FLAGS },
-    { "t",         "set grid line thickness", OFFSET(thickness), AV_OPT_TYPE_INT,    {.i64=1},           0,        INT_MAX,  FLAGS },
-    { NULL }
-};
-
-AVFILTER_DEFINE_CLASS(drawgrid);
-
-static const AVFilterPad drawgrid_inputs[] = {
-    {
-        .name           = "default",
-        .type           = AVMEDIA_TYPE_VIDEO,
-        .config_props   = config_input,
-        .filter_frame   = drawgrid_filter_frame,
-        .needs_writable = 1,
-    },
-    { NULL }
-};
-
-static const AVFilterPad drawgrid_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-    { NULL }
-};
-
-AVFilter avfilter_vf_drawgrid = {
-    .name          = "drawgrid",
-    .description   = NULL_IF_CONFIG_SMALL("Draw a colored grid on the input video."),
-    .priv_size     = sizeof(DrawBoxContext),
-    .priv_class    = &drawgrid_class,
-    .init          = init,
-    .query_formats = query_formats,
-    .inputs        = drawgrid_inputs,
-    .outputs       = drawgrid_outputs,
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
-};
-
-#endif  /* CONFIG_DRAWGRID_FILTER */

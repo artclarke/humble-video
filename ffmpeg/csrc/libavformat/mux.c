@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/* #define DEBUG */
+
 #include "avformat.h"
 #include "avio_internal.h"
 #include "internal.h"
@@ -396,13 +398,6 @@ int avformat_write_header(AVFormatContext *s, AVDictionary **options)
     if ((ret = init_pts(s)) < 0)
         return ret;
 
-    if (s->avoid_negative_ts < 0) {
-        if (s->oformat->flags & (AVFMT_TS_NEGATIVE | AVFMT_NOTIMESTAMPS)) {
-            s->avoid_negative_ts = 0;
-        } else
-            s->avoid_negative_ts = 1;
-    }
-
     return 0;
 }
 
@@ -490,47 +485,15 @@ static int compute_pkt_fields2(AVFormatContext *s, AVStream *st, AVPacket *pkt)
 }
 
 /**
- * Make timestamps non negative, move side data from payload to internal struct, call muxer, and restore
- * sidedata.
- *
- * FIXME: this function should NEVER get undefined pts/dts beside when the
- * AVFMT_NOTIMESTAMPS is set.
- * Those additional safety checks should be dropped once the correct checks
- * are set in the callers.
+ * Move side data from payload to internal struct, call muxer, and restore
+ * original packet.
  */
-static int write_packet(AVFormatContext *s, AVPacket *pkt)
+static inline int split_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     int ret, did_split;
 
-    if (s->avoid_negative_ts > 0) {
-        AVStream *st = s->streams[pkt->stream_index];
-        int64_t offset = st->mux_ts_offset;
-
-        if (pkt->dts < 0 && pkt->dts != AV_NOPTS_VALUE && !s->offset) {
-            s->offset = -pkt->dts;
-            s->offset_timebase = st->time_base;
-        }
-
-        if (s->offset && !offset) {
-            offset = st->mux_ts_offset =
-                av_rescale_q_rnd(s->offset,
-                                 s->offset_timebase,
-                                 st->time_base,
-                                 AV_ROUND_UP);
-        }
-
-        if (pkt->dts != AV_NOPTS_VALUE)
-            pkt->dts += offset;
-        if (pkt->pts != AV_NOPTS_VALUE)
-            pkt->pts += offset;
-
-        av_assert2(pkt->dts == AV_NOPTS_VALUE || pkt->dts >= 0);
-    }
-
     did_split = av_packet_split_side_data(pkt);
     ret = s->oformat->write_packet(s, pkt);
-    if (s->flush_packets && s->pb && s->pb->error >= 0)
-        avio_flush(s->pb);
     if (did_split)
         av_packet_merge_side_data(pkt);
     return ret;
@@ -543,8 +506,6 @@ int av_write_frame(AVFormatContext *s, AVPacket *pkt)
     if (!pkt) {
         if (s->oformat->flags & AVFMT_ALLOW_FLUSH) {
             ret = s->oformat->write_packet(s, NULL);
-            if (s->flush_packets && s->pb && s->pb->error >= 0)
-                avio_flush(s->pb);
             if (ret >= 0 && s->pb && s->pb->error < 0)
                 ret = s->pb->error;
             return ret;
@@ -557,7 +518,7 @@ int av_write_frame(AVFormatContext *s, AVPacket *pkt)
     if (ret < 0 && !(s->oformat->flags & AVFMT_NOTIMESTAMPS))
         return ret;
 
-    ret = write_packet(s, pkt);
+    ret = split_write_packet(s, pkt);
     if (ret >= 0 && s->pb && s->pb->error < 0)
         ret = s->pb->error;
 
@@ -579,12 +540,8 @@ int ff_interleave_add_packet(AVFormatContext *s, AVPacket *pkt,
     if (!this_pktl)
         return AVERROR(ENOMEM);
     this_pktl->pkt = *pkt;
-#if FF_API_DESTRUCT_PACKET
     pkt->destruct  = NULL;           // do not free original but only the copy
-#endif
-    pkt->buf       = NULL;
     av_dup_packet(&this_pktl->pkt);  // duplicate the packet if it uses non-allocated memory
-    av_copy_packet_side_data(&this_pktl->pkt, &this_pktl->pkt); // copy side data
 
     if (s->streams[pkt->stream_index]->last_in_packet_buffer) {
         next_point = &(st->last_in_packet_buffer->next);
@@ -636,8 +593,7 @@ next_non_null:
     return 0;
 }
 
-static int interleave_compare_dts(AVFormatContext *s, AVPacket *next,
-                                  AVPacket *pkt)
+static int ff_interleave_compare_dts(AVFormatContext *s, AVPacket *next, AVPacket *pkt)
 {
     AVStream *st  = s->streams[pkt->stream_index];
     AVStream *st2 = s->streams[next->stream_index];
@@ -668,7 +624,7 @@ int ff_interleave_packet_per_dts(AVFormatContext *s, AVPacket *out,
     int i, ret;
 
     if (pkt) {
-        ret = ff_interleave_add_packet(s, pkt, interleave_compare_dts);
+        ret = ff_interleave_add_packet(s, pkt, ff_interleave_compare_dts);
         if (ret < 0)
             return ret;
     }
@@ -716,12 +672,38 @@ int ff_interleave_packet_per_dts(AVFormatContext *s, AVPacket *out,
             st->last_in_packet_buffer = NULL;
         av_freep(&pktl);
 
+        if (s->avoid_negative_ts > 0) {
+            if (out->dts != AV_NOPTS_VALUE) {
+                if (!st->mux_ts_offset && out->dts < 0) {
+                    for (i = 0; i < s->nb_streams; i++) {
+                        s->streams[i]->mux_ts_offset =
+                            av_rescale_q_rnd(-out->dts,
+                                             st->time_base,
+                                             s->streams[i]->time_base,
+                                             AV_ROUND_UP);
+                    }
+                }
+                out->dts += st->mux_ts_offset;
+            }
+            if (out->pts != AV_NOPTS_VALUE)
+                out->pts += st->mux_ts_offset;
+        }
+
         return 1;
     } else {
         av_init_packet(out);
         return 0;
     }
 }
+
+#if FF_API_INTERLEAVE_PACKET
+int av_interleave_packet_per_dts(AVFormatContext *s, AVPacket *out,
+                                 AVPacket *pkt, int flush)
+{
+    return ff_interleave_packet_per_dts(s, out, pkt, flush);
+}
+
+#endif
 
 /**
  * Interleave an AVPacket correctly so it can be muxed.
@@ -772,7 +754,7 @@ int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt)
         if (ret <= 0) //FIXME cleanup needed for ret<0 ?
             return ret;
 
-        ret = write_packet(s, &opkt);
+        ret = split_write_packet(s, &opkt);
         if (ret >= 0)
             s->streams[opkt.stream_index]->nb_frames++;
 
@@ -798,7 +780,7 @@ int av_write_trailer(AVFormatContext *s)
         if (!ret)
             break;
 
-        ret = write_packet(s, &pkt);
+        ret = split_write_packet(s, &pkt);
         if (ret >= 0)
             s->streams[pkt.stream_index]->nb_frames++;
 
@@ -835,26 +817,4 @@ int av_get_output_timestamp(struct AVFormatContext *s, int stream,
         return AVERROR(ENOSYS);
     s->oformat->get_output_timestamp(s, stream, dts, wall);
     return 0;
-}
-
-int ff_write_chained(AVFormatContext *dst, int dst_stream, AVPacket *pkt,
-                     AVFormatContext *src)
-{
-    AVPacket local_pkt;
-
-    local_pkt = *pkt;
-    local_pkt.stream_index = dst_stream;
-    if (pkt->pts != AV_NOPTS_VALUE)
-        local_pkt.pts = av_rescale_q(pkt->pts,
-                                     src->streams[pkt->stream_index]->time_base,
-                                     dst->streams[dst_stream]->time_base);
-    if (pkt->dts != AV_NOPTS_VALUE)
-        local_pkt.dts = av_rescale_q(pkt->dts,
-                                     src->streams[pkt->stream_index]->time_base,
-                                     dst->streams[dst_stream]->time_base);
-    if (pkt->duration)
-        local_pkt.duration = av_rescale_q(pkt->duration,
-                                          src->streams[pkt->stream_index]->time_base,
-                                          dst->streams[dst_stream]->time_base);
-    return av_write_frame(dst, &local_pkt);
 }

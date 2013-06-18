@@ -70,13 +70,13 @@ typedef struct {
 #define OFFSET(x) offsetof(HTTPContext, x)
 #define D AV_OPT_FLAG_DECODING_PARAM
 #define E AV_OPT_FLAG_ENCODING_PARAM
-#define DEFAULT_USER_AGENT "Lavf/" AV_STRINGIFY(LIBAVFORMAT_VERSION)
+#define DEC AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
 {"seekable", "control seekability of connection", OFFSET(seekable), AV_OPT_TYPE_INT, {.i64 = -1}, -1, 1, D },
 {"chunked_post", "use chunked transfer-encoding for posts", OFFSET(chunked_post), AV_OPT_TYPE_INT, {.i64 = 1}, 0, 1, E },
 {"headers", "set custom HTTP headers, can override built in default headers", OFFSET(headers), AV_OPT_TYPE_STRING, { 0 }, 0, 0, D|E },
 {"content_type", "force a content type", OFFSET(content_type), AV_OPT_TYPE_STRING, { 0 }, 0, 0, D|E },
-{"user-agent", "override User-Agent header", OFFSET(user_agent), AV_OPT_TYPE_STRING, {.str = DEFAULT_USER_AGENT}, 0, 0, D },
+{"user-agent", "override User-Agent header", OFFSET(user_agent), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC},
 {"multiple_requests", "use persistent connections", OFFSET(multiple_requests), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 1, D|E },
 {"post_data", "set custom HTTP post data", OFFSET(post_data), AV_OPT_TYPE_BINARY, .flags = D|E },
 {"timeout", "set timeout of socket I/O operations", OFFSET(rw_timeout), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, D|E },
@@ -421,8 +421,6 @@ static int get_cookies(HTTPContext *s, char **cookies, const char *path,
                 cvalue = av_strdup(param);
             }
         }
-        if (!cdomain)
-            cdomain = av_strdup(domain);
 
         // ensure all of the necessary values are valid
         if (!cdomain || !cpath || !cvalue) {
@@ -542,7 +540,8 @@ static int http_connect(URLContext *h, const char *path, const char *local_path,
     /* set default headers if needed */
     if (!has_header(s->headers, "\r\nUser-Agent: "))
         len += av_strlcatf(headers + len, sizeof(headers) - len,
-                           "User-Agent: %s\r\n", s->user_agent);
+                           "User-Agent: %s\r\n",
+                           s->user_agent ? s->user_agent : LIBAVFORMAT_IDENT);
     if (!has_header(s->headers, "\r\nAccept: "))
         len += av_strlcpy(headers + len, "Accept: */*\r\n",
                           sizeof(headers) - len);

@@ -62,7 +62,7 @@
  * pointer to each of the pointers to itself.
  */
 struct AVFilterFormats {
-    unsigned nb_formats;        ///< number of formats
+    unsigned format_count;      ///< number of formats
     int *formats;               ///< list of media formats
 
     unsigned refcount;          ///< number of references to this list

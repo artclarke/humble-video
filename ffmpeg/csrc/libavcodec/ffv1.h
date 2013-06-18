@@ -41,7 +41,6 @@
 #include "mathops.h"
 #include "put_bits.h"
 #include "rangecoder.h"
-#include "thread.h"
 
 #ifdef __INTEL_COMPILER
 #undef av_flatten
@@ -90,10 +89,8 @@ typedef struct FFV1Context {
     int transparency;
     int flags;
     int picture_number;
-    ThreadFrame picture, last_picture;
-    struct FFV1Context *fsrc;
-
-    AVFrame *cur;
+    AVFrame picture;
+    AVFrame last_picture;
     int plane_count;
     int ac;                              ///< 1=range coder <-> 0=golomb rice
     int ac_byte_count;                   ///< number of bytes used for AC coding
@@ -108,7 +105,6 @@ typedef struct FFV1Context {
     int16_t *sample_buffer;
 
     int ec;
-    int intra;
     int slice_damaged;
     int key_frame_ok;
 

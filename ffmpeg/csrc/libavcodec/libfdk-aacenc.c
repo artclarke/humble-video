@@ -97,6 +97,9 @@ static int aac_encode_close(AVCodecContext *avctx)
 
     if (s->handle)
         aacEncClose(&s->handle);
+#if FF_API_OLD_ENCODE_AUDIO
+    av_freep(&avctx->coded_frame);
+#endif
     av_freep(&avctx->extradata);
     ff_af_queue_close(&s->afq);
 
@@ -272,6 +275,13 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
         goto error;
     }
 
+#if FF_API_OLD_ENCODE_AUDIO
+    avctx->coded_frame = avcodec_alloc_frame();
+    if (!avctx->coded_frame) {
+        ret = AVERROR(ENOMEM);
+        goto error;
+    }
+#endif
     avctx->frame_size = info.frameLength;
     avctx->delay      = info.encoderDelay;
     ff_af_queue_init(avctx, &s->afq);

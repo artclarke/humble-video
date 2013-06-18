@@ -18,13 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/attributes.h"
 #include "avformat.h"
 #include "rtpdec_formats.h"
 
 #define RTP_G726_HANDLER(bitrate) \
-static av_cold int g726_ ## bitrate ##_init(AVFormatContext *s, int st_index, \
-                                            PayloadContext *data) \
+static int g726_ ## bitrate ##_init(AVFormatContext *s, int st_index, PayloadContext *data) \
 { \
     AVStream *stream = s->streams[st_index]; \
     AVCodecContext *codec = stream->codec; \

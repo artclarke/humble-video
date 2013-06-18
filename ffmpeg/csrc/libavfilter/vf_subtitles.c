@@ -85,9 +85,17 @@ static void ass_log(int ass_level, const char *fmt, va_list args, void *ctx)
     av_log(ctx, level, "\n");
 }
 
-static av_cold int init(AVFilterContext *ctx)
+static av_cold int init(AVFilterContext *ctx, const char *args, const AVClass *class)
 {
     AssContext *ass = ctx->priv;
+    static const char *shorthand[] = { "filename", NULL };
+    int ret;
+
+    ass->class = class;
+    av_opt_set_defaults(ass);
+
+    if ((ret = av_opt_set_from_string(ass, args, shorthand, "=", ":")) < 0)
+        return ret;
 
     if (!ass->filename) {
         av_log(ctx, AV_LOG_ERROR, "No filename provided!\n");
@@ -115,6 +123,7 @@ static av_cold void uninit(AVFilterContext *ctx)
 {
     AssContext *ass = ctx->priv;
 
+    av_opt_free(ass);
     if (ass->track)
         ass_free_track(ass->track);
     if (ass->renderer)
@@ -149,7 +158,7 @@ static int config_input(AVFilterLink *inlink)
 #define AB(c)  (((c)>>8) &0xFF)
 #define AA(c)  ((0xFF-c) &0xFF)
 
-static void overlay_ass_image(AssContext *ass, AVFrame *picref,
+static void overlay_ass_image(AssContext *ass, AVFilterBufferRef *picref,
                               const ASS_Image *image)
 {
     for (; image; image = image->next) {
@@ -158,13 +167,13 @@ static void overlay_ass_image(AssContext *ass, AVFrame *picref,
         ff_draw_color(&ass->draw, &color, rgba_color);
         ff_blend_mask(&ass->draw, &color,
                       picref->data, picref->linesize,
-                      picref->width, picref->height,
+                      picref->video->w, picref->video->h,
                       image->bitmap, image->stride, image->w, image->h,
                       3, 0, image->dst_x, image->dst_y);
     }
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *picref)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *picref)
 {
     AVFilterContext *ctx = inlink->dst;
     AVFilterLink *outlink = ctx->outputs[0];
@@ -188,7 +197,7 @@ static const AVFilterPad ass_inputs[] = {
         .type             = AVMEDIA_TYPE_VIDEO,
         .filter_frame     = filter_frame,
         .config_props     = config_input,
-        .needs_writable   = 1,
+        .min_perms        = AV_PERM_READ | AV_PERM_WRITE,
     },
     { NULL }
 };
@@ -210,10 +219,10 @@ static const AVOption ass_options[] = {
 
 AVFILTER_DEFINE_CLASS(ass);
 
-static av_cold int init_ass(AVFilterContext *ctx)
+static av_cold int init_ass(AVFilterContext *ctx, const char *args)
 {
     AssContext *ass = ctx->priv;
-    int ret = init(ctx);
+    int ret = init(ctx, args, &ass_class);
 
     if (ret < 0)
         return ret;
@@ -251,7 +260,7 @@ static const AVOption subtitles_options[] = {
 
 AVFILTER_DEFINE_CLASS(subtitles);
 
-static av_cold int init_subtitles(AVFilterContext *ctx)
+static av_cold int init_subtitles(AVFilterContext *ctx, const char *args)
 {
     int ret, sid;
     AVDictionary *codec_opts = NULL;
@@ -264,7 +273,7 @@ static av_cold int init_subtitles(AVFilterContext *ctx)
     AssContext *ass = ctx->priv;
 
     /* Init libass */
-    ret = init(ctx);
+    ret = init(ctx, args, &subtitles_class);
     if (ret < 0)
         return ret;
     ass->track = ass_new_track(ass->library);
@@ -302,7 +311,7 @@ static av_cold int init_subtitles(AVFilterContext *ctx)
         return AVERROR(EINVAL);
     }
     dec_desc = avcodec_descriptor_get(dec_ctx->codec_id);
-    if (dec_desc && !(dec_desc->props & AV_CODEC_PROP_TEXT_SUB)) {
+    if (dec_desc && (dec_desc->props & AV_CODEC_PROP_BITMAP_SUB)) {
         av_log(ctx, AV_LOG_ERROR,
                "Only text based subtitles are currently supported\n");
         return AVERROR_PATCHWELCOME;

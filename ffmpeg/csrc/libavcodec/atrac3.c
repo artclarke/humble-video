@@ -36,7 +36,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "libavutil/attributes.h"
 #include "libavutil/float_dsp.h"
 #include "libavutil/libm.h"
 #include "avcodec.h"
@@ -165,16 +164,13 @@ static int decode_bytes(const uint8_t *input, uint8_t *out, int bytes)
 
     off = (intptr_t)input & 3;
     buf = (const uint32_t *)(input - off);
-    if (off)
-        c = av_be2ne32((0x537F6103U >> (off * 8)) | (0x537F6103U << (32 - (off * 8))));
-    else
-        c = av_be2ne32(0x537F6103U);
+    c   = av_be2ne32((0x537F6103 >> (off * 8)) | (0x537F6103 << (32 - (off * 8))));
     bytes += 3 + off;
     for (i = 0; i < bytes / 4; i++)
         output[i] = c ^ buf[i];
 
     if (off)
-        avpriv_request_sample(NULL, "Offset of %d", off);
+        av_log_ask_for_sample(NULL, "Offset of %d not handled.\n", off);
 
     return off;
 }
@@ -817,8 +813,10 @@ static int atrac3_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = SAMPLES_PER_FRAME;
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
 
     /* Check if we need to descramble and what buffer to pass on. */
     if (q->scrambled_stream) {
@@ -839,7 +837,7 @@ static int atrac3_decode_frame(AVCodecContext *avctx, void *data,
     return avctx->block_align;
 }
 
-static av_cold void atrac3_init_static_data(void)
+static void atrac3_init_static_data(void)
 {
     int i;
 

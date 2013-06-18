@@ -26,6 +26,7 @@
 #include "libavutil/avstring.h"
 #include "libavutil/mem.h"
 #include "avfilter.h"
+#include "avfiltergraph.h"
 
 #define WHITESPACES " \n\t"
 
@@ -109,27 +110,28 @@ static int create_filter(AVFilterContext **filt_ctx, AVFilterGraph *ctx, int ind
         return AVERROR(EINVAL);
     }
 
-    *filt_ctx = avfilter_graph_alloc_filter(ctx, filt, inst_name);
+    ret = avfilter_open(filt_ctx, filt, inst_name);
     if (!*filt_ctx) {
         av_log(log_ctx, AV_LOG_ERROR,
                "Error creating filter '%s'\n", filt_name);
-        return AVERROR(ENOMEM);
+        return ret;
     }
 
-    if (!strcmp(filt_name, "scale") && args && !strstr(args, "flags") &&
-        ctx->scale_sws_opts) {
+    if ((ret = avfilter_graph_add_filter(ctx, *filt_ctx)) < 0) {
+        avfilter_free(*filt_ctx);
+        return ret;
+    }
+
+    if (!strcmp(filt_name, "scale") && args && !strstr(args, "flags")
+        && ctx->scale_sws_opts) {
         snprintf(tmp_args, sizeof(tmp_args), "%s:%s",
                  args, ctx->scale_sws_opts);
         args = tmp_args;
     }
 
-    ret = avfilter_init_str(*filt_ctx, args);
-    if (ret < 0) {
+    if ((ret = avfilter_init_filter(*filt_ctx, args, NULL)) < 0) {
         av_log(log_ctx, AV_LOG_ERROR,
-               "Error initializing filter '%s'", filt_name);
-        if (args)
-            av_log(log_ctx, AV_LOG_ERROR, " with args '%s'", args);
-        av_log(log_ctx, AV_LOG_ERROR, "\n");
+               "Error initializing filter '%s' with args '%s'\n", filt_name, args);
         return ret;
     }
 
@@ -434,8 +436,8 @@ int avfilter_graph_parse2(AVFilterGraph *graph, const char *filters,
     return 0;
 
  fail:end:
-    while (graph->nb_filters)
-        avfilter_free(graph->filters[0]);
+    for (; graph->filter_count > 0; graph->filter_count--)
+        avfilter_free(graph->filters[graph->filter_count - 1]);
     av_freep(&graph->filters);
     avfilter_inout_free(&open_inputs);
     avfilter_inout_free(&open_outputs);
@@ -502,8 +504,8 @@ int avfilter_graph_parse(AVFilterGraph *graph, const char *filters,
 
  fail:
     if (ret < 0) {
-        while (graph->nb_filters)
-            avfilter_free(graph->filters[0]);
+        for (; graph->filter_count > 0; graph->filter_count--)
+            avfilter_free(graph->filters[graph->filter_count - 1]);
         av_freep(&graph->filters);
     }
     avfilter_inout_free(&inputs);
@@ -589,8 +591,8 @@ end:
     avfilter_inout_free(&curr_inputs);
 
     if (ret < 0) {
-        while (graph->nb_filters)
-            avfilter_free(graph->filters[0]);
+        for (; graph->filter_count > 0; graph->filter_count--)
+            avfilter_free(graph->filters[graph->filter_count - 1]);
         av_freep(&graph->filters);
     }
     return ret;

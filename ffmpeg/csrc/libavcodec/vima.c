@@ -19,20 +19,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * @file
- * LucasArts VIMA audio decoder
- * @author Paul B Mahol
- */
-
 #include "libavutil/channel_layout.h"
 #include "avcodec.h"
 #include "get_bits.h"
 #include "internal.h"
 #include "adpcm_data.h"
 
-static int predict_table_init = 0;
-static uint16_t predict_table[5786 * 2];
+typedef struct {
+    uint16_t    predict_table[5786 * 2];
+} VimaContext;
 
 static const uint8_t size_table[] =
 {
@@ -108,12 +103,8 @@ static const int8_t* const step_index_tables[] =
 
 static av_cold int decode_init(AVCodecContext *avctx)
 {
-    int start_pos;
-
-    avctx->sample_fmt = AV_SAMPLE_FMT_S16;
-
-    if (predict_table_init)
-        return 0;
+    VimaContext *vima = avctx->priv_data;
+    int         start_pos;
 
     for (start_pos = 0; start_pos < 64; start_pos++) {
         unsigned int dest_pos, table_pos;
@@ -129,10 +120,11 @@ static av_cold int decode_init(AVCodecContext *avctx)
                     put += table_value;
                 table_value >>= 1;
             }
-            predict_table[dest_pos] = put;
+            vima->predict_table[dest_pos] = put;
         }
     }
-    predict_table_init = 1;
+
+    avctx->sample_fmt  = AV_SAMPLE_FMT_S16;
 
     return 0;
 }
@@ -141,6 +133,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
                         int *got_frame_ptr, AVPacket *pkt)
 {
     GetBitContext  gb;
+    VimaContext    *vima = avctx->priv_data;
     AVFrame        *frame = data;
     int16_t        pcm_data[2];
     uint32_t       samples;
@@ -177,8 +170,10 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     }
 
     frame->nb_samples = samples;
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
 
     for (chan = 0; chan < channels; chan++) {
         uint16_t *dest = (uint16_t*)frame->data[0] + chan;
@@ -207,7 +202,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
 
                 predict_index = (lookup << (7 - lookup_size)) | (step_index << 6);
                 predict_index = av_clip(predict_index, 0, 5785);
-                diff          = predict_table[predict_index];
+                diff          = vima->predict_table[predict_index];
                 if (lookup)
                     diff += ff_adpcm_step_table[step_index] >> (lookup_size - 1);
                 if (highbit)
@@ -232,6 +227,7 @@ AVCodec ff_vima_decoder = {
     .name           = "vima",
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_VIMA,
+    .priv_data_size = sizeof(VimaContext),
     .init           = decode_init,
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DR1,

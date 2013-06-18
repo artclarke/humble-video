@@ -30,7 +30,6 @@
 #include "libavutil/common.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
-#include "internal.h"
 
 typedef struct VP8DecoderContext {
     struct vpx_codec_ctx decoder;
@@ -66,7 +65,6 @@ static int vp8_decode(AVCodecContext *avctx,
     AVFrame *picture = data;
     const void *iter = NULL;
     struct vpx_image *img;
-    int ret;
 
     if (vpx_codec_decode(&ctx->decoder, avpkt->data, avpkt->size, NULL, 0) !=
         VPX_CODEC_OK) {
@@ -94,10 +92,14 @@ static int vp8_decode(AVCodecContext *avctx,
                 return AVERROR_INVALIDDATA;
             avcodec_set_dimensions(avctx, img->d_w, img->d_h);
         }
-        if ((ret = ff_get_buffer(avctx, picture, 0)) < 0)
-            return ret;
-        av_image_copy(picture->data, picture->linesize, (const uint8_t **)img->planes,
-                      img->stride, avctx->pix_fmt, img->d_w, img->d_h);
+        picture->data[0]     = img->planes[0];
+        picture->data[1]     = img->planes[1];
+        picture->data[2]     = img->planes[2];
+        picture->data[3]     = NULL;
+        picture->linesize[0] = img->stride[0];
+        picture->linesize[1] = img->stride[1];
+        picture->linesize[2] = img->stride[2];
+        picture->linesize[3] = 0;
         *got_frame           = 1;
     }
     return avpkt->size;
@@ -124,7 +126,7 @@ AVCodec ff_libvpx_vp8_decoder = {
     .init           = vp8_init,
     .close          = vp8_free,
     .decode         = vp8_decode,
-    .capabilities   = CODEC_CAP_AUTO_THREADS | CODEC_CAP_DR1,
+    .capabilities   = CODEC_CAP_AUTO_THREADS,
     .long_name      = NULL_IF_CONFIG_SMALL("libvpx VP8"),
 };
 #endif /* CONFIG_LIBVPX_VP8_DECODER */

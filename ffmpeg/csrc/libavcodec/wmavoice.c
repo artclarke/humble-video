@@ -605,7 +605,7 @@ static void calc_input_response(WMAVoiceContext *s, float *lpcs,
 
         /* 70.57 =~ 1/log10(1.0331663) */
         idx = (pwr * gain_mul - 0.0295) * 70.570526123;
-        if (idx > 127) { // fall back if index falls outside table range
+        if (idx > 127) { // fallback if index falls outside table range
             coeffs[n] = wmavoice_energy_table[127] *
                         powf(1.0331663, idx - 127);
         } else
@@ -1763,7 +1763,7 @@ static int synth_superframe(AVCodecContext *ctx, AVFrame *frame,
      * are really WMAPro-in-WMAVoice-superframes. I've never seen those in
      * the wild yet. */
     if (!get_bits1(gb)) {
-        avpriv_request_sample(ctx, "WMAPro-in-WMAVoice");
+        av_log_missing_feature(ctx, "WMAPro-in-WMAVoice", 1);
         return AVERROR_PATCHWELCOME;
     }
 
@@ -1799,8 +1799,10 @@ static int synth_superframe(AVCodecContext *ctx, AVFrame *frame,
 
     /* get output buffer */
     frame->nb_samples = 480;
-    if ((res = ff_get_buffer(ctx, frame, 0)) < 0)
+    if ((res = ff_get_buffer(ctx, frame)) < 0) {
+        av_log(ctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return res;
+    }
     frame->nb_samples = n_samples;
     samples = (float *)frame->data[0];
 

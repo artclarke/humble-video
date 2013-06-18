@@ -25,12 +25,6 @@
 #include <stddef.h>
 #include "attributes.h"
 
-/**
- * @defgroup lavu_crc32 CRC32
- * @ingroup lavu_crypto
- * @{
- */
-
 typedef uint32_t AVCRC;
 
 typedef enum {
@@ -76,9 +70,5 @@ const AVCRC *av_crc_get_table(AVCRCId crc_id);
  */
 uint32_t av_crc(const AVCRC *ctx, uint32_t crc,
                 const uint8_t *buffer, size_t length) av_pure;
-
-/**
- * @}
- */
 
 #endif /* AVUTIL_CRC_H */

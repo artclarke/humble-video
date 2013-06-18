@@ -33,7 +33,6 @@
  *                        FU-B packet types)
  */
 
-#include "libavutil/attributes.h"
 #include "libavutil/base64.h"
 #include "libavutil/avstring.h"
 #include "libavcodec/get_bits.h"
@@ -339,8 +338,7 @@ static void h264_free_context(PayloadContext *data)
     av_free(data);
 }
 
-static av_cold int h264_init(AVFormatContext *s, int st_index,
-                             PayloadContext *data)
+static int h264_init(AVFormatContext *s, int st_index, PayloadContext *data)
 {
     if (st_index < 0)
         return 0;

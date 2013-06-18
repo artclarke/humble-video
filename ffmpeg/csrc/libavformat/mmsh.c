@@ -66,9 +66,9 @@ static int mmsh_close(URLContext *h)
     MMSHContext *mmsh = (MMSHContext *)h->priv_data;
     MMSContext *mms   = &mmsh->mms;
     if (mms->mms_hd)
-        ffurl_closep(&mms->mms_hd);
-    av_freep(&mms->streams);
-    av_freep(&mms->asf_header);
+        ffurl_close(mms->mms_hd);
+    av_free(mms->streams);
+    av_free(mms->asf_header);
     return 0;
 }
 
@@ -309,16 +309,14 @@ static int mmsh_open_internal(URLContext *h, const char *uri, int flags, int tim
     return 0;
 fail:
     av_freep(&stream_selection);
+    mmsh_close(h);
     av_dlog(NULL, "Connection failed with error %d\n", err);
     return err;
 }
 
 static int mmsh_open(URLContext *h, const char *uri, int flags)
 {
-    int ret = mmsh_open_internal(h, uri, flags, 0, 0);
-    if (ret < 0)
-        mmsh_close(h);
-    return ret;
+    return mmsh_open_internal(h, uri, flags, 0, 0);
 }
 
 static int handle_chunk_type(MMSHContext *mmsh)

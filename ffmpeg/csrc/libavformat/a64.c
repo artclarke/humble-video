@@ -20,6 +20,7 @@
  */
 
 #include "libavcodec/avcodec.h"
+#include "libavcodec/a64enc.h"
 #include "libavcodec/bytestream.h"
 #include "avformat.h"
 #include "rawenc.h"

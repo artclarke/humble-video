@@ -68,10 +68,7 @@ static int encode_picture_lossless(AVCodecContext *avctx, AVPacket *pkt,
 
     init_put_bits(&s->pb, pkt->data, pkt->size);
 
-    av_frame_unref(p);
-    ret = av_frame_ref(p, pict);
-    if (ret < 0)
-        return ret;
+    *p = *pict;
     p->pict_type= AV_PICTURE_TYPE_I;
     p->key_frame= 1;
 

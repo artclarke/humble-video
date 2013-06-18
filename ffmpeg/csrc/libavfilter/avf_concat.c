@@ -156,7 +156,8 @@ static int config_output(AVFilterLink *outlink)
     return 0;
 }
 
-static int push_frame(AVFilterContext *ctx, unsigned in_no, AVFrame *buf)
+static void push_frame(AVFilterContext *ctx, unsigned in_no,
+                       AVFilterBufferRef *buf)
 {
     ConcatContext *cat = ctx->priv;
     unsigned out_no = in_no % ctx->nb_outputs;
@@ -170,7 +171,7 @@ static int push_frame(AVFilterContext *ctx, unsigned in_no, AVFrame *buf)
     /* add duration to input PTS */
     if (inlink->sample_rate)
         /* use number of audio samples */
-        in->pts += av_rescale_q(buf->nb_samples,
+        in->pts += av_rescale_q(buf->audio->nb_samples,
                                 (AVRational){ 1, inlink->sample_rate },
                                 outlink->time_base);
     else if (in->nb_frames >= 2)
@@ -178,10 +179,10 @@ static int push_frame(AVFilterContext *ctx, unsigned in_no, AVFrame *buf)
         in->pts = av_rescale(in->pts, in->nb_frames, in->nb_frames - 1);
 
     buf->pts += cat->delta_ts;
-    return ff_filter_frame(outlink, buf);
+    ff_filter_frame(outlink, buf);
 }
 
-static int process_frame(AVFilterLink *inlink, AVFrame *buf)
+static void process_frame(AVFilterLink *inlink, AVFilterBufferRef *buf)
 {
     AVFilterContext *ctx  = inlink->dst;
     ConcatContext *cat    = ctx->priv;
@@ -190,36 +191,38 @@ static int process_frame(AVFilterLink *inlink, AVFrame *buf)
     if (in_no < cat->cur_idx) {
         av_log(ctx, AV_LOG_ERROR, "Frame after EOF on input %s\n",
                ctx->input_pads[in_no].name);
-        av_frame_free(&buf);
+        avfilter_unref_buffer(buf);
     } else if (in_no >= cat->cur_idx + ctx->nb_outputs) {
         ff_bufqueue_add(ctx, &cat->in[in_no].queue, buf);
     } else {
-        return push_frame(ctx, in_no, buf);
+        push_frame(ctx, in_no, buf);
     }
-    return 0;
 }
 
-static AVFrame *get_video_buffer(AVFilterLink *inlink, int w, int h)
+static AVFilterBufferRef *get_video_buffer(AVFilterLink *inlink, int perms,
+                                           int w, int h)
 {
     AVFilterContext *ctx = inlink->dst;
     unsigned in_no = FF_INLINK_IDX(inlink);
     AVFilterLink *outlink = ctx->outputs[in_no % ctx->nb_outputs];
 
-    return ff_get_video_buffer(outlink, w, h);
+    return ff_get_video_buffer(outlink, perms, w, h);
 }
 
-static AVFrame *get_audio_buffer(AVFilterLink *inlink, int nb_samples)
+static AVFilterBufferRef *get_audio_buffer(AVFilterLink *inlink, int perms,
+                                           int nb_samples)
 {
     AVFilterContext *ctx = inlink->dst;
     unsigned in_no = FF_INLINK_IDX(inlink);
     AVFilterLink *outlink = ctx->outputs[in_no % ctx->nb_outputs];
 
-    return ff_get_audio_buffer(outlink, nb_samples);
+    return ff_get_audio_buffer(outlink, perms, nb_samples);
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *buf)
 {
-    return process_frame(inlink, buf);
+    process_frame(inlink, buf);
+    return 0; /* enhancement: handle error return */
 }
 
 static void close_input(AVFilterContext *ctx, unsigned in_no)
@@ -232,7 +235,7 @@ static void close_input(AVFilterContext *ctx, unsigned in_no)
            ctx->input_pads[in_no].name, cat->nb_in_active);
 }
 
-static void find_next_delta_ts(AVFilterContext *ctx, int64_t *seg_delta)
+static void find_next_delta_ts(AVFilterContext *ctx)
 {
     ConcatContext *cat = ctx->priv;
     unsigned i = cat->cur_idx;
@@ -243,51 +246,44 @@ static void find_next_delta_ts(AVFilterContext *ctx, int64_t *seg_delta)
     for (; i < imax; i++)
         pts = FFMAX(pts, cat->in[i].pts);
     cat->delta_ts += pts;
-    *seg_delta = pts;
 }
 
-static int send_silence(AVFilterContext *ctx, unsigned in_no, unsigned out_no,
-                        int64_t seg_delta)
+static void send_silence(AVFilterContext *ctx, unsigned in_no, unsigned out_no)
 {
     ConcatContext *cat = ctx->priv;
     AVFilterLink *outlink = ctx->outputs[out_no];
-    int64_t base_pts = cat->in[in_no].pts + cat->delta_ts - seg_delta;
+    int64_t base_pts = cat->in[in_no].pts + cat->delta_ts;
     int64_t nb_samples, sent = 0;
-    int frame_nb_samples, ret;
+    int frame_nb_samples;
     AVRational rate_tb = { 1, ctx->inputs[in_no]->sample_rate };
-    AVFrame *buf;
+    AVFilterBufferRef *buf;
     int nb_channels = av_get_channel_layout_nb_channels(outlink->channel_layout);
 
     if (!rate_tb.den)
-        return AVERROR_BUG;
-    nb_samples = av_rescale_q(seg_delta - cat->in[in_no].pts,
+        return;
+    nb_samples = av_rescale_q(cat->delta_ts - base_pts,
                               outlink->time_base, rate_tb);
     frame_nb_samples = FFMAX(9600, rate_tb.den / 5); /* arbitrary */
     while (nb_samples) {
         frame_nb_samples = FFMIN(frame_nb_samples, nb_samples);
-        buf = ff_get_audio_buffer(outlink, frame_nb_samples);
+        buf = ff_get_audio_buffer(outlink, AV_PERM_WRITE, frame_nb_samples);
         if (!buf)
-            return AVERROR(ENOMEM);
+            return;
         av_samples_set_silence(buf->extended_data, 0, frame_nb_samples,
                                nb_channels, outlink->format);
         buf->pts = base_pts + av_rescale_q(sent, rate_tb, outlink->time_base);
-        ret = ff_filter_frame(outlink, buf);
-        if (ret < 0)
-            return ret;
+        ff_filter_frame(outlink, buf);
         sent       += frame_nb_samples;
         nb_samples -= frame_nb_samples;
     }
-    return 0;
 }
 
-static int flush_segment(AVFilterContext *ctx)
+static void flush_segment(AVFilterContext *ctx)
 {
-    int ret;
     ConcatContext *cat = ctx->priv;
     unsigned str, str_max;
-    int64_t seg_delta;
 
-    find_next_delta_ts(ctx, &seg_delta);
+    find_next_delta_ts(ctx);
     cat->cur_idx += ctx->nb_outputs;
     cat->nb_in_active = ctx->nb_outputs;
     av_log(ctx, AV_LOG_VERBOSE, "Segment finished at pts=%"PRId64"\n",
@@ -297,24 +293,15 @@ static int flush_segment(AVFilterContext *ctx)
         /* pad audio streams with silence */
         str = cat->nb_streams[AVMEDIA_TYPE_VIDEO];
         str_max = str + cat->nb_streams[AVMEDIA_TYPE_AUDIO];
-        for (; str < str_max; str++) {
-            ret = send_silence(ctx, cat->cur_idx - ctx->nb_outputs + str, str,
-                               seg_delta);
-            if (ret < 0)
-                return ret;
-        }
+        for (; str < str_max; str++)
+            send_silence(ctx, cat->cur_idx - ctx->nb_outputs + str, str);
         /* flush queued buffers */
         /* possible enhancement: flush in PTS order */
         str_max = cat->cur_idx + ctx->nb_outputs;
-        for (str = cat->cur_idx; str < str_max; str++) {
-            while (cat->in[str].queue.available) {
-                ret = push_frame(ctx, str, ff_bufqueue_get(&cat->in[str].queue));
-                if (ret < 0)
-                    return ret;
-            }
-        }
+        for (str = cat->cur_idx; str < str_max; str++)
+            while (cat->in[str].queue.available)
+                push_frame(ctx, str, ff_bufqueue_get(&cat->in[str].queue));
     }
-    return 0;
 }
 
 static int request_frame(AVFilterLink *outlink)
@@ -348,17 +335,24 @@ static int request_frame(AVFilterLink *outlink)
             else if (ret < 0)
                 return ret;
         }
-        ret = flush_segment(ctx);
-        if (ret < 0)
-            return ret;
+        flush_segment(ctx);
         in_no += ctx->nb_outputs;
     }
 }
 
-static av_cold int init(AVFilterContext *ctx)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     ConcatContext *cat = ctx->priv;
+    int ret;
     unsigned seg, type, str;
+
+    cat->class = &concat_class;
+    av_opt_set_defaults(cat);
+    ret = av_set_options_string(cat, args, "=", ":");
+    if (ret < 0) {
+        av_log(ctx, AV_LOG_ERROR, "Error parsing options: '%s'\n", args);
+        return ret;
+    }
 
     /* create input pads */
     for (seg = 0; seg < cat->nb_segments; seg++) {
@@ -366,6 +360,7 @@ static av_cold int init(AVFilterContext *ctx)
             for (str = 0; str < cat->nb_streams[type]; str++) {
                 AVFilterPad pad = {
                     .type             = type,
+                    .min_perms        = AV_PERM_READ | AV_PERM_PRESERVE,
                     .get_video_buffer = get_video_buffer,
                     .get_audio_buffer = get_audio_buffer,
                     .filter_frame     = filter_frame,
@@ -419,5 +414,4 @@ AVFilter avfilter_avf_concat = {
     .inputs        = NULL,
     .outputs       = NULL,
     .priv_class    = &concat_class,
-    .flags         = AVFILTER_FLAG_DYNAMIC_INPUTS | AVFILTER_FLAG_DYNAMIC_OUTPUTS,
 };

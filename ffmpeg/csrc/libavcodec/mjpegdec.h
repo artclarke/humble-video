@@ -34,7 +34,6 @@
 #include "avcodec.h"
 #include "get_bits.h"
 #include "dsputil.h"
-#include "hpeldsp.h"
 
 #define MAX_COMPONENTS 4
 
@@ -98,7 +97,6 @@ typedef struct MJpegDecodeContext {
     uint64_t coefs_finished[MAX_COMPONENTS]; ///< bitmask of which coefs have been completely decoded (progressive mode)
     ScanTable scantable;
     DSPContext dsp;
-    HpelDSPContext hdsp;
 
     int restart_interval;
     int restart_count;

@@ -19,28 +19,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/avassert.h"
-#include "libavutil/avstring.h"
-#include "libavutil/hash.h"
-#include "libavutil/opt.h"
+#include "libavutil/md5.h"
 #include "avformat.h"
 #include "internal.h"
 
 struct MD5Context {
-    const AVClass *avclass;
-    struct AVHashContext *hash;
-    char *hash_name;
+    struct AVMD5 *md5;
 };
 
 static void md5_finish(struct AVFormatContext *s, char *buf)
 {
     struct MD5Context *c = s->priv_data;
-    uint8_t md5[AV_HASH_MAX_SIZE];
+    uint8_t md5[16];
     int i, offset = strlen(buf);
-    int len = av_hash_get_size(c->hash);
-    av_assert0(len > 0 && len <= sizeof(md5));
-    av_hash_final(c->hash, md5);
-    for (i = 0; i < len; i++) {
+    av_md5_final(c->md5, md5);
+    for (i = 0; i < sizeof(md5); i++) {
         snprintf(buf + offset, 3, "%02"PRIx8, md5[i]);
         offset += 2;
     }
@@ -51,48 +44,32 @@ static void md5_finish(struct AVFormatContext *s, char *buf)
     avio_flush(s->pb);
 }
 
-#define OFFSET(x) offsetof(struct MD5Context, x)
-#define ENC AV_OPT_FLAG_ENCODING_PARAM
-static const AVOption hash_options[] = {
-    { "hash", "set hash to use", OFFSET(hash_name), AV_OPT_TYPE_STRING, {.str = "md5"}, 0, 0, ENC },
-    { NULL },
-};
-
-static const AVClass md5enc_class = {
-    .class_name = "hash encoder class",
-    .item_name  = av_default_item_name,
-    .option     = hash_options,
-    .version    = LIBAVUTIL_VERSION_INT,
-};
-
 #if CONFIG_MD5_MUXER
 static int write_header(struct AVFormatContext *s)
 {
     struct MD5Context *c = s->priv_data;
-    int res = av_hash_alloc(&c->hash, c->hash_name);
-    if (res < 0)
-        return res;
-    av_hash_init(c->hash);
+    c->md5 = av_md5_alloc();
+    if (!c->md5)
+        return AVERROR(ENOMEM);
+    av_md5_init(c->md5);
     return 0;
 }
 
 static int write_packet(struct AVFormatContext *s, AVPacket *pkt)
 {
     struct MD5Context *c = s->priv_data;
-    av_hash_update(c->hash, pkt->data, pkt->size);
+    av_md5_update(c->md5, pkt->data, pkt->size);
     return 0;
 }
 
 static int write_trailer(struct AVFormatContext *s)
 {
     struct MD5Context *c = s->priv_data;
-    char buf[256];
-    av_strlcpy(buf, av_hash_get_name(c->hash), sizeof(buf) - 200);
-    av_strlcat(buf, "=", sizeof(buf) - 200);
+    char buf[64] = "MD5=";
 
     md5_finish(s, buf);
 
-    av_hash_freep(&c->hash);
+    av_freep(&c->md5);
     return 0;
 }
 
@@ -106,7 +83,6 @@ AVOutputFormat ff_md5_muxer = {
     .write_packet      = write_packet,
     .write_trailer     = write_trailer,
     .flags             = AVFMT_NOTIMESTAMPS,
-    .priv_class        = &md5enc_class,
 };
 #endif
 
@@ -114,9 +90,9 @@ AVOutputFormat ff_md5_muxer = {
 static int framemd5_write_header(struct AVFormatContext *s)
 {
     struct MD5Context *c = s->priv_data;
-    int res = av_hash_alloc(&c->hash, c->hash_name);
-    if (res < 0)
-        return res;
+    c->md5 = av_md5_alloc();
+    if (!c->md5)
+        return AVERROR(ENOMEM);
     return ff_framehash_write_header(s);
 }
 
@@ -124,8 +100,8 @@ static int framemd5_write_packet(struct AVFormatContext *s, AVPacket *pkt)
 {
     struct MD5Context *c = s->priv_data;
     char buf[256];
-    av_hash_init(c->hash);
-    av_hash_update(c->hash, pkt->data, pkt->size);
+    av_md5_init(c->md5);
+    av_md5_update(c->md5, pkt->data, pkt->size);
 
     snprintf(buf, sizeof(buf) - 64, "%d, %10"PRId64", %10"PRId64", %8d, %8d, ",
              pkt->stream_index, pkt->dts, pkt->pts, pkt->duration, pkt->size);
@@ -136,16 +112,9 @@ static int framemd5_write_packet(struct AVFormatContext *s, AVPacket *pkt)
 static int framemd5_write_trailer(struct AVFormatContext *s)
 {
     struct MD5Context *c = s->priv_data;
-    av_hash_freep(&c->hash);
+    av_freep(&c->md5);
     return 0;
 }
-
-static const AVClass framemd5_class = {
-    .class_name = "frame hash encoder class",
-    .item_name  = av_default_item_name,
-    .option     = hash_options,
-    .version    = LIBAVUTIL_VERSION_INT,
-};
 
 AVOutputFormat ff_framemd5_muxer = {
     .name              = "framemd5",
@@ -156,8 +125,6 @@ AVOutputFormat ff_framemd5_muxer = {
     .write_header      = framemd5_write_header,
     .write_packet      = framemd5_write_packet,
     .write_trailer     = framemd5_write_trailer,
-    .flags             = AVFMT_VARIABLE_FPS | AVFMT_TS_NONSTRICT |
-                         AVFMT_TS_NEGATIVE,
-    .priv_class        = &framemd5_class,
+    .flags             = AVFMT_VARIABLE_FPS | AVFMT_TS_NONSTRICT,
 };
 #endif

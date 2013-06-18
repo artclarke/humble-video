@@ -53,7 +53,7 @@ static int read_header(AVFormatContext *s)
 {
     IcoDemuxContext *ico = s->priv_data;
     AVIOContext *pb = s->pb;
-    int i, codec;
+    int i;
 
     avio_skip(pb, 4);
     ico->nb_images = avio_rl16(pb);
@@ -88,8 +88,7 @@ static int read_header(AVFormatContext *s)
         if (avio_seek(pb, ico->images[i].offset, SEEK_SET) < 0)
             break;
 
-        codec = avio_rl32(pb);
-        switch (codec) {
+        switch(avio_rl32(pb)) {
         case MKTAG(0x89, 'P', 'N', 'G'):
             st->codec->codec_id = AV_CODEC_ID_PNG;
             st->codec->width    = 0;
@@ -107,7 +106,7 @@ static int read_header(AVFormatContext *s)
                 st->codec->height = tmp / 2;
             break;
         default:
-            avpriv_request_sample(s, "codec %d", codec);
+            av_log_ask_for_sample(s, "unsupported codec\n");
             return AVERROR_INVALIDDATA;
         }
     }

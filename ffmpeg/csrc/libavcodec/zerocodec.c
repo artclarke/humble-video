@@ -31,12 +31,14 @@ static int zerocodec_decode_frame(AVCodecContext *avctx, void *data,
                                   int *got_frame, AVPacket *avpkt)
 {
     ZeroCodecContext *zc = avctx->priv_data;
-    AVFrame *pic         = data;
+    AVFrame *pic         = avctx->coded_frame;
     AVFrame *prev_pic    = &zc->previous_frame;
     z_stream *zstream    = &zc->zstream;
     uint8_t *prev        = prev_pic->data[0];
     uint8_t *dst;
-    int i, j, zret, ret;
+    int i, j, zret;
+
+    pic->reference = 3;
 
     if (avpkt->flags & AV_PKT_FLAG_KEY) {
         pic->key_frame = 1;
@@ -59,8 +61,10 @@ static int zerocodec_decode_frame(AVCodecContext *avctx, void *data,
         return AVERROR_INVALIDDATA;
     }
 
-    if ((ret = ff_get_buffer(avctx, pic, AV_GET_BUFFER_FLAG_REF)) < 0)
-        return ret;
+    if (ff_get_buffer(avctx, pic) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Could not allocate buffer.\n");
+        return AVERROR(ENOMEM);
+    }
 
     zstream->next_in  = avpkt->data;
     zstream->avail_in = avpkt->size;
@@ -78,6 +82,7 @@ static int zerocodec_decode_frame(AVCodecContext *avctx, void *data,
 
         zret = inflate(zstream, Z_SYNC_FLUSH);
         if (zret != Z_OK && zret != Z_STREAM_END) {
+            avctx->release_buffer(avctx, pic);
             av_log(avctx, AV_LOG_ERROR,
                    "Inflate failed with return code: %d.\n", zret);
             return AVERROR_INVALIDDATA;
@@ -91,11 +96,16 @@ static int zerocodec_decode_frame(AVCodecContext *avctx, void *data,
         dst  -= pic->linesize[0];
     }
 
-    av_frame_unref(&zc->previous_frame);
-    if ((ret = av_frame_ref(&zc->previous_frame, pic)) < 0)
-        return ret;
+    /* Release the previous buffer if need be */
+    if (prev_pic->data[0])
+        avctx->release_buffer(avctx, prev_pic);
 
     *got_frame = 1;
+    *(AVFrame *)data = *pic;
+
+    /* Store the previous frame for use later.
+     * FFSWAP ensures that e.g. pic->data is NULLed. */
+    FFSWAP(AVFrame, *pic, *prev_pic);
 
     return avpkt->size;
 }
@@ -103,10 +113,15 @@ static int zerocodec_decode_frame(AVCodecContext *avctx, void *data,
 static av_cold int zerocodec_decode_close(AVCodecContext *avctx)
 {
     ZeroCodecContext *zc = avctx->priv_data;
-
-    av_frame_unref(&zc->previous_frame);
+    AVFrame *prev_pic    = &zc->previous_frame;
 
     inflateEnd(&zc->zstream);
+
+    /* Release last frame */
+    if (prev_pic->data[0])
+        avctx->release_buffer(avctx, prev_pic);
+
+    av_freep(&avctx->coded_frame);
 
     return 0;
 }
@@ -127,6 +142,13 @@ static av_cold int zerocodec_decode_init(AVCodecContext *avctx)
     zret = inflateInit(zstream);
     if (zret != Z_OK) {
         av_log(avctx, AV_LOG_ERROR, "Could not initialize inflate: %d.\n", zret);
+        return AVERROR(ENOMEM);
+    }
+
+    avctx->coded_frame = avcodec_alloc_frame();
+    if (!avctx->coded_frame) {
+        av_log(avctx, AV_LOG_ERROR, "Could not allocate frame buffer.\n");
+        zerocodec_decode_close(avctx);
         return AVERROR(ENOMEM);
     }
 

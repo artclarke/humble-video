@@ -49,6 +49,8 @@
 #include "rtpenc.h"
 #include "mpegts.h"
 
+//#define DEBUG
+
 /* Timeout values for socket poll, in ms,
  * and read_packet(), in seconds  */
 #define POLL_TIMEOUT_MS 100
@@ -89,7 +91,6 @@ const AVOption ff_rtsp_options[] = {
     { "min_port", "Minimum local UDP port", OFFSET(rtp_port_min), AV_OPT_TYPE_INT, {.i64 = RTSP_RTP_PORT_MIN}, 0, 65535, DEC|ENC },
     { "max_port", "Maximum local UDP port", OFFSET(rtp_port_max), AV_OPT_TYPE_INT, {.i64 = RTSP_RTP_PORT_MAX}, 0, 65535, DEC|ENC },
     { "timeout", "Maximum timeout (in seconds) to wait for incoming connections. -1 is infinite. Implies flag listen", OFFSET(initial_timeout), AV_OPT_TYPE_INT, {.i64 = -1}, INT_MIN, INT_MAX, DEC },
-    { "stimeout", "timeout (in micro seconds) of socket i/o operations.", OFFSET(stimeout), AV_OPT_TYPE_INT, {.i64 = 0}, INT_MIN, INT_MAX, DEC },
     RTSP_REORDERING_OPTS(),
     { NULL },
 };
@@ -1118,11 +1119,11 @@ start:
  *
  * @return zero if success, nonzero otherwise
  */
-static int rtsp_send_cmd_with_content_async(AVFormatContext *s,
-                                            const char *method, const char *url,
-                                            const char *headers,
-                                            const unsigned char *send_content,
-                                            int send_content_length)
+static int ff_rtsp_send_cmd_with_content_async(AVFormatContext *s,
+                                               const char *method, const char *url,
+                                               const char *headers,
+                                               const unsigned char *send_content,
+                                               int send_content_length)
 {
     RTSPState *rt = s->priv_data;
     char buf[4096], *out_buf;
@@ -1175,7 +1176,7 @@ static int rtsp_send_cmd_with_content_async(AVFormatContext *s,
 int ff_rtsp_send_cmd_async(AVFormatContext *s, const char *method,
                            const char *url, const char *headers)
 {
-    return rtsp_send_cmd_with_content_async(s, method, url, headers, NULL, 0);
+    return ff_rtsp_send_cmd_with_content_async(s, method, url, headers, NULL, 0);
 }
 
 int ff_rtsp_send_cmd(AVFormatContext *s, const char *method, const char *url,
@@ -1200,9 +1201,9 @@ int ff_rtsp_send_cmd_with_content(AVFormatContext *s,
 
 retry:
     cur_auth_type = rt->auth_state.auth_type;
-    if ((ret = rtsp_send_cmd_with_content_async(s, method, url, header,
-                                                send_content,
-                                                send_content_length)))
+    if ((ret = ff_rtsp_send_cmd_with_content_async(s, method, url, header,
+                                                   send_content,
+                                                   send_content_length)))
         return ret;
 
     if ((ret = ff_rtsp_read_reply(s, reply, content_ptr, 0, method) ) < 0)
@@ -1617,8 +1618,7 @@ redirect:
         }
     } else {
         /* open the tcp connection */
-        ff_url_join(tcpname, sizeof(tcpname), "tcp", NULL, host, port,
-                    "?timeout=%d", rt->stimeout);
+        ff_url_join(tcpname, sizeof(tcpname), "tcp", NULL, host, port, NULL);
         if (ffurl_open(&rt->rtsp_hd, tcpname, AVIO_FLAG_READ_WRITE,
                        &s->interrupt_callback, NULL) < 0) {
             err = AVERROR(EIO);
@@ -2028,7 +2028,7 @@ static int sdp_probe(AVProbeData *p1)
     while (p < p_end && *p != '\0') {
         if (p + sizeof("c=IN IP") - 1 < p_end &&
             av_strstart(p, "c=IN IP", NULL))
-            return AVPROBE_SCORE_EXTENSION;
+            return AVPROBE_SCORE_MAX / 2;
 
         while (p < p_end - 1 && *p != '\n') p++;
         if (++p >= p_end)
@@ -2134,7 +2134,7 @@ static int rtp_probe(AVProbeData *p)
 
 static int rtp_read_header(AVFormatContext *s)
 {
-    uint8_t recvbuf[RTP_MAX_PACKET_LENGTH];
+    uint8_t recvbuf[1500];
     char host[500], sdp[500];
     int ret, port;
     URLContext* in = NULL;

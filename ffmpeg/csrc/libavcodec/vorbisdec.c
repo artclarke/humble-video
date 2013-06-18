@@ -422,11 +422,6 @@ static int vorbis_parse_setup_hdr_codebooks(vorbis_context *vc)
         }
 
 // Initialize VLC table
-        if (entries <= 0) {
-            av_log(vc->avctx, AV_LOG_ERROR, "Invalid codebook entry count\n");
-            ret = AVERROR_INVALIDDATA;
-            goto error;
-        }
         if (ff_vorbis_len2vlc(tmp_vlc_bits, tmp_vlc_codes, entries)) {
             av_log(vc->avctx, AV_LOG_ERROR, " Invalid code lengths while generating vlcs. \n");
             ret = AVERROR_INVALIDDATA;
@@ -1313,47 +1308,6 @@ static int vorbis_floor1_decode(vorbis_context *vc,
     return 0;
 }
 
-static av_always_inline int setup_classifs(vorbis_context *vc,
-                                           vorbis_residue *vr,
-                                           uint8_t *do_not_decode,
-                                           unsigned ch_used,
-                                           int partition_count)
-{
-    int p, j, i;
-    unsigned c_p_c         = vc->codebooks[vr->classbook].dimensions;
-    unsigned inverse_class = ff_inverse[vr->classifications];
-    unsigned temp, temp2;
-    for (p = 0, j = 0; j < ch_used; ++j) {
-        if (!do_not_decode[j]) {
-            temp = get_vlc2(&vc->gb, vc->codebooks[vr->classbook].vlc.table,
-                                     vc->codebooks[vr->classbook].nb_bits, 3);
-
-            av_dlog(NULL, "Classword: %u\n", temp);
-
-            av_assert0(vr->classifications > 1); //needed for inverse[]
-
-            if (temp <= 65536) {
-                for (i = partition_count + c_p_c - 1; i >= partition_count; i--) {
-                    temp2 = (((uint64_t)temp) * inverse_class) >> 32;
-
-                    if (i < vr->ptns_to_read)
-                        vr->classifs[p + i] = temp - temp2 * vr->classifications;
-                    temp = temp2;
-                }
-            } else {
-                for (i = partition_count + c_p_c - 1; i >= partition_count; i--) {
-                    temp2 = temp / vr->classifications;
-
-                    if (i < vr->ptns_to_read)
-                        vr->classifs[p + i] = temp - temp2 * vr->classifications;
-                    temp = temp2;
-                }
-            }
-        }
-        p += vr->ptns_to_read;
-    }
-    return 0;
-}
 // Read and decode residue
 
 static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
@@ -1367,10 +1321,10 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
 {
     GetBitContext *gb = &vc->gb;
     unsigned c_p_c        = vc->codebooks[vr->classbook].dimensions;
+    unsigned ptns_to_read = vr->ptns_to_read;
     uint8_t *classifs = vr->classifs;
     unsigned pass, ch_used, i, j, k, l;
     unsigned max_output = (ch - 1) * vlen;
-    int ptns_to_read = vr->ptns_to_read;
 
     if (vr_type == 2) {
         for (j = 1; j < ch; ++j)
@@ -1386,18 +1340,37 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
 
     if (max_output > ch_left * vlen) {
         av_log(vc->avctx, AV_LOG_ERROR, "Insufficient output buffer\n");
-        return AVERROR_INVALIDDATA;
+        return -1;
     }
 
     av_dlog(NULL, " residue type 0/1/2 decode begin, ch: %d  cpc %d  \n", ch, c_p_c);
 
     for (pass = 0; pass <= vr->maxpass; ++pass) { // FIXME OPTIMIZE?
-        int voffset, partition_count, j_times_ptns_to_read;
+        uint16_t voffset, partition_count, j_times_ptns_to_read;
 
         voffset = vr->begin;
         for (partition_count = 0; partition_count < ptns_to_read;) {  // SPEC        error
             if (!pass) {
-                setup_classifs(vc, vr, do_not_decode, ch_used, partition_count);
+                unsigned inverse_class = ff_inverse[vr->classifications];
+                for (j_times_ptns_to_read = 0, j = 0; j < ch_used; ++j) {
+                    if (!do_not_decode[j]) {
+                        unsigned temp = get_vlc2(gb, vc->codebooks[vr->classbook].vlc.table,
+                                                 vc->codebooks[vr->classbook].nb_bits, 3);
+
+                        av_dlog(NULL, "Classword: %u\n", temp);
+
+                        av_assert0(vr->classifications > 1 && temp <= 65536); //needed for inverse[]
+                        for (i = 0; i < c_p_c; ++i) {
+                            unsigned temp2;
+
+                            temp2 = (((uint64_t)temp) * inverse_class) >> 32;
+                            if (partition_count + c_p_c - 1 - i < ptns_to_read)
+                                classifs[j_times_ptns_to_read + partition_count + c_p_c - 1 - i] = temp - temp2 * vr->classifications;
+                            temp = temp2;
+                        }
+                    }
+                    j_times_ptns_to_read += ptns_to_read;
+                }
             }
             for (i = 0; (i < c_p_c) && (partition_count < ptns_to_read); ++i) {
                 for (j_times_ptns_to_read = 0, j = 0; j < ch_used; ++j) {
@@ -1637,7 +1610,7 @@ static int vorbis_parse_audio_packet(vorbis_context *vc, float **floor_ptr)
         residue = &vc->residues[mapping->submap_residue[i]];
         if (ch_left < ch) {
             av_log(vc->avctx, AV_LOG_ERROR, "Too many channels in vorbis_floor_decode.\n");
-            return AVERROR_INVALIDDATA;
+            return -1;
         }
         if (ch) {
             ret = vorbis_residue_decode(vc, residue, ch, do_not_decode, ch_res_ptr, vlen, ch_left);
@@ -1756,8 +1729,10 @@ static int vorbis_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = vc->blocksize[1] / 2;
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
 
     if (vc->audio_channels > 8) {
         for (i = 0; i < vc->audio_channels; i++)
@@ -1777,7 +1752,6 @@ static int vorbis_decode_frame(AVCodecContext *avctx, void *data,
     if (!vc->first_frame) {
         vc->first_frame = 1;
         *got_frame_ptr = 0;
-        av_frame_unref(frame);
         return buf_size;
     }
 

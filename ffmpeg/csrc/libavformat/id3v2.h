@@ -67,7 +67,8 @@ typedef struct ID3v2ExtraMetaGEOB {
 } ID3v2ExtraMetaGEOB;
 
 typedef struct ID3v2ExtraMetaAPIC {
-    AVBufferRef *buf;
+    uint8_t     *data;
+    int          len;
     const char  *type;
     uint8_t     *description;
     enum AVCodecID id;

@@ -27,6 +27,7 @@
 
 typedef struct {
     MJpegDecodeContext mjpeg_ctx;
+    AVFrame frame;
     int is_mjpeg;
     int interlace; //FIXME use frame.interlaced_frame
     int tff;
@@ -51,6 +52,7 @@ static av_cold int init(AVCodecContext *avctx)
     if ((ret = av_image_check_size(avctx->width, avctx->height, 0, avctx)) < 0)
         return ret;
 
+    avcodec_get_frame_defaults(&a->frame);
     avctx->pix_fmt = AV_PIX_FMT_UYVY422;
 
     if(avctx->extradata_size >= 9 && avctx->extradata[4]+28 < avctx->extradata_size) {
@@ -67,6 +69,10 @@ static av_cold int init(AVCodecContext *avctx)
 static av_cold int end(AVCodecContext *avctx)
 {
     AVRnContext *a = avctx->priv_data;
+    AVFrame *p = &a->frame;
+
+    if(p->data[0])
+        avctx->release_buffer(avctx, p);
 
     if(a->is_mjpeg)
         ff_mjpeg_decode_end(avctx);
@@ -78,7 +84,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
                         int *got_frame, AVPacket *avpkt)
 {
     AVRnContext *a = avctx->priv_data;
-    AVFrame *p = data;
+    AVFrame *p = &a->frame;
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
     int y, ret, true_height;
@@ -87,14 +93,18 @@ static int decode_frame(AVCodecContext *avctx, void *data,
         return ff_mjpeg_decode_frame(avctx, data, got_frame, avpkt);
 
     true_height    = buf_size / (2*avctx->width);
+    if(p->data[0])
+        avctx->release_buffer(avctx, p);
 
     if(buf_size < 2*avctx->width * avctx->height) {
         av_log(avctx, AV_LOG_ERROR, "packet too small\n");
         return AVERROR_INVALIDDATA;
     }
 
-    if ((ret = ff_get_buffer(avctx, p, 0)) < 0)
+    if((ret = ff_get_buffer(avctx, p)) < 0){
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
     p->pict_type= AV_PICTURE_TYPE_I;
     p->key_frame= 1;
 
@@ -113,6 +123,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
         }
     }
 
+    *(AVFrame*)data = a->frame;
     *got_frame      = 1;
     return buf_size;
 }

@@ -50,17 +50,7 @@ static av_cold int libspeex_decode_init(AVCodecContext *avctx)
         if (!header)
             av_log(avctx, AV_LOG_WARNING, "Invalid Speex header\n");
     }
-    if (avctx->codec_tag == MKTAG('S', 'P', 'X', 'N')) {
-        if (!avctx->extradata || avctx->extradata && avctx->extradata_size < 47) {
-            av_log(avctx, AV_LOG_ERROR, "Missing or invalid extradata.\n");
-            return AVERROR_INVALIDDATA;
-        }
-        if (avctx->extradata[37] != 10) {
-            av_log(avctx, AV_LOG_ERROR, "Unsupported quality mode.\n");
-            return AVERROR_PATCHWELCOME;
-        }
-        spx_mode           = 0;
-    } else if (header) {
+    if (header) {
         avctx->sample_rate = header->rate;
         avctx->channels    = header->nb_channels;
         spx_mode           = header->mode;
@@ -128,8 +118,10 @@ static int libspeex_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = s->frame_size;
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
     output = (int16_t *)frame->data[0];
 
     /* if there is not enough data left for the smallest possible frame or the

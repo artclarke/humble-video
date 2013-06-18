@@ -56,9 +56,9 @@ static int h263_probe(AVProbeData *p)
         }
     }
     if(valid_psc > 2*invalid_psc + 2*res_change + 3){
-        return AVPROBE_SCORE_EXTENSION;
+        return 50;
     }else if(valid_psc > 2*invalid_psc)
-        return AVPROBE_SCORE_EXTENSION / 2;
+        return 25;
     return 0;
 }
 

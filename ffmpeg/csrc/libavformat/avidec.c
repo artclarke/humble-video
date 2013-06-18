@@ -62,7 +62,6 @@ typedef struct {
     int64_t  riff_end;
     int64_t  movi_end;
     int64_t  fsize;
-    int64_t io_fsize;
     int64_t movi_list;
     int64_t last_pkt_pos;
     int index_loaded;
@@ -365,7 +364,6 @@ static int avi_read_header(AVFormatContext *s)
     int amv_file_format=0;
     uint64_t list_end = 0;
     int ret;
-    AVDictionaryEntry *dict_entry;
 
     avi->stream_index= -1;
 
@@ -375,7 +373,7 @@ static int avi_read_header(AVFormatContext *s)
 
     av_log(avi, AV_LOG_DEBUG, "use odml:%d\n", avi->use_odml);
 
-    avi->io_fsize = avi->fsize = avio_size(pb);
+    avi->fsize = avio_size(pb);
     if(avi->fsize<=0 || avi->fsize < avi->riff_end)
         avi->fsize= avi->riff_end == 8 ? INT64_MAX : avi->riff_end;
 
@@ -571,13 +569,8 @@ static int avi_read_header(AVFormatContext *s)
             default:
                 av_log(s, AV_LOG_INFO, "unknown stream type %X\n", tag1);
             }
-            if(ast->sample_size == 0) {
+            if(ast->sample_size == 0)
                 st->duration = st->nb_frames;
-                if (st->duration > 0 && avi->io_fsize > 0 && avi->riff_end > avi->io_fsize) {
-                    av_log(s, AV_LOG_DEBUG, "File is truncated adjusting duration\n");
-                    st->duration = av_rescale(st->duration, avi->io_fsize, avi->riff_end);
-                }
-            }
             ast->frame_offset= ast->cum_len;
             avio_skip(pb, size - 12 * 4);
             break;
@@ -805,16 +798,6 @@ static int avi_read_header(AVFormatContext *s)
         avi_load_index(s);
     avi->index_loaded |= 1;
     avi->non_interleaved |= guess_ni_flag(s) | (s->flags & AVFMT_FLAG_SORT_DTS);
-
-    dict_entry = av_dict_get(s->metadata, "ISFT", NULL, 0);
-    if (dict_entry && !strcmp(dict_entry->value, "PotEncoder"))
-        for (i=0; i<s->nb_streams; i++) {
-            AVStream *st = s->streams[i];
-            if (   st->codec->codec_id == AV_CODEC_ID_MPEG1VIDEO
-                || st->codec->codec_id == AV_CODEC_ID_MPEG2VIDEO)
-                st->need_parsing = AVSTREAM_PARSE_FULL;
-        }
-
     for(i=0; i<s->nb_streams; i++){
         AVStream *st = s->streams[i];
         if(st->nb_index_entries)
@@ -843,7 +826,7 @@ static int avi_read_header(AVFormatContext *s)
 static int read_gab2_sub(AVStream *st, AVPacket *pkt) {
     if (pkt->data && !strcmp(pkt->data, "GAB2") && AV_RL16(pkt->data+5) == 2) {
         uint8_t desc[256];
-        int score = AVPROBE_SCORE_EXTENSION, ret;
+        int score = AVPROBE_SCORE_MAX / 2, ret;
         AVIStream *ast = st->priv_data;
         AVInputFormat *sub_demuxer;
         AVRational time_base;
@@ -957,7 +940,7 @@ start_sync:
         n= get_stream_idx(d+2);
         av_dlog(s, "%X %X %X %X %X %X %X %X %"PRId64" %u %d\n",
                 d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], i, size, n);
-        if(i*(avi->io_fsize>0) + (uint64_t)size > avi->fsize || d[0] > 127)
+        if(i + (uint64_t)size > avi->fsize || d[0] > 127)
             continue;
 
         //parse ix##
@@ -1076,9 +1059,7 @@ static int avi_read_packet(AVFormatContext *s, AVPacket *pkt)
     AVIContext *avi = s->priv_data;
     AVIOContext *pb = s->pb;
     int err;
-#if FF_API_DESTRUCT_PACKET
     void* dstr;
-#endif
 
     if (CONFIG_DV_DEMUXER && avi->dv_demux) {
         int size = avpriv_dv_get_packet(avi->dv_demux, pkt);
@@ -1183,16 +1164,10 @@ resync:
         }
 
         if (CONFIG_DV_DEMUXER && avi->dv_demux) {
-            AVBufferRef *avbuf = pkt->buf;
-#if FF_API_DESTRUCT_PACKET
             dstr = pkt->destruct;
-#endif
             size = avpriv_dv_produce_packet(avi->dv_demux, pkt,
                                     pkt->data, pkt->size, pkt->pos);
-#if FF_API_DESTRUCT_PACKET
             pkt->destruct = dstr;
-#endif
-            pkt->buf = avbuf;
             pkt->flags |= AV_PKT_FLAG_KEY;
             if (size < 0)
                 av_free_packet(pkt);

@@ -27,24 +27,38 @@ static av_cold int y216_decode_init(AVCodecContext *avctx)
     avctx->pix_fmt             = AV_PIX_FMT_YUV422P16;
     avctx->bits_per_raw_sample = 14;
 
+    avctx->coded_frame = avcodec_alloc_frame();
+
+    if (!avctx->coded_frame) {
+        av_log(avctx, AV_LOG_ERROR, "Could not allocate frame.\n");
+        return AVERROR(ENOMEM);
+    }
+
     return 0;
 }
 
 static int y216_decode_frame(AVCodecContext *avctx, void *data,
                              int *got_frame, AVPacket *avpkt)
 {
-    AVFrame *pic = data;
+    AVFrame *pic = avctx->coded_frame;
     const uint16_t *src = (uint16_t *)avpkt->data;
     uint16_t *y, *u, *v, aligned_width = FFALIGN(avctx->width, 4);
-    int i, j, ret;
+    int i, j;
+
+    if (pic->data[0])
+        avctx->release_buffer(avctx, pic);
 
     if (avpkt->size < 4 * avctx->height * aligned_width) {
         av_log(avctx, AV_LOG_ERROR, "Insufficient input data.\n");
         return AVERROR(EINVAL);
     }
 
-    if ((ret = ff_get_buffer(avctx, pic, 0)) < 0)
-        return ret;
+    pic->reference = 0;
+
+    if (ff_get_buffer(avctx, pic) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Could not allocate buffer.\n");
+        return AVERROR(ENOMEM);
+    }
 
     pic->key_frame = 1;
     pic->pict_type = AV_PICTURE_TYPE_I;
@@ -68,12 +82,17 @@ static int y216_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     *got_frame = 1;
+    *(AVFrame *)data = *pic;
 
     return avpkt->size;
 }
 
 static av_cold int y216_decode_close(AVCodecContext *avctx)
 {
+    if (avctx->coded_frame->data[0])
+        avctx->release_buffer(avctx, avctx->coded_frame);
+
+    av_freep(&avctx->coded_frame);
 
     return 0;
 }

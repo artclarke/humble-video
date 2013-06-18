@@ -23,9 +23,8 @@
 * function definitions common to libschroedinger decoder and encoder
 */
 
-#include "libavutil/attributes.h"
-#include "libavutil/mem.h"
 #include "libschroedinger.h"
+#include "libavutil/mem.h"
 
 static const SchroVideoFormatInfo ff_schro_video_format_info[] = {
     { 640,  480,  24000, 1001},
@@ -67,7 +66,7 @@ static unsigned int get_video_format_idx(AVCodecContext *avctx)
     return ret_idx;
 }
 
-av_cold void ff_schro_queue_init(FFSchroQueue *queue)
+void ff_schro_queue_init(FFSchroQueue *queue)
 {
     queue->p_head = queue->p_tail = NULL;
     queue->size = 0;

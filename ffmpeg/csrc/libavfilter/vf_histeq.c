@@ -82,15 +82,29 @@ static const AVOption histeq_options[] = {
 
 AVFILTER_DEFINE_CLASS(histeq);
 
-static av_cold int init(AVFilterContext *ctx)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     HisteqContext *histeq = ctx->priv;
+    const char *shorthand[] = { "strength", "intensity", "antibanding", NULL };
+    int ret;
+
+    histeq->class = &histeq_class;
+    av_opt_set_defaults(histeq);
+
+    if ((ret = av_opt_set_from_string(histeq, args, shorthand, "=", ":")) < 0)
+        return ret;
 
     av_log(ctx, AV_LOG_VERBOSE,
            "strength:%0.3f intensity:%0.3f antibanding:%d\n",
            histeq->strength, histeq->intensity, histeq->antibanding);
 
     return 0;
+}
+
+static av_cold void uninit(AVFilterContext *ctx)
+{
+    HisteqContext *histeq = ctx->priv;
+    av_opt_free(histeq);
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -128,7 +142,7 @@ static int config_input(AVFilterLink *inlink)
     b = src[x + map[B]];                       \
 } while (0)
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *inpic)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *inpic)
 {
     AVFilterContext   *ctx     = inlink->dst;
     HisteqContext     *histeq  = ctx->priv;
@@ -136,16 +150,16 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpic)
     int strength  = histeq->strength  * 1000;
     int intensity = histeq->intensity * 1000;
     int x, y, i, luthi, lutlo, lut, luma, oluma, m;
-    AVFrame *outpic;
+    AVFilterBufferRef *outpic;
     unsigned int r, g, b, jran;
     uint8_t *src, *dst;
 
-    outpic = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+    outpic = ff_get_video_buffer(outlink, AV_PERM_WRITE|AV_PERM_ALIGN, outlink->w, outlink->h);
     if (!outpic) {
-        av_frame_free(&inpic);
+        avfilter_unref_bufferp(&inpic);
         return AVERROR(ENOMEM);
     }
-    av_frame_copy_props(outpic, inpic);
+    avfilter_copy_buffer_ref_props(outpic, inpic);
 
     /* Seed random generator for antibanding. */
     jran = LCG_SEED;
@@ -235,7 +249,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpic)
                 dst[x + histeq->rgba_map[R]] = r;
                 dst[x + histeq->rgba_map[G]] = g;
                 dst[x + histeq->rgba_map[B]] = b;
-                oluma = av_clip_uint8((55 * r + 182 * g + 19 * b) >> 8);
+                oluma = (55 * r + 182 * g + 19 * b) >> 8;
                 histeq->out_histogram[oluma]++;
             }
         }
@@ -247,7 +261,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpic)
         av_dlog(ctx, "out[%d]: %u\n", x, histeq->out_histogram[x]);
 #endif
 
-    av_frame_free(&inpic);
+    avfilter_unref_bufferp(&inpic);
     return ff_filter_frame(outlink, outpic);
 }
 
@@ -257,6 +271,7 @@ static const AVFilterPad histeq_inputs[] = {
         .type             = AVMEDIA_TYPE_VIDEO,
         .config_props     = config_input,
         .filter_frame     = filter_frame,
+        .min_perms        = AV_PERM_READ,
     },
     { NULL }
 };
@@ -274,10 +289,10 @@ AVFilter avfilter_vf_histeq = {
     .description   = NULL_IF_CONFIG_SMALL("Apply global color histogram equalization."),
     .priv_size     = sizeof(HisteqContext),
     .init          = init,
+    .uninit        = uninit,
     .query_formats = query_formats,
 
     .inputs        = histeq_inputs,
     .outputs       = histeq_outputs,
     .priv_class    = &histeq_class,
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

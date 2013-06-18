@@ -948,8 +948,6 @@ static int decode_pic(AVSContext *h)
     int ret;
     enum cavs_mb mb_type;
 
-    av_frame_unref(h->cur.f);
-
     skip_bits(&h->gb, 16);//bbv_dwlay
     if (h->stc == PIC_PB_START_CODE) {
         h->cur.f->pict_type = get_bits(&h->gb, 2) + AV_PICTURE_TYPE_I;
@@ -975,10 +973,11 @@ static int decode_pic(AVSContext *h)
         if (h->stream_revision > 0)
             skip_bits(&h->gb, 1); //marker_bit
     }
+    /* release last B frame */
+    if (h->cur.f->data[0])
+        h->avctx->release_buffer(h->avctx, h->cur.f);
 
-    if ((ret = ff_get_buffer(h->avctx, h->cur.f,
-                             h->cur.f->pict_type == AV_PICTURE_TYPE_B ?
-                             0 : AV_GET_BUFFER_FLAG_REF)) < 0)
+    if ((ret = ff_get_buffer(h->avctx, h->cur.f)) < 0)
         return ret;
 
     if (!h->edge_emu_buffer) {
@@ -1076,7 +1075,8 @@ static int decode_pic(AVSContext *h)
         } while (ff_cavs_next_mb(h));
     }
     if (h->cur.f->pict_type != AV_PICTURE_TYPE_B) {
-        av_frame_unref(h->DPB[1].f);
+        if (h->DPB[1].f->data[0])
+            h->avctx->release_buffer(h->avctx, h->DPB[1].f);
         FFSWAP(AVSFrame, h->cur, h->DPB[1]);
         FFSWAP(AVSFrame, h->DPB[0], h->DPB[1]);
     }
@@ -1101,8 +1101,7 @@ static int decode_seq_header(AVSContext *h)
     width  = get_bits(&h->gb, 14);
     height = get_bits(&h->gb, 14);
     if ((h->width || h->height) && (h->width != width || h->height != height)) {
-        avpriv_report_missing_feature(h->avctx,
-                                      "Width/height changing in CAVS");
+        av_log_missing_feature(h->avctx, "Width/height changing in CAVS", 0);
         return AVERROR_PATCHWELCOME;
     }
     if (width <= 0 || height <= 0) {
@@ -1143,15 +1142,19 @@ static int cavs_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     AVSContext *h      = avctx->priv_data;
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
+    AVFrame *picture   = data;
     uint32_t stc       = -1;
-    int input_size, ret;
+    int input_size;
     const uint8_t *buf_end;
     const uint8_t *buf_ptr;
 
     if (buf_size == 0) {
         if (!h->low_delay && h->DPB[0].f->data[0]) {
             *got_frame = 1;
-            av_frame_move_ref(data, h->DPB[0].f);
+            *picture = *h->DPB[0].f;
+            if (h->cur.f->data[0])
+                avctx->release_buffer(avctx, h->cur.f);
+            FFSWAP(AVSFrame, h->cur, h->DPB[0]);
         }
         return 0;
     }
@@ -1159,7 +1162,7 @@ static int cavs_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     buf_ptr = buf;
     buf_end = buf + buf_size;
     for(;;) {
-        buf_ptr = avpriv_find_start_code(buf_ptr, buf_end, &stc);
+        buf_ptr = avpriv_mpv_find_start_code(buf_ptr, buf_end, &stc);
         if ((stc & 0xFFFFFE00) || buf_ptr == buf_end)
             return FFMAX(0, buf_ptr - buf);
         input_size = (buf_end - buf_ptr) * 8;
@@ -1170,8 +1173,10 @@ static int cavs_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
             break;
         case PIC_I_START_CODE:
             if (!h->got_keyframe) {
-                av_frame_unref(h->DPB[0].f);
-                av_frame_unref(h->DPB[1].f);
+                if(h->DPB[0].f->data[0])
+                    avctx->release_buffer(avctx, h->DPB[0].f);
+                if(h->DPB[1].f->data[0])
+                    avctx->release_buffer(avctx, h->DPB[1].f);
                 h->got_keyframe = 1;
             }
         case PIC_PB_START_CODE:
@@ -1187,14 +1192,12 @@ static int cavs_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
             *got_frame = 1;
             if (h->cur.f->pict_type != AV_PICTURE_TYPE_B) {
                 if (h->DPB[1].f->data[0]) {
-                    if ((ret = av_frame_ref(data, h->DPB[1].f)) < 0)
-                        return ret;
+                    *picture = *h->DPB[1].f;
                 } else {
                     *got_frame = 0;
                 }
-            } else {
-                av_frame_move_ref(data, h->cur.f);
-            }
+            } else
+                *picture = *h->cur.f;
             break;
         case EXT_START_CODE:
             //mpeg_decode_extension(avctx, buf_ptr, input_size);

@@ -43,34 +43,41 @@ static av_cold int aacPlus_encode_init(AVCodecContext *avctx)
     /* number of channels */
     if (avctx->channels < 1 || avctx->channels > 2) {
         av_log(avctx, AV_LOG_ERROR, "encoding %d channel(s) is not allowed\n", avctx->channels);
-        return AVERROR(EINVAL);
-    }
-
-    if (avctx->profile != FF_PROFILE_AAC_LOW && avctx->profile != FF_PROFILE_UNKNOWN) {
-        av_log(avctx, AV_LOG_ERROR, "invalid AAC profile: %d, only LC supported\n", avctx->profile);
-        return AVERROR(EINVAL);
+        return -1;
     }
 
     s->aacplus_handle = aacplusEncOpen(avctx->sample_rate, avctx->channels,
                                        &s->samples_input, &s->max_output_bytes);
-    if (!s->aacplus_handle) {
-        av_log(avctx, AV_LOG_ERROR, "can't open encoder\n");
-        return AVERROR(EINVAL);
+    if(!s->aacplus_handle) {
+            av_log(avctx, AV_LOG_ERROR, "can't open encoder\n");
+            return -1;
     }
 
     /* check aacplus version */
     aacplus_cfg = aacplusEncGetCurrentConfiguration(s->aacplus_handle);
 
+    /* put the options in the configuration struct */
+    if(avctx->profile != FF_PROFILE_AAC_LOW && avctx->profile != FF_PROFILE_UNKNOWN) {
+            av_log(avctx, AV_LOG_ERROR, "invalid AAC profile: %d, only LC supported\n", avctx->profile);
+            aacplusEncClose(s->aacplus_handle);
+            return -1;
+    }
+
     aacplus_cfg->bitRate = avctx->bit_rate;
     aacplus_cfg->bandWidth = avctx->cutoff;
     aacplus_cfg->outputFormat = !(avctx->flags & CODEC_FLAG_GLOBAL_HEADER);
-    aacplus_cfg->inputFormat = avctx->sample_fmt == AV_SAMPLE_FMT_FLT ? AACPLUS_INPUT_FLOAT : AACPLUS_INPUT_16BIT;
+    aacplus_cfg->inputFormat = AACPLUS_INPUT_16BIT;
     if (!aacplusEncSetConfiguration(s->aacplus_handle, aacplus_cfg)) {
         av_log(avctx, AV_LOG_ERROR, "libaacplus doesn't support this output format!\n");
-        return AVERROR(EINVAL);
+        return -1;
     }
 
     avctx->frame_size = s->samples_input / avctx->channels;
+
+#if FF_API_OLD_ENCODE_AUDIO
+    avctx->coded_frame= avcodec_alloc_frame();
+    avctx->coded_frame->key_frame= 1;
+#endif
 
     /* Set decoder specific info */
     avctx->extradata_size = 0;
@@ -111,16 +118,14 @@ static av_cold int aacPlus_encode_close(AVCodecContext *avctx)
 {
     aacPlusAudioContext *s = avctx->priv_data;
 
+#if FF_API_OLD_ENCODE_AUDIO
+    av_freep(&avctx->coded_frame);
+#endif
     av_freep(&avctx->extradata);
-    aacplusEncClose(s->aacplus_handle);
 
+    aacplusEncClose(s->aacplus_handle);
     return 0;
 }
-
-static const AVProfile profiles[] = {
-    { FF_PROFILE_AAC_LOW, "LC" },
-    { FF_PROFILE_UNKNOWN },
-};
 
 AVCodec ff_libaacplus_encoder = {
     .name           = "libaacplus",
@@ -131,11 +136,6 @@ AVCodec ff_libaacplus_encoder = {
     .encode2        = aacPlus_encode_frame,
     .close          = aacPlus_encode_close,
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
-                                                     AV_SAMPLE_FMT_FLT,
                                                      AV_SAMPLE_FMT_NONE },
     .long_name      = NULL_IF_CONFIG_SMALL("libaacplus AAC+ (Advanced Audio Codec with SBR+PS)"),
-    .profiles       = profiles,
-    .channel_layouts = (const uint64_t[]) { AV_CH_LAYOUT_MONO,
-                                            AV_CH_LAYOUT_STEREO,
-                                            0 },
 };

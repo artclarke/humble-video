@@ -933,7 +933,7 @@ static void read_sbr_extension(AACContext *ac, SpectralBandReplication *sbr,
 #if 1
             *num_bits_left -= ff_ps_read_data(ac->avctx, gb, &sbr->ps, *num_bits_left);
 #else
-            avpriv_report_missing_feature(ac->avctx, "Parametric Stereo");
+            av_log_missing_feature(ac->avctx, "Parametric Stereo", 0);
             skip_bits_long(gb, *num_bits_left); // bs_fill_bits
             *num_bits_left = 0;
 #endif
@@ -942,7 +942,7 @@ static void read_sbr_extension(AACContext *ac, SpectralBandReplication *sbr,
     default:
         // some files contain 0-padding
         if (bs_extension_id || *num_bits_left > 16 || show_bits(gb, *num_bits_left))
-            avpriv_request_sample(ac->avctx, "Reserved SBR extensions");
+            av_log_missing_feature(ac->avctx, "Reserved SBR extensions", 1);
         skip_bits_long(gb, *num_bits_left); // bs_fill_bits
         *num_bits_left = 0;
         break;

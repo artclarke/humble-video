@@ -19,7 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/avassert.h"
 #include "libavutil/dict.h"
 #include "avformat.h"
 #include "avio_internal.h"
@@ -221,7 +220,7 @@ static const AVCodecTag codec_asf_bmp_tags[] = {
 
 void ff_put_guid(AVIOContext *s, const ff_asf_guid *g)
 {
-    av_assert0(sizeof(*g) == 16);
+    assert(sizeof(*g) == 16);
     avio_write(s, *g, sizeof(*g));
 }
 
@@ -601,7 +600,7 @@ static int put_payload_parsing_info(AVFormatContext *s,
     padsize -= PACKET_HEADER_MIN_SIZE;
     if (asf->multi_payloads_present)
         padsize--;
-    av_assert0(padsize >= 0);
+    assert(padsize >= 0);
 
     avio_w8(pb, ASF_PACKET_ERROR_CORRECTION_FLAGS);
     for (i = 0; i < ASF_PACKET_ERROR_CORRECTION_DATA_SIZE; i++)
@@ -640,7 +639,7 @@ static void flush_packet(AVFormatContext *s)
     ASFContext *asf = s->priv_data;
     int packet_hdr_size, packet_filled_size;
 
-    av_assert0(asf->packet_timestamp_end >= asf->packet_timestamp_start);
+    assert(asf->packet_timestamp_end >= asf->packet_timestamp_start);
 
     if (asf->is_streamed)
         put_chunk(s, 0x4424, s->packet_size, 0);
@@ -652,7 +651,7 @@ static void flush_packet(AVFormatContext *s)
                                                asf->packet_size_left);
 
     packet_filled_size = PACKET_SIZE - asf->packet_size_left;
-    av_assert0(packet_hdr_size <= asf->packet_size_left);
+    assert(packet_hdr_size <= asf->packet_size_left);
     memset(asf->packet_buf + packet_filled_size, 0, asf->packet_size_left);
 
     avio_write(s->pb, asf->packet_buf, s->packet_size - packet_hdr_size);
@@ -805,7 +804,7 @@ static int asf_write_packet(AVFormatContext *s, AVPacket *pkt)
         flags &= ~AV_PKT_FLAG_KEY;
 
     pts = (pkt->pts != AV_NOPTS_VALUE) ? pkt->pts : pkt->dts;
-    av_assert0(pts != AV_NOPTS_VALUE);
+    assert(pts != AV_NOPTS_VALUE);
     pts *= 10000;
     asf->duration = FFMAX(asf->duration, pts + pkt->duration * 10000);
 

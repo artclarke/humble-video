@@ -68,7 +68,7 @@ static av_cold int ra288_decode_init(AVCodecContext *avctx)
     avctx->sample_fmt     = AV_SAMPLE_FMT_FLT;
 
     if (avctx->block_align <= 0) {
-        av_log(avctx, AV_LOG_ERROR, "unsupported block align\n");
+        av_log_ask_for_sample(avctx, "unsupported block align\n");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -198,8 +198,10 @@ static int ra288_decode_frame(AVCodecContext * avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = RA288_BLOCK_SIZE * RA288_BLOCKS_PER_FRAME;
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
     out = (float *)frame->data[0];
 
     init_get_bits(&gb, buf, avctx->block_align * 8);

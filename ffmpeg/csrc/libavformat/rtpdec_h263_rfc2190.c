@@ -27,7 +27,6 @@
 
 #include "avformat.h"
 #include "rtpdec_formats.h"
-#include "libavutil/attributes.h"
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/get_bits.h"
 
@@ -56,7 +55,7 @@ static void h263_free_context(PayloadContext *data)
     av_free(data);
 }
 
-static av_cold int h263_init(AVFormatContext *ctx, int st_index, PayloadContext *data)
+static int h263_init(AVFormatContext *ctx, int st_index, PayloadContext *data)
 {
     if (st_index < 0)
         return 0;

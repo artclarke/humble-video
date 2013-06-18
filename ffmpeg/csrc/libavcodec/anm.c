@@ -26,10 +26,9 @@
 
 #include "avcodec.h"
 #include "bytestream.h"
-#include "internal.h"
 
 typedef struct AnmContext {
-    AVFrame *frame;
+    AVFrame frame;
     int palette[AVPALETTE_COUNT];
     GetByteContext gb;
     int x;  ///< x coordinate position
@@ -42,10 +41,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
 
-    s->frame = av_frame_alloc();
-    if (!s->frame)
-        return AVERROR(ENOMEM);
-
+    avcodec_get_frame_defaults(&s->frame);
+    s->frame.reference = 3;
     bytestream2_init(&s->gb, avctx->extradata, avctx->extradata_size);
     if (bytestream2_get_bytes_left(&s->gb) < 16 * 8 + 4 * 256)
         return AVERROR_INVALIDDATA;
@@ -117,19 +114,21 @@ static int decode_frame(AVCodecContext *avctx,
     uint8_t *dst, *dst_end;
     int count, ret;
 
-    if ((ret = ff_reget_buffer(avctx, s->frame)) < 0)
+    if ((ret = avctx->reget_buffer(avctx, &s->frame)) < 0){
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
-    dst     = s->frame->data[0];
-    dst_end = s->frame->data[0] + s->frame->linesize[0]*avctx->height;
+    }
+    dst     = s->frame.data[0];
+    dst_end = s->frame.data[0] + s->frame.linesize[0]*avctx->height;
 
     bytestream2_init(&s->gb, avpkt->data, buf_size);
 
     if (bytestream2_get_byte(&s->gb) != 0x42) {
-        avpriv_request_sample(avctx, "Unknown record type");
+        av_log_ask_for_sample(avctx, "unknown record type\n");
         return AVERROR_INVALIDDATA;
     }
     if (bytestream2_get_byte(&s->gb)) {
-        avpriv_request_sample(avctx, "Padding bytes");
+        av_log_ask_for_sample(avctx, "padding bytes not supported\n");
         return AVERROR_PATCHWELCOME;
     }
     bytestream2_skip(&s->gb, 2);
@@ -138,7 +137,7 @@ static int decode_frame(AVCodecContext *avctx,
     do {
         /* if statements are ordered by probability */
 #define OP(gb, pixel, count) \
-    op(&dst, dst_end, (gb), (pixel), (count), &s->x, avctx->width, s->frame->linesize[0])
+    op(&dst, dst_end, (gb), (pixel), (count), &s->x, avctx->width, s->frame.linesize[0])
 
         int type = bytestream2_get_byte(&s->gb);
         count = type & 0x7F;
@@ -159,7 +158,7 @@ static int decode_frame(AVCodecContext *avctx,
                 if (type == 0)
                     break; // stop
                 if (type == 2) {
-                    avpriv_request_sample(avctx, "Unknown opcode");
+                    av_log_ask_for_sample(avctx, "unknown opcode");
                     return AVERROR_PATCHWELCOME;
                 }
                 continue;
@@ -170,20 +169,18 @@ static int decode_frame(AVCodecContext *avctx,
         }
     } while (bytestream2_get_bytes_left(&s->gb) > 0);
 
-    memcpy(s->frame->data[1], s->palette, AVPALETTE_SIZE);
+    memcpy(s->frame.data[1], s->palette, AVPALETTE_SIZE);
 
     *got_frame = 1;
-    if ((ret = av_frame_ref(data, s->frame)) < 0)
-        return ret;
-
+    *(AVFrame*)data = s->frame;
     return buf_size;
 }
 
 static av_cold int decode_end(AVCodecContext *avctx)
 {
     AnmContext *s = avctx->priv_data;
-
-    av_frame_free(&s->frame);
+    if (s->frame.data[0])
+        avctx->release_buffer(avctx, &s->frame);
     return 0;
 }
 

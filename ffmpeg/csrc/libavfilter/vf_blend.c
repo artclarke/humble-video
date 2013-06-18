@@ -60,35 +60,26 @@ enum BlendMode {
     BLEND_NB
 };
 
-static const char *const var_names[] = {   "X",   "Y",   "W",   "H",   "SW",   "SH",   "T",   "N",   "A",   "B",   "TOP",   "BOTTOM",        NULL };
-enum                                   { VAR_X, VAR_Y, VAR_W, VAR_H, VAR_SW, VAR_SH, VAR_T, VAR_N, VAR_A, VAR_B, VAR_TOP, VAR_BOTTOM, VAR_VARS_NB };
+static const char *const var_names[] = {   "X",   "Y",   "W",   "H",   "SW",   "SH",   "T",     "A",        "B",   "TOP",   "BOTTOM",        NULL };
+enum                                   { VAR_X, VAR_Y, VAR_W, VAR_H, VAR_SW, VAR_SH, VAR_T,   VAR_A,      VAR_B, VAR_TOP, VAR_BOTTOM, VAR_VARS_NB };
 
 typedef struct FilterParams {
     enum BlendMode mode;
+    double values[VAR_VARS_NB];
     double opacity;
     AVExpr *e;
     char *expr_str;
     void (*blend)(const uint8_t *top, int top_linesize,
                   const uint8_t *bottom, int bottom_linesize,
                   uint8_t *dst, int dst_linesize,
-                  int width, int start, int end,
-                  struct FilterParams *param, double *values);
+                  int width, int height, struct FilterParams *param);
 } FilterParams;
-
-typedef struct ThreadData {
-    AVFrame *top, *bottom, *dst;
-    AVFilterLink *inlink;
-    int plane;
-    int w, h;
-    FilterParams *param;
-} ThreadData;
 
 typedef struct {
     const AVClass *class;
     struct FFBufQueue queue_top;
     struct FFBufQueue queue_bottom;
     int hsub, vsub;             ///< chroma subsampling values
-    int nb_planes;
     int frame_requested;
     char *all_expr;
     enum BlendMode all_mode;
@@ -148,23 +139,21 @@ AVFILTER_DEFINE_CLASS(blend);
 static void blend_normal(const uint8_t *top, int top_linesize,
                          const uint8_t *bottom, int bottom_linesize,
                          uint8_t *dst, int dst_linesize,
-                         int width, int start, int end,
-                         FilterParams *param, double *values)
+                         int width, int height, FilterParams *param)
 {
-    av_image_copy_plane(dst, dst_linesize, top, top_linesize, width, end - start);
+    av_image_copy_plane(dst, dst_linesize, top, top_linesize, width, height);
 }
 
 #define DEFINE_BLEND(name, expr)                                      \
 static void blend_## name(const uint8_t *top, int top_linesize,       \
                           const uint8_t *bottom, int bottom_linesize, \
                           uint8_t *dst, int dst_linesize,             \
-                          int width, int start, int end,              \
-                          FilterParams *param, double *values)        \
+                          int width, int height, FilterParams *param) \
 {                                                                     \
     double opacity = param->opacity;                                  \
     int i, j;                                                         \
                                                                       \
-    for (i = start; i < end; i++) {                                   \
+    for (i = 0; i < height; i++) {                                    \
         for (j = 0; j < width; j++) {                                 \
             dst[j] = top[j] + ((expr) - top[j]) * opacity;            \
         }                                                             \
@@ -209,13 +198,14 @@ DEFINE_BLEND(vividlight, (B < 128) ? BURN(A, 2 * B) : DODGE(A, 2 * (B - 128)))
 static void blend_expr(const uint8_t *top, int top_linesize,
                        const uint8_t *bottom, int bottom_linesize,
                        uint8_t *dst, int dst_linesize,
-                       int width, int start, int end,
-                       FilterParams *param, double *values)
+                       int width, int height,
+                       FilterParams *param)
 {
     AVExpr *e = param->e;
+    double *values = param->values;
     int y, x;
 
-    for (y = start; y < end; y++) {
+    for (y = 0; y < height; y++) {
         values[VAR_Y] = y;
         for (x = 0; x < width; x++) {
             values[VAR_X]      = x;
@@ -229,10 +219,16 @@ static void blend_expr(const uint8_t *top, int top_linesize,
     }
 }
 
-static av_cold int init(AVFilterContext *ctx)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     BlendContext *b = ctx->priv;
     int ret, plane;
+
+    b->class = &blend_class;
+    av_opt_set_defaults(b);
+
+    if ((ret = av_set_options_string(b, args, "=", ":")) < 0)
+        return ret;
 
     for (plane = 0; plane < FF_ARRAY_ELEMS(b->params); plane++) {
         FilterParams *param = &b->params[plane];
@@ -290,9 +286,8 @@ static int query_formats(AVFilterContext *ctx)
 {
     static const enum AVPixelFormat pix_fmts[] = {
         AV_PIX_FMT_YUVA444P, AV_PIX_FMT_YUVA422P, AV_PIX_FMT_YUVA420P,
-        AV_PIX_FMT_YUVJ444P, AV_PIX_FMT_YUVJ440P, AV_PIX_FMT_YUVJ422P,AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_YUVJ411P,
-        AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV411P, AV_PIX_FMT_YUV410P,
-        AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRAP, AV_PIX_FMT_GRAY8, AV_PIX_FMT_NONE
+        AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV420P,
+        AV_PIX_FMT_GBRP, AV_PIX_FMT_GRAY8, AV_PIX_FMT_NONE
     };
 
     ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
@@ -304,15 +299,13 @@ static int config_output(AVFilterLink *outlink)
     AVFilterContext *ctx = outlink->src;
     AVFilterLink *toplink = ctx->inputs[TOP];
     AVFilterLink *bottomlink = ctx->inputs[BOTTOM];
-    BlendContext *b = ctx->priv;
-    const AVPixFmtDescriptor *pix_desc = av_pix_fmt_desc_get(toplink->format);
 
     if (toplink->format != bottomlink->format) {
         av_log(ctx, AV_LOG_ERROR, "inputs must be of same pixel format\n");
         return AVERROR(EINVAL);
     }
-    if (toplink->w                       != bottomlink->w ||
-        toplink->h                       != bottomlink->h ||
+    if (toplink->w                        != bottomlink->w ||
+        toplink->h                        != bottomlink->h ||
         toplink->sample_aspect_ratio.num != bottomlink->sample_aspect_ratio.num ||
         toplink->sample_aspect_ratio.den != bottomlink->sample_aspect_ratio.den) {
         av_log(ctx, AV_LOG_ERROR, "First input link %s parameters "
@@ -328,15 +321,20 @@ static int config_output(AVFilterLink *outlink)
     }
 
     outlink->w = toplink->w;
-    outlink->h = toplink->h;
+    outlink->h = bottomlink->h;
     outlink->time_base = toplink->time_base;
     outlink->sample_aspect_ratio = toplink->sample_aspect_ratio;
     outlink->frame_rate = toplink->frame_rate;
+    return 0;
+}
+
+static int config_input_top(AVFilterLink *inlink)
+{
+    BlendContext *b = inlink->dst->priv;
+    const AVPixFmtDescriptor *pix_desc = av_pix_fmt_desc_get(inlink->format);
 
     b->hsub = pix_desc->log2_chroma_w;
     b->vsub = pix_desc->log2_chroma_h;
-    b->nb_planes = av_pix_fmt_count_planes(toplink->format);
-
     return 0;
 }
 
@@ -345,6 +343,7 @@ static av_cold void uninit(AVFilterContext *ctx)
     BlendContext *b = ctx->priv;
     int i;
 
+    av_opt_free(b);
     ff_bufqueue_discard_all(&b->queue_top);
     ff_bufqueue_discard_all(&b->queue_bottom);
 
@@ -360,7 +359,7 @@ static int request_frame(AVFilterLink *outlink)
 
     b->frame_requested = 1;
     while (b->frame_requested) {
-        in = ff_bufqueue_peek(&b->queue_top, 0) ? BOTTOM : TOP;
+        in = ff_bufqueue_peek(&b->queue_top, TOP) ? BOTTOM : TOP;
         ret = ff_request_frame(ctx->inputs[in]);
         if (ret < 0)
             return ret;
@@ -368,57 +367,38 @@ static int request_frame(AVFilterLink *outlink)
     return 0;
 }
 
-static int filter_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
-{
-    ThreadData *td = arg;
-    int slice_start = (td->h *  jobnr   ) / nb_jobs;
-    int slice_end   = (td->h * (jobnr+1)) / nb_jobs;
-    const uint8_t *top    = td->top->data[td->plane];
-    const uint8_t *bottom = td->bottom->data[td->plane];
-    uint8_t *dst    = td->dst->data[td->plane];
-    double values[VAR_VARS_NB];
-
-    values[VAR_N]  = td->inlink->frame_count;
-    values[VAR_T]  = td->dst->pts == AV_NOPTS_VALUE ? NAN : td->dst->pts * av_q2d(td->inlink->time_base);
-    values[VAR_W]  = td->w;
-    values[VAR_H]  = td->h;
-    values[VAR_SW] = td->w / (double)td->dst->width;
-    values[VAR_SH] = td->h / (double)td->dst->height;
-
-    td->param->blend(top + slice_start * td->top->linesize[td->plane],
-                     td->top->linesize[td->plane],
-                     bottom + slice_start * td->bottom->linesize[td->plane],
-                     td->bottom->linesize[td->plane],
-                     dst + slice_start * td->dst->linesize[td->plane],
-                     td->dst->linesize[td->plane],
-                     td->w, slice_start, slice_end, td->param, &values[0]);
-    return 0;
-}
-
 static void blend_frame(AVFilterContext *ctx,
-                        AVFrame *top_buf,
-                        AVFrame *bottom_buf,
-                        AVFrame *dst_buf)
+                        AVFilterBufferRef *top_buf,
+                        AVFilterBufferRef *bottom_buf,
+                        AVFilterBufferRef *dst_buf)
 {
     BlendContext *b = ctx->priv;
     AVFilterLink *inlink = ctx->inputs[0];
+    FilterParams *param;
     int plane;
 
-    for (plane = 0; plane < b->nb_planes; plane++) {
+    for (plane = 0; dst_buf->data[plane]; plane++) {
         int hsub = plane == 1 || plane == 2 ? b->hsub : 0;
         int vsub = plane == 1 || plane == 2 ? b->vsub : 0;
-        int outw = FF_CEIL_RSHIFT(dst_buf->width,  hsub);
-        int outh = FF_CEIL_RSHIFT(dst_buf->height, vsub);
-        FilterParams *param = &b->params[plane];
-        ThreadData td = { .top = top_buf, .bottom = bottom_buf, .dst = dst_buf,
-                          .w = outw, .h = outh, .param = param, .plane = plane,
-                          .inlink = inlink };
+        int outw = dst_buf->video->w >> hsub;
+        int outh = dst_buf->video->h >> vsub;
+        uint8_t *dst    = dst_buf->data[plane];
+        uint8_t *top    = top_buf->data[plane];
+        uint8_t *bottom = bottom_buf->data[plane];
 
-        ctx->internal->execute(ctx, filter_slice, &td, NULL, FFMIN(outh, ctx->graph->nb_threads));
+        param = &b->params[plane];
+        param->values[VAR_T]  = dst_buf->pts == AV_NOPTS_VALUE ? NAN : dst_buf->pts * av_q2d(inlink->time_base);
+        param->values[VAR_W]  = outw;
+        param->values[VAR_H]  = outh;
+        param->values[VAR_SW] = outw / dst_buf->video->w;
+        param->values[VAR_SH] = outh / dst_buf->video->h;
+        param->blend(top, top_buf->linesize[plane],
+                     bottom, bottom_buf->linesize[plane],
+                     dst, dst_buf->linesize[plane], outw, outh, param);
     }
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *buf)
 {
     AVFilterContext *ctx = inlink->dst;
     AVFilterLink *outlink = ctx->outputs[0];
@@ -431,30 +411,26 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
     ff_bufqueue_add(ctx, queue, buf);
 
     while (1) {
-        AVFrame *top_buf, *bottom_buf, *out_buf;
+        AVFilterBufferRef *top_buf, *bottom_buf, *out_buf;
 
-        if (!ff_bufqueue_peek(&b->queue_top, 0) ||
-            !ff_bufqueue_peek(&b->queue_bottom, 0)) break;
+        if (!ff_bufqueue_peek(&b->queue_top, TOP) ||
+            !ff_bufqueue_peek(&b->queue_bottom, BOTTOM)) break;
 
         top_buf = ff_bufqueue_get(&b->queue_top);
         bottom_buf = ff_bufqueue_get(&b->queue_bottom);
 
-        if (!ctx->is_disabled) {
-            out_buf = ff_get_video_buffer(outlink, outlink->w, outlink->h);
-            if (!out_buf)
-                return AVERROR(ENOMEM);
-            av_frame_copy_props(out_buf, top_buf);
-            blend_frame(ctx, top_buf, bottom_buf, out_buf);
-        } else {
-            out_buf = av_frame_clone(top_buf);
-            if (!out_buf)
-                return AVERROR(ENOMEM);
+        out_buf = ff_get_video_buffer(outlink, AV_PERM_WRITE,
+                                      outlink->w, outlink->h);
+        if (!out_buf) {
+            return AVERROR(ENOMEM);
         }
+        avfilter_copy_buffer_ref_props(out_buf, top_buf);
 
         b->frame_requested = 0;
-        ret = ff_filter_frame(outlink, out_buf);
-        av_frame_free(&top_buf);
-        av_frame_free(&bottom_buf);
+        blend_frame(ctx, top_buf, bottom_buf, out_buf);
+        ret = ff_filter_frame(ctx->outputs[0], out_buf);
+        avfilter_unref_buffer(top_buf);
+        avfilter_unref_buffer(bottom_buf);
     }
     return ret;
 }
@@ -463,11 +439,14 @@ static const AVFilterPad blend_inputs[] = {
     {
         .name             = "top",
         .type             = AVMEDIA_TYPE_VIDEO,
+        .config_props     = config_input_top,
         .filter_frame     = filter_frame,
+        .min_perms        = AV_PERM_READ | AV_PERM_PRESERVE,
     },{
         .name             = "bottom",
         .type             = AVMEDIA_TYPE_VIDEO,
         .filter_frame     = filter_frame,
+        .min_perms        = AV_PERM_READ | AV_PERM_PRESERVE,
     },
     { NULL }
 };
@@ -492,5 +471,4 @@ AVFilter avfilter_vf_blend = {
     .inputs        = blend_inputs,
     .outputs       = blend_outputs,
     .priv_class    = &blend_class,
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
 };

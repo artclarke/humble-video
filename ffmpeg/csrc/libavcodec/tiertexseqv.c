@@ -27,7 +27,6 @@
 #include "avcodec.h"
 #define BITSTREAM_READER_LE
 #include "get_bits.h"
-#include "internal.h"
 
 
 typedef struct SeqVideoContext {
@@ -218,6 +217,7 @@ static av_cold int seqvideo_decode_init(AVCodecContext *avctx)
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
 
     avcodec_get_frame_defaults(&seq->frame);
+    seq->frame.data[0] = NULL;
 
     return 0;
 }
@@ -228,19 +228,21 @@ static int seqvideo_decode_frame(AVCodecContext *avctx,
 {
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
-    int ret;
 
     SeqVideoContext *seq = avctx->priv_data;
 
-    if ((ret = ff_reget_buffer(avctx, &seq->frame)) < 0)
-        return ret;
+    seq->frame.reference = 3;
+    seq->frame.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE | FF_BUFFER_HINTS_REUSABLE;
+    if (avctx->reget_buffer(avctx, &seq->frame)) {
+        av_log(seq->avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+        return -1;
+    }
 
     if (seqvideo_decode(seq, buf, buf_size))
         return AVERROR_INVALIDDATA;
 
-    if ((ret = av_frame_ref(data, &seq->frame)) < 0)
-        return ret;
     *got_frame       = 1;
+    *(AVFrame *)data = seq->frame;
 
     return buf_size;
 }
@@ -249,7 +251,8 @@ static av_cold int seqvideo_decode_end(AVCodecContext *avctx)
 {
     SeqVideoContext *seq = avctx->priv_data;
 
-    av_frame_unref(&seq->frame);
+    if (seq->frame.data[0])
+        avctx->release_buffer(avctx, &seq->frame);
 
     return 0;
 }

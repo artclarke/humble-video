@@ -30,7 +30,6 @@
 #include "libavutil/eval.h"
 #include "libavutil/internal.h"
 #include "libavutil/mathematics.h"
-#include "libavutil/opt.h"
 #include "libavutil/rational.h"
 #include "avfilter.h"
 #include "internal.h"
@@ -52,19 +51,19 @@ enum var_name {
 };
 
 typedef struct {
-    const AVClass *class;
-    char *tb_expr;
+    char tb_expr[256];
     double var_values[VAR_VARS_NB];
 } SetTBContext;
 
-#define OFFSET(x) offsetof(SetTBContext, x)
-#define DEFINE_OPTIONS(filt_name, filt_type)                                               \
-static const AVOption filt_name##_options[] = {                                            \
-    { "expr", "set expression determining the output timebase", OFFSET(tb_expr), AV_OPT_TYPE_STRING, {.str="intb"}, \
-           .flags=AV_OPT_FLAG_##filt_type##_PARAM|AV_OPT_FLAG_FILTERING_PARAM },           \
-    { "tb",   "set expression determining the output timebase", OFFSET(tb_expr), AV_OPT_TYPE_STRING, {.str="intb"}, \
-           .flags=AV_OPT_FLAG_##filt_type##_PARAM|AV_OPT_FLAG_FILTERING_PARAM },           \
-    { NULL }                                                                               \
+static av_cold int init(AVFilterContext *ctx, const char *args)
+{
+    SetTBContext *settb = ctx->priv;
+    av_strlcpy(settb->tb_expr, "intb", sizeof(settb->tb_expr));
+
+    if (args)
+        sscanf(args, "%255[^:]", settb->tb_expr);
+
+    return 0;
 }
 
 static int config_output_props(AVFilterLink *outlink)
@@ -104,7 +103,7 @@ static int config_output_props(AVFilterLink *outlink)
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *frame)
 {
     AVFilterContext *ctx = inlink->dst;
     AVFilterLink *outlink = ctx->outputs[0];
@@ -121,10 +120,6 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
 }
 
 #if CONFIG_SETTB_FILTER
-
-DEFINE_OPTIONS(settb, VIDEO);
-AVFILTER_DEFINE_CLASS(settb);
-
 static const AVFilterPad avfilter_vf_settb_inputs[] = {
     {
         .name             = "default",
@@ -147,9 +142,9 @@ static const AVFilterPad avfilter_vf_settb_outputs[] = {
 AVFilter avfilter_vf_settb = {
     .name      = "settb",
     .description = NULL_IF_CONFIG_SMALL("Set timebase for the video output link."),
+    .init      = init,
 
     .priv_size = sizeof(SetTBContext),
-    .priv_class = &settb_class,
 
     .inputs    = avfilter_vf_settb_inputs,
     .outputs   = avfilter_vf_settb_outputs,
@@ -157,10 +152,6 @@ AVFilter avfilter_vf_settb = {
 #endif
 
 #if CONFIG_ASETTB_FILTER
-
-DEFINE_OPTIONS(asettb, AUDIO);
-AVFILTER_DEFINE_CLASS(asettb);
-
 static const AVFilterPad avfilter_af_asettb_inputs[] = {
     {
         .name             = "default",
@@ -183,10 +174,10 @@ static const AVFilterPad avfilter_af_asettb_outputs[] = {
 AVFilter avfilter_af_asettb = {
     .name      = "asettb",
     .description = NULL_IF_CONFIG_SMALL("Set timebase for the audio output link."),
+    .init      = init,
 
     .priv_size = sizeof(SetTBContext),
     .inputs    = avfilter_af_asettb_inputs,
     .outputs   = avfilter_af_asettb_outputs,
-    .priv_class = &asettb_class,
 };
 #endif

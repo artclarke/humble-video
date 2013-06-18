@@ -20,7 +20,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "config.h"
 #include "libavutil/ppc/types_altivec.h"
 #include "libavutil/ppc/util_altivec.h"
 #include "libavcodec/fft.h"
@@ -37,8 +36,8 @@
 void ff_fft_calc_altivec(FFTContext *s, FFTComplex *z);
 void ff_fft_calc_interleave_altivec(FFTContext *s, FFTComplex *z);
 
-#if HAVE_GNU_AS && HAVE_ALTIVEC
-static void imdct_half_altivec(FFTContext *s, FFTSample *output, const FFTSample *input)
+#if HAVE_GNU_AS
+static void ff_imdct_half_altivec(FFTContext *s, FFTSample *output, const FFTSample *input)
 {
     int j, k;
     int n = 1 << s->mdct_bits;
@@ -118,7 +117,7 @@ static void imdct_half_altivec(FFTContext *s, FFTSample *output, const FFTSample
     } while(k >= 0);
 }
 
-static void imdct_calc_altivec(FFTContext *s, FFTSample *output, const FFTSample *input)
+static void ff_imdct_calc_altivec(FFTContext *s, FFTSample *output, const FFTSample *input)
 {
     int k;
     int n = 1 << s->mdct_bits;
@@ -128,7 +127,7 @@ static void imdct_calc_altivec(FFTContext *s, FFTSample *output, const FFTSample
     vec_u32 *p0 = (vec_u32*)(output+n4);
     vec_u32 *p1 = (vec_u32*)(output+n4*3);
 
-    imdct_half_altivec(s, output + n4, input);
+    ff_imdct_half_altivec(s, output+n4, input);
 
     for (k = 0; k < n16; k++) {
         vec_u32 a = p0[k] ^ sign;
@@ -137,15 +136,15 @@ static void imdct_calc_altivec(FFTContext *s, FFTSample *output, const FFTSample
         p1[k]    = vec_perm(b, b, vcprm(3,2,1,0));
     }
 }
-#endif /* HAVE_GNU_AS && HAVE_ALTIVEC */
+#endif /* HAVE_GNU_AS */
 
-av_cold void ff_fft_init_ppc(FFTContext *s)
+av_cold void ff_fft_init_altivec(FFTContext *s)
 {
-#if HAVE_GNU_AS && HAVE_ALTIVEC
+#if HAVE_GNU_AS
     s->fft_calc   = ff_fft_calc_interleave_altivec;
     if (s->mdct_bits >= 5) {
-        s->imdct_calc = imdct_calc_altivec;
-        s->imdct_half = imdct_half_altivec;
+        s->imdct_calc = ff_imdct_calc_altivec;
+        s->imdct_half = ff_imdct_half_altivec;
     }
-#endif /* HAVE_GNU_AS && HAVE_ALTIVEC */
+#endif
 }
