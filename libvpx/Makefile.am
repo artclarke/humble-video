@@ -7,14 +7,6 @@ include $(abs_top_builddir)/Makefile.global
 #             : NOTE that captive packages must support VPATH builds
 #             : or the captive_configure needs to force that.
 
-# This is the main magic.  An "all" build MUST install; otherwise
-# successive builds that depend on this captive project will fail.
-# But, we install into a fake DESTDIR, and the container for this
-# make file will then copy the fake install to the real install
-# later when we're asked to install for real.
-# This has the downside that every make does a captive install, but
-# them's the breaks.
-
 # libvpx doesn't follow gnu configure standards and we
 # have to rely on the cross-compile prefix, in particular for windows
 # we still allow flags to be overriden though
@@ -29,12 +21,14 @@ unexport RANLIB
 unexport AR
 unexport DLLTOOL
 
+DESTDIR=
+
 all-local: incarcerate-package
-	@echo "Incarcerating package $(srcdir) to fake DESTDIR=$(vs_captive_prefix)"
+	@echo "Incarcerating package $(srcdir) to fake DESTDIR=$(DESTDIR)"
 	@cd csrc && \
 	  ( $(MAKE) -q all || \
 	    (echo "Out of date files; re-running make" && $(MAKE) all && \
-	     $(MAKE) DESTDIR="$(vs_captive_prefix)" install) \
+	     $(MAKE) DESTDIR="$(DESTDIR)" install) \
 	)
 	@echo "Incarceration complete: $(srcdir)"
 
@@ -58,9 +52,9 @@ uninstall-local: incarcerate-package
 
 clean-local: incarcerate-package
 	if test -f uninstall.sh; then \
-	  DESTDIR="$(vs_captive_prefix)" sh uninstall.sh; \
+	  DESTDIR="$(DESTDIR)" sh uninstall.sh; \
 	fi
-	cd csrc && $(MAKE) clean && $(MAKE) DESTDIR="$(vs_captive_prefix)" uninstall
+	cd csrc && $(MAKE) clean && $(MAKE) DESTDIR="$(DESTDIR)" uninstall
 
 distclean-local:
 	rm -rf csrc

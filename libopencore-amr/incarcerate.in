@@ -26,9 +26,9 @@ chmod -R u+w @abs_builddir@/csrc/*
 
 echo "Configuring ${LIBRARY} with these options: $LIBRARY_OPTIONS"
 CC="@CC@" \
-CFLAGS="-I@abs_top_builddir@/stage@includedir@ @CFLAGS@" \
+CFLAGS="-I@includedir@ @CFLAGS@" \
 LD="@LD@" \
-LDFLAGS="-L@abs_top_builddir@/stage@libdir@ @LDFLAGS@" \
+LDFLAGS="-L@libdir@ @LDFLAGS@" \
 CPP="@CPP@" \
 CPPFLAGS="@CPPFLAGS@" \
 CXX="@CXX@" \

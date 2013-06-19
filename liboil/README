@@ -15,7 +15,7 @@ index a657101..bba180c 100644
  
  AC_CANONICAL_HOST([])
 +# Patch applied by Art Clarke to make cross-compiling work
-+AC_MSG_CHECKING([for xuggle-overrode aligned memory settings])
++AC_MSG_CHECKING([for overrode aligned memory settings])
 +case $host in
 +      *i?86*|*x86_64*|*amd64*|*powerpc*|*m68k*|*cris*)
 +      as_cv_unaligned_access=yes

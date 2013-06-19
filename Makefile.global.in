@@ -31,7 +31,7 @@
 # configure have been set corectly as $(MAKE) variables.
 
 # These rules are for the "captive build" system
-vs_captive_prefix=$(abs_top_builddir)/stage
+vs_captive_prefix=${HUMBLE_HOME}
 # These rules are needed for first time builders; it ensure
 # linking against ffmpeg can actually find the captive libraries
 # like speex and mp3lame

@@ -64,8 +64,8 @@ fi
 
 # We use the cross-compile setting for openssl but still pass through our
 # flags
-CFLAGS="-I@abs_top_builddir@/stage@includedir@ @CFLAGS@" \
-LDFLAGS="-L@abs_top_builddir@/stage@libdir@ @LDFLAGS@" \
+CFLAGS="-I@includedir@ @CFLAGS@" \
+LDFLAGS="-L@libdir@ @LDFLAGS@" \
 CPPFLAGS="@CPPFLAGS@" \
 CXXFLAGS="@CXXFLAGS@" \
 ASFLAGS="@ASFLAGS@" \
@@ -73,7 +73,7 @@ PATH="$PATH:@abs_top_builddir@@bindir@@" sh "@abs_builddir@/csrc/Configure" \
   ${OPENSSL_CONFIG} no-shared zlib -fPIC \
   --cross-compile-prefix="${CROSS_COMPILE}" \
   --openssldir=${prefix} \
-  --with-zlib-include="@abs_top_builddir@/stage@includedir@" \
-  --with-zlib-lib="@abs_top_builddir@/stage@libdir@" \
+  --with-zlib-include="@includedir@" \
+  --with-zlib-lib="@libdir@" \
   --prefix="${prefix}" || \
   (echo "Could not configure library: \"@abs_srcdir@\"; you may want to try disabling it or installing your own version" && exit 1)

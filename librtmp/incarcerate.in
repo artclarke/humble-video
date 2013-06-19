@@ -14,11 +14,11 @@ else
 fi
 
 
-PKG_CONFIG_PATH="@abs_top_builddir@/stage@libdir@/pkgconfig" \
+PKG_CONFIG_PATH="@libdir@/pkgconfig" \
 CC="@CC@" \
-CFLAGS="-O2 -I@abs_top_builddir@/stage@includedir@ @CFLAGS@" \
+CFLAGS="-O2 -I@includedir@ @CFLAGS@" \
 LD="@LD@" \
-LDFLAGS="-L@abs_top_builddir@/stage@libdir@ @LDFLAGS@" \
+LDFLAGS="-L@libdir@ @LDFLAGS@" \
 CPP="@CPP@" \
 CPPFLAGS="@CPPFLAGS@" \
 CXX="@CXX@" \

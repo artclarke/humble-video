@@ -17,7 +17,7 @@ EXTRA_DIST=COPYING
 #                                   |         |                            |
 #                                   ---------------------------------------
 #                                                        |
-#                                                      xuggle
+#                                                   humble-video
 SUBDIRS=
 #if VS_CAPTIVE_ZLIB
 SUBDIRS+= zlib
@@ -30,14 +30,15 @@ SUBDIRS+= zlib
 #SUBDIRS+= liboil
 
 SUBDIRS+= \
-  libvpx openssl librtmp libvo-aacenc libopencore-amr \
-  libogg libspeex libvorbis libtheora libmp3lame
+  libvpx openssl libvo-aacenc libopencore-amr \
+  libogg libspeex libvorbis libtheora libmp3lame \
+  librtmp
 
 if VS_ENABLE_GPL
 SUBDIRS+=libx264
 endif
 SUBDIRS+=ffmpeg
 
-# We delete the libtool generated .la files because they cause link errors for xuggle
+# We delete the libtool generated .la files because they cause link errors for our code
 all-local:
 	@-find "$(vs_captive_prefix)" -name '*.la' | xargs rm 

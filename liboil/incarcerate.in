@@ -19,9 +19,9 @@ else
 fi
 
 CC="@CC@" \
-CFLAGS="-I@abs_top_builddir@/stage@includedir@ -O0 @CFLAGS@" \
+CFLAGS="-I@includedir@ -O0 @CFLAGS@" \
 LD="@LD@" \
-LDFLAGS="-L@abs_top_builddir@/stage@libdir@ @LDFLAGS@" \
+LDFLAGS="-L@libdir@ @LDFLAGS@" \
 CPP="@CPP@" \
 CPPFLAGS="@CPPFLAGS@" \
 CXX="@CXX@" \

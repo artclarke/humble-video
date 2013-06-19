@@ -15,14 +15,14 @@ VS_DEBUG=@VS_DEBUG@
 CAPTIVE_ENABLE_FFMPEG_GPL=@VS_ENABLE_GPL@
 
 FFMPEG_OPTIONS=
-FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-version=xuggle-@LIB_MAJOR_VERSION@.@LIB_MINOR_VERSION@"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-version=humble-@LIB_MAJOR_VERSION@.@LIB_MINOR_VERSION@"
 
 # Tell FFMPEG about the captive libraries already built and fake
 # installed
-FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-cflags=-I@abs_top_builddir@/stage@includedir@"
-FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-ldflags=-L@abs_top_builddir@/stage@libdir@"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-cflags=-I@includedir@"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-ldflags=-L@libdir@"
 # Set up a place where pkg-config looks for installed packages
-export PKG_CONFIG_PATH="@abs_top_builddir@/stage@libdir@/pkgconfig"
+export PKG_CONFIG_PATH="@libdir@/pkgconfig"
 
 FFMPEG_OPTIONS="$FFMPEG_OPTIONS --disable-shared"
 FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-pic"

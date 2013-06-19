@@ -14,12 +14,14 @@ include $(abs_top_builddir)/Makefile.global
 # later when we're asked to install for real.
 # This has the downside that every make does a captive install, but
 # them's the breaks.
+DESTDIR=
+
 all-local: incarcerate-package
-	@echo "Incarcerating package $(srcdir) to fake DESTDIR=$(vs_captive_prefix)"
+	@echo "Incarcerating package $(srcdir) to fake DESTDIR=$(DESTDIR)"
 	@cd csrc && \
 	  ( $(MAKE) -q all || \
 	    (echo "Out of date files; re-running make" && $(MAKE) all && \
-	     DESTDIR="$(vs_captive_prefix)" $(MAKE) install) \
+	     DESTDIR="$(DESTDIR)" $(MAKE) install) \
 	)
 	@echo "Incarceration complete: $(srcdir)"
 
@@ -42,7 +44,7 @@ check: incarcerate-package
 	cd csrc && $(MAKE) check
 
 clean-local: incarcerate-package
-	cd csrc && $(MAKE) clean && DESTDIR="$(vs_captive_prefix)" $(MAKE) uninstall
+	cd csrc && $(MAKE) clean && DESTDIR="$(DESTDIR)" $(MAKE) uninstall
 
 distclean-local: incarcerate-package
 	cd csrc && $(MAKE) distclean

@@ -9,11 +9,6 @@ include $(abs_top_builddir)/Makefile.global
 
 # This is the main magic.  An "all" build MUST install; otherwise
 # successive builds that depend on this captive project will fail.
-# But, we install into a fake DESTDIR, and the container for this
-# make file will then copy the fake install to the real install
-# later when we're asked to install for real.
-# This has the downside that every make does a captive install, but
-# them's the breaks.
 
 # This Makefile is different than standard -- it relies on the incarcerate
 # script choosing the correct type of Makefile -- libz has very non standard
@@ -21,7 +16,7 @@ include $(abs_top_builddir)/Makefile.global
 
 PREFIX=$(VS_CROSS_PREFIX)
 SHARED_MODE=0
-DESTDIR=$(vs_captive_prefix)
+DESTDIR=
 
 export SHARED_MODE
 export PREFIX

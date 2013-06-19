@@ -38,9 +38,9 @@ case $HOST_OS in
   *)
   CHOST="@HOST_OS@" \
   CC="@CC@" \
-  CFLAGS="-fPIC -I@abs_top_builddir@/stage@includedir@ @CFLAGS@" \
+  CFLAGS="-fPIC -I@includedir@ @CFLAGS@" \
   LD="@LD@" \
-  LDFLAGS="-fPIC -L@abs_top_builddir@/stage@libdir@ @LDFLAGS@" \
+  LDFLAGS="-fPIC -L@libdir@ @LDFLAGS@" \
   CPP="@CPP@" \
   CPPFLAGS="@CPPFLAGS@" \
   CXX="@CXX@" \
