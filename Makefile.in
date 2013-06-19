@@ -85,11 +85,11 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(top_srcdir)/mk/Makefile.dependencies.in COPYING ar-lib \
 	config.guess config.sub install-sh missing ltmain.sh
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
-	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
-	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
-	$(top_srcdir)/m4/humble.m4 $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compiler_vendor.m4 \
+	$(top_srcdir)/m4/ax_prog_doxygen.m4 $(top_srcdir)/m4/humble.m4 \
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -219,9 +219,32 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DLLTOOL = @DLLTOOL@
-DOXYGEN = @DOXYGEN@
+DOXYGEN_PAPER_SIZE = @DOXYGEN_PAPER_SIZE@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
+DX_CONFIG = @DX_CONFIG@
+DX_DOCDIR = @DX_DOCDIR@
+DX_DOT = @DX_DOT@
+DX_DOXYGEN = @DX_DOXYGEN@
+DX_DVIPS = @DX_DVIPS@
+DX_EGREP = @DX_EGREP@
+DX_ENV = @DX_ENV@
+DX_FLAG_chi = @DX_FLAG_chi@
+DX_FLAG_chm = @DX_FLAG_chm@
+DX_FLAG_doc = @DX_FLAG_doc@
+DX_FLAG_dot = @DX_FLAG_dot@
+DX_FLAG_html = @DX_FLAG_html@
+DX_FLAG_man = @DX_FLAG_man@
+DX_FLAG_pdf = @DX_FLAG_pdf@
+DX_FLAG_ps = @DX_FLAG_ps@
+DX_FLAG_rtf = @DX_FLAG_rtf@
+DX_FLAG_xml = @DX_FLAG_xml@
+DX_HHC = @DX_HHC@
+DX_LATEX = @DX_LATEX@
+DX_MAKEINDEX = @DX_MAKEINDEX@
+DX_PDFLATEX = @DX_PDFLATEX@
+DX_PERL = @DX_PERL@
+DX_PROJECT = @DX_PROJECT@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
@@ -348,7 +371,6 @@ EXTRA_DIST = \
   mk/memcheck \
   mk/lib
 
-DOC_DIR = $(abs_top_srcdir)/target/api
 all: all-recursive
 
 .SUFFIXES:
@@ -727,7 +749,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
@@ -799,9 +821,9 @@ uninstall-am:
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
 	am--refresh check check-am clean clean-cscope clean-generic \
-	clean-libtool cscope cscopelist-am ctags ctags-am dist \
-	dist-all dist-bzip2 dist-gzip dist-hook dist-lzip dist-shar \
-	dist-tarZ dist-xz dist-zip distcheck distclean \
+	clean-libtool clean-local cscope cscopelist-am ctags ctags-am \
+	dist dist-all dist-bzip2 dist-gzip dist-hook dist-lzip \
+	dist-shar dist-tarZ dist-xz dist-zip distcheck distclean \
 	distclean-generic distclean-libtool distclean-tags \
 	distcleancheck distdir distuninstallcheck dvi dvi-am html \
 	html-am info info-am install install-am install-data \
@@ -814,19 +836,18 @@ uninstall-am:
 	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
 	uninstall-am
 
+include $(abs_top_srcdir)/mk/doxygen.am
 include $(abs_top_builddir)/mk/Makefile.global
 
 .PHONY : doc
-@HAVE_DOXYGEN_TRUE@doc:
-@HAVE_DOXYGEN_TRUE@	$(MKDIR_P) $(DOC_DIR)
-@HAVE_DOXYGEN_TRUE@	cd $(abs_top_srcdir) && $(DOXYGEN) $(abs_top_srcdir)/mk/Doxyfile
-@HAVE_DOXYGEN_FALSE@doc:
-@HAVE_DOXYGEN_FALSE@	@echo "You must have 'doxygen' installed on your system to generate"
-@HAVE_DOXYGEN_FALSE@	@echo "the documentation.  Try installing it, and running"
-@HAVE_DOXYGEN_FALSE@	@echo "'configure' again."
+doc: doxygen-doc
 
 dist-hook:
 	$(MKDIR_P) $(distdir)/doc
+
+# Remove the swig directory when all else is clean.
+clean-local:
+	rm -rf $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

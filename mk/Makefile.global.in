@@ -97,10 +97,7 @@ memcheck:
 	@echo
 endif
 
-SWIGOUTDIR=$(abs_top_builddir)/generated/java
-SWIGOUTCPPDIR=$(abs_top_builddir)/generated/native
-SWIGOUTTMPDIR=$(abs_top_builddir)/swig/java
-SWIGOUTTMPCPPDIR=$(abs_top_builddir)/swig/native
+SWIGOUTTMPDIR=$(abs_top_builddir)/share/java
 SWIGEXT=.i
 SWIGCPPEXT=.cpp
 ifdef VS_SWIG
@@ -118,27 +115,8 @@ endif
 # But we only copy into the generated tree if write permission is granted
 # so that distcheck does the right thing
 %$(SWIGCPPEXT): $(srcdir)/%$(SWIGEXT)
-	$(MKDIR_P) $(SWIGOUTDIR)/$(VS_CPP_PATH)
-	$(MKDIR_P) $(SWIGOUTCPPDIR)/$(VS_CPP_PATH)
 	$(MKDIR_P) $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)
-	$(MKDIR_P) $(SWIGOUTTMPCPPDIR)/$(VS_CPP_PATH)
 	$(SWIGCOMPILE) -outdir $(SWIGOUTTMPDIR)/$(VS_CPP_PATH) -c++ -java -o $@ $< 
-	if test -w $(SWIGOUTCPPDIR)/$(VS_CPP_PATH) ; then \
-	  cp $@ $(SWIGOUTCPPDIR)/$(VS_CPP_PATH) ; \
-	fi
-	if test -w $(SWIGOUTDIR)/$(VS_CPP_PATH) ; then \
-	  cp $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)/* $(SWIGOUTDIR)/$(VS_CPP_PATH); \
-	fi
-
-# This used be be a command we used
-#	@$(SWIGCOMPILE) -c++ -java -o $@ $< || (\
-#	  echo "---------------- WARNING! ----------------" && \
-#	  echo "Swig could not generate the output files, but" && \
-#	  echo "we don't want that to stop you.  So we're going" && \
-#	  echo "to try copying over some lovely files we prepared" && \
-#	  echo "earlier:" && \
-#	  echo "  $(SWIGOUTCPPDIR)/$(VS_CPP_PATH)/*.cpp to $@" && \
-#	  cp $(SWIGOUTCPPDIR)/$(VS_CPP_PATH)/*.cpp .)
 
 .PHONY: refreshswig
 refreshswig:

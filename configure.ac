@@ -6,8 +6,9 @@
 # JAVA build.xml FILE
 m4_define([VSM4_LIB_MAJOR_VERSION], [0])
 m4_define([VSM4_LIB_MINOR_VERSION], [1])
+m4_define([VSM4_PROJECT_NAME], [humble-video])
 
-AC_INIT([humble-video],[VSM4_LIB_MAJOR_VERSION.VSM4_LIB_MINOR_VERSION],[info@humble.io])
+AC_INIT([VSM4_PROJECT_NAME],[VSM4_LIB_MAJOR_VERSION.VSM4_LIB_MINOR_VERSION],[info@humble.io])
 AC_PREREQ([2.68])
 AC_PREFIX_DEFAULT([${HUMBLE_HOME:-/usr/local}])
 AM_INIT_AUTOMAKE([-Wall -Werror no-dependencies nostdinc tar-pax 1.11.1 ])
@@ -86,9 +87,6 @@ AC_DEFINE(VS_LIB_MINOR_VERSION, [VSM4_LIB_MINOR_VERSION], [Minor version of libr
 
 AC_CONFIG_MACRO_DIR([m4])
 
-m4_include([m4/ax_compiler_vendor.m4])
-m4_include([m4/humble.m4])
-
 AX_COMPILER_VENDOR
 AM_CONDITIONAL([VS_IS_GCC], [ test "$ax_cv_c_compiler_vendor" = gnu ])
 
@@ -111,25 +109,14 @@ if test "x$enable_optimizations" = xno; then
   AC_SUBST([VS_DEBUG])
 fi
 
-AC_ARG_ENABLE([swig],
-              [AS_HELP_STRING([--enable-swig],
-                              [use swig to regenerate java interfaces (default is no)])],
-                              [],
-                              [enable_swig=no])
-AC_MSG_CHECKING([whether to regnerate java interfaces from swig])
-AC_MSG_RESULT([$enable_swig])
-
-AM_CONDITIONAL([VS_SWIG], [ test "$x$enable_swig" = xno ])
-if test "x$enable_swig" != xno; then
-  AC_PATH_PROG([SWIG],[swig])
-  AC_ARG_VAR(SWIG,
-             [Location of the 'swig' program; if found, then we will renerate the Java interface to Humble Software from the C++ interface])
-  if test "x$SWIG" = "x"; then
-    AC_MSG_FAILURE([Could not find swig, and it is required to regenerate java interfaces])
-  else
-    VS_SWIG=1
-    AC_SUBST([VS_SWIG])
-  fi
+AC_PATH_PROG([SWIG],[swig])
+AC_ARG_VAR(SWIG,
+           [Location of the 'swig' program; if found, then we will renerate the Java interface to Humble Software from the C++ interface])
+if test "x$SWIG" = "x"; then
+  AC_MSG_FAILURE([Could not find swig, and it is required to regenerate java interfaces])
+else
+  VS_SWIG=1
+  AC_SUBST([VS_SWIG])
 fi
 
 AC_MSG_CHECKING([whether we saw a bunny])
@@ -199,10 +186,16 @@ AM_CONDITIONAL(HAVE_VALGRIND, [ test "x$VALGRIND" != "x" ])
 AC_MSG_CHECKING([for bunny fur])
 AC_MSG_RESULT([no])
 
-AC_PATH_PROG([DOXYGEN],[doxygen])
-AC_ARG_VAR(DOXYGEN,
-           [Location of the 'doxygen' program; if found, then we will renerate documentation from the C++ interface])
-AM_CONDITIONAL(HAVE_DOXYGEN, [ test "x$DOXYGEN" != "x" ])
+DX_DOT_FEATURE(ON)
+DX_HTML_FEATURE(ON)
+DX_CHM_FEATURE(OFF)
+DX_CHI_FEATURE(OFF)
+DX_MAN_FEATURE(OFF)
+DX_RTF_FEATURE(OFF)
+DX_XML_FEATURE(OFF)
+DX_PDF_FEATURE(ON)
+DX_PS_FEATURE(OFF)
+DX_INIT_DOXYGEN(humble-video, mk/Doxygen, doc)
 
 AC_PATH_PROG([PERL],[perl])
 AC_ARG_VAR(PERL,

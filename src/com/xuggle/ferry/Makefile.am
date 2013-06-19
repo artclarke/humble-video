@@ -54,9 +54,11 @@ BUILT_SOURCES = \
 Ferry.cpp : $(libxuggle_ferry_la_HEADERS)
 
 clean-local:
-	if test -w "$(SWIGOUTTMPDIR)"; then rm -rf $(SWIGOUTTMPDIR); fi
 	rm -f $(BUILT_SOURCES)
+	rm -rf $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)
 
-maintainer-clean-local:
-	rm -rf $(SWIGOUTDIR)/$(VS_CPP_PATH)
+install-data-local:
+	@echo "installing SWIG generated files: $(VS_CPP_PATH): $(DESTDIR)$(prefix)share"
 
+uninstall-local:
+	@echo "removing SWIG generated files: $(VS_CPP_PATH): $(DESTDIR)$(prefix)share"
