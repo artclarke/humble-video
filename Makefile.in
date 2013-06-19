@@ -82,9 +82,10 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(top_srcdir)/mk/Makefile.global.in \
-	$(top_srcdir)/mk/Makefile.dependencies.in COPYING mk/README \
-	mk/ar-lib mk/config.guess mk/config.sub mk/install-sh \
-	mk/missing mk/ltmain.sh $(top_srcdir)/mk/ar-lib \
+	$(top_srcdir)/mk/Makefile.dependencies.in \
+	$(top_srcdir)/mk/pom.xml.in COPYING mk/README mk/ar-lib \
+	mk/config.guess mk/config.sub mk/install-sh mk/missing \
+	mk/ltmain.sh $(top_srcdir)/mk/ar-lib \
 	$(top_srcdir)/mk/config.guess $(top_srcdir)/mk/config.sub \
 	$(top_srcdir)/mk/install-sh $(top_srcdir)/mk/ltmain.sh \
 	$(top_srcdir)/mk/missing
@@ -100,7 +101,8 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/com/xuggle/ferry/config.h
-CONFIG_CLEAN_FILES = mk/Makefile.global mk/Makefile.dependencies
+CONFIG_CLEAN_FILES = mk/Makefile.global mk/Makefile.dependencies \
+	pom.xml
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -440,6 +442,8 @@ $(am__aclocal_m4_deps):
 mk/Makefile.global: $(top_builddir)/config.status $(top_srcdir)/mk/Makefile.global.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 mk/Makefile.dependencies: $(top_builddir)/config.status $(top_srcdir)/mk/Makefile.dependencies.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+pom.xml: $(top_builddir)/config.status $(top_srcdir)/mk/pom.xml.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
@@ -922,9 +926,11 @@ dist-hook:
 clean-local:
 	rm -rf $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)
 
+# Copy over the swig template files and the maven pom file
 install-data-local:
-	$(MKDIR_P) $(DESTDIR)$(prefix)/share/humble/video
+	$(MKDIR_P) $(DESTDIR)$(prefix)/share/humble/video/pom
 	cp -rf $(SWIGOUTTMPDIR) $(DESTDIR)$(prefix)share/humble/video
+	cp pom.xml $(DESTDIR)$(prefix)share/humble/video/pom/
 
 uninstall-local:
 	rm -rf $(DESTDIR)$(prefix)share/humble/video

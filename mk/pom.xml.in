@@ -4,7 +4,7 @@
 
   <groupId>io.humble</groupId>
   <artifactId>@VS_PROJECT_NAME@-native-@build@</artifactId>
-  <version>@LIB_MAJOR_VERSION@.@LIB_MINOR_VERSION@</version>
+  <version>@LIB_MAJOR_VERSION@.@LIB_MINOR_VERSION@-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>@VS_PROJECT_NAME@-native-@build@</name>
@@ -43,7 +43,7 @@
     <resources>
       <!-- Add all the shared objects per OS -->
       <resource>
-        <directory>@prefix@/bin</directory>
+        <directory>@prefix@bin</directory>
         <includes>
           <include>**/*.dll</include>
         </includes>
@@ -52,7 +52,7 @@
         </excludes>
       </resource>
       <resource>
-        <directory>@prefix@/lib</directory>
+        <directory>@prefix@lib</directory>
         <includes>
           <include>**/*.so</include>
           <include>**/*.dylib</include>

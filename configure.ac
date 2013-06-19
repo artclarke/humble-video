@@ -373,6 +373,6 @@ AC_CONFIG_FILES([Makefile
                  src/com/xuggle/ferry/Makefile
                  src/io/Makefile
                  src/io/humble/Makefile
-                 src/io/humble/pom.xml
+                 pom.xml:mk/pom.xml.in
                  ])
 AC_OUTPUT

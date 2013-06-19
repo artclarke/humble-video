@@ -19792,7 +19792,7 @@ esac
 
 ac_config_headers="$ac_config_headers src/com/xuggle/ferry/config.h:config.h.in"
 
-ac_config_files="$ac_config_files Makefile mk/Makefile.global:mk/Makefile.global.in mk/Makefile.dependencies:mk/Makefile.dependencies.in src/Makefile src/com/Makefile src/com/xuggle/Makefile src/com/xuggle/ferry/Makefile src/io/Makefile src/io/humble/Makefile src/io/humble/pom.xml"
+ac_config_files="$ac_config_files Makefile mk/Makefile.global:mk/Makefile.global.in mk/Makefile.dependencies:mk/Makefile.dependencies.in src/Makefile src/com/Makefile src/com/xuggle/Makefile src/com/xuggle/ferry/Makefile src/io/Makefile src/io/humble/Makefile pom.xml:mk/pom.xml.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20986,7 +20986,7 @@ do
     "src/com/xuggle/ferry/Makefile") CONFIG_FILES="$CONFIG_FILES src/com/xuggle/ferry/Makefile" ;;
     "src/io/Makefile") CONFIG_FILES="$CONFIG_FILES src/io/Makefile" ;;
     "src/io/humble/Makefile") CONFIG_FILES="$CONFIG_FILES src/io/humble/Makefile" ;;
-    "src/io/humble/pom.xml") CONFIG_FILES="$CONFIG_FILES src/io/humble/pom.xml" ;;
+    "pom.xml") CONFIG_FILES="$CONFIG_FILES pom.xml:mk/pom.xml.in" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
