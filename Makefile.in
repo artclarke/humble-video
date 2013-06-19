@@ -364,6 +364,30 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
+@DX_COND_doc_TRUE@@DX_COND_html_TRUE@DX_CLEAN_HTML = @DX_DOCDIR@/html
+@DX_COND_chm_TRUE@@DX_COND_doc_TRUE@DX_CLEAN_CHM = @DX_DOCDIR@/chm
+@DX_COND_chi_TRUE@@DX_COND_chm_TRUE@@DX_COND_doc_TRUE@DX_CLEAN_CHI = @DX_DOCDIR@/@PACKAGE@.chi
+@DX_COND_doc_TRUE@@DX_COND_man_TRUE@DX_CLEAN_MAN = @DX_DOCDIR@/man
+@DX_COND_doc_TRUE@@DX_COND_rtf_TRUE@DX_CLEAN_RTF = @DX_DOCDIR@/rtf
+@DX_COND_doc_TRUE@@DX_COND_xml_TRUE@DX_CLEAN_XML = @DX_DOCDIR@/xml
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@DX_CLEAN_PS = @DX_DOCDIR@/@PACKAGE@.ps
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@DX_PS_GOAL = doxygen-ps
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@DX_CLEAN_PDF = @DX_DOCDIR@/@PACKAGE@.pdf
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@DX_PDF_GOAL = doxygen-pdf
+@DX_COND_doc_TRUE@@DX_COND_latex_TRUE@DX_CLEAN_LATEX = @DX_DOCDIR@/latex
+@DX_COND_doc_TRUE@DX_CLEANFILES = \
+@DX_COND_doc_TRUE@    @DX_DOCDIR@/@PACKAGE@.tag \
+@DX_COND_doc_TRUE@    -r \
+@DX_COND_doc_TRUE@    $(DX_CLEAN_HTML) \
+@DX_COND_doc_TRUE@    $(DX_CLEAN_CHM) \
+@DX_COND_doc_TRUE@    $(DX_CLEAN_CHI) \
+@DX_COND_doc_TRUE@    $(DX_CLEAN_MAN) \
+@DX_COND_doc_TRUE@    $(DX_CLEAN_RTF) \
+@DX_COND_doc_TRUE@    $(DX_CLEAN_XML) \
+@DX_COND_doc_TRUE@    $(DX_CLEAN_PS) \
+@DX_COND_doc_TRUE@    $(DX_CLEAN_PDF) \
+@DX_COND_doc_TRUE@    $(DX_CLEAN_LATEX)
+
 SUBDIRS = src
 EXTRA_DIST = \
   mk/Doxyfile \
@@ -836,10 +860,54 @@ uninstall-am:
 	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
 	uninstall-am
 
-include $(abs_top_srcdir)/mk/doxygen.am
 include $(abs_top_builddir)/mk/Makefile.global
 
-.PHONY : doc
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@doxygen-ps: @DX_DOCDIR@/@PACKAGE@.ps
+
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@@DX_DOCDIR@/@PACKAGE@.ps: @DX_DOCDIR@/@PACKAGE@.tag
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	cd @DX_DOCDIR@/latex; \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	rm -f *.aux *.toc *.idx *.ind *.ilg *.log *.out; \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	$(DX_LATEX) refman.tex; \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	$(MAKEINDEX_PATH) refman.idx; \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	$(DX_LATEX) refman.tex; \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	countdown=5; \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	while $(DX_EGREP) 'Rerun (LaTeX|to get cross-references right)' \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	                  refman.log > /dev/null 2>&1 \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	   && test $$countdown -gt 0; do \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	    $(DX_LATEX) refman.tex; \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	    countdown=`expr $$countdown - 1`; \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	done; \
+@DX_COND_doc_TRUE@@DX_COND_ps_TRUE@	$(DX_DVIPS) -o ../@PACKAGE@.ps refman.dvi
+
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@doxygen-pdf: @DX_DOCDIR@/@PACKAGE@.pdf
+
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@@DX_DOCDIR@/@PACKAGE@.pdf: @DX_DOCDIR@/@PACKAGE@.tag
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	cd @DX_DOCDIR@/latex; \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	rm -f *.aux *.toc *.idx *.ind *.ilg *.log *.out; \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	$(DX_PDFLATEX) refman.tex; \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	$(DX_MAKEINDEX) refman.idx; \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	$(DX_PDFLATEX) refman.tex; \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	countdown=5; \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	while $(DX_EGREP) 'Rerun (LaTeX|to get cross-references right)' \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	                  refman.log > /dev/null 2>&1 \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	   && test $$countdown -gt 0; do \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	    $(DX_PDFLATEX) refman.tex; \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	    countdown=`expr $$countdown - 1`; \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	done; \
+@DX_COND_doc_TRUE@@DX_COND_pdf_TRUE@	mv refman.pdf ../@PACKAGE@.pdf
+
+@DX_COND_doc_TRUE@.PHONY: doc doxygen-run doxygen-doc $(DX_PS_GOAL) $(DX_PDF_GOAL)
+
+@DX_COND_doc_TRUE@.INTERMEDIATE: doxygen-run $(DX_PS_GOAL) $(DX_PDF_GOAL)
+
+@DX_COND_doc_TRUE@doxygen-run: @DX_DOCDIR@/@PACKAGE@.tag
+
+@DX_COND_doc_TRUE@doxygen-doc: doxygen-run $(DX_PS_GOAL) $(DX_PDF_GOAL)
+
+@DX_COND_doc_TRUE@@DX_DOCDIR@/@PACKAGE@.tag: $(DX_CONFIG) $(pkginclude_HEADERS)
+@DX_COND_doc_TRUE@	rm -rf @DX_DOCDIR@
+@DX_COND_doc_TRUE@	$(DX_ENV) $(DX_DOXYGEN) $(srcdir)/$(DX_CONFIG)
+
 doc: doxygen-doc
 
 dist-hook:
