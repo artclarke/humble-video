@@ -1,0 +1,8 @@
+In order to do cross-compile builds, we need the jni.h header files
+for each VM.  These are used as the actual byte definition TENDS to
+be very stable.  For each of them:
+
+Windows: Taken from Oracle JDK 7.0.02 on Windows 64
+Darwin: Taken from Java 1.6.0_29 on Mac OS X Lion (10.7)
+Linux: Taken from java-6-openjdk on Ubuntu 11.10
+
