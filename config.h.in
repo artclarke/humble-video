@@ -109,6 +109,9 @@
 /* Minor version of library */
 #undef VS_LIB_MINOR_VERSION
 
+/* Name of library */
+#undef VS_PROJECT_NAME
+
 /* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
 #undef _LARGEFILE_SOURCE
 

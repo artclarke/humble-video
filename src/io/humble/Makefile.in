@@ -104,7 +104,7 @@ host_triplet = @host@
 
 subdir = src/io/humble
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(humble_HEADERS)
+	$(srcdir)/pom.xml.in $(humble_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compiler_vendor.m4 \
 	$(top_srcdir)/m4/ax_prog_doxygen.m4 $(top_srcdir)/m4/humble.m4 \
@@ -115,7 +115,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/com/xuggle/ferry/config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = pom.xml
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -330,6 +330,7 @@ VS_LDFLAGS = @VS_LDFLAGS@
 VS_LIBGCC = @VS_LIBGCC@
 VS_LIBSTDCXX = @VS_LIBSTDCXX@
 VS_OS_WINDOWS = @VS_OS_WINDOWS@
+VS_PROJECT_NAME = @VS_PROJECT_NAME@
 VS_SWIG = @VS_SWIG@
 VS_WARN_ISERROR = @VS_WARN_ISERROR@
 abs_builddir = @abs_builddir@
@@ -388,6 +389,7 @@ VS_CPP_PACKAGE = io.humble
 VS_CPP_NAMESPACE = io::humble
 
 # SUBDIRS=video
+EXTRA_DIST = pom.xml
 humbledir = $(includedir)/$(VS_CPP_PATH)
 humble_HEADERS = \
   Humble.h
@@ -433,6 +435,8 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+pom.xml: $(top_builddir)/config.status $(srcdir)/pom.xml.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)

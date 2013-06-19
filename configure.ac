@@ -81,10 +81,13 @@ AM_CONDITIONAL([VS_CROSS_COMPILE], [ test "x$host_alias" != "x" ])
 
 LIB_MAJOR_VERSION=VSM4_LIB_MAJOR_VERSION
 LIB_MINOR_VERSION=VSM4_LIB_MINOR_VERSION
+VS_PROJECT_NAME=VSM4_PROJECT_NAME
 AC_SUBST([LIB_MAJOR_VERSION])
 AC_SUBST([LIB_MINOR_VERSION])
+AC_SUBST([VS_PROJECT_NAME])
 AC_DEFINE(VS_LIB_MAJOR_VERSION, [VSM4_LIB_MAJOR_VERSION], [Major version of library])
 AC_DEFINE(VS_LIB_MINOR_VERSION, [VSM4_LIB_MINOR_VERSION], [Minor version of library])
+AC_DEFINE(VS_PROJECT_NAME, [VSM4_PROJECT_NAME], [Name of library])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -370,5 +373,6 @@ AC_CONFIG_FILES([Makefile
                  src/com/xuggle/ferry/Makefile
                  src/io/Makefile
                  src/io/humble/Makefile
+                 src/io/humble/pom.xml
                  ])
 AC_OUTPUT

@@ -9,6 +9,8 @@ include @top_builddir@/mk/Makefile.dependencies
 
 # SUBDIRS=video
 
+EXTRA_DIST=pom.xml
+
 humbledir=$(includedir)/$(VS_CPP_PATH)
 humble_HEADERS= \
   Humble.h
