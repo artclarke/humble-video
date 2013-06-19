@@ -83,9 +83,8 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(top_srcdir)/mk/Makefile.global.in \
 	$(top_srcdir)/mk/Makefile.dependencies.in COPYING mk/README \
-	ar-lib mk/ar-lib config.guess mk/config.guess config.sub \
-	mk/config.sub install-sh mk/install-sh missing mk/missing \
-	ltmain.sh mk/ltmain.sh $(top_srcdir)/mk/ar-lib \
+	mk/ar-lib mk/config.guess mk/config.sub mk/install-sh \
+	mk/missing mk/ltmain.sh $(top_srcdir)/mk/ar-lib \
 	$(top_srcdir)/mk/config.guess $(top_srcdir)/mk/config.sub \
 	$(top_srcdir)/mk/install-sh $(top_srcdir)/mk/ltmain.sh \
 	$(top_srcdir)/mk/missing
