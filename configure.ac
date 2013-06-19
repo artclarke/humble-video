@@ -10,6 +10,7 @@ m4_define([VSM4_LIB_MINOR_VERSION], [5])
 AC_INIT([humble-captive],[VSM4_LIB_MAJOR_VERSION.VSM4_LIB_MINOR_VERSION],[info@humble.io])
 AC_PREREQ([2.63])
 AC_PREFIX_DEFAULT([${HUMBLE_HOME:-/usr/local}])
+AC_CONFIG_AUX_DIR(mk)
 AM_INIT_AUTOMAKE([-Wall -Werror no-dependencies nostdinc tar-pax 1.10.2 ])
 AM_MAINTAINER_MODE
 AM_SILENT_RULES([yes])

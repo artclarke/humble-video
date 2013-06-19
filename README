@@ -9,10 +9,9 @@ that the specially built versions do not get installed into
 
 The right way to run configure is something like:
 
-    HUMBLE_HOME=/path/to/install/everything configure
+        configure --prefix="${HUMBLE_HOME}"
 
 Or to cross compile:
 
-    HOME_HOME=/path/to/install/everything/i686-apple-darwin12.4.0 configure --build=i686-apple-darwin12.4.0
-    make && make install
-
+        configure --build=i686-apple-darwin12.4.0 --prefix="${HUMBLE_HOME}/i686-apple-darwin12.4.0"
+        make && make install
