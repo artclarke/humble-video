@@ -173,3 +173,10 @@ dist-hook:
 # Remove the swig directory when all else is clean.
 clean-local:
 	rm -rf $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)
+
+install-data-local:
+	$(MKDIR_P) $(DESTDIR)$(prefix)/share/humble/video
+	cp -rf $(SWIGOUTTMPDIR) $(DESTDIR)$(prefix)share/humble/video
+
+uninstall-local:
+	rm -rf $(DESTDIR)$(prefix)share/humble/video
