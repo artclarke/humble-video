@@ -34,15 +34,14 @@
 # make files, as they will make sure all the variables from
 # configure have been set corectly as $(MAKE) variables.
 
-# NOTE: The captive directories MUST appear before any other includes
-AM_CPPFLAGS=-I@abs_top_builddir@/captive/stage@includedir@
+AM_CPPFLAGS=-I@includedir@
 AM_CFLAGS=
 AM_CXXFLAGS=
-AM_LDFLAGS=-L@abs_top_builddir@/captive/stage@libdir@
+AM_LDFLAGS=-L@libdir@
 
 # Note we may include includedir twice; most compilers will ignore that if
 # $(DESTDIR) is actually empty
-VS_INCLUDES=$(VS_JNI_INCLUDE) -I. -I$(srcdir) -I$(abs_top_srcdir)/csrc -I$(abs_top_builddir)/csrc -I$(DESTDIR)$(includedir) -I$(includedir) -I"$(HUMBLE_HOME)/include"
+VS_INCLUDES=$(VS_JNI_INCLUDE) -I. -I$(srcdir) -I$(abs_top_srcdir)/src -I$(abs_top_builddir)/src -I$(DESTDIR)$(includedir) -I$(includedir) -I"$(HUMBLE_HOME)/include"
 AM_CPPFLAGS+=$(VS_CPPFLAGS) $(VS_INCLUDES) -fno-strict-aliasing
 # Note we include libdir twice; most compilers will ignore that if
 # $(DESTDIR) is actually empty
@@ -69,7 +68,7 @@ ifdef VS_DEBUG
 endif
 
 ifdef VS_TEST
-  AM_CPPFLAGS+=-I$(abs_top_srcdir)/mk/cxxtest -I$(abs_top_srcdir)/test/csrc
+  AM_CPPFLAGS+=-I$(abs_top_srcdir)/mk/cxxtest -I$(abs_top_srcdir)/test/src
   # Set the VS_TEST_FIXTUREDIR env variable to that tests can
   # find the fixtures directory for reading files
   export VS_TEST_FIXTUREDIR=$(abs_top_srcdir)/test/fixtures
@@ -98,8 +97,8 @@ memcheck:
 	@echo
 endif
 
-SWIGOUTDIR=$(abs_top_srcdir)/generated/java
-SWIGOUTCPPDIR=$(abs_top_srcdir)/generated/native
+SWIGOUTDIR=$(abs_top_builddir)/generated/java
+SWIGOUTCPPDIR=$(abs_top_builddir)/generated/native
 SWIGOUTTMPDIR=$(abs_top_builddir)/swig/java
 SWIGOUTTMPCPPDIR=$(abs_top_builddir)/swig/native
 SWIGEXT=.i
@@ -182,26 +181,3 @@ else
 	@false
 endif
 
-# These rules are for the "captive build" system
-vs_captive_prefix=$(abs_top_builddir)/captive
-# These rules are needed for first time builders; it ensure
-# linking against ffmpeg can actually find the captive libraries
-# like speex and mp3lame
-export PATH := ${vs_captive_prefix}@bindir@$(PATH_SEPARATOR)$(PATH)
-export LD_LIBRARY_PATH := ${vs_captive_prefix}@libdir@$(PATH_SEPARATOR)$(LD_LIBRARY_PATH)
-export DYLD_LIBRARY_PATH := ${vs_captive_prefix}@libdir@$(PATH_SEPARATOR)$(DYLD_LIBRARY_PATH)
-
-# This rule makes sure the captive Makefile is created,
-# and is regenerated if the captive configure script
-# changes
-$(abs_builddir)/csrc/Makefile : $(srcdir)/csrc/configure
-	@echo "Incarcerated package must be reconfigured; regenerating out of date captive Makefile from: $(srcdir)/csrc/configure"
-	$(MKDIR_P) csrc
-	cd csrc && sh ../incarcerate
-
-# This rule takes a captive package and configures it for
-# the build.  Every target in the wrapper makefile
-# should call this first.
-.PHONY: incarcerate-package
-incarcerate-package: $(abs_builddir)/csrc/Makefile
-	@echo "Incarcerated package configured: $(srcdir)"

@@ -4,8 +4,8 @@
 # IMPORTANT: IF YOU CHANGE THESE VERSION NUMBERS YOU MUST
 # ALSO CHANGE ANY CORRESPONDING VERSION NUMBERS IN THE
 # JAVA build.xml FILE
-m4_define([VSM4_LIB_MAJOR_VERSION], [5])
-m4_define([VSM4_LIB_MINOR_VERSION], [5])
+m4_define([VSM4_LIB_MAJOR_VERSION], [0])
+m4_define([VSM4_LIB_MINOR_VERSION], [1])
 
 AC_INIT([humble-video],[VSM4_LIB_MAJOR_VERSION.VSM4_LIB_MINOR_VERSION],[info@humble.io])
 AC_PREREQ([2.68])
@@ -84,21 +84,6 @@ AC_SUBST([LIB_MINOR_VERSION])
 AC_DEFINE(VS_LIB_MAJOR_VERSION, [VSM4_LIB_MAJOR_VERSION], [Major version of library])
 AC_DEFINE(VS_LIB_MINOR_VERSION, [VSM4_LIB_MINOR_VERSION], [Minor version of library])
 
-#
-# CAPTIVE building support
-#
-AC_ARG_ENABLE([captives],
-              [AS_HELP_STRING([--enable-captives],
-                              [use our own captive versions of dependent libraries (default is yes)])],
-                              [],
-                              [enable_captives=yes])
-AC_MSG_CHECKING([whether to use captive versions of dependent libraries])
-AC_MSG_RESULT([$enable_captives])
-CAPTIVES_ENABLED=$enable_captives
-AM_CONDITIONAL(CAPTIVES_ENABLED,
-               [ test "x$CAPTIVES_ENABLED" = "xyes" ])
-AC_SUBST([CAPTIVES_ENABLED])
-
 AC_CONFIG_MACRO_DIR([m4])
 
 m4_include([m4/ax_compiler_vendor.m4])
@@ -106,10 +91,6 @@ m4_include([m4/humble.m4])
 
 AX_COMPILER_VENDOR
 AM_CONDITIONAL([VS_IS_GCC], [ test "$ax_cv_c_compiler_vendor" = gnu ])
-
-if test "x$enable_captives" = "xyes"; then
-  AC_CONFIG_SUBDIRS([captive])
-fi
 
 VS_CPPFLAGS=
 VS_CFLAGS=
@@ -239,19 +220,19 @@ if test -z "$JAVA_HOME" ; then
   JAVA_HOME=":" # Something completely invalid
 fi
 if test -z "$JAVAINCDIR" ; then
-  # Cross compiling; use the captive JNI
+  # Cross compiling; use the external JNI
   # And annoyingly at this stage the relative srcdir autoconf variable is
   # set, but not the absolute path.  so we fake it.
   VS_ABS_PATH=$( cd "${srcdir}" && pwd )
   case $host in
     *cygwin*|*mingw*)
-      JAVAINCDIR="${VS_ABS_PATH}/captive/jni/mingw32/"
+      JAVAINCDIR="${VS_ABS_PATH}/external/jni/mingw32/"
     ;;
     *darwin*)
-      JAVAINCDIR="${VS_ABS_PATH}/captive/jni/darwin/"
+      JAVAINCDIR="${VS_ABS_PATH}/external/jni/darwin/"
     ;;
     *linux*)
-      JAVAINCDIR="${VS_ABS_PATH}/captive/jni/linux/"
+      JAVAINCDIR="${VS_ABS_PATH}/external/jni/linux/"
     ;;
     *)
     # And here we add several common locations on Unix like systems to try
@@ -361,7 +342,7 @@ AM_CONDITIONAL(VS_ENABLE_GPL,
                [ test "x$VS_ENABLE_GPL" = "xyes" ])
 
 dnl substitute our values for compiling; we don't reset the
-dnl CFLAGS values because then they'll be propagated to captives
+dnl CFLAGS values 
 AC_SUBST([VS_CFLAGS])dnl
 AC_SUBST([VS_CXXFLAGS])dnl
 AC_SUBST([VS_CPPFLAGS])dnl
