@@ -633,7 +633,7 @@ ac_includes_default="\
 #endif"
 
 ac_cxx_werror_flag=
-ac_unique_file="src/io/humble/Humble.h"
+ac_unique_file="src/main/gnu/io/humble/Humble.h"
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
@@ -19784,15 +19784,17 @@ case $host in
   # on windows use the shared library; it'll be there. trust me.
   VS_LIBSTDCXX="-XCClinker -lstdc++"
   ;;
+  *)
+  ;;
 esac
 
 
 
 
 
-ac_config_headers="$ac_config_headers src/io/humble/ferry/config.h:config.h.in"
+ac_config_headers="$ac_config_headers src/main/gnu/io/humble/ferry/config.h:config.h.in"
 
-ac_config_files="$ac_config_files Makefile mk/Makefile.global:mk/Makefile.global.in mk/Makefile.dependencies:mk/Makefile.dependencies.in src/Makefile src/io/Makefile src/io/humble/Makefile src/io/humble/ferry/Makefile test/src/Makefile test/src/io/Makefile test/src/io/humble/Makefile test/src/io/humble/testutils/Makefile test/src/io/humble/ferry/Makefile pom.xml:mk/pom.xml.in"
+ac_config_files="$ac_config_files Makefile mk/Makefile.global:mk/Makefile.global.in mk/Makefile.dependencies:mk/Makefile.dependencies.in src/main/gnu/Makefile src/main/gnu/io/Makefile src/main/gnu/io/humble/Makefile src/main/gnu/io/humble/ferry/Makefile src/test/gnu/Makefile src/test/gnu/io/Makefile src/test/gnu/io/humble/Makefile src/test/gnu/io/humble/testutils/Makefile src/test/gnu/io/humble/ferry/Makefile pom-${build}.xml:mk/pom.xml.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20976,20 +20978,20 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
-    "src/io/humble/ferry/config.h") CONFIG_HEADERS="$CONFIG_HEADERS src/io/humble/ferry/config.h:config.h.in" ;;
+    "src/main/gnu/io/humble/ferry/config.h") CONFIG_HEADERS="$CONFIG_HEADERS src/main/gnu/io/humble/ferry/config.h:config.h.in" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "mk/Makefile.global") CONFIG_FILES="$CONFIG_FILES mk/Makefile.global:mk/Makefile.global.in" ;;
     "mk/Makefile.dependencies") CONFIG_FILES="$CONFIG_FILES mk/Makefile.dependencies:mk/Makefile.dependencies.in" ;;
-    "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-    "src/io/Makefile") CONFIG_FILES="$CONFIG_FILES src/io/Makefile" ;;
-    "src/io/humble/Makefile") CONFIG_FILES="$CONFIG_FILES src/io/humble/Makefile" ;;
-    "src/io/humble/ferry/Makefile") CONFIG_FILES="$CONFIG_FILES src/io/humble/ferry/Makefile" ;;
-    "test/src/Makefile") CONFIG_FILES="$CONFIG_FILES test/src/Makefile" ;;
-    "test/src/io/Makefile") CONFIG_FILES="$CONFIG_FILES test/src/io/Makefile" ;;
-    "test/src/io/humble/Makefile") CONFIG_FILES="$CONFIG_FILES test/src/io/humble/Makefile" ;;
-    "test/src/io/humble/testutils/Makefile") CONFIG_FILES="$CONFIG_FILES test/src/io/humble/testutils/Makefile" ;;
-    "test/src/io/humble/ferry/Makefile") CONFIG_FILES="$CONFIG_FILES test/src/io/humble/ferry/Makefile" ;;
-    "pom.xml") CONFIG_FILES="$CONFIG_FILES pom.xml:mk/pom.xml.in" ;;
+    "src/main/gnu/Makefile") CONFIG_FILES="$CONFIG_FILES src/main/gnu/Makefile" ;;
+    "src/main/gnu/io/Makefile") CONFIG_FILES="$CONFIG_FILES src/main/gnu/io/Makefile" ;;
+    "src/main/gnu/io/humble/Makefile") CONFIG_FILES="$CONFIG_FILES src/main/gnu/io/humble/Makefile" ;;
+    "src/main/gnu/io/humble/ferry/Makefile") CONFIG_FILES="$CONFIG_FILES src/main/gnu/io/humble/ferry/Makefile" ;;
+    "src/test/gnu/Makefile") CONFIG_FILES="$CONFIG_FILES src/test/gnu/Makefile" ;;
+    "src/test/gnu/io/Makefile") CONFIG_FILES="$CONFIG_FILES src/test/gnu/io/Makefile" ;;
+    "src/test/gnu/io/humble/Makefile") CONFIG_FILES="$CONFIG_FILES src/test/gnu/io/humble/Makefile" ;;
+    "src/test/gnu/io/humble/testutils/Makefile") CONFIG_FILES="$CONFIG_FILES src/test/gnu/io/humble/testutils/Makefile" ;;
+    "src/test/gnu/io/humble/ferry/Makefile") CONFIG_FILES="$CONFIG_FILES src/test/gnu/io/humble/ferry/Makefile" ;;
+    "pom-${build}.xml") CONFIG_FILES="$CONFIG_FILES pom-${build}.xml:mk/pom.xml.in" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

@@ -356,26 +356,28 @@ case $host in
   # on windows use the shared library; it'll be there. trust me.
   VS_LIBSTDCXX="-XCClinker -lstdc++"
   ;;
+  *)
+  ;;
 esac
 
 AC_SUBST([VS_LIBSTDCXX])
 AC_SUBST([VS_LIBGCC])
 
 dnl Now, output everything
-AC_CONFIG_SRCDIR([src/io/humble/Humble.h])
-AC_CONFIG_HEADER([src/io/humble/ferry/config.h:config.h.in])
+AC_CONFIG_SRCDIR([src/main/gnu/io/humble/Humble.h])
+AC_CONFIG_HEADER([src/main/gnu/io/humble/ferry/config.h:config.h.in])
 AC_CONFIG_FILES([Makefile
                  mk/Makefile.global:mk/Makefile.global.in
                  mk/Makefile.dependencies:mk/Makefile.dependencies.in
-                 src/Makefile
-                 src/io/Makefile
-                 src/io/humble/Makefile
-                 src/io/humble/ferry/Makefile
-                 test/src/Makefile
-                 test/src/io/Makefile
-                 test/src/io/humble/Makefile
-                 test/src/io/humble/testutils/Makefile
-                 test/src/io/humble/ferry/Makefile
-                 pom.xml:mk/pom.xml.in
+                 src/main/gnu/Makefile
+                 src/main/gnu/io/Makefile
+                 src/main/gnu/io/humble/Makefile
+                 src/main/gnu/io/humble/ferry/Makefile
+                 src/test/gnu/Makefile
+                 src/test/gnu/io/Makefile
+                 src/test/gnu/io/humble/Makefile
+                 src/test/gnu/io/humble/testutils/Makefile
+                 src/test/gnu/io/humble/ferry/Makefile
+                 pom-${build}.xml:mk/pom.xml.in
                  ])
 AC_OUTPUT

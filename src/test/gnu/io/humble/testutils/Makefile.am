@@ -16,7 +16,7 @@ nodist_testutilsTestTrue_SOURCES= \
   TrueTest_CXXRunner.cpp 
 
 testutilsTestTrue_LDADD= \
-  $(top_builddir)/src/io/humble/libhumblevideo.la
+  $(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 
 BUILT_SOURCES= \
   TrueTest_CXXRunner.cpp

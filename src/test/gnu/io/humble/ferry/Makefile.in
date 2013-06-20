@@ -80,7 +80,7 @@ build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = ferryTestLogger$(EXEEXT) ferryTestRefPointer$(EXEEXT) \
 	ferryTestMutex$(EXEEXT) ferryTestBuffer$(EXEEXT)
-subdir = test/src/io/humble/ferry
+subdir = src/test/gnu/io/humble/ferry
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(noinst_HEADERS) $(top_srcdir)/mk/test-driver
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -92,7 +92,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compiler_vendor.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
+CONFIG_HEADER = $(top_builddir)/src/main/gnu/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am_ferryTestBuffer_OBJECTS = BufferTest.$(OBJEXT) Main.$(OBJEXT)
@@ -100,7 +100,7 @@ nodist_ferryTestBuffer_OBJECTS = BufferTest_CXXRunner.$(OBJEXT)
 ferryTestBuffer_OBJECTS = $(am_ferryTestBuffer_OBJECTS) \
 	$(nodist_ferryTestBuffer_OBJECTS)
 ferryTestBuffer_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
+	$(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -110,13 +110,13 @@ nodist_ferryTestLogger_OBJECTS = LoggerTest_CXXRunner.$(OBJEXT)
 ferryTestLogger_OBJECTS = $(am_ferryTestLogger_OBJECTS) \
 	$(nodist_ferryTestLogger_OBJECTS)
 ferryTestLogger_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
+	$(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 am_ferryTestMutex_OBJECTS = MutexTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_ferryTestMutex_OBJECTS = MutexTest_CXXRunner.$(OBJEXT)
 ferryTestMutex_OBJECTS = $(am_ferryTestMutex_OBJECTS) \
 	$(nodist_ferryTestMutex_OBJECTS)
 ferryTestMutex_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
+	$(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 am_ferryTestRefPointer_OBJECTS = RefPointerTest.$(OBJEXT) \
 	Main.$(OBJEXT)
 nodist_ferryTestRefPointer_OBJECTS =  \
@@ -124,7 +124,7 @@ nodist_ferryTestRefPointer_OBJECTS =  \
 ferryTestRefPointer_OBJECTS = $(am_ferryTestRefPointer_OBJECTS) \
 	$(nodist_ferryTestRefPointer_OBJECTS)
 ferryTestRefPointer_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
+	$(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -574,7 +574,7 @@ nodist_ferryTestLogger_SOURCES = \
   LoggerTest_CXXRunner.cpp
 
 ferryTestLogger_LDADD = \
-  $(top_builddir)/src/io/humble/libhumblevideo.la
+  $(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 
 ferryTestRefPointer_SOURCES = \
   RefPointerTest.cpp \
@@ -584,7 +584,7 @@ nodist_ferryTestRefPointer_SOURCES = \
   RefPointerTest_CXXRunner.cpp
 
 ferryTestRefPointer_LDADD = \
-  $(top_builddir)/src/io/humble/libhumblevideo.la
+  $(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 
 ferryTestMutex_SOURCES = \
   MutexTest.cpp \
@@ -594,7 +594,7 @@ nodist_ferryTestMutex_SOURCES = \
   MutexTest_CXXRunner.cpp
 
 ferryTestMutex_LDADD = \
-  $(top_builddir)/src/io/humble/libhumblevideo.la
+  $(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 
 ferryTestBuffer_SOURCES = \
   BufferTest.cpp \
@@ -604,7 +604,7 @@ nodist_ferryTestBuffer_SOURCES = \
   BufferTest_CXXRunner.cpp
 
 ferryTestBuffer_LDADD = \
-  $(top_builddir)/src/io/humble/libhumblevideo.la
+  $(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 
 BUILT_SOURCES = \
   LoggerTest_CXXRunner.cpp \
@@ -632,9 +632,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu --ignore-deps test/src/io/humble/ferry/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu --ignore-deps src/test/gnu/io/humble/ferry/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu --ignore-deps test/src/io/humble/ferry/Makefile
+	  $(AUTOMAKE) --gnu --ignore-deps src/test/gnu/io/humble/ferry/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

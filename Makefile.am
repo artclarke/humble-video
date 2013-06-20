@@ -158,7 +158,8 @@ DX_CLEANFILES = \
 
 endif DX_COND_doc
 
-SUBDIRS= src test/src
+SUBDIRS= src/main/gnu src/test/gnu
+
 EXTRA_DIST= \
   mk/Doxyfile \
   mk/Valgrind.suppressions \
@@ -178,7 +179,7 @@ clean-local:
 install-data-local:
 	$(MKDIR_P) $(DESTDIR)$(prefix)/share/humble/video/pom
 	cp -rf $(SWIGOUTTMPDIR) $(DESTDIR)$(prefix)/share/humble/video
-	cp pom.xml $(DESTDIR)$(prefix)/share/humble/video/pom/
+	cp pom-$(build).xml $(DESTDIR)$(prefix)/share/humble/video/pom/
 
 uninstall-local:
 	rm -rf $(DESTDIR)$(prefix)/share/humble/video

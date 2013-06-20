@@ -17,7 +17,7 @@ nodist_ferryTestLogger_SOURCES= \
   LoggerTest_CXXRunner.cpp
 
 ferryTestLogger_LDADD= \
-  $(top_builddir)/src/io/humble/libhumblevideo.la
+  $(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 
 
 ferryTestRefPointer_SOURCES= \
@@ -28,7 +28,7 @@ nodist_ferryTestRefPointer_SOURCES= \
   RefPointerTest_CXXRunner.cpp
 
 ferryTestRefPointer_LDADD= \
-  $(top_builddir)/src/io/humble/libhumblevideo.la
+  $(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 
 ferryTestMutex_SOURCES= \
   MutexTest.cpp \
@@ -38,7 +38,7 @@ nodist_ferryTestMutex_SOURCES= \
   MutexTest_CXXRunner.cpp
 
 ferryTestMutex_LDADD= \
-  $(top_builddir)/src/io/humble/libhumblevideo.la
+  $(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 
 ferryTestBuffer_SOURCES=\
   BufferTest.cpp \
@@ -48,7 +48,7 @@ nodist_ferryTestBuffer_SOURCES=\
   BufferTest_CXXRunner.cpp
 
 ferryTestBuffer_LDADD=\
-  $(top_builddir)/src/io/humble/libhumblevideo.la
+  $(top_builddir)/src/main/gnu/io/humble/libhumblevideo.la
 
 
 BUILT_SOURCES= \

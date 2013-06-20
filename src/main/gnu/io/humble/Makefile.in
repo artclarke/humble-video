@@ -102,7 +102,7 @@ host_triplet = @host@
 @VS_OS_LINUX_FALSE@@VS_OS_WINDOWS_FALSE@am__append_3 = \
 @VS_OS_LINUX_FALSE@@VS_OS_WINDOWS_FALSE@	-nostdlib -static-libtool-libs -XCClinker -static-libgcc
 
-subdir = src/io/humble
+subdir = src/main/gnu/io/humble
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(humble_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -114,7 +114,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compiler_vendor.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
+CONFIG_HEADER = $(top_builddir)/src/main/gnu/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -453,9 +453,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu --ignore-deps src/io/humble/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu --ignore-deps src/main/gnu/io/humble/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu --ignore-deps src/io/humble/Makefile
+	  $(AUTOMAKE) --gnu --ignore-deps src/main/gnu/io/humble/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

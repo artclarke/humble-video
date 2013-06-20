@@ -100,9 +100,9 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
+CONFIG_HEADER = $(top_builddir)/src/main/gnu/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES = mk/Makefile.global mk/Makefile.dependencies \
-	pom.xml
+	pom-${build}.xml
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -395,7 +395,7 @@ ACLOCAL_AMFLAGS = -I m4
 @DX_COND_doc_TRUE@    $(DX_CLEAN_PDF) \
 @DX_COND_doc_TRUE@    $(DX_CLEAN_LATEX)
 
-SUBDIRS = src test/src
+SUBDIRS = src/main/gnu src/test/gnu
 EXTRA_DIST = \
   mk/Doxyfile \
   mk/Valgrind.suppressions \
@@ -443,7 +443,7 @@ mk/Makefile.global: $(top_builddir)/config.status $(top_srcdir)/mk/Makefile.glob
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 mk/Makefile.dependencies: $(top_builddir)/config.status $(top_srcdir)/mk/Makefile.dependencies.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-pom.xml: $(top_builddir)/config.status $(top_srcdir)/mk/pom.xml.in
+pom-${build}.xml: $(top_builddir)/config.status $(top_srcdir)/mk/pom.xml.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
@@ -930,7 +930,7 @@ clean-local:
 install-data-local:
 	$(MKDIR_P) $(DESTDIR)$(prefix)/share/humble/video/pom
 	cp -rf $(SWIGOUTTMPDIR) $(DESTDIR)$(prefix)/share/humble/video
-	cp pom.xml $(DESTDIR)$(prefix)/share/humble/video/pom/
+	cp pom-$(build).xml $(DESTDIR)$(prefix)/share/humble/video/pom/
 
 uninstall-local:
 	rm -rf $(DESTDIR)$(prefix)/share/humble/video
