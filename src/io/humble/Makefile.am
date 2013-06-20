@@ -7,7 +7,7 @@ include @top_builddir@/mk/Makefile.global
 # process at autoreconf time.
 include @top_builddir@/mk/Makefile.dependencies
 
-# SUBDIRS=video
+SUBDIRS=ferry
 
 humbledir=$(includedir)/$(VS_CPP_PATH)
 humble_HEADERS= \
@@ -17,7 +17,7 @@ lib_LTLIBRARIES =
 
 lib_LTLIBRARIES+= libhumblevideo.la
 libhumblevideo_la_SOURCES = HumbleVideo.cpp
-libhumblevideo_la_LIBADD = $(builddir)/../../com/xuggle/ferry/libxuggle-ferry.la
+libhumblevideo_la_LIBADD = $(builddir)/ferry/libhumble-ferry.la
 
 libhumblevideo_la_LDFLAGS = \
 	-no-undefined -shared \

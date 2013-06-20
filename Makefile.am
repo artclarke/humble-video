@@ -158,7 +158,7 @@ DX_CLEANFILES = \
 
 endif DX_COND_doc
 
-SUBDIRS= src
+SUBDIRS= src test/src
 EXTRA_DIST= \
   mk/Doxyfile \
   mk/Valgrind.suppressions \

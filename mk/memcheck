@@ -41,7 +41,7 @@
 #echo "MEMCHECK command: $*"
 # if VS_MEMCHECK_LOGFILE is not specified, then create a log file.
 if [ "x$VS_MEMCHECK_LOGFILE" = "x" ]; then
-VS_MEMCHECK_LOGFILE=$1_memcheck.log
+VS_MEMCHECK_LOGFILE=$TMPDIR/valgrind_humble_$$_memcheck.log
 fi
 
 if [ "x$VALGRIND" = "x" ]; then

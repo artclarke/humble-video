@@ -100,7 +100,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/src/com/xuggle/ferry/config.h
+CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES = mk/Makefile.global mk/Makefile.dependencies \
 	pom.xml
 CONFIG_CLEAN_VPATH_FILES =
@@ -395,7 +395,7 @@ ACLOCAL_AMFLAGS = -I m4
 @DX_COND_doc_TRUE@    $(DX_CLEAN_PDF) \
 @DX_COND_doc_TRUE@    $(DX_CLEAN_LATEX)
 
-SUBDIRS = src
+SUBDIRS = src test/src
 EXTRA_DIST = \
   mk/Doxyfile \
   mk/Valgrind.suppressions \

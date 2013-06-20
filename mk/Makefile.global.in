@@ -79,7 +79,6 @@ ifdef VS_TEST_MEMCHECK
   export LIBTOOL
   export VALGRIND
   TESTS_ENVIRONMENT=$(LIBTOOL) --mode=execute $(abs_top_srcdir)/mk/memcheck
-#TESTS_ENVIRONMENT=echo
 endif
 
 ifdef VALGRIND

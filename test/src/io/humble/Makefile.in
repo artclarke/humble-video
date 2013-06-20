@@ -77,7 +77,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = src/io
+subdir = test/src/io/humble
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compiler_vendor.m4 \
@@ -339,10 +339,11 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-VS_CPP_PATH = io
-VS_CPP_PACKAGE = io
-VS_CPP_NAMESPACE = io
-SUBDIRS = humble
+VS_CPP_PATH = io/humble
+VS_CPP_PACKAGE = io.humble
+VS_CPP_NAMESPACE = io::humble
+VS_TEST = 1
+SUBDIRS = testutils ferry
 all: all-recursive
 
 .SUFFIXES:
@@ -355,9 +356,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu --ignore-deps src/io/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu --ignore-deps test/src/io/humble/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu --ignore-deps src/io/Makefile
+	  $(AUTOMAKE) --gnu --ignore-deps test/src/io/humble/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -652,7 +653,6 @@ uninstall-am:
 	installdirs-am maintainer-clean maintainer-clean-generic \
 	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
 	ps ps-am tags tags-am uninstall uninstall-am
-
 
 include @top_builddir@/mk/Makefile.global
 
