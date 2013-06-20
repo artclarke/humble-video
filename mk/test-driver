@@ -92,8 +92,27 @@ trap "st=141; $do_exit" 13
 trap "st=143; $do_exit" 15
 
 # Test script is run here.
+if [ "x$VALGRIND_CMD" != "x" ]; then
+  echo "Running: $LIBTOOL --mode=execute $VALGRIND_CMD --tool=memcheck --error-exitcode=255 --time-stamp=yes --read-var-info=yes --demangle=yes --leak-check=full --show-reachable=yes --smc-check=all --suppressions=$VALGRIND_SUPPRESSIONS --gen-suppressions=all --execute $@" >> $log_file 2>&1
+  $LIBTOOL --mode=execute $VALGRIND_CMD --tool=memcheck --error-exitcode=255 --time-stamp=yes --read-var-info=yes --demangle=yes --leak-check=full --show-reachable=yes --smc-check=all --suppressions=$VALGRIND_SUPPRESSIONS --gen-suppressions=all "$@" >> $log_file 2>&1
+  estatus=$?
+  if test $estatus -eq 0; then
+    echo -n "Ensuring no unsuppressed leaks" >> $log_file
+    grep -q "definitely lost: 0 bytes in 0 blocks" $log_file
+    estatus=$?
+  fi
+  if test $estatus -eq 0; then
+    grep -q "possibly lost: 0 bytes in 0 blocks" $log_file
+    estatus=$?
+  fi
+  if test $estatus -eq 0; then
+    grep -q "still reachable: 0 bytes in 0 blocks" $log_file
+    estatus=$?
+  fi
+else
 "$@" >$log_file 2>&1
 estatus=$?
+fi
 if test $enable_hard_errors = no && test $estatus -eq 99; then
   estatus=1
 fi

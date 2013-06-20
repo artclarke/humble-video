@@ -72,13 +72,13 @@ ifdef VS_TEST
   # Set the VS_TEST_FIXTUREDIR env variable to that tests can
   # find the fixtures directory for reading files
   export VS_TEST_FIXTUREDIR=$(abs_top_srcdir)/test/fixtures
-  TESTS_ENVIRONMENT=$(LIBTOOL) --mode=execute
 endif
 ifdef VS_TEST_MEMCHECK
   export VALGRIND_SUPPRESSIONS=$(abs_top_srcdir)/mk/Valgrind.suppressions
   export LIBTOOL
-  export VALGRIND
-  TESTS_ENVIRONMENT=$(LIBTOOL) --mode=execute $(abs_top_srcdir)/mk/memcheck
+  export VALGRIND_CMD=$(VALGRIND)
+else
+  export VALGRIND_CMD=
 endif
 
 ifdef VALGRIND
