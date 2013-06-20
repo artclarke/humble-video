@@ -6,7 +6,7 @@ HOST=$( ${DIR}/mk/config.guess )
 
 humble_configure()
 {
-  PREFIX="$1/$2"
+  PREFIX="$1/$2/"
   BUILD=$2
   echo "Building ${DIR}/configure in ${PREFIX}"
   mkdir -p ./$cross_os
