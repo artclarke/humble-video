@@ -177,8 +177,8 @@ clean-local:
 # Copy over the swig template files and the maven pom file
 install-data-local:
 	$(MKDIR_P) $(DESTDIR)$(prefix)/share/humble/video/pom
-	cp -rf $(SWIGOUTTMPDIR) $(DESTDIR)$(prefix)share/humble/video
-	cp pom.xml $(DESTDIR)$(prefix)share/humble/video/pom/
+	cp -rf $(SWIGOUTTMPDIR) $(DESTDIR)$(prefix)/share/humble/video
+	cp pom.xml $(DESTDIR)$(prefix)/share/humble/video/pom/
 
 uninstall-local:
-	rm -rf $(DESTDIR)$(prefix)share/humble/video
+	rm -rf $(DESTDIR)$(prefix)/share/humble/video
