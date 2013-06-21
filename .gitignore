@@ -5,3 +5,4 @@ config.h.in~
 /.cproject
 /.settings
 .DS_Store
+/target
