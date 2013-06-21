@@ -3,6 +3,7 @@ config.h.in~
 .*.swp
 /.project
 /.cproject
+/.classpath
 /.settings
 .DS_Store
 /target

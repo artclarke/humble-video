@@ -62,8 +62,9 @@ Java_io_humble_ferry_Ferry_init(JNIEnv *env, jclass)
 %}
 %pragma(java) jniclasscode=%{
   static {
+// TODO: Fix this
     JNILibrary library = new JNILibrary("humble",
-      new Long(com.xuggle.xuggler.Version.MAJOR_VERSION));
+      new Long(0));
     JNILibrary.load("humble-video", library);
     io.humble.ferry.Ferry.init();
     // This seems nuts, but it works around a Java 1.6 bug where
