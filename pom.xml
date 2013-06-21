@@ -7,12 +7,70 @@
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>humble-video</name>
-  <url>http://maven.apache.org</url>
+  <name>humble-video-noarch</name>
+  <url>http://www.humble.io</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
+  <developers>
+    <developer>
+      <id>Art Clarke</id>
+      <email>http://www.google.com/recaptcha/mailhide/d?k=01hY66l9v90EmmqfaxiZDX1Q==&amp;c=qXf0YSZkIUT8y7ZlLIVx38NCGf4u7h9hF3HBaBeisuI=</email>
+    </developer>
+  </developers>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+          <docletArtifact>
+            <groupId>org.umlgraph</groupId>
+            <artifactId>umlgraph</artifactId>
+            <version>5.6</version>
+          </docletArtifact>
+          <additionalparam>-inferrel -inferdep -quiet -hide java.* -hide
+            org.eclipse.* -collpackages java.util.* -postfixpackage
+            -nodefontsize 9 -nodefontpackagesize 7 -attributes -types
+            -visibility -operations -constructors
+            -enumerations
+            -enumconstants -views</additionalparam>
+          <useStandardDocletOptions>true</useStandardDocletOptions>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.15</version>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.15</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>2.7</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
   <dependencies>
     <dependency>
@@ -27,4 +85,9 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <organization>
+    <name>Humble Software</name>
+    <url>http://www.humble.io</url>
+  </organization>
+  <description>This POM file generates all the Java source code needed for the humble-video project. However, it is useless without the correct native code for the platform it is running (usually available as something like humble-video-arch-x86_64-apple-darwin-11.jar or humble-video.jar which will download ALL common native platforms).</description>
 </project>
