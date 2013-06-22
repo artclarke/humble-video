@@ -26,6 +26,7 @@ import java.util.LinkedList;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -54,7 +55,14 @@ public class RefCountedTest
   {
     JNIMemoryManager.setMemoryModel(model);
   }
-   
+  
+  @BeforeClass
+  public static void setUpClass() throws InterruptedException
+  {
+    // ensure if we're running multiple tests in the same JVM that
+    // we clean up other tests first.
+    tearDownClass();
+  }
   
   @After
   public void tearDown()

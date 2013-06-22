@@ -18,7 +18,6 @@
  <logger name="org.ffmpeg" level="info" />
  <root>
   <level value="warn" />
-  <appender-ref ref="CONSOLE" />
   <appender-ref ref="FILE" />
  </root>
 </configuration>

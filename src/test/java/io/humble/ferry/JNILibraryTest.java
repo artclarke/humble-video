@@ -27,7 +27,7 @@ public class JNILibraryTest
   @Test
   public void testLoadSuccess()
   {
-    final JNILibrary library = new JNILibrary("humble-video",
+    final JNILibrary library = new JNILibrary("humblevideo",
         new Long(0));
     JNILibrary.load("humble-video", library);
   }
