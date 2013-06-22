@@ -11,9 +11,9 @@ Makefile
 config.log
 config.status
 libtool
-mk/Makefile.dependencies
-mk/Makefile.global
-pom-x86_64-apple-darwin12.4.0.xml
+src/main/gnu/mk/Makefile.dependencies
+src/main/gnu/mk/Makefile.global
+src/main/gnu/pom*.xml
 src/main/gnu/Makefile
 src/main/gnu/io/Makefile
 src/main/gnu/io/humble/Makefile
@@ -24,11 +24,10 @@ src/test/gnu/Makefile
 src/test/gnu/io/Makefile
 src/test/gnu/io/humble/Makefile
 src/test/gnu/io/humble/ferry/Makefile
+src/test/gnu/io/humble/ferry/humble-ferry-main
 src/test/gnu/io/humble/testutils/Makefile
-/share
 .libs/
 *.lo
 *.o
 *.la
 *_CXXRunner.cpp
-humble-ferry-main
