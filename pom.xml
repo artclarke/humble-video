@@ -106,6 +106,9 @@
       <version>1.0.13</version>
       <scope>test</scope>
     </dependency>
+    <!-- For the tests, we depend upon the Humble Maven Jar with *all* the
+         common native libraries included, but not 'humble-video.jar' which
+         is a downstream dependency of this project. -->
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch-all</artifactId>
