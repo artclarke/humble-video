@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.humble</groupId>
-  <artifactId>@VS_PROJECT_NAME@-native-@build@</artifactId>
+  <artifactId>@VS_PROJECT_NAME@-arch-@build@</artifactId>
   <version>@LIB_MAJOR_VERSION@.@LIB_MINOR_VERSION@-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>@VS_PROJECT_NAME@-native-@build@</name>
+  <name>@VS_PROJECT_NAME@-arch-@build@</name>
   <url>http://www.humble.io</url>
 
   <properties>

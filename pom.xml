@@ -14,6 +14,19 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <organization>
+    <name>Humble Software</name>
+    <url>http://www.humble.io</url>
+  </organization>
+  <description>This POM file generates all the Java source code needed for the humble-video project. However, it is useless without the correct native code for the platform it is running (usually available as something like humble-video-arch-x86_64-apple-darwin-11.jar or humble-video.jar which will download ALL common native platforms).</description>
+  <licenses>
+    <license>
+      <name>AGPL</name>
+      <url>http://www.gnu.org/licenses/agpl-3.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>GNU Affero General Public License</comments>
+    </license>
+  </licenses>
   <developers>
     <developer>
       <id>Art Clarke</id>
@@ -81,13 +94,20 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.0.13</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-arch-all</artifactId>
+      <version>0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <organization>
-    <name>Humble Software</name>
-    <url>http://www.humble.io</url>
-  </organization>
-  <description>This POM file generates all the Java source code needed for the humble-video project. However, it is useless without the correct native code for the platform it is running (usually available as something like humble-video-arch-x86_64-apple-darwin-11.jar or humble-video.jar which will download ALL common native platforms).</description>
 </project>

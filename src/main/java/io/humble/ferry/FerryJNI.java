@@ -12,9 +12,9 @@ class FerryJNI {
 
   static {
 // TODO: Fix this
-    JNILibrary library = new JNILibrary("humble",
+    JNILibrary library = new JNILibrary("humblevideo",
       new Long(0));
-    JNILibrary.load("humble-video", library);
+    JNILibrary.load("humblevideo", library);
     io.humble.ferry.Ferry.init();
     // This seems nuts, but it works around a Java 1.6 bug where
     // a race condition exists when JNI_NewDirectByteBuffer is called
