@@ -46,7 +46,21 @@ namespace io { namespace humble { namespace video
     /**
      * A type to specify how rounding should be done.
      */
-    typedef enum AVRounding Rounding;
+    typedef enum {
+      /** Round toward zero. */
+      ROUND_ZERO     = 0,
+      /** Round away from zero. */
+      ROUND_INF      = 1,
+      /** Round toward -infinity. */
+      ROUND_DOWN     = 2,
+      /** Round toward +infinity. */
+      ROUND_UP       = 3,
+      /** Round to nearest and halfway cases away from zero. */
+      ROUND_NEAR_INF = 5,
+      /** Flag to pass INT64_MIN/MAX through instead of rescaling, this avoids special cases for AV_NOPTS_VALUE */
+      ROUND_PASS_MINMAX = 8192,
+
+    } Rounding;
 
     /**
      * Get the numerator for this rational.

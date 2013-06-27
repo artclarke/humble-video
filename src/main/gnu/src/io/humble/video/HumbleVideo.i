@@ -26,10 +26,10 @@
 #include <io/humble/video/IProperty.h>
 #include <io/humble/video/IPixelFormat.h>
 #include <io/humble/video/Global.h>
+#include <io/humble/video/IRational.h>
 
 /*
 #include <io/humble/video/ITimeValue.h>
-#include <io/humble/video/IRational.h>
 #include <io/humble/video/IMetaData.h>
 #include <io/humble/video/IMediaData.h>
 #include <io/humble/video/IAudioSamples.h>
@@ -124,8 +124,9 @@ Java_io_humble_video_Video_init(JNIEnv *env, jclass)
 %include <io/humble/video/IProperty.swg>
 %include <io/humble/video/Global.swg>
 %include <io/humble/video/IPixelFormat.h>
-/*
 %include <io/humble/video/IRational.swg>
+
+/*
 %include <io/humble/video/ITimeValue.h>
 %include <io/humble/video/IMetaData.swg>
 %include <io/humble/video/IMediaData.swg>
