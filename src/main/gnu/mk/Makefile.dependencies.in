@@ -1,5 +1,5 @@
 # Necessary to be in a file that is NOT processed by automake
 VS_PKG_DEPENDENCIES=libavdevice libswscale libavfilter libavformat libavcodec libavutil
-VS_PKG_LIBRARIES+=$(shell AR=$(AR) $(abs_top_srcdir)/mk/find_archives.sh "@top_builddir@/captive/stage@libdir@" $(VS_PKG_DEPENDENCIES) )
-VS_PKG_LIBRARIES+=$(shell PKG_CONFIG_PATH="@abs_top_builddir@/captive/stage@libdir@/pkgconfig" pkg-config --static --libs-only-other $(VS_PKG_DEPENDENCIES) )
+VS_PKG_LIBRARIES+=$(shell AR=$(AR) $(abs_top_srcdir)/mk/find_archives.sh "@libdir@" $(VS_PKG_DEPENDENCIES) )
+VS_PKG_LIBRARIES+=$(shell PKG_CONFIG_PATH="@libdir@/pkgconfig" pkg-config --static --libs-only-other $(VS_PKG_DEPENDENCIES) )
 

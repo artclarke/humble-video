@@ -259,49 +259,61 @@ Java_io_humble_video_Video_init(JNIEnv *env, jclass)
 extern "C" {
 #endif
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IProperty_1AV_1OPT_1TYPE_1CONST_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IProperty_1PROPERTY_1CONST_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::IProperty::Type result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::IProperty::Type)io::humble::video::IProperty::AV_OPT_TYPE_CONST;
+  result = (io::humble::video::IProperty::Type)io::humble::video::IProperty::PROPERTY_CONST;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IProperty_1AV_1OPT_1TYPE_1IMAGE_1SIZE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IProperty_1PROPERTY_1IMAGE_1SIZE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::IProperty::Type result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::IProperty::Type)io::humble::video::IProperty::AV_OPT_TYPE_IMAGE_SIZE;
+  result = (io::humble::video::IProperty::Type)io::humble::video::IProperty::PROPERTY_IMAGE_SIZE;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IProperty_1AV_1OPT_1TYPE_1PIXEL_1FMT_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IProperty_1PROPERTY_1PIXEL_1FMT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::IProperty::Type result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::IProperty::Type)io::humble::video::IProperty::AV_OPT_TYPE_PIXEL_FMT;
+  result = (io::humble::video::IProperty::Type)io::humble::video::IProperty::PROPERTY_PIXEL_FMT;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IProperty_1AV_1OPT_1TYPE_1SAMPLE_1FMT_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IProperty_1PROPERTY_1SAMPLE_1FMT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::IProperty::Type result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::IProperty::Type)io::humble::video::IProperty::AV_OPT_TYPE_SAMPLE_FMT;
+  result = (io::humble::video::IProperty::Type)io::humble::video::IProperty::PROPERTY_SAMPLE_FMT;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IProperty_1PROPERTY_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::IProperty::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::IProperty::Type)io::humble::video::IProperty::PROPERTY_UNKNOWN;
   jresult = (jint)result; 
   return jresult;
 }

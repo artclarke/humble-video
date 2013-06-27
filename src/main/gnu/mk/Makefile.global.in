@@ -126,10 +126,10 @@ vpath %$(SWIGEXT) .:$(srcdir)
 	@$(MKDIR_P) $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)
 	@echo "  SWIG     "$(notdir $<)
 	@$(SWIGCOMPILE) -outdir $(SWIGOUTTMPDIR)/$(VS_CPP_PATH) -c++ -java -o $@ $< 
-	@if test -w $(SWIGOUTCPPDIR)/$(VS_CPP_PATH) ; then \
+	@-if test -w $(SWIGOUTCPPDIR)/$(VS_CPP_PATH) ; then \
 	  cp -f $@ $(SWIGOUTCPPDIR)/$(VS_CPP_PATH) ; \
 	fi
-	@if test -w $(SWIGOUTDIR)/$(VS_CPP_PATH) ; then \
+	@-if test -w $(SWIGOUTDIR)/$(VS_CPP_PATH) ; then \
 	  cp -f $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)/* $(SWIGOUTDIR)/$(VS_CPP_PATH); \
 	fi
 

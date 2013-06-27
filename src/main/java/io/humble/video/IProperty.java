@@ -176,8 +176,8 @@ public class IProperty extends RefCounted {
   }
 
 /**
- * If this IProperty is of the type {@link Type#AV_OPT_TYPE_FLAGS}, 
- * this method will  
+ * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this 
+ * method will  
  * tell you how many different flag settings it takes.  
  * @return	Number of flag settings, or <0 if not a FLAGS value  
  */
@@ -186,8 +186,8 @@ public class IProperty extends RefCounted {
   }
 
 /**
- * If this IProperty is of the type {@link Type#AV_OPT_TYPE_FLAGS}, 
- * this method will  
+ * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this 
+ * method will  
  * give you another IProperty representing a constant setting for that 
  * flag.  
  * @param	position The position number for the flag; Must be in range 
@@ -201,8 +201,8 @@ public class IProperty extends RefCounted {
   }
 
 /**
- * If this IProperty is of the type {@link Type#AV_OPT_TYPE_FLAGS}, 
- * this method will  
+ * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this 
+ * method will  
  * give you another IProperty representing a constant setting for that 
  * flag.  
  * @param	name The name of the constant.  
@@ -220,18 +220,19 @@ public class IProperty extends RefCounted {
    *
    * Well, actually by FFMPEG, but you get the idea.
    */
-    AV_OPT_TYPE_FLAGS,
-    AV_OPT_TYPE_INT,
-    AV_OPT_TYPE_INT64,
-    AV_OPT_TYPE_DOUBLE,
-    AV_OPT_TYPE_FLOAT,
-    AV_OPT_TYPE_STRING,
-    AV_OPT_TYPE_RATIONAL,
-    AV_OPT_TYPE_BINARY,
-    AV_OPT_TYPE_CONST(VideoJNI.IProperty_AV_OPT_TYPE_CONST_get()),
-    AV_OPT_TYPE_IMAGE_SIZE(VideoJNI.IProperty_AV_OPT_TYPE_IMAGE_SIZE_get()),
-    AV_OPT_TYPE_PIXEL_FMT(VideoJNI.IProperty_AV_OPT_TYPE_PIXEL_FMT_get()),
-    AV_OPT_TYPE_SAMPLE_FMT(VideoJNI.IProperty_AV_OPT_TYPE_SAMPLE_FMT_get());
+    PROPERTY_FLAGS,
+    PROPERTY_INT,
+    PROPERTY_INT64,
+    PROPERTY_DOUBLE,
+    PROPERTY_FLOAT,
+    PROPERTY_STRING,
+    PROPERTY_RATIONAL,
+    PROPERTY_BINARY,
+    PROPERTY_CONST(VideoJNI.IProperty_PROPERTY_CONST_get()),
+    PROPERTY_IMAGE_SIZE(VideoJNI.IProperty_PROPERTY_IMAGE_SIZE_get()),
+    PROPERTY_PIXEL_FMT(VideoJNI.IProperty_PROPERTY_PIXEL_FMT_get()),
+    PROPERTY_SAMPLE_FMT(VideoJNI.IProperty_PROPERTY_SAMPLE_FMT_get()),
+    PROPERTY_UNKNOWN(VideoJNI.IProperty_PROPERTY_UNKNOWN_get());
 
     public final int swigValue() {
       return swigValue;

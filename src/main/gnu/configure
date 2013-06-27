@@ -19561,10 +19561,6 @@ if test "x$enable_warningerrors" = xyes; then
 
 fi
 
-
-$as_echo "#define VSJNI_USE_JVM_FOR_MEMMANAGEMENT 1" >>confdefs.h
-
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if you smiled" >&5
 $as_echo_n "checking if you smiled... " >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: let us know: info@humble.io" >&5
@@ -19794,7 +19790,7 @@ esac
 
 ac_config_headers="$ac_config_headers src/io/humble/ferry/config.h:config.h.in"
 
-ac_config_files="$ac_config_files Makefile mk/Makefile.global:mk/Makefile.global.in mk/Makefile.dependencies:mk/Makefile.dependencies.in src/Makefile src/io/Makefile src/io/humble/Makefile src/io/humble/ferry/Makefile src/io/humble/ferry/Ferry.i src/io/humble/video/Makefile test/Makefile test/io/Makefile test/io/humble/Makefile test/io/humble/testutils/Makefile test/io/humble/ferry/Makefile pom-${build}.xml:mk/pom.xml.in"
+ac_config_files="$ac_config_files Makefile mk/Makefile.global:mk/Makefile.global.in mk/Makefile.dependencies:mk/Makefile.dependencies.in src/Makefile src/io/Makefile src/io/humble/Makefile src/io/humble/ferry/Makefile src/io/humble/ferry/Ferry.i src/io/humble/video/Makefile test/Makefile test/io/Makefile test/io/humble/Makefile test/io/humble/testutils/Makefile test/io/humble/ferry/Makefile test/io/humble/video/Makefile pom-${build}.xml:mk/pom.xml.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20993,6 +20989,7 @@ do
     "test/io/humble/Makefile") CONFIG_FILES="$CONFIG_FILES test/io/humble/Makefile" ;;
     "test/io/humble/testutils/Makefile") CONFIG_FILES="$CONFIG_FILES test/io/humble/testutils/Makefile" ;;
     "test/io/humble/ferry/Makefile") CONFIG_FILES="$CONFIG_FILES test/io/humble/ferry/Makefile" ;;
+    "test/io/humble/video/Makefile") CONFIG_FILES="$CONFIG_FILES test/io/humble/video/Makefile" ;;
     "pom-${build}.xml") CONFIG_FILES="$CONFIG_FILES pom-${build}.xml:mk/pom.xml.in" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

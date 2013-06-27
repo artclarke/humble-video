@@ -41,18 +41,19 @@ namespace io { namespace humble { namespace video {
      * Well, actually by FFMPEG, but you get the idea.
      */
     typedef enum {
-      AV_OPT_TYPE_FLAGS,
-      AV_OPT_TYPE_INT,
-      AV_OPT_TYPE_INT64,
-      AV_OPT_TYPE_DOUBLE,
-      AV_OPT_TYPE_FLOAT,
-      AV_OPT_TYPE_STRING,
-      AV_OPT_TYPE_RATIONAL,
-      AV_OPT_TYPE_BINARY,
-      AV_OPT_TYPE_CONST = 128,
-      AV_OPT_TYPE_IMAGE_SIZE = MKBETAG('S','I','Z','E'),
-      AV_OPT_TYPE_PIXEL_FMT  = MKBETAG('P','F','M','T'),
-      AV_OPT_TYPE_SAMPLE_FMT = MKBETAG('S','F','M','T'),
+      PROPERTY_FLAGS,
+      PROPERTY_INT,
+      PROPERTY_INT64,
+      PROPERTY_DOUBLE,
+      PROPERTY_FLOAT,
+      PROPERTY_STRING,
+      PROPERTY_RATIONAL,
+      PROPERTY_BINARY,
+      PROPERTY_CONST = 128,
+      PROPERTY_IMAGE_SIZE = MKBETAG('S','I','Z','E'),
+      PROPERTY_PIXEL_FMT  = MKBETAG('P','F','M','T'),
+      PROPERTY_SAMPLE_FMT = MKBETAG('S','F','M','T'),
+      PROPERTY_UNKNOWN = -1
     } Type;
     
     typedef enum {
@@ -125,7 +126,7 @@ namespace io { namespace humble { namespace video {
     virtual double getDefaultAsDouble()=0;
     
     /**
-     * If this IProperty is of the type {@link Type#AV_OPT_TYPE_FLAGS}, this method will
+     * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this method will
      * tell you how many different flag settings it takes.
      * 
      * @return Number of flag settings, or <0 if not a FLAGS value
@@ -133,7 +134,7 @@ namespace io { namespace humble { namespace video {
     virtual int32_t getNumFlagSettings()=0;
     
     /**
-     * If this IProperty is of the type {@link Type#AV_OPT_TYPE_FLAGS}, this method will
+     * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this method will
      * give you another IProperty representing a constant setting for that flag.
      * 
      * @param position The position number for the flag;  Must be in range 0 <= position <= #getNumFlagSettings().
@@ -143,7 +144,7 @@ namespace io { namespace humble { namespace video {
     virtual IProperty *getFlagConstant(int32_t position)=0;
 
     /**
-     * If this IProperty is of the type {@link Type#AV_OPT_TYPE_FLAGS}, this method will
+     * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this method will
      * give you another IProperty representing a constant setting for that flag.
      * 
      * @param name The name of the constant.

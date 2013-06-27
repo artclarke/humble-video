@@ -200,6 +200,7 @@ namespace io { namespace humble { namespace video {
      */
     static bool getPropertyAsBoolean(void * context, const char* name);
 
+#if 0
     /**
      * Sets all properties in valuesToSet on object context.
      *
@@ -212,6 +213,7 @@ namespace io { namespace humble { namespace video {
      * @since 5.0
      */
     static int32_t setProperty(void *context, IMetaData* valuesToSet, IMetaData* valuesNotFound);
+#endif
 
   protected:
     Property();

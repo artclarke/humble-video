@@ -208,7 +208,7 @@ namespace io { namespace humble { namespace video
      * @param d double to convert
      * @return A new Rational; caller must release() when done.
      */
-    static IRational *make(double d);
+    VS_API_HUMBLEVIDEO static IRational *make(double d);
     /**
      * Creates deep copy of a Rational from another Rational.
      *

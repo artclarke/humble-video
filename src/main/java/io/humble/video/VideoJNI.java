@@ -27,10 +27,11 @@ class VideoJNI {
 // HumbleVideo.i: End generated code
   
 
-  public final static native int IProperty_AV_OPT_TYPE_CONST_get();
-  public final static native int IProperty_AV_OPT_TYPE_IMAGE_SIZE_get();
-  public final static native int IProperty_AV_OPT_TYPE_PIXEL_FMT_get();
-  public final static native int IProperty_AV_OPT_TYPE_SAMPLE_FMT_get();
+  public final static native int IProperty_PROPERTY_CONST_get();
+  public final static native int IProperty_PROPERTY_IMAGE_SIZE_get();
+  public final static native int IProperty_PROPERTY_PIXEL_FMT_get();
+  public final static native int IProperty_PROPERTY_SAMPLE_FMT_get();
+  public final static native int IProperty_PROPERTY_UNKNOWN_get();
   public final static native int IProperty_FLAG_ENCODING_PARAM_get();
   public final static native int IProperty_FLAG_DECODING_PARAM_get();
   public final static native int IProperty_FLAG_METADATA_get();

@@ -7,20 +7,23 @@ include @top_builddir@/mk/Makefile.global
 SUBDIRS=
 SUFFIXES=.i
 
-noinst_LTLIBRARIES = libhumblevideo.la
+noinst_LTLIBRARIES = libhumble-video.la
 
-libhumblevideo_la_LIBADD= $(VS_PKG_LIBRARIES)
+libhumble_video_la_LIBADD= $(VS_PKG_LIBRARIES)
 
-libhumblevideo_la_SOURCES= \
+libhumble_video_la_SOURCES= \
+  Global.cpp \
   IPixelFormat.cpp \
   IProperty.cpp \
-  IRational.cpp 
+  Property.cpp \
+  IRational.cpp \
+  Rational.cpp
 
-nodist_libhumblevideo_la_SOURCES= \
+nodist_libhumble_video_la_SOURCES= \
   HumbleVideo.cpp
 
-libhumblevideo_ladir=$(includedir)/$(VS_CPP_PATH)
-libhumblevideo_la_HEADERS= \
+libhumble_video_ladir=$(includedir)/$(VS_CPP_PATH)
+libhumble_video_la_HEADERS= \
   HumbleVideo.h \
   FfmpegIncludes.h \
   Global.h \
@@ -36,7 +39,7 @@ libhumblevideo_la_HEADERS= \
 BUILT_SOURCES= \
   HumbleVideo.cpp
 
-HumbleVideo.cpp : $(libhumblevideo_la_HEADERS)
+HumbleVideo.cpp : $(libhumble_video_la_HEADERS)
 
 clean-local:
 	rm -f $(BUILT_SOURCES)

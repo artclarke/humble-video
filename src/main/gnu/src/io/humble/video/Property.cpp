@@ -18,7 +18,6 @@
  *******************************************************************************/
 
 #include <io/humble/video/Property.h>
-#include <io/humble/video/MetaData.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/Property.h>
 extern "C" {
@@ -572,6 +571,7 @@ namespace io { namespace humble { namespace video {
     return retval;
   }
   
+#if 0
   int32_t
   Property :: setProperty(void *aContext, IMetaData* aValuesToSet, IMetaData* aValuesNotFound)
   {
@@ -603,5 +603,6 @@ namespace io { namespace humble { namespace video {
     }
     return retval;
   }
+#endif // 0
   
 }}}

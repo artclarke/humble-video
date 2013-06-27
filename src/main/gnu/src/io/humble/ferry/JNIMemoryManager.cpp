@@ -27,6 +27,8 @@
 #include <cstring>
 #include <climits>
 
+#define VSJNI_USE_JVM_FOR_MEMMANAGEMENT 1
+
 //#define VSJNI_MEMMANAGER_DEBUG 1
 #ifdef VSJNI_MEMMANAGER_DEBUG
 #include <cstdio>

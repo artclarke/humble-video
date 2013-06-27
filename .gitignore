@@ -6,6 +6,10 @@ config.h.in~
 /.classpath
 /.settings
 /.autotools
+src/main/gnu/.autotools
+src/main/gnu/.cproject
+src/main/gnu/.project
+src/main/gnu/.settings
 .DS_Store
 /target
 Makefile

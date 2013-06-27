@@ -327,8 +327,6 @@ if test "x$enable_warningerrors" = xyes; then
   AC_SUBST([VS_WARN_ISERROR])
 fi
 
-AC_DEFINE(VSJNI_USE_JVM_FOR_MEMMANAGEMENT, 1, AC_PACKAGE_NAME [ will use Java to allocate large memory blobs if running inside a Java Virtual Machine])
-
 AC_MSG_CHECKING([if you smiled])
 AC_MSG_RESULT([let us know: info@humble.io])
 
@@ -380,6 +378,7 @@ AC_CONFIG_FILES([Makefile
                  test/io/humble/Makefile
                  test/io/humble/testutils/Makefile
                  test/io/humble/ferry/Makefile
+                 test/io/humble/video/Makefile
                  pom-${build}.xml:mk/pom.xml.in
                  ])
 AC_OUTPUT

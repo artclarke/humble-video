@@ -17,7 +17,9 @@ lib_LTLIBRARIES =
 
 lib_LTLIBRARIES+= libhumblevideo.la
 libhumblevideo_la_SOURCES = HumbleVideo.cpp
-libhumblevideo_la_LIBADD = $(builddir)/ferry/libhumble-ferry.la
+libhumblevideo_la_LIBADD = \
+  $(builddir)/ferry/libhumble-ferry.la \
+  $(builddir)/video/libhumble-video.la
 
 libhumblevideo_la_LDFLAGS = \
 	-no-undefined -shared \

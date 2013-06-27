@@ -81,7 +81,7 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = src/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(libhumblevideo_la_HEADERS)
+	$(libhumble_video_la_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compiler_vendor.m4 \
 	$(top_srcdir)/m4/ax_prog_doxygen.m4 $(top_srcdir)/m4/humble.m4 \
@@ -95,12 +95,12 @@ CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libhumblevideo_la_DEPENDENCIES =
-am_libhumblevideo_la_OBJECTS = IPixelFormat.lo IProperty.lo \
-	IRational.lo
-nodist_libhumblevideo_la_OBJECTS = HumbleVideo.lo
-libhumblevideo_la_OBJECTS = $(am_libhumblevideo_la_OBJECTS) \
-	$(nodist_libhumblevideo_la_OBJECTS)
+libhumble_video_la_DEPENDENCIES =
+am_libhumble_video_la_OBJECTS = Global.lo IPixelFormat.lo IProperty.lo \
+	Property.lo IRational.lo Rational.lo
+nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
+libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
+	$(nodist_libhumble_video_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -138,9 +138,9 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(libhumblevideo_la_SOURCES) \
-	$(nodist_libhumblevideo_la_SOURCES)
-DIST_SOURCES = $(libhumblevideo_la_SOURCES)
+SOURCES = $(libhumble_video_la_SOURCES) \
+	$(nodist_libhumble_video_la_SOURCES)
+DIST_SOURCES = $(libhumble_video_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -181,8 +181,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(libhumblevideo_ladir)"
-HEADERS = $(libhumblevideo_la_HEADERS)
+am__installdirs = "$(DESTDIR)$(libhumble_video_ladir)"
+HEADERS = $(libhumble_video_la_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -408,18 +408,21 @@ VS_CPP_PACKAGE = io.humble.video
 VS_CPP_NAMESPACE = io::humble::video
 SUBDIRS = 
 SUFFIXES = .i
-noinst_LTLIBRARIES = libhumblevideo.la
-libhumblevideo_la_LIBADD = $(VS_PKG_LIBRARIES)
-libhumblevideo_la_SOURCES = \
+noinst_LTLIBRARIES = libhumble-video.la
+libhumble_video_la_LIBADD = $(VS_PKG_LIBRARIES)
+libhumble_video_la_SOURCES = \
+  Global.cpp \
   IPixelFormat.cpp \
   IProperty.cpp \
-  IRational.cpp 
+  Property.cpp \
+  IRational.cpp \
+  Rational.cpp
 
-nodist_libhumblevideo_la_SOURCES = \
+nodist_libhumble_video_la_SOURCES = \
   HumbleVideo.cpp
 
-libhumblevideo_ladir = $(includedir)/$(VS_CPP_PATH)
-libhumblevideo_la_HEADERS = \
+libhumble_video_ladir = $(includedir)/$(VS_CPP_PATH)
+libhumble_video_la_HEADERS = \
   HumbleVideo.h \
   FfmpegIncludes.h \
   Global.h \
@@ -482,8 +485,8 @@ clean-noinstLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-libhumblevideo.la: $(libhumblevideo_la_OBJECTS) $(libhumblevideo_la_DEPENDENCIES) $(EXTRA_libhumblevideo_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK)  $(libhumblevideo_la_OBJECTS) $(libhumblevideo_la_LIBADD) $(LIBS)
+libhumble-video.la: $(libhumble_video_la_OBJECTS) $(libhumble_video_la_DEPENDENCIES) $(EXTRA_libhumble_video_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(CXXLINK)  $(libhumble_video_la_OBJECTS) $(libhumble_video_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -505,27 +508,27 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-libhumblevideo_laHEADERS: $(libhumblevideo_la_HEADERS)
+install-libhumble_video_laHEADERS: $(libhumble_video_la_HEADERS)
 	@$(NORMAL_INSTALL)
-	@list='$(libhumblevideo_la_HEADERS)'; test -n "$(libhumblevideo_ladir)" || list=; \
+	@list='$(libhumble_video_la_HEADERS)'; test -n "$(libhumble_video_ladir)" || list=; \
 	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(libhumblevideo_ladir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(libhumblevideo_ladir)" || exit 1; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(libhumble_video_ladir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(libhumble_video_ladir)" || exit 1; \
 	fi; \
 	for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  echo "$$d$$p"; \
 	done | $(am__base_list) | \
 	while read files; do \
-	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(libhumblevideo_ladir)'"; \
-	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(libhumblevideo_ladir)" || exit $$?; \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(libhumble_video_ladir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(libhumble_video_ladir)" || exit $$?; \
 	done
 
-uninstall-libhumblevideo_laHEADERS:
+uninstall-libhumble_video_laHEADERS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(libhumblevideo_la_HEADERS)'; test -n "$(libhumblevideo_ladir)" || list=; \
+	@list='$(libhumble_video_la_HEADERS)'; test -n "$(libhumble_video_ladir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(libhumblevideo_ladir)'; $(am__uninstall_files_from_dir)
+	dir='$(DESTDIR)$(libhumble_video_ladir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -687,7 +690,7 @@ check: $(BUILT_SOURCES)
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(libhumblevideo_ladir)"; do \
+	for dir in "$(DESTDIR)$(libhumble_video_ladir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: $(BUILT_SOURCES)
@@ -744,7 +747,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-libhumblevideo_laHEADERS
+install-data-am: install-libhumble_video_laHEADERS
 
 install-dvi: install-dvi-recursive
 
@@ -789,7 +792,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-libhumblevideo_laHEADERS
+uninstall-am: uninstall-libhumble_video_laHEADERS
 
 .MAKE: $(am__recursive_targets) all check install install-am \
 	install-strip
@@ -802,17 +805,17 @@ uninstall-am: uninstall-libhumblevideo_laHEADERS
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
 	install-html-am install-info install-info-am \
-	install-libhumblevideo_laHEADERS install-man install-pdf \
+	install-libhumble_video_laHEADERS install-man install-pdf \
 	install-pdf-am install-ps install-ps-am install-strip \
 	installcheck installcheck-am installdirs installdirs-am \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-libhumblevideo_laHEADERS
+	uninstall-libhumble_video_laHEADERS
 
 include @top_builddir@/mk/Makefile.global
 
-HumbleVideo.cpp : $(libhumblevideo_la_HEADERS)
+HumbleVideo.cpp : $(libhumble_video_la_HEADERS)
 
 clean-local:
 	rm -f $(BUILT_SOURCES)

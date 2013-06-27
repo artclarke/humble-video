@@ -96,10 +96,6 @@
 /* Version number of package */
 #undef VERSION
 
-/* humble-video will use Java to allocate large memory blobs if running inside
-   a Java Virtual Machine */
-#undef VSJNI_USE_JVM_FOR_MEMMANAGEMENT
-
 /* humble-video will enable any code that depends on GPL code */
 #undef VS_ENABLE_GPL
 
