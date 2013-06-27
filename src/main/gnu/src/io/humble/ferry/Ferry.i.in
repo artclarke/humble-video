@@ -62,9 +62,8 @@ Java_io_humble_ferry_Ferry_init(JNIEnv *env, jclass)
 %}
 %pragma(java) jniclasscode=%{
   static {
-// TODO: Fix this
     JNILibrary library = new JNILibrary("humblevideo",
-      new Long(0));
+      new Long(Ferry.getMajorVersion()));
     JNILibrary.load("humblevideo", library);
     io.humble.ferry.Ferry.init();
     // This seems nuts, but it works around a Java 1.6 bug where
@@ -105,14 +104,17 @@ Java_io_humble_ferry_Ferry_init(JNIEnv *env, jclass)
  */
 %}
 %pragma(java) modulecode=%{
-
   static {
     FerryJNI.noop();
   }
+  /**
+   * Don't allow creation of this object.
+   */
+  private Ferry(){}
   
   /** call this to force a load of all native components.
    * This is NOT normally required but can be useful in
-   * some circulstances.
+   * some circumstances.
    */
   public static void load()
   {
@@ -131,9 +133,31 @@ Java_io_humble_ferry_Ferry_init(JNIEnv *env, jclass)
   {
     return FerryJNI.RefCounted_release(cptr, (RefCounted)null);
   }
-   
-%}
+  
+  private static final int MAJOR_VERSION=@LIB_MAJOR_VERSION@;
 
+  /** The Major Version Number (Currently
+   * &quot;{@value #MAJOR_VERSION}&quot;).
+   * @return the major version number.
+   */
+  public static int getMajorVersion() { return MAJOR_VERSION; } 
+
+  private static final int MINOR_VERSION=@LIB_MINOR_VERSION@;
+  /** The Minor Version Number (Currently
+   * &quot;{@value #MINOR_VERSION}&quot;).
+   * @return the minor version number.
+   */
+
+  public static int getMinorVersion() { return MINOR_VERSION; } 
+
+  private static final String VERSION=
+  "@LIB_MAJOR_VERSION@.@LIB_MINOR_VERSION@";
+
+  /** The Version String (Currently {@value #VERSION}).
+   * @return the version string
+   */
+  public static String getVersionString() { return VERSION; }  
+%}
 %import <io/humble/ferry/JNIHelper.swg>
 
 %include <io/humble/Humble.h>

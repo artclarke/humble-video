@@ -27,10 +27,17 @@
       <comments>GNU Affero General Public License</comments>
     </license>
   </licenses>
+  <scm>
+    <developerConnection></developerConnection>
+    <tag>xuggle</tag>
+    <url>https://github.com/artclarke/humble-video-noarch</url>
+  </scm>
   <developers>
     <developer>
-      <id>Art Clarke</id>
-      <email>http://www.google.com/recaptcha/mailhide/d?k=01hY66l9v90EmmqfaxiZDX1Q==&amp;c=qXf0YSZkIUT8y7ZlLIVx38NCGf4u7h9hF3HBaBeisuI=</email>
+      <id>art.clarke@gmail.com</id>
+      <name>Art Clarke</name>
+      <email>art.clarke@gmail.com</email>
+      <url>http://www.linkedin.com/in/artclarke</url>
     </developer>
   </developers>
   <reporting>
@@ -69,11 +76,20 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.3.2</version>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.15</version>
-            <configuration>
-              <forkMode>always</forkMode>
-            </configuration>
+          <configuration>
+            <forkMode>always</forkMode>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
@@ -83,6 +99,28 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>2.7</version>
+          <reports>
+            <report>index</report>
+            <report>project-team</report>
+            <report>license</report>
+            <report>mailing-list</report>
+            <report>dependencies</report>
+            <report>dependency-convergence</report>
+            <report>plugin-management</report>
+            <report>cim</report>
+            <report>issue-tracking</report>
+            <report>scm</report>
+            <report>summary</report>
+          </reports>
+
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jxr-plugin</artifactId>
+          <version>2.1</version>
+          <configuration>
+            <aggregate>true</aggregate>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -106,9 +144,9 @@
       <version>1.0.13</version>
       <scope>test</scope>
     </dependency>
-    <!-- For the tests, we depend upon the Humble Maven Jar with *all* the
-         common native libraries included, but not 'humble-video.jar' which
-         is a downstream dependency of this project. -->
+    <!-- For the tests, we depend upon the Humble Maven Jar with *all* the 
+      common native libraries included, but not 'humble-video.jar' which is a downstream 
+      dependency of this project. -->
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch-all</artifactId>

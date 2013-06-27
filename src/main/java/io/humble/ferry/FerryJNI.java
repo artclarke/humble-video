@@ -11,9 +11,8 @@ package io.humble.ferry;
 class FerryJNI {
 
   static {
-// TODO: Fix this
     JNILibrary library = new JNILibrary("humblevideo",
-      new Long(0));
+      new Long(Ferry.getMajorVersion()));
     JNILibrary.load("humblevideo", library);
     io.humble.ferry.Ferry.init();
     // This seems nuts, but it works around a Java 1.6 bug where

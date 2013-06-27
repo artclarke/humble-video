@@ -5,6 +5,7 @@ config.h.in~
 /.cproject
 /.classpath
 /.settings
+/.autotools
 .DS_Store
 /target
 Makefile

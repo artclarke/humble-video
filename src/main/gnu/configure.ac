@@ -373,6 +373,8 @@ AC_CONFIG_FILES([Makefile
                  src/io/Makefile
                  src/io/humble/Makefile
                  src/io/humble/ferry/Makefile
+                 src/io/humble/ferry/Ferry.i
+                 src/io/humble/video/Makefile
                  test/Makefile
                  test/io/Makefile
                  test/io/humble/Makefile

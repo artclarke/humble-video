@@ -79,32 +79,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@VS_OS_WINDOWS_TRUE@am__append_1 = \
-@VS_OS_WINDOWS_TRUE@	-Wl,--add-stdcall-alias \
-@VS_OS_WINDOWS_TRUE@	-Wl,--enable-runtime-pseudo-reloc \
-@VS_OS_WINDOWS_TRUE@	-Wl,--enable-auto-image-base \
-@VS_OS_WINDOWS_TRUE@	-Wl,-Bsymbolic \
-@VS_OS_WINDOWS_TRUE@	-Wl,--warn-common \
-@VS_OS_WINDOWS_TRUE@	-Wl,--as-needed \
-@VS_OS_WINDOWS_TRUE@	-XCClinker -lgcc \
-@VS_OS_WINDOWS_TRUE@	-XCClinker -lmingw32 \
-@VS_OS_WINDOWS_TRUE@	-XCClinker -lmoldname \
-@VS_OS_WINDOWS_TRUE@	-XCClinker -lmingwex \
-@VS_OS_WINDOWS_TRUE@	-XCClinker -lmsvcrt \
-@VS_OS_WINDOWS_TRUE@	-XCClinker -ladvapi32 \
-@VS_OS_WINDOWS_TRUE@	-XCClinker -lshell32 \
-@VS_OS_WINDOWS_TRUE@	-XCClinker -luser32 \
-@VS_OS_WINDOWS_TRUE@	-XCClinker -lkernel32
-
-@VS_OS_LINUX_TRUE@@VS_OS_WINDOWS_FALSE@am__append_2 = \
-@VS_OS_LINUX_TRUE@@VS_OS_WINDOWS_FALSE@	-nostdlib -static-libtool-libs -XCClinker -static-libgcc
-
-@VS_OS_LINUX_FALSE@@VS_OS_WINDOWS_FALSE@am__append_3 = \
-@VS_OS_LINUX_FALSE@@VS_OS_WINDOWS_FALSE@	-nostdlib -static-libtool-libs -XCClinker -static-libgcc
-
-subdir = src/io/humble
+subdir = src/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(humble_HEADERS)
+	$(libhumblevideo_la_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compiler_vendor.m4 \
 	$(top_srcdir)/m4/ax_prog_doxygen.m4 $(top_srcdir)/m4/humble.m4 \
@@ -117,46 +94,17 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__uninstall_files_from_dir = { \
-  test -z "$$files" \
-    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
-    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
-         $(am__cd) "$$dir" && rm -f $$files; }; \
-  }
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(humbledir)"
-LTLIBRARIES = $(lib_LTLIBRARIES)
-libhumblevideo_la_DEPENDENCIES = $(builddir)/ferry/libhumble-ferry.la
-am_libhumblevideo_la_OBJECTS = HumbleVideo.lo
-libhumblevideo_la_OBJECTS = $(am_libhumblevideo_la_OBJECTS)
+LTLIBRARIES = $(noinst_LTLIBRARIES)
+libhumblevideo_la_DEPENDENCIES =
+am_libhumblevideo_la_OBJECTS = IPixelFormat.lo IProperty.lo \
+	IRational.lo
+nodist_libhumblevideo_la_OBJECTS = HumbleVideo.lo
+libhumblevideo_la_OBJECTS = $(am_libhumblevideo_la_OBJECTS) \
+	$(nodist_libhumblevideo_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libhumblevideo_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libhumblevideo_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -190,7 +138,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(libhumblevideo_la_SOURCES)
+SOURCES = $(libhumblevideo_la_SOURCES) \
+	$(nodist_libhumblevideo_la_SOURCES)
 DIST_SOURCES = $(libhumblevideo_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
@@ -205,7 +154,35 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-HEADERS = $(humble_HEADERS)
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
+am__install_max = 40
+am__nobase_strip_setup = \
+  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
+am__nobase_strip = \
+  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
+am__nobase_list = $(am__nobase_strip_setup); \
+  for p in $$list; do echo "$$p $$p"; done | \
+  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
+  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
+    if (++n[$$2] == $(am__install_max)) \
+      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
+    END { for (dir in files) print dir, files[dir] }'
+am__base_list = \
+  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__uninstall_files_from_dir = { \
+  test -z "$$files" \
+    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
+    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
+         $(am__cd) "$$dir" && rm -f $$files; }; \
+  }
+am__installdirs = "$(DESTDIR)$(libhumblevideo_ladir)"
+HEADERS = $(libhumblevideo_la_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -425,25 +402,44 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-VS_CPP_PATH = io/humble
-VS_CPP_PACKAGE = io.humble
-VS_CPP_NAMESPACE = io::humble
-SUBDIRS = ferry video
-humbledir = $(includedir)/$(VS_CPP_PATH)
-humble_HEADERS = \
-  Humble.h
+VS_PRODUCT = humble-video
+VS_CPP_PATH = io/humble/video
+VS_CPP_PACKAGE = io.humble.video
+VS_CPP_NAMESPACE = io::humble::video
+SUBDIRS = 
+SUFFIXES = .i
+noinst_LTLIBRARIES = libhumblevideo.la
+libhumblevideo_la_LIBADD = $(VS_PKG_LIBRARIES)
+libhumblevideo_la_SOURCES = \
+  IPixelFormat.cpp \
+  IProperty.cpp \
+  IRational.cpp 
 
-lib_LTLIBRARIES = libhumblevideo.la
-libhumblevideo_la_SOURCES = HumbleVideo.cpp
-libhumblevideo_la_LIBADD = $(builddir)/ferry/libhumble-ferry.la
-libhumblevideo_la_LDFLAGS = -no-undefined -shared -version-number \
-	@LIB_MAJOR_VERSION@:@LIB_MINOR_VERSION@:0 $(VS_LDFLAGS) \
-	$(VS_PKG_LIBRARIES) $(am__append_1) $(am__append_2) \
-	$(am__append_3)
-all: all-recursive
+nodist_libhumblevideo_la_SOURCES = \
+  HumbleVideo.cpp
+
+libhumblevideo_ladir = $(includedir)/$(VS_CPP_PATH)
+libhumblevideo_la_HEADERS = \
+  HumbleVideo.h \
+  FfmpegIncludes.h \
+  Global.h \
+  Global.swg \
+  IPixelFormat.h \
+  IProperty.h \
+  IRational.h \
+  IRational.swg \
+  PixelFormat.h \
+  Property.h \
+  Rational.h 
+
+BUILT_SOURCES = \
+  HumbleVideo.cpp
+
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .cpp .lo .o .obj
+.SUFFIXES: .i .cpp .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -453,9 +449,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu --ignore-deps src/io/humble/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu --ignore-deps src/io/humble/video/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu --ignore-deps src/io/humble/Makefile
+	  $(AUTOMAKE) --gnu --ignore-deps src/io/humble/video/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -475,33 +471,9 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
-	@$(NORMAL_INSTALL)
-	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
-	list2=; for p in $$list; do \
-	  if test -f $$p; then \
-	    list2="$$list2 $$p"; \
-	  else :; fi; \
-	done; \
-	test -z "$$list2" || { \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(libdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(libdir)" || exit 1; \
-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libdir)'"; \
-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libdir)"; \
-	}
-
-uninstall-libLTLIBRARIES:
-	@$(NORMAL_UNINSTALL)
-	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
-	for p in $$list; do \
-	  $(am__strip_dir) \
-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$f'"; \
-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$f"; \
-	done
-
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; \
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; \
 	locs=`for p in $$list; do echo $$p; done | \
 	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
 	      sort -u`; \
@@ -511,7 +483,7 @@ clean-libLTLIBRARIES:
 	}
 
 libhumblevideo.la: $(libhumblevideo_la_OBJECTS) $(libhumblevideo_la_DEPENDENCIES) $(EXTRA_libhumblevideo_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libhumblevideo_la_LINK) -rpath $(libdir) $(libhumblevideo_la_OBJECTS) $(libhumblevideo_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK)  $(libhumblevideo_la_OBJECTS) $(libhumblevideo_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -533,27 +505,27 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-humbleHEADERS: $(humble_HEADERS)
+install-libhumblevideo_laHEADERS: $(libhumblevideo_la_HEADERS)
 	@$(NORMAL_INSTALL)
-	@list='$(humble_HEADERS)'; test -n "$(humbledir)" || list=; \
+	@list='$(libhumblevideo_la_HEADERS)'; test -n "$(libhumblevideo_ladir)" || list=; \
 	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(humbledir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(humbledir)" || exit 1; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(libhumblevideo_ladir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(libhumblevideo_ladir)" || exit 1; \
 	fi; \
 	for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  echo "$$d$$p"; \
 	done | $(am__base_list) | \
 	while read files; do \
-	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(humbledir)'"; \
-	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(humbledir)" || exit $$?; \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(libhumblevideo_ladir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(libhumblevideo_ladir)" || exit $$?; \
 	done
 
-uninstall-humbleHEADERS:
+uninstall-libhumblevideo_laHEADERS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(humble_HEADERS)'; test -n "$(humbledir)" || list=; \
+	@list='$(libhumblevideo_la_HEADERS)'; test -n "$(libhumblevideo_ladir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(humbledir)'; $(am__uninstall_files_from_dir)
+	dir='$(DESTDIR)$(libhumblevideo_ladir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -710,14 +682,16 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-recursive
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-recursive
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(humbledir)"; do \
+	for dir in "$(DESTDIR)$(libhumblevideo_ladir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-recursive
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
@@ -747,10 +721,11 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-recursive
 
-clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
-	mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local \
+	clean-noinstLTLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f Makefile
@@ -769,13 +744,13 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-humbleHEADERS
+install-data-am: install-libhumblevideo_laHEADERS
 
 install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am:
 
 install-html: install-html-recursive
 
@@ -814,31 +789,34 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-humbleHEADERS uninstall-libLTLIBRARIES
+uninstall-am: uninstall-libhumblevideo_laHEADERS
 
-.MAKE: $(am__recursive_targets) install-am install-strip
+.MAKE: $(am__recursive_targets) all check install install-am \
+	install-strip
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am check \
-	check-am clean clean-generic clean-libLTLIBRARIES \
-	clean-libtool cscopelist-am ctags ctags-am distclean \
+	check-am clean clean-generic clean-libtool clean-local \
+	clean-noinstLTLIBRARIES cscopelist-am ctags ctags-am distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-humbleHEADERS install-info \
-	install-info-am install-libLTLIBRARIES install-man install-pdf \
+	install-html-am install-info install-info-am \
+	install-libhumblevideo_laHEADERS install-man install-pdf \
 	install-pdf-am install-ps install-ps-am install-strip \
 	installcheck installcheck-am installdirs installdirs-am \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-humbleHEADERS uninstall-libLTLIBRARIES
-
+	uninstall-libhumblevideo_laHEADERS
 
 include @top_builddir@/mk/Makefile.global
-# defines VS_PKG_LIBRARIES.  Must be in a file that automake does not
-# process at autoreconf time.
-include @top_builddir@/mk/Makefile.dependencies
+
+HumbleVideo.cpp : $(libhumblevideo_la_HEADERS)
+
+clean-local:
+	rm -f $(BUILT_SOURCES)
+	if test -w "$(SWIGOUTTMPDIR)"; then rm -rf $(SWIGOUTTMPDIR); fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

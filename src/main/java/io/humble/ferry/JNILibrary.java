@@ -389,8 +389,7 @@ public class JNILibrary implements Comparable<JNILibrary> {
     case WINDOWS:
       prefixes = new String[] { "lib", "", "cyg" };
       suffixes = new String[] {
-      // TODO: Fix this.
-      "-"+0+".dll", ".dll"
+      "-"+Ferry.getMajorVersion()+".dll", ".dll"
       };
       break;
     case MAC:

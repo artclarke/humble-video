@@ -83,7 +83,8 @@ host_triplet = @host@
 noinst_PROGRAMS = humble-ferry-main$(EXEEXT)
 subdir = src/io/humble/ferry
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/config.h.in $(libhumble_ferry_la_HEADERS)
+	$(top_srcdir)/config.h.in $(srcdir)/Ferry.i.in \
+	$(libhumble_ferry_la_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compiler_vendor.m4 \
 	$(top_srcdir)/m4/ax_prog_doxygen.m4 $(top_srcdir)/m4/humble.m4 \
@@ -94,7 +95,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = Ferry.i
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_ferry_la_LIBADD =
@@ -469,6 +470,8 @@ $(top_srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
+Ferry.i: $(top_builddir)/config.status $(srcdir)/Ferry.i.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -683,7 +686,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-data-local install-libhumble_ferry_laHEADERS
+install-data-am: install-libhumble_ferry_laHEADERS
 
 install-dvi: install-dvi-am
 
@@ -728,7 +731,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-libhumble_ferry_laHEADERS uninstall-local
+uninstall-am: uninstall-libhumble_ferry_laHEADERS
 
 .MAKE: all check install install-am install-strip
 
@@ -738,16 +741,15 @@ uninstall-am: uninstall-libhumble_ferry_laHEADERS uninstall-local
 	distclean-compile distclean-generic distclean-hdr \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
-	install-data-am install-data-local install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-libhumble_ferry_laHEADERS \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-libhumble_ferry_laHEADERS \
-	uninstall-local
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-libhumble_ferry_laHEADERS install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-libhumble_ferry_laHEADERS
 
 include @top_builddir@/mk/Makefile.global
 
@@ -756,12 +758,6 @@ Ferry.cpp : $(libhumble_ferry_la_HEADERS)
 clean-local:
 	rm -f $(BUILT_SOURCES)
 	rm -rf $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)
-
-install-data-local:
-	@echo "installing SWIG generated files: $(VS_CPP_PATH): $(DESTDIR)$(prefix)share"
-
-uninstall-local:
-	@echo "removing SWIG generated files: $(VS_CPP_PATH): $(DESTDIR)$(prefix)share"
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

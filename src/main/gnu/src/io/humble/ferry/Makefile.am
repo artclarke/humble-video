@@ -56,9 +56,3 @@ Ferry.cpp : $(libhumble_ferry_la_HEADERS)
 clean-local:
 	rm -f $(BUILT_SOURCES)
 	rm -rf $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)
-
-install-data-local:
-	@echo "installing SWIG generated files: $(VS_CPP_PATH): $(DESTDIR)$(prefix)share"
-
-uninstall-local:
-	@echo "removing SWIG generated files: $(VS_CPP_PATH): $(DESTDIR)$(prefix)share"

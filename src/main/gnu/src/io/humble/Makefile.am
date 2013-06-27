@@ -7,7 +7,7 @@ include @top_builddir@/mk/Makefile.global
 # process at autoreconf time.
 include @top_builddir@/mk/Makefile.dependencies
 
-SUBDIRS=ferry
+SUBDIRS=ferry video
 
 humbledir=$(includedir)/$(VS_CPP_PATH)
 humble_HEADERS= \

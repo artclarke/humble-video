@@ -112,12 +112,15 @@ ifdef VS_WARN_ISERROR
 SWIGFLAGS+=-Werror
 endif
 
+# Look in the local directory first for a .i file, and then if not, search the source directory.
+vpath %$(SWIGEXT) .:$(srcdir)
+
 # Regnerate the SWIG CPP files, and copy into the src tree
 # This is definitely NOT what GNU Autotools recommends, but
 # it makes things more convenient for me.
 # And we only copy into the generated tree if write permission is granted
 # so that distcheck does the right thing
-%$(SWIGCPPEXT): $(srcdir)/%$(SWIGEXT)
+%$(SWIGCPPEXT): %$(SWIGEXT)
 	@$(MKDIR_P) $(SWIGOUTDIR)/$(VS_CPP_PATH)
 	@$(MKDIR_P) $(SWIGOUTCPPDIR)/$(VS_CPP_PATH)
 	@$(MKDIR_P) $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)

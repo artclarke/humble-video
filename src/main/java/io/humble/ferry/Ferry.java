@@ -20,14 +20,17 @@ package io.humble.ferry;
 
 public class Ferry {
 
-
   static {
     FerryJNI.noop();
   }
+  /**
+   * Don't allow creation of this object.
+   */
+  private Ferry(){}
   
   /** call this to force a load of all native components.
    * This is NOT normally required but can be useful in
-   * some circulstances.
+   * some circumstances.
    */
   public static void load()
   {
@@ -46,6 +49,29 @@ public class Ferry {
   {
     return FerryJNI.RefCounted_release(cptr, (RefCounted)null);
   }
-   
+  
+  private static final int MAJOR_VERSION=0;
+
+  /** The Major Version Number (Currently
+   * &quot;{@value #MAJOR_VERSION}&quot;).
+   * @return the major version number.
+   */
+  public static int getMajorVersion() { return MAJOR_VERSION; } 
+
+  private static final int MINOR_VERSION=1;
+  /** The Minor Version Number (Currently
+   * &quot;{@value #MINOR_VERSION}&quot;).
+   * @return the minor version number.
+   */
+
+  public static int getMinorVersion() { return MINOR_VERSION; } 
+
+  private static final String VERSION=
+  "0.1";
+
+  /** The Version String (Currently {@value #VERSION}).
+   * @return the version string
+   */
+  public static String getVersionString() { return VERSION; }  
 
 }
