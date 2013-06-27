@@ -7,7 +7,7 @@ int main() {
  // This method is used to clean up static memory
  // to that Valgrind doesn't think I'm a sloppy leaker.
  io::humble::ferry::JNIHelper::shutdownHelper();
-// io::humble::video::Global::deinit();
+ io::humble::video::Global::deinit();
  return retval;
 }
 
