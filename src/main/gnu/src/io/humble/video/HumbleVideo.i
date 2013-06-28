@@ -26,8 +26,10 @@
 #include <io/humble/video/IProperty.h>
 #include <io/humble/video/IPixelFormat.h>
 #include <io/humble/video/Global.h>
+#include <io/humble/video/Codec.h>
 #include <io/humble/video/IRational.h>
 #include <io/humble/video/ContainerFormat.h>
+#include <io/humble/video/OutputFormat.h>
 
 /*
 #include <io/humble/video/ITimeValue.h>
@@ -122,11 +124,13 @@ Java_io_humble_video_Video_init(JNIEnv *env, jclass)
 %import <io/humble/ferry/Ferry.i>
 
 %include <io/humble/video/HumbleVideo.h>
-%include <io/humble/video/IProperty.swg>
 %include <io/humble/video/Global.swg>
+%include <io/humble/video/Codec.h>
+%include <io/humble/video/IProperty.swg>
 %include <io/humble/video/IPixelFormat.h>
 %include <io/humble/video/IRational.swg>
 %include <io/humble/video/ContainerFormat.swg>
+%include <io/humble/video/OutputFormat.swg>
 
 /*
 %include <io/humble/video/ITimeValue.h>

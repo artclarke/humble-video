@@ -18,6 +18,7 @@ libhumble_video_la_SOURCES= \
   IRational.cpp \
   Rational.cpp \
   ContainerFormat.cpp \
+  OutputFormat.cpp \
   Global.cpp
   
 nodist_libhumble_video_la_SOURCES= \
@@ -26,6 +27,7 @@ nodist_libhumble_video_la_SOURCES= \
 libhumble_video_ladir=$(includedir)/$(VS_CPP_PATH)
 libhumble_video_la_HEADERS= \
   HumbleVideo.h \
+  Codec.h \
   FfmpegIncludes.h \
   Global.swg \
   IPixelFormat.h \
@@ -36,6 +38,7 @@ libhumble_video_la_HEADERS= \
   Property.h \
   Rational.h \
   ContainerFormat.h \
+  OutputFormat.h \
   Global.h
 
 BUILT_SOURCES= \

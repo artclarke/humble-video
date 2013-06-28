@@ -109,6 +109,88 @@ public class ContainerFormat extends RefCounted {
   // JNIHelper.swg: End generated code
   
 
+  /**
+    * info about this format object
+    * @return information about this object
+    */
+    
+   @Override
+   public String toString()
+   {
+     StringBuilder result = new StringBuilder();
+     
+     result.append(this.getClass().getName()+"@"+hashCode()+"[");
+     result.append("name:"+getName()+";");
+     result.append("longname:"+getName()+";");
+     result.append("extensions:"+getExtensions()+";");
+     result.append("flags:"+getFlags()+";");
+     result.append("]");
+     return result.toString();
+   }
+   /**
+    * Returns a list of all codecs supported for this Object.
+    *
+    * <p>
+    *
+    * If this object hasn't been set up for output, then
+    * we return null.
+    *
+    * </p>
+    *
+    * @return A list of supported codecs, in decreasing preferred order.
+    */
+   public java.util.List<Codec.Id> getOutputCodecsSupported()
+   {
+     final java.util.List<Codec.Id> retval =
+       new java.util.LinkedList<Codec.Id>();
+     final java.util.Set<Codec.Id> uniqueSet =
+       new java.util.HashSet<Codec.Id>();
+     
+     int numCodecs = getNumSupportedCodecs();
+     for(int i = 0; i < numCodecs; i++)
+     {
+       Codec.Id id = getSupportedCodecId(i);
+       // remove duplicate IDs
+       if (id != Codec.Id.ID_NONE && !uniqueSet.contains(id))
+         retval.add(id);
+       uniqueSet.add(id);
+     }    
+     return retval;
+   }
+
+   /**
+    * Returns a list of all codec tags supported for this container.
+    *
+    * <p>
+    *
+    * If this object hasn't been set up for output, then
+    * we return null.
+    *
+    * </p>
+    *
+    * @return A list of supported codec tags, in decreasing preferred order.
+    */
+   public java.util.List<Long> getOutputTagsSupported()
+   {
+     final java.util.List<Long> retval =
+       new java.util.LinkedList<Long>();
+     final java.util.Set<Long> uniqueSet =
+       new java.util.HashSet<Long>();
+     
+     int numCodecs = getNumSupportedCodecs();
+     for(int i = 0; i < numCodecs; i++)
+     {
+       long tag = getSupportedCodecTag(i);
+       Codec.Id id = getSupportedCodecId(i);
+       // remove duplicate tags
+       if (id != Codec.Id.ID_NONE && !uniqueSet.contains(tag))
+         retval.add(tag);
+       uniqueSet.add(tag);
+     }    
+     return retval;
+   }
+
+
 /**
  * Name for format.  
  */
@@ -140,6 +222,102 @@ public class ContainerFormat extends RefCounted {
     return VideoJNI.ContainerFormat_getFlags(swigCPtr, this);
   }
 
+/**
+ *  
+ */
+  protected int getNumSupportedCodecs() {
+    return VideoJNI.ContainerFormat_getNumSupportedCodecs(swigCPtr, this);
+  }
+
+/**
+ *  
+ * @param	n The n'th codec supported by this codec. Lower n are higher 
+ *		 priority.  
+ * n must be < {@link #getNumSupportedCodecs()}  
+ * @return	the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} 
+ *		 if none.  
+ */
+  protected Codec.Id getSupportedCodecId(int n) {
+    return Codec.Id.swigToEnum(VideoJNI.ContainerFormat_getSupportedCodecId(swigCPtr, this, n));
+  }
+
+/**
+ * Get the 32-bit Codec Tag for the n'th codec supported by this container. 
+ *  
+ * @param	n The n'th codec supported by this codec. Lower n are higher 
+ *		 priority.  
+ * n must be < {@link #getNumSupportedCodecs()}  
+ * @return	the codec tag at the n'th slot, or 0 if none.  
+ */
+  protected long getSupportedCodecTag(int n) {
+    return VideoJNI.ContainerFormat_getSupportedCodecTag(swigCPtr, this, n);
+  }
+
+  public enum MediaType {
+  /**
+   * The type of media contained in a container's stream
+   * Usually treated as DATA
+   */
+    MEDIA_UNKNOWN(VideoJNI.ContainerFormat_MEDIA_UNKNOWN_get()),
+  /**
+   * Video data
+   */
+    MEDIA_VIDEO(VideoJNI.ContainerFormat_MEDIA_VIDEO_get()),
+  /**
+   * Audio data
+   */
+    MEDIA_AUDIO(VideoJNI.ContainerFormat_MEDIA_AUDIO_get()),
+  /**
+   * Opaque data, usually continuous
+   */
+    MEDIA_DATA(VideoJNI.ContainerFormat_MEDIA_DATA_get()),
+  /**
+   * Subtitle data
+   */
+    MEDIA_SUBTITLE(VideoJNI.ContainerFormat_MEDIA_SUBTITLE_get()),
+  /**
+   * Opaque data, usually sparse
+   */
+    MEDIA_ATTACHMENT(VideoJNI.ContainerFormat_MEDIA_ATTACHMENT_get());
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static MediaType swigToEnum(int swigValue) {
+      MediaType[] swigValues = MediaType.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (MediaType swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + MediaType.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private MediaType() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private MediaType(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private MediaType(MediaType swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
   public enum Flags {
   /**
    * A series of flags that different {@link ContainerFormat}s and their 
@@ -153,7 +331,7 @@ public class ContainerFormat extends RefCounted {
    */
     NO_FILE(VideoJNI.ContainerFormat_NO_FILE_get()),
   /**
-   * Needs '-888119376' in filename.
+   * Needs '-643566704' in filename.
    */
     NEED_NUMBER(VideoJNI.ContainerFormat_NEED_NUMBER_get()),
   /**
@@ -212,10 +390,13 @@ public class ContainerFormat extends RefCounted {
    */
     ALLOW_FLUSH(VideoJNI.ContainerFormat_ALLOW_FLUSH_get()),
   /**
-   * Seeking is based on PTS Format does not require strictly increasing 
-   * timestamps, but they must still be monotonic
+   * Format does not require strictly increasing timestamps, but they 
+   * must still be monotonic
    */
     NONSTRICT_TIMESTAMPS(VideoJNI.ContainerFormat_NONSTRICT_TIMESTAMPS_get()),
+  /**
+   * Seeking is based on PTS
+   */
     SEEK_TO_PTS(VideoJNI.ContainerFormat_SEEK_TO_PTS_get());
 
     public final int swigValue() {

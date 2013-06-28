@@ -27,6 +27,7 @@
 
 #include <io/humble/ferry/RefCounted.h>
 #include <io/humble/video/HumbleVideo.h>
+#include <io/humble/video/Codec.h>
 
 namespace io
 {
@@ -38,6 +39,28 @@ namespace io
       class VS_API_HUMBLEVIDEO ContainerFormat : public io::humble::ferry::RefCounted
       {
       public:
+        /**
+         * The type of media contained in a container's stream
+         */
+        typedef enum MediaType
+        {
+          /** Usually treated as DATA */
+          MEDIA_UNKNOWN = AVMEDIA_TYPE_UNKNOWN,
+          /** Video data */
+          MEDIA_VIDEO = AVMEDIA_TYPE_VIDEO,
+          /** Audio data */
+          MEDIA_AUDIO = AVMEDIA_TYPE_AUDIO,
+          /** Opaque data, usually continuous */
+          MEDIA_DATA = AVMEDIA_TYPE_DATA,
+          /** Subtitle data */
+          MEDIA_SUBTITLE = AVMEDIA_TYPE_SUBTITLE,
+          /** Opaque data, usually sparse */
+          MEDIA_ATTACHMENT = AVMEDIA_TYPE_ATTACHMENT,
+  #ifndef SWIG
+          MEDIA_LAST_TYPE = AVMEDIA_TYPE_NB
+  #endif
+        };
+
         /**
          * A series of flags that different {@link ContainerFormat}s and their subclasses
          * can support.
@@ -95,7 +118,7 @@ namespace io
           /** Format does not require strictly increasing timestamps, but they must still be monotonic */
           NONSTRICT_TIMESTAMPS = AVFMT_TS_NONSTRICT,
 
-          /**< Seeking is based on PTS */
+          /** Seeking is based on PTS */
           SEEK_TO_PTS = AVFMT_SEEK_TO_PTS,
         } Flags;
 
@@ -123,7 +146,53 @@ namespace io
          */
         virtual int32_t
         getFlags()=0;
-      private:
+
+
+        /**
+         * Get total number of different codecs this container can output.
+         */
+        virtual int32_t getNumSupportedCodecs() = 0;
+        /**
+         * Get the CodecId for the n'th codec supported by this container.
+         *
+         * @param n The n'th codec supported by this codec. Lower n are higher priority.
+         *   n must be < {@link #getNumSupportedCodecs()}
+         * @return the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} if none.
+         */
+        virtual Codec::Id getSupportedCodecId(int32_t n) = 0;
+        /**
+         * Get the 32-bit Codec Tag for the n'th codec supported by this container.
+         *
+         * @param n The n'th codec supported by this codec. Lower n are higher priority.
+         *   n must be < {@link #getNumSupportedCodecs()}
+         * @return the codec tag at the n'th slot, or 0 if none.
+         */
+        virtual uint32_t getSupportedCodecTag(int32_t n) = 0;
+
+#ifndef SWIG
+        /**
+         * Get total number of different codecs this container can output.
+         */
+        static int32_t getNumSupportedCodecs(const struct AVCodecTag * const * tags);
+
+        /**
+         * Get the CodecId for the n'th codec supported by this container.
+         *
+         * @param n The n'th codec supported by this codec. Lower n are higher priority.
+         *   n must be < {@link #getNumSupportedCodecs()}
+         * @return the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} if none.
+         */
+        static Codec::Id getSupportedCodecId(const struct AVCodecTag * const * tags, int32_t n);
+
+        /**
+         * Get the 32-bit Codec Tag for the n'th codec supported by this container.
+         *
+         * @param n The n'th codec supported by this codec. Lower n are higher priority.
+         *   n must be < {@link #getNumSupportedCodecs()}
+         * @return the codec tag at the n'th slot, or 0 if none.
+         */
+        static uint32_t getSupportedCodecTag(const struct AVCodecTag * const * tags, int32_t n);
+#endif // !SWIG
         ContainerFormat();
         virtual
         ~ContainerFormat();
