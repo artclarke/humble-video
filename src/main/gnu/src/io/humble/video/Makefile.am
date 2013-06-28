@@ -12,13 +12,14 @@ noinst_LTLIBRARIES = libhumble-video.la
 libhumble_video_la_LIBADD= $(VS_PKG_LIBRARIES)
 
 libhumble_video_la_SOURCES= \
-  Global.cpp \
   IPixelFormat.cpp \
   IProperty.cpp \
   Property.cpp \
   IRational.cpp \
-  Rational.cpp
-
+  Rational.cpp \
+  ContainerFormat.cpp \
+  Global.cpp
+  
 nodist_libhumble_video_la_SOURCES= \
   HumbleVideo.cpp
 
@@ -26,7 +27,6 @@ libhumble_video_ladir=$(includedir)/$(VS_CPP_PATH)
 libhumble_video_la_HEADERS= \
   HumbleVideo.h \
   FfmpegIncludes.h \
-  Global.h \
   Global.swg \
   IPixelFormat.h \
   IProperty.h \
@@ -34,7 +34,9 @@ libhumble_video_la_HEADERS= \
   IRational.swg \
   PixelFormat.h \
   Property.h \
-  Rational.h 
+  Rational.h \
+  ContainerFormat.h \
+  Global.h
 
 BUILT_SOURCES= \
   HumbleVideo.cpp

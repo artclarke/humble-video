@@ -96,8 +96,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_video_la_DEPENDENCIES =
-am_libhumble_video_la_OBJECTS = Global.lo IPixelFormat.lo IProperty.lo \
-	Property.lo IRational.lo Rational.lo
+am_libhumble_video_la_OBJECTS = IPixelFormat.lo IProperty.lo \
+	Property.lo IRational.lo Rational.lo ContainerFormat.lo \
+	Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -411,12 +412,13 @@ SUFFIXES = .i
 noinst_LTLIBRARIES = libhumble-video.la
 libhumble_video_la_LIBADD = $(VS_PKG_LIBRARIES)
 libhumble_video_la_SOURCES = \
-  Global.cpp \
   IPixelFormat.cpp \
   IProperty.cpp \
   Property.cpp \
   IRational.cpp \
-  Rational.cpp
+  Rational.cpp \
+  ContainerFormat.cpp \
+  Global.cpp
 
 nodist_libhumble_video_la_SOURCES = \
   HumbleVideo.cpp
@@ -425,7 +427,6 @@ libhumble_video_ladir = $(includedir)/$(VS_CPP_PATH)
 libhumble_video_la_HEADERS = \
   HumbleVideo.h \
   FfmpegIncludes.h \
-  Global.h \
   Global.swg \
   IPixelFormat.h \
   IProperty.h \
@@ -433,7 +434,9 @@ libhumble_video_la_HEADERS = \
   IRational.swg \
   PixelFormat.h \
   Property.h \
-  Rational.h 
+  Rational.h \
+  ContainerFormat.h \
+  Global.h
 
 BUILT_SOURCES = \
   HumbleVideo.cpp

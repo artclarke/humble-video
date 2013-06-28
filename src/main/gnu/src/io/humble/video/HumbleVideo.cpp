@@ -213,6 +213,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <io/humble/video/IPixelFormat.h>
 #include <io/humble/video/Global.h>
 #include <io/humble/video/IRational.h>
+#include <io/humble/video/ContainerFormat.h>
 
 /*
 #include <io/humble/video/ITimeValue.h>
@@ -4462,6 +4463,530 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_IRational_1init(JNIEnv *je
 }
 
 
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1INVALID_1FLAG_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::INVALID_FLAG;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1NO_1FILE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::NO_FILE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1NEED_1NUMBER_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::NEED_NUMBER;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1SHOW_1IDS_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::SHOW_IDS;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1RAW_1PICTURE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::RAW_PICTURE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1GLOBAL_1HEADER_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::GLOBAL_HEADER;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1NO_1TIMESTAMPS_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::NO_TIMESTAMPS;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1GENERIC_1INDEX_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::GENERIC_INDEX;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1TIMESTAMP_1DISCONTINUITIES_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::TIMESTAMP_DISCONTINUITIES;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1VARIABLE_1FPS_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::VARIABLE_FPS;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1NO_1DIMENSIONS_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::NO_DIMENSIONS;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1NO_1STREAMS_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::NO_STREAMS;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1NO_1BINARY_1SEARCH_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::NO_BINARY_SEARCH;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1NO_1GENERIC_1SEARCH_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::NO_GENERIC_SEARCH;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1NO_1BYTE_1SEEKING_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::NO_BYTE_SEEKING;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1ALLOW_1FLUSH_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::ALLOW_FLUSH;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1NONSTRICT_1TIMESTAMPS_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::NONSTRICT_TIMESTAMPS;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1SEEK_1TO_1PTS_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat::Flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerFormat::Flags)io::humble::video::ContainerFormat::SEEK_TO_PTS;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  io::humble::video::ContainerFormat *arg1 = (io::humble::video::ContainerFormat *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::ContainerFormat **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (char *)(arg1)->getName();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  if(result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getLongName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  io::humble::video::ContainerFormat *arg1 = (io::humble::video::ContainerFormat *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::ContainerFormat **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (char *)(arg1)->getLongName();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  if(result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getExtensions(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  io::humble::video::ContainerFormat *arg1 = (io::humble::video::ContainerFormat *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::ContainerFormat **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (char *)(arg1)->getExtensions();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  if(result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getFlags(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerFormat *arg1 = (io::humble::video::ContainerFormat *) 0 ;
+  int32_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::ContainerFormat **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (int32_t)(arg1)->getFlags();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGIPropertyUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
@@ -4491,6 +5016,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGIRationalUpcast(JNIEn
     (void)jenv;
     (void)jcls;
     *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::IRational **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGContainerFormatUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::ContainerFormat **)&jarg1;
     return baseptr;
 }
 
