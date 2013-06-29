@@ -34,14 +34,14 @@
 # make files, as they will make sure all the variables from
 # configure have been set corectly as $(MAKE) variables.
 
-AM_CPPFLAGS=-I@includedir@
+AM_CPPFLAGS=
 AM_CFLAGS=
 AM_CXXFLAGS=
-AM_LDFLAGS=-L@libdir@
+AM_LDFLAGS=
 
 # Note we may include includedir twice; most compilers will ignore that if
 # $(DESTDIR) is actually empty
-VS_INCLUDES=$(VS_JNI_INCLUDE) -I. -I$(srcdir) -I$(abs_top_srcdir)/src -I$(abs_top_builddir) -I$(DESTDIR)$(includedir) -I$(includedir)
+VS_INCLUDES=-I. -I$(srcdir) -I$(abs_top_srcdir)/src -I$(abs_top_builddir)/src $(VS_JNI_INCLUDE) -I$(DESTDIR)$(includedir) -I$(includdir)
 AM_CPPFLAGS+=$(VS_CPPFLAGS) $(VS_INCLUDES) -fno-strict-aliasing
 # Note we include libdir twice; most compilers will ignore that if
 # $(DESTDIR) is actually empty
