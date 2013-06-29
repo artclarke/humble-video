@@ -217,6 +217,9 @@ class VideoJNI {
   public final static native String OutputFormat_getMimeType(long jarg1, OutputFormat jarg1_);
   public final static native long OutputFormat_guessFormat(String jarg1, String jarg2, String jarg3);
   public final static native int OutputFormat_guessCodec(long jarg1, OutputFormat jarg1_, String jarg2, String jarg3, String jarg4, int jarg5);
+  public final static native int OutputFormat_getNumSupportedCodecs(long jarg1, OutputFormat jarg1_);
+  public final static native int OutputFormat_getSupportedCodecId(long jarg1, OutputFormat jarg1_, int jarg2);
+  public final static native long OutputFormat_getSupportedCodecTag(long jarg1, OutputFormat jarg1_, int jarg2);
   public final static native long SWIGGlobalUpcast(long jarg1);
   public final static native long SWIGCodecUpcast(long jarg1);
   public final static native long SWIGIPropertyUpcast(long jarg1);

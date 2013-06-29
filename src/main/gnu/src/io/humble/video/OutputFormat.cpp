@@ -23,6 +23,7 @@
  */
 
 #include "OutputFormat.h"
+#include <io/humble/video/Global.h>
 
 namespace io {
 namespace humble {
@@ -53,6 +54,9 @@ OutputFormat*
 OutputFormat::guessFormat(const char * shortName, const char *filename,
     const char *mimeType)
 {
+  // This is an entry static into this class, so we
+  // ensure we initialize FFmpeg, if not already inited.
+  Global::init();
   OutputFormat *retval = 0;
   AVOutputFormat* format = av_guess_format(shortName, filename, mimeType);
   if (format)

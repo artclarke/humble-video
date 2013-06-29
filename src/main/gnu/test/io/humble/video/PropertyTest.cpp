@@ -14,7 +14,7 @@
 #include <io/humble/video/IStreamCoder.h>
 #endif
 
-using namespace VS_CPP_NAMESPACE;
+using namespace io::humble::video;
 
 //VS_LOG_SETUP(VS_CPP_PACKAGE);
 

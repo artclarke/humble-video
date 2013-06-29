@@ -81,16 +81,25 @@ public:
   {
     return (Codec::Id) mFormat->audio_codec;
   }
+  /**
+   * Get the default video codec for this format.
+   */
   virtual Codec::Id
   getDefaultVideoCodecId()
   {
     return (Codec::Id) mFormat->video_codec;
   }
+  /**
+   * Get the default subtitle coded for this format.
+   */
   virtual Codec::Id
   getDefaultSubtitleCodecId()
   {
     return (Codec::Id) mFormat->subtitle_codec;
   }
+  /**
+   * Get the mime type for this format.
+   */
   virtual const char *
   getMimeType()
   {
@@ -119,10 +128,6 @@ public:
     return (Codec::Id) av_guess_codec(mFormat, shortName, filename, mimeType,
         (enum AVMediaType) type);
   }
-
-protected:
-  // methods here that will not be directly exposed to SWIG (but will be used by hand-crafted
-  // generated methods
 
   /**
    * Get total number of different codecs this container can output.
@@ -157,6 +162,7 @@ protected:
     return ContainerFormat::getSupportedCodecTag(mFormat->codec_tag, n);
   }
 
+protected:
   static OutputFormat*
   make(AVOutputFormat* format);
 

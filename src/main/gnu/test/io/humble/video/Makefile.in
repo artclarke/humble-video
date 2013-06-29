@@ -78,7 +78,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = videoTestProperty$(EXEEXT) videoTestRational$(EXEEXT)
+check_PROGRAMS = videoTestOutputFormat$(EXEEXT) \
+	videoTestProperty$(EXEEXT) videoTestRational$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(noinst_HEADERS) $(top_srcdir)/mk/test-driver
@@ -94,16 +95,24 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+am_videoTestOutputFormat_OBJECTS = OutputFormatTest.$(OBJEXT) \
+	Main.$(OBJEXT)
+nodist_videoTestOutputFormat_OBJECTS =  \
+	OutputFormatTest_CXXRunner.$(OBJEXT)
+videoTestOutputFormat_OBJECTS = $(am_videoTestOutputFormat_OBJECTS) \
+	$(nodist_videoTestOutputFormat_OBJECTS)
+videoTestOutputFormat_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 am_videoTestProperty_OBJECTS = PropertyTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_videoTestProperty_OBJECTS = PropertyTest_CXXRunner.$(OBJEXT)
 videoTestProperty_OBJECTS = $(am_videoTestProperty_OBJECTS) \
 	$(nodist_videoTestProperty_OBJECTS)
 videoTestProperty_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 am_videoTestRational_OBJECTS = RationalTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_videoTestRational_OBJECTS = RationalTest_CXXRunner.$(OBJEXT)
 videoTestRational_OBJECTS = $(am_videoTestRational_OBJECTS) \
@@ -143,12 +152,14 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(videoTestProperty_SOURCES) \
+SOURCES = $(videoTestOutputFormat_SOURCES) \
+	$(nodist_videoTestOutputFormat_SOURCES) \
+	$(videoTestProperty_SOURCES) \
 	$(nodist_videoTestProperty_SOURCES) \
 	$(videoTestRational_SOURCES) \
 	$(nodist_videoTestRational_SOURCES)
-DIST_SOURCES = $(videoTestProperty_SOURCES) \
-	$(videoTestRational_SOURCES)
+DIST_SOURCES = $(videoTestOutputFormat_SOURCES) \
+	$(videoTestProperty_SOURCES) $(videoTestRational_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -591,12 +602,32 @@ VS_CPP_PACKAGE = io.humble.video
 VS_CPP_NAMESPACE = io::humble::video
 VS_TEST = 1
 SUBDIRS = 
+BUILT_SOURCES = \
+  OutputFormatTest_CXXRunner.cpp \
+  PropertyTest_CXXRunner.cpp \
+  RationalTest_CXXRunner.cpp
+
+noinst_HEADERS = \
+  OutputFormatTest.h \
+  PropertyTest.h \
+  RationalTest.h
+
 inst_check = $(check_PROGRAMS)
 inst_checkdir = $(bindir)
 
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS = $(check_PROGRAMS)
+videoTestOutputFormat_SOURCES = \
+  OutputFormatTest.cpp \
+  Main.cpp
+
+nodist_videoTestOutputFormat_SOURCES = \
+  OutputFormatTest_CXXRunner.cpp
+
+videoTestOutputFormat_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 videoTestProperty_SOURCES = \
   PropertyTest.cpp \
   Main.cpp
@@ -616,14 +647,6 @@ nodist_videoTestRational_SOURCES = \
 
 videoTestRational_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
-
-BUILT_SOURCES = \
-  PropertyTest_CXXRunner.cpp \
-  RationalTest_CXXRunner.cpp
-
-noinst_HEADERS = \
-  PropertyTest.h \
-  RationalTest.h
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -669,6 +692,10 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+
+videoTestOutputFormat$(EXEEXT): $(videoTestOutputFormat_OBJECTS) $(videoTestOutputFormat_DEPENDENCIES) $(EXTRA_videoTestOutputFormat_DEPENDENCIES) 
+	@rm -f videoTestOutputFormat$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(videoTestOutputFormat_OBJECTS) $(videoTestOutputFormat_LDADD) $(LIBS)
 
 videoTestProperty$(EXEEXT): $(videoTestProperty_OBJECTS) $(videoTestProperty_DEPENDENCIES) $(EXTRA_videoTestProperty_DEPENDENCIES) 
 	@rm -f videoTestProperty$(EXEEXT)
@@ -939,6 +966,13 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+videoTestOutputFormat.log: videoTestOutputFormat$(EXEEXT)
+	@p='videoTestOutputFormat$(EXEEXT)'; \
+	b='videoTestOutputFormat'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 videoTestProperty.log: videoTestProperty$(EXEEXT)
 	@p='videoTestProperty$(EXEEXT)'; \
 	b='videoTestProperty'; \

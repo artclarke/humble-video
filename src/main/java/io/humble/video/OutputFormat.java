@@ -147,14 +147,23 @@ public class OutputFormat extends ContainerFormat {
     return Codec.Id.swigToEnum(VideoJNI.OutputFormat_getDefaultAudioCodecId(swigCPtr, this));
   }
 
+/**
+ * Get the default video codec for this format.  
+ */
   public Codec.Id getDefaultVideoCodecId() {
     return Codec.Id.swigToEnum(VideoJNI.OutputFormat_getDefaultVideoCodecId(swigCPtr, this));
   }
 
+/**
+ * Get the default subtitle coded for this format.  
+ */
   public Codec.Id getDefaultSubtitleCodecId() {
     return Codec.Id.swigToEnum(VideoJNI.OutputFormat_getDefaultSubtitleCodecId(swigCPtr, this));
   }
 
+/**
+ * Get the mime type for this format.  
+ */
   public String getMimeType() {
     return VideoJNI.OutputFormat_getMimeType(swigCPtr, this);
   }
@@ -181,6 +190,37 @@ public class OutputFormat extends ContainerFormat {
 
   public Codec.Id guessCodec(String shortName, String filename, String mimeType, ContainerFormat.MediaType type) {
     return Codec.Id.swigToEnum(VideoJNI.OutputFormat_guessCodec(swigCPtr, this, shortName, filename, mimeType, type.swigValue()));
+  }
+
+/**
+ *  
+ */
+  protected int getNumSupportedCodecs() {
+    return VideoJNI.OutputFormat_getNumSupportedCodecs(swigCPtr, this);
+  }
+
+/**
+ *  
+ * @param	n The n'th codec supported by this codec. Lower n are higher 
+ *		 priority.  
+ * n must be < {@link #getNumSupportedCodecs()}  
+ * @return	the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} 
+ *		 if none.  
+ */
+  protected Codec.Id getSupportedCodecId(int n) {
+    return Codec.Id.swigToEnum(VideoJNI.OutputFormat_getSupportedCodecId(swigCPtr, this, n));
+  }
+
+/**
+ * Get the 32-bit Codec Tag for the n'th codec supported by this container. 
+ *  
+ * @param	n The n'th codec supported by this codec. Lower n are higher 
+ *		 priority.  
+ * n must be < {@link #getNumSupportedCodecs()}  
+ * @return	the codec tag at the n'th slot, or 0 if none.  
+ */
+  protected long getSupportedCodecTag(int n) {
+    return VideoJNI.OutputFormat_getSupportedCodecTag(swigCPtr, this, n);
   }
 
 }

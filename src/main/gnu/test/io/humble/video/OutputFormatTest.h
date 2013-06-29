@@ -16,16 +16,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  *
- * OutputFormat.h
+ * OutputFormatTest.h
  *
  *  Created on: Jun 28, 2013
  *      Author: aclarke
  */
-%javamethodmodifiers getNumSupportedCodecs "protected";
-%javamethodmodifiers getSupportedCodecId "protected";
-%javamethodmodifiers getSupportedCodecTag "protected";
 
-%typemap (javacode) io::humble::video::OutputFormat,io::humble::video::OutputFormat*,io::humble::video::OutputFormat& %{
-%}
+#ifndef OUTPUTFORMATTEST_H_
+#define OUTPUTFORMATTEST_H_
 
-%include <io/humble/video/OutputFormat.h>
+#include <io/humble/testutils/TestUtils.h>
+
+class OutputFormatTest : public CxxTest::TestSuite
+{
+public:
+  OutputFormatTest();
+  virtual ~OutputFormatTest();
+  void setUp();
+  void tearDown();
+  void testCreateOutputFormat();
+};
+
+#endif /* OUTPUTFORMATTEST_H_ */
