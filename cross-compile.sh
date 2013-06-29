@@ -11,7 +11,7 @@ humble_configure()
   echo "Building ${DIR}/configure in ${PREFIX}"
   mkdir -p ./$cross_os
   mkdir -p "${PREFIX}"
-  (cd ./${cross_os} && (${DIR}/configure --prefix="${PREFIX}" --build="${BUILD}" | tee configure.log) && (make | tee make.out) && make install)
+  (cd ./${cross_os} && (${DIR}/configure --prefix="${PREFIX}" --build="${BUILD}" ${HUMBLE_CONFIGURE} | tee configure.log) && (make | tee make.out) && make install)
 }
 
 STAGE_DIR="${HUMBLE_HOME:-/tmp}"
