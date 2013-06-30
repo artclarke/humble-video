@@ -35,6 +35,7 @@ public:
   void setUp();
   void tearDown();
   void testCreateOutputFormat();
+  void testInstallation();
 };
 
 #endif /* OUTPUTFORMATTEST_H_ */

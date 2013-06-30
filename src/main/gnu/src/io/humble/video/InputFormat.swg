@@ -25,8 +25,41 @@
 %javamethodmodifiers getNumSupportedCodecs "protected";
 %javamethodmodifiers getSupportedCodecId "protected";
 %javamethodmodifiers getSupportedCodecTag "protected";
+%javamethodmodifiers getNumFormats "protected";
+%javamethodmodifiers getFormat "protected"
 
 %typemap (javacode) io::humble::video::InputFormat,io::humble::video::InputFormat*,io::humble::video::InputFormat& %{
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("name:" + getName() + ";");
+    result.append("description:"+getLongName() + ";");
+    result.append("]");
+    return result.toString();
+  }
+
+  /**
+   * Return a collection of all input formats installed on this system.
+   * @return the list.
+   */
+  public static java.util.Collection<InputFormat>
+  getFormats()
+  {
+    java.util.Collection<InputFormat> retval =
+      new java.util.HashSet<InputFormat>();
+    int count = getNumFormats();
+    for(int i = 0; i< count;++i)
+    {
+      InputFormat fmt = getFormat(i);
+      if (fmt != null)
+        retval.add(fmt);
+    }
+    return retval;
+  }
+
 %}
 
 %include <io/humble/video/InputFormat.h>

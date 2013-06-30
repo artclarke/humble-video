@@ -162,6 +162,23 @@ public:
     return ContainerFormat::getSupportedCodecTag(mFormat->codec_tag, n);
   }
 
+  /**
+   * Get the number of input formats this install can demultiplex (read)
+   * from.
+   *
+   * @return the number of formats
+   */
+  static int32_t getNumFormats();
+
+  /**
+   * Return an object for the input format at the given index.
+   *
+   * @param index an index for the input format list we maintain
+   *
+   * @return a format object for that input or null if
+   *   unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()}
+   */
+  static OutputFormat* getFormat(int32_t index);
 protected:
   static OutputFormat*
   make(AVOutputFormat* format);

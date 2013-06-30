@@ -106,3 +106,15 @@ OutputFormatTest::testCreateOutputFormat() {
   VS_TUT_ENSURE_EQUALS("", id, Codec::ID_NONE);
 
 }
+
+void
+OutputFormatTest::testInstallation() {
+  int32_t n = OutputFormat::getNumFormats();
+  VS_TUT_ENSURE("", n > 0);
+
+  for(int32_t i = 0; i < n; i++) {
+    RefPointer<OutputFormat> f = OutputFormat::getFormat(i);
+    VS_LOG_DEBUG("Name: %s; Description: %s", f->getName(), f->getLongName());
+  }
+}
+

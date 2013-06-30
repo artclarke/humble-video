@@ -108,6 +108,40 @@ public class OutputFormat extends ContainerFormat {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+  
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("name:"+getName()+";");
+    result.append("description:"+getLongName()+";");
+    result.append("mimetype:"+getMimeType()+";");
+    result.append("extensions:"+getExtensions()+";");
+    result.append("]");
+    return result.toString();
+  }
+  
+  /**
+   * Return a collection of all output formats installed on this system.
+   * @return the list.
+   */
+  public static java.util.Collection<OutputFormat>
+  getFormats()
+  {
+    java.util.Collection<OutputFormat> retval =
+      new java.util.HashSet<OutputFormat>();
+    int count = getNumFormats();
+    for(int i = 0; i< count;++i)
+    {
+      OutputFormat fmt = getFormat(i);
+      if (fmt != null)
+        retval.add(fmt);
+    }
+    return retval;
+  }
+
 
 /**
  * Name for format.  
@@ -221,6 +255,28 @@ public class OutputFormat extends ContainerFormat {
  */
   protected long getSupportedCodecTag(int n) {
     return VideoJNI.OutputFormat_getSupportedCodecTag(swigCPtr, this, n);
+  }
+
+/**
+ * Get the number of input formats this install can demultiplex (read) 
+ *  
+ * from.  
+ * @return	the number of formats  
+ */
+  public static int getNumFormats() {
+    return VideoJNI.OutputFormat_getNumFormats();
+  }
+
+/**
+ * Return an object for the input format at the given index.  
+ * @param	index an index for the input format list we maintain  
+ * @return	a format object for that input or null if  
+ * unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()} 
+ *  
+ */
+  public static OutputFormat getFormat(int index) {
+    long cPtr = VideoJNI.OutputFormat_getFormat(index);
+    return (cPtr == 0) ? null : new OutputFormat(cPtr, false);
   }
 
 }

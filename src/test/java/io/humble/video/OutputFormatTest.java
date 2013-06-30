@@ -1,5 +1,6 @@
 package io.humble.video;
 
+import java.util.Collection;
 import java.util.List;
 
 import io.humble.video.Codec.Id;
@@ -43,4 +44,15 @@ public class OutputFormatTest extends TestCase {
     assertEquals(20, l.size());
   }
 
+  @Test
+  public void testInstallation() {
+    Collection<OutputFormat> formats = OutputFormat.getFormats();
+    // A well configured FFmpeg will have over 120 output formats
+    assertTrue(formats.size() > 100);
+    for (OutputFormat  f : formats)
+    {
+      assertNotNull(f);
+//      System.out.println(f);
+    }
+  }
 }

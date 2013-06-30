@@ -57,6 +57,34 @@ InputFormat::findFormat(const char *shortName)
   return make(f);
 }
 
+int32_t
+InputFormat::getNumFormats()
+{
+  Global::init();
+  int i = 0;
+  for(AVInputFormat* f = 0;
+  (f = av_iformat_next(f))!=0;
+  ++i)
+    ;
+  return i;
+}
+
+InputFormat*
+InputFormat::getFormat(int32_t index)
+{
+  Global::init();
+  int i = 0;
+  for(AVInputFormat* f = 0;
+  (f = av_iformat_next(f))!=0;
+  ++i)
+    if (i == index) {
+      InputFormat * retval = InputFormat::make(f);
+      return retval;
+    }
+  return 0;
+}
+
+
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

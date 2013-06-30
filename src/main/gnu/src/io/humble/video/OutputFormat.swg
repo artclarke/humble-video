@@ -26,6 +26,40 @@
 %javamethodmodifiers getSupportedCodecTag "protected";
 
 %typemap (javacode) io::humble::video::OutputFormat,io::humble::video::OutputFormat*,io::humble::video::OutputFormat& %{
+  
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("name:"+getName()+";");
+    result.append("description:"+getLongName()+";");
+    result.append("mimetype:"+getMimeType()+";");
+    result.append("extensions:"+getExtensions()+";");
+    result.append("]");
+    return result.toString();
+  }
+  
+  /**
+   * Return a collection of all output formats installed on this system.
+   * @return the list.
+   */
+  public static java.util.Collection<OutputFormat>
+  getFormats()
+  {
+    java.util.Collection<OutputFormat> retval =
+      new java.util.HashSet<OutputFormat>();
+    int count = getNumFormats();
+    for(int i = 0; i< count;++i)
+    {
+      OutputFormat fmt = getFormat(i);
+      if (fmt != null)
+        retval.add(fmt);
+    }
+    return retval;
+  }
+
 %}
 
 %include <io/humble/video/OutputFormat.h>

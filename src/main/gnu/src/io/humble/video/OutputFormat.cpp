@@ -63,6 +63,33 @@ OutputFormat::guessFormat(const char * shortName, const char *filename,
     retval = OutputFormat::make(format);
   return retval;
 }
+
+int32_t
+OutputFormat::getNumFormats()
+{
+  Global::init();
+  int i = 0;
+  for(AVOutputFormat* f = 0;
+  (f = av_oformat_next(f))!=0;
+  ++i)
+    ;
+  return i;
+}
+
+OutputFormat*
+OutputFormat::getFormat(int32_t index)
+{
+  Global::init();
+  int i = 0;
+  for(AVOutputFormat* f = 0;
+  (f = av_oformat_next(f))!=0;
+  ++i)
+    if (i == index) {
+      OutputFormat * retval = OutputFormat::make(f);
+      return retval;
+    }
+  return 0;
+}
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

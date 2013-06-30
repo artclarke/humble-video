@@ -35,6 +35,7 @@ public:
   void setUp();
   void tearDown();
   void testCreateInputFormat();
+  void testInstallation();
 };
 
 #endif /* INPUTFORMATTEST_H_ */
