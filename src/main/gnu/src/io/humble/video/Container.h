@@ -36,7 +36,6 @@ namespace video {
 class VS_API_HUMBLEVIDEO Stream : public io::humble::ferry::RefCounted
 {
 public:
-  virtual void noop() {}
 
 protected:
   Stream() {}

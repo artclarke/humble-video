@@ -330,7 +330,6 @@ class VideoJNI {
   public final static native long InputFormat_findFormat(String jarg1);
   public final static native int InputFormat_getNumFormats();
   public final static native long InputFormat_getFormat(int jarg1);
-  public final static native void Stream_noop(long jarg1, Stream jarg1_);
   public final static native int Container_FLAG_GENPTS_get();
   public final static native int Container_FLAG_IGNIDX_get();
   public final static native int Container_FLAG_NONBLOCK_get();

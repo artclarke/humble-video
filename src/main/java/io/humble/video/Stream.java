@@ -108,8 +108,4 @@ public class Stream extends RefCounted {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
-  public void noop() {
-    VideoJNI.Stream_noop(swigCPtr, this);
-  }
-
 }
