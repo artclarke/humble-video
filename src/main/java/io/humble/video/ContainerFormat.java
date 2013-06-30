@@ -266,7 +266,7 @@ public class ContainerFormat extends RefCounted {
    */
     NO_FILE(VideoJNI.ContainerFormat_NO_FILE_get()),
   /**
-   * Needs '-1699642976' in filename.
+   * Needs '-994928256' in filename.
    */
     NEED_NUMBER(VideoJNI.ContainerFormat_NEED_NUMBER_get()),
   /**

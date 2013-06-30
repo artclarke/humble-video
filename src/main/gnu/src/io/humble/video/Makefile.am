@@ -19,6 +19,7 @@ libhumble_video_la_SOURCES= \
   Rational.cpp \
   ContainerFormat.cpp \
   OutputFormat.cpp \
+  InputFormat.cpp \
   Global.cpp
   
 nodist_libhumble_video_la_SOURCES= \
@@ -39,6 +40,7 @@ libhumble_video_la_HEADERS= \
   Rational.h \
   ContainerFormat.h \
   OutputFormat.h \
+  InputFormat.h \
   Global.h
 
 BUILT_SOURCES= \

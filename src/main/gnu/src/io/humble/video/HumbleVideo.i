@@ -30,6 +30,7 @@
 #include <io/humble/video/IRational.h>
 #include <io/humble/video/ContainerFormat.h>
 #include <io/humble/video/OutputFormat.h>
+#include <io/humble/video/InputFormat.h>
 
 /*
 #include <io/humble/video/ITimeValue.h>
@@ -131,6 +132,7 @@ Java_io_humble_video_Video_init(JNIEnv *env, jclass)
 %include <io/humble/video/IRational.swg>
 %include <io/humble/video/ContainerFormat.swg>
 %include <io/humble/video/OutputFormat.swg>
+%include <io/humble/video/InputFormat.swg>
 
 /*
 %include <io/humble/video/ITimeValue.h>

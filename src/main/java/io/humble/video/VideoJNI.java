@@ -308,6 +308,14 @@ class VideoJNI {
   public final static native int OutputFormat_getNumSupportedCodecs(long jarg1, OutputFormat jarg1_);
   public final static native int OutputFormat_getSupportedCodecId(long jarg1, OutputFormat jarg1_, int jarg2);
   public final static native long OutputFormat_getSupportedCodecTag(long jarg1, OutputFormat jarg1_, int jarg2);
+  public final static native String InputFormat_getName(long jarg1, InputFormat jarg1_);
+  public final static native String InputFormat_getLongName(long jarg1, InputFormat jarg1_);
+  public final static native String InputFormat_getExtensions(long jarg1, InputFormat jarg1_);
+  public final static native int InputFormat_getFlags(long jarg1, InputFormat jarg1_);
+  public final static native int InputFormat_getNumSupportedCodecs(long jarg1, InputFormat jarg1_);
+  public final static native int InputFormat_getSupportedCodecId(long jarg1, InputFormat jarg1_, int jarg2);
+  public final static native long InputFormat_getSupportedCodecTag(long jarg1, InputFormat jarg1_, int jarg2);
+  public final static native long InputFormat_findFormat(String jarg1);
   public final static native long SWIGGlobalUpcast(long jarg1);
   public final static native long SWIGMediaDescriptorUpcast(long jarg1);
   public final static native long SWIGCodecProfileUpcast(long jarg1);
@@ -318,4 +326,5 @@ class VideoJNI {
   public final static native long SWIGIRationalUpcast(long jarg1);
   public final static native long SWIGContainerFormatUpcast(long jarg1);
   public final static native long SWIGOutputFormatUpcast(long jarg1);
+  public final static native long SWIGInputFormatUpcast(long jarg1);
 }

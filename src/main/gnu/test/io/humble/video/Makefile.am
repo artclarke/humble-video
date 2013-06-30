@@ -7,16 +7,19 @@ include @top_builddir@/mk/Makefile.global
 SUBDIRS=
 
 check_PROGRAMS=\
-  videoTestOutputFormat \
-  videoTestProperty \
-  videoTestRational 
+  InputFormatTest \
+  OutputFormatTest \
+  PropertyTest \
+  RationalTest 
 
 BUILT_SOURCES= \
+  InputFormatTest_CXXRunner.cpp \
   OutputFormatTest_CXXRunner.cpp \
   PropertyTest_CXXRunner.cpp \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  InputFormatTest.h \
   OutputFormatTest.h \
   PropertyTest.h \
   RationalTest.h
@@ -29,35 +32,45 @@ inst_checkdir=$(bindir)
 # tests can auto-find their fixtures
 TESTS=$(check_PROGRAMS)
 
-videoTestOutputFormat_SOURCES= \
+InputFormatTest_SOURCES= \
+  InputFormatTest.cpp \
+  Main.cpp
+
+nodist_InputFormatTest_SOURCES= \
+  InputFormatTest_CXXRunner.cpp
+
+InputFormatTest_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+  
+OutputFormatTest_SOURCES= \
   OutputFormatTest.cpp \
   Main.cpp
 
-nodist_videoTestOutputFormat_SOURCES= \
+nodist_OutputFormatTest_SOURCES= \
   OutputFormatTest_CXXRunner.cpp
 
-videoTestOutputFormat_LDADD= \
+OutputFormatTest_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 
-videoTestProperty_SOURCES= \
+PropertyTest_SOURCES= \
   PropertyTest.cpp \
   Main.cpp
 
-nodist_videoTestProperty_SOURCES= \
+nodist_PropertyTest_SOURCES= \
   PropertyTest_CXXRunner.cpp
 
-videoTestProperty_LDADD= \
+PropertyTest_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-videoTestRational_SOURCES=\
+RationalTest_SOURCES=\
   RationalTest.cpp \
   Main.cpp
 
-nodist_videoTestRational_SOURCES=\
+nodist_RationalTest_SOURCES=\
   RationalTest_CXXRunner.cpp 
 
-videoTestRational_LDADD=\
+RationalTest_LDADD=\
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 clean-local:
