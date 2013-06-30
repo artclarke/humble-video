@@ -33,6 +33,10 @@ namespace io {
 namespace humble {
 namespace video {
 
+/**
+ * A descriptor for different types of media that can be handled
+ * by Humble Video.
+ */
 class VS_API_HUMBLEVIDEO MediaDescriptor : public io::humble::ferry::RefCounted
 {
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MediaDescriptor)
@@ -182,6 +186,10 @@ private:
   AVProfile* mProfile;
 };
 
+/**
+ * A codec that can be used either to encode raw data into compressed bitstreams,
+ * or decode compressed data into raw data, or both!
+ */
 class VS_API_HUMBLEVIDEO Codec : public io::humble::ferry::RefCounted
 {
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(Codec)
@@ -741,6 +749,9 @@ private:
   AVCodec* mCodec;
 };
 
+/**
+ * Meta-data that describes a {@link Codec} object.
+ */
 class VS_API_HUMBLEVIDEO CodecDescriptor : public io::humble::ferry::RefCounted
 {
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(CodecDescriptor)
