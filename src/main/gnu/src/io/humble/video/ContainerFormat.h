@@ -51,7 +51,7 @@ namespace io
            * This format does not use an on-disk file (e.g. a network format)
            */
           NO_FILE = AVFMT_NOFILE,
-          /** Needs '%d' in filename. */
+          /** Needs a percent-d in filename. */
           NEED_NUMBER = AVFMT_NEEDNUMBER,
 
           /** Show format stream IDs numbers. */

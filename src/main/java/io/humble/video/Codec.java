@@ -113,6 +113,7 @@ public class Codec extends RefCounted {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+
 /**
  * Checks if this codec has the given capability.  
  * @param	c Capability to check.  

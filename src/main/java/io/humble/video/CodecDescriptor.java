@@ -111,6 +111,25 @@ public class CodecDescriptor extends RefCounted {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+
+  /**
+    * info about this {@link CodecDescriptor} object
+    * @return information about this object
+    */
+    
+   @Override
+   public String toString()
+   {
+     StringBuilder result = new StringBuilder();
+     
+     result.append(this.getClass().getName()+"@"+hashCode()+"[");
+     result.append("name:"+getName()+";");
+     result.append("longname:"+getName()+";");
+     result.append("properties:"+getProperties()+";");
+     result.append("]");
+     return result.toString();
+   }
+
 /**
  * Checks if this codec has the given property.  
  * @param	p property to check  

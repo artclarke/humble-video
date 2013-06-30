@@ -223,7 +223,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <io/humble/video/IMetaData.h>
 #include <io/humble/video/IMediaData.h>
 #include <io/humble/video/IAudioSamples.h>
-#include <io/humble/video/ICodec.h>
+#include <io/humble/video/ICodec.swg>
 #include <io/humble/video/IPacket.h>
 #include <io/humble/video/IIndexEntry.h>
 #include <io/humble/video/IAudioResampler.h>
