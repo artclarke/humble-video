@@ -18,7 +18,7 @@ import io.humble.ferry.*;
  * to encode at.  
  * </p>  
  */
-public class IProperty extends RefCounted {
+public class Property extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -36,18 +36,18 @@ public class IProperty extends RefCounted {
   /**
    * Internal Only.
    */
-  protected IProperty(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGIPropertyUpcast(cPtr), cMemoryOwn);
+  protected Property(long cPtr, boolean cMemoryOwn) {
+    super(VideoJNI.SWIGPropertyUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
   /**
    * Internal Only.
    */
-  protected IProperty(long cPtr, boolean cMemoryOwn,
+  protected Property(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGIPropertyUpcast(cPtr),
+    super(VideoJNI.SWIGPropertyUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -60,7 +60,7 @@ public class IProperty extends RefCounted {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(IProperty obj) {
+  protected static long getCPtr(Property obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -78,17 +78,17 @@ public class IProperty extends RefCounted {
   }
   
   /**
-   * Create a new IProperty object that is actually referring to the
+   * Create a new Property object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
    */
   @Override
-  public IProperty copyReference() {
+  public Property copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new IProperty(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new Property(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -101,8 +101,8 @@ public class IProperty extends RefCounted {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof IProperty)
-      equal = (((IProperty)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof Property)
+      equal = (((Property)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -124,7 +124,7 @@ public class IProperty extends RefCounted {
  * @return	the name.  
  */
   public String getName() {
-    return VideoJNI.IProperty_getName(swigCPtr, this);
+    return VideoJNI.Property_getName(swigCPtr, this);
   }
 
 /**
@@ -132,7 +132,7 @@ public class IProperty extends RefCounted {
  * @return	the help string  
  */
   public String getHelp() {
-    return VideoJNI.IProperty_getHelp(swigCPtr, this);
+    return VideoJNI.Property_getHelp(swigCPtr, this);
   }
 
 /**
@@ -140,15 +140,15 @@ public class IProperty extends RefCounted {
  * @return	the unit, or null if none.  
  */
   public String getUnit() {
-    return VideoJNI.IProperty_getUnit(swigCPtr, this);
+    return VideoJNI.Property_getUnit(swigCPtr, this);
   }
 
 /**
  * Get the underlying native type of this property.  
  * @return	the type  
  */
-  public IProperty.Type getType() {
-    return IProperty.Type.swigToEnum(VideoJNI.IProperty_getType(swigCPtr, this));
+  public Property.Type getType() {
+    return Property.Type.swigToEnum(VideoJNI.Property_getType(swigCPtr, this));
   }
 
 /**
@@ -156,7 +156,7 @@ public class IProperty extends RefCounted {
  * @return	the flags  
  */
   public int getFlags() {
-    return VideoJNI.IProperty_getFlags(swigCPtr, this);
+    return VideoJNI.Property_getFlags(swigCPtr, this);
   }
 
 /**
@@ -164,7 +164,7 @@ public class IProperty extends RefCounted {
  * @return	the default  
  */
   public long getDefault() {
-    return VideoJNI.IProperty_getDefault(swigCPtr, this);
+    return VideoJNI.Property_getDefault(swigCPtr, this);
   }
 
 /**
@@ -172,7 +172,7 @@ public class IProperty extends RefCounted {
  * @return	the default  
  */
   public double getDefaultAsDouble() {
-    return VideoJNI.IProperty_getDefaultAsDouble(swigCPtr, this);
+    return VideoJNI.Property_getDefaultAsDouble(swigCPtr, this);
   }
 
 /**
@@ -182,7 +182,7 @@ public class IProperty extends RefCounted {
  * @return	Number of flag settings, or <0 if not a FLAGS value  
  */
   public int getNumFlagSettings() {
-    return VideoJNI.IProperty_getNumFlagSettings(swigCPtr, this);
+    return VideoJNI.Property_getNumFlagSettings(swigCPtr, this);
   }
 
 /**
@@ -195,9 +195,9 @@ public class IProperty extends RefCounted {
  * @return	An IProperty object for the flag setting, or null if not 
  *		 available.  
  */
-  public IProperty getFlagConstant(int position) {
-    long cPtr = VideoJNI.IProperty_getFlagConstant__SWIG_0(swigCPtr, this, position);
-    return (cPtr == 0) ? null : new IProperty(cPtr, false);
+  public Property getFlagConstant(int position) {
+    long cPtr = VideoJNI.Property_getFlagConstant__SWIG_0(swigCPtr, this, position);
+    return (cPtr == 0) ? null : new Property(cPtr, false);
   }
 
 /**
@@ -209,9 +209,9 @@ public class IProperty extends RefCounted {
  * @return	An IProperty object for the flag setting, or null if not 
  *		 available.  
  */
-  public IProperty getFlagConstant(String name) {
-    long cPtr = VideoJNI.IProperty_getFlagConstant__SWIG_1(swigCPtr, this, name);
-    return (cPtr == 0) ? null : new IProperty(cPtr, false);
+  public Property getFlagConstant(String name) {
+    long cPtr = VideoJNI.Property_getFlagConstant__SWIG_1(swigCPtr, this, name);
+    return (cPtr == 0) ? null : new Property(cPtr, false);
   }
 
   public enum Type {
@@ -228,11 +228,11 @@ public class IProperty extends RefCounted {
     PROPERTY_STRING,
     PROPERTY_RATIONAL,
     PROPERTY_BINARY,
-    PROPERTY_CONST(VideoJNI.IProperty_PROPERTY_CONST_get()),
-    PROPERTY_IMAGE_SIZE(VideoJNI.IProperty_PROPERTY_IMAGE_SIZE_get()),
-    PROPERTY_PIXEL_FMT(VideoJNI.IProperty_PROPERTY_PIXEL_FMT_get()),
-    PROPERTY_SAMPLE_FMT(VideoJNI.IProperty_PROPERTY_SAMPLE_FMT_get()),
-    PROPERTY_UNKNOWN(VideoJNI.IProperty_PROPERTY_UNKNOWN_get());
+    PROPERTY_CONST(VideoJNI.Property_PROPERTY_CONST_get()),
+    PROPERTY_IMAGE_SIZE(VideoJNI.Property_PROPERTY_IMAGE_SIZE_get()),
+    PROPERTY_PIXEL_FMT(VideoJNI.Property_PROPERTY_PIXEL_FMT_get()),
+    PROPERTY_SAMPLE_FMT(VideoJNI.Property_PROPERTY_SAMPLE_FMT_get()),
+    PROPERTY_UNKNOWN(VideoJNI.Property_PROPERTY_UNKNOWN_get());
 
     public final int swigValue() {
       return swigValue;
@@ -273,13 +273,13 @@ public class IProperty extends RefCounted {
   }
 
   public enum Flags {
-    FLAG_ENCODING_PARAM(VideoJNI.IProperty_FLAG_ENCODING_PARAM_get()),
-    FLAG_DECODING_PARAM(VideoJNI.IProperty_FLAG_DECODING_PARAM_get()),
-    FLAG_METADATA(VideoJNI.IProperty_FLAG_METADATA_get()),
-    FLAG_AUDIO_PARAM(VideoJNI.IProperty_FLAG_AUDIO_PARAM_get()),
-    FLAG_VIDEO_PARAM(VideoJNI.IProperty_FLAG_VIDEO_PARAM_get()),
-    FLAG_SUBTITLE_PARAM(VideoJNI.IProperty_FLAG_SUBTITLE_PARAM_get()),
-    FLAG_FILTERING_PARAM(VideoJNI.IProperty_FLAG_FILTERING_PARAM_get());
+    FLAG_ENCODING_PARAM(VideoJNI.Property_FLAG_ENCODING_PARAM_get()),
+    FLAG_DECODING_PARAM(VideoJNI.Property_FLAG_DECODING_PARAM_get()),
+    FLAG_METADATA(VideoJNI.Property_FLAG_METADATA_get()),
+    FLAG_AUDIO_PARAM(VideoJNI.Property_FLAG_AUDIO_PARAM_get()),
+    FLAG_VIDEO_PARAM(VideoJNI.Property_FLAG_VIDEO_PARAM_get()),
+    FLAG_SUBTITLE_PARAM(VideoJNI.Property_FLAG_SUBTITLE_PARAM_get()),
+    FLAG_FILTERING_PARAM(VideoJNI.Property_FLAG_FILTERING_PARAM_get());
 
     public final int swigValue() {
       return swigValue;
@@ -324,11 +324,11 @@ public class IProperty extends RefCounted {
    * How to search options when looking for different values.
    * Do not search child options
    */
-    PROPERTY_SEARCH_DEFAULT(VideoJNI.IProperty_PROPERTY_SEARCH_DEFAULT_get()),
+    PROPERTY_SEARCH_DEFAULT(VideoJNI.Property_PROPERTY_SEARCH_DEFAULT_get()),
   /**
    * Search children first
    */
-    PROPERTY_SEARCH_CHILDREN(VideoJNI.IProperty_PROPERTY_SEARCH_CHILDREN_get());
+    PROPERTY_SEARCH_CHILDREN(VideoJNI.Property_PROPERTY_SEARCH_CHILDREN_get());
 
     public final int swigValue() {
       return swigValue;

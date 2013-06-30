@@ -25,7 +25,7 @@ import io.humble.ferry.*;
  *  
  * </p>  
  */
-public class IRational extends RefCounted {
+public class Rational extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -43,18 +43,18 @@ public class IRational extends RefCounted {
   /**
    * Internal Only.
    */
-  protected IRational(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGIRationalUpcast(cPtr), cMemoryOwn);
+  protected Rational(long cPtr, boolean cMemoryOwn) {
+    super(VideoJNI.SWIGRationalUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
   /**
    * Internal Only.
    */
-  protected IRational(long cPtr, boolean cMemoryOwn,
+  protected Rational(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGIRationalUpcast(cPtr),
+    super(VideoJNI.SWIGRationalUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -67,7 +67,7 @@ public class IRational extends RefCounted {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(IRational obj) {
+  protected static long getCPtr(Rational obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -85,17 +85,17 @@ public class IRational extends RefCounted {
   }
   
   /**
-   * Create a new IRational object that is actually referring to the
+   * Create a new Rational object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
    */
   @Override
-  public IRational copyReference() {
+  public Rational copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new IRational(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new Rational(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -108,8 +108,8 @@ public class IRational extends RefCounted {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof IRational)
-      equal = (((IRational)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof Rational)
+      equal = (((Rational)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -151,7 +151,7 @@ public class IRational extends RefCounted {
    * @param num the number; may be null
    * @return true if not-null and > 0; else false;
    */
-  public static boolean positive(IRational num)
+  public static boolean positive(Rational num)
   {
     if (num == null)
       return false;
@@ -172,7 +172,7 @@ public class IRational extends RefCounted {
    * @param num the number; may be null
    * @return true if not-null and < 0; else false;
    */
-  public static boolean negative(IRational num)
+  public static boolean negative(Rational num)
   {
     if (num == null)
       return false;
@@ -184,7 +184,7 @@ public class IRational extends RefCounted {
  * @return	the numerator.  
  */
   public int getNumerator() {
-    return VideoJNI.IRational_getNumerator(swigCPtr, this);
+    return VideoJNI.Rational_getNumerator(swigCPtr, this);
   }
 
 /**
@@ -192,7 +192,7 @@ public class IRational extends RefCounted {
  * @return	the denominator.  
  */
   public int getDenominator() {
-    return VideoJNI.IRational_getDenominator(swigCPtr, this);
+    return VideoJNI.Rational_getDenominator(swigCPtr, this);
   }
 
 /**
@@ -200,9 +200,9 @@ public class IRational extends RefCounted {
  *  
  * @return	the new object  
  */
-  public IRational copy() {
-    long cPtr = VideoJNI.IRational_copy(swigCPtr, this);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public Rational copy() {
+    long cPtr = VideoJNI.Rational_copy(swigCPtr, this);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -210,8 +210,8 @@ public class IRational extends RefCounted {
  * @param	other second rational  
  *  
  */
-  public int compareTo(IRational other) {
-    return VideoJNI.IRational_compareTo(swigCPtr, this, IRational.getCPtr(other), other);
+  public int compareTo(Rational other) {
+    return VideoJNI.Rational_compareTo(swigCPtr, this, Rational.getCPtr(other), other);
   }
 
 /**
@@ -220,8 +220,8 @@ public class IRational extends RefCounted {
  * @param	b the second rational  
  * @return	0 if a==b, 1 if a>b and -1 if b<a.  
  */
-  public static int sCompareTo(IRational a, IRational b) {
-    return VideoJNI.IRational_sCompareTo(IRational.getCPtr(a), a, IRational.getCPtr(b), b);
+  public static int sCompareTo(Rational a, Rational b) {
+    return VideoJNI.Rational_sCompareTo(Rational.getCPtr(a), a, Rational.getCPtr(b), b);
   }
 
 /**
@@ -229,7 +229,7 @@ public class IRational extends RefCounted {
  * @return	(double) a  
  */
   public double getDouble() {
-    return VideoJNI.IRational_getDouble(swigCPtr, this);
+    return VideoJNI.Rational_getDouble(swigCPtr, this);
   }
 
 /**
@@ -242,7 +242,7 @@ public class IRational extends RefCounted {
  * @return	1 if exact, 0 otherwise  
  */
   public int reduce(long num, long den, long max) {
-    return VideoJNI.IRational_reduce(swigCPtr, this, num, den, max);
+    return VideoJNI.Rational_reduce(swigCPtr, this, num, den, max);
   }
 
 /**
@@ -255,8 +255,8 @@ public class IRational extends RefCounted {
  *		  
  * @return	1 if exact, 0 otherwise  
  */
-  public static int sReduce(IRational dst, long num, long den, long max) {
-    return VideoJNI.IRational_sReduce(IRational.getCPtr(dst), dst, num, den, max);
+  public static int sReduce(Rational dst, long num, long den, long max) {
+    return VideoJNI.Rational_sReduce(Rational.getCPtr(dst), dst, num, den, max);
   }
 
 /**
@@ -264,9 +264,9 @@ public class IRational extends RefCounted {
  * @param	arg number to mulitply by.  
  * @return	this*arg.  
  */
-  public IRational multiply(IRational arg) {
-    long cPtr = VideoJNI.IRational_multiply(swigCPtr, this, IRational.getCPtr(arg), arg);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public Rational multiply(Rational arg) {
+    long cPtr = VideoJNI.Rational_multiply(swigCPtr, this, Rational.getCPtr(arg), arg);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -275,9 +275,9 @@ public class IRational extends RefCounted {
  * @param	b the second number.  
  * @return	a*b  
  */
-  public static IRational sMultiply(IRational a, IRational b) {
-    long cPtr = VideoJNI.IRational_sMultiply(IRational.getCPtr(a), a, IRational.getCPtr(b), b);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public static Rational sMultiply(Rational a, Rational b) {
+    long cPtr = VideoJNI.Rational_sMultiply(Rational.getCPtr(a), a, Rational.getCPtr(b), b);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -285,9 +285,9 @@ public class IRational extends RefCounted {
  * @param	arg The divisor to use.  
  * @return	this/arg.  
  */
-  public IRational divide(IRational arg) {
-    long cPtr = VideoJNI.IRational_divide(swigCPtr, this, IRational.getCPtr(arg), arg);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public Rational divide(Rational arg) {
+    long cPtr = VideoJNI.Rational_divide(swigCPtr, this, Rational.getCPtr(arg), arg);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -296,9 +296,9 @@ public class IRational extends RefCounted {
  * b The second number.  
  * @return	a/b.  
  */
-  public static IRational sDivide(IRational a, IRational b) {
-    long cPtr = VideoJNI.IRational_sDivide(IRational.getCPtr(a), a, IRational.getCPtr(b), b);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public static Rational sDivide(Rational a, Rational b) {
+    long cPtr = VideoJNI.Rational_sDivide(Rational.getCPtr(a), a, Rational.getCPtr(b), b);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -306,9 +306,9 @@ public class IRational extends RefCounted {
  * @param	arg The amount to subtract from this.  
  * @return	this-arg.  
  */
-  public IRational subtract(IRational arg) {
-    long cPtr = VideoJNI.IRational_subtract(swigCPtr, this, IRational.getCPtr(arg), arg);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public Rational subtract(Rational arg) {
+    long cPtr = VideoJNI.Rational_subtract(swigCPtr, this, Rational.getCPtr(arg), arg);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -317,9 +317,9 @@ public class IRational extends RefCounted {
  * b The second number.  
  * @return	a-b.  
  */
-  public static IRational sSubtract(IRational a, IRational b) {
-    long cPtr = VideoJNI.IRational_sSubtract(IRational.getCPtr(a), a, IRational.getCPtr(b), b);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public static Rational sSubtract(Rational a, Rational b) {
+    long cPtr = VideoJNI.Rational_sSubtract(Rational.getCPtr(a), a, Rational.getCPtr(b), b);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -327,9 +327,9 @@ public class IRational extends RefCounted {
  * @param	arg The amount to add to this.  
  * @return	this+arg.  
  */
-  public IRational add(IRational arg) {
-    long cPtr = VideoJNI.IRational_add(swigCPtr, this, IRational.getCPtr(arg), arg);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public Rational add(Rational arg) {
+    long cPtr = VideoJNI.Rational_add(swigCPtr, this, Rational.getCPtr(arg), arg);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -338,9 +338,9 @@ public class IRational extends RefCounted {
  * b The second number.  
  * @return	a+b.  
  */
-  public static IRational sAdd(IRational a, IRational b) {
-    long cPtr = VideoJNI.IRational_sAdd(IRational.getCPtr(a), a, IRational.getCPtr(b), b);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public static Rational sAdd(Rational a, Rational b) {
+    long cPtr = VideoJNI.Rational_sAdd(Rational.getCPtr(a), a, Rational.getCPtr(b), b);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -352,8 +352,8 @@ public class IRational extends RefCounted {
  * @return	The new integer value, scaled in units of this IRational. 
  *		  
  */
-  public long rescale(long origValue, IRational origBase) {
-    return VideoJNI.IRational_rescale__SWIG_0(swigCPtr, this, origValue, IRational.getCPtr(origBase), origBase);
+  public long rescale(long origValue, Rational origBase) {
+    return VideoJNI.Rational_rescale__SWIG_0(swigCPtr, this, origValue, Rational.getCPtr(origBase), origBase);
   }
 
 /**
@@ -366,8 +366,8 @@ public class IRational extends RefCounted {
  * @return	The new integer value, scaled in units of this IRational. 
  *		  
  */
-  public static long sRescale(long origValue, IRational origBase, IRational newBase) {
-    return VideoJNI.IRational_sRescale__SWIG_0(origValue, IRational.getCPtr(origBase), origBase, IRational.getCPtr(newBase), newBase);
+  public static long sRescale(long origValue, Rational origBase, Rational newBase) {
+    return VideoJNI.Rational_sRescale__SWIG_0(origValue, Rational.getCPtr(origBase), origBase, Rational.getCPtr(newBase), newBase);
   }
 
 /**
@@ -377,9 +377,9 @@ public class IRational extends RefCounted {
  * until {@link #init()} is called.  
  * @return	a rational number object  
  */
-  public static IRational make() {
-    long cPtr = VideoJNI.IRational_make__SWIG_0();
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public static Rational make() {
+    long cPtr = VideoJNI.Rational_make__SWIG_0();
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -388,9 +388,9 @@ public class IRational extends RefCounted {
  * @param	d double to convert  
  * @return	A new Rational; caller must release() when done.  
  */
-  public static IRational make(double d) {
-    long cPtr = VideoJNI.IRational_make__SWIG_1(d);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public static Rational make(double d) {
+    long cPtr = VideoJNI.Rational_make__SWIG_1(d);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -399,9 +399,9 @@ public class IRational extends RefCounted {
  * @return	A new Rational; Returns null  
  * if src is null.  
  */
-  public static IRational make(IRational src) {
-    long cPtr = VideoJNI.IRational_make__SWIG_2(IRational.getCPtr(src), src);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public static Rational make(Rational src) {
+    long cPtr = VideoJNI.Rational_make__SWIG_2(Rational.getCPtr(src), src);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -412,9 +412,9 @@ public class IRational extends RefCounted {
  * @param	den The denominator of the resulting Rational  
  * @return	A new Rational;  
  */
-  public static IRational make(int num, int den) {
-    long cPtr = VideoJNI.IRational_make__SWIG_3(num, den);
-    return (cPtr == 0) ? null : new IRational(cPtr, false);
+  public static Rational make(int num, int den) {
+    long cPtr = VideoJNI.Rational_make__SWIG_3(num, den);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -427,8 +427,8 @@ public class IRational extends RefCounted {
  * @return	The new integer value, scaled in units of this IRational. 
  *		  
  */
-  public long rescale(long origValue, IRational origBase, IRational.Rounding rounding) {
-    return VideoJNI.IRational_rescale__SWIG_1(swigCPtr, this, origValue, IRational.getCPtr(origBase), origBase, rounding.swigValue());
+  public long rescale(long origValue, Rational origBase, Rational.Rounding rounding) {
+    return VideoJNI.Rational_rescale__SWIG_1(swigCPtr, this, origValue, Rational.getCPtr(origBase), origBase, rounding.swigValue());
   }
 
 /**
@@ -442,8 +442,8 @@ public class IRational extends RefCounted {
  * @return	The new integer value, scaled in units of this IRational. 
  *		  
  */
-  public static long sRescale(long origValue, IRational origBase, IRational newBase, IRational.Rounding rounding) {
-    return VideoJNI.IRational_sRescale__SWIG_1(origValue, IRational.getCPtr(origBase), origBase, IRational.getCPtr(newBase), newBase, rounding.swigValue());
+  public static long sRescale(long origValue, Rational origBase, Rational newBase, Rational.Rounding rounding) {
+    return VideoJNI.Rational_sRescale__SWIG_1(origValue, Rational.getCPtr(origBase), origBase, Rational.getCPtr(newBase), newBase, rounding.swigValue());
   }
 
 /**
@@ -470,8 +470,8 @@ public class IRational extends RefCounted {
  * dstNumerator/dstNumerator, or 0 if there  
  * is a parameter error.  
  */
-  public static long rescale(long srcValue, int dstNumerator, int dstDenominator, int srcNumerator, int srcDenominator, IRational.Rounding rounding) {
-    return VideoJNI.IRational_rescale__SWIG_2(srcValue, dstNumerator, dstDenominator, srcNumerator, srcDenominator, rounding.swigValue());
+  public static long rescale(long srcValue, int dstNumerator, int dstDenominator, int srcNumerator, int srcDenominator, Rational.Rounding rounding) {
+    return VideoJNI.Rational_rescale__SWIG_2(srcValue, dstNumerator, dstDenominator, srcNumerator, srcDenominator, rounding.swigValue());
   }
 
 /**
@@ -481,7 +481,7 @@ public class IRational extends RefCounted {
  * </p>  
  */
   public void setNumerator(int value) {
-    VideoJNI.IRational_setNumerator(swigCPtr, this, value);
+    VideoJNI.Rational_setNumerator(swigCPtr, this, value);
   }
 
 /**
@@ -491,7 +491,7 @@ public class IRational extends RefCounted {
  * </p>  
  */
   public void setDenominator(int value) {
-    VideoJNI.IRational_setDenominator(swigCPtr, this, value);
+    VideoJNI.Rational_setDenominator(swigCPtr, this, value);
   }
 
 /**
@@ -503,7 +503,7 @@ public class IRational extends RefCounted {
  * </p>  
  */
   public void setValue(double value) {
-    VideoJNI.IRational_setValue(swigCPtr, this, value);
+    VideoJNI.Rational_setValue(swigCPtr, this, value);
   }
 
 /**
@@ -511,7 +511,7 @@ public class IRational extends RefCounted {
  * conventions.  
  */
   public double getValue() {
-    return VideoJNI.IRational_getValue(swigCPtr, this);
+    return VideoJNI.Rational_getValue(swigCPtr, this);
   }
 
 /**
@@ -519,7 +519,7 @@ public class IRational extends RefCounted {
  * this object is now considered finalized and immutable.  
  */
   public boolean isFinalized() {
-    return VideoJNI.IRational_isFinalized(swigCPtr, this);
+    return VideoJNI.Rational_isFinalized(swigCPtr, this);
   }
 
 /**
@@ -533,7 +533,7 @@ public class IRational extends RefCounted {
  * </p>  
  */
   public void init() {
-    VideoJNI.IRational_init(swigCPtr, this);
+    VideoJNI.Rational_init(swigCPtr, this);
   }
 
   public enum Rounding {
@@ -541,28 +541,28 @@ public class IRational extends RefCounted {
    * A type to specify how rounding should be done.
    * Round toward zero.
    */
-    ROUND_ZERO(VideoJNI.IRational_ROUND_ZERO_get()),
+    ROUND_ZERO(VideoJNI.Rational_ROUND_ZERO_get()),
   /**
    * Round away from zero.
    */
-    ROUND_INF(VideoJNI.IRational_ROUND_INF_get()),
+    ROUND_INF(VideoJNI.Rational_ROUND_INF_get()),
   /**
    * Round toward -infinity.
    */
-    ROUND_DOWN(VideoJNI.IRational_ROUND_DOWN_get()),
+    ROUND_DOWN(VideoJNI.Rational_ROUND_DOWN_get()),
   /**
    * Round toward +infinity.
    */
-    ROUND_UP(VideoJNI.IRational_ROUND_UP_get()),
+    ROUND_UP(VideoJNI.Rational_ROUND_UP_get()),
   /**
    * Round to nearest and halfway cases away from zero.
    */
-    ROUND_NEAR_INF(VideoJNI.IRational_ROUND_NEAR_INF_get()),
+    ROUND_NEAR_INF(VideoJNI.Rational_ROUND_NEAR_INF_get()),
   /**
    * Flag to pass INT64_MIN/MAX through instead of rescaling, this avoids 
    * special cases for AV_NOPTS_VALUE
    */
-    ROUND_PASS_MINMAX(VideoJNI.IRational_ROUND_PASS_MINMAX_get());
+    ROUND_PASS_MINMAX(VideoJNI.Rational_ROUND_PASS_MINMAX_get());
 
     public final int swigValue() {
       return swigValue;

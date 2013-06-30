@@ -17,16 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#include "Property.h"
+%typemap (javacode) io::humble::video::Property,io::humble::video::Property*,io::humble::video::Property& %{
+%}
 
-namespace io { namespace humble { namespace video {
-
-  Property :: Property()
-  {
-  }
-
-  Property :: ~Property()
-  {
-  }
-
-}}}
+%include <io/humble/video/Property.h>

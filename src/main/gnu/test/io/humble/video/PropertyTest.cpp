@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "PropertyTest.h"
-#include <io/humble/video/IProperty.h>
+#include <io/humble/video/Property.h>
 #if 0
 #include <io/humble/video/ICodec.h>
 #include <io/humble/video/IStreamCoder.h>
@@ -48,7 +48,7 @@ PropertyTest :: testCreation()
   stack.setGlobalLevel(Logger::LEVEL_WARN, false);
   RefPointer<IStreamCoder> coder = IStreamCoder::make(IStreamCoder::ENCODING,
     ICodec::CODEC_ID_H264);
-  RefPointer <IProperty> property =  coder->getPropertyMetaData("b");
+  RefPointer <Property> property =  coder->getPropertyMetaData("b");
   VS_LOG_DEBUG("Name: %s", property->getName());
   VS_LOG_DEBUG("Description: %s", property->getHelp());
   VS_TUT_ENSURE("should exist", property);
@@ -70,7 +70,7 @@ PropertyTest :: testIteration()
 
   for(int32_t i = 0; i < numProperties; i++)
   {
-    RefPointer <IProperty> property =  coder->getPropertyMetaData(i);
+    RefPointer <Property> property =  coder->getPropertyMetaData(i);
     VS_LOG_DEBUG("Name: %s", property->getName());
     VS_LOG_DEBUG("Description: %s", property->getHelp());
     VS_LOG_DEBUG("Default: %lld", property->getDefault());
@@ -112,7 +112,7 @@ PropertyTest :: testSetMetaData()
   VS_TUT_ENSURE("", coder->getPropertyAsLong(realKey) == 1000);
 
   // make sure the fake isn't there.
-  RefPointer<IProperty> fakeProperty = coder->getPropertyMetaData(fakeKey);
+  RefPointer<Property> fakeProperty = coder->getPropertyMetaData(fakeKey);
   VS_TUT_ENSURE("", !fakeProperty);
 
   // now make sure the returned dictionary only had the fake in it.

@@ -23,18 +23,18 @@
 // HumbleVideo.i: Start generated code
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>
 #include <io/humble/ferry/JNIHelper.h>
-#include <io/humble/video/IProperty.h>
-#include <io/humble/video/IPixelFormat.h>
+#include <io/humble/video/MetaData.h>
+#include <io/humble/video/Property.h>
+#include <io/humble/video/PixelFormat.h>
 #include <io/humble/video/Global.h>
 #include <io/humble/video/Codec.h>
-#include <io/humble/video/IRational.h>
+#include <io/humble/video/Rational.h>
 #include <io/humble/video/ContainerFormat.h>
 #include <io/humble/video/OutputFormat.h>
 #include <io/humble/video/InputFormat.h>
 
 /*
 #include <io/humble/video/ITimeValue.h>
-#include <io/humble/video/IMetaData.h>
 #include <io/humble/video/IMediaData.h>
 #include <io/humble/video/IAudioSamples.h>
 #include <io/humble/video/ICodec.swg>
@@ -127,16 +127,16 @@ Java_io_humble_video_Video_init(JNIEnv *env, jclass)
 %include <io/humble/video/HumbleVideo.h>
 %include <io/humble/video/Global.swg>
 %include <io/humble/video/Codec.swg>
-%include <io/humble/video/IProperty.swg>
-%include <io/humble/video/IPixelFormat.h>
-%include <io/humble/video/IRational.swg>
+%include <io/humble/video/MetaData.swg>
+%include <io/humble/video/Property.swg>
+%include <io/humble/video/PixelFormat.h>
+%include <io/humble/video/Rational.swg>
 %include <io/humble/video/ContainerFormat.swg>
 %include <io/humble/video/OutputFormat.swg>
 %include <io/humble/video/InputFormat.swg>
 
 /*
 %include <io/humble/video/ITimeValue.h>
-%include <io/humble/video/IMetaData.swg>
 %include <io/humble/video/IMediaData.swg>
 %include <io/humble/video/IPacket.swg>
 %include <io/humble/video/IAudioSamples.swg>

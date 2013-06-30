@@ -60,14 +60,14 @@ public interface Configurable
    * @param       propertyNo The property number in the options list.  
    * @return      an IProperty value for this properties meta-data  
    */
-  public IProperty getPropertyMetaData(int propertyNo);
+  public Property getPropertyMetaData(int propertyNo);
 
   /**
    * Returns the name of the numbered property.  
    * @param       name The property name.  
    * @return      an IProperty value for this properties meta-data  
    */
-  public IProperty getPropertyMetaData(String name);
+  public Property getPropertyMetaData(String name);
 
   /**
    * Sets a property on this Object.  
@@ -113,7 +113,7 @@ public interface Configurable
    * @param       value Value of option  
    * @return      >= 0 on success; <0 on error.  
    */
-  public int setProperty(String name, IRational value);
+  public int setProperty(String name, Rational value);
 
   /**
    * Gets a property on this Object.  
@@ -145,7 +145,7 @@ public interface Configurable
    * @param       name name of option  
    * @return      long value of property, or 0 on error.  
    */
-  public IRational getPropertyAsRational(String name);
+  public Rational getPropertyAsRational(String name);
 
   /**
    * Gets the value of this property, and returns as a boolean  
@@ -164,7 +164,7 @@ public interface Configurable
    * @return 0 on success; <0 on failure
    * @since 5.0
    */  
-//  public int setProperty(IMetaData valuesToSet, IMetaData valuesNotFound);
+  public int setProperty(MetaData valuesToSet, MetaData valuesNotFound);
   
 
 }

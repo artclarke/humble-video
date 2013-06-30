@@ -70,7 +70,7 @@ public class Configuration
     
     for(int i = 0; i < numOptions; i++)
     {
-      IProperty prop = configObj.getPropertyMetaData(i);
+      Property prop = configObj.getPropertyMetaData(i);
       printOption(stream, configObj, prop);
     }
    
@@ -84,9 +84,9 @@ public class Configuration
    * @param prop property on object
    */
   public static void printOption(java.io.PrintStream stream,
-      Configurable configObj, IProperty prop)
+      Configurable configObj, Property prop)
   {
-    if (prop.getType() != IProperty.Type.PROPERTY_FLAGS)
+    if (prop.getType() != Property.Type.PROPERTY_FLAGS)
     {
       stream.printf("  %s; default= %s; type=%s;\n",
           prop.getName(),
@@ -101,7 +101,7 @@ public class Configuration
       long value = configObj.getPropertyAsLong(prop.getName());
       for(int i = 0; i < numSettings; i++)
       {
-        IProperty fprop = prop.getFlagConstant(i);
+        Property fprop = prop.getFlagConstant(i);
         long flagMask = fprop.getDefault();
         boolean isSet = (value & flagMask)>0;
         stream.printf("%s%s; ",

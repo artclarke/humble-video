@@ -17,212 +17,147 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef PROPERTY_H_
-#define PROPERTY_H_
+#ifndef IPROPERTY_H_
+#define IPROPERTY_H_
 
-#include <io/humble/video/IProperty.h>
-#include <io/humble/video/IRational.h>
-
-extern "C" {
-#include "FfmpegIncludes.h"
-}
-
+#include <io/humble/video/HumbleVideo.h>
+#include <io/humble/ferry/RefCounted.h>
 namespace io { namespace humble { namespace video {
-
   /**
-   * A wrapper for an FFMPEG AVOption value.
+   * Represents settable properties that effect how Humble Video objects
+   * operate.
+   * <p>
+   * For example, setting the &quot;b&quot; property on an
+   * {@link IStreamCoder} sets the bit-rate the coder will attempt
+   * to encode at.
+   * </p> 
    */
-  class Property : public io::humble::video::IProperty
+  class VS_API_HUMBLEVIDEO Property : public io::humble::ferry::RefCounted
   {
-    VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(Property);
-  public:
-    static Property *make(const AVOption *start, const AVOption *option);
-
   public:
     /**
-     * IProperty implementation
+     * The different type of options that are supported by Humble Video.
+     * 
+     * Well, actually by FFMPEG, but you get the idea.
      */
-    virtual const char *getName();
-    virtual const char *getHelp();
-    virtual const char *getUnit();
-    virtual Type getType();
-    virtual int64_t getDefault();
-    virtual double getDefaultAsDouble();
-    virtual int32_t getFlags();
-    virtual int32_t getNumFlagSettings();
-    virtual IProperty *getFlagConstant(int32_t position);
-    virtual IProperty *getFlagConstant(const char* name);
+    typedef enum {
+      PROPERTY_FLAGS,
+      PROPERTY_INT,
+      PROPERTY_INT64,
+      PROPERTY_DOUBLE,
+      PROPERTY_FLOAT,
+      PROPERTY_STRING,
+      PROPERTY_RATIONAL,
+      PROPERTY_BINARY,
+      PROPERTY_CONST = 128,
+      PROPERTY_IMAGE_SIZE = MKBETAG('S','I','Z','E'),
+      PROPERTY_PIXEL_FMT  = MKBETAG('P','F','M','T'),
+      PROPERTY_SAMPLE_FMT = MKBETAG('S','F','M','T'),
+      PROPERTY_UNKNOWN = -1
+    } Type;
     
-
-    /** For internal use */
-    /**
-     * Returns the total number of settable properties on this object
-     * 
-     * @param context AVClass to search for options in
-     * 
-     * @return total number of options (not including constant definitions)
-     */
-    static int32_t getNumProperties(void *context);
-    
-    /**
-     * Returns the metadata for the numbered property.
-     * 
-     * Note that a property number is guaranteed to stay constant during this run
-     * of Humble Video, but the property number may change if the process restarts.
-     * 
-     * @param context AVClass to search for options in
-     * @param propertyNo The property number in the options list.
-     *   
-     * @return the meta data for this property, or null if not found
-     */
-    static IProperty *getPropertyMetaData(void *context, int32_t propertyNo);
+    typedef enum {
+      FLAG_ENCODING_PARAM=1,
+      FLAG_DECODING_PARAM=2,
+      FLAG_METADATA=4,
+      FLAG_AUDIO_PARAM=8,
+      FLAG_VIDEO_PARAM=16,
+      FLAG_SUBTITLE_PARAM=32,
+      FLAG_FILTERING_PARAM=(1<<16),
+    } Flags;
     
     /**
-     * Returns the metadata for the named property.
+     * How to search options when looking for different values.
+     */
+    typedef enum {
+        /** Do not search child options */
+        PROPERTY_SEARCH_DEFAULT=0x0000,
+        /** Search children first */
+        PROPERTY_SEARCH_CHILDREN=0x0001,
+    } Search;
 
-     * @param context AVClass to search for options in
-     * @param name The property number in the options list.
-     *   
-     * @return the meta data for this property, or null if not found
-     */
-    static IProperty *getPropertyMetaData(void *context, const char* name);
-        
     /**
-     * Looks up the property 'name' in 'context' and sets the
-     * value of the property to 'value'.
+     * Get the name for this property.
      * 
-     * @param context AVClass to search for option in.
-     * @param name name of option
-     * @param value Value of option
-     * 
-     * @return >= 0 on success; <0 on error.
+     * @return the name.
      */
-    static int32_t setProperty(void * context, const char* name, const char* value);
+    virtual const char *getName()=0;
     
     /**
-     * Looks up the property 'name' in 'context' and sets the
-     * value of the property to 'value'.
+     * Get the (English) help string for this property.
      * 
-     * @param context AVClass to search for option in.
-     * @param name name of option
-     * @param value Value of option
-     * 
-     * @return >= 0 on success; <0 on error.
+     * @return the help string
      */
-    static int32_t setProperty(void * context, const char* name, double value);
+    virtual const char *getHelp()=0;
     
     /**
-     * Looks up the property 'name' in 'context' and sets the
-     * value of the property to 'value'.
+     * Get any sub-unit this option or constant belongs to.
      * 
-     * @param context AVClass to search for option in.
-     * @param name name of option
-     * @param value Value of option
-     * 
-     * @return >= 0 on success; <0 on error.
+     * @return the unit, or null if none.
      */
-    static int32_t setProperty(void * context, const char* name, int64_t value);
+    virtual const char *getUnit()=0;
     
     /**
-     * Looks up the property 'name' in 'context' and sets the
-     * value of the property to 'value'.
+     * Get the underlying native type of this property.
      * 
-     * @param context AVClass to search for option in.
-     * @param name name of option
-     * @param value Value of option
-     * 
-     * @return >= 0 on success; <0 on error.
+     * @return the type
      */
-    static int32_t setProperty(void * context, const char* name, bool value);
+    virtual Type getType()=0;
     
     /**
-     * Looks up the property 'name' in 'context' and sets the
-     * value of the property to 'value'.
+     * Get any set flags (a bitmask) for this option.
      * 
-     * @param context AVClass to search for option in.
-     * @param name name of option
-     * @param value Value of option
-     * 
-     * @return >= 0 on success; <0 on error.
+     * @return the flags
      */
-    static int32_t setProperty(void * context, const char* name, IRational *value);
+    virtual int32_t getFlags()=0;
 
     /**
-     * Gets the value of this property, and returns as a new[]ed string.
+     * Get the default setting this flag would have it not set.
      * 
-     * Caller must call delete[] on string.
-     * 
-     * @param context AVClass context to search for option in.
-     * @param name name of option
-     * 
-     * @return string version of option value (caller must call delete[]) or
-     *   null on error.
+     * @return the default
      */
-    static char * getPropertyAsString(void * context, const char* name);
+    virtual int64_t getDefault()=0;
+    
+    /**
+     * Get the default setting this flag would have it not set.
+     * 
+     * @return the default
+     */
+    virtual double getDefaultAsDouble()=0;
+    
+    /**
+     * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this method will
+     * tell you how many different flag settings it takes.
+     * 
+     * @return Number of flag settings, or <0 if not a FLAGS value
+     */
+    virtual int32_t getNumFlagSettings()=0;
+    
+    /**
+     * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this method will
+     * give you another IProperty representing a constant setting for that flag.
+     * 
+     * @param position The position number for the flag;  Must be in range 0 <= position <= #getNumFlagSettings().
+     * 
+     * @return An IProperty object for the flag setting, or null if not available.
+     */
+    virtual Property *getFlagConstant(int32_t position)=0;
 
     /**
-     * Gets the value of this property, and returns as a double;
+     * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this method will
+     * give you another IProperty representing a constant setting for that flag.
      * 
-     * @param context AVClass context to search for option in.
-     * @param name name of option
+     * @param name The name of the constant.
      * 
-     * @return double value of property, or 0 on error.
+     * @return An IProperty object for the flag setting, or null if not available.
      */
-    static double getPropertyAsDouble(void * context, const char* name);
-
-    /**
-     * Gets the value of this property, and returns as an long;
-     * 
-     * @param context AVClass context to search for option in.
-     * @param name name of option
-     * 
-     * @return long value of property, or 0 on error.
-     */
-    static int64_t getPropertyAsLong(void * context, const char* name);
-
-    /**
-     * Gets the value of this property, and returns as an IRational;
-     * 
-     * @param context AVClass context to search for option in.
-     * @param name name of option
-     * 
-     * @return long value of property, or 0 on error.
-     */
-    static IRational *getPropertyAsRational(void * context, const char* name);
-
-    /**
-     * Gets the value of this property, and returns as a boolean
-     * 
-     * @param context AVClass context to search for option in.
-     * @param name name of option
-     * 
-     * @return boolean value of property, or false on error.
-     */
-    static bool getPropertyAsBoolean(void * context, const char* name);
-
-#if 0
-    /**
-     * Sets all properties in valuesToSet on object context.
-     *
-     * @param context AVClass context to set options on
-     * @param valuesToSet The set of key-value pairs to try to set
-     * @param valuesNotFound If non null will contain all key-values pairs in valuesToSet
-     *                       that were not found in context.
-     *
-     * @return 0 on success; <0 on failure
-     * @since 5.0
-     */
-    static int32_t setProperty(void *context, IMetaData* valuesToSet, IMetaData* valuesNotFound);
-#endif
+    virtual Property *getFlagConstant(const char *name)=0;
 
   protected:
     Property();
-    virtual
-    ~Property();
-  private:
-    const AVOption *mOption;
-    const AVOption *mOptionStart;
+    virtual ~Property();
+    
   };
 
 }}}
-#endif /* PROPERTY_H_ */
+#endif /* IPROPERTY_H_ */

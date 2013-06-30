@@ -3,9 +3,9 @@
 
 #include <io/humble/testutils/TestUtils.h>
 #include <io/humble/ferry/RefPointer.h>
-#include <io/humble/video/IRational.h>
+#include <io/humble/video/Rational.h>
 
-using namespace VS_CPP_NAMESPACE;
+using namespace io::humble::video;
 
 class RationalTest : public CxxTest::TestSuite
 {
@@ -21,7 +21,7 @@ class RationalTest : public CxxTest::TestSuite
     void testConstructionFromNumeratorAndDenominatorPair();
     void testRescaling();
   private:
-    io::humble::ferry::RefPointer<IRational> num;
+    io::humble::ferry::RefPointer<Rational> num;
 };
 
 

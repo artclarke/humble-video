@@ -4,7 +4,7 @@ import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.humble.video.IRational;
+import io.humble.video.Rational;
 
 import junit.framework.TestCase;
 
@@ -12,7 +12,7 @@ public class RationalTest extends TestCase
 {
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-  private IRational mRational=null;
+  private Rational mRational=null;
 
   @Before
   public void setUp()
@@ -26,19 +26,19 @@ public class RationalTest extends TestCase
   @Test
   public void testConstructorsAndGetters()
   {
-    mRational = IRational.make();    
+    mRational = Rational.make();    
     assertTrue(mRational.getNumerator() == 0);
     assertTrue(mRational.getDenominator() == 1);
     mRational.delete();
     mRational = null;
     
-    mRational = IRational.make(6.0);
+    mRational = Rational.make(6.0);
     assertTrue(mRational.getNumerator() == 6);
     assertTrue(mRational.getDenominator() == 1);
     mRational.delete();
     mRational = null;
 
-    mRational = IRational.make(6.1);
+    mRational = Rational.make(6.1);
     assertTrue(mRational.getNumerator() == 61);
     assertTrue(mRational.getDenominator() == 10);
     mRational.delete();
@@ -49,7 +49,7 @@ public class RationalTest extends TestCase
   public void testReduction()
   {
     int retval = -1;
-    mRational = IRational.make(2.2);
+    mRational = Rational.make(2.2);
     
     assertTrue(mRational.getNumerator() == 11);
     assertTrue(mRational.getDenominator() == 5);
@@ -60,7 +60,7 @@ public class RationalTest extends TestCase
     assertTrue(mRational.getNumerator()==11);
     assertTrue(mRational.getDenominator()==10);
     
-    retval = IRational.sReduce(mRational, 33, 32, 10);
+    retval = Rational.sReduce(mRational, 33, 32, 10);
     assertTrue("exact reduction?", retval == 0);
     assertTrue(mRational.getNumerator()==1);
     assertTrue(mRational.getDenominator()==1);
@@ -78,8 +78,8 @@ public class RationalTest extends TestCase
   public void testCompareTo()
   {
     int retval = -1;
-    IRational otherRational = IRational.make(5);
-    mRational = IRational.make(4);
+    Rational otherRational = Rational.make(5);
+    mRational = Rational.make(4);
 
     retval = mRational.compareTo(otherRational);
     assertTrue(retval <0);
@@ -87,7 +87,7 @@ public class RationalTest extends TestCase
     assertTrue(retval >0);
     retval = mRational.compareTo(mRational);
     assertTrue(retval == 0);
-    retval = IRational.sCompareTo(mRational, otherRational);
+    retval = Rational.sCompareTo(mRational, otherRational);
     assertTrue(retval < 0);
   }
   
@@ -95,12 +95,12 @@ public class RationalTest extends TestCase
   public void testGetDouble()
   {
     double retval = -1;
-    mRational = IRational.make();
+    mRational = Rational.make();
     retval = mRational.getDouble();
     assertTrue(retval == 0);
     
     // Now, let's create an invalid value and see what happens.
-    mRational = IRational.make();
+    mRational = Rational.make();
     mRational.reduce(1,0, 10);
     retval = mRational.getDouble();
     assertTrue("double is valid: " + retval, Double.isInfinite(retval));
@@ -109,59 +109,59 @@ public class RationalTest extends TestCase
   @Test
   public void testMultiply()
   {
-    IRational a = IRational.make(12);
-    IRational b = IRational.make(3);
+    Rational a = Rational.make(12);
+    Rational b = Rational.make(3);
     
-    mRational = IRational.sMultiply(a, b);
+    mRational = Rational.sMultiply(a, b);
     assertTrue(mRational.getDouble() == 36);
   }
 
   @Test
   public void testAdd()
   {
-    IRational a = IRational.make(12);
-    IRational b = IRational.make(3);
+    Rational a = Rational.make(12);
+    Rational b = Rational.make(3);
     
-    mRational = IRational.sAdd(a, b);
+    mRational = Rational.sAdd(a, b);
     assertTrue(mRational.getDouble() == 15);
   }  
 
   @Test
   public void testSubtract()
   {
-    IRational a = IRational.make(12);
-    IRational b = IRational.make(3);
+    Rational a = Rational.make(12);
+    Rational b = Rational.make(3);
     
-    mRational = IRational.sSubtract(a, b);
+    mRational = Rational.sSubtract(a, b);
     assertTrue(mRational.getDouble() == 9);
   }
   
   @Test
   public void testDivision()
   {
-    IRational a = IRational.make(12);
-    IRational b = IRational.make(3);
+    Rational a = Rational.make(12);
+    Rational b = Rational.make(3);
     
-    mRational = IRational.sDivide(a, b);
+    mRational = Rational.sDivide(a, b);
     assertTrue(mRational.getDouble() == 4);
     
-    mRational = IRational.sDivide(
-        IRational.make(1),
-        IRational.make(0));
+    mRational = Rational.sDivide(
+        Rational.make(1),
+        Rational.make(0));
     assertTrue(Double.isInfinite(mRational.getDouble()));
 
-    mRational = IRational.sDivide(
-        IRational.make(0),
-        IRational.make(0));
+    mRational = Rational.sDivide(
+        Rational.make(0),
+        Rational.make(0));
     assertTrue(Double.isNaN(mRational.getDouble()));
   }
   
   @Test
   public void testCreateFromNumAndDen()
   {
-    mRational = IRational.make(1, 10);
+    mRational = Rational.make(1, 10);
     assertTrue(mRational.getDouble() == 0.1);
-    mRational = IRational.make(2,10);
+    mRational = Rational.make(2,10);
     assertTrue(mRational.getDouble() == 0.2);
     assertTrue(mRational.getNumerator() == 1);
     assertTrue(mRational.getDenominator() == 5);

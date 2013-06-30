@@ -12,11 +12,13 @@ noinst_LTLIBRARIES = libhumble-video.la
 libhumble_video_la_LIBADD= $(VS_PKG_LIBRARIES)
 
 libhumble_video_la_SOURCES= \
-  IPixelFormat.cpp \
-  IProperty.cpp \
+  PixelFormat.cpp \
+  MetaData.cpp \
+  MetaDataImpl.cpp \
   Property.cpp \
-  IRational.cpp \
+  PropertyImpl.cpp \
   Rational.cpp \
+  RationalImpl.cpp \
   ContainerFormat.cpp \
   OutputFormat.cpp \
   InputFormat.cpp \
@@ -31,13 +33,16 @@ libhumble_video_la_HEADERS= \
   Codec.h \
   FfmpegIncludes.h \
   Global.swg \
-  IPixelFormat.h \
-  IProperty.h \
-  IRational.h \
-  IRational.swg \
   PixelFormat.h \
-  Property.h \
+  MetaData.h \
+  MetaDataImpl.h \
+  MetaData.swg \
   Rational.h \
+  RationalImpl.h \
+  Rational.swg \
+  Property.h \
+  PropertyImpl.h \
+  Property.swg \
   ContainerFormat.h \
   OutputFormat.h \
   InputFormat.h \
