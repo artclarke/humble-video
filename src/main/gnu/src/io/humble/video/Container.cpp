@@ -39,141 +39,132 @@ Container::~Container()
 }
 
 int32_t
-Container :: getNumProperties()
+Container::getNumProperties()
 {
   return PropertyImpl::getNumProperties(mCtx);
 }
 
 Property*
-Container :: getPropertyMetaData(int32_t propertyNo)
+Container::getPropertyMetaData(int32_t propertyNo)
 {
   return PropertyImpl::getPropertyMetaData(mCtx, propertyNo);
 }
 
 Property*
-Container :: getPropertyMetaData(const char *name)
+Container::getPropertyMetaData(const char *name)
 {
   return PropertyImpl::getPropertyMetaData(mCtx, name);
 }
 
 int32_t
-Container :: setProperty(MetaData* valuesToSet, MetaData* valuesNotFound)
+Container::setProperty(MetaData* valuesToSet, MetaData* valuesNotFound)
 {
   return PropertyImpl::setProperty(mCtx, valuesToSet, valuesNotFound);
 }
 
 int32_t
-Container :: setProperty(const char* aName, const char *aValue)
+Container::setProperty(const char* aName, const char *aValue)
 {
   return PropertyImpl::setProperty(mCtx, aName, aValue);
 }
 
 int32_t
-Container :: setProperty(const char* aName, double aValue)
+Container::setProperty(const char* aName, double aValue)
 {
   return PropertyImpl::setProperty(mCtx, aName, aValue);
 }
 
 int32_t
-Container :: setProperty(const char* aName, int64_t aValue)
+Container::setProperty(const char* aName, int64_t aValue)
 {
   return PropertyImpl::setProperty(mCtx, aName, aValue);
 }
 
 int32_t
-Container :: setProperty(const char* aName, bool aValue)
+Container::setProperty(const char* aName, bool aValue)
 {
   return PropertyImpl::setProperty(mCtx, aName, aValue);
 }
-
 
 int32_t
-Container :: setProperty(const char* aName, Rational *aValue)
+Container::setProperty(const char* aName, Rational *aValue)
 {
   return PropertyImpl::setProperty(mCtx, aName, aValue);
 }
-
 
 char*
-Container :: getPropertyAsString(const char *aName)
+Container::getPropertyAsString(const char *aName)
 {
   return PropertyImpl::getPropertyAsString(mCtx, aName);
 }
 
 double
-Container :: getPropertyAsDouble(const char *aName)
+Container::getPropertyAsDouble(const char *aName)
 {
   return PropertyImpl::getPropertyAsDouble(mCtx, aName);
 }
 
 int64_t
-Container :: getPropertyAsLong(const char *aName)
+Container::getPropertyAsLong(const char *aName)
 {
   return PropertyImpl::getPropertyAsLong(mCtx, aName);
 }
 
 Rational*
-Container :: getPropertyAsRational(const char *aName)
+Container::getPropertyAsRational(const char *aName)
 {
   return PropertyImpl::getPropertyAsRational(mCtx, aName);
 }
 
 bool
-Container :: getPropertyAsBoolean(const char *aName)
+Container::getPropertyAsBoolean(const char *aName)
 {
   return PropertyImpl::getPropertyAsBoolean(mCtx, aName);
 }
 
 int32_t
-Container :: getFlags()
+Container::getFlags()
 {
-  int32_t flags = (mCtx ? mCtx->flags : 0);
+  int32_t flags = mCtx->flags;
   // remove custom io if set
   flags &= ~(AVFMT_FLAG_CUSTOM_IO);
   return flags;
 }
 
 void
-Container :: setFlags(int32_t newFlags)
+Container::setFlags(int32_t newFlags)
 {
-  if (mCtx) {
-    mCtx->flags = newFlags;
-    // force custom io
-    mCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
-  }
+  mCtx->flags = newFlags;
+  // force custom io
+  mCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
 }
 
 bool
 Container::getFlag(Container::Flag flag)
 {
-  bool result = false;
-  if (mCtx)
-    result = mCtx->flags& flag;
-  return result;
+  return mCtx->flags & flag;
 }
 
 void
 Container::setFlag(Container::Flag flag, bool value)
 {
-  if (mCtx)
+  if (value)
   {
-    if (value)
-    {
-      mCtx->flags |= flag;
-    }
-    else
-    {
-      mCtx->flags &= (~flag);
-    }
+    mCtx->flags |= flag;
+  }
+  else
+  {
+    mCtx->flags &= (~flag);
   }
 
 }
 
 const char*
-Container :: getURL()
+Container::getURL()
 {
-  return mCtx && *mCtx->filename ? mCtx->filename : 0;
+  return mCtx->filename;
 }
+
 
 
 } /* namespace video */

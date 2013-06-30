@@ -190,6 +190,21 @@ class JNIHelper
 
     jweak mInterruptedException_class;
   };
+
+/**
+ * If __COND__ is true, then this macro
+ * checks if the thread is interrupted, and
+ * if so sets 'retval' to 'EINTR'.
+ */
+#define VS_CHECK_INTERRUPT(retval, __COND__) do { \
+    if (__COND__) { \
+      JNIHelper* helper = JNIHelper::getHelper(); \
+      if (helper && helper->isInterrupted()) \
+        (retval) = EINTR > 0 ? -EINTR : EINTR; \
+        } \
+} while(0)
+
+
 }}}
 
 #endif /*JNIHELPER_H_*/

@@ -4,7 +4,7 @@ VS_CPP_PACKAGE=io.humble.video
 VS_CPP_NAMESPACE=io::humble::video
 include @top_builddir@/mk/Makefile.global
 
-SUBDIRS=
+SUBDIRS=io
 SUFFIXES=.i
 
 noinst_LTLIBRARIES = libhumble-video.la

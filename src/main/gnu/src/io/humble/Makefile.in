@@ -147,6 +147,7 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(humbledir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libhumblevideo_la_DEPENDENCIES = $(builddir)/ferry/libhumble-ferry.la \
+	$(builddir)/video/io/libhumble-video-io.la \
 	$(builddir)/video/libhumble-video.la
 am_libhumblevideo_la_OBJECTS = HumbleVideo.lo
 libhumblevideo_la_OBJECTS = $(am_libhumblevideo_la_OBJECTS)
@@ -438,6 +439,7 @@ lib_LTLIBRARIES = libhumblevideo.la
 libhumblevideo_la_SOURCES = HumbleVideo.cpp
 libhumblevideo_la_LIBADD = \
   $(builddir)/ferry/libhumble-ferry.la \
+  $(builddir)/video/io/libhumble-video-io.la \
   $(builddir)/video/libhumble-video.la
 
 libhumblevideo_la_LDFLAGS = -no-undefined -shared -version-number \
