@@ -33,11 +33,24 @@ namespace io {
 namespace humble {
 namespace video {
 
+class VS_API_HUMBLEVIDEO Stream : public io::humble::ferry::RefCounted
+{
+public:
+  virtual void noop() {}
+
+protected:
+  Stream() {}
+  virtual ~Stream() {}
+};
+
+class Property;
+class MetaData;
+class Rational;
+
 /**
  * A Container for Media data. This is an abstract class and
  * cannot be instantiated on its own.
  */
-class Stream;
 class VS_API_HUMBLEVIDEO Container : public io::humble::ferry::RefCounted
 {
 public:
@@ -339,17 +352,6 @@ public:
   virtual int32_t
   getFlags()=0;
 
-#if CONTAINER_ALLOW_SETFLAGS
-  /**
-   * Set the flags to use with this object.  All values
-   * must be ORed (|) together.
-   *
-   * @see Flags
-   *
-   * @param newFlags The new set flags for this codec.
-   */
-  virtual void setFlags(int32_t newFlags) = 0;
-
   /**
    * Get the setting for the specified flag
    *
@@ -359,7 +361,6 @@ public:
    */
   virtual bool
   getFlag(Flag flag) = 0;
-#endif // CONTAINER_ALLOW_SETFLAGS
 
   /**
    * Set the flag.
@@ -370,6 +371,17 @@ public:
    */
   virtual void
   setFlag(Flag flag, bool value) = 0;
+
+  /**
+   * Set the flags to use with this object.  All values
+   * must be ORed (|) together.
+   *
+   * @see Flags
+   *
+   * @param newFlags The new set flags for this codec.
+   */
+  virtual void setFlags(int32_t newFlags) = 0;
+
 
   /**
    * Get the URL the Container was opened with.
@@ -406,14 +418,6 @@ public:
    */
   virtual int32_t
   setProperty(MetaData* valuesToSet, MetaData* valuesNotFound)=0;
-
-  /**
-   * Create a new {@link Container} and call {@link #setFormat(ContainerFormat)} on it immediately.
-   * @param format The format to pass to {@link #setFormat(ContainerFormat)}
-   * @return An {@link Container} on success, or null on failure.
-   */
-  static Container*
-  make(ContainerFormat* format);
 
 protected:
   Container();

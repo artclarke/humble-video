@@ -98,8 +98,8 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_video_la_DEPENDENCIES =
 am_libhumble_video_la_OBJECTS = PixelFormat.lo MetaData.lo \
 	MetaDataImpl.lo Property.lo PropertyImpl.lo Rational.lo \
-	RationalImpl.lo ContainerFormat.lo OutputFormat.lo \
-	InputFormat.lo Global.lo
+	RationalImpl.lo ContainerFormat.lo Container.lo \
+	OutputFormat.lo InputFormat.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -421,6 +421,7 @@ libhumble_video_la_SOURCES = \
   Rational.cpp \
   RationalImpl.cpp \
   ContainerFormat.cpp \
+  Container.cpp \
   OutputFormat.cpp \
   InputFormat.cpp \
   Global.cpp
@@ -445,8 +446,13 @@ libhumble_video_la_HEADERS = \
   PropertyImpl.h \
   Property.swg \
   ContainerFormat.h \
+  ContainerFormat.swg \
   OutputFormat.h \
+  OutputFormat.swg \
   InputFormat.h \
+  InputFormat.swg \
+  Container.h \
+  Container.swg \
   Global.h
 
 BUILT_SOURCES = \
@@ -830,6 +836,8 @@ uninstall-am: uninstall-libhumble_video_laHEADERS
 include @top_builddir@/mk/Makefile.global
 
 HumbleVideo.cpp : $(libhumble_video_la_HEADERS)
+
+HumbleVideo.i : $(libhumble_video_la_HEADERS)
 
 clean-local:
 	rm -f $(BUILT_SOURCES)

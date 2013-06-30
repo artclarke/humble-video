@@ -32,24 +32,7 @@
 #include <io/humble/video/ContainerFormat.h>
 #include <io/humble/video/OutputFormat.h>
 #include <io/humble/video/InputFormat.h>
-
-/*
-#include <io/humble/video/ITimeValue.h>
-#include <io/humble/video/IMediaData.h>
-#include <io/humble/video/IAudioSamples.h>
-#include <io/humble/video/ICodec.swg>
-#include <io/humble/video/IPacket.h>
-#include <io/humble/video/IIndexEntry.h>
-#include <io/humble/video/IAudioResampler.h>
-#include <io/humble/video/IVideoPicture.h>
-#include <io/humble/video/IVideoResampler.h>
-#include <io/humble/video/IStreamCoder.h>
-#include <io/humble/video/IStream.h>
-#include <io/humble/video/IContainerFormat.h>
-#include <io/humble/video/IContainer.h>
-#include <io/humble/video/IMediaDataWrapper.h>
-#include <io/humble/video/IError.h>
-*/
+#include <io/humble/video/Container.h>
 
 using namespace VS_CPP_NAMESPACE;
 
@@ -118,8 +101,7 @@ Java_io_humble_video_Video_init(JNIEnv *env, jclass)
 // HumbleVideo.i: End generated code
   
 %}
-// As per 1.17, we now make sure we generate proper Java enums on
-// classes
+
 %include "enums.swg"
 
 %import <io/humble/ferry/Ferry.i>
@@ -134,21 +116,4 @@ Java_io_humble_video_Video_init(JNIEnv *env, jclass)
 %include <io/humble/video/ContainerFormat.swg>
 %include <io/humble/video/OutputFormat.swg>
 %include <io/humble/video/InputFormat.swg>
-
-/*
-%include <io/humble/video/ITimeValue.h>
-%include <io/humble/video/IMediaData.swg>
-%include <io/humble/video/IPacket.swg>
-%include <io/humble/video/IAudioSamples.swg>
-%include <io/humble/video/IVideoPicture.swg>
-%include <io/humble/video/ICodec.swg>
-%include <io/humble/video/IAudioResampler.h>
-%include <io/humble/video/IVideoResampler.swg>
-%include <io/humble/video/IStreamCoder.swg>
-%include <io/humble/video/IIndexEntry.swg>
-%include <io/humble/video/IStream.swg>
-%include <io/humble/video/IContainerFormat.swg>
-%include <io/humble/video/IContainer.swg>
-%include <io/humble/video/IMediaDataWrapper.swg>
-%include <io/humble/video/IError.swg>
-*/
+%include <io/humble/video/Container.swg>

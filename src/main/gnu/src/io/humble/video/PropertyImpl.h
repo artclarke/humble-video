@@ -29,6 +29,8 @@ extern "C" {
 
 namespace io { namespace humble { namespace video {
 
+  class MetaData;
+
   /**
    * A wrapper for an FFMPEG AVOption value.
    */
@@ -40,7 +42,7 @@ namespace io { namespace humble { namespace video {
 
   public:
     /**
-     * IProperty implementation
+     * Property implementation
      */
     virtual const char *getName();
     virtual const char *getHelp();
@@ -200,7 +202,6 @@ namespace io { namespace humble { namespace video {
      */
     static bool getPropertyAsBoolean(void * context, const char* name);
 
-#if 0
     /**
      * Sets all properties in valuesToSet on object context.
      *
@@ -212,8 +213,7 @@ namespace io { namespace humble { namespace video {
      * @return 0 on success; <0 on failure
      * @since 5.0
      */
-    static int32_t setProperty(void *context, IMetaData* valuesToSet, IMetaData* valuesNotFound);
-#endif
+    static int32_t setProperty(void *context, MetaData* valuesToSet, MetaData* valuesNotFound);
 
   protected:
     PropertyImpl();

@@ -20,6 +20,7 @@ libhumble_video_la_SOURCES= \
   Rational.cpp \
   RationalImpl.cpp \
   ContainerFormat.cpp \
+  Container.cpp \
   OutputFormat.cpp \
   InputFormat.cpp \
   Global.cpp
@@ -44,14 +45,21 @@ libhumble_video_la_HEADERS= \
   PropertyImpl.h \
   Property.swg \
   ContainerFormat.h \
+  ContainerFormat.swg \
   OutputFormat.h \
+  OutputFormat.swg \
   InputFormat.h \
+  InputFormat.swg \
+  Container.h \
+  Container.swg \
   Global.h
 
 BUILT_SOURCES= \
   HumbleVideo.cpp
 
 HumbleVideo.cpp : $(libhumble_video_la_HEADERS)
+
+HumbleVideo.i : $(libhumble_video_la_HEADERS)
 
 clean-local:
 	rm -f $(BUILT_SOURCES)
