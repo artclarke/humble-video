@@ -39,7 +39,7 @@ public class OutputFormatTest extends TestCase {
     final OutputFormat f = OutputFormat.guessFormat("mp4", null, null);
     assertNotNull(f);
     
-    final List<Id> l = f.getOutputCodecsSupported();
+    final List<Id> l = f.getSupportedCodecs();
     assertEquals(20, l.size());
   }
 

@@ -139,7 +139,7 @@ public class ContainerFormat extends RefCounted {
     *
     * @return A list of supported codecs, in decreasing preferred order.
     */
-   public java.util.List<Codec.Id> getOutputCodecsSupported()
+   public java.util.List<Codec.Id> getSupportedCodecs()
    {
      final java.util.List<Codec.Id> retval =
        new java.util.LinkedList<Codec.Id>();
@@ -170,7 +170,7 @@ public class ContainerFormat extends RefCounted {
     *
     * @return A list of supported codec tags, in decreasing preferred order.
     */
-   public java.util.List<Long> getOutputTagsSupported()
+   public java.util.List<Long> getSupportedTags()
    {
      final java.util.List<Long> retval =
        new java.util.LinkedList<Long>();
