@@ -8,6 +8,11 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * A codec that can be used either to encode raw data into compressed 
+ * bitstreams,  
+ * or decode compressed data into raw data, or both!  
+ */
 public class Codec extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
