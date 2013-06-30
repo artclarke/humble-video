@@ -123,7 +123,7 @@ public:
       const char *mimeType);
   virtual Codec::Id
   guessCodec(const char * shortName, const char * filename,
-      const char* mimeType, MediaType type)
+      const char* mimeType, MediaDescriptor::Type type)
   {
     return (Codec::Id) av_guess_codec(mFormat, shortName, filename, mimeType,
         (enum AVMediaType) type);

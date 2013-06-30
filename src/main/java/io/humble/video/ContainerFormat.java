@@ -253,71 +253,6 @@ public class ContainerFormat extends RefCounted {
     return VideoJNI.ContainerFormat_getSupportedCodecTag(swigCPtr, this, n);
   }
 
-  public enum MediaType {
-  /**
-   * The type of media contained in a container's stream
-   * Usually treated as DATA
-   */
-    MEDIA_UNKNOWN(VideoJNI.ContainerFormat_MEDIA_UNKNOWN_get()),
-  /**
-   * Video data
-   */
-    MEDIA_VIDEO(VideoJNI.ContainerFormat_MEDIA_VIDEO_get()),
-  /**
-   * Audio data
-   */
-    MEDIA_AUDIO(VideoJNI.ContainerFormat_MEDIA_AUDIO_get()),
-  /**
-   * Opaque data, usually continuous
-   */
-    MEDIA_DATA(VideoJNI.ContainerFormat_MEDIA_DATA_get()),
-  /**
-   * Subtitle data
-   */
-    MEDIA_SUBTITLE(VideoJNI.ContainerFormat_MEDIA_SUBTITLE_get()),
-  /**
-   * Opaque data, usually sparse
-   */
-    MEDIA_ATTACHMENT(VideoJNI.ContainerFormat_MEDIA_ATTACHMENT_get());
-
-    public final int swigValue() {
-      return swigValue;
-    }
-
-    public static MediaType swigToEnum(int swigValue) {
-      MediaType[] swigValues = MediaType.class.getEnumConstants();
-      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
-        return swigValues[swigValue];
-      for (MediaType swigEnum : swigValues)
-        if (swigEnum.swigValue == swigValue)
-          return swigEnum;
-      throw new IllegalArgumentException("No enum " + MediaType.class + " with value " + swigValue);
-    }
-
-    @SuppressWarnings("unused")
-    private MediaType() {
-      this.swigValue = SwigNext.next++;
-    }
-
-    @SuppressWarnings("unused")
-    private MediaType(int swigValue) {
-      this.swigValue = swigValue;
-      SwigNext.next = swigValue+1;
-    }
-
-    @SuppressWarnings("unused")
-    private MediaType(MediaType swigEnum) {
-      this.swigValue = swigEnum.swigValue;
-      SwigNext.next = this.swigValue+1;
-    }
-
-    private final int swigValue;
-
-    private static class SwigNext {
-      private static int next = 0;
-    }
-  }
-
   public enum Flags {
   /**
    * A series of flags that different {@link ContainerFormat}s and their 
@@ -331,7 +266,7 @@ public class ContainerFormat extends RefCounted {
    */
     NO_FILE(VideoJNI.ContainerFormat_NO_FILE_get()),
   /**
-   * Needs '2065955616' in filename.
+   * Needs '-1699642976' in filename.
    */
     NEED_NUMBER(VideoJNI.ContainerFormat_NEED_NUMBER_get()),
   /**

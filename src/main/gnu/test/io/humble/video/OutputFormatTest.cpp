@@ -65,9 +65,15 @@ OutputFormatTest::testCreateOutputFormat() {
   int32_t n = format->getNumSupportedCodecs();
   VS_LOG_DEBUG("# Supported Codecs: %d", n);
   for(int32_t i = 0; i < n; i++) {
-    VS_LOG_DEBUG("ID: %d, Tag: %d",
-        format->getSupportedCodecId(i),
+    Codec::Id id = format->getSupportedCodecId(i);
+    RefPointer<CodecDescriptor> d = CodecDescriptor::make(id);
+    VS_LOG_DEBUG("  ID: %d, Tag: %d",
+        id,
         format->getSupportedCodecTag(i));
+    VS_LOG_DEBUG("    Name: %s", d->getName());
+    VS_LOG_DEBUG("    Type: %d", d->getType());
+    VS_LOG_DEBUG("    Long Name: %s", d->getLongName());
+    VS_LOG_DEBUG("    Properties: %d", d->getProperties());
   }
   VS_TUT_ENSURE("", strcmp("flv", format->getName()) == 0);
   format = OutputFormat::guessFormat(0, "foo.flv", 0);

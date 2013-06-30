@@ -188,7 +188,7 @@ public class OutputFormat extends ContainerFormat {
     return (cPtr == 0) ? null : new OutputFormat(cPtr, false);
   }
 
-  public Codec.Id guessCodec(String shortName, String filename, String mimeType, ContainerFormat.MediaType type) {
+  public Codec.Id guessCodec(String shortName, String filename, String mimeType, MediaDescriptor.Type type) {
     return Codec.Id.swigToEnum(VideoJNI.OutputFormat_guessCodec(swigCPtr, this, shortName, filename, mimeType, type.swigValue()));
   }
 

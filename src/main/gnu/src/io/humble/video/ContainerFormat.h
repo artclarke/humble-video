@@ -40,28 +40,6 @@ namespace io
       {
       public:
         /**
-         * The type of media contained in a container's stream
-         */
-        typedef enum MediaType
-        {
-          /** Usually treated as DATA */
-          MEDIA_UNKNOWN = AVMEDIA_TYPE_UNKNOWN,
-          /** Video data */
-          MEDIA_VIDEO = AVMEDIA_TYPE_VIDEO,
-          /** Audio data */
-          MEDIA_AUDIO = AVMEDIA_TYPE_AUDIO,
-          /** Opaque data, usually continuous */
-          MEDIA_DATA = AVMEDIA_TYPE_DATA,
-          /** Subtitle data */
-          MEDIA_SUBTITLE = AVMEDIA_TYPE_SUBTITLE,
-          /** Opaque data, usually sparse */
-          MEDIA_ATTACHMENT = AVMEDIA_TYPE_ATTACHMENT,
-  #ifndef SWIG
-          MEDIA_LAST_TYPE = AVMEDIA_TYPE_NB
-  #endif
-        };
-
-        /**
          * A series of flags that different {@link ContainerFormat}s and their subclasses
          * can support.
          */

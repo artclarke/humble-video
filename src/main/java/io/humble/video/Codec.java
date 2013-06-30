@@ -108,6 +108,14 @@ public class Codec extends RefCounted {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+/**
+ * Checks if this codec has the given capability.  
+ * @param	c Capability to check.  
+ */
+  public boolean hasCapability(Codec.CodecCapability c) {
+    return VideoJNI.Codec_hasCapability(swigCPtr, this, c.swigValue());
+  }
+
   public enum Id {
   /**
    * Identify the syntax and semantics of the bitstream.
@@ -518,6 +526,163 @@ public class Codec extends RefCounted {
 
     @SuppressWarnings("unused")
     private Id(Id swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
+  public enum CodecCapability {
+  /**
+   * Capabilities supported by a codec.
+   * Decoder can use draw_horiz_band callback.
+   */
+    CAP_DRAW_HORIZ_BAND(VideoJNI.Codec_CAP_DRAW_HORIZ_BAND_get()),
+  /**
+   * Codec uses get_buffer() for allocating buffers and supports custom 
+   * allocators.
+   * If not set, it might not use get_buffer() at all or use operations 
+   * that
+   * assume the buffer was allocated by avcodec_default_get_buffer.
+   */
+    CAP_DR1(VideoJNI.Codec_CAP_DR1_get()),
+    CAP_TRUNCATED(VideoJNI.Codec_CAP_TRUNCATED_get()),
+    CAP_HWACCEL(VideoJNI.Codec_CAP_HWACCEL_get()),
+  /**
+   * Encoder or decoder requires flushing with NULL input at the end in 
+   * order to
+   * give the complete and correct output.
+   * NOTE: If this flag is not set, the codec is guaranteed to never be 
+   * fed with
+   * with NULL data. The user can still send NULL data to the public encode 
+   *
+   * or decode function, but libavcodec will not pass it along to the 
+   * codec
+   * unless this flag is set.
+   * Decoders:
+   * The decoder has a non-zero delay and needs to be fed with avpkt->data=NULL, 
+   *
+   * avpkt->size=0 at the end to get the delayed data until the decoder 
+   * no longer
+   * returns frames.
+   * Encoders:
+   * The encoder needs to be fed with NULL data at the end of encoding 
+   * until the
+   * encoder no longer returns data.
+   * NOTE: Setting this
+   * flag also means that the encoder must set the pts and duration for 
+   *
+   * each output packet. If this flag is not set, the pts and duration 
+   * will
+   * be determined by libavcodec from the input frame.
+   */
+    CAP_DELAY(VideoJNI.Codec_CAP_DELAY_get()),
+  /**
+   * Codec can be fed a final frame with a smaller size.
+   * This can be used to prevent truncation of the last audio samples. 
+   *
+   */
+    CAP_SMALL_LAST_FRAME(VideoJNI.Codec_CAP_SMALL_LAST_FRAME_get()),
+  /**
+   * Codec can export data for HW decoding (VDPAU).
+   */
+    CAP_HWACCEL_VDPAU(VideoJNI.Codec_CAP_HWACCEL_VDPAU_get()),
+  /**
+   * Codec can output multiple frames per AVPacket
+   * Normally demuxers return one frame at a time, demuxers which do not 
+   * do
+   * are connected to a parser to split what they return into proper frames. 
+   *
+   * This flag is reserved to the very rare category of codecs which have 
+   * a
+   * bitstream that cannot be split into frames without timeconsuming 
+   *
+   * operations like full decoding. Demuxers carring such bitstreams thus 
+   *
+   * may return multiple frames in a packet. This has many disadvantages 
+   * like
+   * prohibiting stream copy in many cases thus it should only be considered 
+   *
+   * as a last resort.
+   */
+    CAP_SUBFRAMES(VideoJNI.Codec_CAP_SUBFRAMES_get()),
+  /**
+   * Codec is experimental and is thus avoided in favor of non experimental 
+   *
+   * encoders
+   */
+    CAP_EXPERIMENTAL(VideoJNI.Codec_CAP_EXPERIMENTAL_get()),
+  /**
+   * Codec should fill in channel configuration and samplerate instead 
+   * of container
+   */
+    CAP_CHANNEL_CONF(VideoJNI.Codec_CAP_CHANNEL_CONF_get()),
+  /**
+   * Codec is able to deal with negative linesizes
+   */
+    CAP_NEG_LINESIZES(VideoJNI.Codec_CAP_NEG_LINESIZES_get()),
+  /**
+   * Codec supports frame-level multithreading.
+   */
+    CAP_FRAME_THREADS(VideoJNI.Codec_CAP_FRAME_THREADS_get()),
+  /**
+   *
+   */
+    CAP_SLICE_THREADS(VideoJNI.Codec_CAP_SLICE_THREADS_get()),
+  /**
+   * Codec supports changed parameters at any point.
+   */
+    CAP_PARAM_CHANGE(VideoJNI.Codec_CAP_PARAM_CHANGE_get()),
+  /**
+   * Codec supports avctx->thread_count == 0 (auto).
+   */
+    CAP_AUTO_THREADS(VideoJNI.Codec_CAP_AUTO_THREADS_get()),
+  /**
+   * Audio encoder supports receiving a different number of samples in 
+   * each call.
+   */
+    CAP_VARIABLE_FRAME_SIZE(VideoJNI.Codec_CAP_VARIABLE_FRAME_SIZE_get()),
+  /**
+   * Codec is intra only.
+   */
+    CAP_INTRA_ONLY(VideoJNI.Codec_CAP_INTRA_ONLY_get()),
+  /**
+   * Codec is lossless.
+   */
+    CAP_LOSSLESS(VideoJNI.Codec_CAP_LOSSLESS_get());
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static CodecCapability swigToEnum(int swigValue) {
+      CodecCapability[] swigValues = CodecCapability.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (CodecCapability swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + CodecCapability.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private CodecCapability() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private CodecCapability(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private CodecCapability(CodecCapability swigEnum) {
       this.swigValue = swigEnum.swigValue;
       SwigNext.next = this.swigValue+1;
     }

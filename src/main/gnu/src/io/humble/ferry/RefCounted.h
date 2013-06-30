@@ -206,7 +206,8 @@ namespace io { namespace humble { namespace ferry {
  private: \
     __class &operator=(const __class &); \
     __class(const __class &); \
-    static void * operator new (size_t aSize) { return ::operator new(aSize); }
+    static void * operator new (std::size_t aSize, const std::nothrow_t& nothrow_value) { return ::operator new(aSize, nothrow_value); } \
+    static void * operator new (std::size_t aSize) throw (std::bad_alloc) { return ::operator new(aSize); }
 
 #define VS_JNIUTILS_REFCOUNTED_OBJECT(__class) \
     public: \

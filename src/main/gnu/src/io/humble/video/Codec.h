@@ -26,14 +26,167 @@
 #define CODEC_H_
 
 #include <io/humble/ferry/RefCounted.h>
+#include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/HumbleVideo.h>
 
-namespace io { namespace humble { namespace video {
+namespace io {
+namespace humble {
+namespace video {
+
+class VS_API_HUMBLEVIDEO MediaDescriptor : public io::humble::ferry::RefCounted
+{
+VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MediaDescriptor)
+public:
+  /**
+   * The type of media contained in a container's stream
+   */
+  typedef enum Type
+  {
+    /** Usually treated as DATA */
+    MEDIA_UNKNOWN = AVMEDIA_TYPE_UNKNOWN,
+    /** Video data */
+    MEDIA_VIDEO = AVMEDIA_TYPE_VIDEO,
+    /** Audio data */
+    MEDIA_AUDIO = AVMEDIA_TYPE_AUDIO,
+    /** Opaque data, usually continuous */
+    MEDIA_DATA = AVMEDIA_TYPE_DATA,
+    /** Subtitle data */
+    MEDIA_SUBTITLE = AVMEDIA_TYPE_SUBTITLE,
+    /** Opaque data, usually sparse */
+    MEDIA_ATTACHMENT = AVMEDIA_TYPE_ATTACHMENT,
+#ifndef SWIG
+    MEDIA_LAST_TYPE = AVMEDIA_TYPE_NB
+#endif
+  } Type;
+
+private:
+  MediaDescriptor()
+  {
+  }
+  virtual
+  ~MediaDescriptor()
+  {
+  }
+};
+
+/**
+ * A profile supported by a {@link Codec}.
+ */
+class VS_API_HUMBLEVIDEO CodecProfile : public io::humble::ferry::RefCounted
+{
+VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(CodecProfile)
+public:
+  /** An enum of known about Profiles. Note these
+   * constants are not guaranteed to remain accessible
+   * through releases, and so should be only used
+   * to display meta information.
+   */
+  typedef enum ProfileType
+  {
+    PROFILE_UNKNOWN = FF_PROFILE_UNKNOWN,
+    PROFILE_RESERVED = FF_PROFILE_RESERVED,
+
+    PROFILE_AAC_MAIN = FF_PROFILE_AAC_MAIN,
+    PROFILE_AAC_LOW = FF_PROFILE_AAC_LOW,
+    PROFILE_AAC_SSR = FF_PROFILE_AAC_SSR,
+    PROFILE_AAC_LTP = FF_PROFILE_AAC_LTP,
+    PROFILE_AAC_HE = FF_PROFILE_AAC_HE,
+    PROFILE_AAC_HE_V2 = FF_PROFILE_AAC_HE_V2,
+    PROFILE_AAC_LD = FF_PROFILE_AAC_LD,
+    PROFILE_AAC_ELD = FF_PROFILE_AAC_ELD,
+
+    PROFILE_DTS = FF_PROFILE_DTS,
+    PROFILE_DTS_ES = FF_PROFILE_DTS_ES,
+    PROFILE_DTS_96_24 = FF_PROFILE_DTS_96_24,
+    PROFILE_DTS_HD_HRA = FF_PROFILE_DTS_HD_HRA,
+    PROFILE_DTS_HD_MA = FF_PROFILE_DTS_HD_MA,
+
+    PROFILE_MPEG2_422 = FF_PROFILE_MPEG2_422,
+    PROFILE_MPEG2_HIGH = FF_PROFILE_MPEG2_HIGH,
+    PROFILE_MPEG2_SS = FF_PROFILE_MPEG2_SS,
+    PROFILE_MPEG2_SNR_SCALABLE = FF_PROFILE_MPEG2_SNR_SCALABLE,
+    PROFILE_MPEG2_MAIN = FF_PROFILE_MPEG2_MAIN,
+    PROFILE_MPEG2_SIMPLE = FF_PROFILE_MPEG2_SIMPLE,
+
+    PROFILE_H264_CONSTRAINED = FF_PROFILE_H264_CONSTRAINED,
+    PROFILE_H264_INTRA = FF_PROFILE_H264_INTRA,
+
+    PROFILE_H264_BASELINE = FF_PROFILE_H264_BASELINE,
+    PROFILE_H264_CONSTRAINED_BASELINE = FF_PROFILE_H264_CONSTRAINED_BASELINE,
+    PROFILE_H264_MAIN = FF_PROFILE_H264_MAIN,
+    PROFILE_H264_EXTENDED = FF_PROFILE_H264_EXTENDED,
+    PROFILE_H264_HIGH = FF_PROFILE_H264_HIGH,
+    PROFILE_H264_HIGH_10 = FF_PROFILE_H264_HIGH_10,
+    PROFILE_H264_HIGH_10_INTRA = FF_PROFILE_H264_HIGH_10_INTRA,
+    PROFILE_H264_HIGH_422 = FF_PROFILE_H264_HIGH_422,
+    PROFILE_H264_HIGH_422_INTRA = FF_PROFILE_H264_HIGH_422_INTRA,
+    PROFILE_H264_HIGH_444 = FF_PROFILE_H264_HIGH_444,
+    PROFILE_H264_HIGH_444_PREDICTIVE = FF_PROFILE_H264_HIGH_444_PREDICTIVE,
+    PROFILE_H264_HIGH_444_INTRA = FF_PROFILE_H264_HIGH_444_INTRA,
+    PROFILE_H264_CAVLC_444 = FF_PROFILE_H264_CAVLC_444,
+
+    PROFILE_VC1_SIMPLE = FF_PROFILE_VC1_SIMPLE,
+    PROFILE_VC1_MAIN = FF_PROFILE_VC1_MAIN,
+    PROFILE_VC1_COMPLEX = FF_PROFILE_VC1_COMPLEX,
+    PROFILE_VC1_ADVANCED = FF_PROFILE_VC1_ADVANCED,
+
+    PROFILE_MPEG4_SIMPLE = FF_PROFILE_MPEG4_SIMPLE,
+    PROFILE_MPEG4_SIMPLE_SCALABLE = FF_PROFILE_MPEG4_SIMPLE_SCALABLE,
+    PROFILE_MPEG4_CORE = FF_PROFILE_MPEG4_CORE,
+    PROFILE_MPEG4_MAIN = FF_PROFILE_MPEG4_MAIN,
+    PROFILE_MPEG4_N_BIT = FF_PROFILE_MPEG4_N_BIT,
+    PROFILE_MPEG4_SCALABLE_TEXTURE = FF_PROFILE_MPEG4_SCALABLE_TEXTURE,
+    PROFILE_MPEG4_SIMPLE_FACE_ANIMATION = FF_PROFILE_MPEG4_SIMPLE_FACE_ANIMATION,
+    PROFILE_MPEG4_BASIC_ANIMATED_TEXTURE = FF_PROFILE_MPEG4_BASIC_ANIMATED_TEXTURE,
+    PROFILE_MPEG4_HYBRID = FF_PROFILE_MPEG4_HYBRID,
+    PROFILE_MPEG4_ADVANCED_REAL_TIME = FF_PROFILE_MPEG4_ADVANCED_REAL_TIME,
+    PROFILE_MPEG4_CORE_SCALABLE = FF_PROFILE_MPEG4_CORE_SCALABLE,
+    PROFILE_MPEG4_ADVANCED_CODING = FF_PROFILE_MPEG4_ADVANCED_CODING,
+    PROFILE_MPEG4_ADVANCED_CORE = FF_PROFILE_MPEG4_ADVANCED_CORE,
+    PROFILE_MPEG4_ADVANCED_SCALABLE_TEXTURE = FF_PROFILE_MPEG4_ADVANCED_SCALABLE_TEXTURE,
+    PROFILE_MPEG4_SIMPLE_STUDIO = FF_PROFILE_MPEG4_SIMPLE_STUDIO,
+    PROFILE_MPEG4_ADVANCED_SIMPLE = FF_PROFILE_MPEG4_ADVANCED_SIMPLE,
+  } ProfileType;
+  /** Get the type for this profile. */
+  virtual ProfileType
+  getProfile()
+  {
+    return (ProfileType) mProfile->profile;
+  }
+  /** Get the name for this profile. */
+  virtual const char *
+  getName()
+  {
+    return mProfile->name;
+  }
+#ifndef SWIG
+  CodecProfile *
+  make(AVProfile * p)
+  {
+    CodecProfile* retval = 0;
+    if (p)
+    {
+      retval = make();
+      retval->mProfile = p;
+    }
+    return retval;
+  }
+#endif // ! SWIG
+private:
+  CodecProfile() :
+      mProfile(0)
+  {
+  }
+  virtual
+  ~CodecProfile();
+  AVProfile* mProfile;
+};
 
 class VS_API_HUMBLEVIDEO Codec : public io::humble::ferry::RefCounted
 {
-  VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(Codec)
+VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(Codec)
 public:
+
   typedef enum Id
   {
     /**
@@ -442,11 +595,266 @@ public:
     ID_FFMETADATA = 0x21000,
 
   } Id;
+
+  /**
+   * Capabilities supported by a codec.
+   */
+  typedef enum CodecCapability
+  {
+    /** Decoder can use draw_horiz_band callback. */
+    CAP_DRAW_HORIZ_BAND = CODEC_CAP_DRAW_HORIZ_BAND,
+    /**
+     * Codec uses get_buffer() for allocating buffers and supports custom allocators.
+     * If not set, it might not use get_buffer() at all or use operations that
+     * assume the buffer was allocated by avcodec_default_get_buffer.
+     */
+    CAP_DR1 = CODEC_CAP_DR1, CAP_TRUNCATED = CODEC_CAP_TRUNCATED,
+    /* Codec can export data for HW decoding (XvMC). */
+    CAP_HWACCEL = CODEC_CAP_HWACCEL,
+    /**
+     * Encoder or decoder requires flushing with NULL input at the end in order to
+     * give the complete and correct output.
+     *
+     * NOTE: If this flag is not set, the codec is guaranteed to never be fed with
+     *       with NULL data. The user can still send NULL data to the public encode
+     *       or decode function, but libavcodec will not pass it along to the codec
+     *       unless this flag is set.
+     *
+     * Decoders:
+     * The decoder has a non-zero delay and needs to be fed with avpkt->data=NULL,
+     * avpkt->size=0 at the end to get the delayed data until the decoder no longer
+     * returns frames.
+     *
+     * Encoders:
+     * The encoder needs to be fed with NULL data at the end of encoding until the
+     * encoder no longer returns data.
+     *
+     * NOTE: Setting this
+     *       flag also means that the encoder must set the pts and duration for
+     *       each output packet. If this flag is not set, the pts and duration will
+     *       be determined by libavcodec from the input frame.
+     */
+    CAP_DELAY = CODEC_CAP_DELAY,
+    /**
+     * Codec can be fed a final frame with a smaller size.
+     * This can be used to prevent truncation of the last audio samples.
+     */
+    CAP_SMALL_LAST_FRAME = CODEC_CAP_SMALL_LAST_FRAME,
+    /**
+     * Codec can export data for HW decoding (VDPAU).
+     */
+    CAP_HWACCEL_VDPAU = CODEC_CAP_HWACCEL_VDPAU,
+    /**
+     * Codec can output multiple frames per AVPacket
+     * Normally demuxers return one frame at a time, demuxers which do not do
+     * are connected to a parser to split what they return into proper frames.
+     * This flag is reserved to the very rare category of codecs which have a
+     * bitstream that cannot be split into frames without timeconsuming
+     * operations like full decoding. Demuxers carring such bitstreams thus
+     * may return multiple frames in a packet. This has many disadvantages like
+     * prohibiting stream copy in many cases thus it should only be considered
+     * as a last resort.
+     */
+    CAP_SUBFRAMES = CODEC_CAP_SUBFRAMES,
+    /**
+     * Codec is experimental and is thus avoided in favor of non experimental
+     * encoders
+     */
+    CAP_EXPERIMENTAL = CODEC_CAP_EXPERIMENTAL,
+    /**
+     * Codec should fill in channel configuration and samplerate instead of container
+     */
+    CAP_CHANNEL_CONF = CODEC_CAP_CHANNEL_CONF,
+
+    /**
+     * Codec is able to deal with negative linesizes
+     */
+    CAP_NEG_LINESIZES = CODEC_CAP_NEG_LINESIZES,
+
+    /**
+     * Codec supports frame-level multithreading.
+     */
+    CAP_FRAME_THREADS = CODEC_CAP_FRAME_THREADS,
+    /**
+     * Codec supports slice-based (or partition-based) multithreading.
+     */
+    CAP_SLICE_THREADS = CODEC_CAP_SLICE_THREADS,
+    /**
+     * Codec supports changed parameters at any point.
+     */
+    CAP_PARAM_CHANGE = CODEC_CAP_PARAM_CHANGE,
+    /**
+     * Codec supports avctx->thread_count == 0 (auto).
+     */
+    CAP_AUTO_THREADS = CODEC_CAP_AUTO_THREADS,
+    /**
+     * Audio encoder supports receiving a different number of samples in each call.
+     */
+    CAP_VARIABLE_FRAME_SIZE = CODEC_CAP_VARIABLE_FRAME_SIZE,
+    /**
+     * Codec is intra only.
+     */
+    CAP_INTRA_ONLY = CODEC_CAP_INTRA_ONLY,
+    /**
+     * Codec is lossless.
+     */
+    CAP_LOSSLESS = CODEC_CAP_LOSSLESS,
+  } CodecCapability;
+
+  /**
+   * Checks if this codec has the given capability.
+   * @param c Capability to check.
+   */
+  virtual bool
+  hasCapability(CodecCapability c)
+  {
+    bool retval = false;
+    if (mCodec) retval = mCodec->capabilities & c;
+    return retval;
+  }
+
+protected:
+  Codec*
+  make(AVCodec* codec)
+  {
+    Codec* retval = 0;
+    if (codec)
+    {
+      retval = make();
+      if (retval)
+      {
+        retval->mCodec = codec;
+      }
+    }
+    return retval;
+  }
 private:
-  Codec() {}
-  virtual ~Codec() {}
+  Codec() :
+      mCodec(0)
+  {
+  }
+  virtual
+  ~Codec()
+  {
+  }
+
+  AVCodec* mCodec;
 };
 
-}}}
+class VS_API_HUMBLEVIDEO CodecDescriptor : public io::humble::ferry::RefCounted
+{
+VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(CodecDescriptor)
+public:
+  /** Properties supported by a codec. */
+  typedef enum CodecProperty
+  {
+
+    /**
+     * Codec uses only intra compression.
+     * Video codecs only.
+     */
+    PROP_INTRA_ONLY = AV_CODEC_PROP_INTRA_ONLY,
+    /**
+     * Codec supports lossy compression. Audio and video codecs only.
+     * @note a codec may support both lossy and lossless
+     * compression modes
+     */
+    PROP_LOSSY = AV_CODEC_PROP_LOSSY,
+    /**
+     * Codec supports lossless compression. Audio and video codecs only.
+     */
+    PROP_LOSSLESS = AV_CODEC_PROP_LOSSLESS,
+    /**
+     * Subtitle codec is bitmap based
+     */
+    PROP_BITMAP_SUB = AV_CODEC_PROP_BITMAP_SUB,
+  } CodecProperty;
+  /**
+   * Checks if this codec has the given property.
+   * @param p property to check
+   */
+  virtual bool
+  hasProperty(CodecProperty p)
+  {
+    bool retval = false;
+    if (mDescriptor) retval = p & mDescriptor->props;
+    return retval;
+  }
+
+  /**
+   * Name of the codec. Unique for each codec. Will contain only
+   * alphanumeric and _ characters.
+   */
+  virtual const char*
+  getName()
+  {
+    return mDescriptor->name;
+  }
+  /**
+   * A more descriptive name for this codec.
+   */
+  virtual const char*
+  getLongName()
+  {
+    return mDescriptor->long_name;
+  }
+  /**
+   * A bit mask of {@link Codec.Properties} this codec has.
+   */
+  virtual int32_t
+  getProperties()
+  {
+    return mDescriptor->props;
+  }
+
+  /** Get the codec ID for this descriptor */
+  virtual Codec::Id
+  getId()
+  {
+    return (Codec::Id) mDescriptor->id;
+  }
+
+  virtual MediaDescriptor::Type
+  getType()
+  {
+    return (MediaDescriptor::Type) mDescriptor->type;
+  }
+  /**
+   * Get the descriptor for the given id.
+   */
+  static CodecDescriptor* make(Codec::Id id)
+  {
+    const AVCodecDescriptor* d = avcodec_descriptor_get((enum AVCodecID)id);
+    return make(d);
+  }
+
+#ifndef SWIG
+  static CodecDescriptor*
+  make(const AVCodecDescriptor *d)
+  {
+    CodecDescriptor* retval = 0;
+    if (d)
+    {
+      retval = make();
+      retval->mDescriptor = d;
+    }
+    return retval;
+  }
+#endif // ! SWIG
+private:
+  CodecDescriptor() :
+      mDescriptor(0)
+  {
+  }
+  virtual
+  ~CodecDescriptor()
+  {
+  }
+  const AVCodecDescriptor *mDescriptor;
+};
+
+}
+}
+}
 
 #endif /* CODEC_H_ */
