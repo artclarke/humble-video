@@ -122,7 +122,7 @@ public class Codec extends RefCounted {
     return VideoJNI.Codec_hasCapability(swigCPtr, this, c.swigValue());
   }
 
-  public enum Id {
+  public enum ID {
   /**
    * Identify the syntax and semantics of the bitstream.
    * The principle is roughly:
@@ -509,29 +509,29 @@ public class Codec extends RefCounted {
       return swigValue;
     }
 
-    public static Id swigToEnum(int swigValue) {
-      Id[] swigValues = Id.class.getEnumConstants();
+    public static ID swigToEnum(int swigValue) {
+      ID[] swigValues = ID.class.getEnumConstants();
       if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
         return swigValues[swigValue];
-      for (Id swigEnum : swigValues)
+      for (ID swigEnum : swigValues)
         if (swigEnum.swigValue == swigValue)
           return swigEnum;
-      throw new IllegalArgumentException("No enum " + Id.class + " with value " + swigValue);
+      throw new IllegalArgumentException("No enum " + ID.class + " with value " + swigValue);
     }
 
     @SuppressWarnings("unused")
-    private Id() {
+    private ID() {
       this.swigValue = SwigNext.next++;
     }
 
     @SuppressWarnings("unused")
-    private Id(int swigValue) {
+    private ID(int swigValue) {
       this.swigValue = swigValue;
       SwigNext.next = swigValue+1;
     }
 
     @SuppressWarnings("unused")
-    private Id(Id swigEnum) {
+    private ID(ID swigEnum) {
       this.swigValue = swigEnum.swigValue;
       SwigNext.next = this.swigValue+1;
     }

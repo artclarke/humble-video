@@ -3,9 +3,6 @@ package io.humble.video;
 import java.util.Collection;
 import java.util.List;
 
-import io.humble.video.Codec.Id;
-import io.humble.video.MediaDescriptor;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +23,13 @@ public class OutputFormatTest extends TestCase {
     f = OutputFormat.guessFormat("mp4", null, null);
     assertNotNull(f);
     
-    assertEquals(Codec.Id.ID_AAC, f.getDefaultAudioCodecId());
-    assertEquals(Codec.Id.ID_H264, f.getDefaultVideoCodecId());
-    assertEquals(Codec.Id.ID_NONE, f.getDefaultSubtitleCodecId());
+    assertEquals(Codec.ID.ID_AAC, f.getDefaultAudioCodecId());
+    assertEquals(Codec.ID.ID_H264, f.getDefaultVideoCodecId());
+    assertEquals(Codec.ID.ID_NONE, f.getDefaultSubtitleCodecId());
     
-    assertEquals(Codec.Id.ID_AAC, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_AUDIO));
-    assertEquals(Codec.Id.ID_H264, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_VIDEO));
-    assertEquals(Codec.Id.ID_NONE, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_SUBTITLE));
+    assertEquals(Codec.ID.ID_AAC, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_AUDIO));
+    assertEquals(Codec.ID.ID_H264, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_VIDEO));
+    assertEquals(Codec.ID.ID_NONE, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_SUBTITLE));
   }
   
   @Test
@@ -40,7 +37,7 @@ public class OutputFormatTest extends TestCase {
     final OutputFormat f = OutputFormat.guessFormat("mp4", null, null);
     assertNotNull(f);
     
-    final List<Id> l = f.getSupportedCodecs();
+    final List<Codec.ID> l = f.getSupportedCodecs();
     assertEquals(20, l.size());
   }
 

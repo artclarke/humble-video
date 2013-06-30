@@ -64,7 +64,7 @@ InputFormatTest::testCreateInputFormat() {
   int32_t n = format->getNumSupportedCodecs();
   VS_LOG_DEBUG("# Supported Codecs: %d", n);
   for(int32_t i = 0; i < n; i++) {
-    Codec::Id id = format->getSupportedCodecId(i);
+    Codec::ID id = format->getSupportedCodecId(i);
     RefPointer<CodecDescriptor> d = CodecDescriptor::make(id);
     VS_LOG_DEBUG("  ID: %d, Tag: %d",
         id,

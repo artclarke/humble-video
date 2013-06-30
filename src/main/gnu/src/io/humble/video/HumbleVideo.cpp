@@ -1917,11 +1917,11 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_CodecProfile_1getName(J
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1BRENDER_1PIX_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_BRENDER_PIX;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_BRENDER_PIX;
   jresult = (jint)result; 
   return jresult;
 }
@@ -1929,11 +1929,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1BRENDER_1PIX_1g
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1Y41P_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_Y41P;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_Y41P;
   jresult = (jint)result; 
   return jresult;
 }
@@ -1941,11 +1941,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1Y41P_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1ESCAPE130_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_ESCAPE130;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_ESCAPE130;
   jresult = (jint)result; 
   return jresult;
 }
@@ -1953,11 +1953,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1ESCAPE130_1get(
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1EXR_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_EXR;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_EXR;
   jresult = (jint)result; 
   return jresult;
 }
@@ -1965,11 +1965,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1EXR_1get(JNIEnv
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1AVRP_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_AVRP;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_AVRP;
   jresult = (jint)result; 
   return jresult;
 }
@@ -1977,11 +1977,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1AVRP_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1012V_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_012V;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_012V;
   jresult = (jint)result; 
   return jresult;
 }
@@ -1989,11 +1989,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1012V_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1G2M_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_G2M;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_G2M;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2001,11 +2001,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1G2M_1get(JNIEnv
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1AVUI_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_AVUI;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_AVUI;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2013,11 +2013,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1AVUI_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1AYUV_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_AYUV;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_AYUV;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2025,11 +2025,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1AYUV_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1TARGA_1Y216_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_TARGA_Y216;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_TARGA_Y216;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2037,11 +2037,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1TARGA_1Y216_1ge
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1V308_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_V308;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_V308;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2049,11 +2049,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1V308_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1V408_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_V408;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_V408;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2061,11 +2061,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1V408_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1YUV4_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_YUV4;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_YUV4;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2073,11 +2073,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1YUV4_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SANM_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_SANM;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_SANM;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2085,11 +2085,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SANM_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PAF_1VIDEO_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_PAF_VIDEO;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_PAF_VIDEO;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2097,11 +2097,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PAF_1VIDEO_1get
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1AVRN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_AVRN;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_AVRN;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2109,11 +2109,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1AVRN_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1CPIA_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_CPIA;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_CPIA;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2121,11 +2121,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1CPIA_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1XFACE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_XFACE;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_XFACE;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2133,11 +2133,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1XFACE_1get(JNIE
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SGIRLE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_SGIRLE;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_SGIRLE;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2145,11 +2145,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SGIRLE_1get(JNI
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MVC1_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_MVC1;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_MVC1;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2157,11 +2157,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MVC1_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MVC2_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_MVC2;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_MVC2;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2169,11 +2169,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MVC2_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1FIRST_1AUDIO_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_FIRST_AUDIO;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_FIRST_AUDIO;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2181,11 +2181,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1FIRST_1AUDIO_1g
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PCM_1S16LE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_PCM_S16LE;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_PCM_S16LE;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2193,11 +2193,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PCM_1S16LE_1get
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PCM_1S24LE_1PLANAR_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_PCM_S24LE_PLANAR;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_PCM_S24LE_PLANAR;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2205,11 +2205,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PCM_1S24LE_1PLA
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PCM_1S32LE_1PLANAR_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_PCM_S32LE_PLANAR;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_PCM_S32LE_PLANAR;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2217,11 +2217,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PCM_1S32LE_1PLA
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PCM_1S16BE_1PLANAR_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_PCM_S16BE_PLANAR;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_PCM_S16BE_PLANAR;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2229,11 +2229,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PCM_1S16BE_1PLA
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1ADPCM_1IMA_1QT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_ADPCM_IMA_QT;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_ADPCM_IMA_QT;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2241,11 +2241,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1ADPCM_1IMA_1QT_
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1VIMA_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_VIMA;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_VIMA;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2253,11 +2253,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1VIMA_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1ADPCM_1AFC_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_ADPCM_AFC;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_ADPCM_AFC;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2265,11 +2265,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1ADPCM_1AFC_1get
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1ADPCM_1IMA_1OKI_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_ADPCM_IMA_OKI;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_ADPCM_IMA_OKI;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2277,11 +2277,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1ADPCM_1IMA_1OKI
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1AMR_1NB_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_AMR_NB;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_AMR_NB;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2289,11 +2289,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1AMR_1NB_1get(JN
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1RA_1144_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_RA_144;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_RA_144;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2301,11 +2301,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1RA_1144_1get(JN
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1ROQ_1DPCM_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_ROQ_DPCM;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_ROQ_DPCM;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2313,11 +2313,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1ROQ_1DPCM_1get(
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MP2_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_MP2;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_MP2;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2325,11 +2325,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MP2_1get(JNIEnv
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1FFWAVESYNTH_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_FFWAVESYNTH;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_FFWAVESYNTH;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2337,11 +2337,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1FFWAVESYNTH_1ge
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_18SVX_1RAW_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_8SVX_RAW;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_8SVX_RAW;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2349,11 +2349,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_18SVX_1RAW_1get(
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SONIC_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_SONIC;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_SONIC;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2361,11 +2361,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SONIC_1get(JNIE
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SONIC_1LS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_SONIC_LS;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_SONIC_LS;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2373,11 +2373,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SONIC_1LS_1get(
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PAF_1AUDIO_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_PAF_AUDIO;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_PAF_AUDIO;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2385,11 +2385,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PAF_1AUDIO_1get
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1OPUS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_OPUS;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_OPUS;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2397,11 +2397,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1OPUS_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1TAK_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_TAK;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_TAK;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2409,11 +2409,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1TAK_1get(JNIEnv
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1EVRC_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_EVRC;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_EVRC;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2421,11 +2421,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1EVRC_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SMV_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_SMV;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_SMV;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2433,11 +2433,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SMV_1get(JNIEnv
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1FIRST_1SUBTITLE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_FIRST_SUBTITLE;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_FIRST_SUBTITLE;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2445,11 +2445,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1FIRST_1SUBTITLE
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1DVD_1SUBTITLE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_DVD_SUBTITLE;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_DVD_SUBTITLE;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2457,11 +2457,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1DVD_1SUBTITLE_1
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MICRODVD_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_MICRODVD;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_MICRODVD;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2469,11 +2469,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MICRODVD_1get(J
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1EIA_1608_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_EIA_608;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_EIA_608;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2481,11 +2481,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1EIA_1608_1get(J
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1JACOSUB_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_JACOSUB;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_JACOSUB;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2493,11 +2493,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1JACOSUB_1get(JN
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SAMI_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_SAMI;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_SAMI;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2505,11 +2505,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SAMI_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1REALTEXT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_REALTEXT;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_REALTEXT;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2517,11 +2517,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1REALTEXT_1get(J
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SUBVIEWER1_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_SUBVIEWER1;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_SUBVIEWER1;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2529,11 +2529,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SUBVIEWER1_1get
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SUBVIEWER_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_SUBVIEWER;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_SUBVIEWER;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2541,11 +2541,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SUBVIEWER_1get(
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SUBRIP_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_SUBRIP;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_SUBRIP;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2553,11 +2553,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SUBRIP_1get(JNI
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1WEBVTT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_WEBVTT;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_WEBVTT;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2565,11 +2565,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1WEBVTT_1get(JNI
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MPL2_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_MPL2;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_MPL2;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2577,11 +2577,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MPL2_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1VPLAYER_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_VPLAYER;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_VPLAYER;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2589,11 +2589,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1VPLAYER_1get(JN
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PJS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_PJS;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_PJS;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2601,11 +2601,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PJS_1get(JNIEnv
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1FIRST_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_FIRST_UNKNOWN;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_FIRST_UNKNOWN;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2613,11 +2613,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1FIRST_1UNKNOWN_
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1TTF_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_TTF;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_TTF;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2625,11 +2625,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1TTF_1get(JNIEnv
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1BINTEXT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_BINTEXT;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_BINTEXT;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2637,11 +2637,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1BINTEXT_1get(JN
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1XBIN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_XBIN;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_XBIN;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2649,11 +2649,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1XBIN_1get(JNIEn
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1IDF_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_IDF;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_IDF;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2661,11 +2661,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1IDF_1get(JNIEnv
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1OTF_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_OTF;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_OTF;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2673,11 +2673,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1OTF_1get(JNIEnv
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SMPTE_1KLV_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_SMPTE_KLV;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_SMPTE_KLV;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2685,11 +2685,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1SMPTE_1KLV_1get
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PROBE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_PROBE;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_PROBE;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2697,11 +2697,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1PROBE_1get(JNIE
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MPEG2TS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_MPEG2TS;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_MPEG2TS;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2709,11 +2709,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MPEG2TS_1get(JN
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MPEG4SYSTEMS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_MPEG4SYSTEMS;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_MPEG4SYSTEMS;
   jresult = (jint)result; 
   return jresult;
 }
@@ -2721,11 +2721,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1MPEG4SYSTEMS_1g
 
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1ID_1FFMETADATA_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Codec::Id)io::humble::video::Codec::ID_FFMETADATA;
+  result = (io::humble::video::Codec::ID)io::humble::video::Codec::ID_FFMETADATA;
   jresult = (jint)result; 
   return jresult;
 }
@@ -3387,7 +3387,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getProper
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   io::humble::video::CodecDescriptor *arg1 = (io::humble::video::CodecDescriptor *) 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
@@ -3405,7 +3405,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getId(JNI
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Codec::Id)(arg1)->getId();
+      result = (io::humble::video::Codec::ID)(arg1)->getId();
     }
     catch(std::invalid_argument & e)
     {
@@ -3540,12 +3540,12 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getType(J
 
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1make(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
-  io::humble::video::Codec::Id arg1 ;
+  io::humble::video::Codec::ID arg1 ;
   io::humble::video::CodecDescriptor *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (io::humble::video::Codec::Id)jarg1; 
+  arg1 = (io::humble::video::Codec::ID)jarg1; 
   {
     // JNIHelper.swg: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -8202,7 +8202,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getSuppor
   jint jresult = 0 ;
   io::humble::video::ContainerFormat *arg1 = (io::humble::video::ContainerFormat *) 0 ;
   int32_t arg2 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
@@ -8221,7 +8221,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getSuppor
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Codec::Id)(arg1)->getSupportedCodecId(arg2);
+      result = (io::humble::video::Codec::ID)(arg1)->getSupportedCodecId(arg2);
     }
     catch(std::invalid_argument & e)
     {
@@ -8739,7 +8739,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getFlags(JNI
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultAudioCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
@@ -8757,7 +8757,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultAu
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Codec::Id)(arg1)->getDefaultAudioCodecId();
+      result = (io::humble::video::Codec::ID)(arg1)->getDefaultAudioCodecId();
     }
     catch(std::invalid_argument & e)
     {
@@ -8816,7 +8816,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultAu
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultVideoCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
@@ -8834,7 +8834,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultVi
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Codec::Id)(arg1)->getDefaultVideoCodecId();
+      result = (io::humble::video::Codec::ID)(arg1)->getDefaultVideoCodecId();
     }
     catch(std::invalid_argument & e)
     {
@@ -8893,7 +8893,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultVi
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultSubtitleCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
@@ -8911,7 +8911,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultSu
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Codec::Id)(arg1)->getDefaultSubtitleCodecId();
+      result = (io::humble::video::Codec::ID)(arg1)->getDefaultSubtitleCodecId();
     }
     catch(std::invalid_argument & e)
     {
@@ -9139,7 +9139,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1guessCodec(J
   char *arg3 = (char *) 0 ;
   char *arg4 = (char *) 0 ;
   io::humble::video::MediaDescriptor::Type arg5 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
@@ -9173,7 +9173,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1guessCodec(J
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Codec::Id)(arg1)->guessCodec((char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
+      result = (io::humble::video::Codec::ID)(arg1)->guessCodec((char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
     }
     catch(std::invalid_argument & e)
     {
@@ -9313,7 +9313,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getSupported
   jint jresult = 0 ;
   io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
   int32_t arg2 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
@@ -9332,7 +9332,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getSupported
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Codec::Id)(arg1)->getSupportedCodecId(arg2);
+      result = (io::humble::video::Codec::ID)(arg1)->getSupportedCodecId(arg2);
     }
     catch(std::invalid_argument & e)
     {
@@ -9992,7 +9992,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getSupportedC
   jint jresult = 0 ;
   io::humble::video::InputFormat *arg1 = (io::humble::video::InputFormat *) 0 ;
   int32_t arg2 ;
-  io::humble::video::Codec::Id result;
+  io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
@@ -10011,7 +10011,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getSupportedC
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Codec::Id)(arg1)->getSupportedCodecId(arg2);
+      result = (io::humble::video::Codec::ID)(arg1)->getSupportedCodecId(arg2);
     }
     catch(std::invalid_argument & e)
     {

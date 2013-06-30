@@ -186,8 +186,8 @@ public class InputFormat extends ContainerFormat {
  * @return	the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} 
  *		 if none.  
  */
-  protected Codec.Id getSupportedCodecId(int n) {
-    return Codec.Id.swigToEnum(VideoJNI.InputFormat_getSupportedCodecId(swigCPtr, this, n));
+  protected Codec.ID getSupportedCodecId(int n) {
+    return Codec.ID.swigToEnum(VideoJNI.InputFormat_getSupportedCodecId(swigCPtr, this, n));
   }
 
 /**

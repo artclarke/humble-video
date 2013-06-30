@@ -137,7 +137,7 @@ namespace io
          *   n must be < {@link #getNumSupportedCodecs()}
          * @return the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} if none.
          */
-        virtual Codec::Id getSupportedCodecId(int32_t n) = 0;
+        virtual Codec::ID getSupportedCodecId(int32_t n) = 0;
         /**
          * Get the 32-bit Codec Tag for the n'th codec supported by this container.
          *
@@ -160,7 +160,7 @@ namespace io
          *   n must be < {@link #getNumSupportedCodecs()}
          * @return the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} if none.
          */
-        static Codec::Id getSupportedCodecId(const struct AVCodecTag * const * tags, int32_t n);
+        static Codec::ID getSupportedCodecId(const struct AVCodecTag * const * tags, int32_t n);
 
         /**
          * Get the 32-bit Codec Tag for the n'th codec supported by this container.

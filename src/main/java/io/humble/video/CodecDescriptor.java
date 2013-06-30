@@ -163,8 +163,8 @@ public class CodecDescriptor extends RefCounted {
 /**
  * Get the codec ID for this descriptor  
  */
-  public Codec.Id getId() {
-    return Codec.Id.swigToEnum(VideoJNI.CodecDescriptor_getId(swigCPtr, this));
+  public Codec.ID getId() {
+    return Codec.ID.swigToEnum(VideoJNI.CodecDescriptor_getId(swigCPtr, this));
   }
 
   public MediaDescriptor.Type getType() {
@@ -174,7 +174,7 @@ public class CodecDescriptor extends RefCounted {
 /**
  * Get the descriptor for the given id.  
  */
-  public static CodecDescriptor make(Codec.Id id) {
+  public static CodecDescriptor make(Codec.ID id) {
     long cPtr = VideoJNI.CodecDescriptor_make(id.swigValue());
     return (cPtr == 0) ? null : new CodecDescriptor(cPtr, false);
   }

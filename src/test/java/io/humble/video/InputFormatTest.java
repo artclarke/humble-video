@@ -1,7 +1,6 @@
 package io.humble.video;
 
 import static org.junit.Assert.*;
-import io.humble.video.Codec.Id;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +16,7 @@ public class InputFormatTest {
     
     assertEquals("aiff", f.getName());
     assertEquals("Audio IFF", f.getLongName());
-    List<Id> l = f.getSupportedCodecs();
+    List<Codec.ID> l = f.getSupportedCodecs();
     assertEquals(17, l.size());
   }
   

@@ -58,19 +58,19 @@
     *
     * @return A list of supported codecs, in decreasing preferred order.
     */
-   public java.util.List<Codec.Id> getSupportedCodecs()
+   public java.util.List<Codec.ID> getSupportedCodecs()
    {
-     final java.util.List<Codec.Id> retval =
-       new java.util.LinkedList<Codec.Id>();
-     final java.util.Set<Codec.Id> uniqueSet =
-       new java.util.HashSet<Codec.Id>();
+     final java.util.List<Codec.ID> retval =
+       new java.util.LinkedList<Codec.ID>();
+     final java.util.Set<Codec.ID> uniqueSet =
+       new java.util.HashSet<Codec.ID>();
      
      int numCodecs = getNumSupportedCodecs();
      for(int i = 0; i < numCodecs; i++)
      {
-       Codec.Id id = getSupportedCodecId(i);
+       Codec.ID id = getSupportedCodecId(i);
        // remove duplicate IDs
-       if (id != Codec.Id.ID_NONE && !uniqueSet.contains(id))
+       if (id != Codec.ID.ID_NONE && !uniqueSet.contains(id))
          retval.add(id);
        uniqueSet.add(id);
      }    
@@ -100,9 +100,9 @@
      for(int i = 0; i < numCodecs; i++)
      {
        long tag = getSupportedCodecTag(i);
-       Codec.Id id = getSupportedCodecId(i);
+       Codec.ID id = getSupportedCodecId(i);
        // remove duplicate tags
-       if (id != Codec.Id.ID_NONE && !uniqueSet.contains(tag))
+       if (id != Codec.ID.ID_NONE && !uniqueSet.contains(tag))
          retval.add(tag);
        uniqueSet.add(tag);
      }    

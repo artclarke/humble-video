@@ -76,26 +76,26 @@ public:
   /**
    * Get the default audio codec for this format.
    */
-  virtual Codec::Id
+  virtual Codec::ID
   getDefaultAudioCodecId()
   {
-    return (Codec::Id) mFormat->audio_codec;
+    return (Codec::ID) mFormat->audio_codec;
   }
   /**
    * Get the default video codec for this format.
    */
-  virtual Codec::Id
+  virtual Codec::ID
   getDefaultVideoCodecId()
   {
-    return (Codec::Id) mFormat->video_codec;
+    return (Codec::ID) mFormat->video_codec;
   }
   /**
    * Get the default subtitle coded for this format.
    */
-  virtual Codec::Id
+  virtual Codec::ID
   getDefaultSubtitleCodecId()
   {
-    return (Codec::Id) mFormat->subtitle_codec;
+    return (Codec::ID) mFormat->subtitle_codec;
   }
   /**
    * Get the mime type for this format.
@@ -121,11 +121,11 @@ public:
   static OutputFormat*
   guessFormat(const char * shortName, const char *filename,
       const char *mimeType);
-  virtual Codec::Id
+  virtual Codec::ID
   guessCodec(const char * shortName, const char * filename,
       const char* mimeType, MediaDescriptor::Type type)
   {
-    return (Codec::Id) av_guess_codec(mFormat, shortName, filename, mimeType,
+    return (Codec::ID) av_guess_codec(mFormat, shortName, filename, mimeType,
         (enum AVMediaType) type);
   }
 
@@ -144,7 +144,7 @@ public:
    *   n must be < {@link #getNumSupportedCodecs()}
    * @return the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} if none.
    */
-  virtual Codec::Id
+  virtual Codec::ID
   getSupportedCodecId(int32_t n)
   {
     return ContainerFormat::getSupportedCodecId(mFormat->codec_tag, n);

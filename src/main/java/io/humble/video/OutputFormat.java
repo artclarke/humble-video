@@ -177,22 +177,22 @@ public class OutputFormat extends ContainerFormat {
 /**
  * Get the default audio codec for this format.  
  */
-  public Codec.Id getDefaultAudioCodecId() {
-    return Codec.Id.swigToEnum(VideoJNI.OutputFormat_getDefaultAudioCodecId(swigCPtr, this));
+  public Codec.ID getDefaultAudioCodecId() {
+    return Codec.ID.swigToEnum(VideoJNI.OutputFormat_getDefaultAudioCodecId(swigCPtr, this));
   }
 
 /**
  * Get the default video codec for this format.  
  */
-  public Codec.Id getDefaultVideoCodecId() {
-    return Codec.Id.swigToEnum(VideoJNI.OutputFormat_getDefaultVideoCodecId(swigCPtr, this));
+  public Codec.ID getDefaultVideoCodecId() {
+    return Codec.ID.swigToEnum(VideoJNI.OutputFormat_getDefaultVideoCodecId(swigCPtr, this));
   }
 
 /**
  * Get the default subtitle coded for this format.  
  */
-  public Codec.Id getDefaultSubtitleCodecId() {
-    return Codec.Id.swigToEnum(VideoJNI.OutputFormat_getDefaultSubtitleCodecId(swigCPtr, this));
+  public Codec.ID getDefaultSubtitleCodecId() {
+    return Codec.ID.swigToEnum(VideoJNI.OutputFormat_getDefaultSubtitleCodecId(swigCPtr, this));
   }
 
 /**
@@ -222,8 +222,8 @@ public class OutputFormat extends ContainerFormat {
     return (cPtr == 0) ? null : new OutputFormat(cPtr, false);
   }
 
-  public Codec.Id guessCodec(String shortName, String filename, String mimeType, MediaDescriptor.Type type) {
-    return Codec.Id.swigToEnum(VideoJNI.OutputFormat_guessCodec(swigCPtr, this, shortName, filename, mimeType, type.swigValue()));
+  public Codec.ID guessCodec(String shortName, String filename, String mimeType, MediaDescriptor.Type type) {
+    return Codec.ID.swigToEnum(VideoJNI.OutputFormat_guessCodec(swigCPtr, this, shortName, filename, mimeType, type.swigValue()));
   }
 
 /**
@@ -241,8 +241,8 @@ public class OutputFormat extends ContainerFormat {
  * @return	the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} 
  *		 if none.  
  */
-  protected Codec.Id getSupportedCodecId(int n) {
-    return Codec.Id.swigToEnum(VideoJNI.OutputFormat_getSupportedCodecId(swigCPtr, this, n));
+  protected Codec.ID getSupportedCodecId(int n) {
+    return Codec.ID.swigToEnum(VideoJNI.OutputFormat_getSupportedCodecId(swigCPtr, this, n));
   }
 
 /**

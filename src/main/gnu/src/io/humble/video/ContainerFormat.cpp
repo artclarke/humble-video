@@ -73,7 +73,7 @@ ContainerFormat::getNumSupportedCodecs(const struct AVCodecTag * const * tags)
  *   n must be < {@link #getNumSupportedCodecs()}
  * @return the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} if none.
  */
-Codec::Id
+Codec::ID
 ContainerFormat::getSupportedCodecId(const struct AVCodecTag * const * tags, int32_t n)
 {
   if (n < 0 || !tags) return Codec::ID_NONE;
@@ -85,7 +85,7 @@ ContainerFormat::getSupportedCodecId(const struct AVCodecTag * const * tags, int
     for (const struct AVCodecTag * tag = tags[i];
         tag && tag->id != (enum AVCodecID) Codec::ID_NONE; ++tag, ++numCodecs)
     {
-      if (numCodecs == n) return (Codec::Id) tag->id;
+      if (numCodecs == n) return (Codec::ID) tag->id;
     }
   }
   return Codec::ID_NONE;

@@ -87,7 +87,7 @@ public:
    *   n must be < {@link #getNumSupportedCodecs()}
    * @return the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} if none.
    */
-  virtual Codec::Id
+  virtual Codec::ID
   getSupportedCodecId(int32_t n)
   {
     return ContainerFormat::getSupportedCodecId(mFormat->codec_tag, n);

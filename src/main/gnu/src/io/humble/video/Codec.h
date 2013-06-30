@@ -195,7 +195,7 @@ class VS_API_HUMBLEVIDEO Codec : public io::humble::ferry::RefCounted
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(Codec)
 public:
 
-  typedef enum Id
+  typedef enum ID
   {
     /**
      * Identify the syntax and semantics of the bitstream.
@@ -602,7 +602,7 @@ public:
     ID_MPEG4SYSTEMS = 0x20001,
     ID_FFMETADATA = 0x21000,
 
-  } Id;
+  } ID;
 
   /**
    * Capabilities supported by a codec.
@@ -819,10 +819,10 @@ public:
   }
 
   /** Get the codec ID for this descriptor */
-  virtual Codec::Id
+  virtual Codec::ID
   getId()
   {
-    return (Codec::Id) mDescriptor->id;
+    return (Codec::ID) mDescriptor->id;
   }
 
   virtual MediaDescriptor::Type
@@ -833,7 +833,7 @@ public:
   /**
    * Get the descriptor for the given id.
    */
-  static CodecDescriptor* make(Codec::Id id)
+  static CodecDescriptor* make(Codec::ID id)
   {
     const AVCodecDescriptor* d = avcodec_descriptor_get((enum AVCodecID)id);
     return make(d);
