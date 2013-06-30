@@ -63,7 +63,7 @@ public class Mutex extends RefCounted {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  public static long getCPtr(Mutex obj) {
+  protected static long getCPtr(Mutex obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -75,7 +75,7 @@ public class Mutex extends RefCounted {
    *   
    * @return The raw pointer we're proxying for.
    */  
-  public long getMyCPtr() {
+  protected long getMyCPtr() {
     if (swigCPtr == 0) throw new IllegalStateException("underlying native object already deleted");
     return swigCPtr;
   }
