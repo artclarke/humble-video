@@ -70,7 +70,7 @@ static enum VSJNIMemoryModel sVSJNI_IsMirroringNativeMemoryInJVM =
 #ifdef VSJNI_USE_JVM_FOR_MEMMANAGEMENT
     JAVA_STANDARD_HEAP;
 #else
-NATIVE_BUFFERS;
+    NATIVE_BUFFERS;
 #endif
 
 namespace io { namespace humble { namespace ferry
@@ -167,7 +167,7 @@ VSJNI_MemoryManagerInit(JavaVM* aJVM)
       throw std::runtime_error(
           "could not find free(byte[]) method in io.humble.ferry.JNIMemoryAllocator");
   }
-  catch (std::exception e)
+  catch (std::exception & e)
   {
     // DON'T HAVE JAVA do memory management.
     sCachedJVM = 0;
