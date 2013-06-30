@@ -80,4 +80,29 @@ OutputFormatTest::testCreateOutputFormat() {
   VS_TUT_ENSURE("", strcmp("flv", format->getName()) == 0);
   format = OutputFormat::guessFormat(0, 0, "video/x-flv");
   VS_TUT_ENSURE("", strcmp("flv", format->getName()) == 0);
+
+  /** make sure default codec stuff works */
+  format = OutputFormat::guessFormat("mp4", 0, 0);
+  VS_TUT_ENSURE("", format);
+
+  Codec::Id id = Codec::ID_NONE;
+
+  id = format->getDefaultAudioCodecId();
+  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_AAC);
+
+  id = format->getDefaultVideoCodecId();
+  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_H264);
+
+  id = format->getDefaultSubtitleCodecId();
+  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_NONE);
+
+  id = format->guessCodec("mp4", 0, 0, MediaDescriptor::MEDIA_AUDIO);
+  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_AAC);
+
+  id = format->guessCodec("mp4", 0, 0, MediaDescriptor::MEDIA_VIDEO);
+  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_H264);
+
+  id = format->guessCodec("mp4", 0, 0, MediaDescriptor::MEDIA_SUBTITLE);
+  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_NONE);
+
 }
