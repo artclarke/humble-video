@@ -24,22 +24,32 @@
 
 #ifndef CONTAINER_H_
 #define CONTAINER_H_
-#include <io/humble/ferry/RefCounted.h>
+
 #include <io/humble/video/HumbleVideo.h>
+#include <io/humble/ferry/RefCounted.h>
 #include <io/humble/video/Codec.h>
 #include <io/humble/video/ContainerFormat.h>
+#include <io/humble/video/customio/URLProtocolHandler.h>
 
-namespace io {
-namespace humble {
-namespace video {
+namespace io
+{
+namespace humble
+{
+namespace video
+{
 
-class VS_API_HUMBLEVIDEO Stream : public io::humble::ferry::RefCounted
+class VS_API_HUMBLEVIDEO Stream : public ::io::humble::ferry::RefCounted
 {
 public:
 
 protected:
-  Stream() {}
-  virtual ~Stream() {}
+  Stream()
+  {
+  }
+  virtual
+  ~Stream()
+  {
+  }
 };
 
 class Property;
@@ -50,7 +60,7 @@ class Rational;
  * A Container for Media data. This is an abstract class and
  * cannot be instantiated on its own.
  */
-class VS_API_HUMBLEVIDEO Container : public io::humble::ferry::RefCounted
+class VS_API_HUMBLEVIDEO Container : public ::io::humble::ferry::RefCounted
 {
 public:
   /**
@@ -379,8 +389,8 @@ public:
    *
    * @param newFlags The new set flags for this codec.
    */
-  virtual void setFlags(int32_t newFlags) = 0;
-
+  virtual void
+  setFlags(int32_t newFlags) = 0;
 
   /**
    * Get the URL the Container was opened with.
@@ -411,7 +421,6 @@ public:
   virtual MetaData*
   getMetaData()=0;
 
-
   /**
    * {@inheritDoc}
    */
@@ -422,8 +431,32 @@ protected:
   Container();
   virtual
   ~Container();
+  virtual AVFormatContext* getCtx()=0;
 protected:
-  AVFormatContext *mCtx;
+  /**
+   * Containers can only be in one of four states:
+   */
+  typedef enum ContainerStates
+  {
+    /**
+     * STATE_INITED: Allocated but open has not been called yet. Transitions to STATE_OPENED when ::open(...)
+     *   is successfully called, or STATE_ERROR if ::open(...) has an error.
+     */
+    STATE_INITED,
+    /**
+     * STATE_OPENED: Opened and read to read or write data. Transitions to STATE_CLOSED on successful ::close(...)
+     *   or STATE_ERROR if ::close(...) has an error.
+     */
+    STATE_OPENED,
+    /**
+     * STATE_CLOSED: Container is closed and should be discarded.
+     */
+    STATE_CLOSED,
+    /**
+     * STATE_ERROR: Container had an error and should be discarded.
+     */
+    STATE_ERROR,
+  };
 };
 
 } /* namespace video */

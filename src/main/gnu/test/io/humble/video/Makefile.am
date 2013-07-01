@@ -4,7 +4,7 @@ VS_CPP_PACKAGE=io.humble.video
 VS_CPP_NAMESPACE=io::humble::video
 VS_TEST=1
 include @top_builddir@/mk/Makefile.global
-SUBDIRS=io
+SUBDIRS=customio
 
 check_PROGRAMS=\
   InputFormatTest \

@@ -374,14 +374,14 @@ AC_CONFIG_FILES([Makefile
                  src/io/humble/ferry/Makefile
                  src/io/humble/ferry/Ferry.i
                  src/io/humble/video/Makefile
-                 src/io/humble/video/io/Makefile
+                 src/io/humble/video/customio/Makefile
                  test/Makefile
                  test/io/Makefile
                  test/io/humble/Makefile
                  test/io/humble/testutils/Makefile
                  test/io/humble/ferry/Makefile
                  test/io/humble/video/Makefile
-                 test/io/humble/video/io/Makefile
+                 test/io/humble/video/customio/Makefile
                  pom-${build}.xml:mk/pom.xml.in
                  ])
 AC_OUTPUT

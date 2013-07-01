@@ -24,108 +24,174 @@
 
 #include "Container.h"
 #include "PropertyImpl.h"
+#include <io/humble/ferry/Logger.h>
 
-namespace io {
-namespace humble {
-namespace video {
+using namespace io::humble::video::customio;
 
-Container::Container() :
-    mCtx(0)
+VS_LOG_SETUP(VS_CPP_PACKAGE);
+
+extern "C"
+{
+/** Some static functions used by custom IO
+ */
+int
+Container_url_read(void*h, unsigned char* buf, int size)
+{
+  int retval = -1;
+  try
+  {
+    URLProtocolHandler* handler = (URLProtocolHandler*) h;
+    if (handler)
+      retval = handler->url_read(buf, size);
+  } catch (...)
+  {
+    retval = -1;
+  }
+  VS_LOG_TRACE("URLProtocolHandler[%p]->url_read(%p, %d) ==> %d", h, buf, size,
+      retval);
+  return retval;
+}
+int
+Container_url_write(void*h, unsigned char* buf, int size)
+{
+  int retval = -1;
+  try
+  {
+    URLProtocolHandler* handler = (URLProtocolHandler*) h;
+    if (handler)
+      retval = handler->url_write(buf, size);
+  } catch (...)
+  {
+    retval = -1;
+  }
+  VS_LOG_TRACE("URLProtocolHandler[%p]->url_write(%p, %d) ==> %d", h, buf, size,
+      retval);
+  return retval;
+}
+
+int64_t
+Container_url_seek(void*h, int64_t position, int whence)
+{
+  int64_t retval = -1;
+  try
+  {
+    URLProtocolHandler* handler = (URLProtocolHandler*) h;
+    if (handler)
+      retval = handler->url_seek(position, whence);
+  } catch (...)
+  {
+    retval = -1;
+  }
+  VS_LOG_TRACE("URLProtocolHandler[%p]->url_seek(%p, %lld) ==> %d", h, position,
+      whence, retval);
+  return retval;
+}
+
+}
+namespace io
+{
+namespace humble
+{
+namespace video
+{
+
+Container::Container()
 {
 }
 
 Container::~Container()
 {
+  VS_LOG_DEBUG("Container destroyed");
 }
 
 int32_t
 Container::getNumProperties()
 {
-  return PropertyImpl::getNumProperties(mCtx);
+  return PropertyImpl::getNumProperties(getCtx());
 }
 
 Property*
 Container::getPropertyMetaData(int32_t propertyNo)
 {
-  return PropertyImpl::getPropertyMetaData(mCtx, propertyNo);
+  return PropertyImpl::getPropertyMetaData(getCtx(), propertyNo);
 }
 
 Property*
 Container::getPropertyMetaData(const char *name)
 {
-  return PropertyImpl::getPropertyMetaData(mCtx, name);
+  return PropertyImpl::getPropertyMetaData(getCtx(), name);
 }
 
 int32_t
 Container::setProperty(MetaData* valuesToSet, MetaData* valuesNotFound)
 {
-  return PropertyImpl::setProperty(mCtx, valuesToSet, valuesNotFound);
+  return PropertyImpl::setProperty(getCtx(), valuesToSet, valuesNotFound);
 }
 
 int32_t
 Container::setProperty(const char* aName, const char *aValue)
 {
-  return PropertyImpl::setProperty(mCtx, aName, aValue);
+  return PropertyImpl::setProperty(getCtx(), aName, aValue);
 }
 
 int32_t
 Container::setProperty(const char* aName, double aValue)
 {
-  return PropertyImpl::setProperty(mCtx, aName, aValue);
+  return PropertyImpl::setProperty(getCtx(), aName, aValue);
 }
 
 int32_t
 Container::setProperty(const char* aName, int64_t aValue)
 {
-  return PropertyImpl::setProperty(mCtx, aName, aValue);
+  return PropertyImpl::setProperty(getCtx(), aName, aValue);
 }
 
 int32_t
 Container::setProperty(const char* aName, bool aValue)
 {
-  return PropertyImpl::setProperty(mCtx, aName, aValue);
+  return PropertyImpl::setProperty(getCtx(), aName, aValue);
 }
 
 int32_t
 Container::setProperty(const char* aName, Rational *aValue)
 {
-  return PropertyImpl::setProperty(mCtx, aName, aValue);
+  return PropertyImpl::setProperty(getCtx(), aName, aValue);
 }
 
 char*
 Container::getPropertyAsString(const char *aName)
 {
-  return PropertyImpl::getPropertyAsString(mCtx, aName);
+  return PropertyImpl::getPropertyAsString(getCtx(), aName);
 }
 
 double
 Container::getPropertyAsDouble(const char *aName)
 {
-  return PropertyImpl::getPropertyAsDouble(mCtx, aName);
+  return PropertyImpl::getPropertyAsDouble(getCtx(), aName);
 }
 
 int64_t
 Container::getPropertyAsLong(const char *aName)
 {
-  return PropertyImpl::getPropertyAsLong(mCtx, aName);
+  return PropertyImpl::getPropertyAsLong(getCtx(), aName);
 }
 
 Rational*
 Container::getPropertyAsRational(const char *aName)
 {
-  return PropertyImpl::getPropertyAsRational(mCtx, aName);
+  return PropertyImpl::getPropertyAsRational(getCtx(), aName);
 }
 
 bool
 Container::getPropertyAsBoolean(const char *aName)
 {
-  return PropertyImpl::getPropertyAsBoolean(mCtx, aName);
+  return PropertyImpl::getPropertyAsBoolean(getCtx(), aName);
 }
 
 int32_t
 Container::getFlags()
 {
-  int32_t flags = mCtx->flags;
+  int32_t flags = getCtx()->flags;
   // remove custom io if set
   flags &= ~(AVFMT_FLAG_CUSTOM_IO);
   return flags;
@@ -134,15 +200,15 @@ Container::getFlags()
 void
 Container::setFlags(int32_t newFlags)
 {
-  mCtx->flags = newFlags;
+  getCtx()->flags = newFlags;
   // force custom io
-  mCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
+  getCtx()->flags |= AVFMT_FLAG_CUSTOM_IO;
 }
 
 bool
 Container::getFlag(Container::Flag flag)
 {
-  return mCtx->flags & flag;
+  return getCtx()->flags & flag;
 }
 
 void
@@ -150,11 +216,10 @@ Container::setFlag(Container::Flag flag, bool value)
 {
   if (value)
   {
-    mCtx->flags |= flag;
-  }
-  else
+    getCtx()->flags |= flag;
+  } else
   {
-    mCtx->flags &= (~flag);
+    getCtx()->flags &= (~flag);
   }
 
 }
@@ -162,10 +227,8 @@ Container::setFlag(Container::Flag flag, bool value)
 const char*
 Container::getURL()
 {
-  return mCtx->filename;
+  return getCtx()->filename;
 }
-
-
 
 } /* namespace video */
 } /* namespace humble */
