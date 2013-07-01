@@ -113,6 +113,7 @@ if test "x$enable_optimizations" = xno; then
   AC_SUBST([VS_DEBUG])
 fi
 
+PKG_PROG_PKG_CONFIG
 AC_PATH_PROG([SWIG],[swig])
 AC_ARG_VAR(SWIG,
            [Location of the 'swig' program; if found, then we will renerate the Java interface to Humble Software from the C++ interface])
