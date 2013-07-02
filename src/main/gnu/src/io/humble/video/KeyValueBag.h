@@ -17,8 +17,8 @@
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IMETADATA_H_
-#define IMETADATA_H_
+#ifndef IKEYVALUEBAG_H_
+#define IKEYVALUEBAG_H_
 
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/ferry/RefCounted.h>
@@ -27,9 +27,7 @@ namespace io { namespace humble { namespace video
 {
 
 /**
- * Get MetaData about a {@link Container} or {@link Stream}.
- * <p>
- * MetaData is a bag of key/value pairs that can be embedded
+ * KeyValueBag is a bag of key/value pairs that can be embedded
  * in some {@link Container} or some {@link Stream}
  * in an {@link Container}, and are then written to
  * or read from a media file.  Keys must be unique, and
@@ -39,7 +37,7 @@ namespace io { namespace humble { namespace video
  * An example is the "title" meta-data item in an MP3 file.
  * </p>
  * <p>
- * Support for IMetaData differs depending upon the {@link
+ * Support for KeyValueBag differs depending upon the {@link
  * Container} format you're using and the implementation
  * in <a href="http://www.ffmpeg.org/">FFmpeg</a>.  For example,
  * MP3 meta-data reading and writing is supported, but
@@ -47,34 +45,34 @@ namespace io { namespace humble { namespace video
  * is not supported.
  * </p>
  */
-class VS_API_HUMBLEVIDEO MetaData : public io::humble::ferry::RefCounted
+class VS_API_HUMBLEVIDEO KeyValueBag : public io::humble::ferry::RefCounted
 {
 public:
   /**
-   * Different types of flags that can be passed to {@link IMetaData#getValue}
+   * Different types of flags that can be passed to {@link KeyValueBag#getValue}
    */
   typedef enum {
     /**
      * For {@link #getValue(String)} case-insensitive match of key.
      */
-    METADATA_NONE=0,
+    KVB_NONE=0,
     /**
      * For {@link #getValue(String)} case-sensitive match of key.
      */
-    METADATA_MATCH_CASE=1,
+    KVB_MATCH_CASE=1,
     /**
      * For {@link #setValue(String,String,Flags)} do not overwrite existing value -- append another key/value pair.
      */
-    METADATA_DONT_OVERWRITE=16,
+    KVB_DONT_OVERWRITE=16,
     /**
      * For {@link #setValue(String,String,Flags)} append to the existing value in a key (string append).
      */
-    META_DATA_APPEND=32,
+    KVB_APPEND=32,
   } Flags;
 
   /**
    * Get the total number of keys currently in this
-   * {@link IMetaData} object.
+   * {@link KeyValueBag} object.
    * 
    * @return the number of keys.
    */
@@ -118,10 +116,10 @@ public:
   virtual int32_t setValue(const char* key, const char* value)=0;
   
   /**
-   * Create a new {@link IMetaData} bag of properties with
+   * Create a new {@link KeyValueBag} bag of properties with
    * no values set.
    */
-  static MetaData* make();
+  static KeyValueBag* make();
 
   /**
    * Sets the value for the given key to value.  This overrides
@@ -137,11 +135,11 @@ public:
   virtual int32_t setValue(const char* key, const char* value, Flags flag)=0;
  
 protected:
-  MetaData();
+  KeyValueBag();
   virtual
-  ~MetaData();
+  ~KeyValueBag();
 };
 
 }}}
 
-#endif /* IMETADATA_H_ */
+#endif /* IKEYVALUEBAG_H_ */

@@ -9,9 +9,7 @@
 package io.humble.video;
 import io.humble.ferry.*;
 /**
- * Get MetaData about a {@link Container} or {@link Stream}.  
- * <p>  
- * MetaData is a bag of key/value pairs that can be embedded  
+ * KeyValueBag is a bag of key/value pairs that can be embedded  
  * in some {@link Container} or some {@link Stream}  
  * in an {@link Container}, and are then written to  
  * or read from a media file. Keys must be unique, and  
@@ -21,7 +19,7 @@ import io.humble.ferry.*;
  * An example is the "title" meta-data item in an MP3 file.  
  * </p>  
  * <p>  
- * Support for IMetaData differs depending upon the {@link  
+ * Support for KeyValueBag differs depending upon the {@link  
  * Container} format you're using and the implementation  
  * in <a href="http://www.ffmpeg.org/">FFmpeg</a>. For example,  
  * MP3 meta-data reading and writing is supported, but  
@@ -29,7 +27,7 @@ import io.humble.ferry.*;
  * is not supported.  
  * </p>  
  */
-public class MetaData extends RefCounted {
+public class KeyValueBag extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -47,18 +45,18 @@ public class MetaData extends RefCounted {
   /**
    * Internal Only.
    */
-  protected MetaData(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGMetaDataUpcast(cPtr), cMemoryOwn);
+  protected KeyValueBag(long cPtr, boolean cMemoryOwn) {
+    super(VideoJNI.SWIGKeyValueBagUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
   /**
    * Internal Only.
    */
-  protected MetaData(long cPtr, boolean cMemoryOwn,
+  protected KeyValueBag(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGMetaDataUpcast(cPtr),
+    super(VideoJNI.SWIGKeyValueBagUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -71,7 +69,7 @@ public class MetaData extends RefCounted {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(MetaData obj) {
+  protected static long getCPtr(KeyValueBag obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -89,17 +87,17 @@ public class MetaData extends RefCounted {
   }
   
   /**
-   * Create a new MetaData object that is actually referring to the
+   * Create a new KeyValueBag object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
    */
   @Override
-  public MetaData copyReference() {
+  public KeyValueBag copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new MetaData(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new KeyValueBag(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -112,8 +110,8 @@ public class MetaData extends RefCounted {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof MetaData)
-      equal = (((MetaData)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof KeyValueBag)
+      equal = (((KeyValueBag)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -141,7 +139,7 @@ public class MetaData extends RefCounted {
     java.util.Collection<String> keys = getKeys();
     for(String key: keys)
     {
-      String value = getValue(key, MetaData.Flags.METADATA_NONE);
+      String value = getValue(key, KeyValueBag.Flags.KVB_NONE);
       result.append(key).append("=").append(value).append(";");
     }
     result.append("]");
@@ -174,16 +172,16 @@ public class MetaData extends RefCounted {
    */
   public String getValue(String key)
   {
-    return getValue(key, MetaData.Flags.METADATA_NONE);
+    return getValue(key, KeyValueBag.Flags.KVB_NONE);
   }
 
 /**
  * Get the total number of keys currently in this  
- * {@link IMetaData} object.  
+ * {@link KeyValueBag} object.  
  * @return	the number of keys.  
  */
   public int getNumKeys() {
-    return VideoJNI.MetaData_getNumKeys(swigCPtr, this);
+    return VideoJNI.KeyValueBag_getNumKeys(swigCPtr, this);
   }
 
 /**
@@ -199,7 +197,7 @@ public class MetaData extends RefCounted {
  * @return	the key, or null if not found.  
  */
   private String getKey(int position) {
-    return VideoJNI.MetaData_getKey(swigCPtr, this, position);
+    return VideoJNI.KeyValueBag_getKey(swigCPtr, this, position);
   }
 
 /**
@@ -208,8 +206,8 @@ public class MetaData extends RefCounted {
  * @param	flag A flag for how to search  
  * @return	The value, or null if none.  
  */
-  public String getValue(String key, MetaData.Flags flag) {
-    return VideoJNI.MetaData_getValue(swigCPtr, this, key, flag.swigValue());
+  public String getValue(String key, KeyValueBag.Flags flag) {
+    return VideoJNI.KeyValueBag_getValue(swigCPtr, this, key, flag.swigValue());
   }
 
 /**
@@ -220,16 +218,16 @@ public class MetaData extends RefCounted {
  * @param	value The value to set.  
  */
   public int setValue(String key, String value) {
-    return VideoJNI.MetaData_setValue__SWIG_0(swigCPtr, this, key, value);
+    return VideoJNI.KeyValueBag_setValue__SWIG_0(swigCPtr, this, key, value);
   }
 
 /**
- * Create a new {@link IMetaData} bag of properties with  
+ * Create a new {@link KeyValueBag} bag of properties with  
  * no values set.  
  */
-  public static MetaData make() {
-    long cPtr = VideoJNI.MetaData_make();
-    return (cPtr == 0) ? null : new MetaData(cPtr, false);
+  public static KeyValueBag make() {
+    long cPtr = VideoJNI.KeyValueBag_make();
+    return (cPtr == 0) ? null : new KeyValueBag(cPtr, false);
   }
 
 /**
@@ -241,31 +239,31 @@ public class MetaData extends RefCounted {
  * @param	flag A flag on how this should be set.  
  * @since	5.0  
  */
-  public int setValue(String key, String value, MetaData.Flags flag) {
-    return VideoJNI.MetaData_setValue__SWIG_1(swigCPtr, this, key, value, flag.swigValue());
+  public int setValue(String key, String value, KeyValueBag.Flags flag) {
+    return VideoJNI.KeyValueBag_setValue__SWIG_1(swigCPtr, this, key, value, flag.swigValue());
   }
 
   public enum Flags {
   /**
-   * Different types of flags that can be passed to {@link IMetaData#getValue} 
+   * Different types of flags that can be passed to {@link KeyValueBag#getValue} 
    *
    * For {@link #getValue(String)} case-insensitive match of key.
    */
-    METADATA_NONE(VideoJNI.MetaData_METADATA_NONE_get()),
+    KVB_NONE(VideoJNI.KeyValueBag_KVB_NONE_get()),
   /**
    * For {@link #getValue(String)} case-sensitive match of key.
    */
-    METADATA_MATCH_CASE(VideoJNI.MetaData_METADATA_MATCH_CASE_get()),
+    KVB_MATCH_CASE(VideoJNI.KeyValueBag_KVB_MATCH_CASE_get()),
   /**
    * For {@link #setValue(String,String,Flags)} do not overwrite existing 
    * value -- append another key/value pair.
    */
-    METADATA_DONT_OVERWRITE(VideoJNI.MetaData_METADATA_DONT_OVERWRITE_get()),
+    KVB_DONT_OVERWRITE(VideoJNI.KeyValueBag_KVB_DONT_OVERWRITE_get()),
   /**
    * For {@link #setValue(String,String,Flags)} append to the existing 
    * value in a key (string append).
    */
-    META_DATA_APPEND(VideoJNI.MetaData_META_DATA_APPEND_get());
+    KVB_APPEND(VideoJNI.KeyValueBag_KVB_APPEND_get());
 
     public final int swigValue() {
       return swigValue;

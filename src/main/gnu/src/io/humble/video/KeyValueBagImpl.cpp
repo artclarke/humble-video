@@ -16,34 +16,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "MetaDataImpl.h"
+#include "KeyValueBagImpl.h"
 
 namespace io { namespace humble { namespace video
 {
 
-MetaDataImpl :: MetaDataImpl()
+KeyValueBagImpl :: KeyValueBagImpl()
 {
-  mLocalMeta = 0;
-  mMetaData = &mLocalMeta;
+  mLocalBag = 0;
+  mBag = &mLocalBag;
 }
 
-MetaDataImpl :: ~MetaDataImpl()
+KeyValueBagImpl :: ~KeyValueBagImpl()
 {
-  if (mMetaData && *mMetaData)
-    av_dict_free(mMetaData);
+  if (mBag && *mBag)
+    av_dict_free(mBag);
 }
 
 int32_t
-MetaDataImpl :: getNumKeys()
+KeyValueBagImpl :: getNumKeys()
 {
-  if (!mMetaData || !*mMetaData)
+  if (!mBag || !*mBag)
     return 0;
   
   AVDictionaryEntry* tag=0;
   int32_t retval=0;
   do
   {
-    tag = av_dict_get(*mMetaData, "", tag, AV_DICT_IGNORE_SUFFIX);
+    tag = av_dict_get(*mBag, "", tag, AV_DICT_IGNORE_SUFFIX);
     if (tag)
       retval++;
   } while(tag);
@@ -51,16 +51,16 @@ MetaDataImpl :: getNumKeys()
 }
 
 const char*
-MetaDataImpl :: getKey(int32_t index)
+KeyValueBagImpl :: getKey(int32_t index)
 {
-  if (!mMetaData || !*mMetaData || index < 0)
+  if (!mBag || !*mBag || index < 0)
     return 0;
 
   AVDictionaryEntry* tag=0;
   int32_t position=-1;
   do
   {
-    tag = av_dict_get(*mMetaData, "", tag, AV_DICT_IGNORE_SUFFIX);
+    tag = av_dict_get(*mBag, "", tag, AV_DICT_IGNORE_SUFFIX);
     if (tag) {
       position++;
       if (position == index)
@@ -70,11 +70,11 @@ MetaDataImpl :: getKey(int32_t index)
   return 0;
 }
 const char*
-MetaDataImpl :: getValue(const char *key, Flags flag)
+KeyValueBagImpl :: getValue(const char *key, Flags flag)
 {
-   if (!mMetaData || !*mMetaData || !key || !*key)
+   if (!mBag || !*mBag || !key || !*key)
      return 0;
-   AVDictionaryEntry* tag = av_dict_get(*mMetaData, key, 0, (int)flag);
+   AVDictionaryEntry* tag = av_dict_get(*mBag, key, 0, (int)flag);
    if (tag)
      return tag->value;
    else
@@ -82,37 +82,37 @@ MetaDataImpl :: getValue(const char *key, Flags flag)
 }
 
 int32_t
-MetaDataImpl :: setValue(const char* key, const char* value)
+KeyValueBagImpl :: setValue(const char* key, const char* value)
 {
-  return setValue(key, value, METADATA_NONE);
+  return setValue(key, value, KVB_NONE);
 }
 
 int32_t
-MetaDataImpl :: setValue(const char* key, const char* value, Flags flag)
+KeyValueBagImpl :: setValue(const char* key, const char* value, Flags flag)
 {
-  if (!key || !*key || !mMetaData)
+  if (!key || !*key || !mBag)
     return -1;
-  return (int32_t)av_dict_set(mMetaData, key, value, (int)flag);
+  return (int32_t)av_dict_set(mBag, key, value, (int)flag);
 }
 
-MetaDataImpl*
-MetaDataImpl :: make(AVDictionary** metaToUse)
+KeyValueBagImpl*
+KeyValueBagImpl :: make(AVDictionary** metaToUse)
 {
   if (!metaToUse)
     return 0;
   
-  MetaDataImpl* retval = make();
+  KeyValueBagImpl* retval = make();
   
   if (retval)
-    retval->mMetaData = metaToUse;
+    retval->mBag = metaToUse;
 
   return retval;
 }
 
-MetaDataImpl*
-MetaDataImpl :: make(AVDictionary* metaDataToCopy)
+KeyValueBagImpl*
+KeyValueBagImpl :: make(AVDictionary* metaDataToCopy)
 {
-  MetaDataImpl* retval = make();
+  KeyValueBagImpl* retval = make();
   if (retval && metaDataToCopy)
   {
     AVDictionaryEntry* tag = 0;
@@ -120,7 +120,7 @@ MetaDataImpl :: make(AVDictionary* metaDataToCopy)
       tag = av_dict_get(metaDataToCopy, "", tag,
           AV_DICT_IGNORE_SUFFIX);
       if (tag)
-        if (av_dict_set(retval->mMetaData, tag->key, tag->value,0) < 0)
+        if (av_dict_set(retval->mBag, tag->key, tag->value,0) < 0)
         {
           VS_REF_RELEASE(retval);
           break;
@@ -131,26 +131,26 @@ MetaDataImpl :: make(AVDictionary* metaDataToCopy)
 }
 
 int32_t
-MetaDataImpl :: copy(AVDictionary *data)
+KeyValueBagImpl :: copy(AVDictionary *data)
 {
   if (!data)
     return -1;
 
-  if (mMetaData) {
-    if (data == *mMetaData)
+  if (mBag) {
+    if (data == *mBag)
       // copy the current data; just return
       return 0;
-    av_dict_free(mMetaData);
-    *mMetaData = 0;
+    av_dict_free(mBag);
+    *mBag = 0;
   }
-  av_dict_copy(mMetaData, data, 0);
+  av_dict_copy(mBag, data, 0);
   return 0;
 }
 
 int32_t
-MetaDataImpl :: copy(MetaData* dataToCopy)
+KeyValueBagImpl :: copy(KeyValueBag* dataToCopy)
 {
-  MetaDataImpl* data = dynamic_cast<MetaDataImpl*>(dataToCopy);
+  KeyValueBagImpl* data = dynamic_cast<KeyValueBagImpl*>(dataToCopy);
   if (!data)
     return -1;
   

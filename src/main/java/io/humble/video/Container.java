@@ -12,7 +12,7 @@ import io.humble.ferry.*;
  * A Container for Media data. This is an abstract class and  
  * cannot be instantiated on its own.  
  */
-public class Container extends RefCounted {
+public class Container extends Configurable {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -114,340 +114,10 @@ public class Container extends RefCounted {
   
 
 /**
- * Is this container opened?  
- * @return	true if opened; false if not.  
+ * Get the current state of the container.  
  */
-  public boolean isOpened() {
-    return VideoJNI.Container_isOpened(swigCPtr, this);
-  }
-
-/**
- * Returns the ContainerFormat object being used for this Container, 
- *  
- * or null if the {@link Container} doesn't yet know.  
- * @return	the ContainerFormat object, or null.  
- */
-  protected ContainerFormat getFormat() {
-    long cPtr = VideoJNI.Container_getFormat(swigCPtr, this);
-    return (cPtr == 0) ? null : new ContainerFormat(cPtr, false);
-  }
-
-/**
- * Close the container. open() must have been called first, or  
- * else an error is returned.<p>If the current thread is interrupted 
- * while this blocking method  
- * is running the method will return with a negative value.  
- * To check if the method exited because of an interruption  
- * pass the return value to {@link Error#make(int)} and then  
- * check {@link Error#getType()} to see if it is  
- * {@link Error.Type#ERROR_INTERRUPTED}.  
- * </p>  
- * <p>  
- * If this method exits because of an interruption,  
- * all resources will be closed anyway.  
- * </p>  
- * @return	>= 0 on success; < 0 on error.  
- */
-  public int close() {
-    return VideoJNI.Container_close(swigCPtr, this);
-  }
-
-/**
- * The number of streams in this container.  
- * <p>If opened in {@link Container.Type#READ} mode, this will query 
- * the stream and find out  
- * how many streams are in it.</p><p>If opened in  
- * {@link Container.Type#WRITE} mode, this will return the number of 
- * streams  
- * the caller has added to date.</p><p>If the current thread is interrupted 
- * while this blocking method  
- * is running the method will return with a negative value.  
- * To check if the method exited because of an interruption  
- * pass the return value to {@link Error#make(int)} and then  
- * check {@link Error#getType()} to see if it is  
- * {@link Error.Type#ERROR_INTERRUPTED}.  
- * </p>  
- * @return	The number of streams in this container.  
- */
-  public int getNumStreams() {
-    return VideoJNI.Container_getNumStreams(swigCPtr, this);
-  }
-
-/**
- * Get the stream at the given position.  
- * @param	streamIndex the index of this stream in the container  
- * @return	The stream at that position in the container, or null if 
- *		 none there.  
- */
-  public Stream getStream(long streamIndex) {
-    long cPtr = VideoJNI.Container_getStream(swigCPtr, this, streamIndex);
-    return (cPtr == 0) ? null : new Stream(cPtr, false);
-  }
-
-/**
- * Gets the duration, if known, of this container.  
- * This will only work for non-streamable containers where Container 
- *  
- * can calculate the container size.  
- * @return	The duration, or {@link Global#NO_PTS} if not known.  
- */
-  public long getDuration() {
-    return VideoJNI.Container_getDuration(swigCPtr, this);
-  }
-
-/**
- * Get the starting timestamp in microseconds of the first packet of 
- * the earliest stream in this container.  
- * <p>  
- * This will only return value values either either (a) for non-streamable 
- *  
- * containers where Container can calculate the container size or  
- * (b) after Container has actually read the  
- * first packet from a streamable source.  
- * </p>  
- * @return	The starting timestamp in microseconds, or {@link Global#NO_PTS} 
- *		 if not known.  
- */
-  public long getStartTime() {
-    return VideoJNI.Container_getStartTime(swigCPtr, this);
-  }
-
-/**
- * Get the file size in bytes of this container.  
- * This will only return a valid value if the container is non-streamed 
- * and supports seek.  
- * @return	The file size in bytes, or <0 on error.  
- */
-  public long getFileSize() {
-    return VideoJNI.Container_getFileSize(swigCPtr, this);
-  }
-
-/**
- * Get the calculated overall bit rate of this file.  
- * <p>  
- * This will only return a valid value if the container is non-streamed 
- * and supports seek.  
- * </p>  
- * @return	The overall bit rate in bytes per second, or <0 on error. 
- *		  
- */
-  public int getBitRate() {
-    return VideoJNI.Container_getBitRate(swigCPtr, this);
-  }
-
-/**
- * Returns the total number of settable properties on this object  
- * @return	total number of options (not including constant definitions) 
- *		  
- */
-  public int getNumProperties() {
-    return VideoJNI.Container_getNumProperties(swigCPtr, this);
-  }
-
-/**
- * Returns the name of the numbered property.  
- * @param	propertyNo The property number in the options list.  
- * @return	an Property value for this properties meta-data  
- */
-  public Property getPropertyMetaData(int propertyNo) {
-    long cPtr = VideoJNI.Container_getPropertyMetaData__SWIG_0(swigCPtr, this, propertyNo);
-    return (cPtr == 0) ? null : new Property(cPtr, false);
-  }
-
-/**
- * Returns the name of the numbered property.  
- * @param	name The property name.  
- * @return	an Property value for this properties meta-data  
- */
-  public Property getPropertyMetaData(String name) {
-    long cPtr = VideoJNI.Container_getPropertyMetaData__SWIG_1(swigCPtr, this, name);
-    return (cPtr == 0) ? null : new Property(cPtr, false);
-  }
-
-/**
- * Sets a property on this Object.  
- * All AVOptions supported by the underlying AVClass are supported. 
- *  
- * @param	name The property name. For example "b" for bit-rate.  
- * @param	value The value of the property.  
- * @return	>= 0 if the property was successfully set; <0 on error  
- */
-  public int setProperty(String name, String value) {
-    return VideoJNI.Container_setProperty__SWIG_0(swigCPtr, this, name, value);
-  }
-
-/**
- * Looks up the property 'name' and sets the  
- * value of the property to 'value'.  
- * @param	name name of option  
- * @param	value Value of option  
- * @return	>= 0 on success; <0 on error.  
- */
-  public int setProperty(String name, double value) {
-    return VideoJNI.Container_setProperty__SWIG_1(swigCPtr, this, name, value);
-  }
-
-/**
- * Looks up the property 'name' and sets the  
- * value of the property to 'value'.  
- * @param	name name of option  
- * @param	value Value of option  
- * @return	>= 0 on success; <0 on error.  
- */
-  public int setProperty(String name, long value) {
-    return VideoJNI.Container_setProperty__SWIG_2(swigCPtr, this, name, value);
-  }
-
-/**
- * Looks up the property 'name' and sets the  
- * value of the property to 'value'.  
- * @param	name name of option  
- * @param	value Value of option  
- * @return	>= 0 on success; <0 on error.  
- */
-  public int setProperty(String name, boolean value) {
-    return VideoJNI.Container_setProperty__SWIG_3(swigCPtr, this, name, value);
-  }
-
-/**
- * Looks up the property 'name' and sets the  
- * value of the property to 'value'.  
- * @param	name name of option  
- * @param	value Value of option  
- * @return	>= 0 on success; <0 on error.  
- */
-  public int setProperty(String name, Rational value) {
-    return VideoJNI.Container_setProperty__SWIG_4(swigCPtr, this, name, Rational.getCPtr(value), value);
-  }
-
-/**
- * Gets a property on this Object.  
- * <p>  
- * Note for C++ callers; you must free the returned array with  
- * delete[] in order to avoid a memory leak. If you call  
- * from Java or any other language, you don't need to worry  
- * about this.  
- * </p>  
- * @param	name property name  
- * @return	an string copy of the option value, or null if the option 
- *		 doesn't exist.  
- */
-  public String getPropertyAsString(String name) {
-    return VideoJNI.Container_getPropertyAsString(swigCPtr, this, name);
-  }
-
-/**
- * Gets the value of this property, and returns as a double;  
- * @param	name name of option  
- * @return	double value of property, or 0 on error.  
- */
-  public double getPropertyAsDouble(String name) {
-    return VideoJNI.Container_getPropertyAsDouble(swigCPtr, this, name);
-  }
-
-/**
- * Gets the value of this property, and returns as an long;  
- * @param	name name of option  
- * @return	long value of property, or 0 on error.  
- */
-  public long getPropertyAsLong(String name) {
-    return VideoJNI.Container_getPropertyAsLong(swigCPtr, this, name);
-  }
-
-/**
- * Gets the value of this property, and returns as an Rational;  
- * @param	name name of option  
- * @return	long value of property, or 0 on error.  
- */
-  public Rational getPropertyAsRational(String name) {
-    long cPtr = VideoJNI.Container_getPropertyAsRational(swigCPtr, this, name);
-    return (cPtr == 0) ? null : new Rational(cPtr, false);
-  }
-
-/**
- * Gets the value of this property, and returns as a boolean  
- * @param	name name of option  
- * @return	boolean value of property, or false on error.  
- */
-  public boolean getPropertyAsBoolean(String name) {
-    return VideoJNI.Container_getPropertyAsBoolean(swigCPtr, this, name);
-  }
-
-/**
- * Get the flags associated with this object.  
- * @return	The (compacted) value of all flags set.  
- */
-  public int getFlags() {
-    return VideoJNI.Container_getFlags(swigCPtr, this);
-  }
-
-/**
- * Get the setting for the specified flag  
- * @param	flag The flag you want to find the setting for  
- * @return	0 for false; non-zero for true  
- */
-  public boolean getFlag(Container.Flag flag) {
-    return VideoJNI.Container_getFlag(swigCPtr, this, flag.swigValue());
-  }
-
-/**
- * Set the flag.  
- * @param	flag The flag to set  
- * @param	value The value to set it to (true or false)  
- */
-  public void setFlag(Container.Flag flag, boolean value) {
-    VideoJNI.Container_setFlag(swigCPtr, this, flag.swigValue(), value);
-  }
-
-/**
- * Set the flags to use with this object. All values  
- * must be ORed (|) together.  
- * @see		Flags  
- * @param	newFlags The new set flags for this codec.  
- */
-  public void setFlags(int newFlags) {
-    VideoJNI.Container_setFlags(swigCPtr, this, newFlags);
-  }
-
-/**
- * Get the URL the Container was opened with.  
- * May return null if unknown.  
- * @return	the URL opened, or null.  
- */
-  public String getURL() {
-    return VideoJNI.Container_getURL(swigCPtr, this);
-  }
-
-/**
- * Get the {@link IMetaData} for this object,  
- * or null if none.  
- * <p>  
- * If the {@link Container} or {@link Stream} object  
- * that this {@link IMetaData} came from was opened  
- * for reading, then changes via {@link IMetaData#setValue(String, String)} 
- *  
- * will have no effect on the underlying media.  
- * </p>  
- * <p>  
- * If the {@link Container} or {@link Stream} object  
- * that this {@link IMetaData} came from was opened  
- * for writing, then changes via {@link IMetaData#setValue(String, String)} 
- *  
- * will have no effect after {@link Sink#writeHeader()}  
- * is called.  
- * </p>  
- * @return	the {@link IMetaData}.  
- */
-  public MetaData getMetaData() {
-    long cPtr = VideoJNI.Container_getMetaData(swigCPtr, this);
-    return (cPtr == 0) ? null : new MetaData(cPtr, false);
-  }
-
-/**
- * {@inheritDoc}  
- */
-  public int setProperty(MetaData valuesToSet, MetaData valuesNotFound) {
-    return VideoJNI.Container_setProperty__SWIG_5(swigCPtr, this, MetaData.getCPtr(valuesToSet), valuesToSet, MetaData.getCPtr(valuesNotFound), valuesNotFound);
+  public Container.State getState() {
+    return Container.State.swigToEnum(VideoJNI.Container_getState(swigCPtr, this));
   }
 
   public enum Flag {
@@ -540,6 +210,72 @@ public class Container extends RefCounted {
 
     @SuppressWarnings("unused")
     private Flag(Flag swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
+  public enum State {
+  /**
+   * Containers can only be in one of four states:
+   * STATE_INITED: Allocated but open has not been called yet. Transitions 
+   * to STATE_OPENED when ::open(...)
+   * is successfully called, or STATE_ERROR if ::open(...) has an error. 
+   *
+   */
+    STATE_INITED,
+  /**
+   * STATE_OPENED: Opened and read to read or write data. Transitions 
+   * to STATE_CLOSED on successful ::close(...)
+   * or STATE_ERROR if ::close(...) has an error.
+   */
+    STATE_OPENED,
+  /**
+   * Some containers (e.g. networks) can be paused.
+   */
+    STATE_PAUSED,
+  /**
+   * STATE_CLOSED: Container is closed and should be discarded.
+   */
+    STATE_CLOSED,
+  /**
+   * STATE_ERROR: Container had an error and should be discarded.
+   */
+    STATE_ERROR;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static State swigToEnum(int swigValue) {
+      State[] swigValues = State.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (State swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + State.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private State() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private State(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private State(State swigEnum) {
       this.swigValue = swigEnum.swigValue;
       SwigNext.next = this.swigValue+1;
     }

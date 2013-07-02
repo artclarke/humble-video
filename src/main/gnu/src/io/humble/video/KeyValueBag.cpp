@@ -17,24 +17,24 @@
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MetaData.h"
-#include "MetaDataImpl.h"
+#include "KeyValueBag.h"
+#include "KeyValueBagImpl.h"
 
 namespace io { namespace humble { namespace video
 {
 
-MetaData :: MetaData()
+KeyValueBag :: KeyValueBag()
 {
 
 }
 
-MetaData :: ~MetaData()
+KeyValueBag :: ~KeyValueBag()
 {
 }
 
-MetaData*
-MetaData :: make()
+KeyValueBag*
+KeyValueBag :: make()
 {
-  return MetaDataImpl::make();
+  return KeyValueBagImpl::make();
 }
 }}}

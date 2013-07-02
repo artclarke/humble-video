@@ -13,14 +13,16 @@ libhumble_video_la_LIBADD= $(VS_PKG_LIBRARIES)
 
 libhumble_video_la_SOURCES= \
   PixelFormat.cpp \
-  MetaData.cpp \
-  MetaDataImpl.cpp \
+  KeyValueBag.cpp \
+  KeyValueBagImpl.cpp \
   Property.cpp \
   PropertyImpl.cpp \
   Rational.cpp \
   RationalImpl.cpp \
   ContainerFormat.cpp \
+  Configurable.cpp \
   Container.cpp \
+  Source.cpp \
   OutputFormat.cpp \
   InputFormat.cpp \
   Global.cpp
@@ -35,9 +37,9 @@ libhumble_video_la_HEADERS= \
   FfmpegIncludes.h \
   Global.swg \
   PixelFormat.h \
-  MetaData.h \
-  MetaDataImpl.h \
-  MetaData.swg \
+  KeyValueBag.h \
+  KeyValueBagImpl.h \
+  KeyValueBag.swg \
   Rational.h \
   RationalImpl.h \
   Rational.swg \
@@ -52,6 +54,10 @@ libhumble_video_la_HEADERS= \
   InputFormat.swg \
   Container.h \
   Container.swg \
+  Configurable.h \
+  Configurable.swg \
+  Source.h \
+  Source.swg \
   Global.h
 
 BUILT_SOURCES= \

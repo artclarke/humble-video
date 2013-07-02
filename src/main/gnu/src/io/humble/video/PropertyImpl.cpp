@@ -19,7 +19,7 @@
 
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/PropertyImpl.h>
-#include <io/humble/video/MetaDataImpl.h>
+#include <io/humble/video/KeyValueBagImpl.h>
 extern "C" {
 #include "FfmpegIncludes.h"
 #include <libavutil/log.h>
@@ -573,12 +573,12 @@ namespace io { namespace humble { namespace video {
   
 
   int32_t
-  PropertyImpl :: setProperty(void *aContext, MetaData* aValuesToSet, MetaData* aValuesNotFound)
+  PropertyImpl :: setProperty(void *aContext, KeyValueBag* aValuesToSet, KeyValueBag* aValuesNotFound)
   {
     int32_t retval =-1;
     AVDictionary *tmp = 0;
-    MetaDataImpl* valuesToSet = dynamic_cast<MetaDataImpl*>(aValuesToSet);
-    MetaDataImpl* valuesNotFound = dynamic_cast<MetaDataImpl*>(aValuesNotFound);
+    KeyValueBagImpl* valuesToSet = dynamic_cast<KeyValueBagImpl*>(aValuesToSet);
+    KeyValueBagImpl* valuesNotFound = dynamic_cast<KeyValueBagImpl*>(aValuesNotFound);
     AVDictionary *orig = valuesToSet ? valuesToSet->getDictionary() : 0;
 
     try {

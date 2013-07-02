@@ -16,16 +16,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef METADATA_H_
-#define METADATA_H_
+#ifndef KEYVALUEBAGIMPL_H_
+#define KEYVALUEBAGIMPL_H_
 
-#include <io/humble/video/MetaData.h>
+#include <io/humble/video/KeyValueBag.h>
 namespace io { namespace humble { namespace video
 {
 
-class MetaDataImpl : public MetaData
+class KeyValueBagImpl : public KeyValueBag
 {
-  VS_JNIUTILS_REFCOUNTED_OBJECT(MetaDataImpl);
+  VS_JNIUTILS_REFCOUNTED_OBJECT(KeyValueBagImpl);
 public:
   virtual int32_t getNumKeys();
   virtual const char* getKey(int32_t position);
@@ -35,25 +35,25 @@ public:
   virtual int32_t setValue(const char* key, const char* value, Flags flag);
   
   /**
-   * Create a MetaData object using metaDataToReference.
-   * Once this is done, this MetaData object is responsible
-   * for calling av_dict_free(*metaDataToReference),
+   * Create a KeyValueBag object using keyValueBagToReference.
+   * Once this is done, this KeyValueBag object is responsible
+   * for calling av_dict_free(*keyValueBagToReference),
    * so take care.
    * 
    */
-  static MetaDataImpl* make(AVDictionary ** metaDataToReference);
+  static KeyValueBagImpl* make(AVDictionary ** keyValueBagToReference);
   
   /**
-   * Copies all meta data currently in metaDataToCopy
+   * Copies all meta data currently in keyValueBagToCopy
    * and returns a new object.
    */
-  static MetaDataImpl* make(AVDictionary* metaDataToCopy);
+  static KeyValueBagImpl* make(AVDictionary* keyValueBagToCopy);
   
   /**
    * Destroys the current data, and copies all data
    * from copy.
    */
-  int32_t copy(MetaData* copy);
+  int32_t copy(KeyValueBag* copy);
 
   /**
    * Destroys the current data and copies all data from copy.
@@ -65,15 +65,15 @@ public:
    *
    * @return The underlying AVDictionary
    */
-  AVDictionary* getDictionary() { return (mMetaData ? *mMetaData : 0); }
+  AVDictionary* getDictionary() { return (mBag ? *mBag : 0); }
 
 protected:
-  MetaDataImpl();
+  KeyValueBagImpl();
   virtual
-  ~MetaDataImpl();
+  ~KeyValueBagImpl();
 private:
-  AVDictionary** mMetaData;
-  AVDictionary* mLocalMeta;
+  AVDictionary** mBag;
+  AVDictionary* mLocalBag;
 };
 
 }
@@ -82,4 +82,4 @@ private:
 
 }
 
-#endif /* METADATA_H_ */
+#endif /* KEYVALUEBAGIMPL_H_ */

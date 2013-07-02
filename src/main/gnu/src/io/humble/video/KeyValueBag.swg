@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  */
-%typemap (javacode) io::humble::video::MetaData,io::humble::video::MetaData*,io::humble::video::MetaData& %{
+%typemap (javacode) io::humble::video::KeyValueBag,io::humble::video::KeyValueBag*,io::humble::video::KeyValueBag& %{
   /**
    * Return the meta-data, with all values expanded.
    */
@@ -29,7 +29,7 @@
     java.util.Collection<String> keys = getKeys();
     for(String key: keys)
     {
-      String value = getValue(key, MetaData.Flags.METADATA_NONE);
+      String value = getValue(key, KeyValueBag.Flags.KVB_NONE);
       result.append(key).append("=").append(value).append(";");
     }
     result.append("]");
@@ -62,9 +62,9 @@
    */
   public String getValue(String key)
   {
-    return getValue(key, MetaData.Flags.METADATA_NONE);
+    return getValue(key, KeyValueBag.Flags.KVB_NONE);
   }
 %}
-%javamethodmodifiers io::humble::video::MetaData::getKey(int32_t) "private"
+%javamethodmodifiers io::humble::video::KeyValueBag::getKey(int32_t) "private"
 
-%include <io/humble/video/MetaData.h>
+%include <io/humble/video/KeyValueBag.h>

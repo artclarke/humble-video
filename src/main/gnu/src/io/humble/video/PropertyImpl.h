@@ -29,7 +29,7 @@ extern "C" {
 
 namespace io { namespace humble { namespace video {
 
-  class MetaData;
+  class KeyValueBag;
 
   /**
    * A wrapper for an FFMPEG AVOption value.
@@ -213,7 +213,7 @@ namespace io { namespace humble { namespace video {
      * @return 0 on success; <0 on failure
      * @since 5.0
      */
-    static int32_t setProperty(void *context, MetaData* valuesToSet, MetaData* valuesNotFound);
+    static int32_t setProperty(void *context, KeyValueBag* valuesToSet, KeyValueBag* valuesNotFound);
 
   protected:
     PropertyImpl();

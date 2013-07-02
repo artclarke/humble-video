@@ -96,10 +96,11 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_video_la_DEPENDENCIES =
-am_libhumble_video_la_OBJECTS = PixelFormat.lo MetaData.lo \
-	MetaDataImpl.lo Property.lo PropertyImpl.lo Rational.lo \
-	RationalImpl.lo ContainerFormat.lo Container.lo \
-	OutputFormat.lo InputFormat.lo Global.lo
+am_libhumble_video_la_OBJECTS = PixelFormat.lo KeyValueBag.lo \
+	KeyValueBagImpl.lo Property.lo PropertyImpl.lo Rational.lo \
+	RationalImpl.lo ContainerFormat.lo Configurable.lo \
+	Container.lo Source.lo OutputFormat.lo InputFormat.lo \
+	Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -417,14 +418,16 @@ noinst_LTLIBRARIES = libhumble-video.la
 libhumble_video_la_LIBADD = $(VS_PKG_LIBRARIES)
 libhumble_video_la_SOURCES = \
   PixelFormat.cpp \
-  MetaData.cpp \
-  MetaDataImpl.cpp \
+  KeyValueBag.cpp \
+  KeyValueBagImpl.cpp \
   Property.cpp \
   PropertyImpl.cpp \
   Rational.cpp \
   RationalImpl.cpp \
   ContainerFormat.cpp \
+  Configurable.cpp \
   Container.cpp \
+  Source.cpp \
   OutputFormat.cpp \
   InputFormat.cpp \
   Global.cpp
@@ -439,9 +442,9 @@ libhumble_video_la_HEADERS = \
   FfmpegIncludes.h \
   Global.swg \
   PixelFormat.h \
-  MetaData.h \
-  MetaDataImpl.h \
-  MetaData.swg \
+  KeyValueBag.h \
+  KeyValueBagImpl.h \
+  KeyValueBag.swg \
   Rational.h \
   RationalImpl.h \
   Rational.swg \
@@ -456,6 +459,10 @@ libhumble_video_la_HEADERS = \
   InputFormat.swg \
   Container.h \
   Container.swg \
+  Configurable.h \
+  Configurable.swg \
+  Source.h \
+  Source.swg \
   Global.h
 
 BUILT_SOURCES = \
