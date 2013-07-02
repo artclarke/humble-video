@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *
+ *  
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
@@ -16,23 +16,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
+/*
+ * SourceImpl.cpp
+ *
+ *  Created on: Jul 2, 2013
+ *      Author: aclarke
+ */
 
-#include "Source.h"
 #include "SourceImpl.h"
 
 namespace io {
 namespace humble {
 namespace video {
 
-Source::Source() {
+SourceImpl::SourceImpl() {
 }
 
-Source::~Source() {
+SourceImpl::~SourceImpl() {
 }
 
-Source*
-Source::make() {
-  return SourceImpl::make();
+SourceImpl*
+SourceImpl::make()
+{
+  return 0;
 }
 
 } /* namespace video */

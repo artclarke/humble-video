@@ -23,6 +23,7 @@ libhumble_video_la_SOURCES= \
   Configurable.cpp \
   Container.cpp \
   Source.cpp \
+  SourceImpl.cpp \
   OutputFormat.cpp \
   InputFormat.cpp \
   Global.cpp
@@ -58,6 +59,7 @@ libhumble_video_la_HEADERS= \
   Configurable.swg \
   Source.h \
   Source.swg \
+  SourceImpl.h \
   Global.h
 
 BUILT_SOURCES= \

@@ -237,6 +237,10 @@ public class Container extends Configurable {
    */
     STATE_OPENED,
   /**
+   * Some Sources can be live (i.e. in Play mode)
+   */
+    STATE_PLAYING,
+  /**
    * Some containers (e.g. networks) can be paused.
    */
     STATE_PAUSED,

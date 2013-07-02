@@ -26,6 +26,9 @@
 #define CONTAINER_H_
 
 #include <io/humble/video/HumbleVideo.h>
+#include <io/humble/video/Rational.h>
+#include <io/humble/video/Property.h>
+#include <io/humble/video/KeyValueBag.h>
 #include <io/humble/video/Codec.h>
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/ContainerFormat.h>
@@ -51,10 +54,19 @@ protected:
   {
   }
 };
+class VS_API_HUMBLEVIDEO Packet : public ::io::humble::ferry::RefCounted
+{
+public:
 
-class Property;
-class KeyValueBag;
-class Rational;
+protected:
+  Packet()
+  {
+  }
+  virtual
+  ~Packet()
+  {
+  }
+};
 
 /**
  * A Container for Media data. This is an abstract class and
@@ -112,6 +124,10 @@ public:
      *   or STATE_ERROR if ::close(...) has an error.
      */
     STATE_OPENED,
+    /**
+     * Some Sources can be live (i.e. in Play mode)
+     */
+    STATE_PLAYING,
     /**
      * Some containers (e.g. networks) can be paused.
      */

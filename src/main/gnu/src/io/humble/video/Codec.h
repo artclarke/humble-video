@@ -194,6 +194,27 @@ class VS_API_HUMBLEVIDEO Codec : public io::humble::ferry::RefCounted
 {
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(Codec)
 public:
+  /**
+   * When decoding, you can instruct streams to discard some
+   * packets. The following table specifies which one.
+   * Each subsequent enum value drops more packets than the prior.
+   */
+  typedef enum DiscardFlag
+  {
+    /** Discard nothing. */
+    DISCARD_NONE = AVDISCARD_NONE,
+    /** Discard useless packets like 0 size packets in avi. */
+    DISCARD_DEFAULT = AVDISCARD_DEFAULT,
+    /** Discard all non reference */
+    DISCARD_NONREF = AVDISCARD_NONREF,
+    /** Discard all bidirectional frames */
+    DISCARD_BIDIR = AVDISCARD_BIDIR,
+    /** Discard all frames except keyframes */
+    DISCARD_NONKEY = AVDISCARD_NONKEY,
+    /** discard all */
+    DISCARD_ALL = AVDISCARD_ALL,
+  } DiscardFlag;
+
 
   typedef enum ID
   {

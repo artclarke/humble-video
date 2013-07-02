@@ -122,6 +122,73 @@ public class Codec extends RefCounted {
     return VideoJNI.Codec_hasCapability(swigCPtr, this, c.swigValue());
   }
 
+  public enum DiscardFlag {
+  /**
+   * When decoding, you can instruct streams to discard some
+   * packets. The following table specifies which one.
+   * Each subsequent enum value drops more packets than the prior.
+   * Discard nothing.
+   */
+    DISCARD_NONE(VideoJNI.Codec_DISCARD_NONE_get()),
+  /**
+   * Discard useless packets like 0 size packets in avi.
+   */
+    DISCARD_DEFAULT(VideoJNI.Codec_DISCARD_DEFAULT_get()),
+  /**
+   * Discard all non reference
+   */
+    DISCARD_NONREF(VideoJNI.Codec_DISCARD_NONREF_get()),
+  /**
+   * Discard all bidirectional frames
+   */
+    DISCARD_BIDIR(VideoJNI.Codec_DISCARD_BIDIR_get()),
+  /**
+   * Discard all frames except keyframes
+   */
+    DISCARD_NONKEY(VideoJNI.Codec_DISCARD_NONKEY_get()),
+  /**
+   * discard all
+   */
+    DISCARD_ALL(VideoJNI.Codec_DISCARD_ALL_get());
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static DiscardFlag swigToEnum(int swigValue) {
+      DiscardFlag[] swigValues = DiscardFlag.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (DiscardFlag swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + DiscardFlag.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private DiscardFlag() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private DiscardFlag(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private DiscardFlag(DiscardFlag swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
   public enum ID {
   /**
    * Identify the syntax and semantics of the bitstream.
