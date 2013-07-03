@@ -34,19 +34,19 @@ namespace video {
 
 class SourceImpl : public io::humble::video::Source
 {
+  VS_JNIUTILS_REFCOUNTED_OBJECT(SourceImpl)
 public:
-  static SourceImpl* make();
   virtual State
-  getState() = 0;
+  getState() { return mState; }
 
   virtual InputFormat *
-  getInputFormat() = 0;
+  getInputFormat() { return mFormat.get(); }
 
   virtual int32_t
-  setInputBufferLength(int32_t size)=0;
+  setInputBufferLength(int32_t size);
 
   virtual int32_t
-  getInputBufferLength()=0;
+  getInputBufferLength();
 
   virtual int32_t
   open(const char *url, InputFormat* format, bool streamsCanBeAddedDynamically,
@@ -54,80 +54,80 @@ public:
       KeyValueBag* optionsNotSet);
 
   virtual int32_t
-  close()=0;
+  close();
 
   virtual int32_t
-  getNumStreams()=0;
+  getNumStreams();
 
   virtual Stream*
-  getStream(int32_t streamIndex)=0;
+  getStream(int32_t streamIndex);
 
   virtual int32_t
-  read(Packet *packet)=0;
+  read(Packet *packet);
 
   virtual int32_t
-  queryStreamMetaData()=0;
+  queryStreamMetaData();
 
   virtual int64_t
-  getDuration()=0;
+  getDuration();
 
   virtual int64_t
-  getStartTime()=0;
+  getStartTime();
 
   virtual int64_t
-  getFileSize()=0;
+  getFileSize();
 
   virtual int32_t
-  getBitRate()=0;
+  getBitRate();
 
   virtual int32_t
-  getFlags()=0;
+  getFlags();
 
   virtual void
-  setFlags(int32_t newFlags) = 0;
+  setFlags(int32_t newFlags);
 
   virtual bool
-  getFlag(Flag flag) = 0;
+  getFlag(Flag flag);
 
   virtual void
-  setFlag(Flag flag, bool value) = 0;
+  setFlag(Flag flag, bool value);
 
   virtual const char*
-  getURL()=0;
+  getURL();
 
   virtual int32_t
-  getReadRetryCount()=0;
+  getReadRetryCount();
 
   virtual void
-  setReadRetryCount(int32_t count)=0;
+  setReadRetryCount(int32_t count);
 
   virtual bool
-  canStreamsBeAddedDynamically()=0;
+  canStreamsBeAddedDynamically();
 
   virtual KeyValueBag*
-  getMetaData()=0;
+  getMetaData();
 
   virtual int32_t
-  setForcedAudioCodec(Codec::ID id)=0;
+  setForcedAudioCodec(Codec::ID id);
 
   virtual int32_t
-  setForcedVideoCodec(Codec::ID id)=0;
+  setForcedVideoCodec(Codec::ID id);
 
   virtual int32_t
-  setForcedSubtitleCodec(Codec::ID id)=0;
+  setForcedSubtitleCodec(Codec::ID id);
 
   virtual int32_t
-  getMaxDelay()=0;
+  getMaxDelay();
 
   virtual int32_t
   seek(int32_t stream_index, int64_t min_ts, int64_t ts,
-      int64_t max_ts, int32_t flags)=0;
+      int64_t max_ts, int32_t flags);
 
   virtual int32_t
-  play()=0;
+  play();
 
   virtual int32_t
-  pause()=0;
+  pause();
 
 protected:
   SourceImpl();
@@ -135,12 +135,15 @@ protected:
   ~SourceImpl();
   virtual void* getCtx() { return mCtx; }
 private:
+  int32_t doOpen(const char*, AVDictionary**);
   Container::State mState;
   AVFormatContext* mCtx;
   int32_t mReadRetryMax;
   int32_t mInputBufferLength;
   io::humble::video::customio::URLProtocolHandler* mIOHandler;
   io::humble::ferry::RefPointer<InputFormat> mFormat;
+  Stream** mStreams;
+  io::humble::ferry::RefPointer<KeyValueBag> mMetaData;
 };
 
 } /* namespace video */

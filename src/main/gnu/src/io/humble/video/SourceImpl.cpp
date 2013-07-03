@@ -98,6 +98,7 @@ namespace humble {
 namespace video {
 
 SourceImpl::SourceImpl() {
+  mStreams = 0;
   mReadRetryMax = 1;
   mInputBufferLength = 0;
   mIOHandler = 0;
@@ -106,13 +107,15 @@ SourceImpl::SourceImpl() {
   // Set up thread interrupt capabilities
   mCtx->interrupt_callback.callback = Global::avioInterruptCB;
   mCtx->interrupt_callback.opaque = this;
-
+  // we're going to always clean up the avio structures ourselves.
+  mCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
   mState = Container::STATE_INITED;
 }
 
 SourceImpl::~SourceImpl() {
   if (mIOHandler) {
-    if (mCtx->pb) av_freep(&mCtx->pb->buffer);
+    if (mCtx->pb)
+      av_freep(&mCtx->pb->buffer);
     av_freep(&mCtx->pb);
     delete mIOHandler;
     mIOHandler = 0;
@@ -124,8 +127,6 @@ int32_t
 SourceImpl::open(const char *url, InputFormat* format,
     bool streamsCanBeAddedDynamically, bool queryMetaData,
     KeyValueBag* options, KeyValueBag* optionsNotSet) {
-  (void) queryMetaData;
-  (void) streamsCanBeAddedDynamically;
 
   int retval = -1;
   if (mState != Container::STATE_INITED) {
@@ -140,6 +141,8 @@ SourceImpl::open(const char *url, InputFormat* format,
     mFormat.reset(format, true);
     mCtx->iformat = mFormat->getCtx();
   }
+
+  AVInputFormat* oldFormat = mCtx->iformat;
 
   // Let's check for custom IO
   mIOHandler = URLProtocolManager::findHandler(
@@ -186,17 +189,269 @@ SourceImpl::open(const char *url, InputFormat* format,
   // Now call the real open method; this is done
   // in another function to ensure we clean up tmp
   // afterwards.
-  retval = -1;
+  retval = doOpen(url, &tmp);
   VS_CHECK_INTERRUPT(retval, true);
 
+  if (retval > 0) {
+    if (oldFormat != mCtx->iformat)
+      mFormat = InputFormat::make(mCtx->iformat);
+
+    if (streamsCanBeAddedDynamically)
+      mCtx->ctx_flags |= AVFMTCTX_NOHEADER;
+    if (queryMetaData)
+      retval = this->queryStreamMetaData();
+  }
   if (tmp)
     av_dict_free(&tmp);
+  if (retval < 0)
+    mState = Container::STATE_ERROR;
   return retval;
 }
 
-SourceImpl*
-SourceImpl::make() {
+int32_t
+SourceImpl::setInputBufferLength(int32_t size) {
+  if (mState != Container::STATE_INITED)
+    return -1;
+  if (size < 0)
+    return -1;
+  int32_t retval = mInputBufferLength;
+  mInputBufferLength = size;
+  return retval;
+}
+
+int32_t
+SourceImpl::getInputBufferLength() {
+  return mInputBufferLength;
+}
+
+int32_t
+SourceImpl::getNumStreams() {
+  return (int32_t)mCtx->nb_streams;
+}
+
+int32_t
+SourceImpl::close() {
+  int32_t retval=-1;
+  switch(mState)
+  {
+  case Container::STATE_OPENED:
+  case Container::STATE_PLAYING:
+  case Container::STATE_PAUSED:
+    // All these cases are valid.
+    break;
+  default:
+  {
+    VS_LOG_WARN("Attempt to close container (%s) when not opened, playing or paused is ignored", getURL());
+    return -1;
+  }
+
+  }
+  // we need to remember the avio context
+  AVIOContext* pb = mCtx->pb;
+
+  avformat_close_input(&mCtx);
+  if (mIOHandler) {
+    retval = mIOHandler->url_close();
+    if (retval < 0) {
+      VS_LOG_ERROR("Error when closing container (%s): %d", getURL(), retval);
+      mState = Container::STATE_ERROR;
+    }
+
+    if (pb)
+      av_freep(&pb->buffer);
+    av_free(pb);
+  } else
+    retval = 0;
+  if (mState != Container::STATE_ERROR)
+    mState = Container::STATE_CLOSED;
+  return retval;
+}
+
+Stream*
+SourceImpl::getStream(int32_t streamIndex) {
+  (void) streamIndex;
   return 0;
+}
+
+int32_t
+SourceImpl::read(Packet* packet) {
+  (void) packet;
+  return -1;
+}
+
+int32_t
+SourceImpl::queryStreamMetaData() {
+  return -1;
+}
+
+int64_t
+SourceImpl::getDuration() {
+  return mCtx->duration;
+}
+
+int64_t
+SourceImpl::getStartTime() {
+  return mCtx->start_time;
+}
+
+int64_t
+SourceImpl::getFileSize() {
+  int64_t retval = -1;
+  if (mCtx->iformat && (mCtx->iformat->flags & AVFMT_NOFILE))
+    retval = 0;
+  else {
+    retval = avio_size(mCtx->pb);
+    retval = FFMAX(0, retval);
+  }
+  return retval;
+}
+
+int32_t
+SourceImpl::getBitRate() {
+  return mCtx->bit_rate;
+}
+
+int32_t
+SourceImpl::getFlags() {
+  int32_t flags = mCtx->flags;
+  // remove custom io if set
+  flags &= ~(AVFMT_FLAG_CUSTOM_IO);
+  return flags;
+}
+
+void
+SourceImpl::setFlags(int32_t newFlags) {
+  mCtx->flags = newFlags;
+  mCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
+}
+
+bool
+SourceImpl::getFlag(Flag flag) {
+  return mCtx->flags & flag;
+}
+
+void
+SourceImpl::setFlag(Flag flag, bool value) {
+  if (value)
+    mCtx->flags |= flag;
+  else
+    mCtx->flags &= (~flag);
+}
+
+const char*
+SourceImpl::getURL() {
+  return mCtx->filename;
+}
+
+int32_t
+SourceImpl::getReadRetryCount() {
+  return mReadRetryMax;
+}
+
+void
+SourceImpl::setReadRetryCount(int32_t count) {
+  if (count >= 0)
+    mReadRetryMax = count;
+}
+
+bool
+SourceImpl::canStreamsBeAddedDynamically() {
+  return mCtx->ctx_flags & AVFMTCTX_NOHEADER;
+}
+
+KeyValueBag*
+SourceImpl::getMetaData() {
+  if (!mMetaData)
+    mMetaData = KeyValueBagImpl::make(mCtx->metadata);
+  return mMetaData.get();
+}
+
+int32_t
+SourceImpl::setForcedAudioCodec(Codec::ID id) {
+  mCtx->audio_codec_id = (enum AVCodecID) id;
+  return 0;
+}
+
+int32_t
+SourceImpl::setForcedVideoCodec(Codec::ID id) {
+  mCtx->video_codec_id = (enum AVCodecID) id;
+  return 0;
+}
+
+int32_t
+SourceImpl::setForcedSubtitleCodec(Codec::ID id) {
+  mCtx->subtitle_codec_id = (enum AVCodecID)id;
+  return 0;
+}
+
+int32_t
+SourceImpl::getMaxDelay() {
+  return mCtx->max_delay;
+}
+
+int32_t
+SourceImpl::seek(int32_t stream_index, int64_t min_ts, int64_t ts,
+    int64_t max_ts, int32_t flags) {
+  if (mState != Container::STATE_OPENED)
+  {
+    VS_LOG_WARN("Can only seek on OPEN (not paused or playing) containers.");
+    return -1;
+  }
+  int32_t retval = avformat_seek_file(mCtx,
+      stream_index,
+      min_ts,
+      ts,
+      max_ts,
+      flags);
+  // TODO: Make sure all FFmpeg input buffers are cleared after seek
+
+  VS_CHECK_INTERRUPT(retval, true);
+  return retval;
+}
+
+int32_t
+SourceImpl::pause() {
+  if (mState != Container::STATE_PLAYING)
+  {
+    VS_LOG_WARN("Can only pause containers in PLAYING state. Current state: %d", mState);
+    return -1;
+  }
+  int32_t retval = av_read_pause(mCtx);
+  VS_CHECK_INTERRUPT(retval, true);
+  if (retval >= 0)
+    mState = Container::STATE_PAUSED;
+  return retval;
+}
+
+int32_t
+SourceImpl::play() {
+  if (mState != Container::STATE_PAUSED || mState != Container::STATE_OPENED)
+  {
+    VS_LOG_WARN("Can only play containers in OPENED or PAUSED states. Current state: %d", mState);
+    return -1;
+  }
+  int32_t retval = av_read_play(mCtx);
+  VS_CHECK_INTERRUPT(retval, true);
+  if (retval >= 0)
+    mState = Container::STATE_PLAYING;
+  return retval;
+}
+
+int32_t
+SourceImpl::doOpen(const char* url, AVDictionary** options)
+{
+  int32_t retval=-1;
+
+  if (mIOHandler)
+    retval = mIOHandler->url_open(url, URLProtocolHandler::URL_RDONLY_MODE);
+
+  if (retval >= 0)
+    retval = avformat_open_input(&mCtx,
+        url,
+        mCtx->iformat,
+        options);
+
+  return retval;
 }
 
 } /* namespace video */
