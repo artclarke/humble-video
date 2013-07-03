@@ -28,8 +28,6 @@
 
 using namespace io::humble::video::customio;
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
-
 namespace io
 {
 namespace humble
@@ -43,7 +41,6 @@ Container::Container()
 
 Container::~Container()
 {
-  VS_LOG_DEBUG("Container destroyed");
 }
 
 

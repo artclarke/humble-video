@@ -93,3 +93,5 @@ clean-local:
 	rm -rf *.mp4
 	rm -rf *.mp3
 	rm -rf *.ogg
+	rm -rf *.log
+	rm -rf *.xml

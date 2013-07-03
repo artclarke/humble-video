@@ -5,17 +5,17 @@ VS_CPP_NAMESPACE=io::humble::testutils
 VS_TEST=1
 include @top_builddir@/mk/Makefile.global
 
-check_PROGRAMS=testutilsTestTrue
+check_PROGRAMS=TrueTest
 TESTS=$(check_PROGRAMS)
 
-testutilsTestTrue_SOURCES= \
+TrueTest_SOURCES= \
   TrueTest.cpp \
   Main.cpp
 
-nodist_testutilsTestTrue_SOURCES= \
+nodist_TrueTest_SOURCES= \
   TrueTest_CXXRunner.cpp 
 
-testutilsTestTrue_LDADD= \
+TrueTest_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
 BUILT_SOURCES= \
@@ -30,4 +30,5 @@ clean-local:
 	rm -rf *.flv
 	rm -rf *.mov
 	rm -rf *.mp3
-	rm -rf memcheck*.log
+	rm -rf *.log
+	rm -rf *.xml

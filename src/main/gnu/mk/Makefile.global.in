@@ -162,7 +162,7 @@ endif
 ifdef PYTHON_BIN
 %_CXXRunner.cpp : $(srcdir)/%.h
 	@echo "  TESTGEN  "$(notdir $<)
-	@$(PYTHON_BIN) $(abs_top_srcdir)/mk/cxxtest/bin/cxxtestgen  --have-eh --have-std --abort-on-fail -o $@ $<
+	@$(PYTHON_BIN) $(abs_top_srcdir)/mk/cxxtest/bin/cxxtestgen --xunit-printer --have-eh --have-std --abort-on-fail --world=$(notdir $<) --main=VS_TestMain -o $@ $<
 else
 %_CXXRunner.cpp : $(srcdir)/%.h
 	@echo "---------------- ERROR! ----------------"

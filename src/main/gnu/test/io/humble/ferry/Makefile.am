@@ -5,49 +5,49 @@ VS_CPP_NAMESPACE=io::humble::ferry
 VS_TEST=1
 include @top_builddir@/mk/Makefile.global
 
-check_PROGRAMS=ferryTestLogger ferryTestRefPointer ferryTestMutex  ferryTestBuffer
+check_PROGRAMS=LoggerTest RefPointerTest MutexTest BufferTest
 
 TESTS=$(check_PROGRAMS)
 
-ferryTestLogger_SOURCES= \
+LoggerTest_SOURCES= \
   LoggerTest.cpp \
   Main.cpp
 
-nodist_ferryTestLogger_SOURCES= \
+nodist_LoggerTest_SOURCES= \
   LoggerTest_CXXRunner.cpp
 
-ferryTestLogger_LDADD= \
+LoggerTest_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
 
-ferryTestRefPointer_SOURCES= \
+RefPointerTest_SOURCES= \
   RefPointerTest.cpp \
   Main.cpp
 
-nodist_ferryTestRefPointer_SOURCES= \
+nodist_RefPointerTest_SOURCES= \
   RefPointerTest_CXXRunner.cpp
 
-ferryTestRefPointer_LDADD= \
+RefPointerTest_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
-ferryTestMutex_SOURCES= \
+MutexTest_SOURCES= \
   MutexTest.cpp \
   Main.cpp 
 
-nodist_ferryTestMutex_SOURCES= \
+nodist_MutexTest_SOURCES= \
   MutexTest_CXXRunner.cpp
 
-ferryTestMutex_LDADD= \
+MutexTest_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
-ferryTestBuffer_SOURCES=\
+BufferTest_SOURCES=\
   BufferTest.cpp \
   Main.cpp
 
-nodist_ferryTestBuffer_SOURCES=\
+nodist_BufferTest_SOURCES=\
   BufferTest_CXXRunner.cpp
 
-ferryTestBuffer_LDADD=\
+BufferTest_LDADD=\
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
 
@@ -68,4 +68,5 @@ clean-local:
 	rm -rf *.flv
 	rm -rf *.mov
 	rm -rf *.mp3
-	rm -rf memcheck*.log
+	rm -rf *.log
+	rm -rf *.xml

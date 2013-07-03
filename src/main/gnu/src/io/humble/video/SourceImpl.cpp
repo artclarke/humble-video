@@ -200,12 +200,15 @@ SourceImpl::open(const char *url, InputFormat* format,
   retval = doOpen(url, &tmp);
   VS_CHECK_INTERRUPT(retval, true);
 
-  if (retval > 0) {
+  if (retval >= 0) {
+    mState = Container::STATE_OPENED;
+
     if (oldFormat != mCtx->iformat)
       mFormat = InputFormat::make(mCtx->iformat);
 
     if (streamsCanBeAddedDynamically)
       mCtx->ctx_flags |= AVFMTCTX_NOHEADER;
+
     if (queryMetaData)
       retval = this->queryStreamMetaData();
   }
@@ -448,7 +451,7 @@ SourceImpl::play() {
 int32_t
 SourceImpl::doOpen(const char* url, AVDictionary** options)
 {
-  int32_t retval=-1;
+  int32_t retval=0;
 
   if (mIOHandler)
     retval = mIOHandler->url_open(url, URLProtocolHandler::URL_RDONLY_MODE);

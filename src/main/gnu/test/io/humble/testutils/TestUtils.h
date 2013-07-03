@@ -21,6 +21,10 @@
 #define __TEST_UTILS_H__
 #include <cxxtest/TestSuite.h>
 
+// This is the main method that will be build by cxxtest. We need
+// to call it from our main.
+int VS_TestMain(int argc, char**argv);
+
 // These macros exists for backwards comability reasons; we used
 //  to use the Template Unit Testing framework and old code
 //  used this form.  This is no deprecated and you should
