@@ -123,16 +123,16 @@ public class Source extends Container {
 /**
  * {@inheritDoc}  
  */
-  public Container.State getState() {
-    return Container.State.swigToEnum(VideoJNI.Source_getState(swigCPtr, this));
+  protected ContainerFormat getFormat() {
+    long cPtr = VideoJNI.Source_getFormat(swigCPtr, this);
+    return (cPtr == 0) ? null : new ContainerFormat(cPtr, false);
   }
 
 /**
  * {@inheritDoc}  
  */
-  protected ContainerFormat getFormat() {
-    long cPtr = VideoJNI.Source_getFormat(swigCPtr, this);
-    return (cPtr == 0) ? null : new ContainerFormat(cPtr, false);
+  public Container.State getState() {
+    return Container.State.swigToEnum(VideoJNI.Source_getState(swigCPtr, this));
   }
 
 /**
@@ -274,7 +274,8 @@ public class Source extends Container {
   }
 
 /**
- * Reads the next packet into the Packet. This method will  
+ * Reads the next packet in the Source into the Packet. This method 
+ * will  
  * release any buffers currently held by this packet and allocate  
  * new ones.  
  * <p>If the current thread is interrupted while this blocking method 
@@ -288,8 +289,8 @@ public class Source extends Container {
  * @param	packet [In/Out] The packet the Source will read into.  
  * @return	0 if successful, or <0 if not.  
  */
-  public int readNextPacket(Packet packet) {
-    return VideoJNI.Source_readNextPacket(swigCPtr, this, Packet.getCPtr(packet), packet);
+  public int read(Packet packet) {
+    return VideoJNI.Source_read(swigCPtr, this, Packet.getCPtr(packet), packet);
   }
 
 /**

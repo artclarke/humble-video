@@ -47,14 +47,14 @@ public:
   make();
 
   /** {@inheritDoc} */
-  virtual State
-  getState() = 0;
-
-  /** {@inheritDoc} */
   virtual ContainerFormat *
   getFormat() {
     return getInputFormat();
   }
+
+  /** {@inheritDoc} */
+  virtual State
+  getState() = 0;
 
   /**
    * Get the {@link InputFormat} associated with this {@link Source}
@@ -173,7 +173,7 @@ public:
   getStream(int32_t streamIndex)=0;
 
   /**
-   * Reads the next packet into the Packet.  This method will
+   * Reads the next packet in the Source into the Packet.  This method will
    * release any buffers currently held by this packet and allocate
    * new ones.
    * <p>If the current thread is interrupted while this blocking method
@@ -189,7 +189,7 @@ public:
    * @return 0 if successful, or <0 if not.
    */
   virtual int32_t
-  readNextPacket(Packet *packet)=0;
+  read(Packet *packet)=0;
   /**
    * Attempts to read all the meta data in this stream, potentially by reading ahead
    * and decoding packets.

@@ -129,6 +129,9 @@ public:
    */
   static InputFormat* getFormat(int32_t index);
 
+#ifndef SWIG
+  virtual AVInputFormat* getCtx();
+#endif // ! SWIG
 protected:
   static InputFormat*
   make(AVInputFormat* format);

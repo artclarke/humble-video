@@ -30,64 +30,6 @@ using namespace io::humble::video::customio;
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
-extern "C"
-{
-/** Some static functions used by custom IO
- */
-int
-Container_url_read(void*h, unsigned char* buf, int size)
-{
-  int retval = -1;
-  try
-  {
-    URLProtocolHandler* handler = (URLProtocolHandler*) h;
-    if (handler)
-      retval = handler->url_read(buf, size);
-  } catch (...)
-  {
-    retval = -1;
-  }
-  VS_LOG_TRACE("URLProtocolHandler[%p]->url_read(%p, %d) ==> %d", h, buf, size,
-      retval);
-  return retval;
-}
-int
-Container_url_write(void*h, unsigned char* buf, int size)
-{
-  int retval = -1;
-  try
-  {
-    URLProtocolHandler* handler = (URLProtocolHandler*) h;
-    if (handler)
-      retval = handler->url_write(buf, size);
-  } catch (...)
-  {
-    retval = -1;
-  }
-  VS_LOG_TRACE("URLProtocolHandler[%p]->url_write(%p, %d) ==> %d", h, buf, size,
-      retval);
-  return retval;
-}
-
-int64_t
-Container_url_seek(void*h, int64_t position, int whence)
-{
-  int64_t retval = -1;
-  try
-  {
-    URLProtocolHandler* handler = (URLProtocolHandler*) h;
-    if (handler)
-      retval = handler->url_seek(position, whence);
-  } catch (...)
-  {
-    retval = -1;
-  }
-  VS_LOG_TRACE("URLProtocolHandler[%p]->url_seek(%p, %lld) ==> %d", h, position,
-      whence, retval);
-  return retval;
-}
-
-}
 namespace io
 {
 namespace humble

@@ -26,8 +26,8 @@
 #ifndef SOURCEIMPL_H_
 #define SOURCEIMPL_H_
 
-#include "Source.h"
-
+#include <io/humble/ferry/RefPointer.h>
+#include <io/humble/video/Source.h>
 namespace io {
 namespace humble {
 namespace video {
@@ -35,12 +35,112 @@ namespace video {
 class SourceImpl : public io::humble::video::Source
 {
 public:
-  virtual void fake()=0;
   static SourceImpl* make();
+  virtual State
+  getState() = 0;
+
+  virtual InputFormat *
+  getInputFormat() = 0;
+
+  virtual int32_t
+  setInputBufferLength(int32_t size)=0;
+
+  virtual int32_t
+  getInputBufferLength()=0;
+
+  virtual int32_t
+  open(const char *url, InputFormat* format, bool streamsCanBeAddedDynamically,
+      bool queryStreamMetaData, KeyValueBag* options,
+      KeyValueBag* optionsNotSet);
+
+  virtual int32_t
+  close()=0;
+
+  virtual int32_t
+  getNumStreams()=0;
+
+  virtual Stream*
+  getStream(int32_t streamIndex)=0;
+
+  virtual int32_t
+  read(Packet *packet)=0;
+
+  virtual int32_t
+  queryStreamMetaData()=0;
+
+  virtual int64_t
+  getDuration()=0;
+
+  virtual int64_t
+  getStartTime()=0;
+
+  virtual int64_t
+  getFileSize()=0;
+
+  virtual int32_t
+  getBitRate()=0;
+
+  virtual int32_t
+  getFlags()=0;
+
+  virtual void
+  setFlags(int32_t newFlags) = 0;
+
+  virtual bool
+  getFlag(Flag flag) = 0;
+
+  virtual void
+  setFlag(Flag flag, bool value) = 0;
+
+  virtual const char*
+  getURL()=0;
+
+  virtual int32_t
+  getReadRetryCount()=0;
+
+  virtual void
+  setReadRetryCount(int32_t count)=0;
+
+  virtual bool
+  canStreamsBeAddedDynamically()=0;
+
+  virtual KeyValueBag*
+  getMetaData()=0;
+
+  virtual int32_t
+  setForcedAudioCodec(Codec::ID id)=0;
+
+  virtual int32_t
+  setForcedVideoCodec(Codec::ID id)=0;
+
+  virtual int32_t
+  setForcedSubtitleCodec(Codec::ID id)=0;
+
+  virtual int32_t
+  getMaxDelay()=0;
+
+  virtual int32_t
+  seek(int32_t stream_index, int64_t min_ts, int64_t ts,
+      int64_t max_ts, int32_t flags)=0;
+
+  virtual int32_t
+  play()=0;
+
+  virtual int32_t
+  pause()=0;
+
 protected:
   SourceImpl();
   virtual
   ~SourceImpl();
+  virtual void* getCtx() { return mCtx; }
+private:
+  Container::State mState;
+  AVFormatContext* mCtx;
+  int32_t mReadRetryMax;
+  int32_t mInputBufferLength;
+  io::humble::video::customio::URLProtocolHandler* mIOHandler;
+  io::humble::ferry::RefPointer<InputFormat> mFormat;
 };
 
 } /* namespace video */
