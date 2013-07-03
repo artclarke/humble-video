@@ -34,8 +34,9 @@ namespace video {
 
 class SourceImpl : public io::humble::video::Source
 {
-  VS_JNIUTILS_REFCOUNTED_OBJECT(SourceImpl)
 public:
+  static SourceImpl* make();
+
   virtual State
   getState() { return mState; }
 

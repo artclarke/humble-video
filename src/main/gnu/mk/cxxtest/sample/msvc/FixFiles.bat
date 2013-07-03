@@ -73,17 +73,15 @@ TESTS            = <TESTS>
 CXXTESTDIR       = <CXXTEST>
 
 # Check CXXTESTDIR
-!if !exist($(CXXTESTDIR)\cxxtestgen.pl)
+!if !exist($(CXXTESTDIR)\bin\cxxtestgen)
 !error Please fix CXXTESTDIR
 !endif
 
-# cxxtestgen needs Perl or Python
-!if defined(PERL)
-CXXTESTGEN       = $(PERL) $(CXXTESTDIR)/cxxtestgen.pl
-!elseif defined(PYTHON)
-CXXTESTGEN       = $(PYTHON) $(CXXTESTDIR)/cxxtestgen.py
+# cxxtestgen needs Python
+!if defined(PYTHON)
+CXXTESTGEN       = $(PYTHON) $(CXXTESTDIR)/bin/cxxtestgen
 !else
-!error You must define PERL or PYTHON
+!error You must define PYTHON
 !endif
 
 # The arguments to pass to cxxtestgen

@@ -78,14 +78,16 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = InputFormatTest$(EXEEXT) OutputFormatTest$(EXEEXT) \
-	PropertyTest$(EXEEXT) RationalTest$(EXEEXT)
+check_PROGRAMS = SourceTest$(EXEEXT) InputFormatTest$(EXEEXT) \
+	OutputFormatTest$(EXEEXT) PropertyTest$(EXEEXT) \
+	RationalTest$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(noinst_HEADERS) $(top_srcdir)/mk/test-driver
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compiler_vendor.m4 \
-	$(top_srcdir)/m4/ax_prog_doxygen.m4 $(top_srcdir)/m4/humble.m4 \
+	$(top_srcdir)/m4/ax_prog_doxygen.m4 \
+	$(top_srcdir)/m4/ax_python.m4 $(top_srcdir)/m4/humble.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
 	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
 	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
@@ -125,6 +127,12 @@ RationalTest_OBJECTS = $(am_RationalTest_OBJECTS) \
 	$(nodist_RationalTest_OBJECTS)
 RationalTest_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_SourceTest_OBJECTS = SourceTest.$(OBJEXT) Main.$(OBJEXT)
+nodist_SourceTest_OBJECTS = SourceTest_CXXRunner.$(OBJEXT)
+SourceTest_OBJECTS = $(am_SourceTest_OBJECTS) \
+	$(nodist_SourceTest_OBJECTS)
+SourceTest_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -161,9 +169,11 @@ am__v_CXXLD_1 =
 SOURCES = $(InputFormatTest_SOURCES) $(nodist_InputFormatTest_SOURCES) \
 	$(OutputFormatTest_SOURCES) $(nodist_OutputFormatTest_SOURCES) \
 	$(PropertyTest_SOURCES) $(nodist_PropertyTest_SOURCES) \
-	$(RationalTest_SOURCES) $(nodist_RationalTest_SOURCES)
+	$(RationalTest_SOURCES) $(nodist_RationalTest_SOURCES) \
+	$(SourceTest_SOURCES) $(nodist_SourceTest_SOURCES)
 DIST_SOURCES = $(InputFormatTest_SOURCES) $(OutputFormatTest_SOURCES) \
-	$(PropertyTest_SOURCES) $(RationalTest_SOURCES)
+	$(PropertyTest_SOURCES) $(RationalTest_SOURCES) \
+	$(SourceTest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -525,10 +535,12 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PERL = @PERL@
 PKG_CONFIG = @PKG_CONFIG@
 PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+PYTHON_BIN = @PYTHON_BIN@
+PYTHON_INCLUDE_DIR = @PYTHON_INCLUDE_DIR@
+PYTHON_LIB = @PYTHON_LIB@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -610,12 +622,14 @@ VS_CPP_NAMESPACE = io::humble::video
 VS_TEST = 1
 SUBDIRS = customio
 BUILT_SOURCES = \
+  SourceTest_CXXRunner.cpp \
   InputFormatTest_CXXRunner.cpp \
   OutputFormatTest_CXXRunner.cpp \
   PropertyTest_CXXRunner.cpp \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  SourceTest.h \
   InputFormatTest.h \
   OutputFormatTest.h \
   PropertyTest.h \
@@ -627,6 +641,16 @@ inst_checkdir = $(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS = $(check_PROGRAMS)
+SourceTest_SOURCES = \
+  SourceTest.cpp \
+  Main.cpp
+
+nodist_SourceTest_SOURCES = \
+  SourceTest_CXXRunner.cpp
+
+SourceTest_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 InputFormatTest_SOURCES = \
   InputFormatTest.cpp \
   Main.cpp
@@ -727,6 +751,10 @@ PropertyTest$(EXEEXT): $(PropertyTest_OBJECTS) $(PropertyTest_DEPENDENCIES) $(EX
 RationalTest$(EXEEXT): $(RationalTest_OBJECTS) $(RationalTest_DEPENDENCIES) $(EXTRA_RationalTest_DEPENDENCIES) 
 	@rm -f RationalTest$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(RationalTest_OBJECTS) $(RationalTest_LDADD) $(LIBS)
+
+SourceTest$(EXEEXT): $(SourceTest_OBJECTS) $(SourceTest_DEPENDENCIES) $(EXTRA_SourceTest_DEPENDENCIES) 
+	@rm -f SourceTest$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(SourceTest_OBJECTS) $(SourceTest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -989,6 +1017,13 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+SourceTest.log: SourceTest$(EXEEXT)
+	@p='SourceTest$(EXEEXT)'; \
+	b='SourceTest'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 InputFormatTest.log: InputFormatTest$(EXEEXT)
 	@p='InputFormatTest$(EXEEXT)'; \
 	b='InputFormatTest'; \

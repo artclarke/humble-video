@@ -159,18 +159,18 @@ refreshswig:
 	@:
 endif
 
-ifdef PERL
+ifdef PYTHON_BIN
 %_CXXRunner.cpp : $(srcdir)/%.h
 	@echo "  TESTGEN  "$(notdir $<)
-	@$(PERL) -w $(abs_top_srcdir)/mk/cxxtest/cxxtestgen.pl  --have-eh --have-std --abort-on-fail -o $@ $<
+	@$(PYTHON_BIN) $(abs_top_srcdir)/mk/cxxtest/bin/cxxtestgen  --have-eh --have-std --abort-on-fail -o $@ $<
 else
 %_CXXRunner.cpp : $(srcdir)/%.h
 	@echo "---------------- ERROR! ----------------"
 	@echo "Test input file output file ($@) is out of date,"
 	@echo "because of $<"
-	@echo "but Perl is not available on this computer."
-	@echo "We need Perl to rebuild the test runner."
-	@echo "Please re-run configure with perl in your path."
+	@echo "but Python is not available on this computer."
+	@echo "We need Python to rebuild the test runner."
+	@echo "Please re-run configure with Python in your path."
 	@echo ""
 	@echo "---------------- ERROR! ----------------"
 	@false

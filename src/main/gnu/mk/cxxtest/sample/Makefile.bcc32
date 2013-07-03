@@ -15,7 +15,7 @@ TARGETS = error_printer.exe stdio_printer.exe yes_no_runner.exe file_printer.exe
 GUI_TARGETS = win32_runner.exe qt_runner.exe
 TESTS = *.h
 GUI_TESTS = gui/GreenYellowRed.h $(TESTS)
-TESTGEN = perl -w ../cxxtestgen.pl
+TESTGEN = ../bin/cxxtestgen
 CXXC = bcc32.exe -w- -I. -I..
 
 all: $(TARGETS)

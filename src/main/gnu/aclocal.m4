@@ -1051,6 +1051,7 @@ AC_SUBST([am__untar])
 
 m4_include([m4/ax_compiler_vendor.m4])
 m4_include([m4/ax_prog_doxygen.m4])
+m4_include([m4/ax_python.m4])
 m4_include([m4/humble.m4])
 m4_include([m4/libtool.m4])
 m4_include([m4/ltoptions.m4])

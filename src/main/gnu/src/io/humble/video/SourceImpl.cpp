@@ -123,6 +123,14 @@ SourceImpl::~SourceImpl() {
   avformat_free_context(mCtx);
 }
 
+SourceImpl*
+SourceImpl::make() {
+  Global::init();
+  SourceImpl *retval = new SourceImpl();
+  VS_REF_ACQUIRE(retval);
+  return retval;
+}
+
 int32_t
 SourceImpl::open(const char *url, InputFormat* format,
     bool streamsCanBeAddedDynamically, bool queryMetaData,

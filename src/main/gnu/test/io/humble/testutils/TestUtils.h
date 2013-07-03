@@ -19,7 +19,6 @@
 
 #ifndef __TEST_UTILS_H__
 #define __TEST_UTILS_H__
-
 #include <cxxtest/TestSuite.h>
 
 // These macros exists for backwards comability reasons; we used

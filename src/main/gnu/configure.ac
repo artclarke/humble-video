@@ -203,10 +203,7 @@ DX_PDF_FEATURE(ON)
 DX_PS_FEATURE(OFF)
 DX_INIT_DOXYGEN(VSM4_PROJECT_NAME, mk/Doxyfile, doc)
 
-AC_PATH_PROG([PERL],[perl])
-AC_ARG_VAR(PERL,
-          [Location of the 'perl' program; [PERL] is required if you add new tests or change exisitng tests.])
-AM_CONDITIONAL(HAVE_PERL, [ test "x$PERL" != "x" ])
+AX_PYTHON
 
 #----------------------------------------------------------------
 # Look for java

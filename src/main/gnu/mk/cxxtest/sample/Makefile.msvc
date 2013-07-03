@@ -14,7 +14,7 @@ TARGETS = error_printer.exe stdio_printer.exe yes_no_runner.exe file_printer.exe
 GUI_TARGETS = win32_runner.exe qt_runner.exe
 TESTS = *.h
 GUI_TESTS = gui/GreenYellowRed.h $(TESTS)
-TESTGEN = perl -w ../cxxtestgen.pl
+TESTGEN = python ../bin/cxxtestgen
 CXXC = cl.exe -GX -W3 -WX -I. -I..
 
 all: $(TARGETS)

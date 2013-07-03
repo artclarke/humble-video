@@ -130,11 +130,11 @@ public:
   static InputFormat* getFormat(int32_t index);
 
 #ifndef SWIG
-  virtual AVInputFormat* getCtx();
+  virtual AVInputFormat* getCtx() { return mFormat; }
   static InputFormat*
   make(AVInputFormat* format);
-
 #endif // ! SWIG
+
 protected:
 private:
   InputFormat();
