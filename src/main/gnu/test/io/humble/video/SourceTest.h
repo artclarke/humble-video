@@ -39,5 +39,9 @@ public:
   void testOpen();
   void testOpenDemuxerPrivatePropertySetting();
   void testOpenResetInputFormat();
+  void testOpenCustomIO();
+private:
+  void openTestHelper(const char* url);
+  char mSampleFile[2048];
 };
 #endif /* SOURCETEST_H_ */

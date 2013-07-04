@@ -30,16 +30,27 @@
 #include <io/humble/ferry/LoggerStack.h>
 #include "SourceTest.h"
 #include <io/humble/video/SourceImpl.h>
+#include <io/humble/video/customio/StdioURLProtocolManager.h>
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 using namespace io::humble::ferry;
 using namespace io::humble::video;
+using namespace io::humble::video::customio;
 
 SourceTest::SourceTest() {
+  mSampleFile[0] =0;
+  char *fixtureDirectory = getenv("VS_TEST_FIXTUREDIR");
+  if (!fixtureDirectory) {
+    TSM_ASSERT("no fixture dir", false);
+    throw new std::runtime_error("Must define environment variable VS_TEST_FIXTUREDIR");
+  }
+  snprintf(mSampleFile, sizeof(mSampleFile), "%s/%s", fixtureDirectory, "testfile.flv");
+  VS_LOG_TRACE("Sample File: %s", mSampleFile);
 }
 
 SourceTest::~SourceTest() {
+  URLProtocolManager::unregisterAllProtocols();
 }
 
 void
@@ -55,18 +66,14 @@ SourceTest::testMake() {
 
 void
 SourceTest::testOpen() {
+  openTestHelper(mSampleFile);
+}
+
+void
+SourceTest::openTestHelper(const char* file)
+{
   RefPointer<Source> source = Source::make();
   TS_ASSERT(source);
-  char file[2048];
-  const char *fixtureDirectory = getenv("VS_TEST_FIXTUREDIR");
-// mov opening causes leak on mac os x, and I cannot
-// track down why right now due to no internet access. ABC.
-//  const char *sample = "testfile_h264_mp4a_tmcd.mov";
-  const char *sample="testfile.flv";
-  if (fixtureDirectory && *fixtureDirectory)
-    snprintf(file, sizeof(file), "%s/%s", fixtureDirectory, sample);
-  else
-    snprintf(file, sizeof(file), "./%s", sample);
 
   int32_t retval = source->open(file, 0, false, false, 0, 0);
   TS_ASSERT(retval >= 0);
@@ -125,13 +132,7 @@ SourceTest::testOpenDemuxerPrivatePropertySetting()
   const char* INVALID_VALUE="23828";
   inputOptions->setValue(INVALID_OPTION, INVALID_VALUE);
   
-  char file[2048];
-  const char *fixtureDirectory = getenv("VS_TEST_FIXTUREDIR");
-  const char *sample="testfile.flv";
-  if (fixtureDirectory && *fixtureDirectory)
-    snprintf(file, sizeof(file), "%s/%s", fixtureDirectory, sample);
-  else
-    snprintf(file, sizeof(file), "./%s", sample);
+  const char* file = mSampleFile;
 
   int32_t r = source->open(file, 0, false, false, inputOptions.value(), 
       outputOptions.value());
@@ -152,16 +153,7 @@ SourceTest::testOpenResetInputFormat()
   RefPointer<InputFormat> format = 0;
   RefPointer<Source> source = Source::make();
   TS_ASSERT(source);
-  char file[2048];
-  const char *fixtureDirectory = getenv("VS_TEST_FIXTUREDIR");
-// mov opening causes leak on mac os x, and I cannot
-// track down why right now due to no internet access. ABC.
-//  const char *sample = "testfile_h264_mp4a_tmcd.mov";
-  const char *sample="testfile.flv";
-  if (fixtureDirectory && *fixtureDirectory)
-    snprintf(file, sizeof(file), "%s/%s", fixtureDirectory, sample);
-  else
-    snprintf(file, sizeof(file), "./%s", sample);
+  const char*file = mSampleFile;
 
   format = source->getInputFormat();
   TS_ASSERT(!format);
@@ -173,4 +165,15 @@ SourceTest::testOpenResetInputFormat()
     // and this should fail since the file is an FLV
     TS_ASSERT(retval < 0);
   }
+}
+
+void
+SourceTest::testOpenCustomIO()
+{
+  StdioURLProtocolManager::registerProtocol("test");
+  char url[2048];
+  snprintf(url, sizeof(url), "test:%s", mSampleFile);
+
+  // now, try open and close.
+  openTestHelper(url);
 }

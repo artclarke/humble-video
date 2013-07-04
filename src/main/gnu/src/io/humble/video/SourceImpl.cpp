@@ -113,9 +113,11 @@ SourceImpl::SourceImpl() {
 
 SourceImpl::~SourceImpl() {
   if (mIOHandler) {
-    if (mCtx->pb)
-      av_freep(&mCtx->pb->buffer);
-    av_freep(&mCtx->pb);
+    if (mCtx) {
+      if (mCtx->pb)
+        av_freep(&mCtx->pb->buffer);
+      av_freep(&mCtx->pb);
+    }
     delete mIOHandler;
     mIOHandler = 0;
   }
