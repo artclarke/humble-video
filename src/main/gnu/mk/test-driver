@@ -93,8 +93,8 @@ trap "st=143; $do_exit" 15
 
 # Test script is run here.
 if [ "x$VALGRIND_CMD" != "x" ]; then
-  echo "Running: $LIBTOOL --mode=execute $VALGRIND_CMD --tool=memcheck --error-exitcode=255 --time-stamp=yes --read-var-info=yes --demangle=yes --leak-check=full --show-reachable=yes --smc-check=all --suppressions=$VALGRIND_SUPPRESSIONS --gen-suppressions=all --execute $@" >> $log_file 2>&1
-  $LIBTOOL --mode=execute $VALGRIND_CMD --tool=memcheck --error-exitcode=255 --time-stamp=yes --read-var-info=yes --demangle=yes --leak-check=full --show-reachable=yes --smc-check=all --suppressions=$VALGRIND_SUPPRESSIONS --gen-suppressions=all "$@" >> $log_file 2>&1
+  echo "Running: $LIBTOOL --mode=execute $VALGRIND_CMD --tool=memcheck --error-exitcode=255 --time-stamp=yes --read-var-info=yes --dsymutil=yes --demangle=yes --track-origins=yes --leak-check=full --show-reachable=yes --smc-check=all --suppressions=$VALGRIND_SUPPRESSIONS --gen-suppressions=all --execute $@" >> $log_file 2>&1
+  $LIBTOOL --mode=execute $VALGRIND_CMD --tool=memcheck --error-exitcode=255 --time-stamp=yes --read-var-info=yes --dsymutil=yes --demangle=yes --track-origins=yes --leak-check=full --show-reachable=yes --smc-check=all --suppressions=$VALGRIND_SUPPRESSIONS --gen-suppressions=all "$@" >> $log_file 2>&1
   estatus=$?
   if test $estatus -eq 0; then
     echo -n "Ensuring no unsuppressed leaks" >> $log_file
