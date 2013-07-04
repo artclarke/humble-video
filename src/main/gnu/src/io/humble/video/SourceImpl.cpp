@@ -272,7 +272,7 @@ SourceImpl::close() {
       av_freep(&pb->buffer);
     av_free(pb);
   } else
-    retval = 0;
+    retval = avio_close(pb);
   if (mState != Container::STATE_ERROR)
     mState = Container::STATE_CLOSED;
   return retval;
