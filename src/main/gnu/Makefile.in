@@ -83,9 +83,9 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(top_srcdir)/mk/Makefile.global.in \
 	$(top_srcdir)/mk/Makefile.dependencies.in \
-	$(top_srcdir)/mk/pom.xml.in COPYING mk/README mk/ar-lib \
-	mk/config.guess mk/config.sub mk/install-sh mk/missing \
-	mk/ltmain.sh $(top_srcdir)/mk/ar-lib \
+	$(top_srcdir)/mk/memcheck.in $(top_srcdir)/mk/pom.xml.in \
+	COPYING mk/README mk/ar-lib mk/config.guess mk/config.sub \
+	mk/install-sh mk/missing mk/ltmain.sh $(top_srcdir)/mk/ar-lib \
 	$(top_srcdir)/mk/config.guess $(top_srcdir)/mk/config.sub \
 	$(top_srcdir)/mk/install-sh $(top_srcdir)/mk/ltmain.sh \
 	$(top_srcdir)/mk/missing
@@ -103,7 +103,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES = mk/Makefile.global mk/Makefile.dependencies \
-	pom-${build}.xml
+	mk/memcheck pom-${build}.xml
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -448,6 +448,8 @@ $(am__aclocal_m4_deps):
 mk/Makefile.global: $(top_builddir)/config.status $(top_srcdir)/mk/Makefile.global.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 mk/Makefile.dependencies: $(top_builddir)/config.status $(top_srcdir)/mk/Makefile.dependencies.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+mk/memcheck: $(top_builddir)/config.status $(top_srcdir)/mk/memcheck.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 pom-${build}.xml: $(top_builddir)/config.status $(top_srcdir)/mk/pom.xml.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

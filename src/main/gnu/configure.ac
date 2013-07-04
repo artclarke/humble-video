@@ -363,8 +363,9 @@ dnl Now, output everything
 AC_CONFIG_SRCDIR([src/io/humble/Humble.h])
 AC_CONFIG_HEADER([src/io/humble/ferry/config.h:config.h.in])
 AC_CONFIG_FILES([Makefile
-                 mk/Makefile.global:mk/Makefile.global.in
-                 mk/Makefile.dependencies:mk/Makefile.dependencies.in
+                 mk/Makefile.global
+                 mk/Makefile.dependencies
+                 mk/memcheck
                  src/Makefile
                  src/io/Makefile
                  src/io/humble/Makefile
