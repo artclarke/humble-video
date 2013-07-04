@@ -37,5 +37,6 @@ public:
   ~SourceTest();
   void testMake();
   void testOpen();
+  void testPropertySetting();
 };
 #endif /* SOURCETEST_H_ */

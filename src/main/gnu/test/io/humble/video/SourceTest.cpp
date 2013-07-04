@@ -111,3 +111,19 @@ SourceTest::testOpen() {
   TS_ASSERT(retval >= 0);
 }
 
+void
+SourceTest::testPropertySetting()
+{
+  RefPointer<Source> source = Source::make();
+  int32_t n = source->getNumProperties();
+  for(int32_t i = 0; i < n; i++)
+  {
+    RefPointer<Property> p = source->getPropertyMetaData(i);
+    const char* name = p->getName();
+    const char* help = p->getHelp();
+    const char* unit = p->getUnit();
+    VS_LOG_DEBUG("Name: %s", name);
+    VS_LOG_DEBUG("Help: %s", help);
+    VS_LOG_DEBUG("Unit: %s", unit);
+  }
+}

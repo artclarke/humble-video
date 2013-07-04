@@ -66,17 +66,17 @@ public:
    *
    * @param propertyNo The property number in the options list.
    *
-   * @return an Property value for this properties meta-data
+   * @return a Property value for this properties meta-data
    */
   virtual Property *
   getPropertyMetaData(int32_t propertyNo);
 
   /**
-   * Returns the name of the numbered property.
+   * Returns the name of the named property.
    *
    * @param name  The property name.
    *
-   * @return an Property value for this properties meta-data
+   * @return a Property value for this properties meta-data
    */
   virtual Property *
   getPropertyMetaData(const char *name);

@@ -247,10 +247,9 @@ namespace io { namespace humble { namespace video {
       if (!aName  || !*aName)
         throw std::runtime_error("empty property name passed to setProperty");
 
-      // we don't allow a string value longer than this.  This is
-      // actually safe because this buffer is only used for non-string options
-      if (av_opt_get(aContext, aName, 0, (uint8_t**)&value) < 0)
-          throw std::runtime_error("could not get property");
+      int32_t errorcode = av_opt_get(aContext, aName, 0, (uint8_t**)&value);
+      if (errorcode < 0)
+        throw std::runtime_error("could not get property");
       
       if (value)
       {

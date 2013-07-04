@@ -18,6 +18,7 @@ public:
   ~PropertyTest();
   void setUp();
   void tearDown();
+  void testValgrindStrlenIssue();
   void testCreation();
   void testIteration();
   void testSetMetaData();

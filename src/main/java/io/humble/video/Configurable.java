@@ -135,7 +135,7 @@ public class Configurable extends RefCounted {
 /**
  * Returns the name of the numbered property.  
  * @param	propertyNo The property number in the options list.  
- * @return	an Property value for this properties meta-data  
+ * @return	a Property value for this properties meta-data  
  */
   public Property getPropertyMetaData(int propertyNo) {
     long cPtr = VideoJNI.Configurable_getPropertyMetaData__SWIG_0(swigCPtr, this, propertyNo);
@@ -143,9 +143,9 @@ public class Configurable extends RefCounted {
   }
 
 /**
- * Returns the name of the numbered property.  
+ * Returns the name of the named property.  
  * @param	name The property name.  
- * @return	an Property value for this properties meta-data  
+ * @return	a Property value for this properties meta-data  
  */
   public Property getPropertyMetaData(String name) {
     long cPtr = VideoJNI.Configurable_getPropertyMetaData__SWIG_1(swigCPtr, this, name);
