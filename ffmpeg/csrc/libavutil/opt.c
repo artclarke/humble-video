@@ -557,6 +557,8 @@ int av_opt_get(void *obj, const char *name, int search_flags, uint8_t **out_val)
             return AVERROR(EINVAL);
         if (!(*out_val = av_malloc(len*2 + 1)))
             return AVERROR(ENOMEM);
+        // ABC: fix memory read error; (*out_val)[0] is not initialized if len == 0
+        **out_val = 0;
         bin = *(uint8_t**)dst;
         for (i = 0; i < len; i++)
             snprintf(*out_val + i*2, 3, "%02X", bin[i]);
