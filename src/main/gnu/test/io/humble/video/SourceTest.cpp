@@ -26,8 +26,11 @@
 // for getenv
 #include <cstdlib>
 
+#include <io/humble/ferry/Logger.h>
 #include "SourceTest.h"
 #include <io/humble/video/SourceImpl.h>
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 using namespace io::humble::ferry;
 using namespace io::humble::video;
@@ -45,14 +48,14 @@ SourceTest::testMake() {
   SourceImpl* obj = (SourceImpl*) source.value();
   (void) obj;
 
-  VS_TUT_ENSURE("", source);
-  VS_TUT_ENSURE("", source->getState() == Container::STATE_INITED);
+  TS_ASSERT(source);
+  TS_ASSERT(source->getState() == Container::STATE_INITED);
 }
 
 void
 SourceTest::testOpen() {
   RefPointer<Source> source = Source::make();
-  VS_TUT_ENSURE("", source);
+  TS_ASSERT(source);
   char file[2048];
   const char *fixtureDirectory = getenv("VS_TEST_FIXTUREDIR");
 // mov opening causes leak on mac os x, and I cannot
@@ -65,10 +68,46 @@ SourceTest::testOpen() {
     snprintf(file, sizeof(file), "./%s", sample);
 
   int32_t retval = source->open(file, 0, false, false, 0, 0);
-  VS_TUT_ENSURE("", retval >= 0);
-  VS_TUT_ENSURE("", source->getState() == Container::STATE_OPENED);
+  TS_ASSERT(retval >= 0);
+  TS_ASSERT(source->getState() == Container::STATE_OPENED);
+
+  // now, let's get the meta-data
+  retval = source->queryStreamMetaData();
+  TS_ASSERT(retval >= 0);
+
+  // let's call it again; if we accidentally call the FFmpeg method
+  // twice it will cause a crash, but the Source object should hide that.
+  retval = source->queryStreamMetaData();
+  TS_ASSERT(retval >= 0);
+
+  RefPointer<KeyValueBag> metadata = source->getMetaData();
+  TS_ASSERT(metadata);
+
+  int32_t n = metadata->getNumKeys();
+  TS_ASSERT_EQUALS(0, n);
+  for (int32_t i = 0; i < n; i++) {
+    const char* key = metadata->getKey(i);
+    const char* val = metadata->getValue(key, KeyValueBag::KVB_NONE);
+    VS_LOG_DEBUG("%s, %s", key, val);
+  }
+
+  int32_t duration = (int32_t) source->getDuration();
+  TSM_ASSERT_EQUALS("Unexpected duration", 149264000, duration);
+  
+  int32_t filesize = (int32_t) source->getFileSize();
+  TSM_ASSERT_EQUALS("Unexpected filesize", 4546420, filesize);
+
+  TSM_ASSERT_EQUALS("Unexpected bitrate", 243671, source->getBitRate());
+
+  TS_ASSERT(strcmp(file, source->getURL()) == 0);
+
+  TS_ASSERT(!source->canStreamsBeAddedDynamically());
+
+  RefPointer<InputFormat> format = source->getInputFormat();
+  TSM_ASSERT("format not set", format);
+  TSM_ASSERT("Unexpected format", strcmp("flv", format->getName())==0);
 
   retval = source->close();
-  VS_TUT_ENSURE("", retval >= 0);
+  TS_ASSERT(retval >= 0);
 }
 

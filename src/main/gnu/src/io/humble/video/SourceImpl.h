@@ -138,6 +138,7 @@ protected:
 private:
   int32_t doOpen(const char*, AVDictionary**);
   Container::State mState;
+  bool mStreamInfoGotten;
   AVFormatContext* mCtx;
   int32_t mReadRetryMax;
   int32_t mInputBufferLength;

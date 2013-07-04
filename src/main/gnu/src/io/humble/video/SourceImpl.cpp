@@ -99,6 +99,7 @@ namespace video {
 
 SourceImpl::SourceImpl() {
   mStreams = 0;
+  mStreamInfoGotten = 0;
   mReadRetryMax = 1;
   mInputBufferLength = 0;
   mIOHandler = 0;
@@ -292,7 +293,15 @@ SourceImpl::read(Packet* packet) {
 
 int32_t
 SourceImpl::queryStreamMetaData() {
-  return -1;
+  int32_t retval = -1;
+  if (!mStreamInfoGotten) {
+    retval = avformat_find_stream_info(mCtx, 0);
+    if (retval >= 0)
+      mStreamInfoGotten = true;
+  } else
+    retval = 0;
+  VS_CHECK_INTERRUPT(retval, true);
+  return retval;
 }
 
 int64_t
