@@ -135,8 +135,10 @@ protected:
   virtual
   ~SourceImpl();
   virtual void* getCtx() { return mCtx; }
+
 private:
   int32_t doOpen(const char*, AVDictionary**);
+  int32_t doCloseFileHandles(AVIOContext* pb);
   Container::State mState;
   bool mStreamInfoGotten;
   AVFormatContext* mCtx;

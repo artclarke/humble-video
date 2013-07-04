@@ -108,8 +108,6 @@ SourceImpl::SourceImpl() {
   // Set up thread interrupt capabilities
   mCtx->interrupt_callback.callback = Global::avioInterruptCB;
   mCtx->interrupt_callback.opaque = this;
-  // we're going to always clean up the avio structures ourselves.
-  mCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
   mState = Container::STATE_INITED;
 }
 
@@ -160,6 +158,7 @@ SourceImpl::open(const char *url, InputFormat* format,
          0);
 
   if (mIOHandler) {
+    mCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
     if (mInputBufferLength <= 0)
       // default to 2k
       mInputBufferLength = 2048;
@@ -262,20 +261,29 @@ SourceImpl::close() {
   AVIOContext* pb = mCtx->pb;
 
   avformat_close_input(&mCtx);
-  if (mIOHandler) {
-    retval = mIOHandler->url_close();
-    if (retval < 0) {
-      VS_LOG_ERROR("Error when closing container (%s): %d", getURL(), retval);
-      mState = Container::STATE_ERROR;
-    }
-
-    if (pb)
-      av_freep(&pb->buffer);
-    av_free(pb);
-  } else
-    retval = avio_close(pb);
+  retval = doCloseFileHandles(pb);
+  if (retval < 0) {
+    VS_LOG_ERROR("Error when closing container (%s): %d", getURL(), retval);
+    mState = Container::STATE_ERROR;
+  }
   if (mState != Container::STATE_ERROR)
     mState = Container::STATE_CLOSED;
+  return retval;
+}
+
+int32_t
+SourceImpl::doCloseFileHandles(AVIOContext* pb)
+{
+  int32_t retval = -1;
+  if (mIOHandler) {
+    // make sure all data is pushed out.
+    if (pb) avio_flush(pb);
+    // close our handle
+    retval = mIOHandler->url_close();
+    if (pb) av_freep(&pb->buffer);
+    av_free(pb);
+  } else
+    retval = 0;
   return retval;
 }
 
@@ -334,15 +342,14 @@ SourceImpl::getBitRate() {
 int32_t
 SourceImpl::getFlags() {
   int32_t flags = mCtx->flags;
-  // remove custom io if set
-  flags &= ~(AVFMT_FLAG_CUSTOM_IO);
   return flags;
 }
 
 void
 SourceImpl::setFlags(int32_t newFlags) {
   mCtx->flags = newFlags;
-  mCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
+  if (mIOHandler)
+    mCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
 }
 
 bool
@@ -465,11 +472,16 @@ SourceImpl::doOpen(const char* url, AVDictionary** options)
   if (mIOHandler)
     retval = mIOHandler->url_open(url, URLProtocolHandler::URL_RDONLY_MODE);
 
-  if (retval >= 0)
+  if (retval >= 0) {
+    AVIOContext* pb = mCtx->pb;
     retval = avformat_open_input(&mCtx,
         url,
         mCtx->iformat,
         options);
+    if (retval < 0)
+      // close open filehandle
+      doCloseFileHandles(pb);
+  }
 
   return retval;
 }

@@ -37,6 +37,7 @@ public:
   ~SourceTest();
   void testMake();
   void testOpen();
-  void testDemuxerPrivatePropertySetting();
+  void testOpenDemuxerPrivatePropertySetting();
+  void testOpenResetInputFormat();
 };
 #endif /* SOURCETEST_H_ */

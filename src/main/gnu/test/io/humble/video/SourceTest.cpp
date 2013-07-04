@@ -27,6 +27,7 @@
 #include <cstdlib>
 
 #include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/LoggerStack.h>
 #include "SourceTest.h"
 #include <io/humble/video/SourceImpl.h>
 
@@ -112,7 +113,7 @@ SourceTest::testOpen() {
 }
 
 void
-SourceTest::testDemuxerPrivatePropertySetting()
+SourceTest::testOpenDemuxerPrivatePropertySetting()
 {
   RefPointer<Source> source = Source::make();
   // create a bag of options to pass in for an FLV input format.
@@ -143,4 +144,33 @@ SourceTest::testDemuxerPrivatePropertySetting()
 
   r = source->close();
   TS_ASSERT(r >= 0);
+}
+void
+SourceTest::testOpenResetInputFormat()
+{
+  LoggerStack stack;
+  RefPointer<InputFormat> format = 0;
+  RefPointer<Source> source = Source::make();
+  TS_ASSERT(source);
+  char file[2048];
+  const char *fixtureDirectory = getenv("VS_TEST_FIXTUREDIR");
+// mov opening causes leak on mac os x, and I cannot
+// track down why right now due to no internet access. ABC.
+//  const char *sample = "testfile_h264_mp4a_tmcd.mov";
+  const char *sample="testfile.flv";
+  if (fixtureDirectory && *fixtureDirectory)
+    snprintf(file, sizeof(file), "%s/%s", fixtureDirectory, sample);
+  else
+    snprintf(file, sizeof(file), "./%s", sample);
+
+  format = source->getInputFormat();
+  TS_ASSERT(!format);
+  format = InputFormat::findFormat("mp4");
+  {
+    // quiet ffmpeg error
+    stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
+    int32_t retval = source->open(file, format.value(), false, false, 0, 0);
+    // and this should fail since the file is an FLV
+    TS_ASSERT(retval < 0);
+  }
 }
