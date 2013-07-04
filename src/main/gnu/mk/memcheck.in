@@ -3,16 +3,4 @@
 # This hacky script allows a developer to run Valgrind against a test
 # without hand-passing in all the params.
 
-echo "1 = ${1}"
-echo "2 = ${2}"
-echo "3 = ${3}"
-echo "4 = ${4}"
-
-log_file="${1}.log"
-valgrind_suppressions=@abs_top_srcdir@/mk/Valgrind.suppressions
-lib_path=@abs_top_builddir@/src/io/humble/.libs
-:> ${log_file}
-# This is a hack to get the actual exec path
-test_app=$(@abs_top_builddir@/libtool execute echo ${1})
-echo @VALGRIND@ --tool=memcheck --error-exitcode=255 --time-stamp=yes --read-var-info=yes --dsymutil=yes --demangle=yes --track-origins=yes --leak-check=full --show-reachable=yes --smc-check=all --suppressions=$valgrind_suppressions --gen-suppressions=all -- $test_app $3 $3 $4
-LD_LIBRARY_PATH=${lib_path} DYLD_LIBRARY_PATH=${lib_path} @VALGRIND@ --tool=memcheck --error-exitcode=255 --time-stamp=yes --read-var-info=yes --dsymutil=yes --demangle=yes --track-origins=yes --leak-check=full --show-reachable=yes --smc-check=all --suppressions=$valgrind_suppressions --gen-suppressions=all -- $test_app $3 $3 $4 >> $log_file 2>&1
+@VALGRIND@ --tool=memcheck --error-exitcode=255 --time-stamp=yes --read-var-info=yes --dsymutil=yes --demangle=yes --track-origins=yes --leak-check=full --show-reachable=yes --smc-check=all --suppressions=@abs_top_srcdir@/mk/Valgrind.suppressions --gen-suppressions=all -- $*
