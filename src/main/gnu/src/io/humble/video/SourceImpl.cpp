@@ -191,10 +191,6 @@ SourceImpl::open(const char *url, InputFormat* format,
   if (realOpts)
     av_dict_copy(&tmp, realOpts->getDictionary(), 0);
 
-  KeyValueBagImpl* realUnsetOpts = dynamic_cast<KeyValueBagImpl*>(optionsNotSet);
-  if (realUnsetOpts)
-    realUnsetOpts->copy(tmp);
-
   // Now call the real open method; this is done
   // in another function to ensure we clean up tmp
   // afterwards.
@@ -209,6 +205,10 @@ SourceImpl::open(const char *url, InputFormat* format,
 
     if (streamsCanBeAddedDynamically)
       mCtx->ctx_flags |= AVFMTCTX_NOHEADER;
+
+    KeyValueBagImpl* realUnsetOpts = dynamic_cast<KeyValueBagImpl*>(optionsNotSet);
+    if (realUnsetOpts)
+      realUnsetOpts->copy(tmp);
 
     if (queryMetaData)
       retval = this->queryStreamMetaData();

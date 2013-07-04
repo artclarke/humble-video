@@ -112,18 +112,35 @@ SourceTest::testOpen() {
 }
 
 void
-SourceTest::testPropertySetting()
+SourceTest::testDemuxerPrivatePropertySetting()
 {
   RefPointer<Source> source = Source::make();
-  int32_t n = source->getNumProperties();
-  for(int32_t i = 0; i < n; i++)
-  {
-    RefPointer<Property> p = source->getPropertyMetaData(i);
-    const char* name = p->getName();
-    const char* help = p->getHelp();
-    const char* unit = p->getUnit();
-    VS_LOG_DEBUG("Name: %s", name);
-    VS_LOG_DEBUG("Help: %s", help);
-    VS_LOG_DEBUG("Unit: %s", unit);
-  }
+  // create a bag of options to pass in for an FLV input format.
+  RefPointer<KeyValueBag> inputOptions = KeyValueBag::make();
+  RefPointer<KeyValueBag> outputOptions = KeyValueBag::make();
+
+  inputOptions->setValue("flv_metadata", "1");
+  const char* INVALID_OPTION="not-a-valid-flv-private-option";
+  const char* INVALID_VALUE="23828";
+  inputOptions->setValue(INVALID_OPTION, INVALID_VALUE);
+  
+  char file[2048];
+  const char *fixtureDirectory = getenv("VS_TEST_FIXTUREDIR");
+  const char *sample="testfile.flv";
+  if (fixtureDirectory && *fixtureDirectory)
+    snprintf(file, sizeof(file), "%s/%s", fixtureDirectory, sample);
+  else
+    snprintf(file, sizeof(file), "./%s", sample);
+
+  int32_t r = source->open(file, 0, false, false, inputOptions.value(), 
+      outputOptions.value());
+  TS_ASSERT(r >= 0);
+  TS_ASSERT(source->getState() == Container::STATE_OPENED);
+
+  TS_ASSERT_EQUALS(1, outputOptions->getNumKeys());
+  TSM_ASSERT("Expected option missing", outputOptions->getValue(INVALID_OPTION,
+        KeyValueBag::KVB_NONE));
+
+  r = source->close();
+  TS_ASSERT(r >= 0);
 }
