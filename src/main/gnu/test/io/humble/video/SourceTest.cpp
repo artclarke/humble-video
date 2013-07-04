@@ -149,7 +149,6 @@ SourceTest::testOpenDemuxerPrivatePropertySetting()
 void
 SourceTest::testOpenResetInputFormat()
 {
-  LoggerStack stack;
   RefPointer<InputFormat> format = 0;
   RefPointer<Source> source = Source::make();
   TS_ASSERT(source);
@@ -159,6 +158,7 @@ SourceTest::testOpenResetInputFormat()
   TS_ASSERT(!format);
   format = InputFormat::findFormat("mp4");
   {
+    LoggerStack stack;
     // quiet ffmpeg error
     stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
     int32_t retval = source->open(file, format.value(), false, false, 0, 0);
@@ -176,4 +176,19 @@ SourceTest::testOpenCustomIO()
 
   // now, try open and close.
   openTestHelper(url);
+}
+
+void
+SourceTest::testOpenWithoutCloseAutoCloses()
+{
+  LoggerStack stack;
+  // quiet Source error when Source is destroyed
+  stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
+  RefPointer<Source> source = Source::make();
+  int32_t retval = source->open(mSampleFile, 0, false, false, 0, 0);
+  TS_ASSERT(retval >= 0);
+
+  // now this test will only fail under a memory leak test, but
+  // if a source is destroyed without closing, it should attempt
+  // to auto-close.
 }

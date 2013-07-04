@@ -40,6 +40,7 @@ public:
   void testOpenDemuxerPrivatePropertySetting();
   void testOpenResetInputFormat();
   void testOpenCustomIO();
+  void testOpenWithoutCloseAutoCloses();
 private:
   void openTestHelper(const char* url);
   char mSampleFile[2048];

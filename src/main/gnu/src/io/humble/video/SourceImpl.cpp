@@ -112,14 +112,12 @@ SourceImpl::SourceImpl() {
 }
 
 SourceImpl::~SourceImpl() {
-  if (mIOHandler) {
-    if (mCtx) {
-      if (mCtx->pb)
-        av_freep(&mCtx->pb->buffer);
-      av_freep(&mCtx->pb);
-    }
-    delete mIOHandler;
-    mIOHandler = 0;
+  if (mState == Container::STATE_OPENED ||
+      mState == Container::STATE_PLAYING ||
+      mState == Container::STATE_PAUSED) {
+    VS_LOG_ERROR("Open Source destroyed without Source.close() being called. Closing anyway: %s",
+        this->getURL());
+    (void) this->close();
   }
   avformat_free_context(mCtx);
 }
@@ -284,6 +282,8 @@ SourceImpl::doCloseFileHandles(AVIOContext* pb)
     retval = mIOHandler->url_close();
     if (pb) av_freep(&pb->buffer);
     av_free(pb);
+    delete mIOHandler;
+    mIOHandler = 0;
   } else
     retval = 0;
   return retval;
