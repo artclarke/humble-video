@@ -140,6 +140,10 @@ SourceImpl::open(const char *url, InputFormat* format,
     VS_LOG_DEBUG("Open can only be called when container is in init state. Current state: %d", mState);
     return retval;
   }
+  if (!url || !*url) {
+    VS_LOG_DEBUG("Open cannot be called with empty URL");
+    return retval;
+  }
 
   AVDictionary* tmp=0;
 

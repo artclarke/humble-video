@@ -192,3 +192,29 @@ SourceTest::testOpenWithoutCloseAutoCloses()
   // if a source is destroyed without closing, it should attempt
   // to auto-close.
 }
+
+void
+SourceTest::testOpenInvalidArguments()
+{
+  int32_t retval = 0;
+
+  // each sub-test will be wrapped in a block so
+  // I can squelch logging once I see the right stuff
+  // happen
+  {
+    RefPointer<Source> source = Source::make();
+    LoggerStack stack;
+    // quiet Source error when Source is destroyed
+    stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
+    retval = source->open(0, 0, false, false, 0, 0);
+    TS_ASSERT(retval < 0);
+  }
+  {
+    RefPointer<Source> source = Source::make();
+    LoggerStack stack;
+    // quiet Source error when Source is destroyed
+    stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
+    retval = source->open("/foo/bar/ohsonotalidfile", 0, false, false, 0, 0);
+    TS_ASSERT(retval < 0);
+  }
+}

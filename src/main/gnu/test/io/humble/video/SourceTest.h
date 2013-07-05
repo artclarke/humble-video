@@ -41,6 +41,7 @@ public:
   void testOpenResetInputFormat();
   void testOpenCustomIO();
   void testOpenWithoutCloseAutoCloses();
+  void testOpenInvalidArguments();
 private:
   void openTestHelper(const char* url);
   char mSampleFile[2048];
