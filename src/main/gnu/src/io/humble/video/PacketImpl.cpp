@@ -24,9 +24,15 @@ namespace humble {
 namespace video {
 
 PacketImpl::PacketImpl() {
+  mPacket = (AVPacket*)av_malloc(sizeof(AVPacket));;
+  if (!mPacket)
+    throw std::bad_alloc();
+  memset(mPacket, sizeof(*mPacket), 0);
+  av_init_packet(mPacket);
 }
 
 PacketImpl::~PacketImpl() {
+  av_freep(&mPacket);
 }
 
 PacketImpl*

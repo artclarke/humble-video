@@ -38,10 +38,51 @@ public:
   static PacketImpl*
   make();
 
+  virtual int64_t getPts()=0;
+
+  virtual void setPts(int64_t aPts)=0;
+
+  virtual int64_t getDts()=0;
+
+  virtual void setDts(int64_t aDts)=0;
+
+  virtual int32_t getSize()=0;
+
+  virtual int32_t getMaxSize()=0;
+
+  virtual int32_t getStreamIndex()=0;
+
+  virtual int32_t getFlags()=0;
+
+  virtual bool isKeyPacket()=0;
+
+  virtual int64_t getDuration()=0;
+
+  virtual int64_t getPosition()=0;
+
+  virtual void setKeyPacket(bool keyPacket)=0;
+
+  virtual void setFlags(int32_t flags)=0;
+
+  virtual void setStreamIndex(int32_t streamIndex)=0;
+
+  virtual void setDuration(int64_t duration)=0;
+
+  virtual void setPosition(int64_t position)=0;
+
+  virtual int64_t getConvergenceDuration()=0;
+
+  virtual void setConvergenceDuration(int64_t duration)=0;
+
+#ifndef SWIG
+  AVPacket* getCtx() { return mPacket; }
+#endif
 protected:
   PacketImpl();
   virtual
   ~PacketImpl();
+private:
+  AVPacket* mPacket;
 };
 
 } /* namespace video */

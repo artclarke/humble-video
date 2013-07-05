@@ -37,13 +37,174 @@ class VS_API_HUMBLEVIDEO Packet : public io::humble::ferry::RefCounted
    * Note: This class is a pure-virtual interface. Actual
    * implementation should be in PacketImpl
    */
-public:
+  public:
 
-  /**
-   * Create a new {@link Source}
-   */
-  static Packet*
-  make();
+    /**
+     * Create a new {@link Packet}
+     */
+    static Packet*
+      make();
+
+    /**
+     * Get the Presentation Time Stamp (PTS) for this packet.
+     * 
+     * This is the time at which the payload for this packet should
+     * be <strong>presented</strong> to the user, in units of
+     * {@link #getTimeBase()}, relative to the start of stream.
+     * 
+     * @return Get the Presentation Timestamp for this packet.
+     */
+    virtual int64_t getPts()=0;
+
+    /**
+     * Set a new Presentation Time Stamp (PTS) for this packet.
+     * 
+     * @param aPts a new PTS for this packet.
+     * 
+     * @see #getPts()
+     */
+    virtual void setPts(int64_t aPts)=0;
+
+    /**
+     * Get the Decompression Time Stamp (DTS) for this packet.
+     * <p>
+     * This is the time at which the payload for this packet should
+     * be <strong>decompressed</strong>, in units of
+     * {@link #getTimeBase()}, relative to the start of stream.
+     * </p>
+     * <p>
+     * Some media codecs can require packets from the &quot;future&quot; to
+     * be decompressed before earliest packets as an additional way to compress
+     * data.  In general you don't need to worry about this, but if you're
+     * curious start reading about the difference between I-Frames, P-Frames
+     * and B-Frames (or Bi-Directional Frames).  B-Frames can use information
+     * from future frames when compressed.
+     * </p>
+     * @return Get the Decompression Timestamp (i.e. when this was read relative
+     * to the start of reading packets).
+     */
+    virtual int64_t getDts()=0;
+
+    /**
+     * Set a new Decompression Time Stamp (DTS) for this packet.
+     * @param aDts a new DTS for this packet.
+     * @see #getDts()
+     */
+    virtual void setDts(int64_t aDts)=0;
+
+    /**
+     * Get the size in bytes of the payload currently in this packet.
+     * @return Size (in bytes) of payload currently in packet.
+     */
+    virtual int32_t getSize()=0;
+
+    /**
+     * Get the maximum size (in bytes) of payload this packet can hold.
+     * @return Get maximum size (in bytes) of payload this packet can hold.
+     */
+    virtual int32_t getMaxSize()=0;
+
+    /**
+     * Get the container-specific index for the stream this packet is
+     * part of.
+     * @return Stream in container that this packet has data for.
+     */
+    virtual int32_t getStreamIndex()=0;
+
+    /**
+     * Get any flags set on this packet, as a 4-byte binary-ORed bit-mask.
+     * This is access to raw FFMPEG
+     * flags, but it is easier to use the is* methods below.
+     * @return Any flags on the packet.
+     */
+    virtual int32_t getFlags()=0;
+
+    /**
+     * Does this packet contain Key data? i.e. data that needs no other
+     * frames or samples to decode.
+     * @return true if key; false otherwise.
+     */
+    virtual bool isKeyPacket()=0;
+
+    /**
+     * Return the duration of this packet, in units of {@link #getTimeBase()}
+     * @return Duration of this packet, in same time-base as the PTS.
+     */
+    virtual int64_t getDuration()=0;
+
+    /**
+     * Return the position (in bytes) of this packet in the stream.
+     * @return The position of this packet in the stream, or -1 if
+     *   unknown.
+     */
+    virtual int64_t getPosition()=0;
+
+    /**
+     * Set if this is a key packet.
+     * 
+     * @param keyPacket true for yes, false for no.
+     */
+    virtual void setKeyPacket(bool keyPacket)=0;
+    
+    /**
+     * Set any internal flags.
+     * 
+     * @param flags Flags to set
+     */
+    virtual void setFlags(int32_t flags)=0;
+
+        
+    /**
+     * Set the stream index for this packet.
+     * 
+     * @param streamIndex The stream index, as determined from the {@link IContainer} this packet will be written to.
+     */
+    virtual void setStreamIndex(int32_t streamIndex)=0;
+
+    /**
+     * Set the duration.
+     * @param duration new duration
+     * @see #getDuration()
+     */
+    virtual void setDuration(int64_t duration)=0;
+    
+    /**
+     * Set the position.
+     * @param position new position
+     * @see #getPosition()
+     */
+    virtual void setPosition(int64_t position)=0;
+    
+    /**
+     * Time difference in {@link IStream#getTimeBase()} units
+     * from the presentation time stamp of this
+     * packet to the point at which the output from the decoder has converged
+     * independent from the availability of previous frames. That is, the
+     * frames are virtually identical no matter if decoding started from
+     * the very first frame or from this keyframe.
+     * Is {@link Global#NO_PTS} if unknown.
+     * This field is not the display duration of the current packet.
+     * <p>
+     * The purpose of this field is to allow seeking in streams that have no
+     * keyframes in the conventional sense. It corresponds to the
+     * recovery point SEI in H.264 and match_time_delta in NUT. It is also
+     * essential for some types of subtitle streams to ensure that all
+     * subtitles are correctly displayed after seeking.
+     * </p>
+     * <p>
+     * If you didn't follow that, try drinking one to two glasses
+     * of Absinthe.  It won't help, but it'll be more fun.
+     * </p>
+     * 
+     * @return the convergence duration
+     */
+    virtual int64_t getConvergenceDuration()=0;
+    
+    /**
+     * Set the convergence duration.
+     * @param duration the new duration
+     */
+    virtual void setConvergenceDuration(int64_t duration)=0;
 
 protected:
   Packet();
