@@ -12,7 +12,7 @@ import io.humble.ferry.*;
  * A packet of data that was read from a {@link Source} or  
  * will be written to a {@link Sink}.  
  */
-public class Packet extends RefCounted {
+public class Packet extends MediaEncodedData {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
