@@ -31,6 +31,26 @@ PacketImpl::PacketImpl() {
   av_init_packet(mPacket);
 }
 
+int64_t
+PacketImpl::getPts() {
+  return mPacket->pts;
+}
+
+void
+PacketImpl::setPts(int64_t aPts) {
+  mPacket->pts = aPts;
+}
+
+int64_t
+PacketImpl::getDts() {
+  return mPacket->dts;
+}
+
+void
+PacketImpl::setDts(int64_t aDts) {
+  mPacket->dts = aDts;
+}
+
 PacketImpl::~PacketImpl() {
   av_freep(&mPacket);
 }

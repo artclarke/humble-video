@@ -38,13 +38,13 @@ public:
   static PacketImpl*
   make();
 
-  virtual int64_t getPts()=0;
+  virtual int64_t getPts();
 
-  virtual void setPts(int64_t aPts)=0;
+  virtual void setPts(int64_t aPts);
 
-  virtual int64_t getDts()=0;
+  virtual int64_t getDts();
 
-  virtual void setDts(int64_t aDts)=0;
+  virtual void setDts(int64_t aDts);
 
   virtual int32_t getSize()=0;
 
