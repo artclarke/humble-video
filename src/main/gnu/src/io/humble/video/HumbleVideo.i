@@ -26,6 +26,7 @@
 #include <io/humble/video/KeyValueBag.h>
 #include <io/humble/video/Property.h>
 #include <io/humble/video/Rational.h>
+#include <io/humble/video/Packet.h>
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/PixelFormat.h>
 #include <io/humble/video/Global.h>
@@ -113,6 +114,7 @@ Java_io_humble_video_Video_init(JNIEnv *env, jclass)
 %include <io/humble/video/Rational.swg>
 %include <io/humble/video/KeyValueBag.swg>
 %include <io/humble/video/Property.swg>
+%include <io/humble/video/Packet.swg>
 %include <io/humble/video/Configurable.swg>
 %include <io/humble/video/PixelFormat.h>
 %include <io/humble/video/Codec.swg>

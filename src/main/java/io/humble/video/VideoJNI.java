@@ -111,6 +111,7 @@ class VideoJNI {
   public final static native int Property_getNumFlagSettings(long jarg1, Property jarg1_);
   public final static native long Property_getFlagConstant__SWIG_0(long jarg1, Property jarg1_, int jarg2);
   public final static native long Property_getFlagConstant__SWIG_1(long jarg1, Property jarg1_, String jarg2);
+  public final static native long Packet_make();
   public final static native int Configurable_getNumProperties(long jarg1, Configurable jarg1_);
   public final static native long Configurable_getPropertyMetaData__SWIG_0(long jarg1, Configurable jarg1_, int jarg2);
   public final static native long Configurable_getPropertyMetaData__SWIG_1(long jarg1, Configurable jarg1_, String jarg2);
@@ -374,7 +375,7 @@ class VideoJNI {
   public final static native int Source_close(long jarg1, Source jarg1_);
   public final static native int Source_getNumStreams(long jarg1, Source jarg1_);
   public final static native long Source_getStream(long jarg1, Source jarg1_, int jarg2);
-  public final static native int Source_read(long jarg1, Source jarg1_, long jarg2);
+  public final static native int Source_read(long jarg1, Source jarg1_, long jarg2, Packet jarg2_);
   public final static native int Source_queryStreamMetaData(long jarg1, Source jarg1_);
   public final static native long Source_getDuration(long jarg1, Source jarg1_);
   public final static native long Source_getStartTime(long jarg1, Source jarg1_);
@@ -404,6 +405,7 @@ class VideoJNI {
   public final static native long SWIGRationalUpcast(long jarg1);
   public final static native long SWIGKeyValueBagUpcast(long jarg1);
   public final static native long SWIGPropertyUpcast(long jarg1);
+  public final static native long SWIGPacketUpcast(long jarg1);
   public final static native long SWIGConfigurableUpcast(long jarg1);
   public final static native long SWIGPixelFormatUpcast(long jarg1);
   public final static native long SWIGMediaDescriptorUpcast(long jarg1);

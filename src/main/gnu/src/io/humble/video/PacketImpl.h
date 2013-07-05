@@ -17,24 +17,34 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#include "Packet.h"
-#include "PacketImpl.h"
+#ifndef PACKETIMPL_H_
+#define PACKETIMPL_H_
+
+#include <io/humble/video/HumbleVideo.h>
+#include <io/humble/ferry/RefPointer.h>
+#include <io/humble/video/Packet.h>
 
 namespace io {
 namespace humble {
 namespace video {
 
-Packet::Packet() {
-}
+class VS_API_HUMBLEVIDEO PacketImpl : public io::humble::video::Packet
+{
+public:
 
-Packet::~Packet() {
-}
+  /**
+   * Create a new {@link PacketImpl}
+   */
+  static PacketImpl*
+  make();
 
-Packet*
-Packet::make() {
-  return PacketImpl::make();
-}
+protected:
+  PacketImpl();
+  virtual
+  ~PacketImpl();
+};
 
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
+#endif /* PACKETIMPL_H_ */

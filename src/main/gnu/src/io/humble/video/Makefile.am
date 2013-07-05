@@ -20,6 +20,7 @@ libhumble_video_la_SOURCES= \
   Rational.cpp \
   RationalImpl.cpp \
   Packet.cpp \
+  PacketImpl.cpp \
   ContainerFormat.cpp \
   Configurable.cpp \
   Container.cpp \
@@ -46,6 +47,7 @@ libhumble_video_la_HEADERS= \
   RationalImpl.h \
   Rational.swg \
   Packet.h \
+  PacketImpl.h \
   Packet.swg \
   Property.h \
   PropertyImpl.h \

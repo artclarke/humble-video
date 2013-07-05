@@ -8,6 +8,10 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * A packet of data that was read from a {@link Source} or  
+ * will be written to a {@link Sink}.  
+ */
 public class Packet extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -108,4 +112,13 @@ public class Packet extends RefCounted {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+
+/**
+ * Create a new {@link Source}  
+ */
+  public static Packet make() {
+    long cPtr = VideoJNI.Packet_make();
+    return (cPtr == 0) ? null : new Packet(cPtr, false);
+  }
+
 }

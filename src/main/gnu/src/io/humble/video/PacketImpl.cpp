@@ -17,22 +17,21 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#include "Packet.h"
 #include "PacketImpl.h"
 
 namespace io {
 namespace humble {
 namespace video {
 
-Packet::Packet() {
+PacketImpl::PacketImpl() {
 }
 
-Packet::~Packet() {
+PacketImpl::~PacketImpl() {
 }
 
-Packet*
-Packet::make() {
-  return PacketImpl::make();
+PacketImpl*
+PacketImpl::make() {
+  return 0;
 }
 
 } /* namespace video */
