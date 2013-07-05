@@ -78,9 +78,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = SourceTest$(EXEEXT) InputFormatTest$(EXEEXT) \
-	OutputFormatTest$(EXEEXT) PropertyTest$(EXEEXT) \
-	RationalTest$(EXEEXT)
+check_PROGRAMS = KeyValueBagTest$(EXEEXT) SourceTest$(EXEEXT) \
+	InputFormatTest$(EXEEXT) OutputFormatTest$(EXEEXT) \
+	PropertyTest$(EXEEXT) RationalTest$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(noinst_HEADERS) $(top_srcdir)/mk/test-driver
@@ -107,6 +107,12 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+am_KeyValueBagTest_OBJECTS = KeyValueBagTest.$(OBJEXT) Main.$(OBJEXT)
+nodist_KeyValueBagTest_OBJECTS = KeyValueBagTest_CXXRunner.$(OBJEXT)
+KeyValueBagTest_OBJECTS = $(am_KeyValueBagTest_OBJECTS) \
+	$(nodist_KeyValueBagTest_OBJECTS)
+KeyValueBagTest_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_OutputFormatTest_OBJECTS = OutputFormatTest.$(OBJEXT) \
 	Main.$(OBJEXT)
 nodist_OutputFormatTest_OBJECTS =  \
@@ -167,13 +173,14 @@ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(InputFormatTest_SOURCES) $(nodist_InputFormatTest_SOURCES) \
+	$(KeyValueBagTest_SOURCES) $(nodist_KeyValueBagTest_SOURCES) \
 	$(OutputFormatTest_SOURCES) $(nodist_OutputFormatTest_SOURCES) \
 	$(PropertyTest_SOURCES) $(nodist_PropertyTest_SOURCES) \
 	$(RationalTest_SOURCES) $(nodist_RationalTest_SOURCES) \
 	$(SourceTest_SOURCES) $(nodist_SourceTest_SOURCES)
-DIST_SOURCES = $(InputFormatTest_SOURCES) $(OutputFormatTest_SOURCES) \
-	$(PropertyTest_SOURCES) $(RationalTest_SOURCES) \
-	$(SourceTest_SOURCES)
+DIST_SOURCES = $(InputFormatTest_SOURCES) $(KeyValueBagTest_SOURCES) \
+	$(OutputFormatTest_SOURCES) $(PropertyTest_SOURCES) \
+	$(RationalTest_SOURCES) $(SourceTest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -622,6 +629,7 @@ VS_CPP_NAMESPACE = io::humble::video
 VS_TEST = 1
 SUBDIRS = customio
 BUILT_SOURCES = \
+  KeyValueBagTest_CXXRunner.cpp \
   SourceTest_CXXRunner.cpp \
   InputFormatTest_CXXRunner.cpp \
   OutputFormatTest_CXXRunner.cpp \
@@ -629,6 +637,7 @@ BUILT_SOURCES = \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  KeyValueBagTest.h \
   SourceTest.h \
   InputFormatTest.h \
   OutputFormatTest.h \
@@ -641,6 +650,16 @@ inst_checkdir = $(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS = $(check_PROGRAMS)
+KeyValueBagTest_SOURCES = \
+  KeyValueBagTest.cpp \
+  Main.cpp
+
+nodist_KeyValueBagTest_SOURCES = \
+  KeyValueBagTest_CXXRunner.cpp
+
+KeyValueBagTest_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 SourceTest_SOURCES = \
   SourceTest.cpp \
   Main.cpp
@@ -739,6 +758,10 @@ clean-checkPROGRAMS:
 InputFormatTest$(EXEEXT): $(InputFormatTest_OBJECTS) $(InputFormatTest_DEPENDENCIES) $(EXTRA_InputFormatTest_DEPENDENCIES) 
 	@rm -f InputFormatTest$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(InputFormatTest_OBJECTS) $(InputFormatTest_LDADD) $(LIBS)
+
+KeyValueBagTest$(EXEEXT): $(KeyValueBagTest_OBJECTS) $(KeyValueBagTest_DEPENDENCIES) $(EXTRA_KeyValueBagTest_DEPENDENCIES) 
+	@rm -f KeyValueBagTest$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(KeyValueBagTest_OBJECTS) $(KeyValueBagTest_LDADD) $(LIBS)
 
 OutputFormatTest$(EXEEXT): $(OutputFormatTest_OBJECTS) $(OutputFormatTest_DEPENDENCIES) $(EXTRA_OutputFormatTest_DEPENDENCIES) 
 	@rm -f OutputFormatTest$(EXEEXT)
@@ -1017,6 +1040,13 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+KeyValueBagTest.log: KeyValueBagTest$(EXEEXT)
+	@p='KeyValueBagTest$(EXEEXT)'; \
+	b='KeyValueBagTest'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 SourceTest.log: SourceTest$(EXEEXT)
 	@p='SourceTest$(EXEEXT)'; \
 	b='SourceTest'; \
