@@ -78,7 +78,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = TrueTest$(EXEEXT)
+check_PROGRAMS = TrueTester$(EXEEXT)
 subdir = test/io/humble/testutils
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(noinst_HEADERS) $(top_srcdir)/mk/test-driver
@@ -95,10 +95,11 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am_TrueTest_OBJECTS = TrueTest.$(OBJEXT) Main.$(OBJEXT)
-nodist_TrueTest_OBJECTS = TrueTest_CXXRunner.$(OBJEXT)
-TrueTest_OBJECTS = $(am_TrueTest_OBJECTS) $(nodist_TrueTest_OBJECTS)
-TrueTest_DEPENDENCIES =  \
+am_TrueTester_OBJECTS = TrueTest.$(OBJEXT) Main.$(OBJEXT)
+nodist_TrueTester_OBJECTS = TrueTest_CXXRunner.$(OBJEXT)
+TrueTester_OBJECTS = $(am_TrueTester_OBJECTS) \
+	$(nodist_TrueTester_OBJECTS)
+TrueTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -137,8 +138,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(TrueTest_SOURCES) $(nodist_TrueTest_SOURCES)
-DIST_SOURCES = $(TrueTest_SOURCES)
+SOURCES = $(TrueTester_SOURCES) $(nodist_TrueTester_SOURCES)
+DIST_SOURCES = $(TrueTester_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -545,14 +546,14 @@ VS_CPP_PACKAGE = io.humble.testutils
 VS_CPP_NAMESPACE = io::humble::testutils
 VS_TEST = 1
 TESTS = $(check_PROGRAMS)
-TrueTest_SOURCES = \
+TrueTester_SOURCES = \
   TrueTest.cpp \
   Main.cpp
 
-nodist_TrueTest_SOURCES = \
+nodist_TrueTester_SOURCES = \
   TrueTest_CXXRunner.cpp 
 
-TrueTest_LDADD = \
+TrueTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
 BUILT_SOURCES = \
@@ -607,9 +608,9 @@ clean-checkPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-TrueTest$(EXEEXT): $(TrueTest_OBJECTS) $(TrueTest_DEPENDENCIES) $(EXTRA_TrueTest_DEPENDENCIES) 
-	@rm -f TrueTest$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(TrueTest_OBJECTS) $(TrueTest_LDADD) $(LIBS)
+TrueTester$(EXEEXT): $(TrueTester_OBJECTS) $(TrueTester_DEPENDENCIES) $(EXTRA_TrueTester_DEPENDENCIES) 
+	@rm -f TrueTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(TrueTester_OBJECTS) $(TrueTester_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -825,9 +826,9 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
-TrueTest.log: TrueTest$(EXEEXT)
-	@p='TrueTest$(EXEEXT)'; \
-	b='TrueTest'; \
+TrueTester.log: TrueTester$(EXEEXT)
+	@p='TrueTester$(EXEEXT)'; \
+	b='TrueTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

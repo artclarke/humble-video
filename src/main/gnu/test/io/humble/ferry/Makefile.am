@@ -5,49 +5,53 @@ VS_CPP_NAMESPACE=io::humble::ferry
 VS_TEST=1
 include @top_builddir@/mk/Makefile.global
 
-check_PROGRAMS=LoggerTest RefPointerTest MutexTest BufferTest
+check_PROGRAMS=\
+  LoggerTester \
+  RefPointerTester \
+  MutexTester \
+  BufferTester
 
 TESTS=$(check_PROGRAMS)
 
-LoggerTest_SOURCES= \
+LoggerTester_SOURCES= \
   LoggerTest.cpp \
   Main.cpp
 
-nodist_LoggerTest_SOURCES= \
+nodist_LoggerTester_SOURCES= \
   LoggerTest_CXXRunner.cpp
 
-LoggerTest_LDADD= \
+LoggerTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
 
-RefPointerTest_SOURCES= \
+RefPointerTester_SOURCES= \
   RefPointerTest.cpp \
   Main.cpp
 
-nodist_RefPointerTest_SOURCES= \
+nodist_RefPointerTester_SOURCES= \
   RefPointerTest_CXXRunner.cpp
 
-RefPointerTest_LDADD= \
+RefPointerTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
-MutexTest_SOURCES= \
+MutexTester_SOURCES= \
   MutexTest.cpp \
   Main.cpp 
 
-nodist_MutexTest_SOURCES= \
+nodist_MutexTester_SOURCES= \
   MutexTest_CXXRunner.cpp
 
-MutexTest_LDADD= \
+MutexTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
-BufferTest_SOURCES=\
+BufferTester_SOURCES=\
   BufferTest.cpp \
   Main.cpp
 
-nodist_BufferTest_SOURCES=\
+nodist_BufferTester_SOURCES=\
   BufferTest_CXXRunner.cpp
 
-BufferTest_LDADD=\
+BufferTester_LDADD=\
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
 

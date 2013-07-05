@@ -7,12 +7,12 @@ include @top_builddir@/mk/Makefile.global
 SUBDIRS=customio
 
 check_PROGRAMS=\
-  KeyValueBagTest \
-  SourceTest \
-  InputFormatTest \
-  OutputFormatTest \
-  PropertyTest \
-  RationalTest 
+  KeyValueBagTester \
+  SourceTester \
+  InputFormatTester \
+  OutputFormatTester \
+  PropertyTester \
+  RationalTester 
 
 BUILT_SOURCES= \
   KeyValueBagTest_CXXRunner.cpp \
@@ -38,65 +38,65 @@ inst_checkdir=$(bindir)
 # tests can auto-find their fixtures
 TESTS=$(check_PROGRAMS)
 
-KeyValueBagTest_SOURCES= \
+KeyValueBagTester_SOURCES= \
   KeyValueBagTest.cpp \
   Main.cpp
 
-nodist_KeyValueBagTest_SOURCES= \
+nodist_KeyValueBagTester_SOURCES= \
   KeyValueBagTest_CXXRunner.cpp
 
-KeyValueBagTest_LDADD= \
+KeyValueBagTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-SourceTest_SOURCES= \
+SourceTester_SOURCES= \
   SourceTest.cpp \
   Main.cpp
 
-nodist_SourceTest_SOURCES= \
+nodist_SourceTester_SOURCES= \
   SourceTest_CXXRunner.cpp
 
-SourceTest_LDADD= \
+SourceTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-InputFormatTest_SOURCES= \
+InputFormatTester_SOURCES= \
   InputFormatTest.cpp \
   Main.cpp
 
-nodist_InputFormatTest_SOURCES= \
+nodist_InputFormatTester_SOURCES= \
   InputFormatTest_CXXRunner.cpp
 
-InputFormatTest_LDADD= \
+InputFormatTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
   
-OutputFormatTest_SOURCES= \
+OutputFormatTester_SOURCES= \
   OutputFormatTest.cpp \
   Main.cpp
 
-nodist_OutputFormatTest_SOURCES= \
+nodist_OutputFormatTester_SOURCES= \
   OutputFormatTest_CXXRunner.cpp
 
-OutputFormatTest_LDADD= \
+OutputFormatTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 
-PropertyTest_SOURCES= \
+PropertyTester_SOURCES= \
   PropertyTest.cpp \
   Main.cpp
 
-nodist_PropertyTest_SOURCES= \
+nodist_PropertyTester_SOURCES= \
   PropertyTest_CXXRunner.cpp
 
-PropertyTest_LDADD= \
+PropertyTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-RationalTest_SOURCES=\
+RationalTester_SOURCES=\
   RationalTest.cpp \
   Main.cpp
 
-nodist_RationalTest_SOURCES=\
+nodist_RationalTester_SOURCES=\
   RationalTest_CXXRunner.cpp 
 
-RationalTest_LDADD=\
+RationalTester_LDADD=\
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 clean-local:

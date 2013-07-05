@@ -78,8 +78,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = LoggerTest$(EXEEXT) RefPointerTest$(EXEEXT) \
-	MutexTest$(EXEEXT) BufferTest$(EXEEXT)
+check_PROGRAMS = LoggerTester$(EXEEXT) RefPointerTester$(EXEEXT) \
+	MutexTester$(EXEEXT) BufferTester$(EXEEXT)
 subdir = test/io/humble/ferry
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(noinst_HEADERS) $(top_srcdir)/mk/test-driver
@@ -96,33 +96,33 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am_BufferTest_OBJECTS = BufferTest.$(OBJEXT) Main.$(OBJEXT)
-nodist_BufferTest_OBJECTS = BufferTest_CXXRunner.$(OBJEXT)
-BufferTest_OBJECTS = $(am_BufferTest_OBJECTS) \
-	$(nodist_BufferTest_OBJECTS)
-BufferTest_DEPENDENCIES =  \
+am_BufferTester_OBJECTS = BufferTest.$(OBJEXT) Main.$(OBJEXT)
+nodist_BufferTester_OBJECTS = BufferTest_CXXRunner.$(OBJEXT)
+BufferTester_OBJECTS = $(am_BufferTester_OBJECTS) \
+	$(nodist_BufferTester_OBJECTS)
+BufferTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am_LoggerTest_OBJECTS = LoggerTest.$(OBJEXT) Main.$(OBJEXT)
-nodist_LoggerTest_OBJECTS = LoggerTest_CXXRunner.$(OBJEXT)
-LoggerTest_OBJECTS = $(am_LoggerTest_OBJECTS) \
-	$(nodist_LoggerTest_OBJECTS)
-LoggerTest_DEPENDENCIES =  \
+am_LoggerTester_OBJECTS = LoggerTest.$(OBJEXT) Main.$(OBJEXT)
+nodist_LoggerTester_OBJECTS = LoggerTest_CXXRunner.$(OBJEXT)
+LoggerTester_OBJECTS = $(am_LoggerTester_OBJECTS) \
+	$(nodist_LoggerTester_OBJECTS)
+LoggerTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_MutexTest_OBJECTS = MutexTest.$(OBJEXT) Main.$(OBJEXT)
-nodist_MutexTest_OBJECTS = MutexTest_CXXRunner.$(OBJEXT)
-MutexTest_OBJECTS = $(am_MutexTest_OBJECTS) \
-	$(nodist_MutexTest_OBJECTS)
-MutexTest_DEPENDENCIES =  \
+am_MutexTester_OBJECTS = MutexTest.$(OBJEXT) Main.$(OBJEXT)
+nodist_MutexTester_OBJECTS = MutexTest_CXXRunner.$(OBJEXT)
+MutexTester_OBJECTS = $(am_MutexTester_OBJECTS) \
+	$(nodist_MutexTester_OBJECTS)
+MutexTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_RefPointerTest_OBJECTS = RefPointerTest.$(OBJEXT) Main.$(OBJEXT)
-nodist_RefPointerTest_OBJECTS = RefPointerTest_CXXRunner.$(OBJEXT)
-RefPointerTest_OBJECTS = $(am_RefPointerTest_OBJECTS) \
-	$(nodist_RefPointerTest_OBJECTS)
-RefPointerTest_DEPENDENCIES =  \
+am_RefPointerTester_OBJECTS = RefPointerTest.$(OBJEXT) Main.$(OBJEXT)
+nodist_RefPointerTester_OBJECTS = RefPointerTest_CXXRunner.$(OBJEXT)
+RefPointerTester_OBJECTS = $(am_RefPointerTester_OBJECTS) \
+	$(nodist_RefPointerTester_OBJECTS)
+RefPointerTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -157,12 +157,12 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(BufferTest_SOURCES) $(nodist_BufferTest_SOURCES) \
-	$(LoggerTest_SOURCES) $(nodist_LoggerTest_SOURCES) \
-	$(MutexTest_SOURCES) $(nodist_MutexTest_SOURCES) \
-	$(RefPointerTest_SOURCES) $(nodist_RefPointerTest_SOURCES)
-DIST_SOURCES = $(BufferTest_SOURCES) $(LoggerTest_SOURCES) \
-	$(MutexTest_SOURCES) $(RefPointerTest_SOURCES)
+SOURCES = $(BufferTester_SOURCES) $(nodist_BufferTester_SOURCES) \
+	$(LoggerTester_SOURCES) $(nodist_LoggerTester_SOURCES) \
+	$(MutexTester_SOURCES) $(nodist_MutexTester_SOURCES) \
+	$(RefPointerTester_SOURCES) $(nodist_RefPointerTester_SOURCES)
+DIST_SOURCES = $(BufferTester_SOURCES) $(LoggerTester_SOURCES) \
+	$(MutexTester_SOURCES) $(RefPointerTester_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -569,44 +569,44 @@ VS_CPP_PACKAGE = io.humble.ferry
 VS_CPP_NAMESPACE = io::humble::ferry
 VS_TEST = 1
 TESTS = $(check_PROGRAMS)
-LoggerTest_SOURCES = \
+LoggerTester_SOURCES = \
   LoggerTest.cpp \
   Main.cpp
 
-nodist_LoggerTest_SOURCES = \
+nodist_LoggerTester_SOURCES = \
   LoggerTest_CXXRunner.cpp
 
-LoggerTest_LDADD = \
+LoggerTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
-RefPointerTest_SOURCES = \
+RefPointerTester_SOURCES = \
   RefPointerTest.cpp \
   Main.cpp
 
-nodist_RefPointerTest_SOURCES = \
+nodist_RefPointerTester_SOURCES = \
   RefPointerTest_CXXRunner.cpp
 
-RefPointerTest_LDADD = \
+RefPointerTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
-MutexTest_SOURCES = \
+MutexTester_SOURCES = \
   MutexTest.cpp \
   Main.cpp 
 
-nodist_MutexTest_SOURCES = \
+nodist_MutexTester_SOURCES = \
   MutexTest_CXXRunner.cpp
 
-MutexTest_LDADD = \
+MutexTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
-BufferTest_SOURCES = \
+BufferTester_SOURCES = \
   BufferTest.cpp \
   Main.cpp
 
-nodist_BufferTest_SOURCES = \
+nodist_BufferTester_SOURCES = \
   BufferTest_CXXRunner.cpp
 
-BufferTest_LDADD = \
+BufferTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la
 
 BUILT_SOURCES = \
@@ -666,21 +666,21 @@ clean-checkPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-BufferTest$(EXEEXT): $(BufferTest_OBJECTS) $(BufferTest_DEPENDENCIES) $(EXTRA_BufferTest_DEPENDENCIES) 
-	@rm -f BufferTest$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(BufferTest_OBJECTS) $(BufferTest_LDADD) $(LIBS)
+BufferTester$(EXEEXT): $(BufferTester_OBJECTS) $(BufferTester_DEPENDENCIES) $(EXTRA_BufferTester_DEPENDENCIES) 
+	@rm -f BufferTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(BufferTester_OBJECTS) $(BufferTester_LDADD) $(LIBS)
 
-LoggerTest$(EXEEXT): $(LoggerTest_OBJECTS) $(LoggerTest_DEPENDENCIES) $(EXTRA_LoggerTest_DEPENDENCIES) 
-	@rm -f LoggerTest$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(LoggerTest_OBJECTS) $(LoggerTest_LDADD) $(LIBS)
+LoggerTester$(EXEEXT): $(LoggerTester_OBJECTS) $(LoggerTester_DEPENDENCIES) $(EXTRA_LoggerTester_DEPENDENCIES) 
+	@rm -f LoggerTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(LoggerTester_OBJECTS) $(LoggerTester_LDADD) $(LIBS)
 
-MutexTest$(EXEEXT): $(MutexTest_OBJECTS) $(MutexTest_DEPENDENCIES) $(EXTRA_MutexTest_DEPENDENCIES) 
-	@rm -f MutexTest$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(MutexTest_OBJECTS) $(MutexTest_LDADD) $(LIBS)
+MutexTester$(EXEEXT): $(MutexTester_OBJECTS) $(MutexTester_DEPENDENCIES) $(EXTRA_MutexTester_DEPENDENCIES) 
+	@rm -f MutexTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(MutexTester_OBJECTS) $(MutexTester_LDADD) $(LIBS)
 
-RefPointerTest$(EXEEXT): $(RefPointerTest_OBJECTS) $(RefPointerTest_DEPENDENCIES) $(EXTRA_RefPointerTest_DEPENDENCIES) 
-	@rm -f RefPointerTest$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(RefPointerTest_OBJECTS) $(RefPointerTest_LDADD) $(LIBS)
+RefPointerTester$(EXEEXT): $(RefPointerTester_OBJECTS) $(RefPointerTester_DEPENDENCIES) $(EXTRA_RefPointerTester_DEPENDENCIES) 
+	@rm -f RefPointerTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(RefPointerTester_OBJECTS) $(RefPointerTester_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -896,30 +896,30 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
-LoggerTest.log: LoggerTest$(EXEEXT)
-	@p='LoggerTest$(EXEEXT)'; \
-	b='LoggerTest'; \
+LoggerTester.log: LoggerTester$(EXEEXT)
+	@p='LoggerTester$(EXEEXT)'; \
+	b='LoggerTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-RefPointerTest.log: RefPointerTest$(EXEEXT)
-	@p='RefPointerTest$(EXEEXT)'; \
-	b='RefPointerTest'; \
+RefPointerTester.log: RefPointerTester$(EXEEXT)
+	@p='RefPointerTester$(EXEEXT)'; \
+	b='RefPointerTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-MutexTest.log: MutexTest$(EXEEXT)
-	@p='MutexTest$(EXEEXT)'; \
-	b='MutexTest'; \
+MutexTester.log: MutexTester$(EXEEXT)
+	@p='MutexTester$(EXEEXT)'; \
+	b='MutexTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-BufferTest.log: BufferTest$(EXEEXT)
-	@p='BufferTest$(EXEEXT)'; \
-	b='BufferTest'; \
+BufferTester.log: BufferTester$(EXEEXT)
+	@p='BufferTester$(EXEEXT)'; \
+	b='BufferTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
