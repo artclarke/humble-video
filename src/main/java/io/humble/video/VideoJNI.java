@@ -374,7 +374,7 @@ class VideoJNI {
   public final static native int Source_close(long jarg1, Source jarg1_);
   public final static native int Source_getNumStreams(long jarg1, Source jarg1_);
   public final static native long Source_getStream(long jarg1, Source jarg1_, int jarg2);
-  public final static native int Source_read(long jarg1, Source jarg1_, long jarg2, Packet jarg2_);
+  public final static native int Source_read(long jarg1, Source jarg1_, long jarg2);
   public final static native int Source_queryStreamMetaData(long jarg1, Source jarg1_);
   public final static native long Source_getDuration(long jarg1, Source jarg1_);
   public final static native long Source_getStartTime(long jarg1, Source jarg1_);
@@ -414,7 +414,6 @@ class VideoJNI {
   public final static native long SWIGOutputFormatUpcast(long jarg1);
   public final static native long SWIGInputFormatUpcast(long jarg1);
   public final static native long SWIGStreamUpcast(long jarg1);
-  public final static native long SWIGPacketUpcast(long jarg1);
   public final static native long SWIGContainerUpcast(long jarg1);
   public final static native long SWIGSourceUpcast(long jarg1);
 }

@@ -54,20 +54,6 @@ protected:
   {
   }
 };
-class VS_API_HUMBLEVIDEO Packet : public ::io::humble::ferry::RefCounted
-{
-public:
-
-protected:
-  Packet()
-  {
-  }
-  virtual
-  ~Packet()
-  {
-  }
-};
-
 /**
  * A Container for Media data. This is an abstract class and
  * cannot be instantiated on its own.

@@ -20,6 +20,7 @@
 #ifndef SOURCE_H_
 #define SOURCE_H_
 
+#include <io/humble/video/Packet.h>
 #include <io/humble/video/Container.h>
 #include <io/humble/video/InputFormat.h>
 
@@ -32,7 +33,7 @@ namespace video {
 /**
  * A Source of {@link Packet} data.
  */
-class Source : public io::humble::video::Container
+class VS_API_HUMBLEVIDEO Source : public io::humble::video::Container
 {
   /**
    * Note: This class is a pure-virtual interface. Actual

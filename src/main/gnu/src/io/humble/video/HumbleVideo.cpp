@@ -12610,18 +12610,17 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getStream(JNIEnv 
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1read(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1read(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jint jresult = 0 ;
   io::humble::video::Source *arg1 = (io::humble::video::Source *) 0 ;
-  io::humble::video::Packet *arg2 = (io::humble::video::Packet *) 0 ;
+  Packet *arg2 = (Packet *) 0 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  (void)jarg2_;
   arg1 = *(io::humble::video::Source **)&jarg1; 
-  arg2 = *(io::humble::video::Packet **)&jarg2; 
+  arg2 = *(Packet **)&jarg2; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -14478,14 +14477,6 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGStreamUpcast(JNIEnv *
     (void)jenv;
     (void)jcls;
     *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::Stream **)&jarg1;
-    return baseptr;
-}
-
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGPacketUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::Packet **)&jarg1;
     return baseptr;
 }
 

@@ -99,7 +99,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_video_la_DEPENDENCIES =
 am_libhumble_video_la_OBJECTS = PixelFormat.lo KeyValueBag.lo \
 	KeyValueBagImpl.lo Property.lo PropertyImpl.lo Rational.lo \
-	RationalImpl.lo ContainerFormat.lo Configurable.lo \
+	RationalImpl.lo Packet.lo ContainerFormat.lo Configurable.lo \
 	Container.lo Source.lo SourceImpl.lo OutputFormat.lo \
 	InputFormat.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
@@ -427,6 +427,7 @@ libhumble_video_la_SOURCES = \
   PropertyImpl.cpp \
   Rational.cpp \
   RationalImpl.cpp \
+  Packet.cpp \
   ContainerFormat.cpp \
   Configurable.cpp \
   Container.cpp \
@@ -452,6 +453,8 @@ libhumble_video_la_HEADERS = \
   Rational.h \
   RationalImpl.h \
   Rational.swg \
+  Packet.h \
+  Packet.swg \
   Property.h \
   PropertyImpl.h \
   Property.swg \
