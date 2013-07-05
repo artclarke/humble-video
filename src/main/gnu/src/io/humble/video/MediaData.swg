@@ -397,30 +397,36 @@ public void get(int srcPos, double[] dest, int destPos, int length)
 
   public String getFormattedTimeStamp(String format)
   {
+    String retval = null;
     java.util.Formatter formatter = new java.util.Formatter();
-    IRational timeBase = getTimeBase();
-    if (timeBase == null)
-      timeBase = IRational.make(1,(int)Global.DEFAULT_PTS_PER_SECOND);
-    String retval = formatter.format(format,
-      (long)(getTimeStamp() * timeBase.getDouble() * 1000) +
-      TIME_OFFSET).toString();
-    timeBase.delete();
+
+    try {
+      Rational timeBase = getTimeBase();
+      if (timeBase == null)
+        timeBase = Rational.make(1,(int)Global.DEFAULT_PTS_PER_SECOND);
+      retval = formatter.format(format,
+          (long)(getTimeStamp() * timeBase.getDouble() * 1000) +
+          TIME_OFFSET).toString();
+      timeBase.delete();
+    } finally {
+      formatter.close();
+    }
     return retval;
   }
   
   /**
    * The data used by {@link #getDataCached()}.
    */
-  private IBuffer mData;
+  private io.humble.ferry.IBuffer mData;
 
   /**
    * Get any underlying raw data available for this object.
    * 
    * @return The raw data, or null if not accessible.
    */
-  public IBuffer getData()
+  public io.humble.ferry.IBuffer getData()
   {
-    IBuffer retval = getData_internal();
+    io.humble.ferry.IBuffer retval = getData_internal();
     if (retval == null)
     {
        if (mData != null)
@@ -430,7 +436,7 @@ public void get(int srcPos, double[] dest, int destPos, int length)
       if (mData == null) {
         mData = retval.copyReference();
       } else {
-        if (mData.getMyCPtr() != retval.getMyCPtr())
+        if (!mData.equals(retval))
         {
           mData.delete();
           mData = retval.copyReference();
@@ -451,11 +457,9 @@ public void get(int srcPos, double[] dest, int destPos, int length)
    * It is up to the caller to ensure the buffer passed in is large enough,
    * and is not simultaneously in use by another part of the system.
    * </p>
-   * @param buffer The buffer to set.  If null, this method
-   *   is ignored.
-   * @since 3.2
+   * @param buffer The buffer to set.
    */
-  public void setData(IBuffer buffer)
+  public void setData(io.humble.ferry.IBuffer buffer)
   {
     if (buffer == null)
     {
@@ -466,7 +470,7 @@ public void get(int srcPos, double[] dest, int destPos, int length)
       if (mData == null) {
         mData = buffer.copyReference();
       } else {
-        if (mData.getMyCPtr() != buffer.getMyCPtr())
+        if (!mData.equals(buffer))
         {
           mData.delete();
           mData = buffer.copyReference();
@@ -488,7 +492,7 @@ public void get(int srcPos, double[] dest, int destPos, int length)
    * @return The raw data, or null if not accessible.
    * @since 3.2
    */
-  public IBuffer getDataCached()
+  public io.humble.ferry.IBuffer getDataCached()
   {
     if (mData == null)
       mData = getData_internal(); // Try crossing the boundary anyway

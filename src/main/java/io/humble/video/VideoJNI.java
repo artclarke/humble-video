@@ -8,6 +8,7 @@
 
 package io.humble.video;
 
+import io.humble.ferry.IBuffer;
 
 class VideoJNI {
 
