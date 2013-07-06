@@ -53,12 +53,11 @@
             <artifactId>umlgraph</artifactId>
             <version>5.6</version>
           </docletArtifact>
-          <additionalparam>-inferrel -inferdep -quiet -hide java.* -hide
+          <additionalparam>-quiet -hide java.* -hide
             org.eclipse.* -collpackages java.util.* -postfixpackage
-            -nodefontsize 9 -nodefontpackagesize 7 -attributes -types
-            -visibility -operations -constructors
-            -enumerations
-            -enumconstants -views</additionalparam>
+            -nodefontsize 9 -nodefontpackagesize 7
+            -visibility
+            -views</additionalparam>
           <useStandardDocletOptions>true</useStandardDocletOptions>
         </configuration>
       </plugin>
