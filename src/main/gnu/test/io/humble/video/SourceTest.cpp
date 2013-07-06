@@ -42,6 +42,7 @@ SourceTest::SourceTest() {
   mSampleFile[0] =0;
   char *fixtureDirectory = getenv("VS_TEST_FIXTUREDIR");
   if (!fixtureDirectory) {
+    VS_LOG_ERROR("Need to define environement variable VS_TEST_FIXTUREDIR");
     TSM_ASSERT("no fixture dir", false);
     throw new std::runtime_error("Must define environment variable VS_TEST_FIXTUREDIR");
   }
@@ -217,4 +218,28 @@ SourceTest::testOpenInvalidArguments()
     retval = source->open("/foo/bar/ohsonotalidfile", 0, false, false, 0, 0);
     TS_ASSERT(retval < 0);
   }
+}
+
+void
+SourceTest::testRead()
+{
+  RefPointer<Source> source = Source::make();
+  TS_ASSERT(source);
+
+  int32_t retval = source->open(mSampleFile, 0, false, true, 0, 0);
+  TS_ASSERT(retval >= 0);
+  TS_ASSERT(source->getState() == Container::STATE_OPENED);
+
+  int64_t pktsRead = 0;
+  RefPointer<Packet> pkt = Packet::make();
+  do {
+    retval = source->read(pkt.value());
+    if (retval >= 0)
+      ++pktsRead;
+  } while (retval >= 0);
+  TS_ASSERT(pktsRead > 0);
+  // I happen to know that there are this number of audio and video packets in this file.
+  TS_ASSERT_EQUALS(pktsRead, 5714+2236);
+  retval = source->close();
+  TS_ASSERT(retval >= 0);
 }

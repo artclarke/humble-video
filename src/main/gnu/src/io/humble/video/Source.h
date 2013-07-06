@@ -191,6 +191,7 @@ public:
    */
   virtual int32_t
   read(Packet *packet)=0;
+
   /**
    * Attempts to read all the meta data in this stream, potentially by reading ahead
    * and decoding packets.

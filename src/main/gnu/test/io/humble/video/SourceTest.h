@@ -42,6 +42,7 @@ public:
   void testOpenCustomIO();
   void testOpenWithoutCloseAutoCloses();
   void testOpenInvalidArguments();
+  void testRead();
 private:
   void openTestHelper(const char* url);
   char mSampleFile[2048];

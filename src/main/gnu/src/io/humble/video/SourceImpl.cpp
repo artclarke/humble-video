@@ -24,9 +24,10 @@
  */
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/JNIHelper.h>
-#include "SourceImpl.h"
-#include "Global.h"
 #include <io/humble/video/customio/URLProtocolManager.h>
+#include "Global.h"
+#include "SourceImpl.h"
+#include "PacketImpl.h"
 #include "KeyValueBagImpl.h"
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
@@ -300,9 +301,62 @@ SourceImpl::getStream(int32_t streamIndex) {
 }
 
 int32_t
-SourceImpl::read(Packet* packet) {
-  (void) packet;
-  return -1;
+SourceImpl::read(Packet* ipkt) {
+  int32_t retval = -1;
+  PacketImpl* pkt = dynamic_cast<PacketImpl*>(ipkt);
+  if (pkt)
+  {
+    AVPacket tmpPacket;
+    AVPacket* packet=0;
+
+    packet = &tmpPacket;
+    av_init_packet(packet);
+    pkt->reset();
+    int32_t numReads=0;
+    do
+    {
+      retval = av_read_frame(mCtx,
+          packet);
+      ++numReads;
+    }
+    while (retval == AVERROR(EAGAIN) &&
+        (mReadRetryMax < 0 || numReads <= mReadRetryMax));
+
+    if (retval >= 0)
+      pkt->wrapAVPacket(packet);
+    av_free_packet(packet);
+
+    // Get a pointer to the wrapped packet
+    packet = pkt->getCtx();
+    // and dump it's contents
+    VS_LOG_TRACE("read: %lld, %lld, %d, %d, %d, %lld, %lld: %p",
+        pkt->getDts(),
+        pkt->getPts(),
+        pkt->getFlags(),
+        pkt->getStreamIndex(),
+        pkt->getSize(),
+        pkt->getDuration(),
+        pkt->getPosition(),
+        packet->data);
+
+#if 0
+    // and let's try to set the packet time base if known
+    if (pkt->getStreamIndex() >= 0)
+    {
+      RefPointer<IStream> stream = this->getStream(pkt->getStreamIndex());
+      if (stream)
+      {
+        RefPointer<IRational> streamBase = stream->getTimeBase();
+        if (streamBase)
+        {
+          pkt->setTimeBase(streamBase.value());
+        }
+      }
+    }
+#endif // redo once stream implemented
+  }
+  VS_CHECK_INTERRUPT(retval, true);
+  return retval;
 }
 
 int32_t
