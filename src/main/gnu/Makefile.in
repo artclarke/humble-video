@@ -85,10 +85,10 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(top_srcdir)/mk/Makefile.dependencies.in \
 	$(top_srcdir)/mk/memcheck.in $(top_srcdir)/mk/pom.xml.in \
 	COPYING mk/README mk/ar-lib mk/config.guess mk/config.sub \
-	mk/install-sh mk/missing mk/ltmain.sh $(top_srcdir)/mk/ar-lib \
-	$(top_srcdir)/mk/config.guess $(top_srcdir)/mk/config.sub \
-	$(top_srcdir)/mk/install-sh $(top_srcdir)/mk/ltmain.sh \
-	$(top_srcdir)/mk/missing
+	mk/depcomp mk/install-sh mk/missing mk/ltmain.sh \
+	$(top_srcdir)/mk/ar-lib $(top_srcdir)/mk/config.guess \
+	$(top_srcdir)/mk/config.sub $(top_srcdir)/mk/install-sh \
+	$(top_srcdir)/mk/ltmain.sh $(top_srcdir)/mk/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compiler_vendor.m4 \
 	$(top_srcdir)/m4/ax_prog_doxygen.m4 \

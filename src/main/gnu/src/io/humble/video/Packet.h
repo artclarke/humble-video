@@ -47,6 +47,45 @@ class VS_API_HUMBLEVIDEO Packet : public io::humble::video::MediaEncodedData
       make();
 
     /**
+     * Allocate a new packet that wraps an existing IBuffer.
+     *
+     * @param buffer The IBuffer to wrap.
+     * @return a new packet or null on error.
+     */
+    static Packet* make(io::humble::ferry::IBuffer* buffer);
+
+    /**
+     * Allocate a new packet wrapping the existing contents of
+     * a passed in packet.  Callers can then modify
+     * {@link #getPts()},
+     * {@link #getDts()} and other get/set methods without
+     * modifying the original packet.
+     *
+     * @param packet Packet to reuse buffer from and to
+     *   copy settings from.
+     * @param copyData if true copy data from packet
+     *   into our own buffer.  If false, share the same
+     *   data buffer that packet uses
+     *
+     * @return a new packet or null on error.
+     */
+    static Packet* make(Packet *packet, bool copyData);
+
+    /**
+     * Allocate a new packet.
+     * <p>
+     * Note that any buffers this packet needs will be
+     * lazily allocated (i.e. we won't actually grab all
+     * the memory until we need it).
+     * </p>
+     * @param size The maximum size, in bytes, of data you
+     *   want to put in this packet.
+     *
+     * @return a new packet, or null on error.
+     */
+    static Packet* make(int32_t size);
+
+    /**
      * Get the Presentation Time Stamp (PTS) for this packet.
      * 
      * This is the time at which the payload for this packet should
@@ -206,6 +245,23 @@ class VS_API_HUMBLEVIDEO Packet : public io::humble::video::MediaEncodedData
      * @param duration the new duration
      */
     virtual void setConvergenceDuration(int64_t duration)=0;
+
+    /**
+     * Discard the current payload and allocate a new payload.
+     * <p>
+     * Note that if any people have access to the old payload using
+     * getData(), the memory will continue to be available to them
+     * until they release their hold of the IBuffer.
+     * </p>
+     * <p>
+     * When requesting a packet size, the system
+     *   may allocate a larger payloadSize.
+     * </p>
+     * @param payloadSize The (minimum) payloadSize of this packet in bytes.
+     *
+     * @return >= 0 if successful.  < 0 if error.
+     */
+    virtual int32_t allocateNewPayload(int32_t payloadSize)=0;
 
 protected:
   Packet();

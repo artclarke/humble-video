@@ -117,7 +117,51 @@ public class Packet extends MediaEncodedData {
  * Create a new {@link Packet}  
  */
   public static Packet make() {
-    long cPtr = VideoJNI.Packet_make();
+    long cPtr = VideoJNI.Packet_make__SWIG_0();
+    return (cPtr == 0) ? null : new Packet(cPtr, false);
+  }
+
+/**
+ * Allocate a new packet that wraps an existing IBuffer.  
+ * @param	buffer The IBuffer to wrap.  
+ * @return	a new packet or null on error.  
+ */
+  public static Packet make(IBuffer buffer) {
+    long cPtr = VideoJNI.Packet_make__SWIG_1(IBuffer.getCPtr(buffer), buffer);
+    return (cPtr == 0) ? null : new Packet(cPtr, false);
+  }
+
+/**
+ * Allocate a new packet wrapping the existing contents of  
+ * a passed in packet. Callers can then modify  
+ * {@link #getPts()},  
+ * {@link #getDts()} and other get/set methods without  
+ * modifying the original packet.  
+ * @param	packet Packet to reuse buffer from and to  
+ * copy settings from.  
+ * @param	copyData if true copy data from packet  
+ * into our own buffer. If false, share the same  
+ * data buffer that packet uses  
+ * @return	a new packet or null on error.  
+ */
+  public static Packet make(Packet packet, boolean copyData) {
+    long cPtr = VideoJNI.Packet_make__SWIG_2(Packet.getCPtr(packet), packet, copyData);
+    return (cPtr == 0) ? null : new Packet(cPtr, false);
+  }
+
+/**
+ * Allocate a new packet.  
+ * <p>  
+ * Note that any buffers this packet needs will be  
+ * lazily allocated (i.e. we won't actually grab all  
+ * the memory until we need it).  
+ * </p>  
+ * @param	size The maximum size, in bytes, of data you  
+ * want to put in this packet.  
+ * @return	a new packet, or null on error.  
+ */
+  public static Packet make(int size) {
+    long cPtr = VideoJNI.Packet_make__SWIG_3(size);
     return (cPtr == 0) ? null : new Packet(cPtr, false);
   }
 
@@ -324,6 +368,25 @@ public class Packet extends MediaEncodedData {
  */
   public void setConvergenceDuration(long duration) {
     VideoJNI.Packet_setConvergenceDuration(swigCPtr, this, duration);
+  }
+
+/**
+ * Discard the current payload and allocate a new payload.  
+ * <p>  
+ * Note that if any people have access to the old payload using  
+ * getData(), the memory will continue to be available to them  
+ * until they release their hold of the IBuffer.  
+ * </p>  
+ * <p>  
+ * When requesting a packet size, the system  
+ * may allocate a larger payloadSize.  
+ * </p>  
+ * @param	payloadSize The (minimum) payloadSize of this packet in bytes. 
+ *		  
+ * @return	>= 0 if successful. < 0 if error.  
+ */
+  public int allocateNewPayload(int payloadSize) {
+    return VideoJNI.Packet_allocateNewPayload(swigCPtr, this, payloadSize);
   }
 
 }

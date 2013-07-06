@@ -17,8 +17,11 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
+#include "Global.h"
 #include "Packet.h"
 #include "PacketImpl.h"
+
+using namespace io::humble::ferry;
 
 namespace io {
 namespace humble {
@@ -31,9 +34,42 @@ Packet::~Packet() {
 }
 
 Packet*
-Packet::make() {
+Packet :: make()
+{
+  Global::init();
   return PacketImpl::make();
 }
+
+Packet*
+Packet::make(IBuffer* buffer)
+{
+  Global::init();
+  if (!buffer)
+    throw std::invalid_argument("no buffer");
+
+  return PacketImpl::make(buffer);
+}
+
+Packet*
+Packet :: make(Packet* packet, bool copyData)
+{
+  Global::init();
+  return PacketImpl::make(dynamic_cast<PacketImpl*>(packet), copyData);
+}
+
+Packet*
+Packet :: make(int32_t size)
+{
+  Global::init();
+  Packet* retval = make();
+  if (retval) {
+    if (retval->allocateNewPayload(size) < 0)
+      VS_REF_RELEASE(retval);
+  }
+  return retval;
+}
+
+
 
 } /* namespace video */
 } /* namespace humble */

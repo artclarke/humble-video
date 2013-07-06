@@ -120,7 +120,10 @@ class VideoJNI {
   public final static native int MediaData_getSize(long jarg1, MediaData jarg1_);
   public final static native boolean MediaData_isKey(long jarg1, MediaData jarg1_);
   public final static native void MediaData_setData_internal(long jarg1, MediaData jarg1_, long jarg2, IBuffer jarg2_);
-  public final static native long Packet_make();
+  public final static native long Packet_make__SWIG_0();
+  public final static native long Packet_make__SWIG_1(long jarg1, IBuffer jarg1_);
+  public final static native long Packet_make__SWIG_2(long jarg1, Packet jarg1_, boolean jarg2);
+  public final static native long Packet_make__SWIG_3(int jarg1);
   public final static native long Packet_getPts(long jarg1, Packet jarg1_);
   public final static native void Packet_setPts(long jarg1, Packet jarg1_, long jarg2);
   public final static native long Packet_getDts(long jarg1, Packet jarg1_);
@@ -139,6 +142,7 @@ class VideoJNI {
   public final static native void Packet_setPosition(long jarg1, Packet jarg1_, long jarg2);
   public final static native long Packet_getConvergenceDuration(long jarg1, Packet jarg1_);
   public final static native void Packet_setConvergenceDuration(long jarg1, Packet jarg1_, long jarg2);
+  public final static native int Packet_allocateNewPayload(long jarg1, Packet jarg1_, int jarg2);
   public final static native int Configurable_getNumProperties(long jarg1, Configurable jarg1_);
   public final static native long Configurable_getPropertyMetaData__SWIG_0(long jarg1, Configurable jarg1_, int jarg2);
   public final static native long Configurable_getPropertyMetaData__SWIG_1(long jarg1, Configurable jarg1_, String jarg2);
