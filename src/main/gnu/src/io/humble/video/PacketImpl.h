@@ -31,73 +31,79 @@ namespace video {
 
 class VS_API_HUMBLEVIDEO PacketImpl : public io::humble::video::Packet
 {
-public:
+  public:
+    /* The default make() method doesn't add a payload */
+    VS_JNIUTILS_REFCOUNTED_OBJECT(PacketImpl);
+  public:
+    /* This make allocates a default payload of size payloadSize */
+    static PacketImpl* make(int32_t payloadSize);
+    /* This make a packet that just wraps a given IBuffer */
+    static PacketImpl* make(io::humble::ferry::IBuffer* buffer);
+    /* This makes a packet wrapping the buffer in another packet and copying
+     * it's settings
+     */
+    static PacketImpl* make(PacketImpl* packet, bool);
+  public:
 
-  static PacketImpl*
-  make();
+    // MediaData
+    virtual int64_t getTimeStamp() { return getDts(); }
+    virtual void setTimeStamp(int64_t aTimeStamp) { setDts(aTimeStamp); }
+    virtual bool isKey() { return isKeyPacket(); }
+    virtual Rational* getTimeBase() { return mTimeBase.get(); }
+    virtual void setTimeBase(Rational *aBase) { mTimeBase.reset(aBase, true); }
+    
+    // Packet
+    virtual void reset();
 
-  virtual int64_t getTimeStamp() { return this->getDts(); }
+    virtual int64_t getPts();
+    virtual int64_t getDts();
+    virtual int32_t getSize();
+    virtual int32_t getMaxSize();
 
-  virtual void setTimeStamp(int64_t aTimeStamp) { this->setDts(aTimeStamp); }
-
-  virtual bool isKey() { return isKeyPacket(); }
-
-  virtual Rational* getTimeBase() { return mTimeBase.get(); }
-
-  virtual void setTimeBase(Rational *aBase) { return mTimeBase.reset(aBase, true); }
-
-  virtual io::humble::ferry::IBuffer* getData()=0;
-
-  virtual void setData(io::humble::ferry::IBuffer* buffer)=0;
-
-  virtual int64_t getPts();
-
-  virtual void setPts(int64_t aPts);
-
-  virtual int64_t getDts();
-
-  virtual void setDts(int64_t aDts);
-
-  virtual int32_t getSize()=0;
-
-  virtual int32_t getMaxSize()=0;
-
-  virtual int32_t getStreamIndex()=0;
-
-  virtual int32_t getFlags()=0;
-
-  virtual bool isKeyPacket()=0;
-
-  virtual int64_t getDuration()=0;
-
-  virtual int64_t getPosition()=0;
-
-  virtual void setKeyPacket(bool keyPacket)=0;
-
-  virtual void setFlags(int32_t flags)=0;
-
-  virtual void setStreamIndex(int32_t streamIndex)=0;
-
-  virtual void setDuration(int64_t duration)=0;
-
-  virtual void setPosition(int64_t position)=0;
-
-  virtual int64_t getConvergenceDuration()=0;
-
-  virtual void setConvergenceDuration(int64_t duration)=0;
+    virtual int32_t getStreamIndex();
+    virtual int32_t getFlags();
+    virtual bool isKeyPacket();
+    virtual int64_t getDuration();
+    virtual int64_t getPosition();
+    virtual io::humble::ferry::IBuffer* getData();
+    virtual int32_t allocateNewPayload(int32_t payloadSize);
+    virtual bool isComplete();
+    
+    virtual void setKeyPacket(bool keyPacket);
+    virtual void setFlags(int32_t flags);
+    virtual void setPts(int64_t pts);
+    virtual void setDts(int64_t dts);
+    virtual void setComplete(bool complete, int32_t size);
+    virtual void setStreamIndex(int32_t streamIndex);
+    virtual void setDuration(int64_t duration);
+    virtual void setPosition(int64_t position);
+    virtual int64_t getConvergenceDuration();
+    virtual void setConvergenceDuration(int64_t duration);
+    virtual void setData(io::humble::ferry::IBuffer* buffer);
 
 #ifndef SWIG
-  AVPacket* getCtx() { return mPacket; }
-#endif
-protected:
-  PacketImpl();
-  virtual
-  ~PacketImpl();
-private:
-  AVPacket* mPacket;
-  io::humble::ferry::RefPointer<io::humble::ferry::IBuffer> mBuffer;
-  io::humble::ferry::RefPointer<Rational> mTimeBase;
-  bool mIsComplete;
+    AVPacket *getCtx() { return mPacket; }
+    /*
+     * Unfortunately people can do a getCtx() and have
+     * FFMPEG update the buffers without us knowing.  When
+     * that happens, we need them to tell us so we can update
+     * our own buffer state.
+     */
+    void wrapAVPacket(AVPacket* pkt);
+    void wrapBuffer(io::humble::ferry::IBuffer *buffer);
+    // Used by the IBuffer to free buffers.
+    static void freeAVBuffer(void *buf, void *closure);
+#endif // ! SWIG
+
+  protected:
+    PacketImpl();
+    virtual ~PacketImpl();
+  private:
+    AVPacket* mPacket;
+    io::humble::ferry::RefPointer<io::humble::ferry::IBuffer> mBuffer;
+    io::humble::ferry::RefPointer<Rational> mTimeBase;
+    bool mIsComplete;
+
 };
 
 } /* namespace video */
