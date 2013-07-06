@@ -12,7 +12,7 @@ AC_INIT(VSM4_PROJECT_NAME,[VSM4_LIB_MAJOR_VERSION.VSM4_LIB_MINOR_VERSION],[info@
 AC_PREREQ([2.68])
 AC_PREFIX_DEFAULT([/usr/local/humble])
 AC_CONFIG_AUX_DIR(mk)
-AM_INIT_AUTOMAKE([-Wall -Werror no-dependencies nostdinc tar-pax 1.11.1 ])
+AM_INIT_AUTOMAKE([-Wall -Werror nostdinc tar-pax 1.11.1 ])
 AM_MAINTAINER_MODE
 AM_SILENT_RULES([yes])
 AM_PROG_AR
