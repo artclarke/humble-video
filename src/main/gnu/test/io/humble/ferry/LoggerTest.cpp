@@ -38,6 +38,6 @@ LoggerTestSuite :: testOutputToStandardError()
   VS_LOG_DEBUG("This is a debug message");
   VS_LOG_TRACE("This is a trace message");
 
-  VS_TUT_ENSURE("this test really just shouldn't crash.  check log files to ensure it outputted", true);
+  TSM_ASSERT("this test really just shouldn't crash.  check log files to ensure it outputted", true);
 }
 

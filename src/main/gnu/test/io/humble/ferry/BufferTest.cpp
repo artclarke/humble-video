@@ -43,9 +43,9 @@ BufferTest :: testCreationAndDestruction()
 {
   long bufSize = 10;
   buffer = Buffer::make(0, bufSize);
-  VS_TUT_ENSURE("no buffer", buffer);
+  TSM_ASSERT("no buffer", buffer);
 
-  VS_TUT_ENSURE_EQUALS("wrong size", buffer->getBufferSize(),
+  TSM_ASSERT_EQUALS("wrong size", buffer->getBufferSize(),
       bufSize);
 
 }
@@ -55,10 +55,10 @@ BufferTest :: testReadingAndWriting()
 {
   long bufSize = 10;
   buffer = Buffer::make(0, bufSize);
-  VS_TUT_ENSURE("no buffer", buffer);
+  TSM_ASSERT("no buffer", buffer);
   int i = 0;
   unsigned char * buf = (unsigned char*)buffer->getBytes(0, bufSize);
-  VS_TUT_ENSURE("no allocation", buf);
+  TSM_ASSERT("no allocation", buf);
 
   for (i = 0; i < bufSize; i++)
   {
@@ -77,7 +77,7 @@ BufferTest :: testReadingAndWriting()
     // area without a memory read error.
     // This test only potentially shows up as errors in a memory
     // tool like valgrind.
-    VS_TUT_ENSURE_EQUALS("but we just wrote here?",
+    TSM_ASSERT_EQUALS("but we just wrote here?",
         buf[i],
         i);
   }    
@@ -90,27 +90,27 @@ BufferTest :: testWrapping()
   unsigned char*raw = new unsigned char[bufSize];
   bool freeCalled = false;
   Buffer* wrappingBuffer=0;
-  VS_TUT_ENSURE("could allocate buffer", raw);
+  TSM_ASSERT("could allocate buffer", raw);
 
   wrappingBuffer = Buffer::make(0, raw, bufSize, freeBuffer, &freeCalled);
-  VS_TUT_ENSURE("no buffer", wrappingBuffer);
+  TSM_ASSERT("no buffer", wrappingBuffer);
 
   // release the buffer
   VS_REF_RELEASE(wrappingBuffer);
 
-  VS_TUT_ENSURE("closure not executed", freeCalled);   
+  TSM_ASSERT("closure not executed", freeCalled);   
 
   freeCalled = false;
   // This time no free buffer
   raw = new unsigned char[bufSize];
 
   wrappingBuffer = Buffer::make(0, raw, bufSize, 0, &freeCalled);
-  VS_TUT_ENSURE("no buffer", wrappingBuffer);
+  TSM_ASSERT("no buffer", wrappingBuffer);
 
   // release the buffer
   VS_REF_RELEASE(wrappingBuffer);
 
-  VS_TUT_ENSURE("closure executed?", !freeCalled);
+  TSM_ASSERT("closure executed?", !freeCalled);
 
   // and clean up
   delete [] raw;

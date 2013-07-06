@@ -28,5 +28,5 @@ MutexTestSuite :: testCreateAndDestroy()
   Mutex* mutex=0;
 
   mutex = Mutex::make();
-  VS_TUT_ENSURE("should not get a mutex when running outside Java", !mutex);
+  TSM_ASSERT("should not get a mutex when running outside Java", !mutex);
 }

@@ -75,42 +75,42 @@ OutputFormatTest::testCreateOutputFormat() {
     VS_LOG_DEBUG("    Long Name: %s", d->getLongName());
     VS_LOG_DEBUG("    Properties: %d", d->getProperties());
   }
-  VS_TUT_ENSURE("", strcmp("flv", format->getName()) == 0);
+  TSM_ASSERT("", strcmp("flv", format->getName()) == 0);
   format = OutputFormat::guessFormat(0, "foo.flv", 0);
-  VS_TUT_ENSURE("", strcmp("flv", format->getName()) == 0);
+  TSM_ASSERT("", strcmp("flv", format->getName()) == 0);
   format = OutputFormat::guessFormat(0, 0, "video/x-flv");
-  VS_TUT_ENSURE("", strcmp("flv", format->getName()) == 0);
+  TSM_ASSERT("", strcmp("flv", format->getName()) == 0);
 
   /** make sure default codec stuff works */
   format = OutputFormat::guessFormat("mp4", 0, 0);
-  VS_TUT_ENSURE("", format);
+  TSM_ASSERT("", format);
 
   Codec::ID id = Codec::ID_NONE;
 
   id = format->getDefaultAudioCodecId();
-  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_AAC);
+  TSM_ASSERT_EQUALS("", id, Codec::ID_AAC);
 
   id = format->getDefaultVideoCodecId();
-  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_H264);
+  TSM_ASSERT_EQUALS("", id, Codec::ID_H264);
 
   id = format->getDefaultSubtitleCodecId();
-  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_NONE);
+  TSM_ASSERT_EQUALS("", id, Codec::ID_NONE);
 
   id = format->guessCodec("mp4", 0, 0, MediaDescriptor::MEDIA_AUDIO);
-  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_AAC);
+  TSM_ASSERT_EQUALS("", id, Codec::ID_AAC);
 
   id = format->guessCodec("mp4", 0, 0, MediaDescriptor::MEDIA_VIDEO);
-  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_H264);
+  TSM_ASSERT_EQUALS("", id, Codec::ID_H264);
 
   id = format->guessCodec("mp4", 0, 0, MediaDescriptor::MEDIA_SUBTITLE);
-  VS_TUT_ENSURE_EQUALS("", id, Codec::ID_NONE);
+  TSM_ASSERT_EQUALS("", id, Codec::ID_NONE);
 
 }
 
 void
 OutputFormatTest::testInstallation() {
   int32_t n = OutputFormat::getNumFormats();
-  VS_TUT_ENSURE("", n > 0);
+  TSM_ASSERT("", n > 0);
 
   for(int32_t i = 0; i < n; i++) {
     RefPointer<OutputFormat> f = OutputFormat::getFormat(i);

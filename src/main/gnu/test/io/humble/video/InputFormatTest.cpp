@@ -74,13 +74,13 @@ InputFormatTest::testCreateInputFormat() {
     VS_LOG_DEBUG("    Long Name: %s", d->getLongName());
     VS_LOG_DEBUG("    Properties: %d", d->getProperties());
   }
-  VS_TUT_ENSURE("", strcmp("mov,mp4,m4a,3gp,3g2,mj2", format->getName()) == 0);
+  TSM_ASSERT("", strcmp("mov,mp4,m4a,3gp,3g2,mj2", format->getName()) == 0);
 }
 
 void
 InputFormatTest::testInstallation() {
   int32_t n = InputFormat::getNumFormats();
-  VS_TUT_ENSURE("", n > 0);
+  TSM_ASSERT("", n > 0);
 
   for(int32_t i = 0; i < n; i++) {
     RefPointer<InputFormat> f = InputFormat::getFormat(i);

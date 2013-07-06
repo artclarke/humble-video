@@ -33,7 +33,7 @@ StdioURLProtocolHandlerTest :: StdioURLProtocolHandlerTest()
      if (fixtureDirectory)
        snprintf(mFixtureDir, sizeof(mFixtureDir), "%s", fixtureDirectory);
      else {
-       VS_TUT_ENSURE("no fixture dir", false);
+       TSM_ASSERT("no fixture dir", false);
        throw new std::runtime_error("Must define environment variable VS_TEST_FIXTUREDIR");
      }
      FIXTURE_DIRECTORY = mFixtureDir;
@@ -63,7 +63,7 @@ StdioURLProtocolHandlerTest :: testCreation()
 {
   StdioURLProtocolManager::registerProtocol("test");
   URLProtocolHandler* handler = StdioURLProtocolManager::findHandler("test:foo", 0,0);
-  VS_TUT_ENSURE("", handler);
+  TSM_ASSERT("", handler);
   delete handler;
 }
 
@@ -72,14 +72,14 @@ StdioURLProtocolHandlerTest :: testOpenClose()
 {
   StdioURLProtocolManager::registerProtocol("test");
   URLProtocolHandler* handler = StdioURLProtocolManager::findHandler("test:foo", 0,0);
-  VS_TUT_ENSURE("", handler);
+  TSM_ASSERT("", handler);
 
   int retval = 0;
   retval = handler->url_open(mSampleFile, URLProtocolHandler::URL_RDONLY_MODE);
-  VS_TUT_ENSURE("", retval >= 0);
+  TSM_ASSERT("", retval >= 0);
 
   retval = handler->url_close();
-  VS_TUT_ENSURE("", retval >= 0);
+  TSM_ASSERT("", retval >= 0);
   delete handler;
 }
 
@@ -88,11 +88,11 @@ StdioURLProtocolHandlerTest :: testRead()
 {
   StdioURLProtocolManager::registerProtocol("test");
   URLProtocolHandler* handler = StdioURLProtocolManager::findHandler("test:foo", 0,0);
-  VS_TUT_ENSURE("", handler);
+  TSM_ASSERT("", handler);
 
   int retval = 0;
   retval = handler->url_open(mSampleFile, URLProtocolHandler::URL_RDONLY_MODE);
-  VS_TUT_ENSURE("", retval >= 0);
+  TSM_ASSERT("", retval >= 0);
 
   int32_t totalBytes = 0;
   do {
@@ -101,10 +101,10 @@ StdioURLProtocolHandlerTest :: testRead()
     if (retval > 0)
       totalBytes+= retval;
   } while (retval > 0);
-  VS_TUT_ENSURE_EQUALS("", 4546420, totalBytes);
+  TSM_ASSERT_EQUALS("", 4546420, totalBytes);
 
   retval = handler->url_close();
-  VS_TUT_ENSURE("", retval >= 0);
+  TSM_ASSERT("", retval >= 0);
   delete handler;
 }
 
@@ -113,16 +113,16 @@ StdioURLProtocolHandlerTest :: testSeek()
 {
   StdioURLProtocolManager::registerProtocol("test");
   URLProtocolHandler* handler = StdioURLProtocolManager::findHandler("test:foo", 0,0);
-  VS_TUT_ENSURE("", handler);
+  TSM_ASSERT("", handler);
 
   int retval = 0;
   retval = handler->url_open(mSampleFile, URLProtocolHandler::URL_RDONLY_MODE);
-  VS_TUT_ENSURE("", retval >= 0);
+  TSM_ASSERT("", retval >= 0);
 
   int64_t offset = 0;
 
   offset = handler->url_seek(0, URLProtocolHandler::SK_SEEK_SIZE);
-  VS_TUT_ENSURE_EQUALS("", 4546420, offset);
+  TSM_ASSERT_EQUALS("", 4546420, offset);
 
   // now ensure we can read back all the data
   int32_t totalBytes = 0;
@@ -132,10 +132,10 @@ StdioURLProtocolHandlerTest :: testSeek()
     if (retval > 0)
       totalBytes+= retval;
   } while (retval > 0);
-  VS_TUT_ENSURE_EQUALS("", 4546420, totalBytes);
+  TSM_ASSERT_EQUALS("", 4546420, totalBytes);
 
   retval = handler->url_close();
-  VS_TUT_ENSURE("", retval >= 0);
+  TSM_ASSERT("", retval >= 0);
   delete handler;
 }
 
@@ -144,9 +144,9 @@ StdioURLProtocolHandlerTest :: testSeekableFlags()
 {
   StdioURLProtocolManager::registerProtocol("test");
   URLProtocolHandler* handler = StdioURLProtocolManager::findHandler("test:foo", 0,0);
-  VS_TUT_ENSURE("", handler);
+  TSM_ASSERT("", handler);
   URLProtocolHandler::SeekableFlags flags = handler->url_seekflags("test:foo", 0);
-  VS_TUT_ENSURE_EQUALS("", URLProtocolHandler::SK_SEEKABLE_NORMAL, flags);
+  TSM_ASSERT_EQUALS("", URLProtocolHandler::SK_SEEKABLE_NORMAL, flags);
   delete handler;
 }
 
@@ -155,17 +155,17 @@ StdioURLProtocolHandlerTest :: testReadWrite()
 {
   StdioURLProtocolManager::registerProtocol("test");
   URLProtocolHandler* handler = StdioURLProtocolManager::findHandler("test:foo", 0,0);
-  VS_TUT_ENSURE("", handler);
+  TSM_ASSERT("", handler);
   const char* OUT_FILE="test:StdioURLProtocolHandlerTest_testReadWrite.flv";
   URLProtocolHandler* writeHandler = StdioURLProtocolManager::findHandler(OUT_FILE, 0, 0);
-  VS_TUT_ENSURE("", writeHandler);
+  TSM_ASSERT("", writeHandler);
 
   int retval = 0;
   retval = handler->url_open(mSampleFile, URLProtocolHandler::URL_RDONLY_MODE);
-  VS_TUT_ENSURE("", retval >= 0);
+  TSM_ASSERT("", retval >= 0);
 
   retval = writeHandler->url_open(OUT_FILE, URLProtocolHandler::URL_WRONLY_MODE);
-  VS_TUT_ENSURE("", retval >= 0);
+  TSM_ASSERT("", retval >= 0);
 
   int32_t totalBytes = 0;
   do {
@@ -176,15 +176,15 @@ StdioURLProtocolHandlerTest :: testReadWrite()
       totalBytes+= retval;
     bytesToWrite = retval;
     retval = writeHandler->url_write(buf, bytesToWrite);
-    VS_TUT_ENSURE_EQUALS("", bytesToWrite, retval);
+    TSM_ASSERT_EQUALS("", bytesToWrite, retval);
   } while (retval > 0);
-  VS_TUT_ENSURE_EQUALS("", 4546420, totalBytes);
+  TSM_ASSERT_EQUALS("", 4546420, totalBytes);
 
   retval = handler->url_close();
-  VS_TUT_ENSURE("", retval >= 0);
+  TSM_ASSERT("", retval >= 0);
 
   retval = writeHandler->url_close();
-  VS_TUT_ENSURE("", retval >= 0);
+  TSM_ASSERT("", retval >= 0);
 
   delete handler;
   delete writeHandler;

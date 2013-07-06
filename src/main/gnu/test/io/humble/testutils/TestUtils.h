@@ -25,17 +25,4 @@
 // to call it from our main.
 int VS_TestMain(int argc, char**argv);
 
-// These macros exists for backwards comability reasons; we used
-//  to use the Template Unit Testing framework and old code
-//  used this form.  This is no deprecated and you should
-//  use the TS_* macros.
-#define VS_TUT_ENSURE(__msg, __expr) \
-  TS_ASSERT(__expr)
-
-#define VS_TUT_ENSURE_EQUALS(msg, __a, __b) \
-  TS_ASSERT_EQUALS(__a, __b)
-
-#define VS_TUT_ENSURE_DISTANCE(msg, __a, __b, __delta) \
-  TS_ASSERT_DELTA(__a, __b, __delta)
-
 #endif // ! __TEST_UTILS_H__
