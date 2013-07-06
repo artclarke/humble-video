@@ -20,6 +20,8 @@ libhumble_video_la_SOURCES= \
   Rational.cpp \
   RationalImpl.cpp \
   MediaData.cpp \
+  Error.cpp \
+  ErrorImpl.cpp \
   Packet.cpp \
   PacketImpl.cpp \
   ContainerFormat.cpp \
@@ -49,6 +51,9 @@ libhumble_video_la_HEADERS= \
   Rational.swg \
   MediaData.h \
   MediaData.swg \
+  Error.h \
+  ErrorImpl.h \
+  Error.swg \
   Packet.h \
   PacketImpl.h \
   Packet.swg \

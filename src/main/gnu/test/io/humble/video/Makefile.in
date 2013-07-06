@@ -78,10 +78,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = PacketTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
-	SourceTester$(EXEEXT) InputFormatTester$(EXEEXT) \
-	OutputFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
-	RationalTester$(EXEEXT)
+check_PROGRAMS = ErrorTester$(EXEEXT) PacketTester$(EXEEXT) \
+	KeyValueBagTester$(EXEEXT) SourceTester$(EXEEXT) \
+	InputFormatTester$(EXEEXT) OutputFormatTester$(EXEEXT) \
+	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mk/depcomp $(noinst_HEADERS) \
@@ -99,6 +99,16 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+am_ErrorTester_OBJECTS = ErrorTest.$(OBJEXT) Main.$(OBJEXT)
+nodist_ErrorTester_OBJECTS = ErrorTest_CXXRunner.$(OBJEXT)
+ErrorTester_OBJECTS = $(am_ErrorTester_OBJECTS) \
+	$(nodist_ErrorTester_OBJECTS)
+ErrorTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 am_InputFormatTester_OBJECTS = InputFormatTest.$(OBJEXT) \
 	Main.$(OBJEXT)
 nodist_InputFormatTester_OBJECTS =  \
@@ -107,10 +117,6 @@ InputFormatTester_OBJECTS = $(am_InputFormatTester_OBJECTS) \
 	$(nodist_InputFormatTester_OBJECTS)
 InputFormatTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 am_KeyValueBagTester_OBJECTS = KeyValueBagTest.$(OBJEXT) \
 	Main.$(OBJEXT)
 nodist_KeyValueBagTester_OBJECTS =  \
@@ -185,7 +191,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(InputFormatTester_SOURCES) \
+SOURCES = $(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
+	$(InputFormatTester_SOURCES) \
 	$(nodist_InputFormatTester_SOURCES) \
 	$(KeyValueBagTester_SOURCES) \
 	$(nodist_KeyValueBagTester_SOURCES) \
@@ -195,7 +202,7 @@ SOURCES = $(InputFormatTester_SOURCES) \
 	$(nodist_PropertyTester_SOURCES) $(RationalTester_SOURCES) \
 	$(nodist_RationalTester_SOURCES) $(SourceTester_SOURCES) \
 	$(nodist_SourceTester_SOURCES)
-DIST_SOURCES = $(InputFormatTester_SOURCES) \
+DIST_SOURCES = $(ErrorTester_SOURCES) $(InputFormatTester_SOURCES) \
 	$(KeyValueBagTester_SOURCES) $(OutputFormatTester_SOURCES) \
 	$(PacketTester_SOURCES) $(PropertyTester_SOURCES) \
 	$(RationalTester_SOURCES) $(SourceTester_SOURCES)
@@ -652,6 +659,7 @@ VS_CPP_NAMESPACE = io::humble::video
 VS_TEST = 1
 SUBDIRS = customio
 BUILT_SOURCES = \
+  ErrorTest_CXXRunner.cpp \
   PacketTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
   SourceTest_CXXRunner.cpp \
@@ -661,6 +669,7 @@ BUILT_SOURCES = \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  ErrorTest.h \
   PacketTest.h \
   KeyValueBagTest.h \
   SourceTest.h \
@@ -675,6 +684,16 @@ inst_checkdir = $(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS = $(check_PROGRAMS)
+ErrorTester_SOURCES = \
+  ErrorTest.cpp \
+  Main.cpp
+
+nodist_ErrorTester_SOURCES = \
+  ErrorTest_CXXRunner.cpp
+
+ErrorTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 PacketTester_SOURCES = \
   PacketTest.cpp \
   Main.cpp
@@ -790,6 +809,10 @@ clean-checkPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
+ErrorTester$(EXEEXT): $(ErrorTester_OBJECTS) $(ErrorTester_DEPENDENCIES) $(EXTRA_ErrorTester_DEPENDENCIES) 
+	@rm -f ErrorTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(ErrorTester_OBJECTS) $(ErrorTester_LDADD) $(LIBS)
+
 InputFormatTester$(EXEEXT): $(InputFormatTester_OBJECTS) $(InputFormatTester_DEPENDENCIES) $(EXTRA_InputFormatTester_DEPENDENCIES) 
 	@rm -f InputFormatTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(InputFormatTester_OBJECTS) $(InputFormatTester_LDADD) $(LIBS)
@@ -824,6 +847,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InputFormatTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InputFormatTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagTest.Po@am__quote@
@@ -1107,6 +1132,13 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+ErrorTester.log: ErrorTester$(EXEEXT)
+	@p='ErrorTester$(EXEEXT)'; \
+	b='ErrorTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 PacketTester.log: PacketTester$(EXEEXT)
 	@p='PacketTester$(EXEEXT)'; \
 	b='PacketTester'; \

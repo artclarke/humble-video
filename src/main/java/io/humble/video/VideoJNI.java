@@ -120,6 +120,13 @@ class VideoJNI {
   public final static native int MediaData_getSize(long jarg1, MediaData jarg1_);
   public final static native boolean MediaData_isKey(long jarg1, MediaData jarg1_);
   public final static native void MediaData_setData_internal(long jarg1, MediaData jarg1_, long jarg2, IBuffer jarg2_);
+  public final static native int Error_getType(long jarg1, Error jarg1_);
+  public final static native String Error_getDescription(long jarg1, Error jarg1_);
+  public final static native int Error_getErrorNumber(long jarg1, Error jarg1_);
+  public final static native long Error_make__SWIG_0(int jarg1);
+  public final static native long Error_make__SWIG_1(int jarg1);
+  public final static native int Error_errorNumberToType(int jarg1);
+  public final static native int Error_typeToErrorNumber(int jarg1);
   public final static native long Packet_make__SWIG_0();
   public final static native long Packet_make__SWIG_1(long jarg1, IBuffer jarg1_);
   public final static native long Packet_make__SWIG_2(long jarg1, Packet jarg1_, boolean jarg2);
@@ -439,6 +446,7 @@ class VideoJNI {
   public final static native long SWIGMediaDataUpcast(long jarg1);
   public final static native long SWIGMediaRawDataUpcast(long jarg1);
   public final static native long SWIGMediaEncodedDataUpcast(long jarg1);
+  public final static native long SWIGErrorUpcast(long jarg1);
   public final static native long SWIGPacketUpcast(long jarg1);
   public final static native long SWIGConfigurableUpcast(long jarg1);
   public final static native long SWIGPixelFormatUpcast(long jarg1);

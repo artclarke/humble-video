@@ -7,6 +7,7 @@ include @top_builddir@/mk/Makefile.global
 SUBDIRS=customio
 
 check_PROGRAMS=\
+  ErrorTester \
   PacketTester \
   KeyValueBagTester \
   SourceTester \
@@ -16,6 +17,7 @@ check_PROGRAMS=\
   RationalTester 
 
 BUILT_SOURCES= \
+  ErrorTest_CXXRunner.cpp \
   PacketTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
   SourceTest_CXXRunner.cpp \
@@ -25,6 +27,7 @@ BUILT_SOURCES= \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  ErrorTest.h \
   PacketTest.h \
   KeyValueBagTest.h \
   SourceTest.h \
@@ -40,6 +43,16 @@ inst_checkdir=$(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS=$(check_PROGRAMS)
+
+ErrorTester_SOURCES= \
+  ErrorTest.cpp \
+  Main.cpp
+
+nodist_ErrorTester_SOURCES= \
+  ErrorTest_CXXRunner.cpp
+
+ErrorTester_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 PacketTester_SOURCES= \
   PacketTest.cpp \
