@@ -47,6 +47,8 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9</version>
         <configuration>
+          <show>public</show>
+          <public>true</public>
           <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
           <docletArtifact>
             <groupId>org.umlgraph</groupId>
