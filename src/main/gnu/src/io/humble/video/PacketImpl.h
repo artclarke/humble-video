@@ -22,6 +22,7 @@
 
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/IBuffer.h>
 #include <io/humble/video/Packet.h>
 
 namespace io {
@@ -32,11 +33,22 @@ class VS_API_HUMBLEVIDEO PacketImpl : public io::humble::video::Packet
 {
 public:
 
-  /**
-   * Create a new {@link PacketImpl}
-   */
   static PacketImpl*
   make();
+
+  virtual int64_t getTimeStamp() { return this->getDts(); }
+
+  virtual void setTimeStamp(int64_t aTimeStamp) { this->setDts(aTimeStamp); }
+
+  virtual bool isKey() { return isKeyPacket(); }
+
+  virtual Rational* getTimeBase() { return mTimeBase.get(); }
+
+  virtual void setTimeBase(Rational *aBase) { return mTimeBase.reset(aBase, true); }
+
+  virtual io::humble::ferry::IBuffer* getData()=0;
+
+  virtual void setData(io::humble::ferry::IBuffer* buffer)=0;
 
   virtual int64_t getPts();
 
@@ -83,6 +95,9 @@ protected:
   ~PacketImpl();
 private:
   AVPacket* mPacket;
+  io::humble::ferry::RefPointer<io::humble::ferry::IBuffer> mBuffer;
+  io::humble::ferry::RefPointer<Rational> mTimeBase;
+  bool mIsComplete;
 };
 
 } /* namespace video */
