@@ -51,6 +51,7 @@ namespace io { namespace humble { namespace video
      * meanings in some Containers.
      */
     typedef enum Disposition {
+      DISPOSITION_NONE = 0,
       DISPOSITION_DEFAULT= AV_DISPOSITION_DEFAULT,
       DISPOSITION_DUB = AV_DISPOSITION_DUB,
       DISPOSITION_ORIGINAL = AV_DISPOSITION_ORIGINAL,
@@ -84,6 +85,7 @@ namespace io { namespace humble { namespace video
      * {@link Source#read(Packet)}
      */
     typedef enum ParseType {
+      /** No special instructions */
       PARSE_NONE=AVSTREAM_PARSE_NONE,
       /** full parsing and repack */
       PARSE_FULL=AVSTREAM_PARSE_FULL,

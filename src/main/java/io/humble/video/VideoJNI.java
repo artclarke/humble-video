@@ -397,6 +397,7 @@ class VideoJNI {
   public final static native int IndexEntry_getSize(long jarg1, IndexEntry jarg1_);
   public final static native int IndexEntry_getMinDistance(long jarg1, IndexEntry jarg1_);
   public final static native boolean IndexEntry_isKeyFrame(long jarg1, IndexEntry jarg1_);
+  public final static native int ContainerStream_DISPOSITION_NONE_get();
   public final static native int ContainerStream_DISPOSITION_DEFAULT_get();
   public final static native int ContainerStream_DISPOSITION_DUB_get();
   public final static native int ContainerStream_DISPOSITION_ORIGINAL_get();

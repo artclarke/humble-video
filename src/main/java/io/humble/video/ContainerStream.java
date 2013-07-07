@@ -418,6 +418,7 @@ public class ContainerStream extends RefCounted {
    * The disposition of this stream. Some streams can have special
    * meanings in some Containers.
    */
+    DISPOSITION_NONE(VideoJNI.ContainerStream_DISPOSITION_NONE_get()),
     DISPOSITION_DEFAULT(VideoJNI.ContainerStream_DISPOSITION_DEFAULT_get()),
     DISPOSITION_DUB(VideoJNI.ContainerStream_DISPOSITION_DUB_get()),
     DISPOSITION_ORIGINAL(VideoJNI.ContainerStream_DISPOSITION_ORIGINAL_get()),
@@ -493,6 +494,7 @@ public class ContainerStream extends RefCounted {
   /**
    * What types of parsing can we do on a call to
    * {@link Source#read(Packet)}
+   * No special instructions
    */
     PARSE_NONE(VideoJNI.ContainerStream_PARSE_NONE_get()),
   /**

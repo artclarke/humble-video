@@ -138,7 +138,7 @@ SourceStreamImpl::getStreamCoder()
 Rational *
 SourceStreamImpl::getFrameRate() {
   Rational * result = 0;
-  if (mStream) {
+  if (mStream && mStream->avg_frame_rate.den != 0) {
     result = Rational::make(mStream->avg_frame_rate.num,
         mStream->avg_frame_rate.den);
   }

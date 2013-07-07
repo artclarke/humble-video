@@ -14996,6 +14996,18 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1isKeyFrame
 }
 
 
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1NONE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::ContainerStream::Disposition result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_NONE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1DEFAULT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::ContainerStream::Disposition result;
