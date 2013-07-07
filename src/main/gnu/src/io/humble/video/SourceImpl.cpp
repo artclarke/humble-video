@@ -241,7 +241,7 @@ SourceImpl::doCloseFileHandles(AVIOContext* pb)
   return retval;
 }
 
-Stream*
+ContainerStream*
 SourceImpl::getStream(int32_t streamIndex) {
   if (mState == Container::STATE_CLOSED || mState == Container::STATE_ERROR)
     return 0;

@@ -170,7 +170,7 @@ public:
    * @param streamIndex the index of this stream in the container
    * @return The stream at that position in the container, or null if none there.
    */
-  virtual Stream*
+  virtual ContainerStream*
   getStream(int32_t streamIndex)=0;
 
   /**

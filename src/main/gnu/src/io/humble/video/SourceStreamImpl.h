@@ -21,7 +21,7 @@
 #define STREAMIMPL_H_
 
 #include <io/humble/ferry/RefPointer.h>
-#include <io/humble/video/Stream.h>
+#include <io/humble/video/SourceStream.h>
 #include <io/humble/video/FfmpegIncludes.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/KeyValueBag.h>
@@ -31,9 +31,9 @@ namespace io { namespace humble { namespace video
   class Container;
   class Packet;
 
-  class StreamImpl : public Stream
+  class SourceStreamImpl : public SourceStream
   {
-    VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(StreamImpl)
+    VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(SourceStreamImpl)
   public:
 
     // IStream
@@ -48,7 +48,7 @@ namespace io { namespace humble { namespace video
     virtual int64_t getNumFrames();
 
     // Not for calling from Java
-    static Stream * make(Container* container, AVStream *, AVCodec*);
+    static ContainerStream * make(Container* container, AVStream *, AVCodec*);
 
     // The StreamCoder will call this if it needs to
     virtual void setTimeBase(Rational *);
@@ -65,7 +65,7 @@ namespace io { namespace humble { namespace video
     virtual void setSampleAspectRatio(Rational* newRatio);
 
     virtual Container* getContainer();
-    virtual Stream::ParseType getParseType();
+    virtual ContainerStream::ParseType getParseType();
     virtual void setParseType(ParseType type);
 
     virtual AVStream* getAVStream() { return mStream; }
@@ -82,11 +82,11 @@ namespace io { namespace humble { namespace video
     virtual int32_t addIndexEntry(IndexEntry* entry);
     void setId(int32_t id);
     virtual Packet* getAttachedPic();
-    virtual Stream::Disposition getDisposition();
+    virtual ContainerStream::Disposition getDisposition();
 
   protected:
-    StreamImpl();
-    virtual ~StreamImpl();
+    SourceStreamImpl();
+    virtual ~SourceStreamImpl();
 
   private:
     void reset();

@@ -17,15 +17,15 @@
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Stream.h"
+#include "ContainerStream.h"
 
 namespace io { namespace humble { namespace video
 {
-  Stream::Stream()
+  ContainerStream::ContainerStream()
   {
   }
 
-  Stream::~Stream()
+  ContainerStream::~ContainerStream()
   {
   }
 }}}

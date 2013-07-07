@@ -44,7 +44,7 @@ namespace io { namespace humble { namespace video
    * decoding.
    * </p>
    */
-  class VS_API_HUMBLEVIDEO Stream : public io::humble::ferry::RefCounted
+  class VS_API_HUMBLEVIDEO ContainerStream : public io::humble::ferry::RefCounted
   {
   public:
     /** The disposition of this stream. Some streams can have special
@@ -190,7 +190,7 @@ namespace io { namespace humble { namespace video
      * Get how the decoding codec should parse data from this stream.
      * @return the parse type.
      */
-    virtual Stream::ParseType getParseType()=0;
+    virtual ContainerStream::ParseType getParseType()=0;
     
     /**
      * Set the parse type the decoding codec should use.  Set to
@@ -302,10 +302,10 @@ namespace io { namespace humble { namespace video
    /**
     * Get the {@link Stream.Disposition} of this stream.
     */
-   virtual Stream::Disposition getDisposition()=0;
+   virtual ContainerStream::Disposition getDisposition()=0;
   protected:
-    virtual ~Stream()=0;
-    Stream();
+    virtual ~ContainerStream()=0;
+    ContainerStream();
   /** Added in 1.17 */
   };
 }}}

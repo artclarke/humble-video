@@ -17,7 +17,7 @@
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-%typemap (javacode) io::humble::video::Stream,io::humble::video::Stream*,io::humble::video::Stream& %{
+%typemap (javacode) io::humble::video::SourceStream,io::humble::video::SourceStream*,io::humble::video::SourceStream& %{
 
   /**
    * info about this stream
@@ -32,7 +32,7 @@
     result.append(this.getClass().getName()+"@"+hashCode()+"[");
     result.append("index:"+getIndex()+";");
     result.append("id:"+getId()+";");
-    result.append("streamcoder:"+getStreamCoder()+";");
+    //result.append("streamcoder:"+getStreamCoder()+";");
     result.append("framerate:"+getFrameRate()+";");
     result.append("timebase:"+getTimeBase()+";");
     result.append("direction:"+getDirection()+";");
@@ -40,26 +40,6 @@
     return result.toString();
   }
 
-  /**
-   * Get an ordered sequence of index entries in this {@link Stream}.
-   * 
-   * @return A list of entries.  Will always return a non-null
-   *   list, but if there are no entries the list size will be zero.
-   */
-  public java.util.List<IndexEntry> getIndexEntries()
-  {
-    final int numEntries = getNumIndexEntries();
-    java.util.List<IndexEntry> retval = new java.util.ArrayList<IndexEntry>(Math.max(numEntries, 10));
-    for(int i = 0; i < numEntries; i++) {
-      final IndexEntry entry = getIndexEntry(i);
-      if (entry != null) {
-       retval.add(entry); 
-      }
-    }
-    
-    return retval;
-  }
-
 %}
 
-%include <io/humble/video/Stream.h>
+%include <io/humble/video/SourceStream.h>

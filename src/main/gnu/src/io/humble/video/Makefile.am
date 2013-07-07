@@ -28,12 +28,14 @@ libhumble_video_la_SOURCES= \
   PacketImpl.cpp \
   ContainerFormat.cpp \
   Configurable.cpp \
-  Stream.cpp \
+  ContainerStream.cpp \
   Container.cpp \
+  SourceFormat.cpp \
   Source.cpp \
   SourceImpl.cpp \
+  SourceStream.cpp \
+  SourceStreamImpl.cpp \
   SinkFormat.cpp \
-  SourceFormat.cpp \
   Global.cpp
   
 nodist_libhumble_video_la_SOURCES= \
@@ -74,11 +76,13 @@ libhumble_video_la_HEADERS= \
   SourceFormat.swg \
   Configurable.h \
   Configurable.swg \
-  Source.h \
-  Source.swg \
-  SourceImpl.h \
+  ContainerStream.h \
+  ContainerStream.swg \
   Container.h \
   Container.swg \
+  SourceStream.h \
+  SourceStream.swg \
+  SourceStreamImpl.h \
   Source.h \
   Source.swg \
   SourceImpl.h \

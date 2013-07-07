@@ -268,9 +268,9 @@ public class Source extends Container {
  * @return	The stream at that position in the container, or null if 
  *		 none there.  
  */
-  public Stream getStream(int streamIndex) {
+  public ContainerStream getStream(int streamIndex) {
     long cPtr = VideoJNI.Source_getStream(swigCPtr, this, streamIndex);
-    return (cPtr == 0) ? null : new Stream(cPtr, false);
+    return (cPtr == 0) ? null : new ContainerStream(cPtr, false);
   }
 
 /**

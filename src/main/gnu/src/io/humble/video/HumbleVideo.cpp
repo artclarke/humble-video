@@ -223,8 +223,9 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <io/humble/video/SinkFormat.h>
 #include <io/humble/video/SourceFormat.h>
 #include <io/humble/video/IndexEntry.h>
-#include <io/humble/video/Stream.h>
+#include <io/humble/video/ContainerStream.h>
 #include <io/humble/video/Container.h>
+#include <io/humble/video/SourceStream.h>
 #include <io/humble/video/Source.h>
 
 using namespace VS_CPP_NAMESPACE;
@@ -14995,219 +14996,219 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1isKeyFrame
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1DISPOSITION_1DEFAULT_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1DEFAULT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::Disposition)io::humble::video::Stream::DISPOSITION_DEFAULT;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_DEFAULT;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1DISPOSITION_1DUB_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1DUB_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::Disposition)io::humble::video::Stream::DISPOSITION_DUB;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_DUB;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1DISPOSITION_1ORIGINAL_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1ORIGINAL_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::Disposition)io::humble::video::Stream::DISPOSITION_ORIGINAL;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_ORIGINAL;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1DISPOSITION_1COMMENT_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1COMMENT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::Disposition)io::humble::video::Stream::DISPOSITION_COMMENT;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_COMMENT;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1DISPOSITION_1LYRICS_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1LYRICS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::Disposition)io::humble::video::Stream::DISPOSITION_LYRICS;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_LYRICS;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1DISPOSITION_1KARAOKE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1KARAOKE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::Disposition)io::humble::video::Stream::DISPOSITION_KARAOKE;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_KARAOKE;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1DISPOSITION_1FORCED_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1FORCED_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::Disposition)io::humble::video::Stream::DISPOSITION_FORCED;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_FORCED;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1DISPOSITION_1HEARING_1IMPAIRED_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1HEARING_1IMPAIRED_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::Disposition)io::humble::video::Stream::DISPOSITION_HEARING_IMPAIRED;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_HEARING_IMPAIRED;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1DISPOSITION_1VISUAL_1IMPAIRED_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1VISUAL_1IMPAIRED_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::Disposition)io::humble::video::Stream::DISPOSITION_VISUAL_IMPAIRED;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_VISUAL_IMPAIRED;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1DISPOSITION_1CLEAN_1EFFECTS_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1CLEAN_1EFFECTS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::Disposition)io::humble::video::Stream::DISPOSITION_CLEAN_EFFECTS;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_CLEAN_EFFECTS;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1DISPOSITION_1ATTACHED_1PIC_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1DISPOSITION_1ATTACHED_1PIC_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::Disposition)io::humble::video::Stream::DISPOSITION_ATTACHED_PIC;
+  result = (io::humble::video::ContainerStream::Disposition)io::humble::video::ContainerStream::DISPOSITION_ATTACHED_PIC;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1PARSE_1NONE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1PARSE_1NONE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::ParseType result;
+  io::humble::video::ContainerStream::ParseType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::ParseType)io::humble::video::Stream::PARSE_NONE;
+  result = (io::humble::video::ContainerStream::ParseType)io::humble::video::ContainerStream::PARSE_NONE;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1PARSE_1FULL_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1PARSE_1FULL_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::ParseType result;
+  io::humble::video::ContainerStream::ParseType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::ParseType)io::humble::video::Stream::PARSE_FULL;
+  result = (io::humble::video::ContainerStream::ParseType)io::humble::video::ContainerStream::PARSE_FULL;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1PARSE_1HEADERS_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1PARSE_1HEADERS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::ParseType result;
+  io::humble::video::ContainerStream::ParseType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::ParseType)io::humble::video::Stream::PARSE_HEADERS;
+  result = (io::humble::video::ContainerStream::ParseType)io::humble::video::ContainerStream::PARSE_HEADERS;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1PARSE_1TIMESTAMPS_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1PARSE_1TIMESTAMPS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::ParseType result;
+  io::humble::video::ContainerStream::ParseType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::ParseType)io::humble::video::Stream::PARSE_TIMESTAMPS;
+  result = (io::humble::video::ContainerStream::ParseType)io::humble::video::ContainerStream::PARSE_TIMESTAMPS;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1PARSE_1FULL_1ONCE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1PARSE_1FULL_1ONCE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::ParseType result;
+  io::humble::video::ContainerStream::ParseType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::ParseType)io::humble::video::Stream::PARSE_FULL_ONCE;
+  result = (io::humble::video::ContainerStream::ParseType)io::humble::video::ContainerStream::PARSE_FULL_ONCE;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1PARSE_1FULL_1RAW_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1PARSE_1FULL_1RAW_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::Stream::ParseType result;
+  io::humble::video::ContainerStream::ParseType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Stream::ParseType)io::humble::video::Stream::PARSE_FULL_RAW;
+  result = (io::humble::video::ContainerStream::ParseType)io::humble::video::ContainerStream::PARSE_FULL_RAW;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1getIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -15276,15 +15277,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1getIndex(JNIEnv *j
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1getId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -15353,15 +15354,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1getId(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getFrameRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getFrameRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   io::humble::video::Rational *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -15430,15 +15431,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getFrameRate(JNIE
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getTimeBase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getTimeBase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   io::humble::video::Rational *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -15507,15 +15508,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getTimeBase(JNIEn
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getStartTime(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getStartTime(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   int64_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -15584,15 +15585,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getStartTime(JNIE
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getDuration(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getDuration(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   int64_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -15661,15 +15662,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getDuration(JNIEn
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getCurrentDts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getCurrentDts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   int64_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -15738,15 +15739,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getCurrentDts(JNI
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1getNumIndexEntries(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getNumIndexEntries(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   int result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -15815,15 +15816,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1getNumIndexEntries
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getNumFrames(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getNumFrames(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   int64_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -15892,15 +15893,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getNumFrames(JNIE
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getSampleAspectRatio(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getSampleAspectRatio(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   io::humble::video::Rational *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -15969,15 +15970,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getSampleAspectRa
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getContainer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getContainer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   io::humble::video::Container *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -16046,15 +16047,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getContainer(JNIE
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1getParseType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getParseType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
-  io::humble::video::Stream::ParseType result;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
+  io::humble::video::ContainerStream::ParseType result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -16067,7 +16068,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1getParseType(JNIEn
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Stream::ParseType)(arg1)->getParseType();
+      result = (io::humble::video::ContainerStream::ParseType)(arg1)->getParseType();
     }
     catch(std::invalid_argument & e)
     {
@@ -16123,15 +16124,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1getParseType(JNIEn
 }
 
 
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Stream_1setParseType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
-  io::humble::video::Stream::ParseType arg2 ;
+SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1setParseType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
+  io::humble::video::ContainerStream::ParseType arg2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
-  arg2 = (io::humble::video::Stream::ParseType)jarg2; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
+  arg2 = (io::humble::video::ContainerStream::ParseType)jarg2; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -16198,15 +16199,15 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Stream_1setParseType(JNIEn
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getMetaData(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getMetaData(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   io::humble::video::KeyValueBag *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -16275,9 +16276,9 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getMetaData(JNIEn
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1findTimeStampEntryInIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1findTimeStampEntryInIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   int64_t arg2 ;
   int32_t arg3 ;
   io::humble::video::IndexEntry *result = 0 ;
@@ -16285,7 +16286,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1findTimeStampEntr
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   arg2 = (int64_t)jarg2; 
   arg3 = (int32_t)jarg3; 
   
@@ -16356,9 +16357,9 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1findTimeStampEntr
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1findTimeStampPositionInIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1findTimeStampPositionInIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
   jint jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   int64_t arg2 ;
   int32_t arg3 ;
   int32_t result;
@@ -16366,7 +16367,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1findTimeStampPosit
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   arg2 = (int64_t)jarg2; 
   arg3 = (int32_t)jarg3; 
   
@@ -16437,16 +16438,16 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1findTimeStampPosit
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getIndexEntry(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getIndexEntry(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   int32_t arg2 ;
   io::humble::video::IndexEntry *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   arg2 = (int32_t)jarg2; 
   
   if (!arg1) {
@@ -16516,15 +16517,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getIndexEntry(JNI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getAttachedPic(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getAttachedPic(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
   io::humble::video::Packet *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -16593,15 +16594,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Stream_1getAttachedPic(JN
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1getDisposition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getDisposition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::Stream *arg1 = (io::humble::video::Stream *) 0 ;
-  io::humble::video::Stream::Disposition result;
+  io::humble::video::ContainerStream *arg1 = (io::humble::video::ContainerStream *) 0 ;
+  io::humble::video::ContainerStream::Disposition result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Stream **)&jarg1; 
+  arg1 = *(io::humble::video::ContainerStream **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -16614,7 +16615,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Stream_1getDisposition(JNI
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Stream::Disposition)(arg1)->getDisposition();
+      result = (io::humble::video::ContainerStream::Disposition)(arg1)->getDisposition();
     }
     catch(std::invalid_argument & e)
     {
@@ -17612,7 +17613,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getStream(JNIEnv 
   jlong jresult = 0 ;
   io::humble::video::Source *arg1 = (io::humble::video::Source *) 0 ;
   int32_t arg2 ;
-  io::humble::video::Stream *result = 0 ;
+  io::humble::video::ContainerStream *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -17631,7 +17632,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getStream(JNIEnv 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Stream *)(arg1)->getStream(arg2);
+      result = (io::humble::video::ContainerStream *)(arg1)->getStream(arg2);
     }
     catch(std::invalid_argument & e)
     {
@@ -17682,7 +17683,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getStream(JNIEnv 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::video::Stream **)&jresult = result; 
+  *(io::humble::video::ContainerStream **)&jresult = result; 
   return jresult;
 }
 
@@ -19598,11 +19599,11 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGIndexEntryUpcast(JNIE
     return baseptr;
 }
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGStreamUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGContainerStreamUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
-    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::Stream **)&jarg1;
+    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::ContainerStream **)&jarg1;
     return baseptr;
 }
 
@@ -19611,6 +19612,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGContainerUpcast(JNIEn
     (void)jenv;
     (void)jcls;
     *(io::humble::video::Configurable **)&baseptr = *(io::humble::video::Container **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGSourceStreamUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::video::ContainerStream **)&baseptr = *(io::humble::video::SourceStream **)&jarg1;
     return baseptr;
 }
 

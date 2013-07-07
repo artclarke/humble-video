@@ -37,8 +37,9 @@
 #include <io/humble/video/SinkFormat.h>
 #include <io/humble/video/SourceFormat.h>
 #include <io/humble/video/IndexEntry.h>
-#include <io/humble/video/Stream.h>
+#include <io/humble/video/ContainerStream.h>
 #include <io/humble/video/Container.h>
+#include <io/humble/video/SourceStream.h>
 #include <io/humble/video/Source.h>
 
 using namespace VS_CPP_NAMESPACE;
@@ -129,6 +130,7 @@ import io.humble.ferry.IBuffer;
 %include <io/humble/video/SinkFormat.swg>
 %include <io/humble/video/SourceFormat.swg>
 %include <io/humble/video/IndexEntry.swg>
-%include <io/humble/video/Stream.swg>
+%include <io/humble/video/ContainerStream.swg>
 %include <io/humble/video/Container.swg>
+%include <io/humble/video/SourceStream.swg>
 %include <io/humble/video/Source.swg>

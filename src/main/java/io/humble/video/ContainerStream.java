@@ -31,7 +31,7 @@ import io.humble.ferry.*;
  * decoding.  
  * </p>  
  */
-public class Stream extends RefCounted {
+public class ContainerStream extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -49,18 +49,18 @@ public class Stream extends RefCounted {
   /**
    * Internal Only.
    */
-  protected Stream(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGStreamUpcast(cPtr), cMemoryOwn);
+  protected ContainerStream(long cPtr, boolean cMemoryOwn) {
+    super(VideoJNI.SWIGContainerStreamUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
   /**
    * Internal Only.
    */
-  protected Stream(long cPtr, boolean cMemoryOwn,
+  protected ContainerStream(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGStreamUpcast(cPtr),
+    super(VideoJNI.SWIGContainerStreamUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -73,7 +73,7 @@ public class Stream extends RefCounted {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(Stream obj) {
+  protected static long getCPtr(ContainerStream obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -91,17 +91,17 @@ public class Stream extends RefCounted {
   }
   
   /**
-   * Create a new Stream object that is actually referring to the
+   * Create a new ContainerStream object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
    */
   @Override
-  public Stream copyReference() {
+  public ContainerStream copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new Stream(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new ContainerStream(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -114,8 +114,8 @@ public class Stream extends RefCounted {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof Stream)
-      equal = (((Stream)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof ContainerStream)
+      equal = (((ContainerStream)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -131,27 +131,6 @@ public class Stream extends RefCounted {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
-
-  /**
-   * info about this stream
-   * @return information about this stream
-   */
-   
-  @Override
-  public String toString()
-  {
-    StringBuilder result = new StringBuilder();
-    
-    result.append(this.getClass().getName()+"@"+hashCode()+"[");
-    result.append("index:"+getIndex()+";");
-    result.append("id:"+getId()+";");
-    result.append("streamcoder:"+getStreamCoder()+";");
-    result.append("framerate:"+getFrameRate()+";");
-    result.append("timebase:"+getTimeBase()+";");
-    result.append("direction:"+getDirection()+";");
-    result.append("]");
-    return result.toString();
-  }
 
   /**
    * Get an ordered sequence of index entries in this {@link Stream}.
@@ -180,7 +159,7 @@ public class Stream extends RefCounted {
  * @return	The Index within the Container of this stream.  
  */
   public int getIndex() {
-    return VideoJNI.Stream_getIndex(swigCPtr, this);
+    return VideoJNI.ContainerStream_getIndex(swigCPtr, this);
   }
 
 /**
@@ -188,7 +167,7 @@ public class Stream extends RefCounted {
  * @return	The (container format specific) id of this stream.  
  */
   public int getId() {
-    return VideoJNI.Stream_getId(swigCPtr, this);
+    return VideoJNI.ContainerStream_getId(swigCPtr, this);
   }
 
 /**
@@ -201,7 +180,7 @@ public class Stream extends RefCounted {
  * @return	The frame-rate of this container.  
  */
   public Rational getFrameRate() {
-    long cPtr = VideoJNI.Stream_getFrameRate(swigCPtr, this);
+    long cPtr = VideoJNI.ContainerStream_getFrameRate(swigCPtr, this);
     return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
@@ -218,7 +197,7 @@ public class Stream extends RefCounted {
  * @return	The time base of this stream.  
  */
   public Rational getTimeBase() {
-    long cPtr = VideoJNI.Stream_getTimeBase(swigCPtr, this);
+    long cPtr = VideoJNI.ContainerStream_getTimeBase(swigCPtr, this);
     return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
@@ -229,7 +208,7 @@ public class Stream extends RefCounted {
  * @return	The start time.  
  */
   public long getStartTime() {
-    return VideoJNI.Stream_getStartTime(swigCPtr, this);
+    return VideoJNI.ContainerStream_getStartTime(swigCPtr, this);
   }
 
 /**
@@ -240,7 +219,7 @@ public class Stream extends RefCounted {
  *		  
  */
   public long getDuration() {
-    return VideoJNI.Stream_getDuration(swigCPtr, this);
+    return VideoJNI.ContainerStream_getDuration(swigCPtr, this);
   }
 
 /**
@@ -251,7 +230,7 @@ public class Stream extends RefCounted {
  *		 this stream.  
  */
   public long getCurrentDts() {
-    return VideoJNI.Stream_getCurrentDts(swigCPtr, this);
+    return VideoJNI.ContainerStream_getCurrentDts(swigCPtr, this);
   }
 
 /**
@@ -260,7 +239,7 @@ public class Stream extends RefCounted {
  * @see		#getIndexEntry(int)  
  */
   public int getNumIndexEntries() {
-    return VideoJNI.Stream_getNumIndexEntries(swigCPtr, this);
+    return VideoJNI.ContainerStream_getNumIndexEntries(swigCPtr, this);
   }
 
 /**
@@ -272,7 +251,7 @@ public class Stream extends RefCounted {
  * @return	The number of frames (encoded) in this stream.  
  */
   public long getNumFrames() {
-    return VideoJNI.Stream_getNumFrames(swigCPtr, this);
+    return VideoJNI.ContainerStream_getNumFrames(swigCPtr, this);
   }
 
 /**
@@ -280,7 +259,7 @@ public class Stream extends RefCounted {
  * @return	The sample aspect ratio.  
  */
   public Rational getSampleAspectRatio() {
-    long cPtr = VideoJNI.Stream_getSampleAspectRatio(swigCPtr, this);
+    long cPtr = VideoJNI.ContainerStream_getSampleAspectRatio(swigCPtr, this);
     return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
@@ -291,7 +270,7 @@ public class Stream extends RefCounted {
  * @return	the container, or null if we don't know.  
  */
   public Container getContainer() {
-    long cPtr = VideoJNI.Stream_getContainer(swigCPtr, this);
+    long cPtr = VideoJNI.ContainerStream_getContainer(swigCPtr, this);
     return (cPtr == 0) ? null : new Container(cPtr, false);
   }
 
@@ -299,8 +278,8 @@ public class Stream extends RefCounted {
  * Get how the decoding codec should parse data from this stream.  
  * @return	the parse type.  
  */
-  public Stream.ParseType getParseType() {
-    return Stream.ParseType.swigToEnum(VideoJNI.Stream_getParseType(swigCPtr, this));
+  public ContainerStream.ParseType getParseType() {
+    return ContainerStream.ParseType.swigToEnum(VideoJNI.ContainerStream_getParseType(swigCPtr, this));
   }
 
 /**
@@ -314,8 +293,8 @@ public class Stream extends RefCounted {
  * </p>  
  * @param	type The type to set.  
  */
-  public void setParseType(Stream.ParseType type) {
-    VideoJNI.Stream_setParseType(swigCPtr, this, type.swigValue());
+  public void setParseType(ContainerStream.ParseType type) {
+    VideoJNI.ContainerStream_setParseType(swigCPtr, this, type.swigValue());
   }
 
 /**
@@ -339,7 +318,7 @@ public class Stream extends RefCounted {
  * @return	the {@link KeyValueBag}.  
  */
   public KeyValueBag getMetaData() {
-    long cPtr = VideoJNI.Stream_getMetaData(swigCPtr, this);
+    long cPtr = VideoJNI.ContainerStream_getMetaData(swigCPtr, this);
     return (cPtr == 0) ? null : new KeyValueBag(cPtr, false);
   }
 
@@ -370,7 +349,7 @@ public class Stream extends RefCounted {
  * in the index, or null if it can't be found.  
  */
   public IndexEntry findTimeStampEntryInIndex(long wantedTimeStamp, int flags) {
-    long cPtr = VideoJNI.Stream_findTimeStampEntryInIndex(swigCPtr, this, wantedTimeStamp, flags);
+    long cPtr = VideoJNI.ContainerStream_findTimeStampEntryInIndex(swigCPtr, this, wantedTimeStamp, flags);
     return (cPtr == 0) ? null : new IndexEntry(cPtr, false);
   }
 
@@ -403,7 +382,7 @@ public class Stream extends RefCounted {
  * @see		#getIndexEntry(int)  
  */
   public int findTimeStampPositionInIndex(long wantedTimeStamp, int flags) {
-    return VideoJNI.Stream_findTimeStampPositionInIndex(swigCPtr, this, wantedTimeStamp, flags);
+    return VideoJNI.ContainerStream_findTimeStampPositionInIndex(swigCPtr, this, wantedTimeStamp, flags);
   }
 
 /**
@@ -423,7 +402,7 @@ public class Stream extends RefCounted {
  * @param	position The position in the index table.  
  */
   public IndexEntry getIndexEntry(int position) {
-    long cPtr = VideoJNI.Stream_getIndexEntry(swigCPtr, this, position);
+    long cPtr = VideoJNI.ContainerStream_getIndexEntry(swigCPtr, this, position);
     return (cPtr == 0) ? null : new IndexEntry(cPtr, false);
   }
 
@@ -434,15 +413,15 @@ public class Stream extends RefCounted {
  * picture (needs to be decoded separately).  
  */
   public Packet getAttachedPic() {
-    long cPtr = VideoJNI.Stream_getAttachedPic(swigCPtr, this);
+    long cPtr = VideoJNI.ContainerStream_getAttachedPic(swigCPtr, this);
     return (cPtr == 0) ? null : new Packet(cPtr, false);
   }
 
 /**
  * Get the {@link Stream.Disposition} of this stream.  
  */
-  public Stream.Disposition getDisposition() {
-    return Stream.Disposition.swigToEnum(VideoJNI.Stream_getDisposition(swigCPtr, this));
+  public ContainerStream.Disposition getDisposition() {
+    return ContainerStream.Disposition.swigToEnum(VideoJNI.ContainerStream_getDisposition(swigCPtr, this));
   }
 
   public enum Disposition {
@@ -450,27 +429,27 @@ public class Stream extends RefCounted {
    * The disposition of this stream. Some streams can have special
    * meanings in some Containers.
    */
-    DISPOSITION_DEFAULT(VideoJNI.Stream_DISPOSITION_DEFAULT_get()),
-    DISPOSITION_DUB(VideoJNI.Stream_DISPOSITION_DUB_get()),
-    DISPOSITION_ORIGINAL(VideoJNI.Stream_DISPOSITION_ORIGINAL_get()),
-    DISPOSITION_COMMENT(VideoJNI.Stream_DISPOSITION_COMMENT_get()),
-    DISPOSITION_LYRICS(VideoJNI.Stream_DISPOSITION_LYRICS_get()),
-    DISPOSITION_KARAOKE(VideoJNI.Stream_DISPOSITION_KARAOKE_get()),
+    DISPOSITION_DEFAULT(VideoJNI.ContainerStream_DISPOSITION_DEFAULT_get()),
+    DISPOSITION_DUB(VideoJNI.ContainerStream_DISPOSITION_DUB_get()),
+    DISPOSITION_ORIGINAL(VideoJNI.ContainerStream_DISPOSITION_ORIGINAL_get()),
+    DISPOSITION_COMMENT(VideoJNI.ContainerStream_DISPOSITION_COMMENT_get()),
+    DISPOSITION_LYRICS(VideoJNI.ContainerStream_DISPOSITION_LYRICS_get()),
+    DISPOSITION_KARAOKE(VideoJNI.ContainerStream_DISPOSITION_KARAOKE_get()),
   /**
    * Track should be used during playback by default.
    * Useful for subtitle track that should be displayed
    * even when user did not explicitly ask for subtitles.
    */
-    DISPOSITION_FORCED(VideoJNI.Stream_DISPOSITION_FORCED_get()),
+    DISPOSITION_FORCED(VideoJNI.ContainerStream_DISPOSITION_FORCED_get()),
   /**
    * stream for hearing impaired audiences
    */
-    DISPOSITION_HEARING_IMPAIRED(VideoJNI.Stream_DISPOSITION_HEARING_IMPAIRED_get()),
+    DISPOSITION_HEARING_IMPAIRED(VideoJNI.ContainerStream_DISPOSITION_HEARING_IMPAIRED_get()),
   /**
    * stream without voice stream for visual impaired audiences
    */
-    DISPOSITION_VISUAL_IMPAIRED(VideoJNI.Stream_DISPOSITION_VISUAL_IMPAIRED_get()),
-    DISPOSITION_CLEAN_EFFECTS(VideoJNI.Stream_DISPOSITION_CLEAN_EFFECTS_get()),
+    DISPOSITION_VISUAL_IMPAIRED(VideoJNI.ContainerStream_DISPOSITION_VISUAL_IMPAIRED_get()),
+    DISPOSITION_CLEAN_EFFECTS(VideoJNI.ContainerStream_DISPOSITION_CLEAN_EFFECTS_get()),
   /**
    * The stream is stored in the file as an attached picture/"cover art" 
    * (e.g.
@@ -481,7 +460,7 @@ public class Stream extends RefCounted {
    * It can also be accessed at any time in {@link #getAttachedPic()}. 
    *
    */
-    DISPOSITION_ATTACHED_PIC(VideoJNI.Stream_DISPOSITION_ATTACHED_PIC_get());
+    DISPOSITION_ATTACHED_PIC(VideoJNI.ContainerStream_DISPOSITION_ATTACHED_PIC_get());
 
     public final int swigValue() {
       return swigValue;
@@ -526,25 +505,25 @@ public class Stream extends RefCounted {
    * What types of parsing can we do on a call to
    * {@link Source#read(Packet)}
    */
-    PARSE_NONE(VideoJNI.Stream_PARSE_NONE_get()),
+    PARSE_NONE(VideoJNI.ContainerStream_PARSE_NONE_get()),
   /**
    * full parsing and repack
    */
-    PARSE_FULL(VideoJNI.Stream_PARSE_FULL_get()),
+    PARSE_FULL(VideoJNI.ContainerStream_PARSE_FULL_get()),
   /**
    * Only parse headers, do not repack.
    */
-    PARSE_HEADERS(VideoJNI.Stream_PARSE_HEADERS_get()),
+    PARSE_HEADERS(VideoJNI.ContainerStream_PARSE_HEADERS_get()),
   /**
    * full parsing and interpolation of timestamps for frames not starting 
    * on a packet boundary
    */
-    PARSE_TIMESTAMPS(VideoJNI.Stream_PARSE_TIMESTAMPS_get()),
+    PARSE_TIMESTAMPS(VideoJNI.ContainerStream_PARSE_TIMESTAMPS_get()),
   /**
    * full parsing and repack of the first frame only, only implemented 
    * for H.264 currently
    */
-    PARSE_FULL_ONCE(VideoJNI.Stream_PARSE_FULL_ONCE_get()),
+    PARSE_FULL_ONCE(VideoJNI.ContainerStream_PARSE_FULL_ONCE_get()),
   /**
    * full parsing and repack with timestamp and position generation by 
    * parser for raw
@@ -552,7 +531,7 @@ public class Stream extends RefCounted {
    * headers and
    *
    */
-    PARSE_FULL_RAW(VideoJNI.Stream_PARSE_FULL_RAW_get());
+    PARSE_FULL_RAW(VideoJNI.ContainerStream_PARSE_FULL_RAW_get());
 
     public final int swigValue() {
       return swigValue;

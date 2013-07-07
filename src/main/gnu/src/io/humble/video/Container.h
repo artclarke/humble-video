@@ -40,7 +40,7 @@ namespace humble
 namespace video
 {
 
-  class Stream;
+  class ContainerStream;
 /**
  * A Container for Media data. This is an abstract class and
  * cannot be instantiated on its own.

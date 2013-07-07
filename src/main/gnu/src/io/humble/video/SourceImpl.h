@@ -61,7 +61,7 @@ public:
   virtual int32_t
   getNumStreams();
 
-  virtual Stream*
+  virtual ContainerStream*
   getStream(int32_t streamIndex);
 
   virtual int32_t
@@ -147,7 +147,7 @@ private:
   int32_t mInputBufferLength;
   io::humble::video::customio::URLProtocolHandler* mIOHandler;
   io::humble::ferry::RefPointer<SourceFormat> mFormat;
-  Stream** mStreams;
+  ContainerStream** mStreams;
   io::humble::ferry::RefPointer<KeyValueBag> mMetaData;
 };
 
