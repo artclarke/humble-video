@@ -26,6 +26,8 @@
 #include "PropertyImpl.h"
 #include <io/humble/ferry/Logger.h>
 
+VS_LOG_SETUP(VS_CPP_PACKAGE);
+
 using namespace io::humble::video::customio;
 
 namespace io
@@ -43,6 +45,58 @@ Container::~Container()
 {
 }
 
+int
+Container::url_read(void*h, unsigned char* buf, int size)
+{
+  int retval = -1;
+  try
+  {
+    URLProtocolHandler* handler = (URLProtocolHandler*) h;
+    if (handler)
+      retval = handler->url_read(buf, size);
+  } catch (...)
+  {
+    retval = -1;
+  }
+  VS_LOG_TRACE("URLProtocolHandler[%p]->url_read(%p, %d) ==> %d", h, buf, size,
+      retval);
+  return retval;
+}
+int
+Container::url_write(void*h, unsigned char* buf, int size)
+{
+  int retval = -1;
+  try
+  {
+    URLProtocolHandler* handler = (URLProtocolHandler*) h;
+    if (handler)
+      retval = handler->url_write(buf, size);
+  } catch (...)
+  {
+    retval = -1;
+  }
+  VS_LOG_TRACE("URLProtocolHandler[%p]->url_write(%p, %d) ==> %d", h, buf, size,
+      retval);
+  return retval;
+}
+
+int64_t
+Container::url_seek(void*h, int64_t position, int whence)
+{
+  int64_t retval = -1;
+  try
+  {
+    URLProtocolHandler* handler = (URLProtocolHandler*) h;
+    if (handler)
+      retval = handler->url_seek(position, whence);
+  } catch (...)
+  {
+    retval = -1;
+  }
+  VS_LOG_TRACE("URLProtocolHandler[%p]->url_seek(%p, %lld) ==> %d", h, position,
+      whence, retval);
+  return retval;
+}
 
 } /* namespace video */
 } /* namespace humble */

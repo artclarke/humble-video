@@ -118,6 +118,21 @@ SourceTest::openTestHelper(const char* file)
 
   retval = source->close();
   TS_ASSERT(retval >= 0);
+
+  // and make sure we don't crash after a close.
+  {
+    LoggerStack stack;
+    // quiet ffmpeg error
+    stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
+
+    TS_ASSERT_THROWS_ANYTHING(source->getNumStreams());
+    TS_ASSERT_THROWS_ANYTHING(source->getDuration());
+    TS_ASSERT_THROWS_ANYTHING(source->getBitRate());
+    TS_ASSERT_THROWS_ANYTHING(source->getFileSize());
+    TS_ASSERT_THROWS_ANYTHING(source->getStartTime());
+    TS_ASSERT_THROWS_ANYTHING(source->getFlags());
+    TS_ASSERT_THROWS_ANYTHING(source->getURL());
+  }
 }
 
 void

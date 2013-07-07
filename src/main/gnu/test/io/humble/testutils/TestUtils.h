@@ -19,6 +19,11 @@
 
 #ifndef __TEST_UTILS_H__
 #define __TEST_UTILS_H__
+
+#define CXXTEST_HAVE_STD
+#define CXXTEST_HAVE_EH
+#define CXXTEST_ABORT_TEST_ON_FAIL
+
 #include <cxxtest/TestSuite.h>
 
 // This is the main method that will be build by cxxtest. We need

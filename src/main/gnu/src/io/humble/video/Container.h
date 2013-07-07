@@ -138,7 +138,12 @@ protected:
   virtual
   ~Container();
 #ifndef SWIG
-  virtual void* getCtx()=0;
+  virtual void* getCtx() { return getFormatCtx(); }
+  virtual AVFormatContext* getFormatCtx()=0;
+  // static methods for custom IO
+  static int url_read(void*h, unsigned char* buf, int size);
+  static int url_write(void*h, unsigned char* buf, int size);
+  static int64_t url_seek(void*h, int64_t position, int whence);
 #endif // ! SWIG
 protected:
 

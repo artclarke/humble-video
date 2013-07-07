@@ -35,65 +35,6 @@ VS_LOG_SETUP(VS_CPP_PACKAGE);
 using namespace io::humble::video::customio;
 using namespace io::humble::ferry;
 
-extern "C"
-{
-/** Some static functions used by custom IO
- */
-int
-Container_url_read(void*h, unsigned char* buf, int size)
-{
-  int retval = -1;
-  try
-  {
-    URLProtocolHandler* handler = (URLProtocolHandler*) h;
-    if (handler)
-      retval = handler->url_read(buf, size);
-  } catch (...)
-  {
-    retval = -1;
-  }
-  VS_LOG_TRACE("URLProtocolHandler[%p]->url_read(%p, %d) ==> %d", h, buf, size,
-      retval);
-  return retval;
-}
-int
-Container_url_write(void*h, unsigned char* buf, int size)
-{
-  int retval = -1;
-  try
-  {
-    URLProtocolHandler* handler = (URLProtocolHandler*) h;
-    if (handler)
-      retval = handler->url_write(buf, size);
-  } catch (...)
-  {
-    retval = -1;
-  }
-  VS_LOG_TRACE("URLProtocolHandler[%p]->url_write(%p, %d) ==> %d", h, buf, size,
-      retval);
-  return retval;
-}
-
-int64_t
-Container_url_seek(void*h, int64_t position, int whence)
-{
-  int64_t retval = -1;
-  try
-  {
-    URLProtocolHandler* handler = (URLProtocolHandler*) h;
-    if (handler)
-      retval = handler->url_seek(position, whence);
-  } catch (...)
-  {
-    retval = -1;
-  }
-  VS_LOG_TRACE("URLProtocolHandler[%p]->url_seek(%p, %lld) ==> %d", h, position,
-      whence, retval);
-  return retval;
-}
-
-}
-
 namespace io {
 namespace humble {
 namespace video {
@@ -102,7 +43,7 @@ SourceImpl::SourceImpl() {
   mStreams = 0;
   mStreamInfoGotten = 0;
   mReadRetryMax = 1;
-  mInputBufferLength = 0;
+  mInputBufferLength = 2048;
   mIOHandler = 0;
   mCtx = avformat_alloc_context();
   if (!mCtx) throw std::bad_alloc();
@@ -120,7 +61,19 @@ SourceImpl::~SourceImpl() {
         this->getURL());
     (void) this->close();
   }
-  avformat_free_context(mCtx);
+  if (mCtx)
+    avformat_free_context(mCtx);
+}
+AVFormatContext*
+SourceImpl::getFormatCtx() {
+  // throw an exception if in wrong state.
+  if (mState == Container::STATE_CLOSED || mState == Container::STATE_ERROR) {
+    const char * MESSAGE="Method called on Source in CLOSED or ERROR state.";
+    VS_LOG_ERROR(MESSAGE);
+    std::exception e = std::runtime_error(MESSAGE);
+    throw e;
+  }
+  return mCtx;
 }
 
 SourceImpl*
@@ -134,8 +87,9 @@ SourceImpl::make() {
 int32_t
 SourceImpl::open(const char *url, InputFormat* format,
     bool streamsCanBeAddedDynamically, bool queryMetaData,
-    KeyValueBag* options, KeyValueBag* optionsNotSet) {
-
+    KeyValueBag* options, KeyValueBag* optionsNotSet)
+{
+  AVFormatContext* ctx = this->getFormatCtx();
   int retval = -1;
   if (mState != Container::STATE_INITED) {
     VS_LOG_DEBUG("Open can only be called when container is in init state. Current state: %d", mState);
@@ -151,10 +105,10 @@ SourceImpl::open(const char *url, InputFormat* format,
   if (format) {
     // acquire a long-lived reference
     mFormat.reset(format, true);
-    mCtx->iformat = mFormat->getCtx();
+    ctx->iformat = mFormat->getCtx();
   }
 
-  AVInputFormat* oldFormat = mCtx->iformat;
+  AVInputFormat* oldFormat = ctx->iformat;
 
   // Let's check for custom IO
   mIOHandler = URLProtocolManager::findHandler(
@@ -163,10 +117,7 @@ SourceImpl::open(const char *url, InputFormat* format,
          0);
 
   if (mIOHandler) {
-    mCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
-    if (mInputBufferLength <= 0)
-      // default to 2k
-      mInputBufferLength = 2048;
+    ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
     // free and realloc the input buffer length
     uint8_t* buffer = (uint8_t*)av_malloc(mInputBufferLength);
     if (!buffer) {
@@ -176,15 +127,15 @@ SourceImpl::open(const char *url, InputFormat* format,
 
     // we will allocate ourselves an io context;
     // ownership of buffer passes here.
-    mCtx->pb = avio_alloc_context(
+    ctx->pb = avio_alloc_context(
         buffer,
         mInputBufferLength,
         0,
         mIOHandler,
-        Container_url_read,
-        Container_url_write,
-        Container_url_seek);
-    if (!mCtx->pb) {
+        Container::url_read,
+        Container::url_write,
+        Container::url_seek);
+    if (!ctx->pb) {
       av_free(buffer);
       mState = Container::STATE_ERROR;
       return retval;
@@ -204,11 +155,11 @@ SourceImpl::open(const char *url, InputFormat* format,
   if (retval >= 0) {
     mState = Container::STATE_OPENED;
 
-    if (oldFormat != mCtx->iformat)
-      mFormat = InputFormat::make(mCtx->iformat);
+    if (oldFormat != ctx->iformat)
+      mFormat = InputFormat::make(ctx->iformat);
 
     if (streamsCanBeAddedDynamically)
-      mCtx->ctx_flags |= AVFMTCTX_NOHEADER;
+      ctx->ctx_flags |= AVFMTCTX_NOHEADER;
 
     KeyValueBagImpl* realUnsetOpts = dynamic_cast<KeyValueBagImpl*>(optionsNotSet);
     if (realUnsetOpts)
@@ -228,7 +179,7 @@ int32_t
 SourceImpl::setInputBufferLength(int32_t size) {
   if (mState != Container::STATE_INITED)
     return -1;
-  if (size < 0)
+  if (size <= 0)
     return -1;
   int32_t retval = mInputBufferLength;
   mInputBufferLength = size;
@@ -242,35 +193,31 @@ SourceImpl::getInputBufferLength() {
 
 int32_t
 SourceImpl::getNumStreams() {
-  return (int32_t)mCtx->nb_streams;
+  return (int32_t)this->getFormatCtx()->nb_streams;
 }
 
 int32_t
 SourceImpl::close() {
   int32_t retval=-1;
-  switch(mState)
-  {
-  case Container::STATE_OPENED:
-  case Container::STATE_PLAYING:
-  case Container::STATE_PAUSED:
-    // All these cases are valid.
-    break;
-  default:
-  {
+  if (!(mState == Container::STATE_OPENED ||
+      mState == Container::STATE_PLAYING ||
+      mState == Container::STATE_PAUSED)) {
     VS_LOG_WARN("Attempt to close container (%s) when not opened, playing or paused is ignored", getURL());
     return -1;
   }
-
-  }
   // we need to remember the avio context
-  AVIOContext* pb = mCtx->pb;
+  AVIOContext* pb = this->getFormatCtx()->pb;
 
   avformat_close_input(&mCtx);
+  // avformat_close_input frees the context, so...
+  mCtx = 0;
+
   retval = doCloseFileHandles(pb);
   if (retval < 0) {
     VS_LOG_ERROR("Error when closing container (%s): %d", getURL(), retval);
     mState = Container::STATE_ERROR;
   }
+
   if (mState != Container::STATE_ERROR)
     mState = Container::STATE_CLOSED;
   return retval;
@@ -296,6 +243,8 @@ SourceImpl::doCloseFileHandles(AVIOContext* pb)
 
 Stream*
 SourceImpl::getStream(int32_t streamIndex) {
+  if (mState == Container::STATE_CLOSED || mState == Container::STATE_ERROR)
+    return 0;
   (void) streamIndex;
   return 0;
 }
@@ -315,7 +264,7 @@ SourceImpl::read(Packet* ipkt) {
     int32_t numReads=0;
     do
     {
-      retval = av_read_frame(mCtx,
+      retval = av_read_frame(this->getFormatCtx(),
           packet);
       ++numReads;
     }
@@ -363,7 +312,7 @@ int32_t
 SourceImpl::queryStreamMetaData() {
   int32_t retval = -1;
   if (!mStreamInfoGotten) {
-    retval = avformat_find_stream_info(mCtx, 0);
+    retval = avformat_find_stream_info(this->getFormatCtx(), 0);
     if (retval >= 0)
       mStreamInfoGotten = true;
   } else
@@ -374,21 +323,22 @@ SourceImpl::queryStreamMetaData() {
 
 int64_t
 SourceImpl::getDuration() {
-  return mCtx->duration;
+  return this->getFormatCtx()->duration;
 }
 
 int64_t
 SourceImpl::getStartTime() {
-  return mCtx->start_time;
+  return this->getFormatCtx()->start_time;
 }
 
 int64_t
 SourceImpl::getFileSize() {
   int64_t retval = -1;
-  if (mCtx->iformat && (mCtx->iformat->flags & AVFMT_NOFILE))
+  AVFormatContext* ctx = this->getFormatCtx();
+  if (ctx->iformat && (ctx->iformat->flags & AVFMT_NOFILE))
     retval = 0;
   else {
-    retval = avio_size(mCtx->pb);
+    retval = avio_size(ctx->pb);
     retval = FFMAX(0, retval);
   }
   return retval;
@@ -396,38 +346,41 @@ SourceImpl::getFileSize() {
 
 int32_t
 SourceImpl::getBitRate() {
-  return mCtx->bit_rate;
+  return this->getFormatCtx()->bit_rate;
 }
 
 int32_t
 SourceImpl::getFlags() {
-  int32_t flags = mCtx->flags;
+  int32_t flags = this->getFormatCtx()->flags;
   return flags;
 }
 
 void
 SourceImpl::setFlags(int32_t newFlags) {
-  mCtx->flags = newFlags;
+  AVFormatContext* ctx=this->getFormatCtx();
+  ctx->flags = newFlags;
   if (mIOHandler)
-    mCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
+    ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
 }
 
 bool
 SourceImpl::getFlag(Flag flag) {
-  return mCtx->flags & flag;
+  return this->getFormatCtx()->flags & flag;
 }
 
 void
 SourceImpl::setFlag(Flag flag, bool value) {
+  AVFormatContext* ctx=this->getFormatCtx();
+
   if (value)
-    mCtx->flags |= flag;
+    ctx->flags |= flag;
   else
-    mCtx->flags &= (~flag);
+    ctx->flags &= (~flag);
 }
 
 const char*
 SourceImpl::getURL() {
-  return mCtx->filename;
+  return this->getFormatCtx()->filename;
 }
 
 int32_t
@@ -443,37 +396,37 @@ SourceImpl::setReadRetryCount(int32_t count) {
 
 bool
 SourceImpl::canStreamsBeAddedDynamically() {
-  return mCtx->ctx_flags & AVFMTCTX_NOHEADER;
+  return this->getFormatCtx()->ctx_flags & AVFMTCTX_NOHEADER;
 }
 
 KeyValueBag*
 SourceImpl::getMetaData() {
   if (!mMetaData)
-    mMetaData = KeyValueBagImpl::make(mCtx->metadata);
+    mMetaData = KeyValueBagImpl::make(this->getFormatCtx()->metadata);
   return mMetaData.get();
 }
 
 int32_t
 SourceImpl::setForcedAudioCodec(Codec::ID id) {
-  mCtx->audio_codec_id = (enum AVCodecID) id;
+  this->getFormatCtx()->audio_codec_id = (enum AVCodecID) id;
   return 0;
 }
 
 int32_t
 SourceImpl::setForcedVideoCodec(Codec::ID id) {
-  mCtx->video_codec_id = (enum AVCodecID) id;
+  this->getFormatCtx()->video_codec_id = (enum AVCodecID) id;
   return 0;
 }
 
 int32_t
 SourceImpl::setForcedSubtitleCodec(Codec::ID id) {
-  mCtx->subtitle_codec_id = (enum AVCodecID)id;
+  this->getFormatCtx()->subtitle_codec_id = (enum AVCodecID)id;
   return 0;
 }
 
 int32_t
 SourceImpl::getMaxDelay() {
-  return mCtx->max_delay;
+  return this->getFormatCtx()->max_delay;
 }
 
 int32_t
@@ -484,7 +437,7 @@ SourceImpl::seek(int32_t stream_index, int64_t min_ts, int64_t ts,
     VS_LOG_WARN("Can only seek on OPEN (not paused or playing) containers.");
     return -1;
   }
-  int32_t retval = avformat_seek_file(mCtx,
+  int32_t retval = avformat_seek_file(this->getFormatCtx(),
       stream_index,
       min_ts,
       ts,
@@ -503,7 +456,7 @@ SourceImpl::pause() {
     VS_LOG_WARN("Can only pause containers in PLAYING state. Current state: %d", mState);
     return -1;
   }
-  int32_t retval = av_read_pause(mCtx);
+  int32_t retval = av_read_pause(this->getFormatCtx());
   VS_CHECK_INTERRUPT(retval, true);
   if (retval >= 0)
     mState = Container::STATE_PAUSED;
@@ -517,7 +470,7 @@ SourceImpl::play() {
     VS_LOG_WARN("Can only play containers in OPENED or PAUSED states. Current state: %d", mState);
     return -1;
   }
-  int32_t retval = av_read_play(mCtx);
+  int32_t retval = av_read_play(this->getFormatCtx());
   VS_CHECK_INTERRUPT(retval, true);
   if (retval >= 0)
     mState = Container::STATE_PLAYING;
@@ -528,15 +481,16 @@ int32_t
 SourceImpl::doOpen(const char* url, AVDictionary** options)
 {
   int32_t retval=0;
+  AVFormatContext* ctx = this->getFormatCtx();
 
   if (mIOHandler)
     retval = mIOHandler->url_open(url, URLProtocolHandler::URL_RDONLY_MODE);
 
   if (retval >= 0) {
-    AVIOContext* pb = mCtx->pb;
+    AVIOContext* pb = ctx->pb;
     retval = avformat_open_input(&mCtx,
         url,
-        mCtx->iformat,
+        ctx->iformat,
         options);
     if (retval < 0)
       // close open filehandle

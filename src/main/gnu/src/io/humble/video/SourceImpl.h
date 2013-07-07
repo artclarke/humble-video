@@ -134,7 +134,7 @@ protected:
   SourceImpl();
   virtual
   ~SourceImpl();
-  virtual void* getCtx() { return mCtx; }
+  virtual AVFormatContext* getFormatCtx();
 
 private:
   int32_t doOpen(const char*, AVDictionary**);
