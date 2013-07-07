@@ -226,45 +226,45 @@ namespace io { namespace humble { namespace ferry {
 #undef VS_LOG_INFO
 #undef VS_LOG_DEBUG
 #undef VS_LOG_TRACE
-#define VS_LOG_ERROR(...) do {} while(0)
-#define VS_LOG_WARN(...) do {} while(0)
-#define VS_LOG_INFO(...) do {} while(0)
-#define VS_LOG_DEBUG(...) do {} while(0)
-#define VS_LOG_TRACE(...) do {} while(0)
+#define VS_LOG_ERROR(...) do { (void) vs_logger_static_context; } while(0)
+#define VS_LOG_WARN(...) do { (void) vs_logger_static_context; } while(0)
+#define VS_LOG_INFO(...) do { (void) vs_logger_static_context; } while(0)
+#define VS_LOG_DEBUG(...) do { (void) vs_logger_static_context; } while(0)
+#define VS_LOG_TRACE(...) do { (void) vs_logger_static_context; } while(0)
 #else
 #ifdef VS_LOG_LOGLEVELS_ERROR
 #undef VS_LOG_WARN
 #undef VS_LOG_INFO
 #undef VS_LOG_DEBUG
 #undef VS_LOG_TRACE
-#define VS_LOG_WARN(...) do {} while(0)
-#define VS_LOG_INFO(...) do {} while(0)
-#define VS_LOG_DEBUG(...) do {} while(0)
-#define VS_LOG_TRACE(...) do {} while(0)
+#define VS_LOG_WARN(...) do { (void) vs_logger_static_context; } while(0)
+#define VS_LOG_INFO(...) do { (void) vs_logger_static_context; } while(0)
+#define VS_LOG_DEBUG(...) do { (void) vs_logger_static_context; } while(0)
+#define VS_LOG_TRACE(...) do { (void) vs_logger_static_context; } while(0)
 #else
 #ifdef VS_LOG_LOGLEVELS_WARN
 #undef VS_LOG_INFO
 #undef VS_LOG_DEBUG
 #undef VS_LOG_TRACE
-#define VS_LOG_INFO(...) do {} while(0)
-#define VS_LOG_DEBUG(...) do {} while(0)
-#define VS_LOG_TRACE(...) do {} while(0)
+#define VS_LOG_INFO(...) do { (void) vs_logger_static_context; } while(0)
+#define VS_LOG_DEBUG(...) do { (void) vs_logger_static_context; } while(0)
+#define VS_LOG_TRACE(...) do { (void) vs_logger_static_context; } while(0)
 #else
 #ifdef VS_LOG_LOGLEVELS_INFO
 #undef VS_LOG_DEBUG
 #undef VS_LOG_TRACE
-#define VS_LOG_DEBUG(...) do {} while(0)
-#define VS_LOG_TRACE(...) do {} while(0)
+#define VS_LOG_DEBUG(...) do { (void) vs_logger_static_context; } while(0)
+#define VS_LOG_TRACE(...) do { (void) vs_logger_static_context; } while(0)
 #else
 #ifdef VS_LOG_LOGLEVELS_DEBUG
 #undef VS_LOG_TRACE
-#define VS_LOG_TRACE(...) do {} while(0)
+#define VS_LOG_TRACE(...) do { (void) vs_logger_static_context; } while(0)
 #else
 #ifdef VS_LOG_LOGLEVELS_ALL
 #else
 #ifndef VS_DEBUG
 #undef VS_LOG_TRACE
-#define VS_LOG_TRACE(...) do {} while(0)
+#define VS_LOG_TRACE(...) do { (void) vs_logger_static_context; } while(0)
 #endif // ! VS_DEBUG
 #endif // VS_LOG_LOGLEVELS_ALL
 #endif // VS_LOG_LOGLEVELS_DEBUG
