@@ -3,7 +3,6 @@
 
 #include <io/humble/testutils/TestUtils.h>
 #include "TestData.h"
-using namespace VS_CPP_NAMESPACE;
 
 class SourceStreamTest : public CxxTest::TestSuite
 {
