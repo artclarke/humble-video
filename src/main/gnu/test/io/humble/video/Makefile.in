@@ -156,7 +156,8 @@ SourceFormatTester_OBJECTS = $(am_SourceFormatTester_OBJECTS) \
 	$(nodist_SourceFormatTester_OBJECTS)
 SourceFormatTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_SourceTester_OBJECTS = SourceTest.$(OBJEXT) Main.$(OBJEXT)
+am_SourceTester_OBJECTS = SourceTest.$(OBJEXT) TestData.$(OBJEXT) \
+	Main.$(OBJEXT)
 nodist_SourceTester_OBJECTS = SourceTest_CXXRunner.$(OBJEXT)
 SourceTester_OBJECTS = $(am_SourceTester_OBJECTS) \
 	$(nodist_SourceTester_OBJECTS)
@@ -734,6 +735,7 @@ KeyValueBagTester_LDADD = \
 
 SourceTester_SOURCES = \
   SourceTest.cpp \
+  TestData.cpp \
   Main.cpp
 
 nodist_SourceTester_SOURCES = \
@@ -888,6 +890,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceFormatTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestData.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

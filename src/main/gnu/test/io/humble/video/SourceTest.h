@@ -29,6 +29,8 @@
 #include <io/humble/testutils/TestUtils.h>
 #include <io/humble/video/Source.h>
 
+#include "TestData.h"
+
 class SourceTest : public CxxTest::TestSuite
 {
 public:
@@ -46,5 +48,7 @@ public:
 private:
   void openTestHelper(const char* url);
   char mSampleFile[2048];
+  TestData mFixtures;
+  TestData::Fixture* mFixture;
 };
 #endif /* SOURCETEST_H_ */

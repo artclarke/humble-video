@@ -39,14 +39,11 @@ using namespace io::humble::video;
 using namespace io::humble::video::customio;
 
 SourceTest::SourceTest() {
-  mSampleFile[0] =0;
-  char *fixtureDirectory = getenv("VS_TEST_FIXTUREDIR");
-  if (!fixtureDirectory) {
-    VS_LOG_ERROR("Need to define environement variable VS_TEST_FIXTUREDIR");
-    TSM_ASSERT("no fixture dir", false);
-    throw new std::runtime_error("Must define environment variable VS_TEST_FIXTUREDIR");
-  }
-  snprintf(mSampleFile, sizeof(mSampleFile), "%s/%s", fixtureDirectory, "testfile.flv");
+  mFixture = 0;
+  mSampleFile[0] = 0;
+  mFixture = mFixtures.getFixture(0);
+  TSM_ASSERT("Missing fixture", mFixture);
+  mFixtures.fillPath(mFixture, mSampleFile, sizeof(mSampleFile));
   VS_LOG_TRACE("Sample File: %s", mSampleFile);
 }
 
@@ -101,12 +98,12 @@ SourceTest::openTestHelper(const char* file)
   }
 
   int32_t duration = (int32_t) source->getDuration();
-  TSM_ASSERT_EQUALS("Unexpected duration", 149264000, duration);
+  TSM_ASSERT_EQUALS("Unexpected duration", mFixture->duration, duration);
   
   int32_t filesize = (int32_t) source->getFileSize();
-  TSM_ASSERT_EQUALS("Unexpected filesize", 4546420, filesize);
+  TSM_ASSERT_EQUALS("Unexpected filesize", mFixture->filesize, filesize);
 
-  TSM_ASSERT_EQUALS("Unexpected bitrate", 243671, source->getBitRate());
+  TSM_ASSERT_EQUALS("Unexpected bitrate", mFixture->bitrate, source->getBitRate());
 
   TS_ASSERT(strcmp(file, source->getURL()) == 0);
 
@@ -254,7 +251,7 @@ SourceTest::testRead()
   } while (retval >= 0);
   TS_ASSERT(pktsRead > 0);
   // I happen to know that there are this number of audio and video packets in this file.
-  TS_ASSERT_EQUALS(pktsRead, 5714+2236);
+  TS_ASSERT_EQUALS(pktsRead, mFixture->packets);
   retval = source->close();
   TS_ASSERT(retval >= 0);
 }

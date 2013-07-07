@@ -89,6 +89,7 @@ KeyValueBagTester_LDADD= \
 
 SourceTester_SOURCES= \
   SourceTest.cpp \
+  TestData.cpp \
   Main.cpp
 
 nodist_SourceTester_SOURCES= \
