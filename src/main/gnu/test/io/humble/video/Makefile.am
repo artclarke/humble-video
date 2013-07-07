@@ -13,6 +13,7 @@ check_PROGRAMS=\
   KeyValueBagTester \
   SourceTester \
   SourceFormatTester \
+  SourceStreamTester \
   SinkFormatTester \
   PropertyTester \
   RationalTester 
@@ -24,6 +25,7 @@ BUILT_SOURCES= \
   KeyValueBagTest_CXXRunner.cpp \
   SourceTest_CXXRunner.cpp \
   SourceFormatTest_CXXRunner.cpp \
+  SourceStreamTest_CXXRunner.cpp \
   SinkFormatTest_CXXRunner.cpp \
   PropertyTest_CXXRunner.cpp \
   RationalTest_CXXRunner.cpp
@@ -35,6 +37,7 @@ noinst_HEADERS = \
   KeyValueBagTest.h \
   SourceTest.h \
   SourceFormatTest.h \
+  SourceStreamTest.h \
   SinkFormatTest.h \
   PropertyTest.h \
   RationalTest.h
@@ -87,6 +90,17 @@ nodist_KeyValueBagTester_SOURCES= \
 KeyValueBagTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
+SourceStreamTester_SOURCES= \
+  SourceStreamTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_SourceStreamTester_SOURCES= \
+  SourceStreamTest_CXXRunner.cpp
+
+SourceStreamTester_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+  
 SourceTester_SOURCES= \
   SourceTest.cpp \
   TestData.cpp \

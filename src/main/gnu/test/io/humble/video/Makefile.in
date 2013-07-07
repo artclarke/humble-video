@@ -81,8 +81,8 @@ host_triplet = @host@
 check_PROGRAMS = IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
 	PacketTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
 	SourceTester$(EXEEXT) SourceFormatTester$(EXEEXT) \
-	SinkFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
-	RationalTester$(EXEEXT)
+	SourceStreamTester$(EXEEXT) SinkFormatTester$(EXEEXT) \
+	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mk/depcomp $(noinst_HEADERS) \
@@ -156,6 +156,14 @@ SourceFormatTester_OBJECTS = $(am_SourceFormatTester_OBJECTS) \
 	$(nodist_SourceFormatTester_OBJECTS)
 SourceFormatTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_SourceStreamTester_OBJECTS = SourceStreamTest.$(OBJEXT) \
+	TestData.$(OBJEXT) Main.$(OBJEXT)
+nodist_SourceStreamTester_OBJECTS =  \
+	SourceStreamTest_CXXRunner.$(OBJEXT)
+SourceStreamTester_OBJECTS = $(am_SourceStreamTester_OBJECTS) \
+	$(nodist_SourceStreamTester_OBJECTS)
+SourceStreamTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_SourceTester_OBJECTS = SourceTest.$(OBJEXT) TestData.$(OBJEXT) \
 	Main.$(OBJEXT)
 nodist_SourceTester_OBJECTS = SourceTest_CXXRunner.$(OBJEXT)
@@ -206,13 +214,15 @@ SOURCES = $(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
 	$(nodist_RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
 	$(nodist_SinkFormatTester_SOURCES) \
 	$(SourceFormatTester_SOURCES) \
-	$(nodist_SourceFormatTester_SOURCES) $(SourceTester_SOURCES) \
+	$(nodist_SourceFormatTester_SOURCES) \
+	$(SourceStreamTester_SOURCES) \
+	$(nodist_SourceStreamTester_SOURCES) $(SourceTester_SOURCES) \
 	$(nodist_SourceTester_SOURCES)
 DIST_SOURCES = $(ErrorTester_SOURCES) $(IndexEntryTester_SOURCES) \
 	$(KeyValueBagTester_SOURCES) $(PacketTester_SOURCES) \
 	$(PropertyTester_SOURCES) $(RationalTester_SOURCES) \
 	$(SinkFormatTester_SOURCES) $(SourceFormatTester_SOURCES) \
-	$(SourceTester_SOURCES)
+	$(SourceStreamTester_SOURCES) $(SourceTester_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -672,6 +682,7 @@ BUILT_SOURCES = \
   KeyValueBagTest_CXXRunner.cpp \
   SourceTest_CXXRunner.cpp \
   SourceFormatTest_CXXRunner.cpp \
+  SourceStreamTest_CXXRunner.cpp \
   SinkFormatTest_CXXRunner.cpp \
   PropertyTest_CXXRunner.cpp \
   RationalTest_CXXRunner.cpp
@@ -683,6 +694,7 @@ noinst_HEADERS = \
   KeyValueBagTest.h \
   SourceTest.h \
   SourceFormatTest.h \
+  SourceStreamTest.h \
   SinkFormatTest.h \
   PropertyTest.h \
   RationalTest.h
@@ -731,6 +743,17 @@ nodist_KeyValueBagTester_SOURCES = \
   KeyValueBagTest_CXXRunner.cpp
 
 KeyValueBagTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
+SourceStreamTester_SOURCES = \
+  SourceStreamTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_SourceStreamTester_SOURCES = \
+  SourceStreamTest_CXXRunner.cpp
+
+SourceStreamTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 SourceTester_SOURCES = \
@@ -861,6 +884,10 @@ SourceFormatTester$(EXEEXT): $(SourceFormatTester_OBJECTS) $(SourceFormatTester_
 	@rm -f SourceFormatTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(SourceFormatTester_OBJECTS) $(SourceFormatTester_LDADD) $(LIBS)
 
+SourceStreamTester$(EXEEXT): $(SourceStreamTester_OBJECTS) $(SourceStreamTester_DEPENDENCIES) $(EXTRA_SourceStreamTester_DEPENDENCIES) 
+	@rm -f SourceStreamTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(SourceStreamTester_OBJECTS) $(SourceStreamTester_LDADD) $(LIBS)
+
 SourceTester$(EXEEXT): $(SourceTester_OBJECTS) $(SourceTester_DEPENDENCIES) $(EXTRA_SourceTester_DEPENDENCIES) 
 	@rm -f SourceTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(SourceTester_OBJECTS) $(SourceTester_LDADD) $(LIBS)
@@ -888,6 +915,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SinkFormatTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceFormatTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceFormatTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceStreamTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceStreamTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestData.Po@am__quote@
@@ -1197,6 +1226,13 @@ SourceTester.log: SourceTester$(EXEEXT)
 SourceFormatTester.log: SourceFormatTester$(EXEEXT)
 	@p='SourceFormatTester$(EXEEXT)'; \
 	b='SourceFormatTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+SourceStreamTester.log: SourceStreamTester$(EXEEXT)
+	@p='SourceStreamTester$(EXEEXT)'; \
+	b='SourceStreamTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
