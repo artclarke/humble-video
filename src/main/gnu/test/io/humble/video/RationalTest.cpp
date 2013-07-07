@@ -1,6 +1,5 @@
-
 // for isinf()
-#include <math.h>
+#include <cmath>
 
 #include <io/humble/video/Global.h>
 #include "RationalTest.h"
@@ -57,7 +56,9 @@ RationalTest :: testReduction()
   TSM_ASSERT("not exact", retval == 1);
   TSM_ASSERT_EQUALS("", num->getNumerator(), 1);
   TSM_ASSERT_EQUALS("", num->getDenominator(), 0);
-  TSM_ASSERT("", isinf(num->getDouble()));
+  double n = num->getDouble();
+  bool inf = std::isinf(n);
+  TSM_ASSERT("", inf);
 
 }
 
@@ -74,7 +75,7 @@ RationalTest :: testGetDouble()
   num = Rational::make();
   num->reduce(1, 0, 10);
   retval = num->getDouble();
-  TSM_ASSERT("", isinf(retval));
+  TSM_ASSERT("", std::isinf(retval));
 }
 
 void
@@ -127,12 +128,12 @@ RationalTest :: testDivision()
   a = Rational::make(1);
   b = Rational::make(0.0);
   num = Rational::sDivide(a.value(), b.value());
-  TSM_ASSERT("", isinf(num->getDouble()));
+  TSM_ASSERT("", std::isinf(num->getDouble()));
 
   a = Rational::make(0.0);
   b = Rational::make(0.0);
   num = Rational::sDivide(a.value(), b.value());
-  TSM_ASSERT("", isnan(num->getDouble()));
+  TSM_ASSERT("", std::isnan(num->getDouble()));
 }
 
 void
