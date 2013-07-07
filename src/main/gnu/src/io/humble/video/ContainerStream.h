@@ -293,13 +293,6 @@ namespace io { namespace humble { namespace video
    virtual IndexEntry* getIndexEntry(int32_t position)=0;
 
    /**
-    * For containers with Stream.Disposition.DISPOSITION_ATTACHED_PIC,
-    * this returns a read-only copy of the packet containing the
-    * picture (needs to be decoded separately).
-    */
-   virtual Packet* getAttachedPic()=0;
-
-   /**
     * Get the {@link Stream.Disposition} of this stream.
     */
    virtual ContainerStream::Disposition getDisposition()=0;

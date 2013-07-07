@@ -120,6 +120,30 @@ public:
    */
   virtual State getState()=0;
 
+  /**
+   * The number of streams in this container.
+   * <p>If this container is a {@link Source} this will query the stream and find out
+   * how many streams are in it.</p><p>If the current thread is interrupted while this blocking method
+   * is running the method will return with a negative value.
+   * To check if the method exited because of an interruption
+   * pass the return value to {@link Error#make(int)} and then
+   * check {@link Error#getType()} to see if it is
+   * {@link Error.Type#ERROR_INTERRUPTED}.
+   * </p>
+   *
+   * @return The number of streams in this container.
+   */
+  virtual int32_t
+  getNumStreams()=0;
+
+  /**
+   * Get the stream at the given position.
+   *
+   * @param streamIndex the index of this stream in the container
+   * @return The stream at that position in the container, or null if none there.
+   */
+  virtual ContainerStream*
+  getStream(int32_t streamIndex)=0;
 protected:
   Container();
   virtual

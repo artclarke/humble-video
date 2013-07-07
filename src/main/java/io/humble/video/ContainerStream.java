@@ -407,17 +407,6 @@ public class ContainerStream extends RefCounted {
   }
 
 /**
- * For containers with Stream.Disposition.DISPOSITION_ATTACHED_PIC, 
- *  
- * this returns a read-only copy of the packet containing the  
- * picture (needs to be decoded separately).  
- */
-  public Packet getAttachedPic() {
-    long cPtr = VideoJNI.ContainerStream_getAttachedPic(swigCPtr, this);
-    return (cPtr == 0) ? null : new Packet(cPtr, false);
-  }
-
-/**
  * Get the {@link Stream.Disposition} of this stream.  
  */
   public ContainerStream.Disposition getDisposition() {

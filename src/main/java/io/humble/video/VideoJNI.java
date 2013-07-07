@@ -431,7 +431,6 @@ class VideoJNI {
   public final static native long ContainerStream_findTimeStampEntryInIndex(long jarg1, ContainerStream jarg1_, long jarg2, int jarg3);
   public final static native int ContainerStream_findTimeStampPositionInIndex(long jarg1, ContainerStream jarg1_, long jarg2, int jarg3);
   public final static native long ContainerStream_getIndexEntry(long jarg1, ContainerStream jarg1_, int jarg2);
-  public final static native long ContainerStream_getAttachedPic(long jarg1, ContainerStream jarg1_);
   public final static native int ContainerStream_getDisposition(long jarg1, ContainerStream jarg1_);
   public final static native int Container_FLAG_GENPTS_get();
   public final static native int Container_FLAG_IGNIDX_get();
@@ -447,6 +446,9 @@ class VideoJNI {
   public final static native int Container_FLAG_PRIV_OPT_get();
   public final static native int Container_FLAG_KEEP_SIDE_DATA_get();
   public final static native int Container_getState(long jarg1, Container jarg1_);
+  public final static native int Container_getNumStreams(long jarg1, Container jarg1_);
+  public final static native long Container_getStream(long jarg1, Container jarg1_, int jarg2);
+  public final static native long SourceStream_getAttachedPic(long jarg1, SourceStream jarg1_);
   public final static native long Source_make();
   public final static native long Source_getFormat(long jarg1, Source jarg1_);
   public final static native int Source_getState(long jarg1, Source jarg1_);
@@ -455,8 +457,7 @@ class VideoJNI {
   public final static native int Source_getInputBufferLength(long jarg1, Source jarg1_);
   public final static native int Source_open(long jarg1, Source jarg1_, String jarg2, long jarg3, SourceFormat jarg3_, boolean jarg4, boolean jarg5, long jarg6, KeyValueBag jarg6_, long jarg7, KeyValueBag jarg7_);
   public final static native int Source_close(long jarg1, Source jarg1_);
-  public final static native int Source_getNumStreams(long jarg1, Source jarg1_);
-  public final static native long Source_getStream(long jarg1, Source jarg1_, int jarg2);
+  public final static native long Source_getSourceStream(long jarg1, Source jarg1_, int jarg2);
   public final static native int Source_read(long jarg1, Source jarg1_, long jarg2, Packet jarg2_);
   public final static native int Source_queryStreamMetaData(long jarg1, Source jarg1_);
   public final static native long Source_getDuration(long jarg1, Source jarg1_);

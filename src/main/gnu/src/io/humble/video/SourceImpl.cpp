@@ -29,6 +29,7 @@
 #include "SourceImpl.h"
 #include "PacketImpl.h"
 #include "KeyValueBagImpl.h"
+#include "SourceStreamImpl.h"
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
@@ -40,7 +41,7 @@ namespace humble {
 namespace video {
 
 SourceImpl::SourceImpl() {
-  mStreams = 0;
+  mNumStreams = 0;
   mStreamInfoGotten = 0;
   mReadRetryMax = 1;
   mInputBufferLength = 2048;
@@ -193,7 +194,19 @@ SourceImpl::getInputBufferLength() {
 
 int32_t
 SourceImpl::getNumStreams() {
-  return (int32_t)this->getFormatCtx()->nb_streams;
+  int32_t retval = 0;
+  if (!(mState == Container::STATE_OPENED ||
+      mState == Container::STATE_PLAYING ||
+      mState == Container::STATE_PAUSED)) {
+    VS_LOG_WARN("Attempt to query number of streams in container (%s) when not opened, playing or paused is ignored", getURL());
+    return -1;
+  }
+  if ((int32_t) mCtx->nb_streams != mNumStreams)
+    doSetupSourceStreams();
+  retval = mNumStreams;
+
+  VS_CHECK_INTERRUPT(retval, true);
+  return retval;
 }
 
 int32_t
@@ -205,6 +218,22 @@ SourceImpl::close() {
     VS_LOG_WARN("Attempt to close container (%s) when not opened, playing or paused is ignored", getURL());
     return -1;
   }
+
+  // tell the streams we're closing.
+  while(mStreams.size() > 0)
+  {
+    RefPointer<SourceStreamImpl> * stream=mStreams.back();
+
+    VS_ASSERT(stream && *stream, "no stream?");
+    if (stream && *stream) {
+      (*stream)->containerClosed(this);
+      delete stream;
+    }
+    mStreams.pop_back();
+  }
+  mNumStreams = 0;
+
+
   // we need to remember the avio context
   AVIOContext* pb = this->getFormatCtx()->pb;
 
@@ -241,12 +270,26 @@ SourceImpl::doCloseFileHandles(AVIOContext* pb)
   return retval;
 }
 
-ContainerStream*
-SourceImpl::getStream(int32_t streamIndex) {
-  if (mState == Container::STATE_CLOSED || mState == Container::STATE_ERROR)
+SourceStream*
+SourceImpl::getSourceStream(int32_t position) {
+  if (!(mState == Container::STATE_OPENED ||
+      mState == Container::STATE_PLAYING ||
+      mState == Container::STATE_PAUSED)) {
+    VS_LOG_WARN("Attempt to get source stream from container (%s) when not opened, playing or paused is ignored", getURL());
     return 0;
-  (void) streamIndex;
-  return 0;
+  }
+  SourceStream *retval = 0;
+  if ((int32_t)mCtx->nb_streams != mNumStreams)
+    doSetupSourceStreams();
+
+  if (position < mNumStreams)
+  {
+    // will acquire for caller.
+    RefPointer<SourceStreamImpl> * p = mStreams.at(position);
+    retval = p ? p->get() : 0;
+  }
+  return retval;
+
 }
 
 int32_t
@@ -288,21 +331,19 @@ SourceImpl::read(Packet* ipkt) {
         pkt->getPosition(),
         packet->data);
 
-#if 0
     // and let's try to set the packet time base if known
     if (pkt->getStreamIndex() >= 0)
     {
-      RefPointer<IStream> stream = this->getStream(pkt->getStreamIndex());
+      RefPointer<SourceStream> stream = this->getSourceStream(pkt->getStreamIndex());
       if (stream)
       {
-        RefPointer<IRational> streamBase = stream->getTimeBase();
+        RefPointer<Rational> streamBase = stream->getTimeBase();
         if (streamBase)
         {
           pkt->setTimeBase(streamBase.value());
         }
       }
     }
-#endif // redo once stream implemented
   }
   VS_CHECK_INTERRUPT(retval, true);
   return retval;
@@ -311,12 +352,26 @@ SourceImpl::read(Packet* ipkt) {
 int32_t
 SourceImpl::queryStreamMetaData() {
   int32_t retval = -1;
+  if (!(mState == Container::STATE_OPENED ||
+      mState == Container::STATE_PLAYING ||
+      mState == Container::STATE_PAUSED)) {
+    VS_LOG_WARN("Attempt to query stream information from container (%s) when not opened, playing or paused is ignored", getURL());
+    return -1;
+  }
   if (!mStreamInfoGotten) {
     retval = avformat_find_stream_info(this->getFormatCtx(), 0);
     if (retval >= 0)
       mStreamInfoGotten = true;
   } else
     retval = 0;
+
+  if (retval >= 0 && mCtx->nb_streams > 0)
+  {
+    doSetupSourceStreams();
+  } else {
+    VS_LOG_WARN("Could not find streams in input container");
+  }
+
   VS_CHECK_INTERRUPT(retval, true);
   return retval;
 }
@@ -498,6 +553,65 @@ SourceImpl::doOpen(const char* url, AVDictionary** options)
   }
 
   return retval;
+}
+
+int32_t
+SourceImpl::doSetupSourceStreams()
+{
+  // do nothing if we're already all set up.
+  if (mNumStreams == (int32_t) mCtx->nb_streams)
+    return 0;
+
+  int32_t retval = -1;
+  // loop through and find the first non-zero time base
+  AVRational *goodTimebase = 0;
+  for(uint32_t i = 0;i < mCtx->nb_streams;i++){
+    AVStream *avStream = mCtx->streams[i];
+    if(avStream && avStream->time_base.num && avStream->time_base.den){
+      goodTimebase = &avStream->time_base;
+      break;
+    }
+  }
+
+  // Only look for new streams
+  for (uint32_t i =mNumStreams ; i < mCtx->nb_streams; i++)
+  {
+    AVStream *avStream = mCtx->streams[i];
+    if (avStream)
+    {
+      if (goodTimebase && (!avStream->time_base.num || !avStream->time_base.den))
+      {
+        avStream->time_base = *goodTimebase;
+      }
+
+      RefPointer<SourceStreamImpl>* stream = new RefPointer<SourceStreamImpl>(
+          SourceStreamImpl::make(this, avStream, 0)
+      );
+
+      if (stream)
+      {
+        if (stream->value())
+        {
+          mStreams.push_back(stream);
+          mNumStreams++;
+        } else {
+          VS_LOG_ERROR("Couldn't make a stream %d", i);
+          delete stream;
+        }
+        stream = 0;
+      }
+      else
+      {
+        VS_LOG_ERROR("Could not make Stream %d", i);
+        retval = -1;
+      }
+    } else {
+      VS_LOG_ERROR("no FFMPEG allocated stream: %d", i);
+      retval = -1;
+    }
+  }
+  return retval;
+
 }
 
 } /* namespace video */

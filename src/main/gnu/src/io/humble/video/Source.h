@@ -22,6 +22,7 @@
 
 #include <io/humble/video/Packet.h>
 #include <io/humble/video/Container.h>
+#include <io/humble/video/SourceStream.h>
 #include <io/humble/video/SourceFormat.h>
 
 #include <io/humble/ferry/RefPointer.h>
@@ -147,31 +148,13 @@ public:
   close()=0;
 
   /**
-   * The number of streams in this container.
-   * <p>If opened in {@link Source.Type#READ} mode, this will query the stream and find out
-   * how many streams are in it.</p><p>If opened in
-   * {@link Source.Type#WRITE} mode, this will return the number of streams
-   * the caller has added to date.</p><p>If the current thread is interrupted while this blocking method
-   * is running the method will return with a negative value.
-   * To check if the method exited because of an interruption
-   * pass the return value to {@link Error#make(int)} and then
-   * check {@link Error#getType()} to see if it is
-   * {@link Error.Type#ERROR_INTERRUPTED}.
-   * </p>
-   *
-   * @return The number of streams in this container.
-   */
-  virtual int32_t
-  getNumStreams()=0;
-
-  /**
    * Get the stream at the given position.
    *
    * @param streamIndex the index of this stream in the container
    * @return The stream at that position in the container, or null if none there.
    */
-  virtual ContainerStream*
-  getStream(int32_t streamIndex)=0;
+  virtual SourceStream*
+  getSourceStream(int32_t streamIndex)=0;
 
   /**
    * Reads the next packet in the Source into the Packet.  This method will

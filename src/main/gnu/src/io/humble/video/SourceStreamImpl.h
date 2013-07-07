@@ -48,7 +48,7 @@ namespace io { namespace humble { namespace video
     virtual int64_t getNumFrames();
 
     // Not for calling from Java
-    static ContainerStream * make(Container* container, AVStream *, AVCodec*);
+    static SourceStreamImpl * make(Container* container, AVStream *, AVCodec*);
 
     // The StreamCoder will call this if it needs to
     virtual void setTimeBase(Rational *);

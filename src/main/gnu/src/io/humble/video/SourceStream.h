@@ -38,6 +38,14 @@ namespace video {
  */
 class VS_API_HUMBLEVIDEO SourceStream : public io::humble::video::ContainerStream
 {
+public:
+  /**
+   * For containers with Stream.Disposition.DISPOSITION_ATTACHED_PIC,
+   * this returns a read-only copy of the packet containing the
+   * picture (needs to be decoded separately).
+   */
+  virtual Packet* getAttachedPic()=0;
+
 protected:
   SourceStream();
   virtual

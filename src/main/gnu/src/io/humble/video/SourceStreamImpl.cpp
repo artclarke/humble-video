@@ -86,7 +86,7 @@ SourceStreamImpl::reset() {
   mContainer = 0;
 }
 
-ContainerStream*
+SourceStreamImpl*
 SourceStreamImpl::make(Container *container, AVStream * aStream,
     AVCodec* /* avCodec */) {
   // note: make will acquire this for us.
