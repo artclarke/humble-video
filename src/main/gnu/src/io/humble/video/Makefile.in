@@ -99,8 +99,9 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_video_la_DEPENDENCIES =
 am_libhumble_video_la_OBJECTS = PixelFormat.lo KeyValueBag.lo \
 	KeyValueBagImpl.lo Property.lo PropertyImpl.lo Rational.lo \
-	RationalImpl.lo MediaData.lo Error.lo ErrorImpl.lo Packet.lo \
-	PacketImpl.lo ContainerFormat.lo Configurable.lo Container.lo \
+	RationalImpl.lo MediaData.lo IndexEntry.lo IndexEntryImpl.lo \
+	Error.lo ErrorImpl.lo Packet.lo PacketImpl.lo \
+	ContainerFormat.lo Configurable.lo Stream.lo Container.lo \
 	Source.lo SourceImpl.lo OutputFormat.lo InputFormat.lo \
 	Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
@@ -435,12 +436,15 @@ libhumble_video_la_SOURCES = \
   Rational.cpp \
   RationalImpl.cpp \
   MediaData.cpp \
+  IndexEntry.cpp \
+  IndexEntryImpl.cpp \
   Error.cpp \
   ErrorImpl.cpp \
   Packet.cpp \
   PacketImpl.cpp \
   ContainerFormat.cpp \
   Configurable.cpp \
+  Stream.cpp \
   Container.cpp \
   Source.cpp \
   SourceImpl.cpp \
@@ -466,6 +470,9 @@ libhumble_video_la_HEADERS = \
   Rational.swg \
   MediaData.h \
   MediaData.swg \
+  IndexEntry.h \
+  IndexEntryImpl.h \
+  IndexEntry.swg \
   Error.h \
   ErrorImpl.h \
   Error.swg \
@@ -481,10 +488,13 @@ libhumble_video_la_HEADERS = \
   OutputFormat.swg \
   InputFormat.h \
   InputFormat.swg \
-  Container.h \
-  Container.swg \
   Configurable.h \
   Configurable.swg \
+  Source.h \
+  Source.swg \
+  SourceImpl.h \
+  Container.h \
+  Container.swg \
   Source.h \
   Source.swg \
   SourceImpl.h \
@@ -556,6 +566,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Global.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HumbleVideo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntryImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InputFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBag.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagImpl.Plo@am__quote@
@@ -570,6 +582,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RationalImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Source.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Stream.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

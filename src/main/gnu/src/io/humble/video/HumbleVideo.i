@@ -36,6 +36,8 @@
 #include <io/humble/video/ContainerFormat.h>
 #include <io/humble/video/OutputFormat.h>
 #include <io/humble/video/InputFormat.h>
+#include <io/humble/video/IndexEntry.h>
+#include <io/humble/video/Stream.h>
 #include <io/humble/video/Container.h>
 #include <io/humble/video/Source.h>
 
@@ -126,5 +128,7 @@ import io.humble.ferry.IBuffer;
 %include <io/humble/video/ContainerFormat.swg>
 %include <io/humble/video/OutputFormat.swg>
 %include <io/humble/video/InputFormat.swg>
+%include <io/humble/video/IndexEntry.swg>
+%include <io/humble/video/Stream.swg>
 %include <io/humble/video/Container.swg>
 %include <io/humble/video/Source.swg>

@@ -78,10 +78,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = ErrorTester$(EXEEXT) PacketTester$(EXEEXT) \
-	KeyValueBagTester$(EXEEXT) SourceTester$(EXEEXT) \
-	InputFormatTester$(EXEEXT) OutputFormatTester$(EXEEXT) \
-	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
+check_PROGRAMS = IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
+	PacketTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
+	SourceTester$(EXEEXT) InputFormatTester$(EXEEXT) \
+	OutputFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
+	RationalTester$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mk/depcomp $(noinst_HEADERS) \
@@ -109,6 +110,12 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+am_IndexEntryTester_OBJECTS = IndexEntryTest.$(OBJEXT) Main.$(OBJEXT)
+nodist_IndexEntryTester_OBJECTS = IndexEntryTest_CXXRunner.$(OBJEXT)
+IndexEntryTester_OBJECTS = $(am_IndexEntryTester_OBJECTS) \
+	$(nodist_IndexEntryTester_OBJECTS)
+IndexEntryTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_InputFormatTester_OBJECTS = InputFormatTest.$(OBJEXT) \
 	Main.$(OBJEXT)
 nodist_InputFormatTester_OBJECTS =  \
@@ -192,6 +199,7 @@ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
+	$(IndexEntryTester_SOURCES) $(nodist_IndexEntryTester_SOURCES) \
 	$(InputFormatTester_SOURCES) \
 	$(nodist_InputFormatTester_SOURCES) \
 	$(KeyValueBagTester_SOURCES) \
@@ -202,10 +210,11 @@ SOURCES = $(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
 	$(nodist_PropertyTester_SOURCES) $(RationalTester_SOURCES) \
 	$(nodist_RationalTester_SOURCES) $(SourceTester_SOURCES) \
 	$(nodist_SourceTester_SOURCES)
-DIST_SOURCES = $(ErrorTester_SOURCES) $(InputFormatTester_SOURCES) \
-	$(KeyValueBagTester_SOURCES) $(OutputFormatTester_SOURCES) \
-	$(PacketTester_SOURCES) $(PropertyTester_SOURCES) \
-	$(RationalTester_SOURCES) $(SourceTester_SOURCES)
+DIST_SOURCES = $(ErrorTester_SOURCES) $(IndexEntryTester_SOURCES) \
+	$(InputFormatTester_SOURCES) $(KeyValueBagTester_SOURCES) \
+	$(OutputFormatTester_SOURCES) $(PacketTester_SOURCES) \
+	$(PropertyTester_SOURCES) $(RationalTester_SOURCES) \
+	$(SourceTester_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -659,6 +668,7 @@ VS_CPP_NAMESPACE = io::humble::video
 VS_TEST = 1
 SUBDIRS = customio
 BUILT_SOURCES = \
+  IndexEntryTest_CXXRunner.cpp \
   ErrorTest_CXXRunner.cpp \
   PacketTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
@@ -669,6 +679,7 @@ BUILT_SOURCES = \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  IndexEntryTest.h \
   ErrorTest.h \
   PacketTest.h \
   KeyValueBagTest.h \
@@ -684,6 +695,16 @@ inst_checkdir = $(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS = $(check_PROGRAMS)
+IndexEntryTester_SOURCES = \
+  IndexEntryTest.cpp \
+  Main.cpp
+
+nodist_IndexEntryTester_SOURCES = \
+  IndexEntryTest_CXXRunner.cpp
+
+IndexEntryTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 ErrorTester_SOURCES = \
   ErrorTest.cpp \
   Main.cpp
@@ -813,6 +834,10 @@ ErrorTester$(EXEEXT): $(ErrorTester_OBJECTS) $(ErrorTester_DEPENDENCIES) $(EXTRA
 	@rm -f ErrorTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(ErrorTester_OBJECTS) $(ErrorTester_LDADD) $(LIBS)
 
+IndexEntryTester$(EXEEXT): $(IndexEntryTester_OBJECTS) $(IndexEntryTester_DEPENDENCIES) $(EXTRA_IndexEntryTester_DEPENDENCIES) 
+	@rm -f IndexEntryTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(IndexEntryTester_OBJECTS) $(IndexEntryTester_LDADD) $(LIBS)
+
 InputFormatTester$(EXEEXT): $(InputFormatTester_OBJECTS) $(InputFormatTester_DEPENDENCIES) $(EXTRA_InputFormatTester_DEPENDENCIES) 
 	@rm -f InputFormatTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(InputFormatTester_OBJECTS) $(InputFormatTester_LDADD) $(LIBS)
@@ -849,6 +874,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntryTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntryTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InputFormatTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InputFormatTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagTest.Po@am__quote@
@@ -1132,6 +1159,13 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+IndexEntryTester.log: IndexEntryTester$(EXEEXT)
+	@p='IndexEntryTester$(EXEEXT)'; \
+	b='IndexEntryTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 ErrorTester.log: ErrorTester$(EXEEXT)
 	@p='ErrorTester$(EXEEXT)'; \
 	b='ErrorTester'; \

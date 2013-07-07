@@ -32,7 +32,6 @@
 #include <io/humble/video/Codec.h>
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/ContainerFormat.h>
-#include <io/humble/video/customio/URLProtocolHandler.h>
 
 namespace io
 {
@@ -41,19 +40,7 @@ namespace humble
 namespace video
 {
 
-class VS_API_HUMBLEVIDEO Stream : public ::io::humble::ferry::RefCounted
-{
-public:
-
-protected:
-  Stream()
-  {
-  }
-  virtual
-  ~Stream()
-  {
-  }
-};
+  class Stream;
 /**
  * A Container for Media data. This is an abstract class and
  * cannot be instantiated on its own.

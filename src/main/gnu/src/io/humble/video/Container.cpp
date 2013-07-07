@@ -25,6 +25,7 @@
 #include "Container.h"
 #include "PropertyImpl.h"
 #include <io/humble/ferry/Logger.h>
+#include <io/humble/video/customio/URLProtocolHandler.h>
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 

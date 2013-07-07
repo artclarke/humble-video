@@ -28,6 +28,7 @@
 
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/Source.h>
+#include <io/humble/video/customio/URLProtocolHandler.h>
 namespace io {
 namespace humble {
 namespace video {

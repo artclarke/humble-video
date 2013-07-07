@@ -20,12 +20,15 @@ libhumble_video_la_SOURCES= \
   Rational.cpp \
   RationalImpl.cpp \
   MediaData.cpp \
+  IndexEntry.cpp \
+  IndexEntryImpl.cpp \
   Error.cpp \
   ErrorImpl.cpp \
   Packet.cpp \
   PacketImpl.cpp \
   ContainerFormat.cpp \
   Configurable.cpp \
+  Stream.cpp \
   Container.cpp \
   Source.cpp \
   SourceImpl.cpp \
@@ -51,6 +54,9 @@ libhumble_video_la_HEADERS= \
   Rational.swg \
   MediaData.h \
   MediaData.swg \
+  IndexEntry.h \
+  IndexEntryImpl.h \
+  IndexEntry.swg \
   Error.h \
   ErrorImpl.h \
   Error.swg \
@@ -66,10 +72,13 @@ libhumble_video_la_HEADERS= \
   OutputFormat.swg \
   InputFormat.h \
   InputFormat.swg \
-  Container.h \
-  Container.swg \
   Configurable.h \
   Configurable.swg \
+  Source.h \
+  Source.swg \
+  SourceImpl.h \
+  Container.h \
+  Container.swg \
   Source.h \
   Source.swg \
   SourceImpl.h \
