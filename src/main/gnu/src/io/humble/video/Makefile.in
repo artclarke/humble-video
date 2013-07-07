@@ -102,7 +102,7 @@ am_libhumble_video_la_OBJECTS = PixelFormat.lo KeyValueBag.lo \
 	RationalImpl.lo MediaData.lo IndexEntry.lo IndexEntryImpl.lo \
 	Error.lo ErrorImpl.lo Packet.lo PacketImpl.lo \
 	ContainerFormat.lo Configurable.lo Stream.lo Container.lo \
-	Source.lo SourceImpl.lo OutputFormat.lo InputFormat.lo \
+	Source.lo SourceImpl.lo SinkFormat.lo SourceFormat.lo \
 	Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
@@ -448,8 +448,8 @@ libhumble_video_la_SOURCES = \
   Container.cpp \
   Source.cpp \
   SourceImpl.cpp \
-  OutputFormat.cpp \
-  InputFormat.cpp \
+  SinkFormat.cpp \
+  SourceFormat.cpp \
   Global.cpp
 
 nodist_libhumble_video_la_SOURCES = \
@@ -484,10 +484,10 @@ libhumble_video_la_HEADERS = \
   Property.swg \
   ContainerFormat.h \
   ContainerFormat.swg \
-  OutputFormat.h \
-  OutputFormat.swg \
-  InputFormat.h \
-  InputFormat.swg \
+  SinkFormat.h \
+  SinkFormat.swg \
+  SourceFormat.h \
+  SourceFormat.swg \
   Configurable.h \
   Configurable.swg \
   Source.h \
@@ -568,11 +568,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HumbleVideo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntry.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntryImpl.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InputFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBag.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaData.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OutputFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Packet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PacketImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PixelFormat.Plo@am__quote@
@@ -580,7 +578,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Rational.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RationalImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SinkFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Source.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Stream.Plo@am__quote@
 

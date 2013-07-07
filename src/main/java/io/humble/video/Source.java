@@ -139,9 +139,9 @@ public class Source extends Container {
  *  
  * or null if unknown.  
  */
-  public InputFormat getInputFormat() {
-    long cPtr = VideoJNI.Source_getInputFormat(swigCPtr, this);
-    return (cPtr == 0) ? null : new InputFormat(cPtr, false);
+  public SourceFormat getSourceFormat() {
+    long cPtr = VideoJNI.Source_getSourceFormat(swigCPtr, this);
+    return (cPtr == 0) ? null : new SourceFormat(cPtr, false);
   }
 
 /**
@@ -216,8 +216,8 @@ public class Source extends Container {
  * {@link Source}.  
  * @return	>= 0 on success; < 0 on error.  
  */
-  public int open(String url, InputFormat format, boolean streamsCanBeAddedDynamically, boolean queryStreamMetaData, KeyValueBag options, KeyValueBag optionsNotSet) {
-    return VideoJNI.Source_open(swigCPtr, this, url, InputFormat.getCPtr(format), format, streamsCanBeAddedDynamically, queryStreamMetaData, KeyValueBag.getCPtr(options), options, KeyValueBag.getCPtr(optionsNotSet), optionsNotSet);
+  public int open(String url, SourceFormat format, boolean streamsCanBeAddedDynamically, boolean queryStreamMetaData, KeyValueBag options, KeyValueBag optionsNotSet) {
+    return VideoJNI.Source_open(swigCPtr, this, url, SourceFormat.getCPtr(format), format, streamsCanBeAddedDynamically, queryStreamMetaData, KeyValueBag.getCPtr(options), options, KeyValueBag.getCPtr(optionsNotSet), optionsNotSet);
   }
 
 /**

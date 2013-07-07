@@ -8,7 +8,7 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
-public class OutputFormat extends ContainerFormat {
+public class SinkFormat extends ContainerFormat {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -26,18 +26,18 @@ public class OutputFormat extends ContainerFormat {
   /**
    * Internal Only.
    */
-  protected OutputFormat(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGOutputFormatUpcast(cPtr), cMemoryOwn);
+  protected SinkFormat(long cPtr, boolean cMemoryOwn) {
+    super(VideoJNI.SWIGSinkFormatUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
   /**
    * Internal Only.
    */
-  protected OutputFormat(long cPtr, boolean cMemoryOwn,
+  protected SinkFormat(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGOutputFormatUpcast(cPtr),
+    super(VideoJNI.SWIGSinkFormatUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -50,7 +50,7 @@ public class OutputFormat extends ContainerFormat {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(OutputFormat obj) {
+  protected static long getCPtr(SinkFormat obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -68,17 +68,17 @@ public class OutputFormat extends ContainerFormat {
   }
   
   /**
-   * Create a new OutputFormat object that is actually referring to the
+   * Create a new SinkFormat object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
    */
   @Override
-  public OutputFormat copyReference() {
+  public SinkFormat copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new OutputFormat(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new SinkFormat(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -91,8 +91,8 @@ public class OutputFormat extends ContainerFormat {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof OutputFormat)
-      equal = (((OutputFormat)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof SinkFormat)
+      equal = (((SinkFormat)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -127,15 +127,15 @@ public class OutputFormat extends ContainerFormat {
    * Return a collection of all output formats installed on this system.
    * @return the list.
    */
-  public static java.util.Collection<OutputFormat>
+  public static java.util.Collection<SinkFormat>
   getFormats()
   {
-    java.util.Collection<OutputFormat> retval =
-      new java.util.HashSet<OutputFormat>();
+    java.util.Collection<SinkFormat> retval =
+      new java.util.HashSet<SinkFormat>();
     int count = getNumFormats();
     for(int i = 0; i< count;++i)
     {
-      OutputFormat fmt = getFormat(i);
+      SinkFormat fmt = getFormat(i);
       if (fmt != null)
         retval.add(fmt);
     }
@@ -147,7 +147,7 @@ public class OutputFormat extends ContainerFormat {
  * Name for format.  
  */
   public String getName() {
-    return VideoJNI.OutputFormat_getName(swigCPtr, this);
+    return VideoJNI.SinkFormat_getName(swigCPtr, this);
   }
 
 /**
@@ -156,14 +156,14 @@ public class OutputFormat extends ContainerFormat {
  * than name.  
  */
   public String getLongName() {
-    return VideoJNI.OutputFormat_getLongName(swigCPtr, this);
+    return VideoJNI.SinkFormat_getLongName(swigCPtr, this);
   }
 
 /**
  * A comma-separated list of supported filename extensions  
  */
   public String getExtensions() {
-    return VideoJNI.OutputFormat_getExtensions(swigCPtr, this);
+    return VideoJNI.SinkFormat_getExtensions(swigCPtr, this);
   }
 
 /**
@@ -171,35 +171,35 @@ public class OutputFormat extends ContainerFormat {
  * @return	a bitmask of {@link Flags}  
  */
   public int getFlags() {
-    return VideoJNI.OutputFormat_getFlags(swigCPtr, this);
+    return VideoJNI.SinkFormat_getFlags(swigCPtr, this);
   }
 
 /**
  * Get the default audio codec for this format.  
  */
   public Codec.ID getDefaultAudioCodecId() {
-    return Codec.ID.swigToEnum(VideoJNI.OutputFormat_getDefaultAudioCodecId(swigCPtr, this));
+    return Codec.ID.swigToEnum(VideoJNI.SinkFormat_getDefaultAudioCodecId(swigCPtr, this));
   }
 
 /**
  * Get the default video codec for this format.  
  */
   public Codec.ID getDefaultVideoCodecId() {
-    return Codec.ID.swigToEnum(VideoJNI.OutputFormat_getDefaultVideoCodecId(swigCPtr, this));
+    return Codec.ID.swigToEnum(VideoJNI.SinkFormat_getDefaultVideoCodecId(swigCPtr, this));
   }
 
 /**
  * Get the default subtitle coded for this format.  
  */
   public Codec.ID getDefaultSubtitleCodecId() {
-    return Codec.ID.swigToEnum(VideoJNI.OutputFormat_getDefaultSubtitleCodecId(swigCPtr, this));
+    return Codec.ID.swigToEnum(VideoJNI.SinkFormat_getDefaultSubtitleCodecId(swigCPtr, this));
   }
 
 /**
  * Get the mime type for this format.  
  */
   public String getMimeType() {
-    return VideoJNI.OutputFormat_getMimeType(swigCPtr, this);
+    return VideoJNI.SinkFormat_getMimeType(swigCPtr, this);
   }
 
 /**
@@ -217,20 +217,20 @@ public class OutputFormat extends ContainerFormat {
  *		  
  * MIME type of the registered formats  
  */
-  public static OutputFormat guessFormat(String shortName, String filename, String mimeType) {
-    long cPtr = VideoJNI.OutputFormat_guessFormat(shortName, filename, mimeType);
-    return (cPtr == 0) ? null : new OutputFormat(cPtr, false);
+  public static SinkFormat guessFormat(String shortName, String filename, String mimeType) {
+    long cPtr = VideoJNI.SinkFormat_guessFormat(shortName, filename, mimeType);
+    return (cPtr == 0) ? null : new SinkFormat(cPtr, false);
   }
 
   public Codec.ID guessCodec(String shortName, String filename, String mimeType, MediaDescriptor.Type type) {
-    return Codec.ID.swigToEnum(VideoJNI.OutputFormat_guessCodec(swigCPtr, this, shortName, filename, mimeType, type.swigValue()));
+    return Codec.ID.swigToEnum(VideoJNI.SinkFormat_guessCodec(swigCPtr, this, shortName, filename, mimeType, type.swigValue()));
   }
 
 /**
  *  
  */
   protected int getNumSupportedCodecs() {
-    return VideoJNI.OutputFormat_getNumSupportedCodecs(swigCPtr, this);
+    return VideoJNI.SinkFormat_getNumSupportedCodecs(swigCPtr, this);
   }
 
 /**
@@ -242,7 +242,7 @@ public class OutputFormat extends ContainerFormat {
  *		 if none.  
  */
   protected Codec.ID getSupportedCodecId(int n) {
-    return Codec.ID.swigToEnum(VideoJNI.OutputFormat_getSupportedCodecId(swigCPtr, this, n));
+    return Codec.ID.swigToEnum(VideoJNI.SinkFormat_getSupportedCodecId(swigCPtr, this, n));
   }
 
 /**
@@ -254,7 +254,7 @@ public class OutputFormat extends ContainerFormat {
  * @return	the codec tag at the n'th slot, or 0 if none.  
  */
   protected long getSupportedCodecTag(int n) {
-    return VideoJNI.OutputFormat_getSupportedCodecTag(swigCPtr, this, n);
+    return VideoJNI.SinkFormat_getSupportedCodecTag(swigCPtr, this, n);
   }
 
 /**
@@ -264,7 +264,7 @@ public class OutputFormat extends ContainerFormat {
  * @return	the number of formats  
  */
   public static int getNumFormats() {
-    return VideoJNI.OutputFormat_getNumFormats();
+    return VideoJNI.SinkFormat_getNumFormats();
   }
 
 /**
@@ -274,9 +274,9 @@ public class OutputFormat extends ContainerFormat {
  * unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()} 
  *  
  */
-  public static OutputFormat getFormat(int index) {
-    long cPtr = VideoJNI.OutputFormat_getFormat(index);
-    return (cPtr == 0) ? null : new OutputFormat(cPtr, false);
+  public static SinkFormat getFormat(int index) {
+    long cPtr = VideoJNI.SinkFormat_getFormat(index);
+    return (cPtr == 0) ? null : new SinkFormat(cPtr, false);
   }
 
 }

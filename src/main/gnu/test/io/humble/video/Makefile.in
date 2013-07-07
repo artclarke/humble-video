@@ -80,8 +80,8 @@ build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
 	PacketTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
-	SourceTester$(EXEEXT) InputFormatTester$(EXEEXT) \
-	OutputFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
+	SourceTester$(EXEEXT) SourceFormatTester$(EXEEXT) \
+	SinkFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
 	RationalTester$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -116,14 +116,6 @@ IndexEntryTester_OBJECTS = $(am_IndexEntryTester_OBJECTS) \
 	$(nodist_IndexEntryTester_OBJECTS)
 IndexEntryTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_InputFormatTester_OBJECTS = InputFormatTest.$(OBJEXT) \
-	Main.$(OBJEXT)
-nodist_InputFormatTester_OBJECTS =  \
-	InputFormatTest_CXXRunner.$(OBJEXT)
-InputFormatTester_OBJECTS = $(am_InputFormatTester_OBJECTS) \
-	$(nodist_InputFormatTester_OBJECTS)
-InputFormatTester_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_KeyValueBagTester_OBJECTS = KeyValueBagTest.$(OBJEXT) \
 	Main.$(OBJEXT)
 nodist_KeyValueBagTester_OBJECTS =  \
@@ -131,14 +123,6 @@ nodist_KeyValueBagTester_OBJECTS =  \
 KeyValueBagTester_OBJECTS = $(am_KeyValueBagTester_OBJECTS) \
 	$(nodist_KeyValueBagTester_OBJECTS)
 KeyValueBagTester_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_OutputFormatTester_OBJECTS = OutputFormatTest.$(OBJEXT) \
-	Main.$(OBJEXT)
-nodist_OutputFormatTester_OBJECTS =  \
-	OutputFormatTest_CXXRunner.$(OBJEXT)
-OutputFormatTester_OBJECTS = $(am_OutputFormatTester_OBJECTS) \
-	$(nodist_OutputFormatTester_OBJECTS)
-OutputFormatTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_PacketTester_OBJECTS = PacketTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_PacketTester_OBJECTS = PacketTest_CXXRunner.$(OBJEXT)
@@ -157,6 +141,20 @@ nodist_RationalTester_OBJECTS = RationalTest_CXXRunner.$(OBJEXT)
 RationalTester_OBJECTS = $(am_RationalTester_OBJECTS) \
 	$(nodist_RationalTester_OBJECTS)
 RationalTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_SinkFormatTester_OBJECTS = SinkFormatTest.$(OBJEXT) Main.$(OBJEXT)
+nodist_SinkFormatTester_OBJECTS = SinkFormatTest_CXXRunner.$(OBJEXT)
+SinkFormatTester_OBJECTS = $(am_SinkFormatTester_OBJECTS) \
+	$(nodist_SinkFormatTester_OBJECTS)
+SinkFormatTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_SourceFormatTester_OBJECTS = SourceFormatTest.$(OBJEXT) \
+	Main.$(OBJEXT)
+nodist_SourceFormatTester_OBJECTS =  \
+	SourceFormatTest_CXXRunner.$(OBJEXT)
+SourceFormatTester_OBJECTS = $(am_SourceFormatTester_OBJECTS) \
+	$(nodist_SourceFormatTester_OBJECTS)
+SourceFormatTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_SourceTester_OBJECTS = SourceTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_SourceTester_OBJECTS = SourceTest_CXXRunner.$(OBJEXT)
@@ -200,20 +198,19 @@ am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(nodist_IndexEntryTester_SOURCES) \
-	$(InputFormatTester_SOURCES) \
-	$(nodist_InputFormatTester_SOURCES) \
 	$(KeyValueBagTester_SOURCES) \
-	$(nodist_KeyValueBagTester_SOURCES) \
-	$(OutputFormatTester_SOURCES) \
-	$(nodist_OutputFormatTester_SOURCES) $(PacketTester_SOURCES) \
+	$(nodist_KeyValueBagTester_SOURCES) $(PacketTester_SOURCES) \
 	$(nodist_PacketTester_SOURCES) $(PropertyTester_SOURCES) \
 	$(nodist_PropertyTester_SOURCES) $(RationalTester_SOURCES) \
-	$(nodist_RationalTester_SOURCES) $(SourceTester_SOURCES) \
+	$(nodist_RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
+	$(nodist_SinkFormatTester_SOURCES) \
+	$(SourceFormatTester_SOURCES) \
+	$(nodist_SourceFormatTester_SOURCES) $(SourceTester_SOURCES) \
 	$(nodist_SourceTester_SOURCES)
 DIST_SOURCES = $(ErrorTester_SOURCES) $(IndexEntryTester_SOURCES) \
-	$(InputFormatTester_SOURCES) $(KeyValueBagTester_SOURCES) \
-	$(OutputFormatTester_SOURCES) $(PacketTester_SOURCES) \
+	$(KeyValueBagTester_SOURCES) $(PacketTester_SOURCES) \
 	$(PropertyTester_SOURCES) $(RationalTester_SOURCES) \
+	$(SinkFormatTester_SOURCES) $(SourceFormatTester_SOURCES) \
 	$(SourceTester_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
@@ -673,8 +670,8 @@ BUILT_SOURCES = \
   PacketTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
   SourceTest_CXXRunner.cpp \
-  InputFormatTest_CXXRunner.cpp \
-  OutputFormatTest_CXXRunner.cpp \
+  SourceFormatTest_CXXRunner.cpp \
+  SinkFormatTest_CXXRunner.cpp \
   PropertyTest_CXXRunner.cpp \
   RationalTest_CXXRunner.cpp
 
@@ -684,8 +681,8 @@ noinst_HEADERS = \
   PacketTest.h \
   KeyValueBagTest.h \
   SourceTest.h \
-  InputFormatTest.h \
-  OutputFormatTest.h \
+  SourceFormatTest.h \
+  SinkFormatTest.h \
   PropertyTest.h \
   RationalTest.h
 
@@ -745,24 +742,24 @@ nodist_SourceTester_SOURCES = \
 SourceTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-InputFormatTester_SOURCES = \
-  InputFormatTest.cpp \
+SourceFormatTester_SOURCES = \
+  SourceFormatTest.cpp \
   Main.cpp
 
-nodist_InputFormatTester_SOURCES = \
-  InputFormatTest_CXXRunner.cpp
+nodist_SourceFormatTester_SOURCES = \
+  SourceFormatTest_CXXRunner.cpp
 
-InputFormatTester_LDADD = \
+SourceFormatTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-OutputFormatTester_SOURCES = \
-  OutputFormatTest.cpp \
+SinkFormatTester_SOURCES = \
+  SinkFormatTest.cpp \
   Main.cpp
 
-nodist_OutputFormatTester_SOURCES = \
-  OutputFormatTest_CXXRunner.cpp
+nodist_SinkFormatTester_SOURCES = \
+  SinkFormatTest_CXXRunner.cpp
 
-OutputFormatTester_LDADD = \
+SinkFormatTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 PropertyTester_SOURCES = \
@@ -838,17 +835,9 @@ IndexEntryTester$(EXEEXT): $(IndexEntryTester_OBJECTS) $(IndexEntryTester_DEPEND
 	@rm -f IndexEntryTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(IndexEntryTester_OBJECTS) $(IndexEntryTester_LDADD) $(LIBS)
 
-InputFormatTester$(EXEEXT): $(InputFormatTester_OBJECTS) $(InputFormatTester_DEPENDENCIES) $(EXTRA_InputFormatTester_DEPENDENCIES) 
-	@rm -f InputFormatTester$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(InputFormatTester_OBJECTS) $(InputFormatTester_LDADD) $(LIBS)
-
 KeyValueBagTester$(EXEEXT): $(KeyValueBagTester_OBJECTS) $(KeyValueBagTester_DEPENDENCIES) $(EXTRA_KeyValueBagTester_DEPENDENCIES) 
 	@rm -f KeyValueBagTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(KeyValueBagTester_OBJECTS) $(KeyValueBagTester_LDADD) $(LIBS)
-
-OutputFormatTester$(EXEEXT): $(OutputFormatTester_OBJECTS) $(OutputFormatTester_DEPENDENCIES) $(EXTRA_OutputFormatTester_DEPENDENCIES) 
-	@rm -f OutputFormatTester$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(OutputFormatTester_OBJECTS) $(OutputFormatTester_LDADD) $(LIBS)
 
 PacketTester$(EXEEXT): $(PacketTester_OBJECTS) $(PacketTester_DEPENDENCIES) $(EXTRA_PacketTester_DEPENDENCIES) 
 	@rm -f PacketTester$(EXEEXT)
@@ -861,6 +850,14 @@ PropertyTester$(EXEEXT): $(PropertyTester_OBJECTS) $(PropertyTester_DEPENDENCIES
 RationalTester$(EXEEXT): $(RationalTester_OBJECTS) $(RationalTester_DEPENDENCIES) $(EXTRA_RationalTester_DEPENDENCIES) 
 	@rm -f RationalTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(RationalTester_OBJECTS) $(RationalTester_LDADD) $(LIBS)
+
+SinkFormatTester$(EXEEXT): $(SinkFormatTester_OBJECTS) $(SinkFormatTester_DEPENDENCIES) $(EXTRA_SinkFormatTester_DEPENDENCIES) 
+	@rm -f SinkFormatTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(SinkFormatTester_OBJECTS) $(SinkFormatTester_LDADD) $(LIBS)
+
+SourceFormatTester$(EXEEXT): $(SourceFormatTester_OBJECTS) $(SourceFormatTester_DEPENDENCIES) $(EXTRA_SourceFormatTester_DEPENDENCIES) 
+	@rm -f SourceFormatTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(SourceFormatTester_OBJECTS) $(SourceFormatTester_LDADD) $(LIBS)
 
 SourceTester$(EXEEXT): $(SourceTester_OBJECTS) $(SourceTester_DEPENDENCIES) $(EXTRA_SourceTester_DEPENDENCIES) 
 	@rm -f SourceTester$(EXEEXT)
@@ -876,19 +873,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntryTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntryTest_CXXRunner.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InputFormatTest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InputFormatTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OutputFormatTest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OutputFormatTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PacketTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PacketTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RationalTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RationalTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SinkFormatTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SinkFormatTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceFormatTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceFormatTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest_CXXRunner.Po@am__quote@
 
@@ -1194,16 +1191,16 @@ SourceTester.log: SourceTester$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-InputFormatTester.log: InputFormatTester$(EXEEXT)
-	@p='InputFormatTester$(EXEEXT)'; \
-	b='InputFormatTester'; \
+SourceFormatTester.log: SourceFormatTester$(EXEEXT)
+	@p='SourceFormatTester$(EXEEXT)'; \
+	b='SourceFormatTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-OutputFormatTester.log: OutputFormatTester$(EXEEXT)
-	@p='OutputFormatTester$(EXEEXT)'; \
-	b='OutputFormatTester'; \
+SinkFormatTester.log: SinkFormatTester$(EXEEXT)
+	@p='SinkFormatTester$(EXEEXT)'; \
+	b='SinkFormatTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

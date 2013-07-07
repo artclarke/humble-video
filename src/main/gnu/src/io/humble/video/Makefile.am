@@ -32,8 +32,8 @@ libhumble_video_la_SOURCES= \
   Container.cpp \
   Source.cpp \
   SourceImpl.cpp \
-  OutputFormat.cpp \
-  InputFormat.cpp \
+  SinkFormat.cpp \
+  SourceFormat.cpp \
   Global.cpp
   
 nodist_libhumble_video_la_SOURCES= \
@@ -68,10 +68,10 @@ libhumble_video_la_HEADERS= \
   Property.swg \
   ContainerFormat.h \
   ContainerFormat.swg \
-  OutputFormat.h \
-  OutputFormat.swg \
-  InputFormat.h \
-  InputFormat.swg \
+  SinkFormat.h \
+  SinkFormat.swg \
+  SourceFormat.h \
+  SourceFormat.swg \
   Configurable.h \
   Configurable.swg \
   Source.h \

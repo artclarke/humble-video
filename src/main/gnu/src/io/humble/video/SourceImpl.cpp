@@ -85,7 +85,7 @@ SourceImpl::make() {
 }
 
 int32_t
-SourceImpl::open(const char *url, InputFormat* format,
+SourceImpl::open(const char *url, SourceFormat* format,
     bool streamsCanBeAddedDynamically, bool queryMetaData,
     KeyValueBag* options, KeyValueBag* optionsNotSet)
 {
@@ -156,7 +156,7 @@ SourceImpl::open(const char *url, InputFormat* format,
     mState = Container::STATE_OPENED;
 
     if (oldFormat != ctx->iformat)
-      mFormat = InputFormat::make(ctx->iformat);
+      mFormat = SourceFormat::make(ctx->iformat);
 
     if (streamsCanBeAddedDynamically)
       ctx->ctx_flags |= AVFMTCTX_NOHEADER;

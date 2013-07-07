@@ -220,8 +220,8 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <io/humble/video/Global.h>
 #include <io/humble/video/Codec.h>
 #include <io/humble/video/ContainerFormat.h>
-#include <io/humble/video/OutputFormat.h>
-#include <io/humble/video/InputFormat.h>
+#include <io/humble/video/SinkFormat.h>
+#include <io/humble/video/SourceFormat.h>
 #include <io/humble/video/IndexEntry.h>
 #include <io/humble/video/Stream.h>
 #include <io/humble/video/Container.h>
@@ -12516,15 +12516,15 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_delete_1ContainerFormat(JN
 }
 
 
-SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   char *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -12593,15 +12593,15 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getName(J
 }
 
 
-SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getLongName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getLongName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   char *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -12670,15 +12670,15 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getLongNa
 }
 
 
-SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getExtensions(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getExtensions(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   char *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -12747,15 +12747,15 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getExtens
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getFlags(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getFlags(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -12824,15 +12824,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getFlags(JNI
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultAudioCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getDefaultAudioCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -12901,15 +12901,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultAu
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultVideoCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getDefaultVideoCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -12978,15 +12978,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultVi
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultSubtitleCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getDefaultSubtitleCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -13055,15 +13055,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getDefaultSu
 }
 
 
-SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getMimeType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getMimeType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   char *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -13132,12 +13132,12 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getMimeTy
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1guessFormat(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jstring jarg3) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1guessFormat(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jstring jarg3) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
-  io::humble::video::OutputFormat *result = 0 ;
+  io::humble::video::SinkFormat *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -13161,7 +13161,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1guessFormat
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::OutputFormat *)io::humble::video::OutputFormat::guessFormat((char const *)arg1,(char const *)arg2,(char const *)arg3);
+      result = (io::humble::video::SinkFormat *)io::humble::video::SinkFormat::guessFormat((char const *)arg1,(char const *)arg2,(char const *)arg3);
     }
     catch(std::invalid_argument & e)
     {
@@ -13212,7 +13212,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1guessFormat
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::video::OutputFormat **)&jresult = result; 
+  *(io::humble::video::SinkFormat **)&jresult = result; 
   if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
   if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
   if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
@@ -13220,9 +13220,9 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1guessFormat
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1guessCodec(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jint jarg5) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1guessCodec(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jint jarg5) {
   jint jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
   char *arg4 = (char *) 0 ;
@@ -13232,7 +13232,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1guessCodec(J
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   arg2 = 0;
   if (jarg2) {
     arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
@@ -13320,15 +13320,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1guessCodec(J
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getNumSupportedCodecs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getNumSupportedCodecs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -13397,16 +13397,16 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getNumSuppor
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getSupportedCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getSupportedCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jint jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   int32_t arg2 ;
   io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   arg2 = (int32_t)jarg2; 
   
   if (!arg1) {
@@ -13476,16 +13476,16 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getSupported
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getSupportedCodecTag(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getSupportedCodecTag(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
-  io::humble::video::OutputFormat *arg1 = (io::humble::video::OutputFormat *) 0 ;
+  io::humble::video::SinkFormat *arg1 = (io::humble::video::SinkFormat *) 0 ;
   int32_t arg2 ;
   uint32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::OutputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SinkFormat **)&jarg1; 
   arg2 = (int32_t)jarg2; 
   
   if (!arg1) {
@@ -13555,7 +13555,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getSupporte
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getNumFormats(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getNumFormats(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int32_t result;
   
@@ -13566,7 +13566,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getNumFormat
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)io::humble::video::OutputFormat::getNumFormats();
+      result = (int32_t)io::humble::video::SinkFormat::getNumFormats();
     }
     catch(std::invalid_argument & e)
     {
@@ -13622,10 +13622,10 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getNumFormat
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getFormat(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getFormat(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   int32_t arg1 ;
-  io::humble::video::OutputFormat *result = 0 ;
+  io::humble::video::SinkFormat *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -13635,7 +13635,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getFormat(J
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::OutputFormat *)io::humble::video::OutputFormat::getFormat(arg1);
+      result = (io::humble::video::SinkFormat *)io::humble::video::SinkFormat::getFormat(arg1);
     }
     catch(std::invalid_argument & e)
     {
@@ -13686,20 +13686,20 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_OutputFormat_1getFormat(J
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::video::OutputFormat **)&jresult = result; 
+  *(io::humble::video::SinkFormat **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
-  io::humble::video::InputFormat *arg1 = (io::humble::video::InputFormat *) 0 ;
+  io::humble::video::SourceFormat *arg1 = (io::humble::video::SourceFormat *) 0 ;
   char *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::InputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SourceFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -13768,15 +13768,15 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getName(JN
 }
 
 
-SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getLongName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getLongName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
-  io::humble::video::InputFormat *arg1 = (io::humble::video::InputFormat *) 0 ;
+  io::humble::video::SourceFormat *arg1 = (io::humble::video::SourceFormat *) 0 ;
   char *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::InputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SourceFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -13845,15 +13845,15 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getLongNam
 }
 
 
-SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getExtensions(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getExtensions(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
-  io::humble::video::InputFormat *arg1 = (io::humble::video::InputFormat *) 0 ;
+  io::humble::video::SourceFormat *arg1 = (io::humble::video::SourceFormat *) 0 ;
   char *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::InputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SourceFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -13922,15 +13922,15 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getExtensi
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getFlags(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getFlags(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::InputFormat *arg1 = (io::humble::video::InputFormat *) 0 ;
+  io::humble::video::SourceFormat *arg1 = (io::humble::video::SourceFormat *) 0 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::InputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SourceFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -13999,15 +13999,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getFlags(JNIE
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getNumSupportedCodecs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getNumSupportedCodecs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::video::InputFormat *arg1 = (io::humble::video::InputFormat *) 0 ;
+  io::humble::video::SourceFormat *arg1 = (io::humble::video::SourceFormat *) 0 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::InputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SourceFormat **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -14076,16 +14076,16 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getNumSupport
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getSupportedCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getSupportedCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jint jresult = 0 ;
-  io::humble::video::InputFormat *arg1 = (io::humble::video::InputFormat *) 0 ;
+  io::humble::video::SourceFormat *arg1 = (io::humble::video::SourceFormat *) 0 ;
   int32_t arg2 ;
   io::humble::video::Codec::ID result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::InputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SourceFormat **)&jarg1; 
   arg2 = (int32_t)jarg2; 
   
   if (!arg1) {
@@ -14155,16 +14155,16 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getSupportedC
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getSupportedCodecTag(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getSupportedCodecTag(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
-  io::humble::video::InputFormat *arg1 = (io::humble::video::InputFormat *) 0 ;
+  io::humble::video::SourceFormat *arg1 = (io::humble::video::SourceFormat *) 0 ;
   int32_t arg2 ;
   uint32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::InputFormat **)&jarg1; 
+  arg1 = *(io::humble::video::SourceFormat **)&jarg1; 
   arg2 = (int32_t)jarg2; 
   
   if (!arg1) {
@@ -14234,10 +14234,10 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getSupported
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_InputFormat_1findFormat(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1findFormat(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
-  io::humble::video::InputFormat *result = 0 ;
+  io::humble::video::SourceFormat *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -14251,7 +14251,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_InputFormat_1findFormat(J
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::InputFormat *)io::humble::video::InputFormat::findFormat((char const *)arg1);
+      result = (io::humble::video::SourceFormat *)io::humble::video::SourceFormat::findFormat((char const *)arg1);
     }
     catch(std::invalid_argument & e)
     {
@@ -14302,13 +14302,13 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_InputFormat_1findFormat(J
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::video::InputFormat **)&jresult = result; 
+  *(io::humble::video::SourceFormat **)&jresult = result; 
   if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getNumFormats(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getNumFormats(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int32_t result;
   
@@ -14319,7 +14319,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getNumFormats
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)io::humble::video::InputFormat::getNumFormats();
+      result = (int32_t)io::humble::video::SourceFormat::getNumFormats();
     }
     catch(std::invalid_argument & e)
     {
@@ -14375,10 +14375,10 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getNumFormats
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getFormat(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getFormat(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   int32_t arg1 ;
-  io::humble::video::InputFormat *result = 0 ;
+  io::humble::video::SourceFormat *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -14388,7 +14388,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getFormat(JN
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::InputFormat *)io::humble::video::InputFormat::getFormat(arg1);
+      result = (io::humble::video::SourceFormat *)io::humble::video::SourceFormat::getFormat(arg1);
     }
     catch(std::invalid_argument & e)
     {
@@ -14439,7 +14439,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_InputFormat_1getFormat(JN
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::video::InputFormat **)&jresult = result; 
+  *(io::humble::video::SourceFormat **)&jresult = result; 
   return jresult;
 }
 
@@ -17124,10 +17124,10 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1getState(JNIEnv *j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getInputFormat(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getSourceFormat(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   io::humble::video::Source *arg1 = (io::humble::video::Source *) 0 ;
-  io::humble::video::InputFormat *result = 0 ;
+  io::humble::video::SourceFormat *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -17145,7 +17145,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getInputFormat(JN
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::InputFormat *)(arg1)->getInputFormat();
+      result = (io::humble::video::SourceFormat *)(arg1)->getSourceFormat();
     }
     catch(std::invalid_argument & e)
     {
@@ -17196,7 +17196,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getInputFormat(JN
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::video::InputFormat **)&jresult = result; 
+  *(io::humble::video::SourceFormat **)&jresult = result; 
   return jresult;
 }
 
@@ -17361,7 +17361,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1open(JNIEnv *jenv,
   jint jresult = 0 ;
   io::humble::video::Source *arg1 = (io::humble::video::Source *) 0 ;
   char *arg2 = (char *) 0 ;
-  io::humble::video::InputFormat *arg3 = (io::humble::video::InputFormat *) 0 ;
+  io::humble::video::SourceFormat *arg3 = (io::humble::video::SourceFormat *) 0 ;
   bool arg4 ;
   bool arg5 ;
   io::humble::video::KeyValueBag *arg6 = (io::humble::video::KeyValueBag *) 0 ;
@@ -17380,7 +17380,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1open(JNIEnv *jenv,
     arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
     if (!arg2) return 0;
   }
-  arg3 = *(io::humble::video::InputFormat **)&jarg3; 
+  arg3 = *(io::humble::video::SourceFormat **)&jarg3; 
   arg4 = jarg4 ? true : false; 
   arg5 = jarg5 ? true : false; 
   arg6 = *(io::humble::video::KeyValueBag **)&jarg6; 
@@ -19574,19 +19574,19 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGContainerFormatUpcast
     return baseptr;
 }
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGOutputFormatUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGSinkFormatUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
-    *(io::humble::video::ContainerFormat **)&baseptr = *(io::humble::video::OutputFormat **)&jarg1;
+    *(io::humble::video::ContainerFormat **)&baseptr = *(io::humble::video::SinkFormat **)&jarg1;
     return baseptr;
 }
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGInputFormatUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGSourceFormatUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
-    *(io::humble::video::ContainerFormat **)&baseptr = *(io::humble::video::InputFormat **)&jarg1;
+    *(io::humble::video::ContainerFormat **)&baseptr = *(io::humble::video::SourceFormat **)&jarg1;
     return baseptr;
 }
 

@@ -12,8 +12,8 @@ check_PROGRAMS=\
   PacketTester \
   KeyValueBagTester \
   SourceTester \
-  InputFormatTester \
-  OutputFormatTester \
+  SourceFormatTester \
+  SinkFormatTester \
   PropertyTester \
   RationalTester 
 
@@ -23,8 +23,8 @@ BUILT_SOURCES= \
   PacketTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
   SourceTest_CXXRunner.cpp \
-  InputFormatTest_CXXRunner.cpp \
-  OutputFormatTest_CXXRunner.cpp \
+  SourceFormatTest_CXXRunner.cpp \
+  SinkFormatTest_CXXRunner.cpp \
   PropertyTest_CXXRunner.cpp \
   RationalTest_CXXRunner.cpp
 
@@ -34,8 +34,8 @@ noinst_HEADERS = \
   PacketTest.h \
   KeyValueBagTest.h \
   SourceTest.h \
-  InputFormatTest.h \
-  OutputFormatTest.h \
+  SourceFormatTest.h \
+  SinkFormatTest.h \
   PropertyTest.h \
   RationalTest.h
 
@@ -97,24 +97,24 @@ nodist_SourceTester_SOURCES= \
 SourceTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-InputFormatTester_SOURCES= \
-  InputFormatTest.cpp \
+SourceFormatTester_SOURCES= \
+  SourceFormatTest.cpp \
   Main.cpp
 
-nodist_InputFormatTester_SOURCES= \
-  InputFormatTest_CXXRunner.cpp
+nodist_SourceFormatTester_SOURCES= \
+  SourceFormatTest_CXXRunner.cpp
 
-InputFormatTester_LDADD= \
+SourceFormatTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
   
-OutputFormatTester_SOURCES= \
-  OutputFormatTest.cpp \
+SinkFormatTester_SOURCES= \
+  SinkFormatTest.cpp \
   Main.cpp
 
-nodist_OutputFormatTester_SOURCES= \
-  OutputFormatTest_CXXRunner.cpp
+nodist_SinkFormatTester_SOURCES= \
+  SinkFormatTest_CXXRunner.cpp
 
-OutputFormatTester_LDADD= \
+SinkFormatTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 

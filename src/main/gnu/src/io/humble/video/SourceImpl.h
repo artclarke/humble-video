@@ -41,8 +41,8 @@ public:
   virtual State
   getState() { return mState; }
 
-  virtual InputFormat *
-  getInputFormat() { return mFormat.get(); }
+  virtual SourceFormat *
+  getSourceFormat() { return mFormat.get(); }
 
   virtual int32_t
   setInputBufferLength(int32_t size);
@@ -51,7 +51,7 @@ public:
   getInputBufferLength();
 
   virtual int32_t
-  open(const char *url, InputFormat* format, bool streamsCanBeAddedDynamically,
+  open(const char *url, SourceFormat* format, bool streamsCanBeAddedDynamically,
       bool queryStreamMetaData, KeyValueBag* options,
       KeyValueBag* optionsNotSet);
 
@@ -146,7 +146,7 @@ private:
   int32_t mReadRetryMax;
   int32_t mInputBufferLength;
   io::humble::video::customio::URLProtocolHandler* mIOHandler;
-  io::humble::ferry::RefPointer<InputFormat> mFormat;
+  io::humble::ferry::RefPointer<SourceFormat> mFormat;
   Stream** mStreams;
   io::humble::ferry::RefPointer<KeyValueBag> mMetaData;
 };

@@ -8,7 +8,7 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
-public class InputFormat extends ContainerFormat {
+public class SourceFormat extends ContainerFormat {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -26,18 +26,18 @@ public class InputFormat extends ContainerFormat {
   /**
    * Internal Only.
    */
-  protected InputFormat(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGInputFormatUpcast(cPtr), cMemoryOwn);
+  protected SourceFormat(long cPtr, boolean cMemoryOwn) {
+    super(VideoJNI.SWIGSourceFormatUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
   /**
    * Internal Only.
    */
-  protected InputFormat(long cPtr, boolean cMemoryOwn,
+  protected SourceFormat(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGInputFormatUpcast(cPtr),
+    super(VideoJNI.SWIGSourceFormatUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -50,7 +50,7 @@ public class InputFormat extends ContainerFormat {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(InputFormat obj) {
+  protected static long getCPtr(SourceFormat obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -68,17 +68,17 @@ public class InputFormat extends ContainerFormat {
   }
   
   /**
-   * Create a new InputFormat object that is actually referring to the
+   * Create a new SourceFormat object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
    */
   @Override
-  public InputFormat copyReference() {
+  public SourceFormat copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new InputFormat(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new SourceFormat(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -91,8 +91,8 @@ public class InputFormat extends ContainerFormat {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof InputFormat)
-      equal = (((InputFormat)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof SourceFormat)
+      equal = (((SourceFormat)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -124,15 +124,15 @@ public class InputFormat extends ContainerFormat {
    * Return a collection of all input formats installed on this system.
    * @return the list.
    */
-  public static java.util.Collection<InputFormat>
+  public static java.util.Collection<SourceFormat>
   getFormats()
   {
-    java.util.Collection<InputFormat> retval =
-      new java.util.HashSet<InputFormat>();
+    java.util.Collection<SourceFormat> retval =
+      new java.util.HashSet<SourceFormat>();
     int count = getNumFormats();
     for(int i = 0; i< count;++i)
     {
-      InputFormat fmt = getFormat(i);
+      SourceFormat fmt = getFormat(i);
       if (fmt != null)
         retval.add(fmt);
     }
@@ -144,7 +144,7 @@ public class InputFormat extends ContainerFormat {
  * Name for format.  
  */
   public String getName() {
-    return VideoJNI.InputFormat_getName(swigCPtr, this);
+    return VideoJNI.SourceFormat_getName(swigCPtr, this);
   }
 
 /**
@@ -153,14 +153,14 @@ public class InputFormat extends ContainerFormat {
  * than name.  
  */
   public String getLongName() {
-    return VideoJNI.InputFormat_getLongName(swigCPtr, this);
+    return VideoJNI.SourceFormat_getLongName(swigCPtr, this);
   }
 
 /**
  * A comma-separated list of supported filename extensions  
  */
   public String getExtensions() {
-    return VideoJNI.InputFormat_getExtensions(swigCPtr, this);
+    return VideoJNI.SourceFormat_getExtensions(swigCPtr, this);
   }
 
 /**
@@ -168,14 +168,14 @@ public class InputFormat extends ContainerFormat {
  * @return	a bitmask of {@link Flags}  
  */
   public int getFlags() {
-    return VideoJNI.InputFormat_getFlags(swigCPtr, this);
+    return VideoJNI.SourceFormat_getFlags(swigCPtr, this);
   }
 
 /**
  *  
  */
   protected int getNumSupportedCodecs() {
-    return VideoJNI.InputFormat_getNumSupportedCodecs(swigCPtr, this);
+    return VideoJNI.SourceFormat_getNumSupportedCodecs(swigCPtr, this);
   }
 
 /**
@@ -187,7 +187,7 @@ public class InputFormat extends ContainerFormat {
  *		 if none.  
  */
   protected Codec.ID getSupportedCodecId(int n) {
-    return Codec.ID.swigToEnum(VideoJNI.InputFormat_getSupportedCodecId(swigCPtr, this, n));
+    return Codec.ID.swigToEnum(VideoJNI.SourceFormat_getSupportedCodecId(swigCPtr, this, n));
   }
 
 /**
@@ -199,7 +199,7 @@ public class InputFormat extends ContainerFormat {
  * @return	the codec tag at the n'th slot, or 0 if none.  
  */
   protected long getSupportedCodecTag(int n) {
-    return VideoJNI.InputFormat_getSupportedCodecTag(swigCPtr, this, n);
+    return VideoJNI.SourceFormat_getSupportedCodecTag(swigCPtr, this, n);
   }
 
 /**
@@ -207,9 +207,9 @@ public class InputFormat extends ContainerFormat {
  *  
  * @return	An {@link InputFormat} or null if none found.  
  */
-  public static InputFormat findFormat(String shortName) {
-    long cPtr = VideoJNI.InputFormat_findFormat(shortName);
-    return (cPtr == 0) ? null : new InputFormat(cPtr, false);
+  public static SourceFormat findFormat(String shortName) {
+    long cPtr = VideoJNI.SourceFormat_findFormat(shortName);
+    return (cPtr == 0) ? null : new SourceFormat(cPtr, false);
   }
 
 /**
@@ -219,7 +219,7 @@ public class InputFormat extends ContainerFormat {
  * @return	the number of formats  
  */
   protected static int getNumFormats() {
-    return VideoJNI.InputFormat_getNumFormats();
+    return VideoJNI.SourceFormat_getNumFormats();
   }
 
 /**
@@ -229,9 +229,9 @@ public class InputFormat extends ContainerFormat {
  * unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()} 
  *  
  */
-  protected static InputFormat getFormat(int index) {
-    long cPtr = VideoJNI.InputFormat_getFormat(index);
-    return (cPtr == 0) ? null : new InputFormat(cPtr, false);
+  protected static SourceFormat getFormat(int index) {
+    long cPtr = VideoJNI.SourceFormat_getFormat(index);
+    return (cPtr == 0) ? null : new SourceFormat(cPtr, false);
   }
 
 }

@@ -112,7 +112,7 @@ SourceTest::openTestHelper(const char* file)
 
   TS_ASSERT(!source->canStreamsBeAddedDynamically());
 
-  RefPointer<InputFormat> format = source->getInputFormat();
+  RefPointer<SourceFormat> format = source->getSourceFormat();
   TSM_ASSERT("format not set", format);
   TSM_ASSERT("Unexpected format", strcmp("flv", format->getName())==0);
 
@@ -165,14 +165,14 @@ SourceTest::testOpenDemuxerPrivatePropertySetting()
 void
 SourceTest::testOpenResetInputFormat()
 {
-  RefPointer<InputFormat> format = 0;
+  RefPointer<SourceFormat> format = 0;
   RefPointer<Source> source = Source::make();
   TS_ASSERT(source);
   const char*file = mSampleFile;
 
-  format = source->getInputFormat();
+  format = source->getSourceFormat();
   TS_ASSERT(!format);
-  format = InputFormat::findFormat("mp4");
+  format = SourceFormat::findFormat("mp4");
   {
     LoggerStack stack;
     // quiet ffmpeg error

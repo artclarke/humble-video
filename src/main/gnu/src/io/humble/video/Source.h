@@ -22,7 +22,7 @@
 
 #include <io/humble/video/Packet.h>
 #include <io/humble/video/Container.h>
-#include <io/humble/video/InputFormat.h>
+#include <io/humble/video/SourceFormat.h>
 
 #include <io/humble/ferry/RefPointer.h>
 
@@ -50,7 +50,7 @@ public:
   /** {@inheritDoc} */
   virtual ContainerFormat *
   getFormat() {
-    return getInputFormat();
+    return getSourceFormat();
   }
 
   /** {@inheritDoc} */
@@ -61,8 +61,8 @@ public:
    * Get the {@link InputFormat} associated with this {@link Source}
    * or null if unknown.
    */
-  virtual InputFormat *
-  getInputFormat() = 0;
+  virtual SourceFormat *
+  getSourceFormat() = 0;
 
   /**
    * Set the buffer length Humble Video will suggest to FFMPEG for reading inputs.
@@ -122,7 +122,7 @@ public:
    * @return >= 0 on success; < 0 on error.
    */
   virtual int32_t
-  open(const char *url, InputFormat* format, bool streamsCanBeAddedDynamically,
+  open(const char *url, SourceFormat* format, bool streamsCanBeAddedDynamically,
       bool queryStreamMetaData, KeyValueBag* options,
       KeyValueBag* optionsNotSet)=0;
 
