@@ -71,24 +71,24 @@ ContainerFormat::getNumSupportedCodecs(const struct AVCodecTag * const * tags)
  *
  * @param n The n'th codec supported by this codec. Lower n are higher priority.
  *   n must be < {@link #getNumSupportedCodecs()}
- * @return the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} if none.
+ * @return the {@link CodecId} at the n'th slot, or {@link Codec.ID.CODEC_ID_NONE} if none.
  */
 Codec::ID
 ContainerFormat::getSupportedCodecId(const struct AVCodecTag * const * tags, int32_t n)
 {
-  if (n < 0 || !tags) return Codec::ID_NONE;
+  if (n < 0 || !tags) return Codec::CODEC_ID_NONE;
 
   int numCodecs = 0;
 
   for (int i = 0; tags[i]; i++)
   {
     for (const struct AVCodecTag * tag = tags[i];
-        tag && tag->id != (enum AVCodecID) Codec::ID_NONE; ++tag, ++numCodecs)
+        tag && tag->id != (enum AVCodecID) Codec::CODEC_ID_NONE; ++tag, ++numCodecs)
     {
       if (numCodecs == n) return (Codec::ID) tag->id;
     }
   }
-  return Codec::ID_NONE;
+  return Codec::CODEC_ID_NONE;
 
 }
 /**
@@ -100,14 +100,14 @@ ContainerFormat::getSupportedCodecId(const struct AVCodecTag * const * tags, int
  */
 uint32_t
 ContainerFormat::getSupportedCodecTag(const struct AVCodecTag * const * tags, int32_t n) {
-  if (n < 0 || !tags) return Codec::ID_NONE;
+  if (n < 0 || !tags) return Codec::CODEC_ID_NONE;
 
   int numCodecs = 0;
 
   for (int i = 0; tags[i]; i++)
   {
     for (const struct AVCodecTag * tag = tags[i];
-        tag && tag->id != (enum AVCodecID) Codec::ID_NONE; ++tag, ++numCodecs)
+        tag && tag->id != (enum AVCodecID) Codec::CODEC_ID_NONE; ++tag, ++numCodecs)
     {
       if (numCodecs == n) return tag->tag;
     }

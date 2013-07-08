@@ -85,25 +85,25 @@ SinkFormatTest::testCreateSinkFormat() {
   format = SinkFormat::guessFormat("mp4", 0, 0);
   TSM_ASSERT("", format);
 
-  Codec::ID id = Codec::ID_NONE;
+  Codec::ID id = Codec::CODEC_ID_NONE;
 
   id = format->getDefaultAudioCodecId();
-  TSM_ASSERT_EQUALS("", id, Codec::ID_AAC);
+  TSM_ASSERT_EQUALS("", id, Codec::CODEC_ID_AAC);
 
   id = format->getDefaultVideoCodecId();
-  TSM_ASSERT_EQUALS("", id, Codec::ID_H264);
+  TSM_ASSERT_EQUALS("", id, Codec::CODEC_ID_H264);
 
   id = format->getDefaultSubtitleCodecId();
-  TSM_ASSERT_EQUALS("", id, Codec::ID_NONE);
+  TSM_ASSERT_EQUALS("", id, Codec::CODEC_ID_NONE);
 
   id = format->guessCodec("mp4", 0, 0, MediaDescriptor::MEDIA_AUDIO);
-  TSM_ASSERT_EQUALS("", id, Codec::ID_AAC);
+  TSM_ASSERT_EQUALS("", id, Codec::CODEC_ID_AAC);
 
   id = format->guessCodec("mp4", 0, 0, MediaDescriptor::MEDIA_VIDEO);
-  TSM_ASSERT_EQUALS("", id, Codec::ID_H264);
+  TSM_ASSERT_EQUALS("", id, Codec::CODEC_ID_H264);
 
   id = format->guessCodec("mp4", 0, 0, MediaDescriptor::MEDIA_SUBTITLE);
-  TSM_ASSERT_EQUALS("", id, Codec::ID_NONE);
+  TSM_ASSERT_EQUALS("", id, Codec::CODEC_ID_NONE);
 
 }
 
