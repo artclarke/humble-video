@@ -7,11 +7,11 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class InputFormatTest {
+public class SourceFormatTest {
 
   @Test
-  public void testInputFormat() {
-    final InputFormat f = InputFormat.findFormat("aiff");
+  public void testSourceFormat() {
+    final SourceFormat f = SourceFormat.findFormat("aiff");
     assertNotNull(f);
     
     assertEquals("aiff", f.getName());
@@ -22,10 +22,10 @@ public class InputFormatTest {
   
   @Test
   public void testInstallation() {
-    Collection<InputFormat> formats = InputFormat.getFormats();
+    Collection<SourceFormat> formats = SourceFormat.getFormats();
     // A well configured FFmpeg will have over 180 formats
     assertTrue(formats.size() > 100);
-    for (InputFormat  f : formats)
+    for (SourceFormat  f : formats)
     {
       assertNotNull(f);
 //      System.out.println(f);

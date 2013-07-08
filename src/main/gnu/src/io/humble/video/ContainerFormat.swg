@@ -70,7 +70,7 @@
      {
        Codec.ID id = getSupportedCodecId(i);
        // remove duplicate IDs
-       if (id != Codec.ID.ID_NONE && !uniqueSet.contains(id))
+       if (id != Codec.ID.CODEC_ID_NONE && !uniqueSet.contains(id))
          retval.add(id);
        uniqueSet.add(id);
      }    
@@ -102,7 +102,7 @@
        long tag = getSupportedCodecTag(i);
        Codec.ID id = getSupportedCodecId(i);
        // remove duplicate tags
-       if (id != Codec.ID.ID_NONE && !uniqueSet.contains(tag))
+       if (id != Codec.ID.CODEC_ID_NONE && !uniqueSet.contains(tag))
          retval.add(tag);
        uniqueSet.add(tag);
      }    

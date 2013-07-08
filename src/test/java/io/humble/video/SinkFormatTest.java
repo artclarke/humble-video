@@ -9,18 +9,18 @@ import org.slf4j.LoggerFactory;
 
 import junit.framework.TestCase;
 
-public class OutputFormatTest extends TestCase {
+public class SinkFormatTest extends TestCase {
   private final Logger log = LoggerFactory.getLogger(this.getClass());
-  public OutputFormatTest() {
+  public SinkFormatTest() {
     log.trace("Remove a warning; ignore");
   }
 
   @Test
-  public void testOutputFormat() {
-    OutputFormat f = OutputFormat.guessFormat("flv", null, null);
+  public void testSinkFormat() {
+    SinkFormat f = SinkFormat.guessFormat("flv", null, null);
     assertNotNull(f);
     
-    f = OutputFormat.guessFormat("mp4", null, null);
+    f = SinkFormat.guessFormat("mp4", null, null);
     assertNotNull(f);
     
     assertEquals(Codec.ID.CODEC_ID_AAC, f.getDefaultAudioCodecId());
@@ -34,7 +34,7 @@ public class OutputFormatTest extends TestCase {
   
   @Test
   public void testGetCodecs() {
-    final OutputFormat f = OutputFormat.guessFormat("mp4", null, null);
+    final SinkFormat f = SinkFormat.guessFormat("mp4", null, null);
     assertNotNull(f);
     
     final List<Codec.ID> l = f.getSupportedCodecs();
@@ -43,10 +43,10 @@ public class OutputFormatTest extends TestCase {
 
   @Test
   public void testInstallation() {
-    Collection<OutputFormat> formats = OutputFormat.getFormats();
+    Collection<SinkFormat> formats = SinkFormat.getFormats();
     // A well configured FFmpeg will have over 120 output formats
     assertTrue(formats.size() > 100);
-    for (OutputFormat  f : formats)
+    for (SinkFormat  f : formats)
     {
       assertNotNull(f);
 //      System.out.println(f);

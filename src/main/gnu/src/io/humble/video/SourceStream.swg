@@ -35,7 +35,6 @@
     //result.append("streamcoder:"+getStreamCoder()+";");
     result.append("framerate:"+getFrameRate()+";");
     result.append("timebase:"+getTimeBase()+";");
-    result.append("direction:"+getDirection()+";");
     result.append("]");
     return result.toString();
   }

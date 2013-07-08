@@ -129,7 +129,6 @@ public class SourceStream extends ContainerStream {
     //result.append("streamcoder:"+getStreamCoder()+";");
     result.append("framerate:"+getFrameRate()+";");
     result.append("timebase:"+getTimeBase()+";");
-    result.append("direction:"+getDirection()+";");
     result.append("]");
     return result.toString();
   }
