@@ -657,6 +657,8 @@ class VideoJNI {
   public final static native int Codec_getSupportedAudioSampleFormat(long jarg1, Codec jarg1_, int jarg2);
   public final static native int Codec_getNumSupportedAudioChannelLayouts(long jarg1, Codec jarg1_);
   public final static native long Codec_getSupportedAudioChannelLayout(long jarg1, Codec jarg1_, int jarg2);
+  public final static native int Codec_getNumSupportedProfiles(long jarg1, Codec jarg1_);
+  public final static native long Codec_getSupportedProfile(long jarg1, Codec jarg1_, int jarg2);
   public final static native int CodecDescriptor_PROP_INTRA_ONLY_get();
   public final static native int CodecDescriptor_PROP_LOSSY_get();
   public final static native int CodecDescriptor_PROP_LOSSLESS_get();

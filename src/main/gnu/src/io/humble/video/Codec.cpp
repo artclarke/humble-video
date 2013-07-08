@@ -351,6 +351,28 @@ namespace io { namespace humble { namespace video
   }
 
   int32_t
+  Codec::getNumSupportedProfiles()
+  {
+    int i = 0;
+    for(const AVProfile* p=mCodec->profiles;
+      p && p->profile != FF_PROFILE_UNKNOWN;
+      p++,i++)
+      ;
+    return i;
+  }
+  CodecProfile*
+  Codec::getSupportedProfile(int32_t index)
+  {
+    int i = 0;
+    for(const AVProfile* p=mCodec->profiles;
+      p && p->profile != FF_PROFILE_UNKNOWN;
+      p++,i++)
+      if (index == i)
+        return CodecProfile::make(p);
+    return 0;
+  }
+
+  int32_t
   Codec::getNumInstalledCodecs()
   {
     Global::init();

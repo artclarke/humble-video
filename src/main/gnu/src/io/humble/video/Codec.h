@@ -164,8 +164,8 @@ public:
     return mProfile->name;
   }
 #ifndef SWIG
-  CodecProfile *
-  make(AVProfile * p) {
+  static CodecProfile *
+  make(const AVProfile * p) {
     CodecProfile* retval = 0;
     if (p) {
       retval = make();
@@ -179,8 +179,8 @@ private:
       mProfile(0) {
   }
   virtual
-  ~CodecProfile();
-  AVProfile* mProfile;
+  ~CodecProfile() {};
+  const AVProfile* mProfile;
 };
 
 /**
@@ -991,6 +991,23 @@ public:
    */
   virtual int64_t
   getSupportedAudioChannelLayout(int32_t index);
+
+  /**
+   * Get the number of supported {@link CodecProfile}s this codec
+   * supports.
+   */
+  virtual int32_t
+  getNumSupportedProfiles();
+
+  /**
+   * Get the supported {@link CodecProfile} at this index.
+   *
+   * @param index the index
+   * @return A CodecProfile, or null if unknown, index < 0
+   *   or lindex >= {@link #getNumSupportedProfiles}.
+   */
+  virtual CodecProfile*
+  getSupportedProfile(int32_t index);
 
 #ifndef SWIG
   static Codec*

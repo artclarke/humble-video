@@ -580,6 +580,25 @@ public class Codec extends RefCounted {
     return VideoJNI.Codec_getSupportedAudioChannelLayout(swigCPtr, this, index);
   }
 
+/**
+ * Get the number of supported {@link CodecProfile}s this codec  
+ * supports.  
+ */
+  public int getNumSupportedProfiles() {
+    return VideoJNI.Codec_getNumSupportedProfiles(swigCPtr, this);
+  }
+
+/**
+ * Get the supported {@link CodecProfile} at this index.  
+ * @param	index the index  
+ * @return	A CodecProfile, or null if unknown, index < 0  
+ * or lindex >= {@link #getNumSupportedProfiles}.  
+ */
+  public CodecProfile getSupportedProfile(int index) {
+    long cPtr = VideoJNI.Codec_getSupportedProfile(swigCPtr, this, index);
+    return (cPtr == 0) ? null : new CodecProfile(cPtr, false);
+  }
+
   public enum DiscardFlag {
   /**
    * When decoding, you can instruct streams to discard some
