@@ -45,7 +45,7 @@ public class HumbleIOTest extends TestCase
 
   private HumbleIO mFactory = null;
   private IURLProtocolHandler mHandler = null;
-  private final String mSampleFile = "target/test-classes/testfile.flv";
+  private final String mSampleFile = this.getClass().getResource("/testfile.flv").getPath();
   private final String mProtocolString = HumbleIO.DEFAULT_PROTOCOL;
 
   @Before

@@ -31,7 +31,7 @@ import org.junit.*;
 public class NullProtocolHandlerTest extends TestCase
 {
   private IURLProtocolHandler writeHandle = null;
-  private final String sampleFile = "target/test-classes/testfile.flv";
+  private final String sampleFile = this.getClass().getResource("/testfile.flv").getPath();
   private final String nullProtocolString = URLProtocolManager.NULL_PROTOCOL;
   
   @Before

@@ -18,6 +18,8 @@
  *******************************************************************************/
 package io.humble.video.customio;
 
+import java.net.URL;
+
 import junit.framework.TestCase;
 
 import io.humble.video.customio.FfmpegIO;
@@ -35,7 +37,8 @@ public class FileProtocolHandlerTest extends TestCase
 
   private IURLProtocolHandlerFactory factory = null;
   private IURLProtocolHandler handler = null;
-  private final String sampleFile = "target/test-classes/testfile.flv";
+  private final URL s = this.getClass().getResource("/testfile.flv");
+  private final String sampleFile = s.getPath();
   private final String fileProtocolString = "file";
   private final String ffmpegioProtocolString = URLProtocolManager.DEFAULT_PROTOCOL;
 

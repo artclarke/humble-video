@@ -90,6 +90,7 @@
           <version>2.15</version>
           <configuration>
             <forkMode>always</forkMode>
+            <workingDirectory>${basedir}/target</workingDirectory>
           </configuration>
         </plugin>
         <plugin>
