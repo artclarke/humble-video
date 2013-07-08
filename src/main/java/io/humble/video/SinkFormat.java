@@ -234,11 +234,12 @@ public class SinkFormat extends ContainerFormat {
   }
 
 /**
+ * Get the Codec.ID for the n'th codec supported by this container. 
  *  
  * @param	n The n'th codec supported by this codec. Lower n are higher 
  *		 priority.  
  * n must be < {@link #getNumSupportedCodecs()}  
- * @return	the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} 
+ * @return	the {@link Codec.ID} at the n'th slot, or {@link Codec.ID.CODEC_ID_NONE} 
  *		 if none.  
  */
   protected Codec.ID getSupportedCodecId(int n) {

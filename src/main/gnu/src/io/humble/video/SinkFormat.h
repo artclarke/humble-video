@@ -138,11 +138,11 @@ public:
     return ContainerFormat::getNumSupportedCodecs(mFormat->codec_tag);
   }
   /**
-   * Get the CodecId for the n'th codec supported by this container.
+   * Get the Codec.ID for the n'th codec supported by this container.
    *
    * @param n The n'th codec supported by this codec. Lower n are higher priority.
    *   n must be < {@link #getNumSupportedCodecs()}
-   * @return the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} if none.
+   * @return the {@link Codec.ID} at the n'th slot, or {@link Codec.ID.CODEC_ID_NONE} if none.
    */
   virtual Codec::ID
   getSupportedCodecId(int32_t n)

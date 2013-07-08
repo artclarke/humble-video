@@ -23,13 +23,13 @@ public class OutputFormatTest extends TestCase {
     f = OutputFormat.guessFormat("mp4", null, null);
     assertNotNull(f);
     
-    assertEquals(Codec.ID.ID_AAC, f.getDefaultAudioCodecId());
-    assertEquals(Codec.ID.ID_H264, f.getDefaultVideoCodecId());
-    assertEquals(Codec.ID.ID_NONE, f.getDefaultSubtitleCodecId());
+    assertEquals(Codec.ID.CODEC_ID_AAC, f.getDefaultAudioCodecId());
+    assertEquals(Codec.ID.CODEC_ID_H264, f.getDefaultVideoCodecId());
+    assertEquals(Codec.ID.CODEC_ID_NONE, f.getDefaultSubtitleCodecId());
     
-    assertEquals(Codec.ID.ID_AAC, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_AUDIO));
-    assertEquals(Codec.ID.ID_H264, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_VIDEO));
-    assertEquals(Codec.ID.ID_NONE, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_SUBTITLE));
+    assertEquals(Codec.ID.CODEC_ID_AAC, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_AUDIO));
+    assertEquals(Codec.ID.CODEC_ID_H264, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_VIDEO));
+    assertEquals(Codec.ID.CODEC_ID_NONE, f.guessCodec("mov", null, null, MediaDescriptor.Type.MEDIA_SUBTITLE));
   }
   
   @Test
