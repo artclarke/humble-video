@@ -30,20 +30,20 @@ namespace io { namespace humble { namespace video
 {
   using namespace io::humble::ferry;
 
-  Codec :: Codec()
+  Codec::Codec()
   {
     VS_LOG_TRACE("Starting");
     mCodec = 0;
   }
 
-  Codec :: ~Codec()
+  Codec::~Codec()
   {
     // no memory freeing required.
     mCodec = 0;
   }
 
   const char *
-  Codec :: getName() {
+  Codec::getName() {
     const char * retval = 0;
     if (mCodec)
       retval = mCodec->name;
@@ -51,7 +51,7 @@ namespace io { namespace humble { namespace video
   }
 
   int
-  Codec :: getIDAsInt()
+  Codec::getIDAsInt()
   {
     int retval = CODEC_ID_NONE;
     if (mCodec)
@@ -60,7 +60,7 @@ namespace io { namespace humble { namespace video
   }
 
   MediaDescriptor::Type
-  Codec :: getType()
+  Codec::getType()
   {
     MediaDescriptor::Type retval = (MediaDescriptor::Type) AVMEDIA_TYPE_UNKNOWN;
     if (mCodec)
@@ -69,8 +69,9 @@ namespace io { namespace humble { namespace video
   }
 
   Codec *
-  Codec :: make(AVCodec *aCodec)
+  Codec::make(AVCodec *aCodec)
   {
+    Global::init();
     Codec *retval = 0;
     if (aCodec)
     {
@@ -82,13 +83,15 @@ namespace io { namespace humble { namespace video
   }
 
   Codec *
-  Codec :: findEncodingCodec(const Codec::ID id)
+  Codec::findEncodingCodec(const Codec::ID id)
   {
+    Global::init();
     return Codec::findEncodingCodecByIntID((const int)id);
   }
   Codec *
-  Codec :: findEncodingCodecByIntID(const int id)
+  Codec::findEncodingCodecByIntID(const int id)
   {
+    Global::init();
     Codec *retval = 0;
     AVCodec *codec = 0;
     enum CodecID ffmpeg_id = (enum CodecID) id;
@@ -102,8 +105,9 @@ namespace io { namespace humble { namespace video
   }
 
   Codec *
-  Codec :: findEncodingCodecByName(const char* name)
+  Codec::findEncodingCodecByName(const char* name)
   {
+    Global::init();
     Codec *retval = 0;
     AVCodec *codec = 0;
     if (name && *name)
@@ -118,14 +122,16 @@ namespace io { namespace humble { namespace video
   }
 
   Codec *
-  Codec :: findDecodingCodec(const Codec::ID id)
+  Codec::findDecodingCodec(const Codec::ID id)
   {
+    Global::init();
     return Codec::findDecodingCodecByIntID((const int)id);
   }
 
   Codec *
-  Codec :: findDecodingCodecByIntID(const int id)
+  Codec::findDecodingCodecByIntID(const int id)
   {
+    Global::init();
     Codec *retval = 0;
     AVCodec *codec = 0;
 
@@ -139,8 +145,9 @@ namespace io { namespace humble { namespace video
   }
 
   Codec *
-  Codec :: findDecodingCodecByName(const char* name)
+  Codec::findDecodingCodecByName(const char* name)
   {
+    Global::init();
     Codec *retval = 0;
     AVCodec *codec = 0;
     if (name && *name)
@@ -154,24 +161,25 @@ namespace io { namespace humble { namespace video
     return retval;
   }
   bool
-  Codec :: canDecode()
+  Codec::canDecode()
   {
     return av_codec_is_decoder(mCodec);
   }
 
   bool
-  Codec :: canEncode()
+  Codec::canEncode()
   {
     return av_codec_is_encoder(mCodec);
   }
 
   Codec*
-  Codec :: guessEncodingCodec(SinkFormat* pFmt,
+  Codec::guessEncodingCodec(SinkFormat* pFmt,
       const char* shortName,
       const char* url,
       const char* mimeType,
       MediaDescriptor::Type type)
   {
+    Global::init();
     Codec* retval = 0;
     RefPointer<SinkFormat> fmt = 0;
     AVOutputFormat * oFmt = 0;
@@ -206,24 +214,24 @@ namespace io { namespace humble { namespace video
   }
 
   const char *
-  Codec :: getLongName()
+  Codec::getLongName()
   {
     return mCodec->long_name;
   }
 
   int32_t
-  Codec :: getCapabilities()
+  Codec::getCapabilities()
   {
     return mCodec->capabilities;
   }
   bool
-  Codec :: hasCapability(CodecCapability flag)
+  Codec::hasCapability(CodecCapability flag)
   {
     return mCodec->capabilities&flag;
   }
 
   int32_t
-  Codec :: getNumSupportedVideoFrameRates()
+  Codec::getNumSupportedVideoFrameRates()
   {
     int count = 0;
     for(
@@ -235,7 +243,7 @@ namespace io { namespace humble { namespace video
     return count;
   }
   Rational*
-  Codec :: getSupportedVideoFrameRate(int32_t index)
+  Codec::getSupportedVideoFrameRate(int32_t index)
   {
     int i = 0;
     for(
@@ -249,7 +257,7 @@ namespace io { namespace humble { namespace video
   }
 
   int32_t
-  Codec :: getNumSupportedVideoPixelFormats()
+  Codec::getNumSupportedVideoPixelFormats()
   {
     if (!mCodec)
       return 0;
@@ -263,7 +271,7 @@ namespace io { namespace humble { namespace video
   }
 
   PixelFormat::Type
-  Codec :: getSupportedVideoPixelFormat(int32_t index)
+  Codec::getSupportedVideoPixelFormat(int32_t index)
   {
     int i = 0;
     for(const enum AVPixelFormat* p = mCodec->pix_fmts;
@@ -275,7 +283,7 @@ namespace io { namespace humble { namespace video
   }
 
   int32_t
-  Codec :: getNumSupportedAudioSampleRates()
+  Codec::getNumSupportedAudioSampleRates()
   {
     int i = 0;
     for(const int *p = mCodec->supported_samplerates;
@@ -285,7 +293,7 @@ namespace io { namespace humble { namespace video
     return i;
   }
   int32_t
-  Codec :: getSupportedAudioSampleRate(int32_t index)
+  Codec::getSupportedAudioSampleRate(int32_t index)
   {
     int i = 0;
     for(const int *p = mCodec->supported_samplerates;
@@ -297,7 +305,7 @@ namespace io { namespace humble { namespace video
   }
 
   int32_t
-  Codec :: getNumSupportedAudioSampleFormats()
+  Codec::getNumSupportedAudioSampleFormats()
   {
     int i = 0;
     for(const enum AVSampleFormat* p=mCodec->sample_fmts;
@@ -308,7 +316,7 @@ namespace io { namespace humble { namespace video
   }
   
   int32_t
-  Codec :: getSupportedAudioSampleFormat(int32_t index)
+  Codec::getSupportedAudioSampleFormat(int32_t index)
   {
     int i = 0;
     for(const enum AVSampleFormat* p=mCodec->sample_fmts;
@@ -321,7 +329,7 @@ namespace io { namespace humble { namespace video
   }
 
   int32_t
-  Codec :: getNumSupportedAudioChannelLayouts()
+  Codec::getNumSupportedAudioChannelLayouts()
   {
     int i = 0;
     for(const uint64_t* p=mCodec->channel_layouts;
@@ -331,7 +339,7 @@ namespace io { namespace humble { namespace video
     return i;
   }
   int64_t
-  Codec :: getSupportedAudioChannelLayout(int32_t index)
+  Codec::getSupportedAudioChannelLayout(int32_t index)
   {
     int i = 0;
     for(const uint64_t* p=mCodec->channel_layouts;
@@ -341,5 +349,56 @@ namespace io { namespace humble { namespace video
         return (int64_t)*p;
     return 0;
   }
+
+  int32_t
+  Codec::getNumInstalledCodecs()
+  {
+    Global::init();
+    int32_t numInstalledCodecs = 0;
+    AVCodec * codec = 0;
+    while((codec = av_codec_next(codec))!=0)
+      ++numInstalledCodecs;
+    return numInstalledCodecs;
+  }
+
+  Codec*
+  Codec::getInstalledCodec(int32_t index)
+  {
+    Global::init();
+    if (index < 0)
+      return 0;
+
+    AVCodec * codec = 0;
+    for(int32_t i = 0; (codec = av_codec_next(codec))!=0; i++)
+    {
+      if (i == index)
+        return Codec::make(codec);
+    }
+    return 0;
+  }
+
+  Codec::ID
+  Codec::getID()
+  {
+    // Warning; this might not be protable
+    ID retval = CODEC_ID_NONE;
+    int id = getIDAsInt();
+
+    // This cast is not defined in C++ when id is
+    // not in ID.  That means if we're using a
+    // newer version of LIBAVCODEC this might
+    // give a bogus value for a Codec we don't
+    // know about.
+    retval = (ID)id;
+    if (id != (int) retval)
+    {
+      // we assume some back and forth conversion failed...
+      retval = CODEC_ID_NONE;
+    }
+    return retval;
+  }
+
+
+
 
 }}}

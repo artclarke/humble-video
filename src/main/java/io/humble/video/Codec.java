@@ -113,6 +113,190 @@ public class Codec extends RefCounted {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+  /**
+   * Prints the type and id of this codec
+   * @return the type and id
+   */
+   
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("type="+getType()+";");
+    result.append("id="+getID()+";");
+    result.append("name="+getName()+";");
+    result.append("]");
+    return result.toString();
+  }
+
+  /**
+   * Gets a collection of ALL codecs installed on this
+   * system. 
+   * 
+   * @return A collection of all installed codecs.
+   */
+
+  public static java.util.Collection<Codec>
+  getInstalledCodecs()
+  {
+    java.util.Collection<Codec> retval = new java.util.HashSet<Codec>();
+    int count = getNumInstalledCodecs();
+    for(int i=0;i<count;i++)
+    {
+      Codec codec = getInstalledCodec(i);
+      if (codec != null)
+        retval.add(codec);
+    }
+    return retval;
+  }
+
+  /**
+   * Returns a list of supported frame-rates this codec can encode
+   * video to.
+   * 
+   * <p>
+   * 
+   * Not all codecs support reporting this, in which case the returned list
+   * will be empty.
+   * 
+   * </p>
+   * 
+   * @return a list
+   */
+
+  public java.util.List<Rational>
+  getSupportedVideoFrameRates()
+  {
+    java.util.List<Rational> retval =
+      new java.util.LinkedList<Rational>();
+    int count = getNumSupportedVideoFrameRates();
+    for(int i=0;i<count;i++)
+    {
+      Rational rate = getSupportedVideoFrameRate(i);
+      if (rate != null)
+        retval.add(rate);
+    }
+    return retval;
+  }
+
+  /**
+   * Returns a list of supported pixel formats this codec can encode
+   * video in.
+   * 
+   * <p>
+   * 
+   * Not all codecs support reporting this, in which case the returned list
+   * will be empty.
+   * 
+   * </p>
+   * 
+   * @return a list
+   */
+
+  public java.util.List<PixelFormat.Type>
+  getSupportedVideoPixelFormats()
+  {
+    java.util.List<PixelFormat.Type> retval =
+      new java.util.LinkedList<PixelFormat.Type>();
+    int count = getNumSupportedVideoPixelFormats();
+    for(int i=0;i<count;i++)
+    {
+      PixelFormat.Type type = getSupportedVideoPixelFormat(i);
+      if (type != null && type != PixelFormat.Type.FMT_NONE)
+        retval.add(type);
+    }
+    return retval;
+  }
+
+  /**
+   * Returns a list of supported audio sample rates this codec can encode
+   * audio in.
+   * 
+   * <p>
+   * 
+   * Not all codecs support reporting this, in which case the returned list
+   * will be empty.
+   * 
+   * </p>
+   * 
+   * @return a list
+   */
+
+  public java.util.List<Integer>
+  getSupportedAudioSampleRates()
+  {
+    java.util.List<Integer> retval =
+      new java.util.LinkedList<Integer>();
+    int count = getNumSupportedAudioSampleRates();
+    for(int i=0;i<count;i++)
+    {
+      int rate = getSupportedAudioSampleRate(i);
+      if (rate != 0)
+        retval.add(rate);
+    }
+    return retval;
+  }
+
+  /**
+   * Returns a list of supported audio sample formats this codec can encode
+   * audio in.
+   * 
+   * <p>
+   * 
+   * Not all codecs support reporting this, in which case the returned list
+   * will be empty.
+   * 
+   * </p>
+   * 
+   * @return a list
+   */
+
+  public java.util.List<Integer>
+  getSupportedAudioSampleFormats()
+  {
+    java.util.List<Integer> retval =
+      new java.util.LinkedList<Integer>();
+    int count = getNumSupportedAudioSampleFormats();
+    for(int i=0;i<count;i++)
+    {
+      Integer fmt = getSupportedAudioSampleFormat(i);
+      if (fmt != null && fmt != -1)
+        retval.add(fmt);
+    }
+    return retval;
+  }
+
+  /**
+   * Returns a list of supported audio channel layouts this codec can encode
+   * audio in.
+   * 
+   * <p>
+   * 
+   * Not all codecs support reporting this, in which case the returned list
+   * will be empty.
+   * 
+   * </p>
+   * 
+   * @return a list
+   */
+
+  public java.util.List<Long>
+  getSupportedAudioChannelLayouts()
+  {
+    java.util.List<Long> retval =
+      new java.util.LinkedList<Long>();
+    int count = getNumSupportedAudioChannelLayouts();
+    for(int i=0;i<count;i++)
+    {
+      long layout = getSupportedAudioChannelLayout(i);
+      if (layout != 0)
+        retval.add(layout);
+    }
+    return retval;
+  }
+
 
 /**
  * Checks if this codec has the given capability.  

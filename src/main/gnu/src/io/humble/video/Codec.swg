@@ -42,6 +42,27 @@
      return result.toString();
    }
 
+%}
+
+%typemap (javacode) io::humble::video::Codec,io::humble::video::Codec*,io::humble::video::Codec& %{
+  /**
+   * Prints the type and id of this codec
+   * @return the type and id
+   */
+   
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("type="+getType()+";");
+    result.append("id="+getID()+";");
+    result.append("name="+getName()+";");
+    result.append("]");
+    return result.toString();
+  }
+
   /**
    * Gets a collection of ALL codecs installed on this
    * system. 
@@ -115,7 +136,7 @@
     for(int i=0;i<count;i++)
     {
       PixelFormat.Type type = getSupportedVideoPixelFormat(i);
-      if (type != null && type != PixelFormat.Type.NONE)
+      if (type != null && type != PixelFormat.Type.FMT_NONE)
         retval.add(type);
     }
     return retval;
@@ -208,9 +229,6 @@
     return retval;
   }
 
-%}
-
-%typemap (javacode) io::humble::video::Codec,io::humble::video::Codec*,io::humble::video::Codec& %{
 %}
 
 %include <io/humble/video/Codec.h>

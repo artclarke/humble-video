@@ -181,8 +181,9 @@ public:
   static SinkFormat* getFormat(int32_t index);
 
 #ifndef SWIG
-  AVOutputFormat* getCtx();
+  virtual AVOutputFormat* getCtx();
 #endif // ! SWIG
+
 protected:
   static SinkFormat*
   make(AVOutputFormat* format);
