@@ -37,3 +37,4 @@ src/test/gnu/io/humble/testutils/Makefile
 *.la
 *_CXXRunner.cpp
 /io.humble.*
+/test.log

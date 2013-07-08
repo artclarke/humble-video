@@ -90,7 +90,7 @@
           <version>2.15</version>
           <configuration>
             <forkMode>always</forkMode>
-            <workingDirectory>${basedir}/target</workingDirectory>
+            <workingDirectory>${basedir}/target/test-workingdir</workingDirectory>
           </configuration>
         </plugin>
         <plugin>
