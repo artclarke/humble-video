@@ -28,10 +28,14 @@
 #include <io/humble/ferry/RefCounted.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/HumbleVideo.h>
+#include <io/humble/video/PixelFormat.h>
+#include <io/humble/video/Rational.h>
 
 namespace io {
 namespace humble {
 namespace video {
+
+class SinkFormat;
 
 /**
  * A descriptor for different types of media that can be handled
@@ -64,12 +68,10 @@ public:
   } Type;
 
 private:
-  MediaDescriptor()
-  {
+  MediaDescriptor() {
   }
   virtual
-  ~MediaDescriptor()
-  {
+  ~MediaDescriptor() {
   }
 };
 
@@ -153,23 +155,19 @@ public:
   } ProfileType;
   /** Get the type for this profile. */
   virtual ProfileType
-  getProfile()
-  {
+  getProfile() {
     return (ProfileType) mProfile->profile;
   }
   /** Get the name for this profile. */
   virtual const char *
-  getName()
-  {
+  getName() {
     return mProfile->name;
   }
 #ifndef SWIG
   CodecProfile *
-  make(AVProfile * p)
-  {
+  make(AVProfile * p) {
     CodecProfile* retval = 0;
-    if (p)
-    {
+    if (p) {
       retval = make();
       retval->mProfile = p;
     }
@@ -178,8 +176,7 @@ public:
 #endif // ! SWIG
 private:
   CodecProfile() :
-      mProfile(0)
-  {
+      mProfile(0) {
   }
   virtual
   ~CodecProfile();
@@ -214,7 +211,6 @@ public:
     /** discard all */
     DISCARD_ALL = AVDISCARD_ALL,
   } DiscardFlag;
-
 
   typedef enum ID
   {
@@ -402,7 +398,7 @@ public:
     CODEC_ID_CLLC = AV_CODEC_ID_CLLC,
     CODEC_ID_MSS2 = AV_CODEC_ID_MSS2,
     CODEC_ID_VP9 = AV_CODEC_ID_VP9,
-    AV_CODEC_ID_BRENDER_PIX= MKBETAG('B','P','I','X'),
+    AV_CODEC_ID_BRENDER_PIX = MKBETAG('B','P','I','X'),
     CODEC_ID_Y41P = AV_CODEC_ID_Y41P,
     CODEC_ID_ESCAPE130 = AV_CODEC_ID_ESCAPE130,
     CODEC_ID_EXR = AV_CODEC_ID_EXR,
@@ -628,7 +624,7 @@ public:
     CODEC_ID_PROBE = AV_CODEC_ID_PROBE,
 
     /**_FAKE_ codec to indicate a raw MPEG-2 TS stream (only used by libavformat) */
-    CODEC_ID_MPEG2TS = AV_CODEC_ID_MPEG2TS, 
+    CODEC_ID_MPEG2TS = AV_CODEC_ID_MPEG2TS,
     /**< _FAKE_ codec to indicate a MPEG-4 Systems stream (only used by libavformat) */
     CODEC_ID_MPEG4SYSTEMS = AV_CODEC_ID_MPEG4SYSTEMS,
     // Dummy codec for streams containing only metadata information.
@@ -745,37 +741,264 @@ public:
    * @param c Capability to check.
    */
   virtual bool
-  hasCapability(CodecCapability c)
-  {
-    bool retval = false;
-    if (mCodec) retval = mCodec->capabilities & c;
-    return retval;
-  }
+  hasCapability(CodecCapability c);
+
+  /**
+   * Get a bitmask of the supported {@link CodecCapability} flags.
+   */
+  virtual int32_t
+  getCapabilities();
+
+  /**
+   * Get the name of the codec.
+   * @return The name of this Codec.
+   */
+  virtual const char *
+  getName();
+
+  /**
+   * Get the ID of this codec, as an integer.
+   * @return the ID of this codec, as an integer.
+   */
+  virtual int
+  getIDAsInt();
+
+  /**
+   * Get the ID of this codec as an enumeration.
+   * @return the ID of this codec, an enum ID
+   */
+  virtual ID
+  getID();
+
+  /**
+   * Get the type of this codec.
+   * @return The type of this Codec, as a enum Type
+   */
+  virtual MediaDescriptor::Type
+  getType();
+
+  /**
+   * Can this codec be used for decoding?
+   * @return Can this Codec decode?
+   */
+  virtual bool
+  canDecode();
+
+  /**
+   * Can this codec be used for encoding?
+   * @return Can this Codec encode?
+   */
+  virtual bool
+  canEncode();
+
+  /**
+   * Find a codec that can be used for encoding.
+   * @param id The id of the codec
+   * @return the codec, or null if we can't find it.
+   *
+   */
+  static Codec *
+  findEncodingCodec(Codec::ID id);
+  /**
+   * Find a codec that can be used for encoding.
+   * @param id The id of the codec, as an integer.
+   * @return the codec, or null if we can't find it.
+   */
+  static Codec *
+  findEncodingCodecByIntID(int id);
+  /**
+   * Find a codec that can be used for encoding.
+   * @param id The id of the codec, as a FFMPEG short-name string
+   *   (for example, "mpeg4").
+   * @return the codec, or null if we can't find it.
+   */
+  static Codec *
+  findEncodingCodecByName(const char*id);
+  /**
+   * Find a codec that can be used for decoding.
+   * @param id The id of the codec
+   * @return the codec, or null if we can't find it.
+   */
+  static Codec *
+  findDecodingCodec(Codec::ID id);
+  /**
+   * Find a codec that can be used for decoding.
+   * @param id The id of the codec, as an integer
+   * @return the codec, or null if we can't find it.
+   */
+  static Codec *
+  findDecodingCodecByIntID(int id);
+  /**
+   * Find a codec that can be used for decoding.
+   * @param id The id of the codec, as a FFMPEG short-name string
+   *   (for example, "mpeg4")
+   * @return the codec, or null if we can't find it.
+   */
+  static Codec *
+  findDecodingCodecByName(const char*id);
+
+  /**
+   * Ask us to guess an encoding codec based on the inputs
+   * passed in.
+   * <p>
+   * You must pass in at least one non null fmt, shortName,
+   * url or mime_type.
+   * </p>
+   * @param fmt A SinkFormat for the container you'll want to encode into.
+   * @param shortName The FFMPEG short name of the codec (e.g. "mpeg4").
+   * @param url The URL you'll be writing packets to.
+   * @param mimeType The mime type of the container.
+   * @param type The codec type.
+   * @return the codec, or null if we can't find it.
+   */
+  static Codec*
+  guessEncodingCodec(SinkFormat* fmt, const char *shortName, const char*url,
+      const char*mimeType, MediaDescriptor::Type type);
+
+  /**
+   * Get the long name for this codec.
+   *
+   * @return the long name.
+   */
+  virtual const char *
+  getLongName();
+
+  /**
+   * Capability flags
+   */
+
+  /**
+   * Get the number of installed codecs on this system.
+   * @return the number of installed codecs.
+   */
+  static int32_t
+  getNumInstalledCodecs();
+
+  /**
+   * Get the {@link ICodec} at the given index.
+   *
+   * @param index the index in our list
+   *
+   * @return the codec, or null if index < 0 or index >=
+   *   {@link #getNumInstalledCodecs()}
+   */
+  static Codec*
+  getInstalledCodec(int32_t index);
+
+  /**
+   * Get the number of frame rates this codec supports for encoding.
+   * Not all codecs will report this number.
+   * @return the number or 0 if we don't know.
+   */
+  virtual int32_t
+  getNumSupportedVideoFrameRates();
+
+  /**
+   * Return the supported frame rate at the given index.
+   *
+   * @param index the index in our list.
+   *
+   * @return the frame rate, or null if unknown, if index <0 or
+   *   if index >= {@link #getNumSupportedVideoFrameRates()}
+   */
+  virtual Rational*
+  getSupportedVideoFrameRate(int32_t index);
+
+  /**
+   * Get the number of supported video pixel formats this codec supports
+   * for encoding.  Not all codecs will report this.
+   *
+   * @return the number or 0 if we don't know.
+   */
+  virtual int32_t
+  getNumSupportedVideoPixelFormats();
+
+  /**
+   * Return the supported video pixel format at the given index.
+   *
+   * @param index the index in our list.
+   *
+   * @return the pixel format, or {@link IPixelFormat.Type#NONE} if unknown,
+   *   if index <0 or
+   *   if index >= {@link #getNumSupportedVideoPixelFormats()}
+   */
+  virtual PixelFormat::Type
+  getSupportedVideoPixelFormat(int32_t index);
+
+  /**
+   * Get the number of different audio sample rates this codec supports
+   * for encoding.  Not all codecs will report this.
+   *
+   * @return the number or 0 if we don't know.
+   */
+  virtual int32_t
+  getNumSupportedAudioSampleRates();
+
+  /**
+   * Return the support audio sample rate at the given index.
+   *
+   * @param index the index in our list.
+   *
+   * @return the sample rate, or 0 if unknown, index < 0 or
+   *   index >= {@link #getNumSupportedAudioSampleRates()}
+   */
+  virtual int32_t
+  getSupportedAudioSampleRate(int32_t index);
+
+  /**
+   * Get the number of different audio sample formats this codec supports
+   * for encoding.  Not all codecs will report this.
+   *
+   * @return the number or 0 if we don't know.
+   */
+  virtual int32_t
+  getNumSupportedAudioSampleFormats();
+
+  /**
+   * Get the supported sample format at this index.
+   *
+   * @param index the index in our list.
+   *
+   * @return the format, or {@link IAudioSamples.Format.FMT_NONE} if
+   *   unknown, index < 0 or index >=
+   *   {@link #getNumSupportedAudioSampleFormats()}.
+   */
+  virtual int32_t
+  getSupportedAudioSampleFormat(int32_t index);
+
+  /**
+   * Get the number of different audio channel layouts this codec supports
+   * for encoding.  Not all codecs will report this.
+   *
+   *
+   * @return the number or 0 if we don't know.
+   */
+  virtual int32_t
+  getNumSupportedAudioChannelLayouts();
+
+  /**
+   * Get the supported audio channel layout at this index.
+   *
+   * The value returned is a bit flag representing the different
+   * types of audio layout this codec can support.  Test the values
+   * by bit-comparing them to the {@link IAudioSamples.ChannelLayout}
+   * enum types.
+   *
+   * @param index the index
+   *
+   * @return the channel layout, or 0 if unknown, index < 0 or
+   *   index >= {@link #getNumSupportedAudioChannelLayouts}.
+   */
+  virtual int64_t
+  getSupportedAudioChannelLayout(int32_t index);
 
 protected:
-  Codec*
-  make(AVCodec* codec)
-  {
-    Codec* retval = 0;
-    if (codec)
-    {
-      retval = make();
-      if (retval)
-      {
-        retval->mCodec = codec;
-      }
-    }
-    return retval;
-  }
+  static Codec*
+  make(AVCodec* codec);
 private:
-  Codec() :
-      mCodec(0)
-  {
-  }
+  Codec();
   virtual
-  ~Codec()
-  {
-  }
+  ~Codec();
 
   AVCodec* mCodec;
 };
@@ -816,8 +1039,7 @@ public:
    * @param p property to check
    */
   virtual bool
-  hasProperty(CodecProperty p)
-  {
+  hasProperty(CodecProperty p) {
     bool retval = false;
     if (mDescriptor) retval = p & mDescriptor->props;
     return retval;
@@ -828,55 +1050,48 @@ public:
    * alphanumeric and _ characters.
    */
   virtual const char*
-  getName()
-  {
+  getName() {
     return mDescriptor->name;
   }
   /**
    * A more descriptive name for this codec.
    */
   virtual const char*
-  getLongName()
-  {
+  getLongName() {
     return mDescriptor->long_name;
   }
   /**
    * A bit mask of {@link Codec.Properties} this codec has.
    */
   virtual int32_t
-  getProperties()
-  {
+  getProperties() {
     return mDescriptor->props;
   }
 
   /** Get the codec ID for this descriptor */
   virtual Codec::ID
-  getId()
-  {
+  getId() {
     return (Codec::ID) mDescriptor->id;
   }
 
   virtual MediaDescriptor::Type
-  getType()
-  {
+  getType() {
     return (MediaDescriptor::Type) mDescriptor->type;
   }
   /**
    * Get the descriptor for the given id.
    */
-  static CodecDescriptor* make(Codec::ID id)
-  {
-    const AVCodecDescriptor* d = avcodec_descriptor_get((enum AVCodecID)id);
+  static CodecDescriptor*
+  make(Codec::ID id) {
+    const AVCodecDescriptor* d = avcodec_descriptor_get((enum AVCodecID) id);
     return make(d);
   }
 
 #ifndef SWIG
   static CodecDescriptor*
-  make(const AVCodecDescriptor *d)
-  {
+  make(const AVCodecDescriptor *d) {
     CodecDescriptor* retval = 0;
-    if (d)
-    {
+    if (d) {
       retval = make();
       retval->mDescriptor = d;
     }
@@ -885,12 +1100,10 @@ public:
 #endif // ! SWIG
 private:
   CodecDescriptor() :
-      mDescriptor(0)
-  {
+      mDescriptor(0) {
   }
   virtual
-  ~CodecDescriptor()
-  {
+  ~CodecDescriptor() {
   }
   const AVCodecDescriptor *mDescriptor;
 };

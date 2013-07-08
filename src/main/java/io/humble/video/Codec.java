@@ -122,6 +122,280 @@ public class Codec extends RefCounted {
     return VideoJNI.Codec_hasCapability(swigCPtr, this, c.swigValue());
   }
 
+/**
+ * Get a bitmask of the supported {@link CodecCapability} flags.  
+ */
+  public int getCapabilities() {
+    return VideoJNI.Codec_getCapabilities(swigCPtr, this);
+  }
+
+/**
+ * Get the name of the codec.  
+ * @return	The name of this Codec.  
+ */
+  public String getName() {
+    return VideoJNI.Codec_getName(swigCPtr, this);
+  }
+
+/**
+ * Get the ID of this codec, as an integer.  
+ * @return	the ID of this codec, as an integer.  
+ */
+  public int getIDAsInt() {
+    return VideoJNI.Codec_getIDAsInt(swigCPtr, this);
+  }
+
+/**
+ * Get the ID of this codec as an enumeration.  
+ * @return	the ID of this codec, an enum ID  
+ */
+  public Codec.ID getID() {
+    return Codec.ID.swigToEnum(VideoJNI.Codec_getID(swigCPtr, this));
+  }
+
+/**
+ * Get the type of this codec.  
+ * @return	The type of this Codec, as a enum Type  
+ */
+  public MediaDescriptor.Type getType() {
+    return MediaDescriptor.Type.swigToEnum(VideoJNI.Codec_getType(swigCPtr, this));
+  }
+
+/**
+ * Can this codec be used for decoding?  
+ * @return	Can this Codec decode?  
+ */
+  public boolean canDecode() {
+    return VideoJNI.Codec_canDecode(swigCPtr, this);
+  }
+
+/**
+ * Can this codec be used for encoding?  
+ * @return	Can this Codec encode?  
+ */
+  public boolean canEncode() {
+    return VideoJNI.Codec_canEncode(swigCPtr, this);
+  }
+
+/**
+ * Find a codec that can be used for encoding.  
+ * @param	id The id of the codec  
+ * @return	the codec, or null if we can't find it.  
+ */
+  public static Codec findEncodingCodec(Codec.ID id) {
+    long cPtr = VideoJNI.Codec_findEncodingCodec(id.swigValue());
+    return (cPtr == 0) ? null : new Codec(cPtr, false);
+  }
+
+/**
+ * Find a codec that can be used for encoding.  
+ * @param	id The id of the codec, as an integer.  
+ * @return	the codec, or null if we can't find it.  
+ */
+  public static Codec findEncodingCodecByIntID(int id) {
+    long cPtr = VideoJNI.Codec_findEncodingCodecByIntID(id);
+    return (cPtr == 0) ? null : new Codec(cPtr, false);
+  }
+
+/**
+ * Find a codec that can be used for encoding.  
+ * @param	id The id of the codec, as a FFMPEG short-name string  
+ * (for example, "mpeg4").  
+ * @return	the codec, or null if we can't find it.  
+ */
+  public static Codec findEncodingCodecByName(String id) {
+    long cPtr = VideoJNI.Codec_findEncodingCodecByName(id);
+    return (cPtr == 0) ? null : new Codec(cPtr, false);
+  }
+
+/**
+ * Find a codec that can be used for decoding.  
+ * @param	id The id of the codec  
+ * @return	the codec, or null if we can't find it.  
+ */
+  public static Codec findDecodingCodec(Codec.ID id) {
+    long cPtr = VideoJNI.Codec_findDecodingCodec(id.swigValue());
+    return (cPtr == 0) ? null : new Codec(cPtr, false);
+  }
+
+/**
+ * Find a codec that can be used for decoding.  
+ * @param	id The id of the codec, as an integer  
+ * @return	the codec, or null if we can't find it.  
+ */
+  public static Codec findDecodingCodecByIntID(int id) {
+    long cPtr = VideoJNI.Codec_findDecodingCodecByIntID(id);
+    return (cPtr == 0) ? null : new Codec(cPtr, false);
+  }
+
+/**
+ * Find a codec that can be used for decoding.  
+ * @param	id The id of the codec, as a FFMPEG short-name string  
+ * (for example, "mpeg4")  
+ * @return	the codec, or null if we can't find it.  
+ */
+  public static Codec findDecodingCodecByName(String id) {
+    long cPtr = VideoJNI.Codec_findDecodingCodecByName(id);
+    return (cPtr == 0) ? null : new Codec(cPtr, false);
+  }
+
+/**
+ * Ask us to guess an encoding codec based on the inputs  
+ * passed in.  
+ * <p>  
+ * You must pass in at least one non null fmt, shortName,  
+ * url or mime_type.  
+ * </p>  
+ * @param	fmt A SinkFormat for the container you'll want to encode into. 
+ *		  
+ * @param	shortName The FFMPEG short name of the codec (e.g. "mpeg4"). 
+ *		  
+ * @param	url The URL you'll be writing packets to.  
+ * @param	mimeType The mime type of the container.  
+ * @param	type The codec type.  
+ * @return	the codec, or null if we can't find it.  
+ */
+  public static Codec guessEncodingCodec(SinkFormat fmt, String shortName, String url, String mimeType, MediaDescriptor.Type type) {
+    long cPtr = VideoJNI.Codec_guessEncodingCodec(SinkFormat.getCPtr(fmt), fmt, shortName, url, mimeType, type.swigValue());
+    return (cPtr == 0) ? null : new Codec(cPtr, false);
+  }
+
+/**
+ * Get the long name for this codec.  
+ * @return	the long name.  
+ */
+  public String getLongName() {
+    return VideoJNI.Codec_getLongName(swigCPtr, this);
+  }
+
+/**
+ * Capability flags  
+ * Get the number of installed codecs on this system.  
+ * @return	the number of installed codecs.  
+ */
+  public static int getNumInstalledCodecs() {
+    return VideoJNI.Codec_getNumInstalledCodecs();
+  }
+
+/**
+ * Get the {@link ICodec} at the given index.  
+ * @param	index the index in our list  
+ * @return	the codec, or null if index < 0 or index >=  
+ * {@link #getNumInstalledCodecs()}  
+ */
+  public static Codec getInstalledCodec(int index) {
+    long cPtr = VideoJNI.Codec_getInstalledCodec(index);
+    return (cPtr == 0) ? null : new Codec(cPtr, false);
+  }
+
+/**
+ *  
+ * Not all codecs will report this number.  
+ * @return	the number or 0 if we don't know.  
+ */
+  public int getNumSupportedVideoFrameRates() {
+    return VideoJNI.Codec_getNumSupportedVideoFrameRates(swigCPtr, this);
+  }
+
+/**
+ * Return the supported frame rate at the given index.  
+ * @param	index the index in our list.  
+ * @return	the frame rate, or null if unknown, if index <0 or  
+ * if index >= {@link #getNumSupportedVideoFrameRates()}  
+ */
+  public Rational getSupportedVideoFrameRate(int index) {
+    long cPtr = VideoJNI.Codec_getSupportedVideoFrameRate(swigCPtr, this, index);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
+  }
+
+/**
+ * Get the number of supported video pixel formats this codec supports 
+ *  
+ * for encoding. Not all codecs will report this.  
+ * @return	the number or 0 if we don't know.  
+ */
+  public int getNumSupportedVideoPixelFormats() {
+    return VideoJNI.Codec_getNumSupportedVideoPixelFormats(swigCPtr, this);
+  }
+
+/**
+ * Return the supported video pixel format at the given index.  
+ * @param	index the index in our list.  
+ * @return	the pixel format, or {@link IPixelFormat.Type#NONE} if unknown, 
+ *		  
+ * if index <0 or  
+ * if index >= {@link #getNumSupportedVideoPixelFormats()}  
+ */
+  public PixelFormat.Type getSupportedVideoPixelFormat(int index) {
+    return PixelFormat.Type.swigToEnum(VideoJNI.Codec_getSupportedVideoPixelFormat(swigCPtr, this, index));
+  }
+
+/**
+ * Get the number of different audio sample rates this codec supports 
+ *  
+ * for encoding. Not all codecs will report this.  
+ * @return	the number or 0 if we don't know.  
+ */
+  public int getNumSupportedAudioSampleRates() {
+    return VideoJNI.Codec_getNumSupportedAudioSampleRates(swigCPtr, this);
+  }
+
+/**
+ * Return the support audio sample rate at the given index.  
+ * @param	index the index in our list.  
+ * @return	the sample rate, or 0 if unknown, index < 0 or  
+ * index >= {@link #getNumSupportedAudioSampleRates()}  
+ */
+  public int getSupportedAudioSampleRate(int index) {
+    return VideoJNI.Codec_getSupportedAudioSampleRate(swigCPtr, this, index);
+  }
+
+/**
+ * Get the number of different audio sample formats this codec supports 
+ *  
+ * for encoding. Not all codecs will report this.  
+ * @return	the number or 0 if we don't know.  
+ */
+  public int getNumSupportedAudioSampleFormats() {
+    return VideoJNI.Codec_getNumSupportedAudioSampleFormats(swigCPtr, this);
+  }
+
+/**
+ * Get the supported sample format at this index.  
+ * @param	index the index in our list.  
+ *  
+ * unknown, index < 0 or index >=  
+ * {@link #getNumSupportedAudioSampleFormats()}.  
+ */
+  public int getSupportedAudioSampleFormat(int index) {
+    return VideoJNI.Codec_getSupportedAudioSampleFormat(swigCPtr, this, index);
+  }
+
+/**
+ * Get the number of different audio channel layouts this codec supports 
+ *  
+ * for encoding. Not all codecs will report this.  
+ * @return	the number or 0 if we don't know.  
+ */
+  public int getNumSupportedAudioChannelLayouts() {
+    return VideoJNI.Codec_getNumSupportedAudioChannelLayouts(swigCPtr, this);
+  }
+
+/**
+ * Get the supported audio channel layout at this index.  
+ * The value returned is a bit flag representing the different  
+ * types of audio layout this codec can support. Test the values  
+ * by bit-comparing them to the {@link IAudioSamples.ChannelLayout} 
+ *  
+ * enum types.  
+ * @param	index the index  
+ * @return	the channel layout, or 0 if unknown, index < 0 or  
+ * index >= {@link #getNumSupportedAudioChannelLayouts}.  
+ */
+  public long getSupportedAudioChannelLayout(int index) {
+    return VideoJNI.Codec_getSupportedAudioChannelLayout(swigCPtr, this, index);
+  }
+
   public enum DiscardFlag {
   /**
    * When decoding, you can instruct streams to discard some

@@ -99,11 +99,12 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_video_la_DEPENDENCIES =
 am_libhumble_video_la_OBJECTS = PixelFormat.lo KeyValueBag.lo \
 	KeyValueBagImpl.lo Property.lo PropertyImpl.lo Rational.lo \
-	RationalImpl.lo MediaData.lo IndexEntry.lo IndexEntryImpl.lo \
-	Error.lo ErrorImpl.lo Packet.lo PacketImpl.lo \
-	ContainerFormat.lo Configurable.lo ContainerStream.lo \
-	Container.lo SourceFormat.lo Source.lo SourceImpl.lo \
-	SourceStream.lo SourceStreamImpl.lo SinkFormat.lo Global.lo
+	RationalImpl.lo Codec.lo MediaData.lo IndexEntry.lo \
+	IndexEntryImpl.lo Error.lo ErrorImpl.lo Packet.lo \
+	PacketImpl.lo ContainerFormat.lo Configurable.lo \
+	ContainerStream.lo Container.lo SourceFormat.lo Source.lo \
+	SourceImpl.lo SourceStream.lo SourceStreamImpl.lo \
+	SinkFormat.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -435,6 +436,7 @@ libhumble_video_la_SOURCES = \
   PropertyImpl.cpp \
   Rational.cpp \
   RationalImpl.cpp \
+  Codec.cpp \
   MediaData.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
@@ -461,6 +463,7 @@ libhumble_video_ladir = $(includedir)/$(VS_CPP_PATH)
 libhumble_video_la_HEADERS = \
   HumbleVideo.h \
   Codec.h \
+  Codec.swg \
   FfmpegIncludes.h \
   Global.swg \
   PixelFormat.h \
@@ -563,6 +566,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Codec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Configurable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Container.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ContainerFormat.Plo@am__quote@

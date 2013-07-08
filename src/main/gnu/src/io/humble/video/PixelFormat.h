@@ -36,6 +36,10 @@ namespace video {
  * includes some utility methods for dealing with {@link Type#YUV420P} data; the
  * most common type of encoding used in video files I've run across.
  */
+#ifdef PixelFormat
+#undef PixelFormat
+#endif // PixelFormat
+
 class VS_API_HUMBLEVIDEO PixelFormat : public io::humble::ferry::RefCounted
 {
 public:

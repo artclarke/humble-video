@@ -19,6 +19,7 @@ libhumble_video_la_SOURCES= \
   PropertyImpl.cpp \
   Rational.cpp \
   RationalImpl.cpp \
+  Codec.cpp \
   MediaData.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
@@ -45,6 +46,7 @@ libhumble_video_ladir=$(includedir)/$(VS_CPP_PATH)
 libhumble_video_la_HEADERS= \
   HumbleVideo.h \
   Codec.h \
+  Codec.swg \
   FfmpegIncludes.h \
   Global.swg \
   PixelFormat.h \

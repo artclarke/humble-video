@@ -179,6 +179,10 @@ public:
    *   unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()}
    */
   static SinkFormat* getFormat(int32_t index);
+
+#ifndef SWIG
+  AVOutputFormat* getCtx();
+#endif // ! SWIG
 protected:
   static SinkFormat*
   make(AVOutputFormat* format);
