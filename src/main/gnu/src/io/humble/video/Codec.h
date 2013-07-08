@@ -992,9 +992,12 @@ public:
   virtual int64_t
   getSupportedAudioChannelLayout(int32_t index);
 
-protected:
+#ifndef SWIG
   static Codec*
   make(AVCodec* codec);
+
+  AVCodec* getCtx() { return mCodec; }
+#endif // ! SWIG
 private:
   Codec();
   virtual
