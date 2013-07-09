@@ -99,6 +99,16 @@ public:
    *   is ignored.
    */
   virtual void setData(io::humble::ferry::IBuffer* buffer)=0;
+
+  /**
+   * Returns whether or not we think this buffer has been filled
+   * with data.
+   * 
+   * 
+   * @return Has setComplete() been called and the buffer populated.
+   */
+  virtual bool isComplete()=0;
+
   
 protected:
   MediaData();

@@ -700,4 +700,13 @@ public void get(int srcPos, double[] dest, int destPos, int length)
     VideoJNI.MediaData_setData_internal(swigCPtr, this, IBuffer.getCPtr(buffer), buffer);
   }
 
+/**
+ * Returns whether or not we think this buffer has been filled  
+ * with data.  
+ *  
+ */
+  public boolean isComplete() {
+    return VideoJNI.MediaData_isComplete(swigCPtr, this);
+  }
+
 }

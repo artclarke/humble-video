@@ -98,6 +98,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_video_la_DEPENDENCIES =
 am_libhumble_video_la_OBJECTS = PixelFormat.lo AudioSamples.lo \
+	AudioSamplesImpl.lo VideoPicture.lo VideoPictureImpl.lo \
 	KeyValueBag.lo KeyValueBagImpl.lo Property.lo PropertyImpl.lo \
 	Rational.lo RationalImpl.lo Codec.lo MediaData.lo \
 	IndexEntry.lo IndexEntryImpl.lo Error.lo ErrorImpl.lo \
@@ -431,6 +432,9 @@ libhumble_video_la_LIBADD = $(VS_PKG_LIBRARIES)
 libhumble_video_la_SOURCES = \
   PixelFormat.cpp \
   AudioSamples.cpp \
+  AudioSamplesImpl.cpp \
+  VideoPicture.cpp \
+  VideoPictureImpl.cpp \
   KeyValueBag.cpp \
   KeyValueBagImpl.cpp \
   Property.cpp \
@@ -470,6 +474,10 @@ libhumble_video_la_HEADERS = \
   PixelFormat.h \
   AudioSamples.h \
   AudioSamples.swg \
+  AudioSamplesImpl.h \
+  VideoPicture.h \
+  VideoPicture.swg \
+  VideoPictureImpl.h \
   KeyValueBag.h \
   KeyValueBagImpl.h \
   KeyValueBag.swg \
@@ -570,6 +578,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioSamples.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioSamplesImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Codec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Configurable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Container.Plo@am__quote@
@@ -597,6 +606,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceStream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceStreamImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VideoPicture.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VideoPictureImpl.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

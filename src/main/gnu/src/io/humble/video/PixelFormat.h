@@ -23,6 +23,10 @@
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/ferry/RefCounted.h>
 
+#ifdef PixelFormat
+#undef PixelFormat
+#endif // PixelFormat
+
 namespace io {
 namespace humble {
 namespace video {

@@ -8,6 +8,12 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * A set of raw (decoded) samples, plus a timestamp for when to play 
+ * those  
+ * samples relative to other items in a given {@link Container}.  
+ * The timestamp value in decoded data is always in Microseonds.  
+ */
 public class AudioSamples extends MediaRawData {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -109,11 +115,291 @@ public class AudioSamples extends MediaRawData {
   // JNIHelper.swg: End generated code
   
 
+  /**
+   * info about this packet
+   * @return information about this packet
+   */
+   
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("sample rate:"+getSampleRate()+";");
+    result.append("channels:"+getChannels()+";");
+    result.append("format:"+getFormat()+";");
+    result.append("time stamp:"+getTimeStamp()+";");
+    result.append("complete:"+isComplete()+";");
+    result.append("num samples:"+getNumSamples()+";");
+    result.append("size:"+getSize()+";");
+    result.append("key:"+isKey()+";");
+    Rational timeBase = Rational.make(1,(int)Global.DEFAULT_PTS_PER_SECOND);
+    result.append("time base:"+timeBase+";");
+    if (timeBase != null) timeBase.delete();
+    result.append("]");
+    return result.toString();
+  }
+
+
+/**
+ * Find the sample rate of the samples in this audio buffer.  
+ * @return	The Sampling Rate of the samples in this buffer (e.g. 22050). 
+ *		  
+ */
+  public int getSampleRate() {
+    return VideoJNI.AudioSamples_getSampleRate(swigCPtr, this);
+  }
+
+/**
+ * Return the number of channels of the samples in this buffer. For 
+ * example,  
+ * 1 is mono, 2 is stereo.  
+ * @return	The number of channels.  
+ */
+  public int getChannels() {
+    return VideoJNI.AudioSamples_getChannels(swigCPtr, this);
+  }
+
+/**
+ * Find out the bit-depth of the samples in this buffer.  
+ * @return	Number of bits in a raw sample (per channel)  
+ */
+  public long getSampleBitDepth() {
+    return VideoJNI.AudioSamples_getSampleBitDepth(swigCPtr, this);
+  }
+
+/**
+ * Find the Format of the samples in this buffer. Right now  
+ * only FMT_S16 is supported.  
+ * @return	The format of the samples.  
+ */
+  public AudioSamples.Format getFormat() {
+    return AudioSamples.Format.swigToEnum(VideoJNI.AudioSamples_getFormat(swigCPtr, this));
+  }
+
+/**
+ * Get the number of samples in this video.  
+ *  
+ * audio in this buffer, there are 25 samples. If you have  
+ * 100 bytes of mono (1-channel) 16-bit audio in this buffer, you  
+ * have 50 samples.  
+ * @return	The number of samples.  
+ */
+  public long getNumSamples() {
+    return VideoJNI.AudioSamples_getNumSamples(swigCPtr, this);
+  }
+
+/**
+ * @return	Maximum number of bytes that can be put in  
+ * this buffer. To get the number of samples you can  
+ * put in this AudioSamples instance, do the following  
+ * num_samples = getMaxBufferSize() (getSampleSize())  
+ */
+  public long getMaxBufferSize() {
+    return VideoJNI.AudioSamples_getMaxBufferSize(swigCPtr, this);
+  }
+
+/**
+ * @return	Maximum number of samples this buffer can hold.  
+ */
+  public long getMaxSamples() {
+    return VideoJNI.AudioSamples_getMaxSamples(swigCPtr, this);
+  }
+
+/**
+ * @return	Number of bytes in a single sample of audio (including channels). 
+ *		  
+ * You can also get this by getSampleBitDepth()*getChannels()/8.  
+ */
+  public long getSampleSize() {
+    return VideoJNI.AudioSamples_getSampleSize(swigCPtr, this);
+  }
+
+/**
+ * What is the Presentation Time Stamp of this set of audio samples. 
+ *  
+ * @return	the presentation time stamp (pts)  
+ */
+  public long getPts() {
+    return VideoJNI.AudioSamples_getPts(swigCPtr, this);
+  }
+
+/**
+ * Set the Presentation Time Stamp for this set of samples.  
+ * @param	aValue the new value  
+ */
+  public void setPts(long aValue) {
+    VideoJNI.AudioSamples_setPts(swigCPtr, this, aValue);
+  }
+
+/**
+ * What would be the next Presentation Time Stamp after all the  
+ * samples in this buffer were played?  
+ * @return	the next presentation time stamp (pts)  
+ */
+  public long getNextPts() {
+    return VideoJNI.AudioSamples_getNextPts(swigCPtr, this);
+  }
+
+/**
+ * Call this if you modify the samples and are now done. This  
+ * updates the pertinent information in the structure.  
+ * @param	complete Is this set of samples complete?  
+ * @param	numSamples Number of samples in this update (note that  
+ * 4 shorts of 16-bit audio in stereo is actually 1 sample).  
+ * @param	sampleRate The sample rate (in Hz) of this set of samples. 
+ *		  
+ * @param	channels The number of channels in this set of samples.  
+ * @param	format The sample-format of this set of samples.  
+ * @param	pts The presentation time stamp of the starting sample in 
+ *		 this buffer.  
+ * Caller must ensure pts is in units of 1/1,000,000 of a second  
+ */
+  public void setComplete(boolean complete, long numSamples, int sampleRate, int channels, AudioSamples.Format format, long pts) {
+    VideoJNI.AudioSamples_setComplete(swigCPtr, this, complete, numSamples, sampleRate, channels, format.swigValue(), pts);
+  }
+
+/**
+ * Sets the sample at the given index and channel to the sample. In 
+ *  
+ * theory we assume input is the given Format, and will convert  
+ * if needed, but right now we only support FMT_S16 anyway.  
+ *  
+ * @param	channel The zero-based channel number. If this set of samples 
+ *		 doesn't  
+ * have that given channel, an error is returned.  
+ * @param	format The format of the given sample  
+ * @param	sample The actual sample  
+ * @return	>= 0 on success; -1 on error.  
+ */
+  public int setSample(long sampleIndex, int channel, AudioSamples.Format format, int sample) {
+    return VideoJNI.AudioSamples_setSample(swigCPtr, this, sampleIndex, channel, format.swigValue(), sample);
+  }
+
+/**
+ * Get the sample at the given sampleIndex and channel, and return it 
+ * in  
+ * the asked for format.  
+ * @param	sampleIndex The zero-based index into this set of samples. 
+ *		  
+ * @param	channel The zero-based channel to get the sample from  
+ * @param	format The format to return in  
+ * @return	The sample if available. If that sample is not available 
+ *		  
+ * (e.g. because the channel doesn't exist, or the samples have not 
+ *  
+ * been #setComplete(bool, uint32_t, int32_t, int32_t, Format, int64_t)), 
+ *  
+ * then this method returns 0. It is up to the caller to ensure  
+ *  
+ */
+  public int getSample(long sampleIndex, int channel, AudioSamples.Format format) {
+    return VideoJNI.AudioSamples_getSample(swigCPtr, this, sampleIndex, channel, format.swigValue());
+  }
+
+/**
+ * A convenience method that returns the # of bits in a given  
+ * format. Be aware that right now this library only supports  
+ * 16-bit audio.  
+ * @param	format The format you want to find the number of bits in. 
+ *		  
+ *  
+ */
+  public static long findSampleBitDepth(AudioSamples.Format format) {
+    return VideoJNI.AudioSamples_findSampleBitDepth(format.swigValue());
+  }
+
+/**
+ * Get a new audio samples buffer.  
+ * <p>  
+ * Note that any buffers this objects needs will be  
+ * lazily allocated (i.e. we won't actually grab all  
+ * the memory until we need it).  
+ * </p>  
+ * @param	numSamples The minimum number of samples you're  
+ * going to want to put in this buffer. We may (and probably  
+ * will) return a larger buffer, but you cannot assume that.  
+ * @param	numChannels The number of channels in the audio you'll  
+ * want to put in this buffer.  
+ * @return	A new object, or null if we can't allocate one.  
+ */
+  public static AudioSamples make(long numSamples, long numChannels) {
+    long cPtr = VideoJNI.AudioSamples_make__SWIG_0(numSamples, numChannels);
+    return (cPtr == 0) ? null : new AudioSamples(cPtr, false);
+  }
+
+/**
+ * Converts a number of samples at a given sampleRate into  
+ * Microseconds.  
+ * @param	samples Number of samples.  
+ * @param	sampleRate sample rate that those samples are recorded at. 
+ *		  
+ * @return	number of microseconds it would take to play that audio. 
+ *		  
+ */
+  public static long samplesToDefaultPts(long samples, int sampleRate) {
+    return VideoJNI.AudioSamples_samplesToDefaultPts(samples, sampleRate);
+  }
+
+/**
+ * Converts a duration in microseconds into  
+ * a number of samples, assuming a given sampleRate.  
+ * @param	duration The duration in microseconds.  
+ * @param	sampleRate sample rate that you want to use.  
+ * @return	The number of samples it would take (at the given sampleRate) 
+ *		 to take duration microseconds to play.  
+ */
+  public static long defaultPtsToSamples(long duration, int sampleRate) {
+    return VideoJNI.AudioSamples_defaultPtsToSamples(duration, sampleRate);
+  }
+
+/**
+ * Creates an {@link AudioSamples} object by wrapping an  
+ * {@link io.humble.ferry.IBuffer object}.  
+ * <p>  
+ * If you are decoding into this buffer, the buffer must be at least 
+ *  
+ * 192k*channels large (an FFmpeg requirement) or the decodeAudio  
+ * call on {@link StreamCoder} will fail with an error.  
+ * If you are encoding from, any size should do.  
+ * </p>  
+ * @param	buffer the buffer to wrap  
+ * @param	channels the number of channels of audio you will put it the 
+ *		 buffer  
+ * @param	format the audio sample format  
+ * @return	a new {@link AudioSamples} object, or null on error.  
+ */
+  public static AudioSamples make(IBuffer buffer, int channels, AudioSamples.Format format) {
+    long cPtr = VideoJNI.AudioSamples_make__SWIG_1(IBuffer.getCPtr(buffer), buffer, channels, format.swigValue());
+    return (cPtr == 0) ? null : new AudioSamples(cPtr, false);
+  }
+
+/**
+ * Get a new audio samples buffer.  
+ * <p>  
+ * Note that any buffers this objects needs will be  
+ * lazily allocated (i.e. we won't actually grab all  
+ * the memory until we need it).  
+ * </p>  
+ * @param	numSamples The minimum number of samples you're  
+ * going to want to put in this buffer. We may (and probably  
+ * will) return a larger buffer, but you cannot assume that.  
+ * @param	numChannels The number of channels in the audio you'll  
+ * want to put in this buffer.  
+ * @param	format The format of this buffer  
+ * @return	A new object, or null if we can't allocate one.  
+ */
+  public static AudioSamples make(long numSamples, long numChannels, AudioSamples.Format format) {
+    long cPtr = VideoJNI.AudioSamples_make__SWIG_2(numSamples, numChannels, format.swigValue());
+    return (cPtr == 0) ? null : new AudioSamples(cPtr, false);
+  }
+
   public enum Format {
   /**
-   * Different type of audio sample formats.
-   * From libavutil/samplefmt.h
-   * No sample format
+   * The format we use to represent audio. Today
+   * only FMT_S16 (signed integer 16-bit audio) is supported.
+   * No format
    */
     SAMPLE_FMT_NONE(VideoJNI.AudioSamples_SAMPLE_FMT_NONE_get()),
   /**
@@ -184,6 +470,98 @@ public class AudioSamples extends MediaRawData {
 
     @SuppressWarnings("unused")
     private Format(Format swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
+  public enum ChannelLayout {
+    CH_FRONT_LEFT(VideoJNI.AudioSamples_CH_FRONT_LEFT_get()),
+    CH_FRONT_RIGHT(VideoJNI.AudioSamples_CH_FRONT_RIGHT_get()),
+    CH_FRONT_CENTER(VideoJNI.AudioSamples_CH_FRONT_CENTER_get()),
+    CH_LOW_FREQUENCY(VideoJNI.AudioSamples_CH_LOW_FREQUENCY_get()),
+    CH_BACK_LEFT(VideoJNI.AudioSamples_CH_BACK_LEFT_get()),
+    CH_BACK_RIGHT(VideoJNI.AudioSamples_CH_BACK_RIGHT_get()),
+    CH_FRONT_LEFT_OF_CENTER(VideoJNI.AudioSamples_CH_FRONT_LEFT_OF_CENTER_get()),
+    CH_FRONT_RIGHT_OF_CENTER(VideoJNI.AudioSamples_CH_FRONT_RIGHT_OF_CENTER_get()),
+    CH_BACK_CENTER(VideoJNI.AudioSamples_CH_BACK_CENTER_get()),
+    CH_SIDE_LEFT(VideoJNI.AudioSamples_CH_SIDE_LEFT_get()),
+    CH_SIDE_RIGHT(VideoJNI.AudioSamples_CH_SIDE_RIGHT_get()),
+    CH_TOP_CENTER(VideoJNI.AudioSamples_CH_TOP_CENTER_get()),
+    CH_TOP_FRONT_LEFT(VideoJNI.AudioSamples_CH_TOP_FRONT_LEFT_get()),
+    CH_TOP_FRONT_CENTER(VideoJNI.AudioSamples_CH_TOP_FRONT_CENTER_get()),
+    CH_TOP_FRONT_RIGHT(VideoJNI.AudioSamples_CH_TOP_FRONT_RIGHT_get()),
+    CH_TOP_BACK_LEFT(VideoJNI.AudioSamples_CH_TOP_BACK_LEFT_get()),
+    CH_TOP_BACK_CENTER(VideoJNI.AudioSamples_CH_TOP_BACK_CENTER_get()),
+    CH_TOP_BACK_RIGHT(VideoJNI.AudioSamples_CH_TOP_BACK_RIGHT_get()),
+    CH_STEREO_LEFT(VideoJNI.AudioSamples_CH_STEREO_LEFT_get()),
+    CH_STEREO_RIGHT(VideoJNI.AudioSamples_CH_STEREO_RIGHT_get()),
+    CH_WIDE_LEFT(VideoJNI.AudioSamples_CH_WIDE_LEFT_get()),
+    CH_WIDE_RIGHT(VideoJNI.AudioSamples_CH_WIDE_RIGHT_get()),
+    CH_SURROUND_DIRECT_LEFT(VideoJNI.AudioSamples_CH_SURROUND_DIRECT_LEFT_get()),
+    CH_SURROUND_DIRECT_RIGHT(VideoJNI.AudioSamples_CH_SURROUND_DIRECT_RIGHT_get()),
+    CH_LOW_FREQUENCY_2(VideoJNI.AudioSamples_CH_LOW_FREQUENCY_2_get()),
+    CH_LAYOUT_MONO(VideoJNI.AudioSamples_CH_LAYOUT_MONO_get()),
+    CH_LAYOUT_STEREO(VideoJNI.AudioSamples_CH_LAYOUT_STEREO_get()),
+    CH_LAYOUT_2POINT1(VideoJNI.AudioSamples_CH_LAYOUT_2POINT1_get()),
+    CH_LAYOUT_2_1(VideoJNI.AudioSamples_CH_LAYOUT_2_1_get()),
+    CH_LAYOUT_SURROUND(VideoJNI.AudioSamples_CH_LAYOUT_SURROUND_get()),
+    CH_LAYOUT_3POINT1(VideoJNI.AudioSamples_CH_LAYOUT_3POINT1_get()),
+    CH_LAYOUT_4POINT0(VideoJNI.AudioSamples_CH_LAYOUT_4POINT0_get()),
+    CH_LAYOUT_4POINT1(VideoJNI.AudioSamples_CH_LAYOUT_4POINT1_get()),
+    CH_LAYOUT_2_2(VideoJNI.AudioSamples_CH_LAYOUT_2_2_get()),
+    CH_LAYOUT_QUAD(VideoJNI.AudioSamples_CH_LAYOUT_QUAD_get()),
+    CH_LAYOUT_5POINT0(VideoJNI.AudioSamples_CH_LAYOUT_5POINT0_get()),
+    CH_LAYOUT_5POINT1(VideoJNI.AudioSamples_CH_LAYOUT_5POINT1_get()),
+    CH_LAYOUT_5POINT0_BACK(VideoJNI.AudioSamples_CH_LAYOUT_5POINT0_BACK_get()),
+    CH_LAYOUT_5POINT1_BACK(VideoJNI.AudioSamples_CH_LAYOUT_5POINT1_BACK_get()),
+    CH_LAYOUT_6POINT0(VideoJNI.AudioSamples_CH_LAYOUT_6POINT0_get()),
+    CH_LAYOUT_6POINT0_FRONT(VideoJNI.AudioSamples_CH_LAYOUT_6POINT0_FRONT_get()),
+    CH_LAYOUT_HEXAGONAL(VideoJNI.AudioSamples_CH_LAYOUT_HEXAGONAL_get()),
+    CH_LAYOUT_6POINT1(VideoJNI.AudioSamples_CH_LAYOUT_6POINT1_get()),
+    CH_LAYOUT_6POINT1_BACK(VideoJNI.AudioSamples_CH_LAYOUT_6POINT1_BACK_get()),
+    CH_LAYOUT_6POINT1_FRONT(VideoJNI.AudioSamples_CH_LAYOUT_6POINT1_FRONT_get()),
+    CH_LAYOUT_7POINT0(VideoJNI.AudioSamples_CH_LAYOUT_7POINT0_get()),
+    CH_LAYOUT_7POINT0_FRONT(VideoJNI.AudioSamples_CH_LAYOUT_7POINT0_FRONT_get()),
+    CH_LAYOUT_7POINT1(VideoJNI.AudioSamples_CH_LAYOUT_7POINT1_get()),
+    CH_LAYOUT_7POINT1_WIDE(VideoJNI.AudioSamples_CH_LAYOUT_7POINT1_WIDE_get()),
+    CH_LAYOUT_7POINT1_WIDE_BACK(VideoJNI.AudioSamples_CH_LAYOUT_7POINT1_WIDE_BACK_get()),
+    CH_LAYOUT_OCTAGONAL(VideoJNI.AudioSamples_CH_LAYOUT_OCTAGONAL_get()),
+    CH_LAYOUT_STEREO_DOWNMIX(VideoJNI.AudioSamples_CH_LAYOUT_STEREO_DOWNMIX_get());
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static ChannelLayout swigToEnum(int swigValue) {
+      ChannelLayout[] swigValues = ChannelLayout.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (ChannelLayout swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + ChannelLayout.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private ChannelLayout() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private ChannelLayout(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private ChannelLayout(ChannelLayout swigEnum) {
       this.swigValue = swigEnum.swigValue;
       SwigNext.next = this.swigValue+1;
     }
