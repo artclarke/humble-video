@@ -13,6 +13,7 @@ libhumble_video_la_LIBADD= $(VS_PKG_LIBRARIES)
 
 libhumble_video_la_SOURCES= \
   PixelFormat.cpp \
+  AudioSamples.cpp \
   KeyValueBag.cpp \
   KeyValueBagImpl.cpp \
   Property.cpp \
@@ -50,6 +51,8 @@ libhumble_video_la_HEADERS= \
   FfmpegIncludes.h \
   Global.swg \
   PixelFormat.h \
+  AudioSamples.h \
+  AudioSamples.swg \
   KeyValueBag.h \
   KeyValueBagImpl.h \
   KeyValueBag.swg \

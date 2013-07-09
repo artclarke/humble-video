@@ -78,11 +78,12 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
-	PacketTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
-	SourceTester$(EXEEXT) SourceFormatTester$(EXEEXT) \
-	SourceStreamTester$(EXEEXT) SinkFormatTester$(EXEEXT) \
-	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
+check_PROGRAMS = CodecTester$(EXEEXT) IndexEntryTester$(EXEEXT) \
+	ErrorTester$(EXEEXT) PacketTester$(EXEEXT) \
+	KeyValueBagTester$(EXEEXT) SourceTester$(EXEEXT) \
+	SourceFormatTester$(EXEEXT) SourceStreamTester$(EXEEXT) \
+	SinkFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
+	RationalTester$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mk/depcomp $(noinst_HEADERS) \
@@ -100,16 +101,23 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+am_CodecTester_OBJECTS = CodecTest.$(OBJEXT) TestData.$(OBJEXT) \
+	Main.$(OBJEXT)
+nodist_CodecTester_OBJECTS = CodecTest_CXXRunner.$(OBJEXT)
+CodecTester_OBJECTS = $(am_CodecTester_OBJECTS) \
+	$(nodist_CodecTester_OBJECTS)
+CodecTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 am_ErrorTester_OBJECTS = ErrorTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_ErrorTester_OBJECTS = ErrorTest_CXXRunner.$(OBJEXT)
 ErrorTester_OBJECTS = $(am_ErrorTester_OBJECTS) \
 	$(nodist_ErrorTester_OBJECTS)
 ErrorTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 am_IndexEntryTester_OBJECTS = IndexEntryTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_IndexEntryTester_OBJECTS = IndexEntryTest_CXXRunner.$(OBJEXT)
 IndexEntryTester_OBJECTS = $(am_IndexEntryTester_OBJECTS) \
@@ -205,7 +213,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
+SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
+	$(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(nodist_IndexEntryTester_SOURCES) \
 	$(KeyValueBagTester_SOURCES) \
 	$(nodist_KeyValueBagTester_SOURCES) $(PacketTester_SOURCES) \
@@ -218,11 +227,12 @@ SOURCES = $(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
 	$(SourceStreamTester_SOURCES) \
 	$(nodist_SourceStreamTester_SOURCES) $(SourceTester_SOURCES) \
 	$(nodist_SourceTester_SOURCES)
-DIST_SOURCES = $(ErrorTester_SOURCES) $(IndexEntryTester_SOURCES) \
-	$(KeyValueBagTester_SOURCES) $(PacketTester_SOURCES) \
-	$(PropertyTester_SOURCES) $(RationalTester_SOURCES) \
-	$(SinkFormatTester_SOURCES) $(SourceFormatTester_SOURCES) \
-	$(SourceStreamTester_SOURCES) $(SourceTester_SOURCES)
+DIST_SOURCES = $(CodecTester_SOURCES) $(ErrorTester_SOURCES) \
+	$(IndexEntryTester_SOURCES) $(KeyValueBagTester_SOURCES) \
+	$(PacketTester_SOURCES) $(PropertyTester_SOURCES) \
+	$(RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
+	$(SourceFormatTester_SOURCES) $(SourceStreamTester_SOURCES) \
+	$(SourceTester_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -676,6 +686,7 @@ VS_CPP_NAMESPACE = io::humble::video
 VS_TEST = 1
 SUBDIRS = customio
 BUILT_SOURCES = \
+  CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
   ErrorTest_CXXRunner.cpp \
   PacketTest_CXXRunner.cpp \
@@ -688,6 +699,7 @@ BUILT_SOURCES = \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  CodecTest.h \
   IndexEntryTest.h \
   ErrorTest.h \
   PacketTest.h \
@@ -705,6 +717,17 @@ inst_checkdir = $(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS = $(check_PROGRAMS)
+CodecTester_SOURCES = \
+  CodecTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_CodecTester_SOURCES = \
+  CodecTest_CXXRunner.cpp
+
+CodecTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 IndexEntryTester_SOURCES = \
   IndexEntryTest.cpp \
   Main.cpp
@@ -852,6 +875,10 @@ clean-checkPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
+CodecTester$(EXEEXT): $(CodecTester_OBJECTS) $(CodecTester_DEPENDENCIES) $(EXTRA_CodecTester_DEPENDENCIES) 
+	@rm -f CodecTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(CodecTester_OBJECTS) $(CodecTester_LDADD) $(LIBS)
+
 ErrorTester$(EXEEXT): $(ErrorTester_OBJECTS) $(ErrorTester_DEPENDENCIES) $(EXTRA_ErrorTester_DEPENDENCIES) 
 	@rm -f ErrorTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(ErrorTester_OBJECTS) $(ErrorTester_LDADD) $(LIBS)
@@ -898,6 +925,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CodecTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CodecTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntryTest.Po@am__quote@
@@ -1188,6 +1217,13 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+CodecTester.log: CodecTester$(EXEEXT)
+	@p='CodecTester$(EXEEXT)'; \
+	b='CodecTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 IndexEntryTester.log: IndexEntryTester$(EXEEXT)
 	@p='IndexEntryTester$(EXEEXT)'; \
 	b='IndexEntryTester'; \

@@ -315,16 +315,16 @@ namespace io { namespace humble { namespace video
     return i;
   }
   
-  int32_t
+  AudioSamples::Format
   Codec::getSupportedAudioSampleFormat(int32_t index)
   {
     int i = 0;
     for(const enum AVSampleFormat* p=mCodec->sample_fmts;
-      p && (*p != -1);
+      p && (*p != AV_SAMPLE_FMT_NONE);
       p++,i++)
       if (index == i)
-        return *p;
-    return AV_SAMPLE_FMT_NONE;
+        return (AudioSamples::Format)*p;
+    return AudioSamples::SAMPLE_FMT_NONE;
     
   }
 

@@ -213,6 +213,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <io/humble/video/Property.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/MediaData.h>
+#include <io/humble/video/AudioSamples.h>
 #include <io/humble/video/Error.h>
 #include <io/humble/video/Packet.h>
 #include <io/humble/video/Configurable.h>
@@ -5535,6 +5536,138 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaData_1setData_1intern
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioSamples_1SAMPLE_1FMT_1NONE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::AudioSamples::Format result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::AudioSamples::Format)io::humble::video::AudioSamples::SAMPLE_FMT_NONE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioSamples_1SAMPLE_1FMT_1U8_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::AudioSamples::Format result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::AudioSamples::Format)io::humble::video::AudioSamples::SAMPLE_FMT_U8;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioSamples_1SAMPLE_1FMT_1S16_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::AudioSamples::Format result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::AudioSamples::Format)io::humble::video::AudioSamples::SAMPLE_FMT_S16;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioSamples_1SAMPLE_1FMT_1S32_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::AudioSamples::Format result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::AudioSamples::Format)io::humble::video::AudioSamples::SAMPLE_FMT_S32;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioSamples_1SAMPLE_1FMT_1FLT_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::AudioSamples::Format result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::AudioSamples::Format)io::humble::video::AudioSamples::SAMPLE_FMT_FLT;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioSamples_1SAMPLE_1FMT_1DBL_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::AudioSamples::Format result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::AudioSamples::Format)io::humble::video::AudioSamples::SAMPLE_FMT_DBL;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioSamples_1SAMPLE_1FMT_1U8P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::AudioSamples::Format result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::AudioSamples::Format)io::humble::video::AudioSamples::SAMPLE_FMT_U8P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioSamples_1SAMPLE_1FMT_1S16P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::AudioSamples::Format result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::AudioSamples::Format)io::humble::video::AudioSamples::SAMPLE_FMT_S16P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioSamples_1SAMPLE_1FMT_1S32P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::AudioSamples::Format result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::AudioSamples::Format)io::humble::video::AudioSamples::SAMPLE_FMT_S32P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioSamples_1SAMPLE_1FMT_1FLTP_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::AudioSamples::Format result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::AudioSamples::Format)io::humble::video::AudioSamples::SAMPLE_FMT_FLTP;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioSamples_1SAMPLE_1FMT_1DBLP_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::AudioSamples::Format result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::AudioSamples::Format)io::humble::video::AudioSamples::SAMPLE_FMT_DBLP;
+  jresult = (jint)result; 
+  return jresult;
 }
 
 
@@ -16559,7 +16692,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedAudioSa
   jint jresult = 0 ;
   io::humble::video::Codec *arg1 = (io::humble::video::Codec *) 0 ;
   int32_t arg2 ;
-  int32_t result;
+  io::humble::video::AudioSamples::Format result;
   
   (void)jenv;
   (void)jcls;
@@ -16578,7 +16711,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedAudioSa
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)(arg1)->getSupportedAudioSampleFormat(arg2);
+      result = (io::humble::video::AudioSamples::Format)(arg1)->getSupportedAudioSampleFormat(arg2);
     }
     catch(std::invalid_argument & e)
     {
@@ -25432,6 +25565,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaEncodedDataUpcas
     (void)jenv;
     (void)jcls;
     *(io::humble::video::MediaData **)&baseptr = *(io::humble::video::MediaEncodedData **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGAudioSamplesUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::video::MediaRawData **)&baseptr = *(io::humble::video::AudioSamples **)&jarg1;
     return baseptr;
 }
 

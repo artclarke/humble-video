@@ -120,6 +120,17 @@ class VideoJNI {
   public final static native int MediaData_getSize(long jarg1, MediaData jarg1_);
   public final static native boolean MediaData_isKey(long jarg1, MediaData jarg1_);
   public final static native void MediaData_setData_internal(long jarg1, MediaData jarg1_, long jarg2, IBuffer jarg2_);
+  public final static native int AudioSamples_SAMPLE_FMT_NONE_get();
+  public final static native int AudioSamples_SAMPLE_FMT_U8_get();
+  public final static native int AudioSamples_SAMPLE_FMT_S16_get();
+  public final static native int AudioSamples_SAMPLE_FMT_S32_get();
+  public final static native int AudioSamples_SAMPLE_FMT_FLT_get();
+  public final static native int AudioSamples_SAMPLE_FMT_DBL_get();
+  public final static native int AudioSamples_SAMPLE_FMT_U8P_get();
+  public final static native int AudioSamples_SAMPLE_FMT_S16P_get();
+  public final static native int AudioSamples_SAMPLE_FMT_S32P_get();
+  public final static native int AudioSamples_SAMPLE_FMT_FLTP_get();
+  public final static native int AudioSamples_SAMPLE_FMT_DBLP_get();
   public final static native int Error_getType(long jarg1, Error jarg1_);
   public final static native String Error_getDescription(long jarg1, Error jarg1_);
   public final static native int Error_getErrorNumber(long jarg1, Error jarg1_);
@@ -824,6 +835,7 @@ class VideoJNI {
   public final static native long SWIGMediaDataUpcast(long jarg1);
   public final static native long SWIGMediaRawDataUpcast(long jarg1);
   public final static native long SWIGMediaEncodedDataUpcast(long jarg1);
+  public final static native long SWIGAudioSamplesUpcast(long jarg1);
   public final static native long SWIGErrorUpcast(long jarg1);
   public final static native long SWIGPacketUpcast(long jarg1);
   public final static native long SWIGConfigurableUpcast(long jarg1);

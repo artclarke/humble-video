@@ -547,12 +547,13 @@ public class Codec extends RefCounted {
 /**
  * Get the supported sample format at this index.  
  * @param	index the index in our list.  
- *  
+ * @return	the format, or {@link AudioSamples.Format.SAMPLE_FMT_NONE} 
+ *		 if  
  * unknown, index < 0 or index >=  
  * {@link #getNumSupportedAudioSampleFormats()}.  
  */
-  public int getSupportedAudioSampleFormat(int index) {
-    return VideoJNI.Codec_getSupportedAudioSampleFormat(swigCPtr, this, index);
+  public AudioSamples.Format getSupportedAudioSampleFormat(int index) {
+    return AudioSamples.Format.swigToEnum(VideoJNI.Codec_getSupportedAudioSampleFormat(swigCPtr, this, index));
   }
 
 /**

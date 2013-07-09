@@ -29,6 +29,7 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/PixelFormat.h>
+#include <io/humble/video/AudioSamples.h>
 #include <io/humble/video/Rational.h>
 
 namespace io {
@@ -959,11 +960,11 @@ public:
    *
    * @param index the index in our list.
    *
-   * @return the format, or {@link IAudioSamples.Format.FMT_NONE} if
+   * @return the format, or {@link AudioSamples.Format.SAMPLE_FMT_NONE} if
    *   unknown, index < 0 or index >=
    *   {@link #getNumSupportedAudioSampleFormats()}.
    */
-  virtual int32_t
+  virtual AudioSamples::Format
   getSupportedAudioSampleFormat(int32_t index);
 
   /**
