@@ -37,7 +37,7 @@
     result.append("complete:"+isComplete()+";");
     result.append("size:"+getSize()+";");
     result.append("key:"+isKey()+";");
-    IRational timeBase = IRational.make(1,(int)Global.DEFAULT_PTS_PER_SECOND);
+    Rational timeBase = Rational.make(1,(int)Global.DEFAULT_PTS_PER_SECOND);
     result.append("time base:"+timeBase+";");
     if (timeBase != null) timeBase.delete();
     result.append("]");

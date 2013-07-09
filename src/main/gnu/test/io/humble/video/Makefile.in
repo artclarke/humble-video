@@ -78,12 +78,13 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = CodecTester$(EXEEXT) IndexEntryTester$(EXEEXT) \
-	ErrorTester$(EXEEXT) PacketTester$(EXEEXT) \
-	KeyValueBagTester$(EXEEXT) SourceTester$(EXEEXT) \
-	SourceFormatTester$(EXEEXT) SourceStreamTester$(EXEEXT) \
-	SinkFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
-	RationalTester$(EXEEXT)
+check_PROGRAMS = VideoPictureTester$(EXEEXT) \
+	AudioSamplesTester$(EXEEXT) CodecTester$(EXEEXT) \
+	IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
+	PacketTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
+	SourceTester$(EXEEXT) SourceFormatTester$(EXEEXT) \
+	SourceStreamTester$(EXEEXT) SinkFormatTester$(EXEEXT) \
+	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mk/depcomp $(noinst_HEADERS) \
@@ -101,6 +102,18 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+am_AudioSamplesTester_OBJECTS = AudioSamplesTest.$(OBJEXT) \
+	TestData.$(OBJEXT) Main.$(OBJEXT)
+nodist_AudioSamplesTester_OBJECTS =  \
+	AudioSamplesTest_CXXRunner.$(OBJEXT)
+AudioSamplesTester_OBJECTS = $(am_AudioSamplesTester_OBJECTS) \
+	$(nodist_AudioSamplesTester_OBJECTS)
+AudioSamplesTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 am_CodecTester_OBJECTS = CodecTest.$(OBJEXT) TestData.$(OBJEXT) \
 	Main.$(OBJEXT)
 nodist_CodecTester_OBJECTS = CodecTest_CXXRunner.$(OBJEXT)
@@ -108,10 +121,6 @@ CodecTester_OBJECTS = $(am_CodecTester_OBJECTS) \
 	$(nodist_CodecTester_OBJECTS)
 CodecTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 am_ErrorTester_OBJECTS = ErrorTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_ErrorTester_OBJECTS = ErrorTest_CXXRunner.$(OBJEXT)
 ErrorTester_OBJECTS = $(am_ErrorTester_OBJECTS) \
@@ -179,6 +188,14 @@ SourceTester_OBJECTS = $(am_SourceTester_OBJECTS) \
 	$(nodist_SourceTester_OBJECTS)
 SourceTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_VideoPictureTester_OBJECTS = VideoPictureTest.$(OBJEXT) \
+	TestData.$(OBJEXT) Main.$(OBJEXT)
+nodist_VideoPictureTester_OBJECTS =  \
+	VideoPictureTest_CXXRunner.$(OBJEXT)
+VideoPictureTester_OBJECTS = $(am_VideoPictureTester_OBJECTS) \
+	$(nodist_VideoPictureTester_OBJECTS)
+VideoPictureTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -213,9 +230,11 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
-	$(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
-	$(IndexEntryTester_SOURCES) $(nodist_IndexEntryTester_SOURCES) \
+SOURCES = $(AudioSamplesTester_SOURCES) \
+	$(nodist_AudioSamplesTester_SOURCES) $(CodecTester_SOURCES) \
+	$(nodist_CodecTester_SOURCES) $(ErrorTester_SOURCES) \
+	$(nodist_ErrorTester_SOURCES) $(IndexEntryTester_SOURCES) \
+	$(nodist_IndexEntryTester_SOURCES) \
 	$(KeyValueBagTester_SOURCES) \
 	$(nodist_KeyValueBagTester_SOURCES) $(PacketTester_SOURCES) \
 	$(nodist_PacketTester_SOURCES) $(PropertyTester_SOURCES) \
@@ -226,13 +245,15 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(nodist_SourceFormatTester_SOURCES) \
 	$(SourceStreamTester_SOURCES) \
 	$(nodist_SourceStreamTester_SOURCES) $(SourceTester_SOURCES) \
-	$(nodist_SourceTester_SOURCES)
-DIST_SOURCES = $(CodecTester_SOURCES) $(ErrorTester_SOURCES) \
-	$(IndexEntryTester_SOURCES) $(KeyValueBagTester_SOURCES) \
-	$(PacketTester_SOURCES) $(PropertyTester_SOURCES) \
-	$(RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
-	$(SourceFormatTester_SOURCES) $(SourceStreamTester_SOURCES) \
-	$(SourceTester_SOURCES)
+	$(nodist_SourceTester_SOURCES) $(VideoPictureTester_SOURCES) \
+	$(nodist_VideoPictureTester_SOURCES)
+DIST_SOURCES = $(AudioSamplesTester_SOURCES) $(CodecTester_SOURCES) \
+	$(ErrorTester_SOURCES) $(IndexEntryTester_SOURCES) \
+	$(KeyValueBagTester_SOURCES) $(PacketTester_SOURCES) \
+	$(PropertyTester_SOURCES) $(RationalTester_SOURCES) \
+	$(SinkFormatTester_SOURCES) $(SourceFormatTester_SOURCES) \
+	$(SourceStreamTester_SOURCES) $(SourceTester_SOURCES) \
+	$(VideoPictureTester_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -686,6 +707,8 @@ VS_CPP_NAMESPACE = io::humble::video
 VS_TEST = 1
 SUBDIRS = customio
 BUILT_SOURCES = \
+  VideoPictureTest_CXXRunner.cpp \
+  AudioSamplesTest_CXXRunner.cpp \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
   ErrorTest_CXXRunner.cpp \
@@ -699,6 +722,8 @@ BUILT_SOURCES = \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  VideoPictureTest.h \
+  AudioSamplesTest.h \
   CodecTest.h \
   IndexEntryTest.h \
   ErrorTest.h \
@@ -717,6 +742,28 @@ inst_checkdir = $(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS = $(check_PROGRAMS)
+VideoPictureTester_SOURCES = \
+  VideoPictureTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_VideoPictureTester_SOURCES = \
+  VideoPictureTest_CXXRunner.cpp
+
+VideoPictureTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
+AudioSamplesTester_SOURCES = \
+  AudioSamplesTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_AudioSamplesTester_SOURCES = \
+  AudioSamplesTest_CXXRunner.cpp
+
+AudioSamplesTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 CodecTester_SOURCES = \
   CodecTest.cpp \
   TestData.cpp \
@@ -875,6 +922,10 @@ clean-checkPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
+AudioSamplesTester$(EXEEXT): $(AudioSamplesTester_OBJECTS) $(AudioSamplesTester_DEPENDENCIES) $(EXTRA_AudioSamplesTester_DEPENDENCIES) 
+	@rm -f AudioSamplesTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(AudioSamplesTester_OBJECTS) $(AudioSamplesTester_LDADD) $(LIBS)
+
 CodecTester$(EXEEXT): $(CodecTester_OBJECTS) $(CodecTester_DEPENDENCIES) $(EXTRA_CodecTester_DEPENDENCIES) 
 	@rm -f CodecTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(CodecTester_OBJECTS) $(CodecTester_LDADD) $(LIBS)
@@ -919,12 +970,18 @@ SourceTester$(EXEEXT): $(SourceTester_OBJECTS) $(SourceTester_DEPENDENCIES) $(EX
 	@rm -f SourceTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(SourceTester_OBJECTS) $(SourceTester_LDADD) $(LIBS)
 
+VideoPictureTester$(EXEEXT): $(VideoPictureTester_OBJECTS) $(VideoPictureTester_DEPENDENCIES) $(EXTRA_VideoPictureTester_DEPENDENCIES) 
+	@rm -f VideoPictureTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(VideoPictureTester_OBJECTS) $(VideoPictureTester_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioSamplesTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioSamplesTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CodecTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CodecTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest.Po@am__quote@
@@ -949,6 +1006,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestData.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VideoPictureTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VideoPictureTest_CXXRunner.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1217,6 +1276,20 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+VideoPictureTester.log: VideoPictureTester$(EXEEXT)
+	@p='VideoPictureTester$(EXEEXT)'; \
+	b='VideoPictureTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+AudioSamplesTester.log: AudioSamplesTester$(EXEEXT)
+	@p='AudioSamplesTester$(EXEEXT)'; \
+	b='AudioSamplesTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 CodecTester.log: CodecTester$(EXEEXT)
 	@p='CodecTester$(EXEEXT)'; \
 	b='CodecTester'; \

@@ -22,9 +22,9 @@
 
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/MediaData.h>
-#include <io/humble/video/PixelFormat.h>
 #include <io/humble/ferry/IBuffer.h>
 #include <io/humble/video/Rational.h>
+#include <io/humble/video/PixelFormat.h>
 
 namespace io { namespace humble { namespace video
 {

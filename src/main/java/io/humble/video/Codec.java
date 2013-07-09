@@ -253,16 +253,16 @@ public class Codec extends RefCounted {
    * @return a list
    */
 
-  public java.util.List<Integer>
+  public java.util.List<AudioSamples.Format>
   getSupportedAudioSampleFormats()
   {
-    java.util.List<Integer> retval =
-      new java.util.LinkedList<Integer>();
+    java.util.List<AudioSamples.Format> retval =
+      new java.util.LinkedList<AudioSamples.Format>();
     int count = getNumSupportedAudioSampleFormats();
     for(int i=0;i<count;i++)
     {
-      Integer fmt = getSupportedAudioSampleFormat(i);
-      if (fmt != null && fmt != -1)
+      AudioSamples.Format fmt = getSupportedAudioSampleFormat(i);
+      if (fmt != null && fmt != AudioSamples.Format.SAMPLE_FMT_NONE)
         retval.add(fmt);
     }
     return retval;

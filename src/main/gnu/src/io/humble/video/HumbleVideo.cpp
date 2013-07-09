@@ -213,12 +213,12 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <io/humble/video/Property.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/MediaData.h>
+#include <io/humble/video/PixelFormat.h>
 #include <io/humble/video/AudioSamples.h>
 #include <io/humble/video/VideoPicture.h>
 #include <io/humble/video/Error.h>
 #include <io/humble/video/Packet.h>
 #include <io/humble/video/Configurable.h>
-#include <io/humble/video/PixelFormat.h>
 #include <io/humble/video/Global.h>
 #include <io/humble/video/Codec.h>
 #include <io/humble/video/ContainerFormat.h>
@@ -1007,6 +1007,78 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Global_1setFFmpegLoggingLe
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1FMT_1NONE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PixelFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PixelFormat::Type)io::humble::video::PixelFormat::FMT_NONE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1FMT_1RGBA64BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PixelFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PixelFormat::Type)io::humble::video::PixelFormat::FMT_RGBA64BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1FMT_10RGB_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PixelFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PixelFormat::Type)io::humble::video::PixelFormat::FMT_0RGB;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1YUV_1Y_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PixelFormat::YUVColorComponent result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PixelFormat::YUVColorComponent)io::humble::video::PixelFormat::YUV_Y;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1YUV_1U_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PixelFormat::YUVColorComponent result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PixelFormat::YUVColorComponent)io::humble::video::PixelFormat::YUV_U;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1YUV_1V_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PixelFormat::YUVColorComponent result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PixelFormat::YUVColorComponent)io::humble::video::PixelFormat::YUV_V;
+  jresult = (jint)result; 
+  return jresult;
 }
 
 
@@ -8360,10 +8432,10 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1getHeight(JN
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1getPixelType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1getPixelType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
   io::humble::video::VideoPicture *arg1 = (io::humble::video::VideoPicture *) 0 ;
-  PixelFormat::Type result;
+  io::humble::video::PixelFormat::Type result;
   
   (void)jenv;
   (void)jcls;
@@ -8381,7 +8453,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1getPixelTyp
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (arg1)->getPixelType();
+      result = (io::humble::video::PixelFormat::Type)(arg1)->getPixelType();
     }
     catch(std::invalid_argument & e)
     {
@@ -8432,7 +8504,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1getPixelTyp
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(PixelFormat::Type **)&jresult = new PixelFormat::Type((const PixelFormat::Type &)result); 
+  jresult = (jint)result; 
   return jresult;
 }
 
@@ -8820,26 +8892,20 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1getDataLineS
 }
 
 
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1setComplete(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2, jlong jarg3, jint jarg4, jint jarg5, jlong jarg6) {
+SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1setComplete(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2, jint jarg3, jint jarg4, jint jarg5, jlong jarg6) {
   io::humble::video::VideoPicture *arg1 = (io::humble::video::VideoPicture *) 0 ;
   bool arg2 ;
-  PixelFormat::Type arg3 ;
+  io::humble::video::PixelFormat::Type arg3 ;
   int arg4 ;
   int arg5 ;
   int64_t arg6 ;
-  PixelFormat::Type *argp3 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(io::humble::video::VideoPicture **)&jarg1; 
   arg2 = jarg2 ? true : false; 
-  argp3 = *(PixelFormat::Type **)&jarg3; 
-  if (!argp3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null PixelFormat::Type");
-    return ;
-  }
-  arg3 = *argp3; 
+  arg3 = (io::humble::video::PixelFormat::Type)jarg3; 
   arg4 = (int)jarg4; 
   arg5 = (int)jarg5; 
   arg6 = (int64_t)jarg6; 
@@ -8989,22 +9055,16 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1copy(JNI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1make_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jint jarg3) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1make_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3) {
   jlong jresult = 0 ;
-  PixelFormat::Type arg1 ;
+  io::humble::video::PixelFormat::Type arg1 ;
   int arg2 ;
   int arg3 ;
-  PixelFormat::Type *argp1 ;
   io::humble::video::VideoPicture *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  argp1 = *(PixelFormat::Type **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null PixelFormat::Type");
-    return 0;
-  }
-  arg1 = *argp1; 
+  arg1 = (io::humble::video::PixelFormat::Type)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   {
@@ -9386,25 +9446,19 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1setPictureTy
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1make_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3, jint jarg4) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_VideoPicture_1make_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4) {
   jlong jresult = 0 ;
   io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
-  PixelFormat::Type arg2 ;
+  io::humble::video::PixelFormat::Type arg2 ;
   int arg3 ;
   int arg4 ;
-  PixelFormat::Type *argp2 ;
   io::humble::video::VideoPicture *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
-  argp2 = *(PixelFormat::Type **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null PixelFormat::Type");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (io::humble::video::PixelFormat::Type)jarg2; 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
   {
@@ -12877,78 +12931,6 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1FMT_1NONE_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  io::humble::video::PixelFormat::Type result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (io::humble::video::PixelFormat::Type)io::humble::video::PixelFormat::FMT_NONE;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1FMT_1RGBA64BE_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  io::humble::video::PixelFormat::Type result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (io::humble::video::PixelFormat::Type)io::humble::video::PixelFormat::FMT_RGBA64BE;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1FMT_10RGB_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  io::humble::video::PixelFormat::Type result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (io::humble::video::PixelFormat::Type)io::humble::video::PixelFormat::FMT_0RGB;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1YUV_1Y_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  io::humble::video::PixelFormat::YUVColorComponent result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (io::humble::video::PixelFormat::YUVColorComponent)io::humble::video::PixelFormat::YUV_Y;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1YUV_1U_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  io::humble::video::PixelFormat::YUVColorComponent result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (io::humble::video::PixelFormat::YUVColorComponent)io::humble::video::PixelFormat::YUV_U;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1YUV_1V_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  io::humble::video::PixelFormat::YUVColorComponent result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (io::humble::video::PixelFormat::YUVColorComponent)io::humble::video::PixelFormat::YUV_V;
   jresult = (jint)result; 
   return jresult;
 }
@@ -29317,6 +29299,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGGlobalUpcast(JNIEnv *
     return baseptr;
 }
 
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGPixelFormatUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::PixelFormat **)&jarg1;
+    return baseptr;
+}
+
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGRationalUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
@@ -29402,14 +29392,6 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGConfigurableUpcast(JN
     (void)jenv;
     (void)jcls;
     *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::Configurable **)&jarg1;
-    return baseptr;
-}
-
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGPixelFormatUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::PixelFormat **)&jarg1;
     return baseptr;
 }
 

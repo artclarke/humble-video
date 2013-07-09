@@ -136,7 +136,7 @@ public class VideoPicture extends MediaRawData {
     result.append("complete:"+isComplete()+";");
     result.append("size:"+getSize()+";");
     result.append("key:"+isKey()+";");
-    IRational timeBase = IRational.make(1,(int)Global.DEFAULT_PTS_PER_SECOND);
+    Rational timeBase = Rational.make(1,(int)Global.DEFAULT_PTS_PER_SECOND);
     result.append("time base:"+timeBase+";");
     if (timeBase != null) timeBase.delete();
     result.append("]");
@@ -200,8 +200,8 @@ public class VideoPicture extends MediaRawData {
  * Returns the pixel format of the picture.  
  * @return	the pixel format of the picture.  
  */
-  public SWIGTYPE_p_PixelFormat__Type getPixelType() {
-    return new SWIGTYPE_p_PixelFormat__Type(VideoJNI.VideoPicture_getPixelType(swigCPtr, this), true);
+  public PixelFormat.Type getPixelType() {
+    return PixelFormat.Type.swigToEnum(VideoJNI.VideoPicture_getPixelType(swigCPtr, this));
   }
 
 /**
@@ -276,8 +276,8 @@ public class VideoPicture extends MediaRawData {
  * The caller must ensure this PTS is in units of 1/1,000,000 seconds. 
  *  
  */
-  public void setComplete(boolean aIsComplete, SWIGTYPE_p_PixelFormat__Type format, int width, int height, long pts) {
-    VideoJNI.VideoPicture_setComplete(swigCPtr, this, aIsComplete, SWIGTYPE_p_PixelFormat__Type.getCPtr(format), width, height, pts);
+  public void setComplete(boolean aIsComplete, PixelFormat.Type format, int width, int height, long pts) {
+    VideoJNI.VideoPicture_setComplete(swigCPtr, this, aIsComplete, format.swigValue(), width, height, pts);
   }
 
 /**
@@ -317,8 +317,8 @@ public class VideoPicture extends MediaRawData {
  *		 want Humble Video to guess when decoding.  
  * @return	A new object, or null if we can't allocate one.  
  */
-  public static VideoPicture make(SWIGTYPE_p_PixelFormat__Type format, int width, int height) {
-    long cPtr = VideoJNI.VideoPicture_make__SWIG_0(SWIGTYPE_p_PixelFormat__Type.getCPtr(format), width, height);
+  public static VideoPicture make(PixelFormat.Type format, int width, int height) {
+    long cPtr = VideoJNI.VideoPicture_make__SWIG_0(format.swigValue(), width, height);
     return (cPtr == 0) ? null : new VideoPicture(cPtr, false);
   }
 
@@ -384,8 +384,8 @@ public class VideoPicture extends MediaRawData {
  * @param	height The height of the picture, in pixels.  
  * @return	A new object, or null if we can't allocate one.  
  */
-  public static VideoPicture make(IBuffer buffer, SWIGTYPE_p_PixelFormat__Type format, int width, int height) {
-    long cPtr = VideoJNI.VideoPicture_make__SWIG_2(IBuffer.getCPtr(buffer), buffer, SWIGTYPE_p_PixelFormat__Type.getCPtr(format), width, height);
+  public static VideoPicture make(IBuffer buffer, PixelFormat.Type format, int width, int height) {
+    long cPtr = VideoJNI.VideoPicture_make__SWIG_2(IBuffer.getCPtr(buffer), buffer, format.swigValue(), width, height);
     return (cPtr == 0) ? null : new VideoPicture(cPtr, false);
   }
 

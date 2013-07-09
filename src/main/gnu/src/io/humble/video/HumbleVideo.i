@@ -27,12 +27,12 @@
 #include <io/humble/video/Property.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/MediaData.h>
+#include <io/humble/video/PixelFormat.h>
 #include <io/humble/video/AudioSamples.h>
 #include <io/humble/video/VideoPicture.h>
 #include <io/humble/video/Error.h>
 #include <io/humble/video/Packet.h>
 #include <io/humble/video/Configurable.h>
-#include <io/humble/video/PixelFormat.h>
 #include <io/humble/video/Global.h>
 #include <io/humble/video/Codec.h>
 #include <io/humble/video/ContainerFormat.h>
@@ -119,6 +119,7 @@ import io.humble.ferry.IBuffer;
 
 %include <io/humble/video/HumbleVideo.h>
 %include <io/humble/video/Global.swg>
+%include <io/humble/video/PixelFormat.h>
 %include <io/humble/video/Rational.swg>
 %include <io/humble/video/KeyValueBag.swg>
 %include <io/humble/video/Property.swg>
@@ -128,7 +129,6 @@ import io.humble.ferry.IBuffer;
 %include <io/humble/video/Error.swg>
 %include <io/humble/video/Packet.swg>
 %include <io/humble/video/Configurable.swg>
-%include <io/humble/video/PixelFormat.h>
 %include <io/humble/video/Codec.swg>
 %include <io/humble/video/ContainerFormat.swg>
 %include <io/humble/video/SinkFormat.swg>

@@ -7,6 +7,8 @@ include @top_builddir@/mk/Makefile.global
 SUBDIRS=customio
 
 check_PROGRAMS=\
+  VideoPictureTester \
+  AudioSamplesTester \
   CodecTester \
   IndexEntryTester \
   ErrorTester \
@@ -20,6 +22,8 @@ check_PROGRAMS=\
   RationalTester 
 
 BUILT_SOURCES= \
+  VideoPictureTest_CXXRunner.cpp \
+  AudioSamplesTest_CXXRunner.cpp \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
   ErrorTest_CXXRunner.cpp \
@@ -33,6 +37,8 @@ BUILT_SOURCES= \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  VideoPictureTest.h \
+  AudioSamplesTest.h \
   CodecTest.h \
   IndexEntryTest.h \
   ErrorTest.h \
@@ -52,6 +58,28 @@ inst_checkdir=$(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS=$(check_PROGRAMS)
+
+VideoPictureTester_SOURCES= \
+  VideoPictureTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_VideoPictureTester_SOURCES= \
+  VideoPictureTest_CXXRunner.cpp
+
+VideoPictureTester_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
+AudioSamplesTester_SOURCES= \
+  AudioSamplesTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_AudioSamplesTester_SOURCES= \
+  AudioSamplesTest_CXXRunner.cpp
+
+AudioSamplesTester_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 CodecTester_SOURCES= \
   CodecTest.cpp \
