@@ -229,6 +229,25 @@ CodecTest :: testGetSupportedAudioChannelLayouts()
 }
 
 void
+CodecTest::testGetSupportedProfiles()
+{
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_INFO, false);
+
+  codec = Codec::findDecodingCodec(Codec::CODEC_ID_MPEG4);
+  TS_ASSERT(codec);
+  int32_t num = codec->getNumSupportedProfiles();
+  TS_ASSERT(num > 0);
+  for (int i = 0; i < num; i++) {
+    RefPointer<CodecProfile> p = codec->getSupportedProfile(i);
+    TS_ASSERT(p);
+    VS_LOG_DEBUG("Profile: %s", p->getName());
+  }
+  TS_ASSERT(!codec->getSupportedProfile(-1));
+  TS_ASSERT(!codec->getSupportedProfile(0x7FFFFFFF));
+}
+
+void
 CodecTest :: testEncodePCM()
 {
   codec = Codec::findEncodingCodecByName("pcm_s16le");

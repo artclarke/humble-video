@@ -41,6 +41,7 @@ class CodecTest : public CxxTest::TestSuite
     void testGetSupportedAudioSampleRates();
     void testGetSupportedAudioSampleFormats();
     void testGetSupportedAudioChannelLayouts();
+    void testGetSupportedProfiles();
     void testEncodePCM();
   private:
     RefPointer<Codec> codec;
