@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.humble</groupId>
-  <artifactId>humble-video-noarch</artifactId>
+  <artifactId>humble-video-main</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>humble-video-noarch</name>
+  <name>humble-video-main</name>
   <url>http://www.humble.io</url>
 
   <properties>
@@ -30,7 +30,7 @@
   <scm>
     <developerConnection></developerConnection>
     <tag>xuggle</tag>
-    <url>https://github.com/artclarke/humble-video-noarch</url>
+    <url>https://github.com/artclarke/humble-video-main</url>
   </scm>
   <developers>
     <developer>
