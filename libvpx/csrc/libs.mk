@@ -202,6 +202,7 @@ INSTALL-SRCS-$(CONFIG_CODEC_SRCS) += $(call enabled,CODEC_EXPORTS)
 libvpx_srcs.txt:
 	@echo "    [CREATE] $@"
 	@echo $(CODEC_SRCS) | xargs -n1 echo | sort -u > $@
+CLEAN-OBJS += libvpx_srcs.txt
 
 
 ifeq ($(CONFIG_EXTERNAL_BUILD),yes)
@@ -382,6 +383,11 @@ LIBVPX_TEST_DATA=$(addprefix $(LIBVPX_TEST_DATA_PATH)/,\
                      $(call enabled,LIBVPX_TEST_DATA))
 libvpx_test_data_url=http://downloads.webmproject.org/test_data/libvpx/$(1)
 
+libvpx_test_srcs.txt:
+	@echo "    [CREATE] $@"
+	@echo $(LIBVPX_TEST_SRCS) | xargs -n1 echo | sort -u > $@
+CLEAN-OBJS += libvpx_test_srcs.txt
+
 $(LIBVPX_TEST_DATA):
 	@echo "    [DOWNLOAD] $@"
 	$(qexec)trap 'rm -f $@' INT TERM &&\
@@ -442,6 +448,10 @@ else
 include $(SRC_PATH_BARE)/third_party/googletest/gtest.mk
 GTEST_SRCS := $(addprefix third_party/googletest/src/,$(call enabled,GTEST_SRCS))
 GTEST_OBJS=$(call objs,$(GTEST_SRCS))
+ifeq ($(filter win%,$(TGT_OS)),$(TGT_OS))
+# Disabling pthreads globally will cause issues on darwin and possibly elsewhere
+$(GTEST_OBJS) $(GTEST_OBJS:.o=.d): CXXFLAGS += -DGTEST_HAS_PTHREAD=0
+endif
 $(GTEST_OBJS) $(GTEST_OBJS:.o=.d): CXXFLAGS += -I$(SRC_PATH_BARE)/third_party/googletest/src
 $(GTEST_OBJS) $(GTEST_OBJS:.o=.d): CXXFLAGS += -I$(SRC_PATH_BARE)/third_party/googletest/src/include
 OBJS-$(BUILD_LIBVPX) += $(GTEST_OBJS)
@@ -466,7 +476,7 @@ $(foreach bin,$(LIBVPX_TEST_BINS),\
         lib$(CODEC_LIB)$(CODEC_LIB_SUF) libgtest.a ))\
     $(if $(BUILD_LIBVPX),$(eval $(call linkerxx_template,$(bin),\
         $(LIBVPX_TEST_OBJS) \
-        -L. -lvpx -lgtest -lpthread -lm)\
+        -L. -lvpx -lgtest $(extralibs) -lm)\
         )))\
     $(if $(LIPO_LIBS),$(eval $(call lipo_bin_template,$(bin))))\
 

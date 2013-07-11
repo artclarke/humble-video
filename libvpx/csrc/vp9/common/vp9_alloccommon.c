@@ -11,6 +11,7 @@
 
 #include "./vpx_config.h"
 #include "vpx_mem/vpx_mem.h"
+
 #include "vp9/common/vp9_blockd.h"
 #include "vp9/common/vp9_entropymode.h"
 #include "vp9/common/vp9_entropymv.h"
@@ -62,9 +63,9 @@ void vp9_free_frame_buffers(VP9_COMMON *oci) {
   vpx_free(oci->above_context[0]);
   for (i = 0; i < MAX_MB_PLANE; i++)
     oci->above_context[i] = 0;
-  oci->mip = 0;
-  oci->prev_mip = 0;
-  oci->above_seg_context = 0;
+  oci->mip = NULL;
+  oci->prev_mip = NULL;
+  oci->above_seg_context = NULL;
 }
 
 static void set_mb_mi(VP9_COMMON *cm, int aligned_width, int aligned_height) {
@@ -74,7 +75,7 @@ static void set_mb_mi(VP9_COMMON *cm, int aligned_width, int aligned_height) {
 
   cm->mi_cols = aligned_width >> LOG2_MI_SIZE;
   cm->mi_rows = aligned_height >> LOG2_MI_SIZE;
-  cm->mode_info_stride = cm->mi_cols + 64 / MI_SIZE;
+  cm->mode_info_stride = cm->mi_cols + MI_BLOCK_SIZE;
 }
 
 static void setup_mi(VP9_COMMON *cm) {
@@ -94,11 +95,11 @@ static void setup_mi(VP9_COMMON *cm) {
 int vp9_alloc_frame_buffers(VP9_COMMON *oci, int width, int height) {
   int i, mi_cols;
 
-  // Our internal buffers are always multiples of 16
-  const int aligned_width = multiple8(width);
-  const int aligned_height = multiple8(height);
+  const int aligned_width = ALIGN_POWER_OF_TWO(width, LOG2_MI_SIZE);
+  const int aligned_height = ALIGN_POWER_OF_TWO(height, LOG2_MI_SIZE);
   const int ss_x = oci->subsampling_x;
   const int ss_y = oci->subsampling_y;
+  int mi_size;
 
   vp9_free_frame_buffers(oci);
 
@@ -131,14 +132,13 @@ int vp9_alloc_frame_buffers(VP9_COMMON *oci, int width, int height) {
   set_mb_mi(oci, aligned_width, aligned_height);
 
   // Allocation
-  oci->mip = vpx_calloc(oci->mode_info_stride * (oci->mi_rows + 64 / MI_SIZE),
-                        sizeof(MODE_INFO));
+  mi_size = oci->mode_info_stride * (oci->mi_rows + MI_BLOCK_SIZE);
+
+  oci->mip = vpx_calloc(mi_size, sizeof(MODE_INFO));
   if (!oci->mip)
     goto fail;
 
-  oci->prev_mip = vpx_calloc(oci->mode_info_stride *
-                             (oci->mi_rows + 64 / MI_SIZE),
-                             sizeof(MODE_INFO));
+  oci->prev_mip = vpx_calloc(mi_size, sizeof(MODE_INFO));
   if (!oci->prev_mip)
     goto fail;
 
@@ -146,7 +146,7 @@ int vp9_alloc_frame_buffers(VP9_COMMON *oci, int width, int height) {
 
   // FIXME(jkoleszar): allocate subsampled arrays for U/V once subsampling
   // information is exposed at this level
-  mi_cols = mi_cols_aligned_to_sb(oci);
+  mi_cols = mi_cols_aligned_to_sb(oci->mi_cols);
 
   // 2 contexts per 'mi unit', so that we have one context per 4x4 txfm
   // block where mi unit size is 8x8.
@@ -197,8 +197,8 @@ void vp9_initialize_common() {
 }
 
 void vp9_update_frame_size(VP9_COMMON *cm) {
-  const int aligned_width = multiple8(cm->width);
-  const int aligned_height = multiple8(cm->height);
+  const int aligned_width = ALIGN_POWER_OF_TWO(cm->width, LOG2_MI_SIZE);
+  const int aligned_height = ALIGN_POWER_OF_TWO(cm->height, LOG2_MI_SIZE);
 
   set_mb_mi(cm, aligned_width, aligned_height);
   setup_mi(cm);

@@ -32,45 +32,42 @@ static int unscaled_value(int val, const struct scale_factors *scale) {
   return val;
 }
 
-static int_mv32 mv_q3_to_q4_with_scaling(const int_mv *src_mv,
-                                         const struct scale_factors *scale) {
-  // returns mv * scale + offset
-  int_mv32 result;
-  const int32_t mv_row_q4 = src_mv->as_mv.row << 1;
-  const int32_t mv_col_q4 = src_mv->as_mv.col << 1;
-
-  result.as_mv.row = (mv_row_q4 * scale->y_scale_fp >> VP9_REF_SCALE_SHIFT)
-                      + scale->y_offset_q4;
-  result.as_mv.col = (mv_col_q4 * scale->x_scale_fp >> VP9_REF_SCALE_SHIFT)
-                      + scale->x_offset_q4;
-  return result;
+static MV32 mv_q3_to_q4_with_scaling(const MV *mv,
+                                     const struct scale_factors *scale) {
+  const MV32 res = {
+    ((mv->row << 1) * scale->y_scale_fp >> VP9_REF_SCALE_SHIFT)
+        + scale->y_offset_q4,
+    ((mv->col << 1) * scale->x_scale_fp >> VP9_REF_SCALE_SHIFT)
+        + scale->x_offset_q4
+  };
+  return res;
 }
 
-static int_mv32 mv_q3_to_q4_without_scaling(const int_mv *src_mv,
-                                            const struct scale_factors *scale) {
-  // returns mv * scale + offset
-  int_mv32 result;
-
-  result.as_mv.row = src_mv->as_mv.row << 1;
-  result.as_mv.col = src_mv->as_mv.col << 1;
-  return result;
+static MV32 mv_q3_to_q4_without_scaling(const MV *mv,
+                                        const struct scale_factors *scale) {
+  const MV32 res = {
+     mv->row << 1,
+     mv->col << 1
+  };
+  return res;
 }
 
-static int32_t mv_component_q4_with_scaling(int mv_q4, int scale_fp,
-                                            int offset_q4) {
-  int32_t scaled_mv;
-  // returns the scaled and offset value of the mv component.
-  scaled_mv = (mv_q4 * scale_fp >> VP9_REF_SCALE_SHIFT) + offset_q4;
-
-  return scaled_mv;
+static MV32 mv_q4_with_scaling(const MV *mv,
+                               const struct scale_factors *scale) {
+  const MV32 res = {
+    (mv->row * scale->y_scale_fp >> VP9_REF_SCALE_SHIFT) + scale->y_offset_q4,
+    (mv->col * scale->x_scale_fp >> VP9_REF_SCALE_SHIFT) + scale->x_offset_q4
+  };
+  return res;
 }
 
-static int32_t mv_component_q4_without_scaling(int mv_q4, int scale_fp,
-                                               int offset_q4) {
-  // returns the scaled and offset value of the mv component.
-  (void)scale_fp;
-  (void)offset_q4;
-  return mv_q4;
+static MV32 mv_q4_without_scaling(const MV *mv,
+                                  const struct scale_factors *scale) {
+  const MV32 res = {
+    mv->row,
+    mv->col
+  };
+  return res;
 }
 
 static void set_offsets_with_scaling(struct scale_factors *scale,
@@ -112,13 +109,13 @@ void vp9_setup_scale_factors_for_frame(struct scale_factors *scale,
     scale->scale_value_y = unscaled_value;
     scale->set_scaled_offsets = set_offsets_without_scaling;
     scale->scale_mv_q3_to_q4 = mv_q3_to_q4_without_scaling;
-    scale->scale_mv_component_q4 = mv_component_q4_without_scaling;
+    scale->scale_mv_q4 = mv_q4_without_scaling;
   } else {
     scale->scale_value_x = scale_value_x_with_scaling;
     scale->scale_value_y = scale_value_y_with_scaling;
     scale->set_scaled_offsets = set_offsets_with_scaling;
     scale->scale_mv_q3_to_q4 = mv_q3_to_q4_with_scaling;
-    scale->scale_mv_component_q4 = mv_component_q4_with_scaling;
+    scale->scale_mv_q4 = mv_q4_with_scaling;
   }
 
   // TODO(agrange): Investigate the best choice of functions to use here
@@ -175,9 +172,7 @@ void vp9_setup_interp_filters(MACROBLOCKD *xd,
   if (xd->mode_info_context) {
     MB_MODE_INFO *mbmi = &xd->mode_info_context->mbmi;
 
-    set_scale_factors(xd,
-                      mbmi->ref_frame[0] - 1,
-                      mbmi->ref_frame[1] - 1,
+    set_scale_factors(xd, mbmi->ref_frame[0] - 1, mbmi->ref_frame[1] - 1,
                       cm->active_ref_scale);
   }
 
@@ -199,124 +194,20 @@ void vp9_setup_interp_filters(MACROBLOCKD *xd,
   assert(((intptr_t)xd->subpix.filter_x & 0xff) == 0);
 }
 
-void vp9_copy_mem16x16_c(const uint8_t *src,
-                         int src_stride,
-                         uint8_t *dst,
-                         int dst_stride) {
-  int r;
-
-  for (r = 0; r < 16; r++) {
-#if !(CONFIG_FAST_UNALIGNED)
-    dst[0] = src[0];
-    dst[1] = src[1];
-    dst[2] = src[2];
-    dst[3] = src[3];
-    dst[4] = src[4];
-    dst[5] = src[5];
-    dst[6] = src[6];
-    dst[7] = src[7];
-    dst[8] = src[8];
-    dst[9] = src[9];
-    dst[10] = src[10];
-    dst[11] = src[11];
-    dst[12] = src[12];
-    dst[13] = src[13];
-    dst[14] = src[14];
-    dst[15] = src[15];
-
-#else
-    ((uint32_t *)dst)[0] = ((const uint32_t *)src)[0];
-    ((uint32_t *)dst)[1] = ((const uint32_t *)src)[1];
-    ((uint32_t *)dst)[2] = ((const uint32_t *)src)[2];
-    ((uint32_t *)dst)[3] = ((const uint32_t *)src)[3];
-
-#endif
-    src += src_stride;
-    dst += dst_stride;
-  }
-}
-
-void vp9_copy_mem8x8_c(const uint8_t *src,
-                       int src_stride,
-                       uint8_t *dst,
-                       int dst_stride) {
-  int r;
-
-  for (r = 0; r < 8; r++) {
-#if !(CONFIG_FAST_UNALIGNED)
-    dst[0] = src[0];
-    dst[1] = src[1];
-    dst[2] = src[2];
-    dst[3] = src[3];
-    dst[4] = src[4];
-    dst[5] = src[5];
-    dst[6] = src[6];
-    dst[7] = src[7];
-#else
-    ((uint32_t *)dst)[0] = ((const uint32_t *)src)[0];
-    ((uint32_t *)dst)[1] = ((const uint32_t *)src)[1];
-#endif
-    src += src_stride;
-    dst += dst_stride;
-  }
-}
-
-void vp9_copy_mem8x4_c(const uint8_t *src,
-                       int src_stride,
-                       uint8_t *dst,
-                       int dst_stride) {
-  int r;
-
-  for (r = 0; r < 4; r++) {
-#if !(CONFIG_FAST_UNALIGNED)
-    dst[0] = src[0];
-    dst[1] = src[1];
-    dst[2] = src[2];
-    dst[3] = src[3];
-    dst[4] = src[4];
-    dst[5] = src[5];
-    dst[6] = src[6];
-    dst[7] = src[7];
-#else
-    ((uint32_t *)dst)[0] = ((const uint32_t *)src)[0];
-    ((uint32_t *)dst)[1] = ((const uint32_t *)src)[1];
-#endif
-    src += src_stride;
-    dst += dst_stride;
-  }
-}
-
 void vp9_build_inter_predictor(const uint8_t *src, int src_stride,
                                uint8_t *dst, int dst_stride,
-                               const int_mv *mv_q3,
+                               const int_mv *src_mv,
                                const struct scale_factors *scale,
                                int w, int h, int weight,
-                               const struct subpix_fn_table *subpix) {
-  int_mv32 mv = scale->scale_mv_q3_to_q4(mv_q3, scale);
-  src += (mv.as_mv.row >> 4) * src_stride + (mv.as_mv.col >> 4);
-  scale->predict[!!(mv.as_mv.col & 15)][!!(mv.as_mv.row & 15)][weight](
-      src, src_stride, dst, dst_stride,
-      subpix->filter_x[mv.as_mv.col & 15], scale->x_step_q4,
-      subpix->filter_y[mv.as_mv.row & 15], scale->y_step_q4,
-      w, h);
-}
+                               const struct subpix_fn_table *subpix,
+                               enum mv_precision precision) {
+  const MV32 mv = precision == MV_PRECISION_Q4
+                     ? scale->scale_mv_q4(&src_mv->as_mv, scale)
+                     : scale->scale_mv_q3_to_q4(&src_mv->as_mv, scale);
+  const int subpel_x = mv.col & 15;
+  const int subpel_y = mv.row & 15;
 
-void vp9_build_inter_predictor_q4(const uint8_t *src, int src_stride,
-                                  uint8_t *dst, int dst_stride,
-                                  const int_mv *mv_q4,
-                                  const struct scale_factors *scale,
-                                  int w, int h, int weight,
-                                  const struct subpix_fn_table *subpix) {
-  const int scaled_mv_row_q4 = scale->scale_mv_component_q4(mv_q4->as_mv.row,
-                                                            scale->y_scale_fp,
-                                                            scale->y_offset_q4);
-  const int scaled_mv_col_q4 = scale->scale_mv_component_q4(mv_q4->as_mv.col,
-                                                            scale->x_scale_fp,
-                                                            scale->x_offset_q4);
-  const int subpel_x = scaled_mv_col_q4 & 15;
-  const int subpel_y = scaled_mv_row_q4 & 15;
-
-  src += (scaled_mv_row_q4 >> 4) * src_stride + (scaled_mv_col_q4 >> 4);
+  src += (mv.row >> 4) * src_stride + (mv.col >> 4);
   scale->predict[!!subpel_x][!!subpel_y][weight](
       src, src_stride, dst, dst_stride,
       subpix->filter_x[subpel_x], scale->x_step_q4,
@@ -387,17 +278,16 @@ static void build_inter_predictors(int plane, int block,
   MACROBLOCKD * const xd = arg->xd;
   const int bwl = b_width_log2(bsize) - xd->plane[plane].subsampling_x;
   const int bhl = b_height_log2(bsize) - xd->plane[plane].subsampling_y;
-  const int bh = 4 << bhl, bw = 4 << bwl;
   const int x = 4 * (block & ((1 << bwl) - 1)), y = 4 * (block >> bwl);
   const int use_second_ref = xd->mode_info_context->mbmi.ref_frame[1] > 0;
   int which_mv;
 
-  assert(x < bw);
-  assert(y < bh);
+  assert(x < (4 << bwl));
+  assert(y < (4 << bhl));
   assert(xd->mode_info_context->mbmi.sb_type < BLOCK_SIZE_SB8X8 ||
-         4 << pred_w == bw);
+         4 << pred_w == (4 << bwl));
   assert(xd->mode_info_context->mbmi.sb_type < BLOCK_SIZE_SB8X8 ||
-         4 << pred_h == bh);
+         4 << pred_h == (4 << bhl));
 
   for (which_mv = 0; which_mv < 1 + use_second_ref; ++which_mv) {
     // source
@@ -446,11 +336,11 @@ static void build_inter_predictors(int plane, int block,
                                                  xd->mb_to_bottom_edge);
     scale->set_scaled_offsets(scale, arg->y + y, arg->x + x);
 
-    vp9_build_inter_predictor_q4(pre, pre_stride,
-                                 dst, arg->dst_stride[plane],
-                                 &clamped_mv, &xd->scale_factor[which_mv],
-                                 4 << pred_w, 4 << pred_h, which_mv,
-                                 &xd->subpix);
+    vp9_build_inter_predictor(pre, pre_stride,
+                              dst, arg->dst_stride[plane],
+                              &clamped_mv, &xd->scale_factor[which_mv],
+                              4 << pred_w, 4 << pred_h, which_mv,
+                              &xd->subpix, MV_PRECISION_Q4);
   }
 }
 void vp9_build_inter_predictors_sby(MACROBLOCKD *xd,
@@ -503,13 +393,6 @@ void vp9_build_inter_predictors_sb(MACROBLOCKD *xd,
 
   vp9_build_inter_predictors_sby(xd, mi_row, mi_col, bsize);
   vp9_build_inter_predictors_sbuv(xd, mi_row, mi_col, bsize);
-}
-
-/*encoder only*/
-void vp9_build_inter4x4_predictors_mbuv(MACROBLOCKD *xd,
-                                        int mb_row, int mb_col) {
-  vp9_build_inter_predictors_sbuv(xd, mb_row, mb_col,
-                                  BLOCK_SIZE_MB16X16);
 }
 
 // TODO(dkovalev: find better place for this function)

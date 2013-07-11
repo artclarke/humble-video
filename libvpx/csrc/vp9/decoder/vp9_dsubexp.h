@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2011 The WebM project authors. All Rights Reserved.
+ *  Copyright (c) 2013 The WebM project authors. All Rights Reserved.
  *
  *  Use of this source code is governed by a BSD-style license
  *  that can be found in the LICENSE file in the root of the source
@@ -9,9 +9,11 @@
  */
 
 
-#include "vpx_ports/asm_offsets.h"
+#ifndef VP9_DECODER_VP9_DSUBEXP_H_
+#define VP9_DECODER_VP9_DSUBEXP_H_
 
-BEGIN
+#include "vp9/decoder/vp9_dboolhuff.h"
 
+void vp9_diff_update_prob(vp9_reader *r, vp9_prob* p);
 
-END
+#endif  // VP9_DECODER_VP9_DSUBEXP_H_

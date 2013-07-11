@@ -51,6 +51,7 @@ typedef struct {
   int comp_pred_diff;
   int single_pred_diff;
   int64_t txfm_rd_diff[NB_TXFM_MODES];
+  int64_t best_filter_diff[VP9_SWITCHABLE_FILTERS + 1];
 
   // Bit flag for each mode whether it has high error in comparison to others.
   unsigned int modes_with_high_error;
@@ -66,9 +67,8 @@ struct macroblock_plane {
 
   // Quantizer setings
   int16_t *quant;
-  uint8_t *quant_shift;
+  int16_t *quant_shift;
   int16_t *zbin;
-  int16_t *zrun_zbin_boost;
   int16_t *round;
 
   // Zbin Over Quant value
@@ -115,6 +115,7 @@ struct macroblock {
   int **mvsadcost;
 
   int mbmode_cost[MB_MODE_COUNT];
+  unsigned inter_mode_cost[INTER_MODE_CONTEXTS][MB_MODE_COUNT - NEARESTMV];
   int intra_uv_mode_cost[2][MB_MODE_COUNT];
   int y_mode_costs[VP9_INTRA_MODES][VP9_INTRA_MODES][VP9_INTRA_MODES];
   int switchable_interp_costs[VP9_SWITCHABLE_FILTERS + 1]
@@ -134,10 +135,12 @@ struct macroblock {
   unsigned char *active_ptr;
 
   // note that token_costs is the cost when eob node is skipped
-  vp9_coeff_count token_costs[TX_SIZE_MAX_SB][BLOCK_TYPES];
-  vp9_coeff_count token_costs_noskip[TX_SIZE_MAX_SB][BLOCK_TYPES];
+  vp9_coeff_count token_costs[TX_SIZE_MAX_SB][BLOCK_TYPES][2];
 
   int optimize;
+
+  // indicate if it is in the rd search loop or encoding process
+  int rd_search;
 
   // TODO(jingning): Need to refactor the structure arrays that buffers the
   // coding mode decisions of each partition type.
