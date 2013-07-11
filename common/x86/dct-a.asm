@@ -406,15 +406,17 @@ cglobal add8x8_idct, 2,3,8
     TAIL_CALL .skip_prologue, 0
 global current_function %+ .skip_prologue
 .skip_prologue:
-    mova   m0, [r1+  0]
-    mova   m1, [r1+ 32]
-    mova   m2, [r1+ 64]
-    mova   m3, [r1+ 96]
     ; TRANSPOSE4x4Q
+    mova       xm0, [r1+ 0]
+    mova       xm1, [r1+32]
+    mova       xm2, [r1+16]
+    mova       xm3, [r1+48]
+    vinserti128 m0, m0, [r1+ 64], 1
+    vinserti128 m1, m1, [r1+ 96], 1
+    vinserti128 m2, m2, [r1+ 80], 1
+    vinserti128 m3, m3, [r1+112], 1
     SBUTTERFLY qdq, 0, 1, 4
-    SBUTTERFLY qdq, 2, 3, 5
-    SBUTTERFLY dqqq, 0, 2, 4
-    SBUTTERFLY dqqq, 1, 3, 5
+    SBUTTERFLY qdq, 2, 3, 4
     IDCT4_1D w,0,1,2,3,4,5
     TRANSPOSE2x4x4W 0,1,2,3,4
     paddw m0, [pw_32]

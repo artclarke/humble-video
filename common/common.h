@@ -904,8 +904,8 @@ struct x264_t
     uint32_t (*nr_residual_sum)[64];
     uint32_t *nr_count;
 
-    ALIGNED_16( udctcoef nr_offset_denoise[4][64] );
-    ALIGNED_16( uint32_t nr_residual_sum_buf[2][4][64] );
+    ALIGNED_N( udctcoef nr_offset_denoise[4][64] );
+    ALIGNED_N( uint32_t nr_residual_sum_buf[2][4][64] );
     uint32_t nr_count_buf[2][4];
 
     uint8_t luma2chroma_pixel[7]; /* Subsampled pixel size */

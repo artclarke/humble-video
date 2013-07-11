@@ -81,6 +81,9 @@ intel_cflags() {
         [[ "$arg" = -falign-loops* ]] && arg=
         [ "$arg" = -fno-tree-vectorize ] && arg=
         [ "$arg" = -Wshadow ] && arg=
+        [[ "$arg" = -mpreferred-stack-boundary* ]] && arg=
+        [[ "$arg" = -l* ]] && arg=
+        [[ "$arg" = -L* ]] && arg=
         if [ $compiler = ICL ]; then
             [ "$arg" = -Wall ] && arg=-W0
             [ "$arg" = -g ] && arg=-Z7
@@ -134,7 +137,7 @@ cc_check() {
     [ -n "$1" ] && echo "#include <$1>" > conftest.c
     echo "int main () { $3 return 0; }" >> conftest.c
     if [ $compiler = ICL ]; then
-        cc_cmd="$CC conftest.c $CFLAGS $2 -link $(icl_ldflags $2 $LDFLAGSCLI $LDFLAGS)"
+        cc_cmd="$CC conftest.c $(intel_cflags $CFLAGS $2) -link $(icl_ldflags $2 $LDFLAGSCLI $LDFLAGS)"
     else
         cc_cmd="$CC conftest.c $CFLAGS $2 $LDFLAGSCLI $LDFLAGS -o conftest"
     fi

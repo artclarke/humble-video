@@ -152,8 +152,10 @@ static void x264_cabac_qp_delta( x264_t *h, x264_cabac_t *cb )
     int i_dqp = h->mb.i_qp - h->mb.i_last_qp;
     int ctx;
 
-    /* Avoid writing a delta quant if we have an empty i16x16 block, e.g. in a completely flat background area */
-    if( h->mb.i_type == I_16x16 && !h->mb.cbp[h->mb.i_mb_xy] )
+    /* Avoid writing a delta quant if we have an empty i16x16 block, e.g. in a completely
+     * flat background area. Don't do this if it would raise the quantizer, since that could
+     * cause unexpected deblocking artifacts. */
+    if( h->mb.i_type == I_16x16 && !h->mb.cbp[h->mb.i_mb_xy] && h->mb.i_qp > h->mb.i_last_qp )
     {
 #if !RDO_SKIP_BS
         h->mb.i_qp = h->mb.i_last_qp;
@@ -161,9 +163,7 @@ static void x264_cabac_qp_delta( x264_t *h, x264_cabac_t *cb )
         i_dqp = 0;
     }
 
-    /* Since, per the above, empty-CBP I16x16 blocks never have delta quants,
-     * we don't have to check for them. */
-    ctx = h->mb.i_last_dqp && h->mb.cbp[h->mb.i_mb_prev_xy];
+    ctx = h->mb.i_last_dqp && (h->mb.type[h->mb.i_mb_prev_xy] == I_16x16 || (h->mb.cbp[h->mb.i_mb_prev_xy]&0x3f));
 
     if( i_dqp != 0 )
     {

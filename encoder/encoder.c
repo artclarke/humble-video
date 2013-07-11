@@ -353,34 +353,49 @@ static void x264_slice_header_write( bs_t *s, x264_slice_header_t *sh, int i_nal
 
 /* If we are within a reasonable distance of the end of the memory allocated for the bitstream, */
 /* reallocate, adding an arbitrary amount of space. */
-static int x264_bitstream_check_buffer( x264_t *h )
+static int x264_bitstream_check_buffer_internal( x264_t *h, int size, int b_cabac, int i_nal )
 {
-    uint8_t *bs_bak = h->out.p_bitstream;
-    int max_row_size = (2500 << SLICE_MBAFF) * h->mb.i_mb_width;
-    if( (h->param.b_cabac && (h->cabac.p_end - h->cabac.p < max_row_size)) ||
-        (h->out.bs.p_end - h->out.bs.p < max_row_size) )
+    if( (b_cabac && (h->cabac.p_end - h->cabac.p < size)) ||
+        (h->out.bs.p_end - h->out.bs.p < size) )
     {
-        h->out.i_bitstream += max_row_size;
-        CHECKED_MALLOC( h->out.p_bitstream, h->out.i_bitstream );
-        h->mc.memcpy_aligned( h->out.p_bitstream, bs_bak, (h->out.i_bitstream - max_row_size) & ~15 );
-        intptr_t delta = h->out.p_bitstream - bs_bak;
+        int buf_size = h->out.i_bitstream + size;
+        uint8_t *buf = x264_malloc( buf_size );
+        if( !buf )
+            return -1;
+        int aligned_size = h->out.i_bitstream & ~15;
+        h->mc.memcpy_aligned( buf, h->out.p_bitstream, aligned_size );
+        memcpy( buf + aligned_size, h->out.p_bitstream + aligned_size, h->out.i_bitstream - aligned_size );
+
+        intptr_t delta = buf - h->out.p_bitstream;
 
         h->out.bs.p_start += delta;
         h->out.bs.p += delta;
-        h->out.bs.p_end = h->out.p_bitstream + h->out.i_bitstream;
+        h->out.bs.p_end = buf + buf_size;
 
         h->cabac.p_start += delta;
         h->cabac.p += delta;
-        h->cabac.p_end = h->out.p_bitstream + h->out.i_bitstream;
+        h->cabac.p_end = buf + buf_size;
 
-        for( int i = 0; i <= h->out.i_nal; i++ )
+        for( int i = 0; i <= i_nal; i++ )
             h->out.nal[i].p_payload += delta;
-        x264_free( bs_bak );
+
+        x264_free( h->out.p_bitstream );
+        h->out.p_bitstream = buf;
+        h->out.i_bitstream = buf_size;
     }
     return 0;
-fail:
-    x264_free( bs_bak );
-    return -1;
+}
+
+static int x264_bitstream_check_buffer( x264_t *h )
+{
+    int max_row_size = (2500 << SLICE_MBAFF) * h->mb.i_mb_width;
+    return x264_bitstream_check_buffer_internal( h, max_row_size, h->param.b_cabac, h->out.i_nal );
+}
+
+static int x264_bitstream_check_buffer_filler( x264_t *h, int filler )
+{
+    filler += 32; // add padding for safety
+    return x264_bitstream_check_buffer_internal( h, filler, 0, -1 );
 }
 
 #if HAVE_THREAD
@@ -681,7 +696,7 @@ static int x264_validate_parameters( x264_t *h, int b_open )
                  h->param.rc.i_rc_method == X264_RC_ABR )
         {
             x264_log( h, X264_LOG_WARNING, "max bitrate less than average bitrate, assuming CBR\n" );
-            h->param.rc.i_vbv_max_bitrate = h->param.rc.i_bitrate;
+            h->param.rc.i_bitrate = h->param.rc.i_vbv_max_bitrate;
         }
     }
     else if( h->param.rc.i_vbv_max_bitrate )
@@ -1064,6 +1079,7 @@ static int x264_validate_parameters( x264_t *h, int b_open )
     BOOLIFY( b_fake_interlaced );
     BOOLIFY( b_open_gop );
     BOOLIFY( b_bluray_compat );
+    BOOLIFY( b_stitchable );
     BOOLIFY( b_full_recon );
     BOOLIFY( b_opencl );
     BOOLIFY( analyse.b_transform_8x8 );
@@ -1649,6 +1665,7 @@ static int x264_nal_end( x264_t *h )
 
 static int x264_encoder_encapsulate_nals( x264_t *h, int start )
 {
+    x264_t *h0 = h->thread[0];
     int nal_size = 0, previous_nal_size = 0;
 
     if( h->param.nalu_process )
@@ -1665,20 +1682,26 @@ static int x264_encoder_encapsulate_nals( x264_t *h, int start )
         nal_size += h->out.nal[i].i_payload;
 
     /* Worst-case NAL unit escaping: reallocate the buffer if it's too small. */
-    int necessary_size = nal_size * 3/2 + h->out.i_nal * 4 + 4 + 64;
-    if( h->nal_buffer_size < necessary_size )
+    int necessary_size = previous_nal_size + nal_size * 3/2 + h->out.i_nal * 4 + 4 + 64;
+    if( h0->nal_buffer_size < necessary_size )
     {
-        h->nal_buffer_size = necessary_size * 2;
-        uint8_t *buf = x264_malloc( h->nal_buffer_size );
+        necessary_size *= 2;
+        uint8_t *buf = x264_malloc( necessary_size );
         if( !buf )
             return -1;
         if( previous_nal_size )
-            memcpy( buf, h->nal_buffer, previous_nal_size );
-        x264_free( h->nal_buffer );
-        h->nal_buffer = buf;
+            memcpy( buf, h0->nal_buffer, previous_nal_size );
+
+        intptr_t delta = buf - h0->nal_buffer;
+        for( int i = 0; i < start; i++ )
+            h->out.nal[i].p_payload += delta;
+
+        x264_free( h0->nal_buffer );
+        h0->nal_buffer = buf;
+        h0->nal_buffer_size = necessary_size;
     }
 
-    uint8_t *nal_buffer = h->nal_buffer + previous_nal_size;
+    uint8_t *nal_buffer = h0->nal_buffer + previous_nal_size;
 
     for( int i = start; i < h->out.i_nal; i++ )
     {
@@ -1689,7 +1712,7 @@ static int x264_encoder_encapsulate_nals( x264_t *h, int start )
 
     x264_emms();
 
-    return nal_buffer - (h->nal_buffer + previous_nal_size);
+    return nal_buffer - (h0->nal_buffer + previous_nal_size);
 }
 
 /****************************************************************************
@@ -3480,6 +3503,8 @@ static int x264_encoder_frame_end( x264_t *h, x264_t *thread_current,
         else
             f = X264_MAX( 0, filler - overhead );
 
+        if( x264_bitstream_check_buffer_filler( h, f ) )
+            return -1;
         x264_nal_start( h, NAL_FILLER, NAL_PRIORITY_DISPOSABLE );
         x264_filler_write( h, &h->out.bs, f );
         if( x264_nal_end( h ) )

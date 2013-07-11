@@ -746,16 +746,18 @@ static void help( x264_param_t *defaults, int longhelp )
     H2( "      --range <string>        Specify color range [\"%s\"]\n"
         "                                  - %s\n", range_names[0], stringify_names( buf, range_names ) );
     H2( "      --colorprim <string>    Specify color primaries [\"%s\"]\n"
-        "                                  - undef, bt709, bt470m, bt470bg\n"
-        "                                    smpte170m, smpte240m, film\n",
+        "                                  - undef, bt709, bt470m, bt470bg, smpte170m,\n"
+        "                                    smpte240m, film, bt2020\n",
                                        strtable_lookup( x264_colorprim_names, defaults->vui.i_colorprim ) );
     H2( "      --transfer <string>     Specify transfer characteristics [\"%s\"]\n"
-        "                                  - undef, bt709, bt470m, bt470bg, linear,\n"
-        "                                    log100, log316, smpte170m, smpte240m\n",
+        "                                  - undef, bt709, bt470m, bt470bg, smpte170m,\n"
+        "                                    smpte240m, linear, log100, log316,\n"
+        "                                    iec61966-2-4, bt1361e, iec61966-2-1,\n"
+        "                                    bt2020-10, bt2020-12\n",
                                        strtable_lookup( x264_transfer_names, defaults->vui.i_transfer ) );
     H2( "      --colormatrix <string>  Specify color matrix setting [\"%s\"]\n"
-        "                                  - undef, bt709, fcc, bt470bg\n"
-        "                                    smpte170m, smpte240m, GBR, YCgCo\n",
+        "                                  - undef, bt709, fcc, bt470bg, smpte170m,\n"
+        "                                    smpte240m, GBR, YCgCo, bt2020nc, bt2020c\n",
                                        strtable_lookup( x264_colmatrix_names, defaults->vui.i_colmatrix ) );
     H2( "      --chromaloc <integer>   Specify chroma sample location (0 to 5) [%d]\n",
                                        defaults->vui.i_chroma_loc );
@@ -790,6 +792,8 @@ static void help( x264_param_t *defaults, int longhelp )
     H0( "      --frames <integer>      Maximum number of frames to encode\n" );
     H0( "      --level <string>        Specify level (as defined by Annex A)\n" );
     H1( "      --bluray-compat         Enable compatibility hacks for Blu-ray support\n" );
+    H1( "      --stitchable            Don't optimize headers based on video content\n"
+        "                              Ensures ability to recombine a segmented encode\n" );
     H1( "\n" );
     H1( "  -v, --verbose               Print stats for each frame\n" );
     H1( "      --no-progress           Don't show the progress indicator while encoding\n" );
@@ -1036,6 +1040,7 @@ static struct option long_options[] =
     { "dts-compress",      no_argument, NULL, OPT_DTS_COMPRESSION },
     { "output-csp",  required_argument, NULL, OPT_OUTPUT_CSP },
     { "input-range", required_argument, NULL, OPT_INPUT_RANGE },
+    { "stitchable",        no_argument, NULL, 0 },
     {0, 0, 0, 0}
 };
 

@@ -34,7 +34,7 @@
 #else
 #include <dlfcn.h> //dlopen, dlsym, dlclose
 #if SYS_MACOSX
-#define ocl_open dlopen( "libOpenCL.dylib", RTLD_NOW )
+#define ocl_open dlopen( "/System/Library/Frameworks/OpenCL.framework/OpenCL", RTLD_NOW )
 #else
 #define ocl_open dlopen( "libOpenCL.so", RTLD_NOW )
 #endif
@@ -119,7 +119,7 @@ static int x264_detect_switchable_graphics( void );
 
 /* Try to load the cached compiled program binary, verify the device context is
  * still valid before reuse */
-static cl_program x264_opencl_cache_load( x264_t *h, char *devname, char *devvendor, char *driverversion )
+static cl_program x264_opencl_cache_load( x264_t *h, char *dev_name, char *dev_vendor, char *driver_version )
 {
     /* try to load cached program binary */
     FILE *fp = fopen( h->param.psz_clbin_file, "rb" );
@@ -128,12 +128,11 @@ static cl_program x264_opencl_cache_load( x264_t *h, char *devname, char *devven
 
     x264_opencl_function_t *ocl = h->opencl.ocl;
     cl_program program = NULL;
-    cl_int status;
+    uint8_t *binary = NULL;
 
     fseek( fp, 0, SEEK_END );
     size_t size = ftell( fp );
     rewind( fp );
-    uint8_t *binary;
     CHECKED_MALLOC( binary, size );
 
     fread( binary, 1, size, fp );
@@ -149,12 +148,13 @@ static cl_program x264_opencl_cache_load( x264_t *h, char *devname, char *devven
         }\
     } while( 0 )
 
-    CHECK_STRING( devname );
-    CHECK_STRING( devvendor );
-    CHECK_STRING( driverversion );
+    CHECK_STRING( dev_name );
+    CHECK_STRING( dev_vendor );
+    CHECK_STRING( driver_version );
     CHECK_STRING( x264_opencl_source_hash );
 #undef CHECK_STRING
 
+    cl_int status;
     program = ocl->clCreateProgramWithBinary( h->opencl.context, 1, &h->opencl.device, &size, &ptr, NULL, &status );
     if( status != CL_SUCCESS )
         program = NULL;
@@ -167,44 +167,47 @@ fail:
 
 /* Save the compiled program binary to a file for later reuse.  Device context
  * is also saved in the cache file so we do not reuse stale binaries */
-static void x264_opencl_cache_save( x264_t *h, cl_program program, char *devname, char *devvendor, char *driverversion )
+static void x264_opencl_cache_save( x264_t *h, cl_program program, char *dev_name, char *dev_vendor, char *driver_version )
 {
     FILE *fp = fopen( h->param.psz_clbin_file, "wb" );
     if( !fp )
     {
-        x264_log( h, X264_LOG_INFO, "OpenCL: unable to open clbin file for write");
+        x264_log( h, X264_LOG_INFO, "OpenCL: unable to open clbin file for write\n" );
         return;
     }
 
     x264_opencl_function_t *ocl = h->opencl.ocl;
-    size_t size;
+    uint8_t *binary = NULL;
+
+    size_t size = 0;
     cl_int status = ocl->clGetProgramInfo( program, CL_PROGRAM_BINARY_SIZES, sizeof(size_t), &size, NULL );
-    if( status == CL_SUCCESS )
+    if( status != CL_SUCCESS || !size )
     {
-        uint8_t *binary;
-        CHECKED_MALLOC( binary, size );
-        status = ocl->clGetProgramInfo( program, CL_PROGRAM_BINARIES, sizeof(uint8_t *), &binary, NULL );
-        if( status == CL_SUCCESS )
-        {
-            fputs( devname, fp );
-            fputc( '\n', fp );
-            fputs( devvendor, fp );
-            fputc( '\n', fp );
-            fputs( driverversion, fp );
-            fputc( '\n', fp );
-            fputs( x264_opencl_source_hash, fp );
-            fputc( '\n', fp );
-            fwrite( binary, 1, size, fp );
-        }
-        else
-            x264_log( h, X264_LOG_INFO, "OpenCL: Unable to query program binary, no cache file generated");
-        x264_free( binary );
+        x264_log( h, X264_LOG_INFO, "OpenCL: Unable to query program binary size, no cache file generated\n" );
+        goto fail;
     }
-    else
-        x264_log( h, X264_LOG_INFO, "OpenCL: Unable to query program binary size, no cache file generated");
-    fclose( fp );
+
+    CHECKED_MALLOC( binary, size );
+    status = ocl->clGetProgramInfo( program, CL_PROGRAM_BINARIES, sizeof(uint8_t *), &binary, NULL );
+    if( status != CL_SUCCESS )
+    {
+        x264_log( h, X264_LOG_INFO, "OpenCL: Unable to query program binary, no cache file generated\n" );
+        goto fail;
+    }
+
+    fputs( dev_name, fp );
+    fputc( '\n', fp );
+    fputs( dev_vendor, fp );
+    fputc( '\n', fp );
+    fputs( driver_version, fp );
+    fputc( '\n', fp );
+    fputs( x264_opencl_source_hash, fp );
+    fputc( '\n', fp );
+    fwrite( binary, 1, size, fp );
 
 fail:
+    fclose( fp );
+    x264_free( binary );
     return;
 }
 
@@ -215,20 +218,21 @@ fail:
 static cl_program x264_opencl_compile( x264_t *h )
 {
     x264_opencl_function_t *ocl = h->opencl.ocl;
-    cl_program program;
-    cl_int status;
+    cl_program program = NULL;
+    char *build_log = NULL;
 
-    char devname[64];
-    char devvendor[64];
-    char driverversion[64];
-    status  = ocl->clGetDeviceInfo( h->opencl.device, CL_DEVICE_NAME,    sizeof(devname), devname, NULL );
-    status |= ocl->clGetDeviceInfo( h->opencl.device, CL_DEVICE_VENDOR,  sizeof(devvendor), devvendor, NULL );
-    status |= ocl->clGetDeviceInfo( h->opencl.device, CL_DRIVER_VERSION, sizeof(driverversion), driverversion, NULL );
+    char dev_name[64];
+    char dev_vendor[64];
+    char driver_version[64];
+    cl_int status;
+    status  = ocl->clGetDeviceInfo( h->opencl.device, CL_DEVICE_NAME,    sizeof(dev_name), dev_name, NULL );
+    status |= ocl->clGetDeviceInfo( h->opencl.device, CL_DEVICE_VENDOR,  sizeof(dev_vendor), dev_vendor, NULL );
+    status |= ocl->clGetDeviceInfo( h->opencl.device, CL_DRIVER_VERSION, sizeof(driver_version), driver_version, NULL );
     if( status != CL_SUCCESS )
         return NULL;
 
     // Most AMD GPUs have vector registers
-    int vectorize = !strcmp( devvendor, "Advanced Micro Devices, Inc." );
+    int vectorize = !strcmp( dev_vendor, "Advanced Micro Devices, Inc." );
     h->opencl.b_device_AMD_SI = 0;
 
     if( vectorize )
@@ -250,9 +254,9 @@ static cl_program x264_opencl_compile( x264_t *h )
         }
     }
 
-    x264_log( h, X264_LOG_INFO, "OpenCL acceleration enabled with %s %s %s\n", devvendor, devname, h->opencl.b_device_AMD_SI ? "(SI)" : "" );
+    x264_log( h, X264_LOG_INFO, "OpenCL acceleration enabled with %s %s %s\n", dev_vendor, dev_name, h->opencl.b_device_AMD_SI ? "(SI)" : "" );
 
-    program = x264_opencl_cache_load( h, devname, devvendor, driverversion );
+    program = x264_opencl_cache_load( h, dev_name, dev_vendor, driver_version );
     if( !program )
     {
         /* clCreateProgramWithSource() requires a pointer variable, you cannot just use &x264_opencl_source */
@@ -272,47 +276,48 @@ static cl_program x264_opencl_compile( x264_t *h )
     status = ocl->clBuildProgram( program, 1, &h->opencl.device, buildopts, NULL, NULL );
     if( status == CL_SUCCESS )
     {
-        x264_opencl_cache_save( h, program, devname, devvendor, driverversion );
+        x264_opencl_cache_save( h, program, dev_name, dev_vendor, driver_version );
         return program;
     }
 
     /* Compile failure, should not happen with production code. */
 
     size_t build_log_len = 0;
-
-    status = ocl->clGetProgramBuildInfo( program, h->opencl.device, CL_PROGRAM_BUILD_LOG, build_log_len, NULL, &build_log_len );
-    if( status != CL_SUCCESS )
+    status = ocl->clGetProgramBuildInfo( program, h->opencl.device, CL_PROGRAM_BUILD_LOG, 0, NULL, &build_log_len );
+    if( status != CL_SUCCESS || !build_log_len )
     {
         x264_log( h, X264_LOG_WARNING, "OpenCL: Compilation failed, unable to query build log\n" );
-        return NULL;
+        goto fail;
     }
 
-    char *build_log;
-    CHECKED_MALLOC( build_log, build_log_len );
+    build_log = x264_malloc( build_log_len );
     if( !build_log )
     {
         x264_log( h, X264_LOG_WARNING, "OpenCL: Compilation failed, unable to alloc build log\n" );
-        return NULL;
+        goto fail;
     }
 
     status = ocl->clGetProgramBuildInfo( program, h->opencl.device, CL_PROGRAM_BUILD_LOG, build_log_len, build_log, NULL );
     if( status != CL_SUCCESS )
     {
         x264_log( h, X264_LOG_WARNING, "OpenCL: Compilation failed, unable to get build log\n" );
-        x264_free( build_log );
-        return NULL;
+        goto fail;
     }
 
-    FILE *lg = fopen( "x264_kernel_build_log.txt", "w" );
-    if( lg )
+    FILE *log_file = fopen( "x264_kernel_build_log.txt", "w" );
+    if( !log_file )
     {
-        fwrite( build_log, 1, build_log_len, lg );
-        fclose( lg );
-        x264_log( h, X264_LOG_WARNING, "OpenCL: kernel build errors written to x264_kernel_build_log.txt\n" );
+        x264_log( h, X264_LOG_WARNING, "OpenCL: Compilation failed, unable to create file x264_kernel_build_log.txt\n" );
+        goto fail;
     }
+    fwrite( build_log, 1, build_log_len, log_file );
+    fclose( log_file );
+    x264_log( h, X264_LOG_WARNING, "OpenCL: kernel build errors written to x264_kernel_build_log.txt\n" );
 
-    x264_free( build_log );
 fail:
+    x264_free( build_log );
+    if( program )
+        ocl->clReleaseProgram( program );
     return NULL;
 }
 
@@ -321,7 +326,7 @@ static int x264_opencl_lookahead_alloc( x264_t *h )
     if( !h->param.rc.i_lookahead )
         return -1;
 
-    static const char const *kernelnames[] = {
+    static const char *kernelnames[] = {
         "mb_intra_cost_satd_8x8",
         "sum_intra_cost",
         "downscale_hpel",
@@ -388,7 +393,7 @@ fail:
     return -1;
 }
 
-static void x264_opencl_error_notify( const char *errinfo, const void *private_info, size_t cb, void *user_data )
+static void CL_CALLBACK x264_opencl_error_notify( const char *errinfo, const void *private_info, size_t cb, void *user_data )
 {
     /* Any error notification can be assumed to be fatal to the OpenCL context.
      * We need to stop using it immediately to prevent further damage. */
@@ -402,45 +407,49 @@ static void x264_opencl_error_notify( const char *errinfo, const void *private_i
 int x264_opencl_lookahead_init( x264_t *h )
 {
     x264_opencl_function_t *ocl = h->opencl.ocl;
-    cl_int status;
-    cl_uint numPlatforms;
+    cl_platform_id *platforms = NULL;
+    cl_device_id *devices = NULL;
+    cl_image_format *imageType = NULL;
+    cl_context context = NULL;
     int ret = -1;
 
-    status = ocl->clGetPlatformIDs( 0, NULL, &numPlatforms );
-    if( status != CL_SUCCESS || numPlatforms == 0 )
+    cl_uint numPlatforms = 0;
+    cl_int status = ocl->clGetPlatformIDs( 0, NULL, &numPlatforms );
+    if( status != CL_SUCCESS || !numPlatforms )
     {
-        x264_log( h, X264_LOG_WARNING, "OpenCL: Unable to query installed platforms\n");
-        return -1;
+        x264_log( h, X264_LOG_WARNING, "OpenCL: Unable to query installed platforms\n" );
+        goto fail;
     }
-
-    cl_platform_id *platforms = (cl_platform_id*)x264_malloc( numPlatforms * sizeof(cl_platform_id) );
+    platforms = (cl_platform_id*)x264_malloc( sizeof(cl_platform_id) * numPlatforms );
+    if( !platforms )
+    {
+        x264_log( h, X264_LOG_WARNING, "OpenCL: malloc of installed platforms buffer failed\n" );
+        goto fail;
+    }
     status = ocl->clGetPlatformIDs( numPlatforms, platforms, NULL );
     if( status != CL_SUCCESS )
     {
-        x264_log( h, X264_LOG_WARNING, "OpenCL: Unable to query installed platforms\n");
-        x264_free( platforms );
-        return -1;
+        x264_log( h, X264_LOG_WARNING, "OpenCL: Unable to query installed platforms\n" );
+        goto fail;
     }
 
     /* Select the first OpenCL platform with a GPU device that supports our
      * required image (texture) formats */
-    for( cl_uint i = 0; i < numPlatforms; ++i )
+    for( cl_uint i = 0; i < numPlatforms; i++ )
     {
         cl_uint gpu_count = 0;
         status = ocl->clGetDeviceIDs( platforms[i], CL_DEVICE_TYPE_GPU, 0, NULL, &gpu_count );
         if( status != CL_SUCCESS || !gpu_count )
             continue;
 
-        cl_device_id *devices = x264_malloc( sizeof(cl_device_id) * gpu_count );
+        x264_free( devices );
+        devices = x264_malloc( sizeof(cl_device_id) * gpu_count );
         if( !devices )
             continue;
 
         status = ocl->clGetDeviceIDs( platforms[i], CL_DEVICE_TYPE_GPU, gpu_count, devices, NULL );
         if( status != CL_SUCCESS )
-        {
-            x264_free( devices );
             continue;
-        }
 
         /* Find a GPU device that supports our image formats */
         for( cl_uint gpu = 0; gpu < gpu_count; gpu++ )
@@ -450,34 +459,33 @@ int x264_opencl_lookahead_init( x264_t *h )
             /* if the user has specified an exact device ID, skip all other
              * GPUs.  If this device matches, allow it to continue through the
              * checks for supported images, etc.  */
-            if( h->param.opencl_device_id && devices[gpu] != (cl_device_id) h->param.opencl_device_id )
+            if( h->param.opencl_device_id && devices[gpu] != (cl_device_id)h->param.opencl_device_id )
                 continue;
 
-            cl_bool image_support;
-            ocl->clGetDeviceInfo( h->opencl.device, CL_DEVICE_IMAGE_SUPPORT, sizeof(cl_bool), &image_support, NULL );
-            if( !image_support )
+            cl_bool image_support = 0;
+            status = ocl->clGetDeviceInfo( h->opencl.device, CL_DEVICE_IMAGE_SUPPORT, sizeof(cl_bool), &image_support, NULL );
+            if( status != CL_SUCCESS || !image_support )
                 continue;
 
-            cl_context context = ocl->clCreateContext( NULL, 1, &h->opencl.device, (void*)x264_opencl_error_notify, (void*)h, &status );
-            if( status != CL_SUCCESS )
+            if( context )
+                ocl->clReleaseContext( context );
+            context = ocl->clCreateContext( NULL, 1, &h->opencl.device, (void*)x264_opencl_error_notify, (void*)h, &status );
+            if( status != CL_SUCCESS || !context )
                 continue;
 
             cl_uint imagecount = 0;
-            ocl->clGetSupportedImageFormats( context, CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE2D, 0, NULL, &imagecount );
-            if( !imagecount )
-            {
-                ocl->clReleaseContext( context );
+            status = ocl->clGetSupportedImageFormats( context, CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE2D, 0, NULL, &imagecount );
+            if( status != CL_SUCCESS || !imagecount )
                 continue;
-            }
 
-            cl_image_format *imageType = x264_malloc( sizeof(cl_image_format) * imagecount );
+            x264_free( imageType );
+            imageType = x264_malloc( sizeof(cl_image_format) * imagecount );
             if( !imageType )
-            {
-                ocl->clReleaseContext( context );
                 continue;
-            }
 
-            ocl->clGetSupportedImageFormats( context, CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE2D, imagecount, imageType, NULL );
+            status = ocl->clGetSupportedImageFormats( context, CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE2D, imagecount, imageType, NULL );
+            if( status != CL_SUCCESS )
+                continue;
 
             int b_has_r = 0;
             int b_has_rgba = 0;
@@ -490,18 +498,16 @@ int x264_opencl_lookahead_init( x264_t *h )
                          imageType[j].image_channel_data_type == CL_UNSIGNED_INT8 )
                     b_has_rgba = 1;
             }
-            x264_free( imageType );
             if( !b_has_r || !b_has_rgba )
             {
-                char devname[64];
-                status = ocl->clGetDeviceInfo( h->opencl.device, CL_DEVICE_NAME, sizeof(devname), devname, NULL );
+                char dev_name[64];
+                status = ocl->clGetDeviceInfo( h->opencl.device, CL_DEVICE_NAME, sizeof(dev_name), dev_name, NULL );
                 if( status == CL_SUCCESS )
                 {
                     /* emit warning if we are discarding the user's explicit choice */
                     int level = h->param.opencl_device_id ? X264_LOG_WARNING : X264_LOG_DEBUG;
-                    x264_log( h, level, "OpenCL: %s does not support required image formats\n", devname);
+                    x264_log( h, level, "OpenCL: %s does not support required image formats\n", dev_name );
                 }
-                ocl->clReleaseContext( context );
                 continue;
             }
 
@@ -509,39 +515,38 @@ int x264_opencl_lookahead_init( x264_t *h )
             if( h->param.i_opencl_device )
             {
                 h->param.i_opencl_device--;
-                ocl->clReleaseContext( context );
                 continue;
             }
 
             h->opencl.queue = ocl->clCreateCommandQueue( context, h->opencl.device, 0, &status );
-            if( status != CL_SUCCESS )
-            {
-                ocl->clReleaseContext( context );
+            if( status != CL_SUCCESS || !h->opencl.queue )
                 continue;
-            }
 
             h->opencl.context = context;
+            context = NULL;
 
             ret = 0;
             break;
         }
 
-        x264_free( devices );
-
         if( !ret )
             break;
     }
-
-    x264_free( platforms );
 
     if( !h->param.psz_clbin_file )
         h->param.psz_clbin_file = "x264_lookahead.clbin";
 
     if( ret )
-        x264_log( h, X264_LOG_WARNING, "OpenCL: Unable to find a compatible device\n");
+        x264_log( h, X264_LOG_WARNING, "OpenCL: Unable to find a compatible device\n" );
     else
         ret = x264_opencl_lookahead_alloc( h );
 
+fail:
+    if( context )
+        ocl->clReleaseContext( context );
+    x264_free( imageType );
+    x264_free( devices );
+    x264_free( platforms );
     return ret;
 }
 
