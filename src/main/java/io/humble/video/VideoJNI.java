@@ -269,7 +269,7 @@ class VideoJNI {
   public final static native void Packet_setPosition(long jarg1, Packet jarg1_, long jarg2);
   public final static native long Packet_getConvergenceDuration(long jarg1, Packet jarg1_);
   public final static native void Packet_setConvergenceDuration(long jarg1, Packet jarg1_, long jarg2);
-  public final static native int Packet_allocateNewPayload(long jarg1, Packet jarg1_, int jarg2);
+  public final static native int Packet_reset(long jarg1, Packet jarg1_, int jarg2);
   public final static native int Configurable_getNumProperties(long jarg1, Configurable jarg1_);
   public final static native long Configurable_getPropertyMetaData__SWIG_0(long jarg1, Configurable jarg1_, int jarg2);
   public final static native long Configurable_getPropertyMetaData__SWIG_1(long jarg1, Configurable jarg1_, String jarg2);

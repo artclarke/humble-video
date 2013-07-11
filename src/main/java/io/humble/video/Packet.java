@@ -382,11 +382,13 @@ public class Packet extends MediaEncodedData {
  * may allocate a larger payloadSize.  
  * </p>  
  * @param	payloadSize The (minimum) payloadSize of this packet in bytes. 
- *		  
+ *		 It is ok to  
+ * pass in 0 here, in which case the packet will later allocate memory 
+ * if needed.  
  * @return	>= 0 if successful. < 0 if error.  
  */
-  public int allocateNewPayload(int payloadSize) {
-    return VideoJNI.Packet_allocateNewPayload(swigCPtr, this, payloadSize);
+  public int reset(int payloadSize) {
+    return VideoJNI.Packet_reset(swigCPtr, this, payloadSize);
   }
 
 }
