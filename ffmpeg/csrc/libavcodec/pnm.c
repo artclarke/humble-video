@@ -181,7 +181,7 @@ int ff_pnm_decode_header(AVCodecContext *avctx, PNMContext * const s)
     }else
         s->maxval=1;
     /* more check if YUV420 */
-    if (av_pix_fmt_desc_get(avctx->pix_fmt)->flags & PIX_FMT_PLANAR) {
+    if (av_pix_fmt_desc_get(avctx->pix_fmt)->flags & AV_PIX_FMT_FLAG_PLANAR) {
         if ((avctx->width & 1) != 0)
             return AVERROR_INVALIDDATA;
         h = (avctx->height * 2);
@@ -190,16 +190,6 @@ int ff_pnm_decode_header(AVCodecContext *avctx, PNMContext * const s)
         h /= 3;
         avctx->height = h;
     }
-    return 0;
-}
-
-av_cold int ff_pnm_end(AVCodecContext *avctx)
-{
-    PNMContext *s = avctx->priv_data;
-
-    if (s->picture.data[0])
-        avctx->release_buffer(avctx, &s->picture);
-
     return 0;
 }
 

@@ -3,6 +3,8 @@
  * Copyright (c) 2000, 2001 Fabrice Bellard
  * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
+ * MMX optimization by Nick Kurshev <nickols_k@mail.ru>
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -18,8 +20,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- * MMX optimization by Nick Kurshev <nickols_k@mail.ru>
  */
 
 #include "libavutil/attributes.h"
@@ -30,7 +30,7 @@
 #include "libavcodec/dsputil.h"
 #include "libavcodec/mpegvideo.h"
 #include "libavcodec/mathops.h"
-#include "dsputil_mmx.h"
+#include "dsputil_x86.h"
 
 void ff_get_pixels_mmx(int16_t *block, const uint8_t *pixels, int line_size);
 void ff_get_pixels_sse2(int16_t *block, const uint8_t *pixels, int line_size);
@@ -947,9 +947,10 @@ hadamard_func(ssse3)
 av_cold void ff_dsputilenc_init_mmx(DSPContext *c, AVCodecContext *avctx)
 {
     int mm_flags = av_get_cpu_flags();
-    int bit_depth = avctx->bits_per_raw_sample;
 
 #if HAVE_YASM
+    int bit_depth = avctx->bits_per_raw_sample;
+
     if (EXTERNAL_MMX(mm_flags)) {
         if (bit_depth <= 8)
             c->get_pixels = ff_get_pixels_mmx;

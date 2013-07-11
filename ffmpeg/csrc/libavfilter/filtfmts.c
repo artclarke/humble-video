@@ -35,7 +35,7 @@ static void print_formats(AVFilterContext *filter_ctx)
         if (filter_ctx->inout##puts[i]->type == AVMEDIA_TYPE_VIDEO) {   \
             AVFilterFormats *fmts =                                     \
                 filter_ctx->inout##puts[i]->outin##_formats;            \
-            for (j = 0; j < fmts->format_count; j++)                    \
+            for (j = 0; j < fmts->nb_formats; j++)                    \
                 if(av_get_pix_fmt_name(fmts->formats[j]))               \
                 printf(#INOUT "PUT[%d] %s: fmt:%s\n",                   \
                        i, filter_ctx->filter->inout##puts[i].name,      \
@@ -45,7 +45,7 @@ static void print_formats(AVFilterContext *filter_ctx)
             AVFilterChannelLayouts *layouts;                            \
                                                                         \
             fmts = filter_ctx->inout##puts[i]->outin##_formats;         \
-            for (j = 0; j < fmts->format_count; j++)                    \
+            for (j = 0; j < fmts->nb_formats; j++)                    \
                 printf(#INOUT "PUT[%d] %s: fmt:%s\n",                   \
                        i, filter_ctx->filter->inout##puts[i].name,      \
                        av_get_sample_fmt_name(fmts->formats[j]));       \
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
                 filter_name);
         return 1;
     }
-    if (avfilter_init_filter(filter_ctx, filter_args, NULL) < 0) {
+    if (avfilter_init_str(filter_ctx, filter_args) < 0) {
         fprintf(stderr, "Impossible to init filter '%s' with arguments '%s'\n",
                 filter_name, filter_args);
         return 1;

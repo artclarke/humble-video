@@ -139,7 +139,7 @@ static int pmp_packet(AVFormatContext *s, AVPacket *pkt)
         int num_packets;
         pmp->audio_packets = avio_r8(pb);
         if (!pmp->audio_packets) {
-            av_log_ask_for_sample(s, "0 audio packets\n");
+            avpriv_request_sample(s, "0 audio packets");
             return AVERROR_PATCHWELCOME;
         }
         num_packets = (pmp->num_streams - 1) * pmp->audio_packets + 1;
@@ -174,7 +174,7 @@ static int pmp_seek(AVFormatContext *s, int stream_index, int64_t ts, int flags)
 {
     PMPContext *pmp = s->priv_data;
     pmp->cur_stream = 0;
-    // fallback to default seek now
+    // fall back on default seek now
     return -1;
 }
 

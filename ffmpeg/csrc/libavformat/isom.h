@@ -110,7 +110,7 @@ typedef struct MOVStreamContext {
     int ctts_index;
     int ctts_sample;
     unsigned int sample_size; ///< may contain value calculated from stsd or value from stsz atom
-    unsigned int alt_sample_size; ///< always contains sample size from stsz atom
+    unsigned int stsz_sample_size; ///< always contains sample size from stsz atom
     unsigned int sample_count;
     int *sample_sizes;
     int keyframe_absent;
@@ -162,6 +162,8 @@ typedef struct MOVContext {
     int use_absolute_path;
     int ignore_editlist;
     int64_t next_root_atom; ///< offset of the next root atom
+    int *bitrates;          ///< bitrates read before streams creation
+    int bitrates_count;
 } MOVContext;
 
 int ff_mp4_read_descr_len(AVIOContext *pb);

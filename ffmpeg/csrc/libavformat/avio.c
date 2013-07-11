@@ -241,6 +241,8 @@ int ffurl_alloc(URLContext **puc, const char *filename, int flags,
             return url_alloc_for_protocol (puc, up, filename, flags, int_cb);
     }
     *puc = NULL;
+    if (!strcmp("https", proto_str))
+        av_log(NULL, AV_LOG_WARNING, "https protocol not found, recompile with openssl or gnutls enabled.\n");
     return AVERROR_PROTOCOL_NOT_FOUND;
 }
 
@@ -290,7 +292,7 @@ static inline int retry_transfer_wrapper(URLContext *h, unsigned char *buf, int 
                 av_usleep(1000);
             }
         } else if (ret < 1)
-            return ret < 0 ? ret : len;
+            return (ret < 0 && ret != AVERROR_EOF) ? ret : len;
         if (ret)
            fast_retries = FFMAX(fast_retries, 2);
         len += ret;

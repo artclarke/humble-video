@@ -48,16 +48,6 @@ static av_cold int pcm_encode_init(AVCodecContext *avctx)
     avctx->bits_per_coded_sample = av_get_bits_per_sample(avctx->codec->id);
     avctx->block_align           = avctx->channels * avctx->bits_per_coded_sample / 8;
     avctx->bit_rate              = avctx->block_align * avctx->sample_rate * 8;
-    avctx->coded_frame           = avcodec_alloc_frame();
-    if (!avctx->coded_frame)
-        return AVERROR(ENOMEM);
-
-    return 0;
-}
-
-static av_cold int pcm_encode_close(AVCodecContext *avctx)
-{
-    av_freep(&avctx->coded_frame);
 
     return 0;
 }
@@ -356,10 +346,8 @@ static int pcm_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = n * samples_per_block / avctx->channels;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
     samples = frame->data[0];
 
     switch (avctx->codec_id) {
@@ -554,7 +542,6 @@ AVCodec ff_ ## name_ ## _encoder = {                                        \
     .id           = AV_CODEC_ID_ ## id_,                                    \
     .init         = pcm_encode_init,                                        \
     .encode2      = pcm_encode_frame,                                       \
-    .close        = pcm_encode_close,                                       \
     .capabilities = CODEC_CAP_VARIABLE_FRAME_SIZE,                          \
     .sample_fmts  = (const enum AVSampleFormat[]){ sample_fmt_,             \
                                                    AV_SAMPLE_FMT_NONE },    \

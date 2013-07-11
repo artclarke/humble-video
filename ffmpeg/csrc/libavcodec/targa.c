@@ -27,7 +27,6 @@
 #include "targa.h"
 
 typedef struct TargaContext {
-    AVFrame picture;
     GetByteContext gb;
 } TargaContext;
 
@@ -112,8 +111,7 @@ static int decode_frame(AVCodecContext *avctx,
                         AVPacket *avpkt)
 {
     TargaContext * const s = avctx->priv_data;
-    AVFrame *picture = data;
-    AVFrame * const p = &s->picture;
+    AVFrame * const p = data;
     uint8_t *dst;
     int stride;
     int idlen, pal, compr, y, w, h, bpp, flags, ret;
@@ -170,9 +168,6 @@ static int decode_frame(AVCodecContext *avctx,
         return AVERROR_INVALIDDATA;
     }
 
-    if (s->picture.data[0])
-        avctx->release_buffer(avctx, &s->picture);
-
     if (colors && (colors + first_clr) > 256) {
         av_log(avctx, AV_LOG_ERROR, "Incorrect palette: %i colors with offset %i\n", colors, first_clr);
         return AVERROR_INVALIDDATA;
@@ -182,10 +177,8 @@ static int decode_frame(AVCodecContext *avctx,
         return ret;
     if (w != avctx->width || h != avctx->height)
         avcodec_set_dimensions(avctx, w, h);
-    if ((ret = ff_get_buffer(avctx, p)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, p, 0)) < 0)
         return ret;
-    }
 
     if (flags & TGA_TOPTOBOTTOM) {
         dst = p->data[0];
@@ -298,30 +291,9 @@ static int decode_frame(AVCodecContext *avctx,
         }
     }
 
-    *picture   = s->picture;
     *got_frame = 1;
 
     return avpkt->size;
-}
-
-static av_cold int targa_init(AVCodecContext *avctx)
-{
-    TargaContext *s = avctx->priv_data;
-
-    avcodec_get_frame_defaults(&s->picture);
-    avctx->coded_frame = &s->picture;
-
-    return 0;
-}
-
-static av_cold int targa_end(AVCodecContext *avctx)
-{
-    TargaContext *s = avctx->priv_data;
-
-    if (s->picture.data[0])
-        avctx->release_buffer(avctx, &s->picture);
-
-    return 0;
 }
 
 AVCodec ff_targa_decoder = {
@@ -329,8 +301,6 @@ AVCodec ff_targa_decoder = {
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_TARGA,
     .priv_data_size = sizeof(TargaContext),
-    .init           = targa_init,
-    .close          = targa_end,
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DR1,
     .long_name      = NULL_IF_CONFIG_SMALL("Truevision Targa image"),

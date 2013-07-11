@@ -27,6 +27,7 @@
 #include "libavutil/internal.h"
 #include "avcodec.h"
 #include "dsputil.h"
+#include "h261.h"
 #include "mpegvideo.h"
 #include "mjpegenc.h"
 #include "msmpeg4.h"
@@ -59,13 +60,11 @@ static void gmc1_motion(MpegEncContext *s,
 
     ptr = ref_picture[0] + (src_y * linesize) + src_x;
 
-    if(s->flags&CODEC_FLAG_EMU_EDGE){
         if(   (unsigned)src_x >= FFMAX(s->h_edge_pos - 17, 0)
            || (unsigned)src_y >= FFMAX(s->v_edge_pos - 17, 0)){
             s->vdsp.emulated_edge_mc(s->edge_emu_buffer, ptr, linesize, 17, 17, src_x, src_y, s->h_edge_pos, s->v_edge_pos);
             ptr= s->edge_emu_buffer;
         }
-    }
 
     if((motion_x|motion_y)&7){
         s->dsp.gmc1(dest_y  , ptr  , linesize, 16, motion_x&15, motion_y&15, 128 - s->no_rounding);
@@ -75,9 +74,9 @@ static void gmc1_motion(MpegEncContext *s,
 
         dxy= ((motion_x>>3)&1) | ((motion_y>>2)&2);
         if (s->no_rounding){
-            s->dsp.put_no_rnd_pixels_tab[0][dxy](dest_y, ptr, linesize, 16);
+            s->hdsp.put_no_rnd_pixels_tab[0][dxy](dest_y, ptr, linesize, 16);
         }else{
-            s->dsp.put_pixels_tab       [0][dxy](dest_y, ptr, linesize, 16);
+            s->hdsp.put_pixels_tab       [0][dxy](dest_y, ptr, linesize, 16);
         }
     }
 
@@ -98,14 +97,12 @@ static void gmc1_motion(MpegEncContext *s,
 
     offset = (src_y * uvlinesize) + src_x;
     ptr = ref_picture[1] + offset;
-    if(s->flags&CODEC_FLAG_EMU_EDGE){
         if(   (unsigned)src_x >= FFMAX((s->h_edge_pos>>1) - 9, 0)
            || (unsigned)src_y >= FFMAX((s->v_edge_pos>>1) - 9, 0)){
             s->vdsp.emulated_edge_mc(s->edge_emu_buffer, ptr, uvlinesize, 9, 9, src_x, src_y, s->h_edge_pos>>1, s->v_edge_pos>>1);
             ptr= s->edge_emu_buffer;
             emu=1;
         }
-    }
     s->dsp.gmc1(dest_cb, ptr, uvlinesize, 8, motion_x&15, motion_y&15, 128 - s->no_rounding);
 
     ptr = ref_picture[2] + offset;
@@ -641,7 +638,7 @@ static av_always_inline void MPV_motion_internal(MpegEncContext *s,
 
     if(!is_mpeg12 && s->obmc && s->pict_type != AV_PICTURE_TYPE_B){
         LOCAL_ALIGNED_8(int16_t, mv_cache, [4], [4][2]);
-        AVFrame *cur_frame = &s->current_picture.f;
+        Picture *cur_frame = &s->current_picture;
         const int xy= s->mb_x + s->mb_y*s->mb_stride;
         const int mot_stride= s->b8_stride;
         const int mot_xy= mb_x*2 + mb_y*2*mot_stride;
@@ -812,7 +809,8 @@ static av_always_inline void MPV_motion_internal(MpegEncContext *s,
                                   s->mv[dir][1][0], s->mv[dir][1][1], 8, mb_y);
             }
         } else {
-            if(s->picture_structure != s->field_select[dir][0] + 1 && s->pict_type != AV_PICTURE_TYPE_B && !s->first_field){
+            if(   s->picture_structure != s->field_select[dir][0] + 1 && s->pict_type != AV_PICTURE_TYPE_B && !s->first_field
+               || !ref_picture[0]){
                 ref_picture = s->current_picture_ptr->f.data;
             }
 
@@ -826,8 +824,8 @@ static av_always_inline void MPV_motion_internal(MpegEncContext *s,
         for(i=0; i<2; i++){
             uint8_t ** ref2picture;
 
-            if(s->picture_structure == s->field_select[dir][i] + 1
-               || s->pict_type == AV_PICTURE_TYPE_B || s->first_field){
+            if((s->picture_structure == s->field_select[dir][i] + 1
+               || s->pict_type == AV_PICTURE_TYPE_B || s->first_field) && ref_picture[0]){
                 ref2picture= ref_picture;
             }else{
                 ref2picture = s->current_picture_ptr->f.data;
@@ -853,9 +851,12 @@ static av_always_inline void MPV_motion_internal(MpegEncContext *s,
                                       s->mv[dir][2*i + j][0],
                                       s->mv[dir][2*i + j][1], 8, mb_y);
                 }
-                pix_op = s->dsp.avg_pixels_tab;
+                pix_op = s->hdsp.avg_pixels_tab;
             }
         }else{
+            if (!ref_picture[0]) {
+                ref_picture = s->current_picture_ptr->f.data;
+            }
             for(i=0; i<2; i++){
                 mpeg_motion(s, dest_y, dest_cb, dest_cr,
                             s->picture_structure != i+1,
@@ -863,7 +864,7 @@ static av_always_inline void MPV_motion_internal(MpegEncContext *s,
                             s->mv[dir][2*i][0],s->mv[dir][2*i][1],16, mb_y>>1);
 
                 // after put we make avg of the same block
-                pix_op=s->dsp.avg_pixels_tab;
+                pix_op=s->hdsp.avg_pixels_tab;
 
                 //opposite parity is always in the same frame if this is second field
                 if(!s->first_field){

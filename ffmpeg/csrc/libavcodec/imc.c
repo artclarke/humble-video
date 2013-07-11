@@ -182,7 +182,7 @@ static av_cold int imc_decode_init(AVCodecContext *avctx)
         avctx->channels = 1;
 
     if (avctx->channels > 2) {
-        av_log_ask_for_sample(avctx, "Number of channels is not supported\n");
+        avpriv_request_sample(avctx, "Number of channels > 2");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -450,6 +450,10 @@ static int bit_allocation(IMCContext *q, IMCChannel *chctx,
         iacc  += chctx->bandWidthT[i];
         summa += chctx->bandWidthT[i] * chctx->flcoeffs4[i];
     }
+
+    if (!iacc)
+        return AVERROR_INVALIDDATA;
+
     chctx->bandWidthT[BANDS - 1] = 0;
     summa = (summa * 0.5 - freebits) / iacc;
 
@@ -779,8 +783,7 @@ static int imc_decode_block(AVCodecContext *avctx, IMCContext *q, int ch)
     stream_format_code = get_bits(&q->gb, 3);
 
     if (stream_format_code & 1) {
-        av_log_ask_for_sample(avctx, "Stream format %X is not supported\n",
-                              stream_format_code);
+        avpriv_request_sample(avctx, "Stream format %X", stream_format_code);
         return AVERROR_PATCHWELCOME;
     }
 
@@ -948,10 +951,8 @@ static int imc_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = COEFFS;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
 
     for (i = 0; i < avctx->channels; i++) {
         q->out_samples = (float *)frame->extended_data[i];

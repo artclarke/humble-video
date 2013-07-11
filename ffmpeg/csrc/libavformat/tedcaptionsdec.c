@@ -295,7 +295,7 @@ static av_cold int tedcaptions_read_header(AVFormatContext *avf)
     if (!st)
         return AVERROR(ENOMEM);
     st->codec->codec_type     = AVMEDIA_TYPE_SUBTITLE;
-    st->codec->codec_id       = CODEC_ID_TEXT;
+    st->codec->codec_id       = AV_CODEC_ID_TEXT;
     avpriv_set_pts_info(st, 64, 1, 1000);
     st->probe_packets = 0;
     st->start_time    = 0;
@@ -340,7 +340,7 @@ static av_cold int tedcaptions_read_probe(AVProbeData *p)
             count++;
     }
     return count == FF_ARRAY_ELEMS(tags) ? AVPROBE_SCORE_MAX :
-           count                         ? AVPROBE_SCORE_MAX / 2 : 0;
+           count                         ? AVPROBE_SCORE_EXTENSION : 0;
 }
 
 static int tedcaptions_read_seek(AVFormatContext *avf, int stream_index,

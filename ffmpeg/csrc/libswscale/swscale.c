@@ -254,7 +254,10 @@ static av_always_inline void hyscale(SwsContext *c, int16_t *dst, int dstWidth,
         toYV12(formatConvBuffer, src, src_in[1], src_in[2], srcW, pal);
         src = formatConvBuffer;
     } else if (c->readLumPlanar && !isAlpha) {
-        c->readLumPlanar(formatConvBuffer, src_in, srcW);
+        c->readLumPlanar(formatConvBuffer, src_in, srcW, c->input_rgb2yuv_table);
+        src = formatConvBuffer;
+    } else if (c->readAlpPlanar && isAlpha) {
+        c->readAlpPlanar(formatConvBuffer, src_in, srcW, NULL);
         src = formatConvBuffer;
     }
 
@@ -307,7 +310,7 @@ static av_always_inline void hcscale(SwsContext *c, int16_t *dst1,
     } else if (c->readChrPlanar) {
         uint8_t *buf2 = formatConvBuffer +
                         FFALIGN(srcW*2+78, 16);
-        c->readChrPlanar(formatConvBuffer, buf2, src_in, srcW);
+        c->readChrPlanar(formatConvBuffer, buf2, src_in, srcW, c->input_rgb2yuv_table);
         src1 = formatConvBuffer;
         src2 = buf2;
     }
@@ -370,8 +373,8 @@ static int swScale(SwsContext *c, const uint8_t *src[],
     yuv2packed2_fn yuv2packed2       = c->yuv2packed2;
     yuv2packedX_fn yuv2packedX       = c->yuv2packedX;
     yuv2anyX_fn yuv2anyX             = c->yuv2anyX;
-    const int chrSrcSliceY           =     srcSliceY  >> c->chrSrcVSubSample;
-    const int chrSrcSliceH           = -((-srcSliceH) >> c->chrSrcVSubSample);
+    const int chrSrcSliceY           =                srcSliceY >> c->chrSrcVSubSample;
+    const int chrSrcSliceH           = FF_CEIL_RSHIFT(srcSliceH,   c->chrSrcVSubSample);
     int should_dither                = is9_OR_10BPS(c->srcFormat) ||
                                        is16BPS(c->srcFormat);
     int lastDstY;
@@ -382,6 +385,10 @@ static int swScale(SwsContext *c, const uint8_t *src[],
     int chrBufIndex  = c->chrBufIndex;
     int lastInLumBuf = c->lastInLumBuf;
     int lastInChrBuf = c->lastInChrBuf;
+
+    if (!usePal(c->srcFormat)) {
+        pal = c->input_rgb2yuv_table;
+    }
 
     if (isPacked(c->srcFormat)) {
         src[0] =
@@ -484,7 +491,7 @@ static int swScale(SwsContext *c, const uint8_t *src[],
 
         // Do we have enough lines in this slice to output the dstY line
         enough_lines = lastLumSrcY2 < srcSliceY + srcSliceH &&
-                       lastChrSrcY < -((-srcSliceY - srcSliceH) >> c->chrSrcVSubSample);
+                       lastChrSrcY < FF_CEIL_RSHIFT(srcSliceY + srcSliceH, c->chrSrcVSubSample);
 
         if (!enough_lines) {
             lastLumSrcY = srcSliceY + srcSliceH - 1;
@@ -787,6 +794,62 @@ static int check_image_pointers(const uint8_t * const data[4], enum AVPixelForma
     return 1;
 }
 
+static void xyz12Torgb48(struct SwsContext *c, uint16_t *dst,
+                         const uint16_t *src, int stride, int h)
+{
+    int xp,yp;
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(c->srcFormat);
+
+    for (yp=0; yp<h; yp++) {
+        for (xp=0; xp+2<stride; xp+=3) {
+            int x, y, z, r, g, b;
+
+            if (desc->flags & AV_PIX_FMT_FLAG_BE) {
+                x = AV_RB16(src + xp + 0);
+                y = AV_RB16(src + xp + 1);
+                z = AV_RB16(src + xp + 2);
+            } else {
+                x = AV_RL16(src + xp + 0);
+                y = AV_RL16(src + xp + 1);
+                z = AV_RL16(src + xp + 2);
+            }
+
+            x = c->xyzgamma[x>>4];
+            y = c->xyzgamma[y>>4];
+            z = c->xyzgamma[z>>4];
+
+            // convert from XYZlinear to sRGBlinear
+            r = c->xyz2rgb_matrix[0][0] * x +
+                c->xyz2rgb_matrix[0][1] * y +
+                c->xyz2rgb_matrix[0][2] * z >> 12;
+            g = c->xyz2rgb_matrix[1][0] * x +
+                c->xyz2rgb_matrix[1][1] * y +
+                c->xyz2rgb_matrix[1][2] * z >> 12;
+            b = c->xyz2rgb_matrix[2][0] * x +
+                c->xyz2rgb_matrix[2][1] * y +
+                c->xyz2rgb_matrix[2][2] * z >> 12;
+
+            // limit values to 12-bit depth
+            r = av_clip_c(r,0,4095);
+            g = av_clip_c(g,0,4095);
+            b = av_clip_c(b,0,4095);
+
+            // convert from sRGBlinear to RGB and scale from 12bit to 16bit
+            if (desc->flags & AV_PIX_FMT_FLAG_BE) {
+                AV_WB16(dst + xp + 0, c->rgbgamma[r] << 4);
+                AV_WB16(dst + xp + 1, c->rgbgamma[g] << 4);
+                AV_WB16(dst + xp + 2, c->rgbgamma[b] << 4);
+            } else {
+                AV_WL16(dst + xp + 0, c->rgbgamma[r] << 4);
+                AV_WL16(dst + xp + 1, c->rgbgamma[g] << 4);
+                AV_WL16(dst + xp + 2, c->rgbgamma[b] << 4);
+            }
+        }
+        src += stride;
+        dst += stride;
+    }
+}
+
 /**
  * swscale wrapper, so we don't need to export the SwsContext.
  * Assumes planar YUV to be in YUV order instead of YVU.
@@ -908,6 +971,9 @@ int attribute_align_arg sws_scale(struct SwsContext *c,
         uint8_t *base;
         int x,y;
         rgb0_tmp = av_malloc(FFABS(srcStride[0]) * srcSliceH + 32);
+        if (!rgb0_tmp)
+            return AVERROR(ENOMEM);
+
         base = srcStride[0] < 0 ? rgb0_tmp - srcStride[0] * (srcSliceH-1) : rgb0_tmp;
         for (y=0; y<srcSliceH; y++){
             memcpy(base + srcStride[0]*y, src2[0] + srcStride[0]*y, 4*c->srcW);
@@ -915,6 +981,18 @@ int attribute_align_arg sws_scale(struct SwsContext *c,
                 base[ srcStride[0]*y + x] = 0xFF;
             }
         }
+        src2[0] = base;
+    }
+
+    if (c->srcXYZ && !(c->dstXYZ && c->srcW==c->dstW && c->srcH==c->dstH)) {
+        uint8_t *base;
+        rgb0_tmp = av_malloc(FFABS(srcStride[0]) * srcSliceH + 32);
+        if (!rgb0_tmp)
+            return AVERROR(ENOMEM);
+
+        base = srcStride[0] < 0 ? rgb0_tmp - srcStride[0] * (srcSliceH-1) : rgb0_tmp;
+
+        xyz12Torgb48(c, (uint16_t*)base, (const uint16_t*)src2[0], srcStride[0]/2, srcSliceH);
         src2[0] = base;
     }
 

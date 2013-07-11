@@ -48,6 +48,7 @@ typedef struct LAMEContext {
     int buffer_index;
     int buffer_size;
     int reservoir;
+    int joint_stereo;
     float *samples_flt[2];
     AudioFrameQueue afq;
     AVFloatDSPContext fdsp;
@@ -78,9 +79,6 @@ static av_cold int mp3lame_encode_close(AVCodecContext *avctx)
 {
     LAMEContext *s = avctx->priv_data;
 
-#if FF_API_OLD_ENCODE_AUDIO
-    av_freep(&avctx->coded_frame);
-#endif
     av_freep(&s->samples_flt[0]);
     av_freep(&s->samples_flt[1]);
     av_freep(&s->buffer);
@@ -104,7 +102,7 @@ static av_cold int mp3lame_encode_init(AVCodecContext *avctx)
 
 
     lame_set_num_channels(s->gfp, avctx->channels);
-    lame_set_mode(s->gfp, avctx->channels > 1 ? JOINT_STEREO : MONO);
+    lame_set_mode(s->gfp, avctx->channels > 1 ? s->joint_stereo ? JOINT_STEREO : STEREO : MONO);
 
     /* sample rate */
     lame_set_in_samplerate (s->gfp, avctx->sample_rate);
@@ -142,14 +140,6 @@ static av_cold int mp3lame_encode_init(AVCodecContext *avctx)
     ff_af_queue_init(avctx, &s->afq);
 
     avctx->frame_size  = lame_get_framesize(s->gfp);
-
-#if FF_API_OLD_ENCODE_AUDIO
-    avctx->coded_frame = avcodec_alloc_frame();
-    if (!avctx->coded_frame) {
-        ret = AVERROR(ENOMEM);
-        goto error;
-    }
-#endif
 
     /* allocate float sample buffers */
     if (avctx->sample_fmt == AV_SAMPLE_FMT_FLTP) {
@@ -218,7 +208,7 @@ static int mp3lame_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
         }
     } else {
         lame_result = lame_encode_flush(s->gfp, s->buffer + s->buffer_index,
-                                        BUFFER_SIZE - s->buffer_index);
+                                        s->buffer_size - s->buffer_index);
     }
     if (lame_result < 0) {
         if (lame_result == -1) {
@@ -274,6 +264,7 @@ static int mp3lame_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 #define AE AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
     { "reservoir", "Use bit reservoir.", OFFSET(reservoir), AV_OPT_TYPE_INT, { .i64 = 1 }, 0, 1, AE },
+    { "joint_stereo", "Use joint stereo.", OFFSET(joint_stereo), AV_OPT_TYPE_INT, { .i64 = 1 }, 0, 1, AE },
     { NULL },
 };
 

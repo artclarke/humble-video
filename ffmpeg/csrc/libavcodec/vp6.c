@@ -53,16 +53,16 @@ static int vp6_parse_header(VP56Context *s, const uint8_t *buf, int buf_size)
     int res = 0;
     int separated_coeff = buf[0] & 1;
 
-    s->framep[VP56_FRAME_CURRENT]->key_frame = !(buf[0] & 0x80);
+    s->frames[VP56_FRAME_CURRENT]->key_frame = !(buf[0] & 0x80);
     ff_vp56_init_dequant(s, (buf[0] >> 1) & 0x3F);
 
-    if (s->framep[VP56_FRAME_CURRENT]->key_frame) {
+    if (s->frames[VP56_FRAME_CURRENT]->key_frame) {
         sub_version = buf[1] >> 3;
         if (sub_version > 8)
             return AVERROR_INVALIDDATA;
         s->filter_header = buf[1] & 0x06;
         if (buf[1] & 1) {
-            av_log_missing_feature(s->avctx, "Interlacing", 0);
+            avpriv_report_missing_feature(s->avctx, "Interlacing");
             return AVERROR_PATCHWELCOME;
         }
         if (separated_coeff || !s->filter_header) {
@@ -143,7 +143,7 @@ static int vp6_parse_header(VP56Context *s, const uint8_t *buf, int buf_size)
         buf      += coeff_offset;
         buf_size -= coeff_offset;
         if (buf_size < 0) {
-            if (s->framep[VP56_FRAME_CURRENT]->key_frame)
+            if (s->frames[VP56_FRAME_CURRENT]->key_frame)
                 avcodec_set_dimensions(s->avctx, 0, 0);
             return AVERROR_INVALIDDATA;
         }
@@ -258,7 +258,7 @@ static int vp6_parse_coeff_models(VP56Context *s)
             if (vp56_rac_get_prob(c, vp6_dccv_pct[pt][node])) {
                 def_prob[node] = vp56_rac_gets_nn(c, 7);
                 model->coeff_dccv[pt][node] = def_prob[node];
-            } else if (s->framep[VP56_FRAME_CURRENT]->key_frame) {
+            } else if (s->frames[VP56_FRAME_CURRENT]->key_frame) {
                 model->coeff_dccv[pt][node] = def_prob[node];
             }
 
@@ -281,7 +281,7 @@ static int vp6_parse_coeff_models(VP56Context *s)
                     if (vp56_rac_get_prob(c, vp6_ract_pct[ct][pt][cg][node])) {
                         def_prob[node] = vp56_rac_gets_nn(c, 7);
                         model->coeff_ract[pt][ct][cg][node] = def_prob[node];
-                    } else if (s->framep[VP56_FRAME_CURRENT]->key_frame) {
+                    } else if (s->frames[VP56_FRAME_CURRENT]->key_frame) {
                         model->coeff_ract[pt][ct][cg][node] = def_prob[node];
                     }
 
@@ -368,7 +368,7 @@ static unsigned vp6_get_nb_null(VP56Context *s)
 static void vp6_parse_coeff_huffman(VP56Context *s)
 {
     VP56Model *model = s->modelp;
-    uint8_t *permute = s->scantable.permutated;
+    uint8_t *permute = s->idct_scantable;
     VLC *vlc_coeff;
     int coeff, sign, coeff_idx;
     int b, cg, idx;
@@ -388,11 +388,11 @@ static void vp6_parse_coeff_huffman(VP56Context *s)
             } else {
                 if (get_bits_left(&s->gb) <= 0)
                     return;
-                coeff = get_vlc2(&s->gb, vlc_coeff->table, 9, 3);
+                coeff = get_vlc2(&s->gb, vlc_coeff->table, FF_HUFFMAN_BITS, 3);
                 if (coeff == 0) {
                     if (coeff_idx) {
                         int pt = (coeff_idx >= 6);
-                        run += get_vlc2(&s->gb, s->runv_vlc[pt].table, 9, 3);
+                        run += get_vlc2(&s->gb, s->runv_vlc[pt].table, FF_HUFFMAN_BITS, 3);
                         if (run >= 9)
                             run += get_bits(&s->gb, 6);
                     } else
@@ -428,7 +428,7 @@ static void vp6_parse_coeff(VP56Context *s)
 {
     VP56RangeCoder *c = s->ccp;
     VP56Model *model = s->modelp;
-    uint8_t *permute = s->scantable.permutated;
+    uint8_t *permute = s->idct_scantable;
     uint8_t *model1, *model2, *model3;
     int coeff, sign, coeff_idx;
     int b, i, cg, idx, ctx;
@@ -594,20 +594,19 @@ static av_cold void vp6_decode_init_context(VP56Context *s);
 static av_cold int vp6_decode_init(AVCodecContext *avctx)
 {
     VP56Context *s = avctx->priv_data;
+    int ret;
 
-    ff_vp56_init(avctx, avctx->codec->id == AV_CODEC_ID_VP6,
-                        avctx->codec->id == AV_CODEC_ID_VP6A);
+    if ((ret = ff_vp56_init(avctx, avctx->codec->id == AV_CODEC_ID_VP6,
+                            avctx->codec->id == AV_CODEC_ID_VP6A)) < 0)
+        return ret;
+
     vp6_decode_init_context(s);
 
     if (s->has_alpha) {
-        int i;
-
         s->alpha_context = av_mallocz(sizeof(VP56Context));
         ff_vp56_init_context(avctx, s->alpha_context,
                              s->flip == -1, s->has_alpha);
         vp6_decode_init_context(s->alpha_context);
-        for (i = 0; i < 6; ++i)
-            s->alpha_context->framep[i] = s->framep[i];
     }
 
     return 0;

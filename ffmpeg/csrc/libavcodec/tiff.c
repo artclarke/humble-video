@@ -24,26 +24,26 @@
  * @author Konstantin Shishkov
  */
 
-#include "avcodec.h"
-#include "bytestream.h"
 #include "config.h"
 #if CONFIG_ZLIB
 #include <zlib.h>
 #endif
-#include "lzw.h"
-#include "tiff.h"
-#include "tiff_data.h"
-#include "faxcompr.h"
-#include "internal.h"
-#include "mathops.h"
+
 #include "libavutil/attributes.h"
+#include "libavutil/avstring.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/imgutils.h"
-#include "libavutil/avstring.h"
+#include "avcodec.h"
+#include "bytestream.h"
+#include "faxcompr.h"
+#include "internal.h"
+#include "lzw.h"
+#include "mathops.h"
+#include "tiff.h"
+#include "tiff_data.h"
 
 typedef struct TiffContext {
     AVCodecContext *avctx;
-    AVFrame picture;
     GetByteContext gb;
 
     int width, height;
@@ -53,6 +53,7 @@ typedef struct TiffContext {
     int le;
     enum TiffCompr compr;
     int invert;
+    int planar;
     int fax_opts;
     int predictor;
     int fill_order;
@@ -90,10 +91,14 @@ static double tget_double(GetByteContext *gb, int le)
 static unsigned tget(GetByteContext *gb, int type, int le)
 {
     switch (type) {
-    case TIFF_BYTE : return bytestream2_get_byte(gb);
-    case TIFF_SHORT: return tget_short(gb, le);
-    case TIFF_LONG : return tget_long(gb, le);
-    default        : return UINT_MAX;
+    case TIFF_BYTE:
+        return bytestream2_get_byte(gb);
+    case TIFF_SHORT:
+        return tget_short(gb, le);
+    case TIFF_LONG:
+        return tget_long(gb, le);
+    default:
+        return UINT_MAX;
     }
 }
 
@@ -268,7 +273,7 @@ static char *shorts2str(int16_t *sp, int count, const char *sep)
 
 static int add_doubles_metadata(int count,
                                 const char *name, const char *sep,
-                                TiffContext *s)
+                                TiffContext *s, AVFrame *frame)
 {
     char *ap;
     int i;
@@ -289,12 +294,12 @@ static int add_doubles_metadata(int count,
     av_freep(&dp);
     if (!ap)
         return AVERROR(ENOMEM);
-    av_dict_set(ff_frame_get_metadatap(&s->picture), name, ap, AV_DICT_DONT_STRDUP_VAL);
+    av_dict_set(avpriv_frame_get_metadatap(frame), name, ap, AV_DICT_DONT_STRDUP_VAL);
     return 0;
 }
 
 static int add_shorts_metadata(int count, const char *name,
-                               const char *sep, TiffContext *s)
+                               const char *sep, TiffContext *s, AVFrame *frame)
 {
     char *ap;
     int i;
@@ -315,12 +320,12 @@ static int add_shorts_metadata(int count, const char *name,
     av_freep(&sp);
     if (!ap)
         return AVERROR(ENOMEM);
-    av_dict_set(ff_frame_get_metadatap(&s->picture), name, ap, AV_DICT_DONT_STRDUP_VAL);
+    av_dict_set(avpriv_frame_get_metadatap(frame), name, ap, AV_DICT_DONT_STRDUP_VAL);
     return 0;
 }
 
 static int add_string_metadata(int count, const char *name,
-                               TiffContext *s)
+                               TiffContext *s, AVFrame *frame)
 {
     char *value;
 
@@ -334,43 +339,20 @@ static int add_string_metadata(int count, const char *name,
     bytestream2_get_bufferu(&s->gb, value, count);
     value[count] = 0;
 
-    av_dict_set(ff_frame_get_metadatap(&s->picture), name, value, AV_DICT_DONT_STRDUP_VAL);
+    av_dict_set(avpriv_frame_get_metadatap(frame), name, value, AV_DICT_DONT_STRDUP_VAL);
     return 0;
 }
 
 static int add_metadata(int count, int type,
-                        const char *name, const char *sep, TiffContext *s)
+                        const char *name, const char *sep, TiffContext *s, AVFrame *frame)
 {
     switch(type) {
-    case TIFF_DOUBLE: return add_doubles_metadata(count, name, sep, s);
-    case TIFF_SHORT : return add_shorts_metadata(count, name, sep, s);
-    case TIFF_STRING: return add_string_metadata(count, name, s);
+    case TIFF_DOUBLE: return add_doubles_metadata(count, name, sep, s, frame);
+    case TIFF_SHORT : return add_shorts_metadata(count, name, sep, s, frame);
+    case TIFF_STRING: return add_string_metadata(count, name, s, frame);
     default         : return AVERROR_INVALIDDATA;
     };
 }
-
-#if CONFIG_ZLIB
-static int tiff_uncompress(uint8_t *dst, unsigned long *len, const uint8_t *src,
-                           int size)
-{
-    z_stream zstream = { 0 };
-    int zret;
-
-    zstream.next_in = (uint8_t *)src;
-    zstream.avail_in = size;
-    zstream.next_out = dst;
-    zstream.avail_out = *len;
-    zret = inflateInit(&zstream);
-    if (zret != Z_OK) {
-        av_log(NULL, AV_LOG_ERROR, "Inflate init error: %d\n", zret);
-        return zret;
-    }
-    zret = inflate(&zstream, Z_SYNC_FLUSH);
-    inflateEnd(&zstream);
-    *len = zstream.total_out;
-    return zret == Z_STREAM_END ? Z_OK : zret;
-}
-#endif
 
 static void av_always_inline horizontal_fill(unsigned int bpp, uint8_t* dst,
                                              int usePtr, const uint8_t *src,
@@ -412,71 +394,147 @@ static void av_always_inline horizontal_fill(unsigned int bpp, uint8_t* dst,
     }
 }
 
+static int deinvert_buffer(TiffContext *s, const uint8_t *src, int size)
+{
+    int i;
+
+    av_fast_padded_malloc(&s->deinvert_buf, &s->deinvert_buf_size, size);
+    if (!s->deinvert_buf)
+        return AVERROR(ENOMEM);
+    for (i = 0; i < size; i++)
+        s->deinvert_buf[i] = ff_reverse[src[i]];
+
+    return 0;
+}
+
+#if CONFIG_ZLIB
+static int tiff_uncompress(uint8_t *dst, unsigned long *len, const uint8_t *src,
+                           int size)
+{
+    z_stream zstream = { 0 };
+    int zret;
+
+    zstream.next_in   = (uint8_t *)src;
+    zstream.avail_in  = size;
+    zstream.next_out  = dst;
+    zstream.avail_out = *len;
+    zret              = inflateInit(&zstream);
+    if (zret != Z_OK) {
+        av_log(NULL, AV_LOG_ERROR, "Inflate init error: %d\n", zret);
+        return zret;
+    }
+    zret = inflate(&zstream, Z_SYNC_FLUSH);
+    inflateEnd(&zstream);
+    *len = zstream.total_out;
+    return zret == Z_STREAM_END ? Z_OK : zret;
+}
+
+static int tiff_unpack_zlib(TiffContext *s, uint8_t *dst, int stride,
+                            const uint8_t *src, int size,
+                            int width, int lines)
+{
+    uint8_t *zbuf;
+    unsigned long outlen;
+    int ret, line;
+    outlen = width * lines;
+    zbuf   = av_malloc(outlen);
+    if (!zbuf)
+        return AVERROR(ENOMEM);
+    if (s->fill_order) {
+        if ((ret = deinvert_buffer(s, src, size)) < 0) {
+            av_free(zbuf);
+            return ret;
+        }
+        src = s->deinvert_buf;
+    }
+    ret = tiff_uncompress(zbuf, &outlen, src, size);
+    if (ret != Z_OK) {
+        av_log(s->avctx, AV_LOG_ERROR,
+               "Uncompressing failed (%lu of %lu) with error %d\n", outlen,
+               (unsigned long)width * lines, ret);
+        av_free(zbuf);
+        return AVERROR_UNKNOWN;
+    }
+    src = zbuf;
+    for (line = 0; line < lines; line++) {
+        if (s->bpp < 8 && s->avctx->pix_fmt == AV_PIX_FMT_PAL8) {
+            horizontal_fill(s->bpp, dst, 1, src, 0, width, 0);
+        } else {
+            memcpy(dst, src, width);
+        }
+        dst += stride;
+        src += width;
+    }
+    av_free(zbuf);
+    return 0;
+}
+#endif
+
+
+static int tiff_unpack_fax(TiffContext *s, uint8_t *dst, int stride,
+                           const uint8_t *src, int size, int width, int lines)
+{
+    int i, ret = 0;
+    int line;
+    uint8_t *src2 = av_malloc((unsigned)size +
+                              FF_INPUT_BUFFER_PADDING_SIZE);
+
+    if (!src2) {
+        av_log(s->avctx, AV_LOG_ERROR,
+               "Error allocating temporary buffer\n");
+        return AVERROR(ENOMEM);
+    }
+    if (s->fax_opts & 2) {
+        avpriv_request_sample(s->avctx, "Uncompressed fax mode");
+        av_free(src2);
+        return AVERROR_PATCHWELCOME;
+    }
+    if (!s->fill_order) {
+        memcpy(src2, src, size);
+    } else {
+        for (i = 0; i < size; i++)
+            src2[i] = ff_reverse[src[i]];
+    }
+    memset(src2 + size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+    ret = ff_ccitt_unpack(s->avctx, src2, size, dst, lines, stride,
+                          s->compr, s->fax_opts);
+    if (s->bpp < 8 && s->avctx->pix_fmt == AV_PIX_FMT_PAL8)
+        for (line = 0; line < lines; line++) {
+            horizontal_fill(s->bpp, dst, 1, dst, 0, width, 0);
+            dst += stride;
+        }
+    av_free(src2);
+    return ret;
+}
+
 static int tiff_unpack_strip(TiffContext *s, uint8_t *dst, int stride,
                              const uint8_t *src, int size, int lines)
 {
     int c, line, pixels, code, ret;
     const uint8_t *ssrc = src;
-    int width = ((s->width * s->bpp) + 7) >> 3;
+    int width           = ((s->width * s->bpp) + 7) >> 3;
+
+    if (s->planar)
+        width /= s->bppcount;
 
     if (size <= 0)
         return AVERROR_INVALIDDATA;
 
-#if CONFIG_ZLIB
     if (s->compr == TIFF_DEFLATE || s->compr == TIFF_ADOBE_DEFLATE) {
-        uint8_t *src2 = NULL, *zbuf;
-        unsigned long outlen;
-        int i, ret;
-        outlen = width * lines;
-        zbuf = av_malloc(outlen);
-        if (!zbuf)
-            return AVERROR(ENOMEM);
-        if (s->fill_order) {
-            src2 = av_malloc((unsigned)size + FF_INPUT_BUFFER_PADDING_SIZE);
-            if (!src2) {
-                av_log(s->avctx, AV_LOG_ERROR, "Error allocating temporary buffer\n");
-                av_free(zbuf);
-                return AVERROR(ENOMEM);
-            }
-            for (i = 0; i < size; i++)
-                src2[i] = ff_reverse[src[i]];
-            memset(src2 + size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
-            src = src2;
-        }
-        ret = tiff_uncompress(zbuf, &outlen, src, size);
-        if (ret != Z_OK) {
-            av_log(s->avctx, AV_LOG_ERROR,
-                   "Uncompressing failed (%lu of %lu) with error %d\n", outlen,
-                   (unsigned long)width * lines, ret);
-            av_free(src2);
-            av_free(zbuf);
-            return AVERROR_UNKNOWN;
-        }
-        src = zbuf;
-        for (line = 0; line < lines; line++) {
-            if(s->bpp < 8 && s->avctx->pix_fmt == AV_PIX_FMT_PAL8){
-                horizontal_fill(s->bpp, dst, 1, src, 0, width, 0);
-            }else{
-                memcpy(dst, src, width);
-            }
-            dst += stride;
-            src += width;
-        }
-        av_free(src2);
-        av_free(zbuf);
-        return 0;
-    }
+#if CONFIG_ZLIB
+        return tiff_unpack_zlib(s, dst, stride, src, size, width, lines);
+#else
+        av_log(s->avctx, AV_LOG_ERROR,
+               "zlib support not enabled, "
+               "deflate compression not supported\n");
+        return AVERROR(ENOSYS);
 #endif
+    }
     if (s->compr == TIFF_LZW) {
         if (s->fill_order) {
-            int i;
-            av_fast_padded_malloc(&s->deinvert_buf, &s->deinvert_buf_size, size);
-            if (!s->deinvert_buf)
-                return AVERROR(ENOMEM);
-            for (i = 0; i < size; i++)
-                s->deinvert_buf[i] = ff_reverse[src[i]];
-            src = s->deinvert_buf;
-            ssrc = src;
+            if ((ret = deinvert_buffer(s, src, size)) < 0)
+                return ret;
+            ssrc = src = s->deinvert_buf;
         }
         if (size > 1 && !src[0] && (src[1]&1)) {
             av_log(s->avctx, AV_LOG_ERROR, "Old style LZW is unsupported\n");
@@ -486,45 +544,10 @@ static int tiff_unpack_strip(TiffContext *s, uint8_t *dst, int stride,
             return ret;
         }
     }
-    if (s->compr == TIFF_CCITT_RLE || s->compr == TIFF_G3
-        || s->compr == TIFF_G4) {
-        int i, ret = 0;
-        uint8_t *src2 = av_malloc((unsigned)size +
-                                  FF_INPUT_BUFFER_PADDING_SIZE);
-
-        if (!src2) {
-            av_log(s->avctx, AV_LOG_ERROR,
-                   "Error allocating temporary buffer\n");
-            return AVERROR(ENOMEM);
-        }
-        if (s->fax_opts & 2) {
-            av_log(s->avctx, AV_LOG_ERROR,
-                   "Uncompressed fax mode is not supported (yet)\n");
-            av_free(src2);
-            return AVERROR_INVALIDDATA;
-        }
-        if (!s->fill_order) {
-            memcpy(src2, src, size);
-        } else {
-            for (i = 0; i < size; i++)
-                src2[i] = ff_reverse[src[i]];
-        }
-        memset(src2 + size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
-        switch (s->compr) {
-        case TIFF_CCITT_RLE:
-        case TIFF_G3:
-        case TIFF_G4:
-            ret = ff_ccitt_unpack(s->avctx, src2, size, dst, lines, stride,
-                                  s->compr, s->fax_opts);
-            break;
-        }
-        if (s->bpp < 8 && s->avctx->pix_fmt == AV_PIX_FMT_PAL8)
-            for (line = 0; line < lines; line++) {
-                horizontal_fill(s->bpp, dst, 1, dst, 0, width, 0);
-                dst += stride;
-            }
-        av_free(src2);
-        return ret;
+    if (s->compr == TIFF_CCITT_RLE ||
+        s->compr == TIFF_G3        ||
+        s->compr == TIFF_G4) {
+        return tiff_unpack_fax(s, dst, stride, src, size, width, lines);
     }
     for (line = 0; line < lines; line++) {
         if (src - ssrc > size) {
@@ -551,21 +574,18 @@ static int tiff_unpack_strip(TiffContext *s, uint8_t *dst, int stride,
                     av_log(s->avctx, AV_LOG_ERROR, "Read went out of bounds\n");
                     return AVERROR_INVALIDDATA;
                 }
-                code = (int8_t) * src++;
+                code = s->fill_order ? (int8_t) ff_reverse[*src++]: (int8_t) *src++;
                 if (code >= 0) {
                     code++;
-                    if (pixels + code > width) {
+                    if (pixels + code > width ||
+                        ssrc + size - src < code) {
                         av_log(s->avctx, AV_LOG_ERROR,
                                "Copy went out of bounds\n");
                         return AVERROR_INVALIDDATA;
                     }
-                    if (ssrc + size - src < code) {
-                        av_log(s->avctx, AV_LOG_ERROR, "Read went out of bounds\n");
-                        return AVERROR_INVALIDDATA;
-                    }
                     horizontal_fill(s->bpp * (s->avctx->pix_fmt == AV_PIX_FMT_PAL8),
                                     dst, 1, src, 0, code, pixels);
-                    src += code;
+                    src    += code;
                     pixels += code;
                 } else if (code != -128) { // -127..-1
                     code = (-code) + 1;
@@ -579,6 +599,11 @@ static int tiff_unpack_strip(TiffContext *s, uint8_t *dst, int stride,
                                     dst, 0, NULL, c, code, pixels);
                     pixels += code;
                 }
+            }
+            if (s->fill_order) {
+                int i;
+                for (i = 0; i < width; i++)
+                    dst[i] = ff_reverse[dst[i]];
             }
             break;
         case TIFF_LZW:
@@ -597,12 +622,12 @@ static int tiff_unpack_strip(TiffContext *s, uint8_t *dst, int stride,
     return 0;
 }
 
-static int init_image(TiffContext *s)
+static int init_image(TiffContext *s, AVFrame *frame)
 {
     int i, ret;
     uint32_t *pal;
 
-    switch (s->bpp * 10 + s->bppcount) {
+    switch (s->planar * 1000 + s->bpp * 10 + s->bppcount) {
     case 11:
         if (!s->palette_is_set) {
             s->avctx->pix_fmt = AV_PIX_FMT_MONOBLACK;
@@ -626,10 +651,22 @@ static int init_image(TiffContext *s)
         s->avctx->pix_fmt = AV_PIX_FMT_RGBA;
         break;
     case 483:
-        s->avctx->pix_fmt = s->le ? AV_PIX_FMT_RGB48LE : AV_PIX_FMT_RGB48BE;
+        s->avctx->pix_fmt = s->le ? AV_PIX_FMT_RGB48LE  : AV_PIX_FMT_RGB48BE;
         break;
     case 644:
-        s->avctx->pix_fmt = s->le ? AV_PIX_FMT_RGBA64LE : AV_PIX_FMT_RGBA64BE;
+        s->avctx->pix_fmt = s->le ? AV_PIX_FMT_RGBA64LE  : AV_PIX_FMT_RGBA64BE;
+        break;
+    case 1243:
+        s->avctx->pix_fmt = AV_PIX_FMT_GBRP;
+        break;
+    case 1324:
+        s->avctx->pix_fmt = AV_PIX_FMT_GBRAP;
+        break;
+    case 1483:
+        s->avctx->pix_fmt = s->le ? AV_PIX_FMT_GBRP16LE : AV_PIX_FMT_GBRP16BE;
+        break;
+    case 1644:
+        s->avctx->pix_fmt = s->le ? AV_PIX_FMT_GBRAP16LE : AV_PIX_FMT_GBRAP16BE;
         break;
     default:
         av_log(s->avctx, AV_LOG_ERROR,
@@ -642,18 +679,14 @@ static int init_image(TiffContext *s)
             return ret;
         avcodec_set_dimensions(s->avctx, s->width, s->height);
     }
-    if (s->picture.data[0])
-        s->avctx->release_buffer(s->avctx, &s->picture);
-    if ((ret = ff_get_buffer(s->avctx, &s->picture)) < 0) {
-        av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(s->avctx, frame, 0)) < 0)
         return ret;
-    }
     if (s->avctx->pix_fmt == AV_PIX_FMT_PAL8) {
         if (s->palette_is_set) {
-            memcpy(s->picture.data[1], s->palette, sizeof(s->palette));
+            memcpy(frame->data[1], s->palette, sizeof(s->palette));
         } else {
             /* make default grayscale pal */
-            pal = (uint32_t *) s->picture.data[1];
+            pal = (uint32_t *) frame->data[1];
             for (i = 0; i < 1<<s->bpp; i++)
                 pal[i] = 0xFFU << 24 | i * 255 / ((1<<s->bpp) - 1) * 0x010101;
         }
@@ -661,7 +694,7 @@ static int init_image(TiffContext *s)
     return 0;
 }
 
-static int tiff_decode_tag(TiffContext *s)
+static int tiff_decode_tag(TiffContext *s, AVFrame *frame)
 {
     unsigned tag, type, count, off, value = 0;
     int i, j, k, pos, start;
@@ -701,11 +734,10 @@ static int tiff_decode_tag(TiffContext *s)
             bytestream2_seek(&s->gb, off, SEEK_SET);
         }
     } else {
-        if (count <= 4 && type_sizes[type] * count <= 4) {
+        if (count <= 4 && type_sizes[type] * count <= 4)
             bytestream2_seek(&s->gb, -4, SEEK_CUR);
-        } else {
+        else
             bytestream2_seek(&s->gb, off, SEEK_SET);
-        }
     }
 
     switch (tag) {
@@ -760,7 +792,7 @@ static int tiff_decode_tag(TiffContext *s)
         s->bppcount = value;
         break;
     case TIFF_COMPR:
-        s->compr = value;
+        s->compr     = value;
         s->predictor = 0;
         switch (s->compr) {
         case TIFF_RAW:
@@ -782,8 +814,7 @@ static int tiff_decode_tag(TiffContext *s)
 #endif
         case TIFF_JPEG:
         case TIFF_NEWJPEG:
-            av_log(s->avctx, AV_LOG_ERROR,
-                   "JPEG compression is not supported\n");
+            avpriv_report_missing_feature(s->avctx, "JPEG compression");
             return AVERROR_PATCHWELCOME;
         default:
             av_log(s->avctx, AV_LOG_ERROR, "Unknown compression method %i\n",
@@ -803,8 +834,8 @@ static int tiff_decode_tag(TiffContext *s)
         break;
     case TIFF_STRIP_OFFS:
         if (count == 1) {
-            s->strippos = 0;
-            s->stripoff = value;
+            s->strippos  = 0;
+            s->stripoff  = value;
         } else
             s->strippos = off;
         s->strips = count;
@@ -820,8 +851,8 @@ static int tiff_decode_tag(TiffContext *s)
     case TIFF_STRIP_SIZE:
         if (count == 1) {
             s->stripsizesoff = 0;
-            s->stripsize = value;
-            s->strips = 1;
+            s->stripsize  = value;
+            s->strips     = 1;
         } else {
             s->stripsizesoff = off;
         }
@@ -885,10 +916,7 @@ static int tiff_decode_tag(TiffContext *s)
         s->palette_is_set = 1;
         break;
     case TIFF_PLANAR:
-        if (value == 2) {
-            av_log(s->avctx, AV_LOG_ERROR, "Planar format is not supported\n");
-            return AVERROR_PATCHWELCOME;
-        }
+        s->planar = value == 2;
         break;
     case TIFF_T4OPTIONS:
         if (s->compr == TIFF_G3)
@@ -899,7 +927,7 @@ static int tiff_decode_tag(TiffContext *s)
             s->fax_opts = value;
         break;
 #define ADD_METADATA(count, name, sep)\
-    if ((ret = add_metadata(count, type, name, sep, s)) < 0) {\
+    if ((ret = add_metadata(count, type, name, sep, s, frame)) < 0) {\
         av_log(s->avctx, AV_LOG_ERROR, "Error allocating temporary buffer\n");\
         return ret;\
     }
@@ -1030,8 +1058,12 @@ static int tiff_decode_tag(TiffContext *s)
         ADD_METADATA(count, "software", NULL);
         break;
     default:
-        av_log(s->avctx, AV_LOG_DEBUG, "Unknown or unsupported tag %d/0X%0X\n",
-               tag, tag);
+        if (s->avctx->err_recognition & AV_EF_EXPLODE) {
+            av_log(s->avctx, AV_LOG_ERROR,
+                   "Unknown or unsupported tag %d/0X%0X\n",
+                   tag, tag);
+            return AVERROR_INVALIDDATA;
+        }
     }
     bytestream2_seek(&s->gb, start, SEEK_SET);
     return 0;
@@ -1041,12 +1073,10 @@ static int decode_frame(AVCodecContext *avctx,
                         void *data, int *got_frame, AVPacket *avpkt)
 {
     TiffContext *const s = avctx->priv_data;
-    AVFrame *picture = data;
-    AVFrame *const p = &s->picture;
+    AVFrame *const p = data;
     unsigned off;
-    int id, le, ret;
-    int i, j, entries;
-    int stride;
+    int id, le, ret, plane, planes;
+    int i, j, entries, stride;
     unsigned soff, ssize;
     uint8_t *dst;
     GetByteContext stripsizes;
@@ -1054,10 +1084,10 @@ static int decode_frame(AVCodecContext *avctx,
 
     bytestream2_init(&s->gb, avpkt->data, avpkt->size);
 
-    //parse image header
+    // parse image header
     if (avpkt->size < 8)
         return AVERROR_INVALIDDATA;
-    id = bytestream2_get_le16u(&s->gb);
+    id   = bytestream2_get_le16u(&s->gb);
     if (id == 0x4949)
         le = 1;
     else if (id == 0x4D4D)
@@ -1066,16 +1096,13 @@ static int decode_frame(AVCodecContext *avctx,
         av_log(avctx, AV_LOG_ERROR, "TIFF header not found\n");
         return AVERROR_INVALIDDATA;
     }
-    s->le = le;
+    s->le         = le;
     // TIFF_BPP is not a required tag and defaults to 1
-    s->bppcount = s->bpp = 1;
-    s->invert = 0;
-    s->compr = TIFF_RAW;
+    s->bppcount   = s->bpp = 1;
+    s->invert     = 0;
+    s->compr      = TIFF_RAW;
     s->fill_order = 0;
     free_geotags(s);
-    /* metadata has been destroyed from lavc internals, that pointer is not
-     * valid anymore */
-    av_frame_set_metadata(&s->picture, NULL);
 
     // As TIFF 6.0 specification puts it "An arbitrary but carefully chosen number
     // that further identifies the file as a TIFF file"
@@ -1097,7 +1124,7 @@ static int decode_frame(AVCodecContext *avctx,
     if (bytestream2_get_bytes_left(&s->gb) < entries * 12)
         return AVERROR_INVALIDDATA;
     for (i = 0; i < entries; i++) {
-        if ((ret = tiff_decode_tag(s)) < 0)
+        if ((ret = tiff_decode_tag(s, p)) < 0)
             return ret;
     }
 
@@ -1111,7 +1138,7 @@ static int decode_frame(AVCodecContext *avctx,
             av_log(avctx, AV_LOG_WARNING, "Type of GeoTIFF key %d is wrong\n", s->geotags[i].key);
             continue;
         }
-        ret = av_dict_set(ff_frame_get_metadatap(&s->picture), keyname, s->geotags[i].val, 0);
+        ret = av_dict_set(avpriv_frame_get_metadatap(p), keyname, s->geotags[i].val, 0);
         if (ret<0) {
             av_log(avctx, AV_LOG_ERROR, "Writing metadata with key '%s' failed\n", keyname);
             return ret;
@@ -1123,15 +1150,13 @@ static int decode_frame(AVCodecContext *avctx,
         return AVERROR_INVALIDDATA;
     }
     /* now we have the data and may start decoding */
-    if ((ret = init_image(s)) < 0)
+    if ((ret = init_image(s, p)) < 0)
         return ret;
 
     if (s->strips == 1 && !s->stripsize) {
         av_log(avctx, AV_LOG_WARNING, "Image data size missing\n");
         s->stripsize = avpkt->size - s->stripoff;
     }
-    stride = p->linesize[0];
-    dst = p->data[0];
 
     if (s->stripsizesoff) {
         if (s->stripsizesoff >= (unsigned)avpkt->size)
@@ -1149,6 +1174,10 @@ static int decode_frame(AVCodecContext *avctx,
         return AVERROR_INVALIDDATA;
     }
 
+    planes = s->planar ? s->bppcount : 1;
+    for (plane = 0; plane < planes; plane++) {
+        stride = p->linesize[plane];
+        dst    = p->data[plane];
     for (i = 0; i < s->height; i += s->rps) {
         if (s->stripsizesoff)
             ssize = tget(&stripsizes, s->sstype, s->le);
@@ -1164,24 +1193,33 @@ static int decode_frame(AVCodecContext *avctx,
             av_log(avctx, AV_LOG_ERROR, "Invalid strip size/offset\n");
             return AVERROR_INVALIDDATA;
         }
-        if (tiff_unpack_strip(s, dst, stride, avpkt->data + soff, ssize,
-                              FFMIN(s->rps, s->height - i)) < 0)
+        if ((ret = tiff_unpack_strip(s, dst, stride, avpkt->data + soff, ssize,
+                                     FFMIN(s->rps, s->height - i))) < 0) {
+            if (avctx->err_recognition & AV_EF_EXPLODE)
+                return ret;
             break;
+        }
         dst += s->rps * stride;
     }
     if (s->predictor == 2) {
-        dst = p->data[0];
-        soff = s->bpp >> 3;
+        dst   = p->data[plane];
+        soff  = s->bpp >> 3;
+        if (s->planar)
+            soff  = FFMAX(soff / s->bppcount, 1);
         ssize = s->width * soff;
         if (s->avctx->pix_fmt == AV_PIX_FMT_RGB48LE ||
-            s->avctx->pix_fmt == AV_PIX_FMT_RGBA64LE) {
+            s->avctx->pix_fmt == AV_PIX_FMT_RGBA64LE ||
+            s->avctx->pix_fmt == AV_PIX_FMT_GBRP16LE ||
+            s->avctx->pix_fmt == AV_PIX_FMT_GBRAP16LE) {
             for (i = 0; i < s->height; i++) {
                 for (j = soff; j < ssize; j += 2)
                     AV_WL16(dst + j, AV_RL16(dst + j) + AV_RL16(dst + j - soff));
                 dst += stride;
             }
         } else if (s->avctx->pix_fmt == AV_PIX_FMT_RGB48BE ||
-                   s->avctx->pix_fmt == AV_PIX_FMT_RGBA64BE) {
+                   s->avctx->pix_fmt == AV_PIX_FMT_RGBA64BE ||
+                   s->avctx->pix_fmt == AV_PIX_FMT_GBRP16BE ||
+                   s->avctx->pix_fmt == AV_PIX_FMT_GBRAP16BE) {
             for (i = 0; i < s->height; i++) {
                 for (j = soff; j < ssize; j += 2)
                     AV_WB16(dst + j, AV_RB16(dst + j) + AV_RB16(dst + j - soff));
@@ -1197,14 +1235,22 @@ static int decode_frame(AVCodecContext *avctx,
     }
 
     if (s->invert) {
-        dst = s->picture.data[0];
+        dst = p->data[plane];
         for (i = 0; i < s->height; i++) {
-            for (j = 0; j < s->picture.linesize[0]; j++)
+            for (j = 0; j < p->linesize[plane]; j++)
                 dst[j] = (s->avctx->pix_fmt == AV_PIX_FMT_PAL8 ? (1<<s->bpp) - 1 : 255) - dst[j];
-            dst += s->picture.linesize[0];
+            dst += p->linesize[plane];
         }
     }
-    *picture   = s->picture;
+    }
+
+    if (s->planar && s->bppcount > 2) {
+        FFSWAP(uint8_t*, p->data[0],     p->data[2]);
+        FFSWAP(int,      p->linesize[0], p->linesize[2]);
+        FFSWAP(uint8_t*, p->data[0],     p->data[1]);
+        FFSWAP(int,      p->linesize[0], p->linesize[1]);
+    }
+
     *got_frame = 1;
 
     return avpkt->size;
@@ -1214,11 +1260,9 @@ static av_cold int tiff_init(AVCodecContext *avctx)
 {
     TiffContext *s = avctx->priv_data;
 
-    s->width = 0;
+    s->width  = 0;
     s->height = 0;
-    s->avctx = avctx;
-    avcodec_get_frame_defaults(&s->picture);
-    avctx->coded_frame = &s->picture;
+    s->avctx  = avctx;
     ff_lzw_decode_open(&s->lzw);
     ff_ccitt_unpack_init();
 
@@ -1233,13 +1277,12 @@ static av_cold int tiff_end(AVCodecContext *avctx)
 
     ff_lzw_decode_close(&s->lzw);
     av_freep(&s->deinvert_buf);
-    if (s->picture.data[0])
-        avctx->release_buffer(avctx, &s->picture);
     return 0;
 }
 
 AVCodec ff_tiff_decoder = {
     .name           = "tiff",
+    .long_name      = NULL_IF_CONFIG_SMALL("TIFF image"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_TIFF,
     .priv_data_size = sizeof(TiffContext),
@@ -1247,5 +1290,4 @@ AVCodec ff_tiff_decoder = {
     .close          = tiff_end,
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("TIFF image"),
 };

@@ -34,6 +34,7 @@
 #include "libavutil/avstring.h"
 #include "libavutil/opt.h"
 #include "libavutil/log.h"
+#include "libavutil/time.h"
 #include "internal.h"
 #include "network.h"
 #include "os_support.h"
@@ -585,7 +586,11 @@ static int udp_open(URLContext *h, const char *uri, int flags)
     }
     /* handling needed to support options picking from both AVOption and URL */
     s->circular_buffer_size *= 188;
-    h->max_packet_size = s->packet_size;
+    if (flags & AVIO_FLAG_WRITE) {
+        h->max_packet_size = s->packet_size;
+    } else {
+        h->max_packet_size = UDP_MAX_PKT_SIZE;
+    }
     h->rw_timeout = s->timeout;
 
     /* fill the dest addr */

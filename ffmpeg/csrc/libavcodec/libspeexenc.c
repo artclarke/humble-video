@@ -252,16 +252,6 @@ static av_cold int encode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "memory allocation error\n");
         return AVERROR(ENOMEM);
     }
-#if FF_API_OLD_ENCODE_AUDIO
-    avctx->coded_frame = avcodec_alloc_frame();
-    if (!avctx->coded_frame) {
-        av_freep(&avctx->extradata);
-        speex_header_free(header_data);
-        speex_encoder_destroy(s->enc_state);
-        av_log(avctx, AV_LOG_ERROR, "memory allocation error\n");
-        return AVERROR(ENOMEM);
-    }
-#endif
 
     /* copy header packet to extradata */
     memcpy(avctx->extradata, header_data, header_size);
@@ -328,9 +318,6 @@ static av_cold int encode_close(AVCodecContext *avctx)
     speex_encoder_destroy(s->enc_state);
 
     ff_af_queue_close(&s->afq);
-#if FF_API_OLD_ENCODE_AUDIO
-    av_freep(&avctx->coded_frame);
-#endif
     av_freep(&avctx->extradata);
 
     return 0;
@@ -347,7 +334,7 @@ static const AVOption options[] = {
     { NULL },
 };
 
-static const AVClass class = {
+static const AVClass speex_class = {
     .class_name = "libspeex",
     .item_name  = av_default_item_name,
     .option     = options,
@@ -376,6 +363,6 @@ AVCodec ff_libspeex_encoder = {
                                            0 },
     .supported_samplerates = (const int[]){ 8000, 16000, 32000, 0 },
     .long_name      = NULL_IF_CONFIG_SMALL("libspeex Speex"),
-    .priv_class     = &class,
+    .priv_class     = &speex_class,
     .defaults       = defaults,
 };

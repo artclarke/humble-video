@@ -20,6 +20,7 @@
 #include "avutil.h"
 #include "avassert.h"
 #include "samplefmt.h"
+#include "pixdesc.h"
 
 /**
  * @file
@@ -28,6 +29,10 @@
 
 unsigned avutil_version(void)
 {
+    static int checks_done;
+    if (checks_done)
+        return LIBAVUTIL_VERSION_INT;
+
     av_assert0(AV_PIX_FMT_VDA_VLD == 81); //check if the pix fmt enum has not had anything inserted or removed by mistake
     av_assert0(AV_SAMPLE_FMT_DBLP == 9);
     av_assert0(AVMEDIA_TYPE_ATTACHMENT == 4);
@@ -40,6 +45,12 @@ unsigned avutil_version(void)
         abort();
     }
 
+    if (llrint(1LL<<60) != 1LL<<60) {
+        av_log(NULL, AV_LOG_ERROR, "Libavutil has been linked to a broken llrint()\n");
+    }
+
+    ff_check_pixfmt_descriptors();
+    checks_done = 1;
     return LIBAVUTIL_VERSION_INT;
 }
 
@@ -78,4 +89,23 @@ char av_get_picture_type_char(enum AVPictureType pict_type)
     case AV_PICTURE_TYPE_BI: return 'b';
     default:                 return '?';
     }
+}
+
+unsigned av_int_list_length_for_size(unsigned elsize,
+                                     const void *list, uint64_t term)
+{
+    unsigned i;
+
+    if (!list)
+        return 0;
+#define LIST_LENGTH(type) \
+    { type t = term, *l = (type *)list; for (i = 0; l[i] != t; i++); }
+    switch (elsize) {
+    case 1: LIST_LENGTH(uint8_t);  break;
+    case 2: LIST_LENGTH(uint16_t); break;
+    case 4: LIST_LENGTH(uint32_t); break;
+    case 8: LIST_LENGTH(uint64_t); break;
+    default: av_assert0(!"valid element size");
+    }
+    return i;
 }

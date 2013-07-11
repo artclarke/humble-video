@@ -25,7 +25,7 @@
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
 
-#define CABAC 0
+#define CABAC(h) 0
 #define UNCHECKED_BITSTREAM_READER 1
 
 #include "internal.h"
@@ -549,9 +549,15 @@ static int decode_residual(H264Context *h, GetBitContext *gb, int16_t *block, in
                 if(prefix<15){
                     level_code = (prefix<<suffix_length) + get_bits(gb, suffix_length);
                 }else{
-                    level_code = (15<<suffix_length) + get_bits(gb, prefix-3);
-                    if(prefix>=16)
+                    level_code = 15<<suffix_length;
+                    if (prefix>=16) {
+                        if(prefix > 25+3){
+                            av_log(h->avctx, AV_LOG_ERROR, "Invalid level prefix\n");
+                            return AVERROR_INVALIDDATA;
+                        }
                         level_code += (1<<(prefix-3))-4096;
+                    }
+                    level_code += get_bits(gb, prefix-3);
                 }
                 mask= -(level_code&1);
                 level_code= (((2+level_code)>>1) ^ mask) - mask;
@@ -709,7 +715,7 @@ int ff_h264_decode_mb_cavlc(H264Context *h){
             h->mb_skip_run= get_ue_golomb_long(&h->gb);
 
         if (h->mb_skip_run--) {
-            if(FRAME_MBAFF && (h->mb_y&1) == 0){
+            if(FRAME_MBAFF(h) && (h->mb_y&1) == 0){
                 if(h->mb_skip_run==0)
                     h->mb_mbaff = h->mb_field_decoding_flag = get_bits1(&h->gb);
             }
@@ -717,7 +723,7 @@ int ff_h264_decode_mb_cavlc(H264Context *h){
             return 0;
         }
     }
-    if(FRAME_MBAFF){
+    if (FRAME_MBAFF(h)) {
         if( (h->mb_y&1) == 0 )
             h->mb_mbaff = h->mb_field_decoding_flag = get_bits1(&h->gb);
     }
@@ -756,7 +762,7 @@ decode_intra_mb:
         mb_type= i_mb_type_info[mb_type].type;
     }
 
-    if(MB_FIELD)
+    if(MB_FIELD(h))
         mb_type |= MB_TYPE_INTERLACED;
 
     h->slice_table[ mb_xy ]= h->slice_num;
@@ -770,16 +776,16 @@ decode_intra_mb:
         skip_bits_long(&h->gb, mb_size);
 
         // In deblocking, the quantizer is 0
-        h->cur_pic.f.qscale_table[mb_xy] = 0;
+        h->cur_pic.qscale_table[mb_xy] = 0;
         // All coeffs are present
         memset(h->non_zero_count[mb_xy], 16, 48);
 
-        h->cur_pic.f.mb_type[mb_xy] = mb_type;
+        h->cur_pic.mb_type[mb_xy] = mb_type;
         return 0;
     }
 
-    local_ref_count[0] = h->ref_count[0] << MB_MBAFF;
-    local_ref_count[1] = h->ref_count[1] << MB_MBAFF;
+    local_ref_count[0] = h->ref_count[0] << MB_MBAFF(h);
+    local_ref_count[1] = h->ref_count[1] << MB_MBAFF(h);
 
     fill_decode_neighbors(h, mb_type);
     fill_decode_caches(h, mb_type);
@@ -1074,7 +1080,7 @@ decode_intra_mb:
     }
     h->cbp=
     h->cbp_table[mb_xy]= cbp;
-    h->cur_pic.f.mb_type[mb_xy] = mb_type;
+    h->cur_pic.mb_type[mb_xy] = mb_type;
 
     if(cbp || IS_INTRA16x16(mb_type)){
         int i4x4, i8x8, chroma_idx;
@@ -1112,7 +1118,7 @@ decode_intra_mb:
             return -1;
         }
         h->cbp_table[mb_xy] |= ret << 12;
-        if(CHROMA444){
+        if (CHROMA444(h)) {
             if( decode_luma_residual(h, gb, scan, scan8x8, pixel_shift, mb_type, cbp, 1) < 0 ){
                 return -1;
             }
@@ -1126,7 +1132,7 @@ decode_intra_mb:
                 for(chroma_idx=0; chroma_idx<2; chroma_idx++)
                     if (decode_residual(h, gb, h->mb + ((256 + 16*16*chroma_idx) << pixel_shift),
                                         CHROMA_DC_BLOCK_INDEX+chroma_idx,
-                                        CHROMA422 ? chroma422_dc_scan : chroma_dc_scan,
+                                        CHROMA422(h) ? chroma422_dc_scan : chroma_dc_scan,
                                         NULL, 4*num_c8x8) < 0) {
                         return -1;
                     }
@@ -1155,7 +1161,7 @@ decode_intra_mb:
         fill_rectangle(&h->non_zero_count_cache[scan8[16]], 4, 4, 8, 0, 1);
         fill_rectangle(&h->non_zero_count_cache[scan8[32]], 4, 4, 8, 0, 1);
     }
-    h->cur_pic.f.qscale_table[mb_xy] = h->qscale;
+    h->cur_pic.qscale_table[mb_xy] = h->qscale;
     write_back_non_zero_count(h);
 
     return 0;

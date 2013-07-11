@@ -195,7 +195,7 @@ static int ogg_replace_stream(AVFormatContext *s, uint32_t serial, int nsegs)
         if (i >= ogg->nstreams)
             return ogg_new_stream(s, serial);
     } else if (ogg->nstreams != 1) {
-        av_log_missing_feature(s, "Changing stream parameters in multistream ogg", 0);
+        avpriv_report_missing_feature(s, "Changing stream parameters in multistream ogg");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -671,7 +671,12 @@ static int ogg_read_header(AVFormatContext *s)
             av_log(s, AV_LOG_ERROR, "Header parsing failed for stream %d\n", i);
             ogg->streams[i].codec = NULL;
         } else if (os->codec && os->nb_header < os->codec->nb_header) {
-            av_log(s, AV_LOG_WARNING, "Number of headers (%d) mismatch for stream %d\n", os->nb_header, i);
+            av_log(s, AV_LOG_WARNING,
+                   "Headers mismatch for stream %d: "
+                   "expected %d received %d.\n",
+                   i, os->codec->nb_header, os->nb_header);
+            if (s->error_recognition & AV_EF_EXPLODE)
+                return AVERROR_INVALIDDATA;
         }
         if (os->start_granule != OGG_NOGRANULE_VALUE)
             os->lastpts = s->streams[i]->start_time =
@@ -734,6 +739,11 @@ static int ogg_read_packet(AVFormatContext *s, AVPacket *pkt)
     int idx, ret;
     int pstart, psize;
     int64_t fpos, pts, dts;
+
+    if (s->io_repositioned) {
+        ogg_reset(s);
+        s->io_repositioned = 0;
+    }
 
     //Get an ogg packet
 retry:
@@ -849,5 +859,5 @@ AVInputFormat ff_ogg_demuxer = {
     .read_seek      = ogg_read_seek,
     .read_timestamp = ogg_read_timestamp,
     .extensions     = "ogg",
-    .flags          = AVFMT_GENERIC_INDEX | AVFMT_TS_DISCONT,
+    .flags          = AVFMT_GENERIC_INDEX | AVFMT_TS_DISCONT | AVFMT_NOBINSEARCH,
 };

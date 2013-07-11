@@ -189,7 +189,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
             avctx->sample_fmt = AV_SAMPLE_FMT_S16P;
         else if (s->bits_per_sample == 24) {
             avctx->sample_fmt = AV_SAMPLE_FMT_S32P;
-            av_log_missing_feature(avctx, "Bit-depth higher than 16", 0);
+            avpriv_report_missing_feature(avctx, "Bit-depth higher than 16");
             return AVERROR_PATCHWELCOME;
         } else {
             av_log(avctx, AV_LOG_ERROR, "Unknown bit-depth: %d\n",
@@ -202,7 +202,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
         av_dlog(avctx, "\n");
 
     } else {
-        av_log_ask_for_sample(avctx, "Unsupported extradata size\n");
+        avpriv_request_sample(avctx, "Unsupported extradata size");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -256,7 +256,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
                s->num_channels);
         return AVERROR_INVALIDDATA;
     } else if (s->num_channels > WMALL_MAX_CHANNELS) {
-        av_log_ask_for_sample(avctx, "unsupported number of channels\n");
+        avpriv_request_sample(avctx,
+                              "More than %d channels", WMALL_MAX_CHANNELS);
         return AVERROR_PATCHWELCOME;
     }
 
@@ -885,7 +886,7 @@ static int decode_subframe(WmallDecodeCtx *s)
 
         s->do_arith_coding    = get_bits1(&s->gb);
         if (s->do_arith_coding) {
-            av_log_missing_feature(s->avctx, "Arithmetic coding", 1);
+            avpriv_request_sample(s->avctx, "Arithmetic coding");
             return AVERROR_PATCHWELCOME;
         }
         s->do_ac_filter       = get_bits1(&s->gb);
@@ -925,8 +926,8 @@ static int decode_subframe(WmallDecodeCtx *s)
             s->do_lpc = get_bits1(&s->gb);
             if (s->do_lpc) {
                 decode_lpc(s);
-                av_log_ask_for_sample(s->avctx, "Inverse LPC filter not "
-                                      "implemented. Expect wrong output.\n");
+                avpriv_request_sample(s->avctx, "Expect wrong output since "
+                                      "inverse LPC filter");
             }
         } else
             s->do_lpc = 0;
@@ -1015,10 +1016,8 @@ static int decode_frame(WmallDecodeCtx *s)
     int more_frames = 0, len = 0, i, ret;
 
     s->frame.nb_samples = s->samples_per_frame;
-    if ((ret = ff_get_buffer(s->avctx, &s->frame)) < 0) {
+    if ((ret = ff_get_buffer(s->avctx, &s->frame, 0)) < 0) {
         /* return an error if no frame could be decoded at all */
-        av_log(s->avctx, AV_LOG_ERROR,
-               "not enough space for the output samples\n");
         s->packet_loss = 1;
         return ret;
     }
@@ -1137,7 +1136,7 @@ static void save_bits(WmallDecodeCtx *s, GetBitContext* gb, int len,
     buflen = (s->num_saved_bits + len + 8) >> 3;
 
     if (len <= 0 || buflen > MAX_FRAMESIZE) {
-        av_log_ask_for_sample(s->avctx, "input buffer too small\n");
+        avpriv_request_sample(s->avctx, "Too small input buffer");
         s->packet_loss = 1;
         return;
     }
@@ -1190,7 +1189,7 @@ static int decode_packet(AVCodecContext *avctx, void *data, int *got_frame_ptr,
         skip_bits(gb, 1);   // Skip seekable_frame_in_packet, currently ununused
         spliced_packet = get_bits1(gb);
         if (spliced_packet)
-            av_log_missing_feature(avctx, "Bitstream splicing", 1);
+            avpriv_request_sample(avctx, "Bitstream splicing");
 
         /* get number of bits that need to be added to the previous frame */
         num_bits_prev_frame = get_bits(gb, s->log2_frame_size);
@@ -1264,8 +1263,9 @@ static int decode_packet(AVCodecContext *avctx, void *data, int *got_frame_ptr,
         save_bits(s, gb, remaining_bits(s, gb), 0);
     }
 
-    *(AVFrame *)data = s->frame;
     *got_frame_ptr   = s->frame.nb_samples > 0;
+    av_frame_move_ref(data, &s->frame);
+
     s->packet_offset = get_bits_count(gb) & 7;
 
     return (s->packet_loss) ? AVERROR_INVALIDDATA : get_bits_count(gb) >> 3;

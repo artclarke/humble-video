@@ -70,6 +70,7 @@
  */
 
 #include "libavutil/imgutils.h"
+#include "libavutil/opt.h"
 #include "avfilter.h"
 #include "formats.h"
 #include "internal.h"
@@ -79,6 +80,8 @@
 #include "lswsutils.h"
 
 typedef struct {
+    const AVClass *class;
+    char *filename;
     /* Stores our collection of masks. The first is for an array of
        the second for the y axis, and the third for the x axis. */
     int ***mask;
@@ -90,6 +93,16 @@ typedef struct {
     uint8_t      *half_mask_data;
     FFBoundingBox half_mask_bbox;
 } RemovelogoContext;
+
+#define OFFSET(x) offsetof(RemovelogoContext, x)
+#define FLAGS AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM
+static const AVOption removelogo_options[] = {
+    { "filename", "set bitmap filename", OFFSET(filename), AV_OPT_TYPE_STRING, {.str=NULL}, .flags = FLAGS },
+    { "f",        "set bitmap filename", OFFSET(filename), AV_OPT_TYPE_STRING, {.str=NULL}, .flags = FLAGS },
+    { NULL }
+};
+
+AVFILTER_DEFINE_CLASS(removelogo);
 
 /**
  * Choose a slightly larger mask size to improve performance.
@@ -264,7 +277,7 @@ static void generate_half_size_image(const uint8_t *src_data, int src_linesize,
                                   src_w/2, src_h/2, 0, max_mask_size);
 }
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
+static av_cold int init(AVFilterContext *ctx)
 {
     RemovelogoContext *removelogo = ctx->priv;
     int ***mask;
@@ -272,13 +285,13 @@ static av_cold int init(AVFilterContext *ctx, const char *args)
     int a, b, c, w, h;
     int full_max_mask_size, half_max_mask_size;
 
-    if (!args) {
-        av_log(ctx, AV_LOG_ERROR, "An image file must be specified as argument\n");
+    if (!removelogo->filename) {
+        av_log(ctx, AV_LOG_ERROR, "The bitmap file name is mandatory\n");
         return AVERROR(EINVAL);
     }
 
     /* Load our mask image. */
-    if ((ret = load_mask(&removelogo->full_mask_data, &w, &h, args, ctx)) < 0)
+    if ((ret = load_mask(&removelogo->full_mask_data, &w, &h, removelogo->filename, ctx)) < 0)
         return ret;
     removelogo->mask_w = w;
     removelogo->mask_h = h;
@@ -473,23 +486,23 @@ static void blur_image(int ***mask,
     }
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *inpicref)
+static int filter_frame(AVFilterLink *inlink, AVFrame *inpicref)
 {
     RemovelogoContext *removelogo = inlink->dst->priv;
     AVFilterLink *outlink = inlink->dst->outputs[0];
-    AVFilterBufferRef *outpicref;
+    AVFrame *outpicref;
     int direct = 0;
 
-    if (inpicref->perms & AV_PERM_WRITE) {
+    if (av_frame_is_writable(inpicref)) {
         direct = 1;
         outpicref = inpicref;
     } else {
-        outpicref = ff_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
+        outpicref = ff_get_video_buffer(outlink, outlink->w, outlink->h);
         if (!outpicref) {
-            avfilter_unref_bufferp(&inpicref);
+            av_frame_free(&inpicref);
             return AVERROR(ENOMEM);
         }
-        avfilter_copy_buffer_ref_props(outpicref, inpicref);
+        av_frame_copy_props(outpicref, inpicref);
     }
 
     blur_image(removelogo->mask,
@@ -509,12 +522,12 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *inpicref)
                inlink->w/2, inlink->h/2, direct, &removelogo->half_mask_bbox);
 
     if (!direct)
-        avfilter_unref_bufferp(&inpicref);
+        av_frame_free(&inpicref);
 
     return ff_filter_frame(outlink, outpicref);
 }
 
-static void uninit(AVFilterContext *ctx)
+static av_cold void uninit(AVFilterContext *ctx)
 {
     RemovelogoContext *removelogo = ctx->priv;
     int a, b;
@@ -543,7 +556,6 @@ static const AVFilterPad removelogo_inputs[] = {
         .get_video_buffer = ff_null_get_video_buffer,
         .config_props     = config_props_input,
         .filter_frame     = filter_frame,
-        .min_perms        = AV_PERM_READ,
     },
     { NULL }
 };
@@ -565,4 +577,6 @@ AVFilter avfilter_vf_removelogo = {
     .query_formats = query_formats,
     .inputs        = removelogo_inputs,
     .outputs       = removelogo_outputs,
+    .priv_class    = &removelogo_class,
+    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

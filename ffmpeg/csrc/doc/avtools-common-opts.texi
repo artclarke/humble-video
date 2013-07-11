@@ -1,32 +1,33 @@
-All the numerical options, if not specified otherwise, accept in input
-a string representing a number, which may contain one of the
-SI unit prefixes, for example 'K', 'M', 'G'.
-If 'i' is appended after the prefix, binary prefixes are used,
-which are based on powers of 1024 instead of powers of 1000.
-The 'B' postfix multiplies the value by 8, and can be
-appended after a unit prefix or used alone. This allows using for
-example 'KB', 'MiB', 'G' and 'B' as number postfix.
+All the numerical options, if not specified otherwise, accept a string
+representing a number as input, which may be followed by one of the SI
+unit prefixes, for example: 'K', 'M', or 'G'.
+
+If 'i' is appended to the SI unit prefix, the complete prefix will be
+interpreted as a unit prefix for binary multiplies, which are based on
+powers of 1024 instead of powers of 1000. Appending 'B' to the SI unit
+prefix multiplies the value by 8. This allows using, for example:
+'KB', 'MiB', 'G' and 'B' as number suffixes.
 
 Options which do not take arguments are boolean options, and set the
 corresponding value to true. They can be set to false by prefixing
-with "no" the option name, for example using "-nofoo" in the
-command line will set to false the boolean option with name "foo".
+the option name with "no". For example using "-nofoo"
+will set the boolean option with name "foo" to false.
 
 @anchor{Stream specifiers}
 @section Stream specifiers
 Some options are applied per-stream, e.g. bitrate or codec. Stream specifiers
-are used to precisely specify which stream(s) does a given option belong to.
+are used to precisely specify which stream(s) a given option belongs to.
 
 A stream specifier is a string generally appended to the option name and
-separated from it by a colon. E.g. @code{-codec:a:1 ac3} option contains
-@code{a:1} stream specifier, which matches the second audio stream. Therefore it
+separated from it by a colon. E.g. @code{-codec:a:1 ac3} contains the
+@code{a:1} stream specifier, which matches the second audio stream. Therefore, it
 would select the ac3 codec for the second audio stream.
 
-A stream specifier can match several streams, the option is then applied to all
+A stream specifier can match several streams, so that the option is applied to all
 of them. E.g. the stream specifier in @code{-b:a 128k} matches all audio
 streams.
 
-An empty stream specifier matches all streams, for example @code{-codec copy}
+An empty stream specifier matches all streams. For example, @code{-codec copy}
 or @code{-codec: copy} would copy all the streams without reencoding.
 
 Possible forms of stream specifiers are:
@@ -35,20 +36,21 @@ Possible forms of stream specifiers are:
 Matches the stream with this index. E.g. @code{-threads:1 4} would set the
 thread count for the second stream to 4.
 @item @var{stream_type}[:@var{stream_index}]
-@var{stream_type} is one of: 'v' for video, 'a' for audio, 's' for subtitle,
-'d' for data and 't' for attachments. If @var{stream_index} is given, then
-matches stream number @var{stream_index} of this type. Otherwise matches all
+@var{stream_type} is one of following: 'v' for video, 'a' for audio, 's' for subtitle,
+'d' for data, and 't' for attachments. If @var{stream_index} is given, then it matches
+stream number @var{stream_index} of this type. Otherwise, it matches all
 streams of this type.
 @item p:@var{program_id}[:@var{stream_index}]
-If @var{stream_index} is given, then matches stream number @var{stream_index} in
-program with id @var{program_id}. Otherwise matches all streams in this program.
+If @var{stream_index} is given, then it matches the stream with number @var{stream_index}
+in the program with the id @var{program_id}. Otherwise, it matches all streams in the
+program.
 @item #@var{stream_id}
-Matches the stream by format-specific ID.
+Matches the stream by a format-specific ID.
 @end table
 
 @section Generic options
 
-These options are shared amongst the av* tools.
+These options are shared amongst the ff* tools.
 
 @table @option
 
@@ -77,6 +79,10 @@ Print detailed information about the demuxer named @var{demuxer_name}. Use the
 Print detailed information about the muxer named @var{muxer_name}. Use the
 @option{-formats} option to get a list of all muxers and demuxers.
 
+@item filter=@var{filter_name}
+Print detailed information about the filter name @var{filter_name}. Use the
+@option{-filters} option to get a list of all filters.
+
 @end table
 
 @item -version
@@ -84,14 +90,6 @@ Show version.
 
 @item -formats
 Show available formats.
-
-The fields preceding the format names have the following meanings:
-@table @samp
-@item D
-Decoding available
-@item E
-Encoding available
-@end table
 
 @item -codecs
 Show all codecs known to libavcodec.
@@ -123,18 +121,36 @@ Show available sample formats.
 @item -layouts
 Show channel names and standard channel layouts.
 
-@item -loglevel @var{loglevel} | -v @var{loglevel}
+@item -loglevel [repeat+]@var{loglevel} | -v [repeat+]@var{loglevel}
 Set the logging level used by the library.
+Adding "repeat+" indicates that repeated log output should not be compressed
+to the first line and the "Last message repeated n times" line will be
+omitted. "repeat" can also be used alone.
+If "repeat" is used alone, and with no prior loglevel set, the default
+loglevel will be used. If multiple loglevel parameters are given, using
+'repeat' will not change the loglevel.
 @var{loglevel} is a number or a string containing one of the following values:
 @table @samp
 @item quiet
+Show nothing at all; be silent.
 @item panic
+Only show fatal errors which could lead the process to crash, such as
+and assert failure. This is not currently used for anything.
 @item fatal
+Only show fatal errors. These are errors after which the process absolutely
+cannot continue after.
 @item error
+Show all errors, including ones which can be recovered from.
 @item warning
+Show all warnings and errors. Any message related to possibly
+incorrect or unexpected events will be shown.
 @item info
+Show informative messages during processing. This is in addition to
+warnings and errors. This is the default value.
 @item verbose
+Same as @code{info}, except more verbose.
 @item debug
+Show everything, including debugging information.
 @end table
 
 By default the program logs to stderr, if coloring is supported by the
@@ -176,7 +192,61 @@ ffmpeg -cpuflags -sse+mmx ...
 ffmpeg -cpuflags mmx ...
 ffmpeg -cpuflags 0 ...
 @end example
+Possible flags for this option are:
+@table @samp
+@item x86
+@table @samp
+@item mmx
+@item mmxext
+@item sse
+@item sse2
+@item sse2slow
+@item sse3
+@item sse3slow
+@item ssse3
+@item atom
+@item sse4.1
+@item sse4.2
+@item avx
+@item xop
+@item fma4
+@item 3dnow
+@item 3dnowext
+@item cmov
+@end table
+@item ARM
+@table @samp
+@item armv5te
+@item armv6
+@item armv6t2
+@item vfp
+@item vfpv3
+@item neon
+@end table
+@item PowerPC
+@table @samp
+@item altivec
+@end table
+@item Specific Processors
+@table @samp
+@item pentium2
+@item pentium3
+@item pentium4
+@item k6
+@item k62
+@item athlon
+@item athlonxp
+@item k8
+@end table
+@end table
 
+@item -opencl_options options (@emph{global})
+Set OpenCL environment options. This option is only available when
+FFmpeg has been compiled with @code{--enable-opencl}.
+
+@var{options} must be a list of @var{key}=@var{value} option pairs
+separated by ':'. See the ``OpenCL Options'' section in the
+ffmpeg-utils manual for the list of supported options.
 @end table
 
 @section AVOptions

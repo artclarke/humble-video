@@ -663,6 +663,7 @@ static int rm_assemble_video_frame(AVFormatContext *s, AVIOContext *pb,
     int hdr;
     int seq = 0, pic_num = 0, len2 = 0, pos = 0; //init to silcense compiler warning
     int type;
+    int ret;
 
     hdr = avio_r8(pb); len--;
     type = hdr >> 6;
@@ -691,7 +692,10 @@ static int rm_assemble_video_frame(AVFormatContext *s, AVIOContext *pb,
         pkt->data[0] = 0;
         AV_WL32(pkt->data + 1, 1);
         AV_WL32(pkt->data + 5, 0);
-        avio_read(pb, pkt->data + 9, len);
+        if ((ret = avio_read(pb, pkt->data + 9, len)) != len) {
+            av_free_packet(pkt);
+            return ret < 0 ? ret : AVERROR(EIO);
+        }
         return 0;
     }
     //now we have to deal with single slice
@@ -707,6 +711,7 @@ static int rm_assemble_video_frame(AVFormatContext *s, AVIOContext *pb,
         av_free_packet(&vst->pkt); //FIXME this should be output.
         if(av_new_packet(&vst->pkt, vst->videobufsize) < 0)
             return AVERROR(ENOMEM);
+        memset(vst->pkt.data, 0, vst->pkt.size);
         vst->videobufpos = 8*vst->slices + 1;
         vst->cur_slice = 0;
         vst->curpic_num = pic_num;
@@ -731,6 +736,10 @@ static int rm_assemble_video_frame(AVFormatContext *s, AVIOContext *pb,
         *pkt= vst->pkt;
         vst->pkt.data= NULL;
         vst->pkt.size= 0;
+        vst->pkt.buf = NULL;
+#if FF_API_DESTRUCT_PACKET
+        vst->pkt.destruct = NULL;
+#endif
         if(vst->slices != vst->cur_slice) //FIXME find out how to set slices correct from the begin
             memmove(pkt->data + 1 + 8*vst->cur_slice, pkt->data + 1 + 8*vst->slices,
                 vst->videobufpos - 1 - 8*vst->slices);

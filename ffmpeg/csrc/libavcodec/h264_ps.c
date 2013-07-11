@@ -224,6 +224,11 @@ static inline int decode_vui_parameters(H264Context *h, SPS *sps){
         get_ue_golomb(&h->gb);  /* chroma_sample_location_type_bottom_field */
     }
 
+    if (show_bits1(&h->gb) && get_bits_left(&h->gb) < 10) {
+        av_log(h->avctx, AV_LOG_WARNING, "Truncated VUI\n");
+        return 0;
+    }
+
     sps->timing_info_present_flag = get_bits1(&h->gb);
     if(sps->timing_info_present_flag){
         sps->num_units_in_tick = get_bits_long(&h->gb, 32);
@@ -459,44 +464,58 @@ int ff_h264_decode_seq_parameter_set(H264Context *h){
 #endif
     sps->crop= get_bits1(&h->gb);
     if(sps->crop){
-        int crop_vertical_limit   = sps->chroma_format_idc  & 2 ? 16 : 8;
-        int crop_horizontal_limit = sps->chroma_format_idc == 3 ? 16 : 8;
-        sps->crop_left  = get_ue_golomb(&h->gb);
-        sps->crop_right = get_ue_golomb(&h->gb);
-        sps->crop_top   = get_ue_golomb(&h->gb);
-        sps->crop_bottom= get_ue_golomb(&h->gb);
+        int crop_left   = get_ue_golomb(&h->gb);
+        int crop_right  = get_ue_golomb(&h->gb);
+        int crop_top    = get_ue_golomb(&h->gb);
+        int crop_bottom = get_ue_golomb(&h->gb);
+        int width  = 16 * sps->mb_width;
+        int height = 16 * sps->mb_height * (2 - sps->frame_mbs_only_flag);
+
         if (h->avctx->flags2 & CODEC_FLAG2_IGNORE_CROP) {
-            av_log(h->avctx, AV_LOG_DEBUG,
-                   "discarding sps cropping, "
-                   "original values are l:%u r:%u t:%u b:%u\n",
-                   sps->crop_left,
-                   sps->crop_right,
-                   sps->crop_top,
-                   sps->crop_bottom);
+            av_log(h->avctx, AV_LOG_DEBUG, "discarding sps cropping, original "
+                   "values are l:%u r:%u t:%u b:%u\n", crop_left, crop_right,
+                   crop_top, crop_bottom);
 
             sps->crop_left   =
             sps->crop_right  =
             sps->crop_top    =
             sps->crop_bottom = 0;
-        }
-        if(sps->crop_left || sps->crop_top){
-            av_log(h->avctx, AV_LOG_ERROR, "insane cropping not completely supported, this could look slightly wrong ... (left: %d, top: %d)\n", sps->crop_left, sps->crop_top);
-        }
-        if(sps->crop_right >= crop_horizontal_limit || sps->crop_bottom >= crop_vertical_limit){
-            av_log(h->avctx, AV_LOG_ERROR, "brainfart cropping not supported, cropping disabled (right: %d, bottom: %d)\n", sps->crop_right, sps->crop_bottom);
-        /* It is very unlikely that partial cropping will make anybody happy.
-         * Not cropping at all fixes for example playback of Sisvel 3D streams
-         * in applications supporting Sisvel 3D. */
-        sps->crop_left  =
-        sps->crop_right =
-        sps->crop_top   =
-        sps->crop_bottom= 0;
+        } else {
+            int vsub = (sps->chroma_format_idc == 1) ? 1 : 0;
+            int hsub = (sps->chroma_format_idc == 1 || sps->chroma_format_idc == 2) ? 1 : 0;
+            int step_x = 1 << hsub;
+            int step_y = (2 - sps->frame_mbs_only_flag) << vsub;
+
+            if (crop_left & (0x1F >> (sps->bit_depth_luma > 8)) &&
+                !(h->avctx->flags & CODEC_FLAG_UNALIGNED)) {
+                crop_left &= ~(0x1F >> (sps->bit_depth_luma > 8));
+                av_log(h->avctx, AV_LOG_WARNING, "Reducing left cropping to %d "
+                       "chroma samples to preserve alignment.\n",
+                       crop_left);
+            }
+
+            if (crop_left  > (unsigned)INT_MAX / 4 / step_x ||
+                crop_right > (unsigned)INT_MAX / 4 / step_x ||
+                crop_top   > (unsigned)INT_MAX / 4 / step_y ||
+                crop_bottom> (unsigned)INT_MAX / 4 / step_y ||
+                (crop_left + crop_right ) * step_x >= width ||
+                (crop_top  + crop_bottom) * step_y >= height
+            ) {
+                av_log(h->avctx, AV_LOG_ERROR, "crop values invalid %d %d %d %d / %d %d\n", crop_left, crop_right, crop_top, crop_bottom, width, height);
+                goto fail;
+            }
+
+            sps->crop_left   = crop_left   * step_x;
+            sps->crop_right  = crop_right  * step_x;
+            sps->crop_top    = crop_top    * step_y;
+            sps->crop_bottom = crop_bottom * step_y;
         }
     }else{
         sps->crop_left  =
         sps->crop_right =
         sps->crop_top   =
         sps->crop_bottom= 0;
+        sps->crop = 0;
     }
 
     sps->vui_parameters_present_flag= get_bits1(&h->gb);
@@ -530,8 +549,6 @@ int ff_h264_decode_seq_parameter_set(H264Context *h){
 
     av_free(h->sps_buffers[sps_id]);
     h->sps_buffers[sps_id] = sps;
-    h->sps                 = *sps;
-    h->current_sps_id      = sps_id;
 
     return 0;
 fail:
@@ -566,18 +583,13 @@ static int more_rbsp_data_in_pps(H264Context *h, PPS *pps)
 int ff_h264_decode_picture_parameter_set(H264Context *h, int bit_length){
     unsigned int pps_id= get_ue_golomb(&h->gb);
     PPS *pps;
-    const int qp_bd_offset = 6*(h->sps.bit_depth_luma-8);
+    SPS *sps;
+    int qp_bd_offset;
     int bits_left;
 
     if(pps_id >= MAX_PPS_COUNT) {
         av_log(h->avctx, AV_LOG_ERROR, "pps_id (%d) out of range\n", pps_id);
-        return -1;
-    } else if (h->sps.bit_depth_luma > 14) {
-        av_log(h->avctx, AV_LOG_ERROR, "Invalid luma bit depth=%d\n", h->sps.bit_depth_luma);
         return AVERROR_INVALIDDATA;
-    } else if (h->sps.bit_depth_luma == 11 || h->sps.bit_depth_luma == 13) {
-        av_log(h->avctx, AV_LOG_ERROR, "Unimplemented luma bit depth=%d\n", h->sps.bit_depth_luma);
-        return AVERROR_PATCHWELCOME;
     }
 
     pps= av_mallocz(sizeof(PPS));
@@ -586,6 +598,15 @@ int ff_h264_decode_picture_parameter_set(H264Context *h, int bit_length){
     pps->sps_id= get_ue_golomb_31(&h->gb);
     if((unsigned)pps->sps_id>=MAX_SPS_COUNT || h->sps_buffers[pps->sps_id] == NULL){
         av_log(h->avctx, AV_LOG_ERROR, "sps_id out of range\n");
+        goto fail;
+    }
+    sps = h->sps_buffers[pps->sps_id];
+    qp_bd_offset = 6*(sps->bit_depth_luma-8);
+    if (sps->bit_depth_luma > 14) {
+        av_log(h->avctx, AV_LOG_ERROR, "Invalid luma bit depth=%d\n", sps->bit_depth_luma);
+        goto fail;
+    } else if (sps->bit_depth_luma == 11 || sps->bit_depth_luma == 13) {
+        av_log(h->avctx, AV_LOG_ERROR, "Unimplemented luma bit depth=%d\n", sps->bit_depth_luma);
         goto fail;
     }
 
@@ -659,8 +680,8 @@ int ff_h264_decode_picture_parameter_set(H264Context *h, int bit_length){
         pps->chroma_qp_index_offset[1]= pps->chroma_qp_index_offset[0];
     }
 
-    build_qp_table(pps, 0, pps->chroma_qp_index_offset[0], h->sps.bit_depth_luma);
-    build_qp_table(pps, 1, pps->chroma_qp_index_offset[1], h->sps.bit_depth_luma);
+    build_qp_table(pps, 0, pps->chroma_qp_index_offset[0], sps->bit_depth_luma);
+    build_qp_table(pps, 1, pps->chroma_qp_index_offset[1], sps->bit_depth_luma);
     if(pps->chroma_qp_index_offset[0] != pps->chroma_qp_index_offset[1])
         pps->chroma_qp_diff= 1;
 

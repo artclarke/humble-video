@@ -25,10 +25,6 @@
  * @author Thilo Borgmann <thilo.borgmann _at_ googlemail.com>
  */
 
-
-//#define DEBUG
-
-
 #include "avcodec.h"
 #include "get_bits.h"
 #include "unary.h"
@@ -433,7 +429,8 @@ static int check_specific_config(ALSDecContext *ctx)
     #define MISSING_ERR(cond, str, errval)              \
     {                                                   \
         if (cond) {                                     \
-            av_log_missing_feature(ctx->avctx, str, 0); \
+            avpriv_report_missing_feature(ctx->avctx,   \
+                                          str);         \
             error = errval;                             \
         }                                               \
     }
@@ -1480,10 +1477,8 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame_ptr,
 
     /* get output buffer */
     frame->nb_samples = ctx->cur_frame_length;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed.\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
 
     // transform decoded frame into output format
     #define INTERLEAVE_OUTPUT(bps)                                                   \

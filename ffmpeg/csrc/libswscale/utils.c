@@ -72,7 +72,9 @@ const char *swscale_license(void)
 #define RET 0xC3 // near return opcode for x86
 
 typedef struct FormatEntry {
-    int is_supported_in, is_supported_out;
+    uint8_t is_supported_in         :1;
+    uint8_t is_supported_out        :1;
+    uint8_t is_supported_endianness :1;
 } FormatEntry;
 
 static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
@@ -89,6 +91,7 @@ static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_MONOBLACK]   = { 1, 1 },
     [AV_PIX_FMT_PAL8]        = { 1, 0 },
     [AV_PIX_FMT_YUVJ420P]    = { 1, 1 },
+    [AV_PIX_FMT_YUVJ411P]    = { 1, 1 },
     [AV_PIX_FMT_YUVJ422P]    = { 1, 1 },
     [AV_PIX_FMT_YUVJ444P]    = { 1, 1 },
     [AV_PIX_FMT_UYVY422]     = { 1, 1 },
@@ -136,8 +139,8 @@ static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_YUVA444P16LE]= { 1, 1 },
     [AV_PIX_FMT_RGB48BE]     = { 1, 1 },
     [AV_PIX_FMT_RGB48LE]     = { 1, 1 },
-    [AV_PIX_FMT_RGBA64BE]    = { 1, 0 },
-    [AV_PIX_FMT_RGBA64LE]    = { 1, 0 },
+    [AV_PIX_FMT_RGBA64BE]    = { 1, 1 },
+    [AV_PIX_FMT_RGBA64LE]    = { 1, 1 },
     [AV_PIX_FMT_RGB565BE]    = { 1, 1 },
     [AV_PIX_FMT_RGB565LE]    = { 1, 1 },
     [AV_PIX_FMT_RGB555BE]    = { 1, 1 },
@@ -196,6 +199,11 @@ static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_GBRP14BE]    = { 1, 1 },
     [AV_PIX_FMT_GBRP16LE]    = { 1, 0 },
     [AV_PIX_FMT_GBRP16BE]    = { 1, 0 },
+    [AV_PIX_FMT_XYZ12BE]     = { 1, 0, 1 },
+    [AV_PIX_FMT_XYZ12LE]     = { 1, 0, 1 },
+    [AV_PIX_FMT_GBRAP]       = { 1, 1 },
+    [AV_PIX_FMT_GBRAP16LE]   = { 1, 0 },
+    [AV_PIX_FMT_GBRAP16BE]   = { 1, 0 },
 };
 
 int sws_isSupportedInput(enum AVPixelFormat pix_fmt)
@@ -208,6 +216,12 @@ int sws_isSupportedOutput(enum AVPixelFormat pix_fmt)
 {
     return (unsigned)pix_fmt < AV_PIX_FMT_NB ?
            format_entries[pix_fmt].is_supported_out : 0;
+}
+
+int sws_isSupportedEndiannessConversion(enum AVPixelFormat pix_fmt)
+{
+    return (unsigned)pix_fmt < AV_PIX_FMT_NB ?
+           format_entries[pix_fmt].is_supported_endianness : 0;
 }
 
 extern const int32_t ff_yuv2rgb_coeffs[8][4];
@@ -236,11 +250,12 @@ static double getSplineCoeff(double a, double b, double c, double d,
                               dist - 1.0);
 }
 
-static int initFilter(int16_t **outFilter, int32_t **filterPos,
-                      int *outFilterSize, int xInc, int srcW, int dstW,
-                      int filterAlign, int one, int flags, int cpu_flags,
-                      SwsVector *srcFilter, SwsVector *dstFilter,
-                      double param[2])
+static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
+                              int *outFilterSize, int xInc, int srcW,
+                              int dstW, int filterAlign, int one,
+                              int flags, int cpu_flags,
+                              SwsVector *srcFilter, SwsVector *dstFilter,
+                              double param[2])
 {
     int i;
     int filterSize;
@@ -520,7 +535,7 @@ static int initFilter(int16_t **outFilter, int32_t **filterPos,
             filterAlign = 1;
     }
 
-    if (INLINE_MMX(cpu_flags)) {
+    if (HAVE_MMX && cpu_flags & AV_CPU_FLAG_MMX) {
         // special case for unscaled vertical filtering
         if (minFilterSize == 1 && filterAlign == 2)
             filterAlign = 1;
@@ -627,9 +642,9 @@ fail:
 }
 
 #if HAVE_MMXEXT_INLINE
-static int init_hscaler_mmxext(int dstW, int xInc, uint8_t *filterCode,
-                               int16_t *filter, int32_t *filterPos,
-                               int numSplits)
+static av_cold int init_hscaler_mmxext(int dstW, int xInc, uint8_t *filterCode,
+                                       int16_t *filter, int32_t *filterPos,
+                                       int numSplits)
 {
     uint8_t *fragmentA;
     x86_reg imm8OfPShufW1A;
@@ -799,6 +814,125 @@ static void getSubSampleFactors(int *h, int *v, enum AVPixelFormat format)
     *v = desc->log2_chroma_h;
 }
 
+static void fill_rgb2yuv_table(SwsContext *c, const int table[4], int dstRange)
+{
+    int64_t W, V, Z, Cy, Cu, Cv;
+    int64_t vr =  table[0];
+    int64_t ub =  table[1];
+    int64_t ug = -table[2];
+    int64_t vg = -table[3];
+    int64_t ONE = 65536;
+    int64_t cy = ONE;
+    uint8_t *p = (uint8_t*)c->input_rgb2yuv_table;
+    int i;
+    static const int8_t map[] = {
+    BY_IDX, GY_IDX, -1    , BY_IDX, BY_IDX, GY_IDX, -1    , BY_IDX,
+    RY_IDX, -1    , GY_IDX, RY_IDX, RY_IDX, -1    , GY_IDX, RY_IDX,
+    RY_IDX, GY_IDX, -1    , RY_IDX, RY_IDX, GY_IDX, -1    , RY_IDX,
+    BY_IDX, -1    , GY_IDX, BY_IDX, BY_IDX, -1    , GY_IDX, BY_IDX,
+    BU_IDX, GU_IDX, -1    , BU_IDX, BU_IDX, GU_IDX, -1    , BU_IDX,
+    RU_IDX, -1    , GU_IDX, RU_IDX, RU_IDX, -1    , GU_IDX, RU_IDX,
+    RU_IDX, GU_IDX, -1    , RU_IDX, RU_IDX, GU_IDX, -1    , RU_IDX,
+    BU_IDX, -1    , GU_IDX, BU_IDX, BU_IDX, -1    , GU_IDX, BU_IDX,
+    BV_IDX, GV_IDX, -1    , BV_IDX, BV_IDX, GV_IDX, -1    , BV_IDX,
+    RV_IDX, -1    , GV_IDX, RV_IDX, RV_IDX, -1    , GV_IDX, RV_IDX,
+    RV_IDX, GV_IDX, -1    , RV_IDX, RV_IDX, GV_IDX, -1    , RV_IDX,
+    BV_IDX, -1    , GV_IDX, BV_IDX, BV_IDX, -1    , GV_IDX, BV_IDX,
+    RY_IDX, BY_IDX, RY_IDX, BY_IDX, RY_IDX, BY_IDX, RY_IDX, BY_IDX,
+    BY_IDX, RY_IDX, BY_IDX, RY_IDX, BY_IDX, RY_IDX, BY_IDX, RY_IDX,
+    GY_IDX, -1    , GY_IDX, -1    , GY_IDX, -1    , GY_IDX, -1    ,
+    -1    , GY_IDX, -1    , GY_IDX, -1    , GY_IDX, -1    , GY_IDX,
+    RU_IDX, BU_IDX, RU_IDX, BU_IDX, RU_IDX, BU_IDX, RU_IDX, BU_IDX,
+    BU_IDX, RU_IDX, BU_IDX, RU_IDX, BU_IDX, RU_IDX, BU_IDX, RU_IDX,
+    GU_IDX, -1    , GU_IDX, -1    , GU_IDX, -1    , GU_IDX, -1    ,
+    -1    , GU_IDX, -1    , GU_IDX, -1    , GU_IDX, -1    , GU_IDX,
+    RV_IDX, BV_IDX, RV_IDX, BV_IDX, RV_IDX, BV_IDX, RV_IDX, BV_IDX,
+    BV_IDX, RV_IDX, BV_IDX, RV_IDX, BV_IDX, RV_IDX, BV_IDX, RV_IDX,
+    GV_IDX, -1    , GV_IDX, -1    , GV_IDX, -1    , GV_IDX, -1    ,
+    -1    , GV_IDX, -1    , GV_IDX, -1    , GV_IDX, -1    , GV_IDX, //23
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //24
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //25
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //26
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //27
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //28
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //29
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //30
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //31
+    BY_IDX, GY_IDX, RY_IDX, -1    , -1    , -1    , -1    , -1    , //32
+    BU_IDX, GU_IDX, RU_IDX, -1    , -1    , -1    , -1    , -1    , //33
+    BV_IDX, GV_IDX, RV_IDX, -1    , -1    , -1    , -1    , -1    , //34
+    };
+
+    dstRange = 0; //FIXME range = 1 is handled elsewhere
+
+    if (!dstRange) {
+        cy = cy * 255 / 219;
+    } else {
+        vr = vr * 224 / 255;
+        ub = ub * 224 / 255;
+        ug = ug * 224 / 255;
+        vg = vg * 224 / 255;
+    }
+    W = ROUNDED_DIV(ONE*ONE*ug, ub);
+    V = ROUNDED_DIV(ONE*ONE*vg, vr);
+    Z = ONE*ONE-W-V;
+
+    Cy = ROUNDED_DIV(cy*Z, ONE);
+    Cu = ROUNDED_DIV(ub*Z, ONE);
+    Cv = ROUNDED_DIV(vr*Z, ONE);
+
+    c->input_rgb2yuv_table[RY_IDX] = -ROUNDED_DIV((1 << RGB2YUV_SHIFT)*V        , Cy);
+    c->input_rgb2yuv_table[GY_IDX] =  ROUNDED_DIV((1 << RGB2YUV_SHIFT)*ONE*ONE  , Cy);
+    c->input_rgb2yuv_table[BY_IDX] = -ROUNDED_DIV((1 << RGB2YUV_SHIFT)*W        , Cy);
+
+    c->input_rgb2yuv_table[RU_IDX] =  ROUNDED_DIV((1 << RGB2YUV_SHIFT)*V        , Cu);
+    c->input_rgb2yuv_table[GU_IDX] = -ROUNDED_DIV((1 << RGB2YUV_SHIFT)*ONE*ONE  , Cu);
+    c->input_rgb2yuv_table[BU_IDX] =  ROUNDED_DIV((1 << RGB2YUV_SHIFT)*(Z+W)    , Cu);
+
+    c->input_rgb2yuv_table[RV_IDX] =  ROUNDED_DIV((1 << RGB2YUV_SHIFT)*(V+Z)    , Cv);
+    c->input_rgb2yuv_table[GV_IDX] = -ROUNDED_DIV((1 << RGB2YUV_SHIFT)*ONE*ONE  , Cv);
+    c->input_rgb2yuv_table[BV_IDX] =  ROUNDED_DIV((1 << RGB2YUV_SHIFT)*W        , Cv);
+
+    if(/*!dstRange && */table == ff_yuv2rgb_coeffs[SWS_CS_DEFAULT]) {
+        c->input_rgb2yuv_table[BY_IDX] =  ((int)(0.114 * 219 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
+        c->input_rgb2yuv_table[BV_IDX] = (-(int)(0.081 * 224 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
+        c->input_rgb2yuv_table[BU_IDX] =  ((int)(0.500 * 224 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
+        c->input_rgb2yuv_table[GY_IDX] =  ((int)(0.587 * 219 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
+        c->input_rgb2yuv_table[GV_IDX] = (-(int)(0.419 * 224 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
+        c->input_rgb2yuv_table[GU_IDX] = (-(int)(0.331 * 224 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
+        c->input_rgb2yuv_table[RY_IDX] =  ((int)(0.299 * 219 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
+        c->input_rgb2yuv_table[RV_IDX] =  ((int)(0.500 * 224 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
+        c->input_rgb2yuv_table[RU_IDX] = (-(int)(0.169 * 224 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
+    }
+    for(i=0; i<FF_ARRAY_ELEMS(map); i++)
+        AV_WL16(p + 16*4 + 2*i, map[i] >= 0 ? c->input_rgb2yuv_table[map[i]] : 0);
+}
+
+static void fill_xyztables(struct SwsContext *c)
+{
+    int i;
+    double xyzgamma = XYZ_GAMMA;
+    double rgbgamma = 1.0 / RGB_GAMMA;
+    static const int16_t xyz2rgb_matrix[3][4] = {
+        {13270, -6295, -2041},
+        {-3969,  7682,   170},
+        {  228,  -835,  4329} };
+    static int16_t xyzgamma_tab[4096], rgbgamma_tab[4096];
+
+    memcpy(c->xyz2rgb_matrix, xyz2rgb_matrix, sizeof(c->xyz2rgb_matrix));
+    c->xyzgamma = xyzgamma_tab;
+    c->rgbgamma = rgbgamma_tab;
+
+    if (rgbgamma_tab[4095])
+        return;
+
+    /* set gamma vectors */
+    for (i = 0; i < 4096; i++) {
+        xyzgamma_tab[i] = lrint(pow(i / 4095.0, xyzgamma) * 4095.0);
+        rgbgamma_tab[i] = lrint(pow(i / 4095.0, rgbgamma) * 4095.0);
+    }
+}
+
 int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
                              int srcRange, const int table[4], int dstRange,
                              int brightness, int contrast, int saturation)
@@ -819,12 +953,15 @@ int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
     c->srcRange   = srcRange;
     c->dstRange   = dstRange;
 
-    if (isYUV(c->dstFormat) || isGray(c->dstFormat))
+    fill_xyztables(c);
+
+    if ((isYUV(c->dstFormat) || isGray(c->dstFormat)) && (isYUV(c->srcFormat) || isGray(c->srcFormat)))
         return -1;
 
     c->dstFormatBpp = av_get_bits_per_pixel(desc_dst);
     c->srcFormatBpp = av_get_bits_per_pixel(desc_src);
 
+    if (!isYUV(c->dstFormat) && !isGray(c->dstFormat)) {
     ff_yuv2rgb_c_init_tables(c, inv_table, srcRange, brightness,
                              contrast, saturation);
     // FIXME factorize
@@ -832,6 +969,10 @@ int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
     if (HAVE_ALTIVEC && av_get_cpu_flags() & AV_CPU_FLAG_ALTIVEC)
         ff_yuv2rgb_init_tables_altivec(c, inv_table, brightness,
                                        contrast, saturation);
+    }
+
+    fill_rgb2yuv_table(c, table, dstRange);
+
     return 0;
 }
 
@@ -859,6 +1000,9 @@ static int handle_jpeg(enum AVPixelFormat *format)
     case AV_PIX_FMT_YUVJ420P:
         *format = AV_PIX_FMT_YUV420P;
         return 1;
+    case AV_PIX_FMT_YUVJ411P:
+        *format = AV_PIX_FMT_YUV411P;
+        return 1;
     case AV_PIX_FMT_YUVJ422P:
         *format = AV_PIX_FMT_YUV422P;
         return 1;
@@ -867,6 +1011,8 @@ static int handle_jpeg(enum AVPixelFormat *format)
         return 1;
     case AV_PIX_FMT_YUVJ440P:
         *format = AV_PIX_FMT_YUV440P;
+        return 1;
+    case AV_PIX_FMT_GRAY8:
         return 1;
     default:
         return 0;
@@ -881,6 +1027,15 @@ static int handle_0alpha(enum AVPixelFormat *format)
     case AV_PIX_FMT_0RGB    : *format = AV_PIX_FMT_ARGB   ; return 1;
     case AV_PIX_FMT_RGB0    : *format = AV_PIX_FMT_RGBA   ; return 4;
     default:                                          return 0;
+    }
+}
+
+static int handle_xyz(enum AVPixelFormat *format)
+{
+    switch (*format) {
+    case AV_PIX_FMT_XYZ12BE : *format = AV_PIX_FMT_RGB48BE; return 1;
+    case AV_PIX_FMT_XYZ12LE : *format = AV_PIX_FMT_RGB48LE; return 1;
+    default:                                                return 0;
     }
 }
 
@@ -924,15 +1079,20 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
 
     handle_jpeg(&srcFormat);
     handle_jpeg(&dstFormat);
+    if(srcFormat!=c->srcFormat || dstFormat!=c->dstFormat)
+        av_log(c, AV_LOG_WARNING, "deprecated pixel format used, make sure you did set range correctly\n");
     handle_0alpha(&srcFormat);
     handle_0alpha(&dstFormat);
+    handle_xyz(&srcFormat);
+    handle_xyz(&dstFormat);
 
     if(srcFormat!=c->srcFormat || dstFormat!=c->dstFormat){
-        av_log(c, AV_LOG_WARNING, "deprecated pixel format used, make sure you did set range correctly\n");
         c->srcFormat= srcFormat;
         c->dstFormat= dstFormat;
     }
 
+    if (!(unscaled && sws_isSupportedEndiannessConversion(srcFormat) &&
+          av_pix_fmt_swap_endianness(srcFormat) == dstFormat)) {
     if (!sws_isSupportedInput(srcFormat)) {
         av_log(c, AV_LOG_ERROR, "%s is not supported as input pixel format\n",
                av_get_pix_fmt_name(srcFormat));
@@ -942,6 +1102,7 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
         av_log(c, AV_LOG_ERROR, "%s is not supported as output pixel format\n",
                av_get_pix_fmt_name(dstFormat));
         return AVERROR(EINVAL);
+    }
     }
 
     i = flags & (SWS_POINT         |
@@ -1073,11 +1234,11 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
          (flags & SWS_FAST_BILINEAR)))
         c->chrSrcHSubSample = 1;
 
-    // Note the -((-x)>>y) is so that we always round toward +inf.
-    c->chrSrcW = -((-srcW) >> c->chrSrcHSubSample);
-    c->chrSrcH = -((-srcH) >> c->chrSrcVSubSample);
-    c->chrDstW = -((-dstW) >> c->chrDstHSubSample);
-    c->chrDstH = -((-dstH) >> c->chrDstVSubSample);
+    // Note the FF_CEIL_RSHIFT is so that we always round toward +inf.
+    c->chrSrcW = FF_CEIL_RSHIFT(srcW, c->chrSrcHSubSample);
+    c->chrSrcH = FF_CEIL_RSHIFT(srcH, c->chrSrcVSubSample);
+    c->chrDstW = FF_CEIL_RSHIFT(dstW, c->chrDstHSubSample);
+    c->chrDstH = FF_CEIL_RSHIFT(dstH, c->chrDstVSubSample);
 
     FF_ALLOC_OR_GOTO(c, c->formatConvBuffer, FFALIGN(srcW*2+78, 16) * 2, fail);
 
@@ -1419,6 +1580,8 @@ SwsContext *sws_getContext(int srcW, int srcH, enum AVPixelFormat srcFormat,
     c->dstRange  = handle_jpeg(&dstFormat);
     c->src0Alpha = handle_0alpha(&srcFormat);
     c->dst0Alpha = handle_0alpha(&dstFormat);
+    c->srcXYZ    = handle_xyz(&srcFormat);
+    c->dstXYZ    = handle_xyz(&dstFormat);
     c->srcFormat = srcFormat;
     c->dstFormat = dstFormat;
 
@@ -1860,11 +2023,13 @@ struct SwsContext *sws_getCachedContext(struct SwsContext *context, int srcW,
         context->srcH      = srcH;
         context->srcRange  = handle_jpeg(&srcFormat);
         context->src0Alpha = handle_0alpha(&srcFormat);
+        context->srcXYZ    = handle_xyz(&srcFormat);
         context->srcFormat = srcFormat;
         context->dstW      = dstW;
         context->dstH      = dstH;
         context->dstRange  = handle_jpeg(&dstFormat);
         context->dst0Alpha = handle_0alpha(&dstFormat);
+        context->dstXYZ    = handle_xyz(&dstFormat);
         context->dstFormat = dstFormat;
         context->flags     = flags;
         context->param[0]  = param[0];

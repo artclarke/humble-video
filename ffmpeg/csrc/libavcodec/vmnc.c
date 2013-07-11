@@ -31,6 +31,7 @@
 #include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
+#include "internal.h"
 
 enum EncTypes {
     MAGIC_WMVd = 0x574D5664,
@@ -293,14 +294,10 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     VmncContext * const c = avctx->priv_data;
     uint8_t *outptr;
     const uint8_t *src = buf;
-    int dx, dy, w, h, depth, enc, chunks, res, size_left;
+    int dx, dy, w, h, depth, enc, chunks, res, size_left, ret;
 
-    c->pic.reference = 3;
-    c->pic.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE | FF_BUFFER_HINTS_REUSABLE;
-    if(avctx->reget_buffer(avctx, &c->pic) < 0){
-        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
-        return -1;
-    }
+    if ((ret = ff_reget_buffer(avctx, &c->pic)) < 0)
+        return ret;
 
     c->pic.key_frame = 0;
     c->pic.pict_type = AV_PICTURE_TYPE_P;
@@ -456,7 +453,8 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         }
     }
     *got_frame      = 1;
-    *(AVFrame*)data = c->pic;
+    if ((ret = av_frame_ref(data, &c->pic)) < 0)
+        return ret;
 
     /* always report that the buffer was completely consumed */
     return buf_size;
@@ -497,6 +495,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
         return AVERROR_INVALIDDATA;
     }
 
+    avcodec_get_frame_defaults(&c->pic);
+
     return 0;
 }
 
@@ -511,8 +511,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 {
     VmncContext * const c = avctx->priv_data;
 
-    if (c->pic.data[0])
-        avctx->release_buffer(avctx, &c->pic);
+    av_frame_unref(&c->pic);
 
     av_free(c->curbits);
     av_free(c->curmask);

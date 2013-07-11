@@ -239,7 +239,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
     ff_set_cmp(&s->dsp, s->dsp.me_cmp, s->avctx->me_cmp);
     ff_set_cmp(&s->dsp, s->dsp.me_sub_cmp, s->avctx->me_sub_cmp);
 
-    if ((ret = ff_get_buffer(s->avctx, &s->input_picture)) < 0)
+    if ((ret = ff_get_buffer(s->avctx, &s->input_picture, AV_GET_BUFFER_FLAG_REF)) < 0)
         return ret;
 
     if(s->avctx->me_method == ME_ITER){
@@ -1748,7 +1748,9 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         s->lambda2= s->m.lambda2= (s->m.lambda*s->m.lambda + FF_LAMBDA_SCALE/2) >> FF_LAMBDA_SHIFT;
 
         s->m.dsp= s->dsp; //move
+        s->m.hdsp = s->hdsp;
         ff_init_me(&s->m);
+        s->hdsp = s->m.hdsp;
         s->dsp= s->m.dsp;
     }
 
@@ -1767,6 +1769,11 @@ redo_frame:
     while(   !(width >>(s->chroma_h_shift + s->spatial_decomposition_count))
           || !(height>>(s->chroma_v_shift + s->spatial_decomposition_count)))
         s->spatial_decomposition_count--;
+
+    if (s->spatial_decomposition_count <= 0) {
+        av_log(avctx, AV_LOG_ERROR, "Resolution too low\n");
+        return AVERROR(EINVAL);
+    }
 
     s->m.pict_type = pic->pict_type;
     s->qbias = pic->pict_type == AV_PICTURE_TYPE_P ? 2 : 0;
@@ -1948,8 +1955,7 @@ static av_cold int encode_end(AVCodecContext *avctx)
     SnowContext *s = avctx->priv_data;
 
     ff_snow_common_end(s);
-    if (s->input_picture.data[0])
-        avctx->release_buffer(avctx, &s->input_picture);
+    av_frame_unref(&s->input_picture);
     av_free(avctx->stats_out);
 
     return 0;

@@ -287,10 +287,8 @@ static int atrac1_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = AT1_SU_SAMPLES;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
 
     for (ch = 0; ch < avctx->channels; ch++) {
         AT1SUCtx* su = &q->SUs[ch];
@@ -344,7 +342,7 @@ static av_cold int atrac1_decode_init(AVCodecContext *avctx)
     }
 
     if (avctx->block_align <= 0) {
-        av_log_ask_for_sample(avctx, "unsupported block align\n");
+        av_log(avctx, AV_LOG_ERROR, "Unsupported block align.");
         return AVERROR_PATCHWELCOME;
     }
 
