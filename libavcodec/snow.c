@@ -81,8 +81,8 @@ void ff_snow_reset_contexts(SnowContext *s){ //FIXME better initial contexts
 }
 
 int ff_snow_alloc_blocks(SnowContext *s){
-    int w= -((-s->avctx->width )>>LOG2_MB_SIZE);
-    int h= -((-s->avctx->height)>>LOG2_MB_SIZE);
+    int w= FF_CEIL_RSHIFT(s->avctx->width,  LOG2_MB_SIZE);
+    int h= FF_CEIL_RSHIFT(s->avctx->height, LOG2_MB_SIZE);
 
     s->b_width = w;
     s->b_height= h;
@@ -92,7 +92,7 @@ int ff_snow_alloc_blocks(SnowContext *s){
     return 0;
 }
 
-static void init_qexp(void){
+static av_cold void init_qexp(void){
     int i;
     double v=128;
 
@@ -352,8 +352,6 @@ void ff_snow_pred_block(SnowContext *s, uint8_t *dst, uint8_t *tmp, int stride, 
 
         av_assert2(s->chroma_h_shift == s->chroma_v_shift); // only one mv_scale
 
-//        assert(b_w == b_h || 2*b_w == b_h || b_w == 2*b_h);
-//        assert(!(b_w&(b_w-1)));
         av_assert2(b_w>1 && b_h>1);
         av_assert2((tab_index>=0 && tab_index<4) || b_w==32);
         if((dx&3) || (dy&3) || !(b_w == b_h || 2*b_w == b_h || b_w == 2*b_h) || (b_w&(b_w-1)) || !s->plane[plane_index].fast_mc )
@@ -401,6 +399,7 @@ av_cold int ff_snow_common_init(AVCodecContext *avctx){
     s->max_ref_frames=1; //just make sure it's not an invalid value in case of no initial keyframe
 
     ff_dsputil_init(&s->dsp, avctx);
+    ff_hpeldsp_init(&s->hdsp, avctx->flags);
     ff_videodsp_init(&s->vdsp, 8);
     ff_dwt_init(&s->dwt);
     ff_h264qpel_init(&s->h264qpel, 8);
@@ -431,11 +430,11 @@ av_cold int ff_snow_common_init(AVCodecContext *avctx){
     mcf(12,12)
 
 #define mcfh(dx,dy)\
-    s->dsp.put_pixels_tab       [0][dy/4+dx/8]=\
-    s->dsp.put_no_rnd_pixels_tab[0][dy/4+dx/8]=\
+    s->hdsp.put_pixels_tab       [0][dy/4+dx/8]=\
+    s->hdsp.put_no_rnd_pixels_tab[0][dy/4+dx/8]=\
         mc_block_hpel ## dx ## dy ## 16;\
-    s->dsp.put_pixels_tab       [1][dy/4+dx/8]=\
-    s->dsp.put_no_rnd_pixels_tab[1][dy/4+dx/8]=\
+    s->hdsp.put_pixels_tab       [1][dy/4+dx/8]=\
+    s->hdsp.put_no_rnd_pixels_tab[1][dy/4+dx/8]=\
         mc_block_hpel ## dx ## dy ## 8;
 
     mcfh(0, 0)
@@ -456,9 +455,14 @@ av_cold int ff_snow_common_init(AVCodecContext *avctx){
     FF_ALLOCZ_OR_GOTO(avctx, s->temp_idwt_buffer,    width * sizeof(IDWTELEM), fail);
     FF_ALLOC_OR_GOTO(avctx,  s->run_buffer,          ((width + 1) >> 1) * ((height + 1) >> 1) * sizeof(*s->run_buffer), fail);
 
-    for(i=0; i<MAX_REF_FRAMES; i++)
+    for(i=0; i<MAX_REF_FRAMES; i++) {
         for(j=0; j<MAX_REF_FRAMES; j++)
             ff_scale_mv_ref[i][j] = 256*(i+1)/(j+1);
+        avcodec_get_frame_defaults(&s->last_picture[i]);
+    }
+
+    avcodec_get_frame_defaults(&s->mconly_picture);
+    avcodec_get_frame_defaults(&s->current_picture);
 
     return 0;
 fail:
@@ -471,10 +475,9 @@ int ff_snow_common_init_after_header(AVCodecContext *avctx) {
     int ret, emu_buf_size;
 
     if(!s->scratchbuf) {
-        if ((ret = ff_get_buffer(s->avctx, &s->mconly_picture)) < 0) {
-            av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+        if ((ret = ff_get_buffer(s->avctx, &s->mconly_picture,
+                                 AV_GET_BUFFER_FLAG_REF)) < 0)
             return ret;
-        }
         FF_ALLOCZ_OR_GOTO(avctx, s->scratchbuf, FFMAX(s->mconly_picture.linesize[0], 2*avctx->width+256)*7*MB_SIZE, fail);
         emu_buf_size = FFMAX(s->mconly_picture.linesize[0], 2*avctx->width+256) * (2 * MB_SIZE + HTAPS_MAX - 1);
         FF_ALLOC_OR_GOTO(avctx, s->emu_edge_buffer, emu_buf_size, fail);
@@ -586,7 +589,7 @@ void ff_snow_release_buffer(AVCodecContext *avctx)
     int i;
 
     if(s->last_picture[s->max_ref_frames-1].data[0]){
-        avctx->release_buffer(avctx, &s->last_picture[s->max_ref_frames-1]);
+        av_frame_unref(&s->last_picture[s->max_ref_frames-1]);
         for(i=0; i<9; i++)
             if(s->halfpel_plane[s->max_ref_frames-1][1+i/3][i%3])
                 av_free(s->halfpel_plane[s->max_ref_frames-1][1+i/3][i%3] - EDGE_WIDTH*(1+s->current_picture.linesize[i%3]));
@@ -595,6 +598,7 @@ void ff_snow_release_buffer(AVCodecContext *avctx)
 
 int ff_snow_frame_start(SnowContext *s){
    AVFrame tmp;
+   int i, ret;
    int w= s->avctx->width; //FIXME round up to x16 ?
    int h= s->avctx->height;
 
@@ -612,13 +616,14 @@ int ff_snow_frame_start(SnowContext *s){
 
     ff_snow_release_buffer(s->avctx);
 
-    tmp= s->last_picture[s->max_ref_frames-1];
-    memmove(s->last_picture+1, s->last_picture, (s->max_ref_frames-1)*sizeof(AVFrame));
+    av_frame_move_ref(&tmp, &s->last_picture[s->max_ref_frames-1]);
+    for(i=s->max_ref_frames-1; i>0; i--)
+        av_frame_move_ref(&s->last_picture[i], &s->last_picture[i-1]);
     memmove(s->halfpel_plane+1, s->halfpel_plane, (s->max_ref_frames-1)*sizeof(void*)*4*4);
     if(USE_HALFPEL_PLANE && s->current_picture.data[0])
         halfpel_interpol(s, s->halfpel_plane[0], &s->current_picture);
-    s->last_picture[0]= s->current_picture;
-    s->current_picture= tmp;
+    av_frame_move_ref(&s->last_picture[0], &s->current_picture);
+    av_frame_move_ref(&s->current_picture, &tmp);
 
     if(s->keyframe){
         s->ref_frames= 0;
@@ -634,11 +639,8 @@ int ff_snow_frame_start(SnowContext *s){
         }
     }
 
-    s->current_picture.reference= 3;
-    if(ff_get_buffer(s->avctx, &s->current_picture) < 0){
-        av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
-        return -1;
-    }
+    if ((ret = ff_get_buffer(s->avctx, &s->current_picture, AV_GET_BUFFER_FLAG_REF)) < 0)
+        return ret;
 
     s->current_picture.key_frame= s->keyframe;
 
@@ -670,7 +672,7 @@ av_cold void ff_snow_common_end(SnowContext *s)
         av_freep(&s->ref_scores[i]);
         if(s->last_picture[i].data[0]) {
             av_assert0(s->last_picture[i].data[0] != s->current_picture.data[0]);
-            s->avctx->release_buffer(s->avctx, &s->last_picture[i]);
+            av_frame_unref(&s->last_picture[i]);
         }
     }
 
@@ -683,8 +685,6 @@ av_cold void ff_snow_common_end(SnowContext *s)
             }
         }
     }
-    if (s->mconly_picture.data[0])
-        s->avctx->release_buffer(s->avctx, &s->mconly_picture);
-    if (s->current_picture.data[0])
-        s->avctx->release_buffer(s->avctx, &s->current_picture);
+    av_frame_unref(&s->mconly_picture);
+    av_frame_unref(&s->current_picture);
 }

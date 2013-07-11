@@ -74,7 +74,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .id        = AV_CODEC_ID_RV20,
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "rv20",
-        .long_name = NULL_IF_CONFIG_SMALL("RealVideo 1.0"),
+        .long_name = NULL_IF_CONFIG_SMALL("RealVideo 2.0"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
     {
@@ -1038,6 +1038,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_LOSSY,
     },
     {
+        .id        = AV_CODEC_ID_WEBP,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "webp",
+        .long_name = NULL_IF_CONFIG_SMALL("WebP"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
         .id        = AV_CODEC_ID_PICTOR,
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "pictor",
@@ -1241,6 +1248,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
     {
+        .id        = AV_CODEC_ID_AIC,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "aic",
+        .long_name = NULL_IF_CONFIG_SMALL("Apple Intermediate Codec"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
         .id        = AV_CODEC_ID_Y41P,
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "y41p",
@@ -1275,12 +1289,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "012v",
         .long_name = NULL_IF_CONFIG_SMALL("Uncompressed 4:2:2 10-bit"),
         .props     = AV_CODEC_PROP_INTRA_ONLY,
-    },
-    {
-        .id        = AV_CODEC_ID_G2M,
-        .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "g2m",
-        .long_name = NULL_IF_CONFIG_SMALL("GoToMeeting"),
     },
     {
         .id        = AV_CODEC_ID_AVUI,
@@ -1363,6 +1371,20 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "brender_pix",
         .long_name = NULL_IF_CONFIG_SMALL("BRender PIX image"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_SMVJPEG,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "smv",
+        .long_name = NULL_IF_CONFIG_SMALL("Sigmatel Motion Video"),
+    },
+
+    {
+        .id        = AV_CODEC_ID_G2M,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "g2m",
+        .long_name = NULL_IF_CONFIG_SMALL("Go2Meeting"),
+        .props     = AV_CODEC_PROP_LOSSY,
     },
 
     /* various PCM "codecs" */
@@ -1574,7 +1596,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "s302m",
         .long_name = NULL_IF_CONFIG_SMALL("SMPTE 302M"),
-        .props     = AV_CODEC_PROP_LOSSY,
+        .props     = AV_CODEC_PROP_LOSSLESS,
     },
     {
         .id        = AV_CODEC_ID_PCM_S8_PLANAR,
@@ -1807,6 +1829,20 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "adpcm_ima_oki",
         .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Dialogic OKI"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_DTK,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_dtk",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Nintendo Gamecube DTK"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_RAD,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_rad",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Radical"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
 
@@ -2387,6 +2423,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "text",
         .long_name = NULL_IF_CONFIG_SMALL("raw UTF-8 text"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_XSUB,
@@ -2396,16 +2433,25 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_BITMAP_SUB,
     },
     {
+        .id        = AV_CODEC_ID_ASS,
+        .type      = AVMEDIA_TYPE_SUBTITLE,
+        .name      = "ass",
+        .long_name = NULL_IF_CONFIG_SMALL("ASS (Advanced SSA) subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
+    },
+    {
         .id        = AV_CODEC_ID_SSA,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "ssa",
-        .long_name = NULL_IF_CONFIG_SMALL("SSA (SubStation Alpha) / ASS (Advanced SSA) subtitle"),
+        .long_name = NULL_IF_CONFIG_SMALL("SSA (SubStation Alpha) subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_MOV_TEXT,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "mov_text",
         .long_name = NULL_IF_CONFIG_SMALL("MOV text"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_HDMV_PGS_SUBTITLE,
@@ -2425,24 +2471,28 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "srt",
         .long_name = NULL_IF_CONFIG_SMALL("SubRip subtitle with embedded timing"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_SUBRIP,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "subrip",
         .long_name = NULL_IF_CONFIG_SMALL("SubRip subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_MICRODVD,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "microdvd",
         .long_name = NULL_IF_CONFIG_SMALL("MicroDVD subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_MPL2,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "mpl2",
         .long_name = NULL_IF_CONFIG_SMALL("MPL2 subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_EIA_608,
@@ -2455,48 +2505,56 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "jacosub",
         .long_name = NULL_IF_CONFIG_SMALL("JACOsub subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_PJS,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "pjs",
         .long_name = NULL_IF_CONFIG_SMALL("PJS (Phoenix Japanimation Society) subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_SAMI,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "sami",
         .long_name = NULL_IF_CONFIG_SMALL("SAMI subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_REALTEXT,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "realtext",
         .long_name = NULL_IF_CONFIG_SMALL("RealText subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_SUBVIEWER1,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "subviewer1",
         .long_name = NULL_IF_CONFIG_SMALL("SubViewer v1 subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_SUBVIEWER,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "subviewer",
         .long_name = NULL_IF_CONFIG_SMALL("SubViewer subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_VPLAYER,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "vplayer",
         .long_name = NULL_IF_CONFIG_SMALL("VPlayer subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_WEBVTT,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "webvtt",
         .long_name = NULL_IF_CONFIG_SMALL("WebVTT subtitle"),
+        .props     = AV_CODEC_PROP_TEXT_SUB,
     },
     {
         .id        = AV_CODEC_ID_BINTEXT,
@@ -2524,6 +2582,12 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_DATA,
         .name      = "klv",
         .long_name = NULL_IF_CONFIG_SMALL("SMPTE 336M Key-Length-Value (KLV) metadata"),
+    },
+    {
+        .id        = AV_CODEC_ID_DVD_NAV,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "dvd_nav_packet",
+        .long_name = NULL_IF_CONFIG_SMALL("DVD Nav packet"),
     },
 
 };

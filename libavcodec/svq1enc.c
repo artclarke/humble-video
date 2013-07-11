@@ -27,6 +27,8 @@
  */
 
 #include "avcodec.h"
+#include "dsputil.h"
+#include "hpeldsp.h"
 #include "mpegvideo.h"
 #include "h263.h"
 #include "internal.h"
@@ -42,6 +44,7 @@ typedef struct SVQ1Context {
     MpegEncContext m;
     AVCodecContext *avctx;
     DSPContext dsp;
+    HpelDSPContext hdsp;
     AVFrame picture;
     AVFrame current_picture;
     AVFrame last_picture;
@@ -323,9 +326,9 @@ static int svq1_encode_plane(SVQ1Context *s, int plane,
         s->m.current_picture.mb_mean   = (uint8_t *)s->dummy;
         s->m.current_picture.mb_var    = (uint16_t *)s->dummy;
         s->m.current_picture.mc_mb_var = (uint16_t *)s->dummy;
-        s->m.current_picture.f.mb_type = s->dummy;
+        s->m.current_picture.mb_type = s->dummy;
 
-        s->m.current_picture.f.motion_val[0] = s->motion_val8[plane] + 2;
+        s->m.current_picture.motion_val[0]   = s->motion_val8[plane] + 2;
         s->m.p_mv_table                      = s->motion_val16[plane] +
                                                s->m.mb_stride + 1;
         s->m.dsp                             = s->dsp; // move
@@ -443,10 +446,10 @@ static int svq1_encode_plane(SVQ1Context *s, int plane,
 
                     dxy = (mx & 1) + 2 * (my & 1);
 
-                    s->dsp.put_pixels_tab[0][dxy](temp + 16,
-                                                  ref + (mx >> 1) +
-                                                  stride * (my >> 1),
-                                                  stride, 16);
+                    s->hdsp.put_pixels_tab[0][dxy](temp + 16,
+                                                   ref + (mx >> 1) +
+                                                   stride * (my >> 1),
+                                                   stride, 16);
 
                     score[1] += encode_block(s, src + 16 * x, temp + 16,
                                              decoded, stride, 5, 64, lambda, 0);
@@ -458,7 +461,7 @@ static int svq1_encode_plane(SVQ1Context *s, int plane,
                     score[2] += vlc[1] * lambda;
                     if (score[2] < score[best] && mx == 0 && my == 0) {
                         best = 2;
-                        s->dsp.put_pixels_tab[0][0](decoded, ref, stride, 16);
+                        s->hdsp.put_pixels_tab[0][0](decoded, ref, stride, 16);
                         for (i = 0; i < 6; i++)
                             count[2][i] = 0;
                         put_bits(&s->pb, vlc[1], vlc[0]);
@@ -488,7 +491,7 @@ static int svq1_encode_plane(SVQ1Context *s, int plane,
                 avpriv_copy_bits(&s->pb, reorder_buffer[best][i],
                                  count[best][i]);
             if (best == 0)
-                s->dsp.put_pixels_tab[0][0](decoded, temp, stride, 16);
+                s->hdsp.put_pixels_tab[0][0](decoded, temp, stride, 16);
         }
         s->m.first_slice_line = 0;
     }
@@ -500,6 +503,7 @@ static av_cold int svq1_encode_init(AVCodecContext *avctx)
     SVQ1Context *const s = avctx->priv_data;
 
     ff_dsputil_init(&s->dsp, avctx);
+    ff_hpeldsp_init(&s->hdsp, avctx->flags);
     avctx->coded_frame = &s->picture;
 
     s->frame_width  = avctx->width;
@@ -546,16 +550,16 @@ static int svq1_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     }
 
     if (!s->current_picture.data[0]) {
-        if ((ret = ff_get_buffer(avctx, &s->current_picture))< 0 ||
-            (ret = ff_get_buffer(avctx, &s->last_picture))   < 0) {
+        if ((ret = ff_get_buffer(avctx, &s->current_picture, 0))< 0 ||
+            (ret = ff_get_buffer(avctx, &s->last_picture, 0))   < 0) {
             return ret;
         }
         s->scratchbuf = av_malloc(s->current_picture.linesize[0] * 16 * 2);
     }
 
-    temp               = s->current_picture;
-    s->current_picture = s->last_picture;
-    s->last_picture    = temp;
+    av_frame_move_ref(&temp, &s->current_picture);
+    av_frame_move_ref(&s->current_picture, &s->last_picture);
+    av_frame_move_ref(&s->last_picture, &temp);
 
     init_put_bits(&s->pb, pkt->data, pkt->size);
 
@@ -610,10 +614,9 @@ static av_cold int svq1_encode_end(AVCodecContext *avctx)
         av_freep(&s->motion_val8[i]);
         av_freep(&s->motion_val16[i]);
     }
-    if(s->current_picture.data[0])
-        avctx->release_buffer(avctx, &s->current_picture);
-    if(s->last_picture.data[0])
-        avctx->release_buffer(avctx, &s->last_picture);
+
+    av_frame_unref(&s->current_picture);
+    av_frame_unref(&s->last_picture);
 
     return 0;
 }
@@ -626,7 +629,7 @@ AVCodec ff_svq1_encoder = {
     .init           = svq1_encode_init,
     .encode2        = svq1_encode_frame,
     .close          = svq1_encode_end,
-    .pix_fmts       = (const enum PixelFormat[]) { AV_PIX_FMT_YUV410P,
-                                                   AV_PIX_FMT_NONE },
+    .pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_YUV410P,
+                                                     AV_PIX_FMT_NONE },
     .long_name      = NULL_IF_CONFIG_SMALL("Sorenson Vector Quantizer 1 / Sorenson Video 1 / SVQ1"),
 };

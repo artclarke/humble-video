@@ -398,7 +398,7 @@ static int amf_parse_object(AVFormatContext *s, AVStream *astream, AVStream *vst
         acodec = astream ? astream->codec : NULL;
         vcodec = vstream ? vstream->codec : NULL;
 
-        if (amf_type == AMF_DATA_TYPE_NUMBER) {
+        if (amf_type == AMF_DATA_TYPE_NUMBER || amf_type == AMF_DATA_TYPE_BOOL) {
             if (!strcmp(key, "duration"))
                 s->duration = num_val * AV_TIME_BASE;
             else if (!strcmp(key, "videodatarate") && vcodec && 0 <= (int)(num_val * 1024.0))
@@ -415,10 +415,18 @@ static int amf_parse_object(AVFormatContext *s, AVStream *astream, AVStream *vst
                     flv_set_video_codec(s, vstream, num_val, 0);
                 } else
                 if (!strcmp(key, "audiocodecid") && acodec) {
-                    flv_set_audio_codec(s, astream, acodec, num_val);
+                    int id = ((int)num_val) << FLV_AUDIO_CODECID_OFFSET;
+                    flv_set_audio_codec(s, astream, acodec, id);
                 } else
                 if (!strcmp(key, "audiosamplerate") && acodec) {
                     acodec->sample_rate = num_val;
+                } else if (!strcmp(key, "audiosamplesize") && acodec) {
+                    acodec->bits_per_coded_sample = num_val;
+                } else if (!strcmp(key, "stereo") && acodec) {
+                    acodec->channels = num_val + 1;
+                    acodec->channel_layout = acodec->channels == 2 ?
+                                             AV_CH_LAYOUT_STEREO :
+                                             AV_CH_LAYOUT_MONO;
                 } else
                 if (!strcmp(key, "width") && vcodec) {
                     vcodec->width = num_val;
@@ -645,7 +653,7 @@ static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
     FLVContext *flv = s->priv_data;
     int ret, i, type, size, flags;
     int stream_type=-1;
-    int64_t next, pos;
+    int64_t next, pos, meta_pos;
     int64_t dts, pts = AV_NOPTS_VALUE;
     int av_uninit(channels);
     int av_uninit(sample_rate);
@@ -695,13 +703,13 @@ static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
         if ((flags & FLV_VIDEO_FRAMETYPE_MASK) == FLV_FRAME_VIDEO_INFO_CMD)
             goto skip;
     } else if (type == FLV_TAG_TYPE_META) {
+        stream_type=FLV_STREAM_TYPE_DATA;
         if (size > 13+1+4 && dts == 0) { // Header-type metadata stuff
-            flv_read_metabody(s, next);
-            goto skip;
-        } else if (dts != 0) { // Script-data "special" metadata frames - don't skip
-            stream_type=FLV_STREAM_TYPE_DATA;
-        } else {
-            goto skip;
+            meta_pos = avio_tell(s->pb);
+            if (flv_read_metabody(s, next) == 0){
+                goto skip;
+            }
+            avio_seek(s->pb, meta_pos, SEEK_SET);
         }
     } else {
         av_log(s, AV_LOG_DEBUG, "skipping flv packet: type %d, size %d, flags %d\n", type, size, flags);
@@ -734,9 +742,10 @@ static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
         }
     }
     if(i == s->nb_streams){
+        static const enum AVMediaType stream_types[] = {AVMEDIA_TYPE_VIDEO, AVMEDIA_TYPE_AUDIO, AVMEDIA_TYPE_DATA};
         av_log(s, AV_LOG_WARNING, "Stream discovered after head already parsed\n");
         st = create_stream(s,
-             (int[]){AVMEDIA_TYPE_VIDEO, AVMEDIA_TYPE_AUDIO, AVMEDIA_TYPE_DATA}[stream_type]);
+                           stream_types[stream_type]);
         if (!st)
             return AVERROR(ENOMEM);
 
@@ -749,7 +758,7 @@ static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
         avio_seek(s->pb, next, SEEK_SET);
         continue;
     }
-    if ((flags & FLV_VIDEO_FRAMETYPE_MASK) == FLV_FRAME_KEY)
+    if ((flags & FLV_VIDEO_FRAMETYPE_MASK) == FLV_FRAME_KEY || stream_type == FLV_STREAM_TYPE_AUDIO)
         av_add_index_entry(st, pos, dts, size, 0, AVINDEX_KEYFRAME);
     break;
  }
@@ -902,7 +911,7 @@ static const AVOption options[] = {
     { NULL }
 };
 
-static const AVClass class = {
+static const AVClass flv_class = {
     .class_name = "flvdec",
     .item_name  = av_default_item_name,
     .option     = options,
@@ -919,5 +928,5 @@ AVInputFormat ff_flv_demuxer = {
     .read_seek      = flv_read_seek,
     .read_close     = flv_read_close,
     .extensions     = "flv",
-    .priv_class     = &class,
+    .priv_class     = &flv_class,
 };

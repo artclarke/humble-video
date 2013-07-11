@@ -86,7 +86,7 @@ fail to open.
 Set the video size in the captured video.
 
 @item framerate
-Set the framerate in the captured video.
+Set the frame rate in the captured video.
 
 @item sample_rate
 Set the sample rate (in Hz) of the captured audio.
@@ -590,8 +590,8 @@ Video4Linux2 input video device.
 "v4l2" can be used as alias for "video4linux2".
 
 If FFmpeg is built with v4l-utils support (by using the
-@code{--enable-libv4l2} configure option), the device will always rely
-on libv4l2.
+@code{--enable-libv4l2} configure option), it is possible to use it with the
+@code{-use_libv4l2} input device option.
 
 The name of the device to grab is a file device node, usually Linux
 systems tend to automatically create such nodes when the device
@@ -600,7 +600,7 @@ kind @file{/dev/video@var{N}}, where @var{N} is a number associated to
 the device.
 
 Video4Linux2 devices usually support a limited set of
-@var{width}x@var{height} sizes and framerates. You can check which are
+@var{width}x@var{height} sizes and frame rates. You can check which are
 supported using @command{-list_formats all} for Video4Linux2 devices.
 Some devices, like TV cards, support one or more standards. It is possible
 to list all the supported standards using @command{-list_standards all}.
@@ -623,7 +623,7 @@ ffplay -f video4linux2 -framerate 30 -video_size hd720 /dev/video0
 
 @item
 Grab and record the input of a video4linux2 device, leave the
-framerate and size as previously set:
+frame rate and size as previously set:
 @example
 ffmpeg -f video4linux2 -input_format mjpeg -i /dev/video0 out.mpeg
 @end example
@@ -640,7 +640,8 @@ list of the supported standards, use the @option{list_standards}
 option.
 
 @item channel
-Set the input channel number. Default to 0.
+Set the input channel number. Default to -1, which means using the
+previously selected channel.
 
 @item video_size
 Set the video frame size. The argument must be a string in the form
@@ -655,7 +656,7 @@ This option allows to select the input format, when several are
 available.
 
 @item framerate
-Set the preferred video framerate.
+Set the preferred video frame rate.
 
 @item list_formats
 List available formats (supported pixel formats, codecs, and frame
@@ -771,7 +772,7 @@ ffmpeg -f x11grab -follow_mouse 100 -r 25 -s cif -i :0.0 out.mpg
 
 @item framerate
 Set the grabbing frame rate. Default value is @code{ntsc},
-corresponding to a framerate of @code{30000/1001}.
+corresponding to a frame rate of @code{30000/1001}.
 
 @item show_region
 Show grabbed region on screen.

@@ -50,28 +50,13 @@ static const AVOption field_options[] = {
 
 AVFILTER_DEFINE_CLASS(field);
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
-{
-    FieldContext *field = ctx->priv;
-    static const char *shorthand[] = { "type", NULL };
-
-    field->class = &field_class;
-    av_opt_set_defaults(field);
-
-    return av_opt_set_from_string(field, args, shorthand, "=", ":");
-}
-
 static int config_props_output(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
     FieldContext *field = ctx->priv;
     AVFilterLink *inlink = ctx->inputs[0];
-    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(inlink->format);
-    int i;
 
-    for (i = 0; i < desc->nb_components; i++)
-        field->nb_planes = FFMAX(field->nb_planes, desc->comp[i].plane);
-    field->nb_planes++;
+    field->nb_planes = av_pix_fmt_count_planes(outlink->format);
 
     outlink->w = inlink->w;
     outlink->h = (inlink->h + (field->type == FIELD_TYPE_TOP)) / 2;
@@ -82,14 +67,14 @@ static int config_props_output(AVFilterLink *outlink)
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *inpicref)
+static int filter_frame(AVFilterLink *inlink, AVFrame *inpicref)
 {
     FieldContext *field = inlink->dst->priv;
     AVFilterLink *outlink = inlink->dst->outputs[0];
     int i;
 
-    inpicref->video->h = outlink->h;
-    inpicref->video->interlaced = 0;
+    inpicref->height = outlink->h;
+    inpicref->interlaced_frame = 0;
 
     for (i = 0; i < field->nb_planes; i++) {
         if (field->type == FIELD_TYPE_BOTTOM)
@@ -123,8 +108,6 @@ AVFilter avfilter_vf_field = {
     .description   = NULL_IF_CONFIG_SMALL("Extract a field from the input video."),
 
     .priv_size     = sizeof(FieldContext),
-    .init          = init,
-
     .inputs        = field_inputs,
     .outputs       = field_outputs,
     .priv_class    = &field_class,

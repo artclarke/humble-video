@@ -39,7 +39,6 @@ typedef struct HistogramContext {
     const AVClass *class;               ///< AVClass context for log and options purpose
     enum HistogramMode mode;
     unsigned       histogram[256];
-    unsigned       max_hval;
     int            ncomp;
     const uint8_t  *bg_color;
     const uint8_t  *fg_color;
@@ -48,6 +47,7 @@ typedef struct HistogramContext {
     int            step;
     int            waveform_mode;
     int            display_mode;
+    int            levels_mode;
 } HistogramContext;
 
 #define OFFSET(x) offsetof(HistogramContext, x)
@@ -68,24 +68,13 @@ static const AVOption histogram_options[] = {
     { "display_mode", "set display mode", OFFSET(display_mode), AV_OPT_TYPE_INT, {.i64=1}, 0, 1, FLAGS, "display_mode"},
     { "parade",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, FLAGS, "display_mode" },
     { "overlay", NULL, 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, FLAGS, "display_mode" },
+    { "levels_mode", "set levels mode", OFFSET(levels_mode), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, FLAGS, "levels_mode"},
+    { "linear",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, FLAGS, "levels_mode" },
+    { "logarithmic", NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, FLAGS, "levels_mode" },
     { NULL },
 };
 
 AVFILTER_DEFINE_CLASS(histogram);
-
-static av_cold int init(AVFilterContext *ctx, const char *args)
-{
-    HistogramContext *h = ctx->priv;
-    int ret;
-
-    h->class = &histogram_class;
-    av_opt_set_defaults(h);
-
-    if ((ret = (av_set_options_string(h, args, "=", ":"))) < 0)
-        return ret;
-
-    return 0;
-}
 
 static const enum AVPixelFormat color_pix_fmts[] = {
     AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUVA444P, AV_PIX_FMT_YUVJ444P,
@@ -94,7 +83,7 @@ static const enum AVPixelFormat color_pix_fmts[] = {
 
 static const enum AVPixelFormat levels_pix_fmts[] = {
     AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUVA444P, AV_PIX_FMT_YUVJ444P,
-    AV_PIX_FMT_GRAY8, AV_PIX_FMT_GBRP, AV_PIX_FMT_NONE
+    AV_PIX_FMT_GRAY8, AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRAP, AV_PIX_FMT_NONE
 };
 
 static int query_formats(AVFilterContext *ctx)
@@ -133,6 +122,7 @@ static int config_input(AVFilterLink *inlink)
     h->ncomp = desc->nb_components;
 
     switch (inlink->format) {
+    case AV_PIX_FMT_GBRAP:
     case AV_PIX_FMT_GBRP:
         h->bg_color = black_gbrp_color;
         h->fg_color = white_gbrp_color;
@@ -174,24 +164,23 @@ static int config_output(AVFilterLink *outlink)
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *in)
+static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 {
     HistogramContext *h   = inlink->dst->priv;
     AVFilterContext *ctx  = inlink->dst;
     AVFilterLink *outlink = ctx->outputs[0];
-    AVFilterBufferRef *out;
+    AVFrame *out;
     const uint8_t *src;
     uint8_t *dst;
-    int i, j, k, l, ret;
+    int i, j, k, l;
 
-    out = ff_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
+    out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
     if (!out) {
-        avfilter_unref_bufferp(&in);
+        av_frame_free(&in);
         return AVERROR(ENOMEM);
     }
 
     out->pts = in->pts;
-    out->pos = in->pos;
 
     for (k = 0; k < h->ncomp; k++)
         for (i = 0; i < outlink->h; i++)
@@ -201,18 +190,26 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *in)
     case MODE_LEVELS:
         for (k = 0; k < h->ncomp; k++) {
             int start = k * (h->level_height + h->scale_height) * h->display_mode;
+            double max_hval_log;
+            unsigned max_hval = 0;
 
-            for (i = 0; i < in->video->h; i++) {
+            for (i = 0; i < in->height; i++) {
                 src = in->data[k] + i * in->linesize[k];
-                for (j = 0; j < in->video->w; j++)
+                for (j = 0; j < in->width; j++)
                     h->histogram[src[j]]++;
             }
 
             for (i = 0; i < 256; i++)
-                h->max_hval = FFMAX(h->max_hval, h->histogram[i]);
+                max_hval = FFMAX(max_hval, h->histogram[i]);
+            max_hval_log = log2(max_hval + 1);
 
             for (i = 0; i < outlink->w; i++) {
-                int col_height = h->level_height - (float)h->histogram[i] / h->max_hval * h->level_height;
+                int col_height;
+
+                if (h->levels_mode)
+                    col_height = round(h->level_height * (1. - (log2(h->histogram[i] + 1) / max_hval_log)));
+                else
+                    col_height = h->level_height - (h->histogram[i] * (int64_t)h->level_height + max_hval - 1) / max_hval;
 
                 for (j = h->level_height - 1; j >= col_height; j--) {
                     if (h->display_mode) {
@@ -227,7 +224,6 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *in)
             }
 
             memset(h->histogram, 0, 256 * sizeof(unsigned));
-            h->max_hval = 0;
         }
         break;
     case MODE_WAVEFORM:
@@ -300,18 +296,8 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *in)
         av_assert0(0);
     }
 
-    ret = ff_filter_frame(outlink, out);
-    avfilter_unref_bufferp(&in);
-    if (ret < 0)
-        return ret;
-    return 0;
-}
-
-static av_cold void uninit(AVFilterContext *ctx)
-{
-    HistogramContext *h = ctx->priv;
-
-    av_opt_free(h);
+    av_frame_free(&in);
+    return ff_filter_frame(outlink, out);
 }
 
 static const AVFilterPad inputs[] = {
@@ -320,7 +306,6 @@ static const AVFilterPad inputs[] = {
         .type         = AVMEDIA_TYPE_VIDEO,
         .filter_frame = filter_frame,
         .config_props = config_input,
-        .min_perms    = AV_PERM_READ,
     },
     { NULL }
 };
@@ -338,8 +323,6 @@ AVFilter avfilter_vf_histogram = {
     .name          = "histogram",
     .description   = NULL_IF_CONFIG_SMALL("Compute and draw a histogram."),
     .priv_size     = sizeof(HistogramContext),
-    .init          = init,
-    .uninit        = uninit,
     .query_formats = query_formats,
     .inputs        = inputs,
     .outputs       = outputs,

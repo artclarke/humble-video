@@ -36,8 +36,8 @@
  *  8bit  compatible version   (0)
  *  8bit  sample size
  *  8bit  history mult         (40)
- *  8bit  initial history      (14)
- *  8bit  rice param limit     (10)
+ *  8bit  initial history      (10)
+ *  8bit  rice param limit     (14)
  *  8bit  channels
  * 16bit  maxRun               (255)
  * 32bit  max coded frame size (0 means unknown)
@@ -50,6 +50,7 @@
 #include "get_bits.h"
 #include "bytestream.h"
 #include "internal.h"
+#include "thread.h"
 #include "unary.h"
 #include "mathops.h"
 #include "alac_data.h"
@@ -287,12 +288,11 @@ static int decode_element(AVCodecContext *avctx, AVFrame *frame, int ch_index,
         return AVERROR_INVALIDDATA;
     }
     if (!alac->nb_samples) {
+        ThreadFrame tframe = { .f = frame };
         /* get output buffer */
         frame->nb_samples = output_samples;
-        if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-            av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+        if ((ret = ff_thread_get_buffer(avctx, &tframe, 0)) < 0)
             return ret;
-        }
     } else if (output_samples != alac->nb_samples) {
         av_log(avctx, AV_LOG_ERROR, "sample count mismatch: %u != %d\n",
                output_samples, alac->nb_samples);
@@ -445,7 +445,8 @@ static int alac_decode_frame(AVCodecContext *avctx, void *data,
     int channels;
     int ch, ret, got_end;
 
-    init_get_bits(&alac->gb, avpkt->data, avpkt->size * 8);
+    if ((ret = init_get_bits8(&alac->gb, avpkt->data, avpkt->size)) < 0)
+        return ret;
 
     got_end = 0;
     alac->nb_samples = 0;
@@ -588,8 +589,7 @@ static av_cold int alac_decode_init(AVCodecContext * avctx)
     case 24:
     case 32: avctx->sample_fmt = req_packed ? AV_SAMPLE_FMT_S32 : AV_SAMPLE_FMT_S32P;
              break;
-    default: av_log_ask_for_sample(avctx, "Sample depth %d is not supported.\n",
-                                   alac->sample_size);
+    default: avpriv_request_sample(avctx, "Sample depth %d", alac->sample_size);
              return AVERROR_PATCHWELCOME;
     }
     avctx->bits_per_raw_sample = alac->sample_size;
@@ -618,6 +618,13 @@ static av_cold int alac_decode_init(AVCodecContext * avctx)
     return 0;
 }
 
+static int init_thread_copy(AVCodecContext *avctx)
+{
+    ALACContext *alac = avctx->priv_data;
+    alac->avctx = avctx;
+    return allocate_buffers(alac);
+}
+
 AVCodec ff_alac_decoder = {
     .name           = "alac",
     .type           = AVMEDIA_TYPE_AUDIO,
@@ -626,6 +633,7 @@ AVCodec ff_alac_decoder = {
     .init           = alac_decode_init,
     .close          = alac_decode_close,
     .decode         = alac_decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
+    .init_thread_copy = ONLY_IF_THREADS_ENABLED(init_thread_copy),
+    .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
     .long_name      = NULL_IF_CONFIG_SMALL("ALAC (Apple Lossless Audio Codec)"),
 };

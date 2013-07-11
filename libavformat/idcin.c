@@ -68,7 +68,7 @@
  *       transmitting them to the video decoder
  */
 
-#include "libavutil/audioconvert.h"
+#include "libavutil/channel_layout.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
@@ -136,8 +136,8 @@ static int idcin_probe(AVProbeData *p)
     if (number > 2 || sample_rate && !number)
         return 0;
 
-    /* return half certainly since this check is a bit sketchy */
-    return AVPROBE_SCORE_MAX / 2;
+    /* return half certainty since this check is a bit sketchy */
+    return AVPROBE_SCORE_EXTENSION;
 }
 
 static int idcin_read_header(AVFormatContext *s)
@@ -196,8 +196,10 @@ static int idcin_read_header(AVFormatContext *s)
     st->codec->height = height;
 
     /* load up the Huffman tables into extradata */
-    st->codec->extradata_size = HUFFMAN_TABLE_SIZE;
     st->codec->extradata = av_malloc(HUFFMAN_TABLE_SIZE);
+    if (!st->codec->extradata)
+        return AVERROR(ENOMEM);
+    st->codec->extradata_size = HUFFMAN_TABLE_SIZE;
     ret = avio_read(pb, st->codec->extradata, HUFFMAN_TABLE_SIZE);
     if (ret < 0) {
         return ret;

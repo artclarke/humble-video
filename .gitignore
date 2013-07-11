@@ -6,6 +6,8 @@
 *.dylib
 *.exe
 *.exp
+*.gcda
+*.gcno
 *.h.c
 *.ilk
 *.lib
@@ -24,11 +26,13 @@
 /ffprobe
 /ffserver
 /config.*
+/coverage.info
 /version.h
 /doc/*.1
 /doc/*.3
 /doc/*.html
 /doc/*.pod
+/doc/config.texi
 /doc/avoptions_codec.texi
 /doc/avoptions_format.texi
 /doc/examples/decoding_encoding
@@ -43,6 +47,7 @@
 /doc/fate.txt
 /doc/doxy/html/
 /doc/print_options
+/lcov/
 /libavcodec/*_tablegen
 /libavcodec/*_tables.c
 /libavcodec/*_tables.h
@@ -52,6 +57,7 @@
 /tests/data/
 /tests/rotozoom
 /tests/tiny_psnr
+/tests/tiny_ssim
 /tests/videogen
 /tests/vsynth1/
 /tools/aviocat
@@ -61,6 +67,7 @@
 /tools/fourcc2pixfmt
 /tools/ffescape
 /tools/ffeval
+/tools/ffhash
 /tools/graph2dot
 /tools/ismindex
 /tools/pktdumper
@@ -68,3 +75,4 @@
 /tools/qt-faststart
 /tools/trasher
 /tools/seek_print
+/tools/zmqsend

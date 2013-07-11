@@ -31,17 +31,26 @@
 #undef NDEBUG
 #include <assert.h>
 
-#define PERM_RWP AV_PERM_WRITE | AV_PERM_PRESERVE | AV_PERM_REUSE
+typedef struct ThreadData {
+    AVFrame *frame;
+    int plane;
+    int w, h;
+    int parity;
+    int tff;
+} ThreadData;
 
 #define CHECK(j)\
-    {   int score = FFABS(cur[mrefs + off_left + (j)] - cur[prefs + off_left - (j)])\
+    {   int score = FFABS(cur[mrefs - 1 + (j)] - cur[prefs - 1 - (j)])\
                   + FFABS(cur[mrefs  +(j)] - cur[prefs  -(j)])\
-                  + FFABS(cur[mrefs + off_right + (j)] - cur[prefs + off_right - (j)]);\
+                  + FFABS(cur[mrefs + 1 + (j)] - cur[prefs + 1 - (j)]);\
         if (score < spatial_score) {\
             spatial_score= score;\
             spatial_pred= (cur[mrefs  +(j)] + cur[prefs  -(j)])>>1;\
 
-#define FILTER(start, end) \
+/* The is_not_edge argument here controls when the code will enter a branch
+ * which reads up to and including x-3 and x+3. */
+
+#define FILTER(start, end, is_not_edge) \
     for (x = start;  x < end; x++) { \
         int c = cur[mrefs]; \
         int d = (prev2[0] + next2[0])>>1; \
@@ -51,12 +60,10 @@
         int temporal_diff2 =(FFABS(next[mrefs] - c) + FFABS(next[prefs] - e) )>>1; \
         int diff = FFMAX3(temporal_diff0 >> 1, temporal_diff1, temporal_diff2); \
         int spatial_pred = (c+e) >> 1; \
-        int off_right = (x < w - 1) ? 1 : -1;\
-        int off_left  = x ? -1 : 1;\
-        int spatial_score = FFABS(cur[mrefs + off_left]  - cur[prefs + off_left]) + FFABS(c-e) \
-                          + FFABS(cur[mrefs + off_right] - cur[prefs + off_right]) - 1; \
  \
-        if (x > 2 && x < w - 3) {\
+        if (is_not_edge) {\
+            int spatial_score = FFABS(cur[mrefs - 1] - cur[prefs - 1]) + FFABS(c-e) \
+                              + FFABS(cur[mrefs + 1] - cur[prefs + 1]) - 1; \
             CHECK(-1) CHECK(-2) }} }} \
             CHECK( 1) CHECK( 2) }} }} \
         }\
@@ -97,12 +104,16 @@ static void filter_line_c(void *dst1,
     uint8_t *prev2 = parity ? prev : cur ;
     uint8_t *next2 = parity ? cur  : next;
 
-    FILTER(0, w)
+    /* The function is called with the pointers already pointing to data[3] and
+     * with 6 subtracted from the width.  This allows the FILTER macro to be
+     * called so that it processes all the pixels normally.  A constant value of
+     * true for is_not_edge lets the compiler ignore the if statement. */
+    FILTER(0, w, 1)
 }
 
+#define MAX_ALIGN 8
 static void filter_edges(void *dst1, void *prev1, void *cur1, void *next1,
-                         int w, int prefs, int mrefs, int parity, int mode,
-                         int l_edge)
+                         int w, int prefs, int mrefs, int parity, int mode)
 {
     uint8_t *dst  = dst1;
     uint8_t *prev = prev1;
@@ -112,16 +123,19 @@ static void filter_edges(void *dst1, void *prev1, void *cur1, void *next1,
     uint8_t *prev2 = parity ? prev : cur ;
     uint8_t *next2 = parity ? cur  : next;
 
-    FILTER(0, l_edge)
+    /* Only edge pixels need to be processed here.  A constant value of false
+     * for is_not_edge should let the compiler ignore the whole branch. */
+    FILTER(0, 3, 0)
 
-    dst  = (uint8_t*)dst1  + w - 3;
-    prev = (uint8_t*)prev1 + w - 3;
-    cur  = (uint8_t*)cur1  + w - 3;
-    next = (uint8_t*)next1 + w - 3;
+    dst  = (uint8_t*)dst1  + w - (MAX_ALIGN-1);
+    prev = (uint8_t*)prev1 + w - (MAX_ALIGN-1);
+    cur  = (uint8_t*)cur1  + w - (MAX_ALIGN-1);
+    next = (uint8_t*)next1 + w - (MAX_ALIGN-1);
     prev2 = (uint8_t*)(parity ? prev : cur);
     next2 = (uint8_t*)(parity ? cur  : next);
 
-    FILTER(w - 3, w)
+    FILTER(w - (MAX_ALIGN-1), w - 3, 1)
+    FILTER(w - 3, w, 0)
 }
 
 
@@ -140,12 +154,11 @@ static void filter_line_c_16bit(void *dst1,
     mrefs /= 2;
     prefs /= 2;
 
-    FILTER(0, w)
+    FILTER(0, w, 1)
 }
 
 static void filter_edges_16bit(void *dst1, void *prev1, void *cur1, void *next1,
-                               int w, int prefs, int mrefs, int parity, int mode,
-                               int l_edge)
+                               int w, int prefs, int mrefs, int parity, int mode)
 {
     uint16_t *dst  = dst1;
     uint16_t *prev = prev1;
@@ -154,72 +167,82 @@ static void filter_edges_16bit(void *dst1, void *prev1, void *cur1, void *next1,
     int x;
     uint16_t *prev2 = parity ? prev : cur ;
     uint16_t *next2 = parity ? cur  : next;
+    mrefs /= 2;
+    prefs /= 2;
 
-    FILTER(0, l_edge)
+    FILTER(0, 3, 0)
 
-    dst   = (uint16_t*)dst1  + w - 3;
-    prev  = (uint16_t*)prev1 + w - 3;
-    cur   = (uint16_t*)cur1  + w - 3;
-    next  = (uint16_t*)next1 + w - 3;
+    dst   = (uint16_t*)dst1  + w - (MAX_ALIGN/2-1);
+    prev  = (uint16_t*)prev1 + w - (MAX_ALIGN/2-1);
+    cur   = (uint16_t*)cur1  + w - (MAX_ALIGN/2-1);
+    next  = (uint16_t*)next1 + w - (MAX_ALIGN/2-1);
     prev2 = (uint16_t*)(parity ? prev : cur);
     next2 = (uint16_t*)(parity ? cur  : next);
 
-    FILTER(w - 3, w)
+    FILTER(w - (MAX_ALIGN/2-1), w - 3, 1)
+    FILTER(w - 3, w, 0)
 }
 
-static void filter(AVFilterContext *ctx, AVFilterBufferRef *dstpic,
+static int filter_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
+{
+    YADIFContext *s = ctx->priv;
+    ThreadData *td  = arg;
+    int refs = s->cur->linesize[td->plane];
+    int df = (s->csp->comp[td->plane].depth_minus1 + 8) / 8;
+    int pix_3 = 3 * df;
+    int slice_start = (td->h *  jobnr   ) / nb_jobs;
+    int slice_end   = (td->h * (jobnr+1)) / nb_jobs;
+    int y;
+
+    /* filtering reads 3 pixels to the left/right; to avoid invalid reads,
+     * we need to call the c variant which avoids this for border pixels
+     */
+    for (y = slice_start; y < slice_end; y++) {
+        if ((y ^ td->parity) & 1) {
+            uint8_t *prev = &s->prev->data[td->plane][y * refs];
+            uint8_t *cur  = &s->cur ->data[td->plane][y * refs];
+            uint8_t *next = &s->next->data[td->plane][y * refs];
+            uint8_t *dst  = &td->frame->data[td->plane][y * td->frame->linesize[td->plane]];
+            int     mode  = y == 1 || y + 2 == td->h ? 2 : s->mode;
+            s->filter_line(dst + pix_3, prev + pix_3, cur + pix_3,
+                           next + pix_3, td->w - (3 + MAX_ALIGN/df-1),
+                           y + 1 < td->h ? refs : -refs,
+                           y ? -refs : refs,
+                           td->parity ^ td->tff, mode);
+            s->filter_edges(dst, prev, cur, next, td->w,
+                            y + 1 < td->h ? refs : -refs,
+                            y ? -refs : refs,
+                            td->parity ^ td->tff, mode);
+        } else {
+            memcpy(&td->frame->data[td->plane][y * td->frame->linesize[td->plane]],
+                   &s->cur->data[td->plane][y * refs], td->w * df);
+        }
+    }
+    return 0;
+}
+
+static void filter(AVFilterContext *ctx, AVFrame *dstpic,
                    int parity, int tff)
 {
     YADIFContext *yadif = ctx->priv;
-    int y, i;
+    ThreadData td = { .frame = dstpic, .parity = parity, .tff = tff };
+    int i;
 
     for (i = 0; i < yadif->csp->nb_components; i++) {
-        int w = dstpic->video->w;
-        int h = dstpic->video->h;
-        int refs = yadif->cur->linesize[i];
-        int df = (yadif->csp->comp[i].depth_minus1 + 8) / 8;
-        int l_edge, l_edge_pix;
+        int w = dstpic->width;
+        int h = dstpic->height;
 
         if (i == 1 || i == 2) {
-        /* Why is this not part of the per-plane description thing? */
-            w >>= yadif->csp->log2_chroma_w;
-            h >>= yadif->csp->log2_chroma_h;
+            w = FF_CEIL_RSHIFT(w, yadif->csp->log2_chroma_w);
+            h = FF_CEIL_RSHIFT(h, yadif->csp->log2_chroma_h);
         }
 
-        /* filtering reads 3 pixels to the left/right; to avoid invalid reads,
-         * we need to call the c variant which avoids this for border pixels
-         */
-        l_edge     = yadif->req_align;
-        l_edge_pix = l_edge / df;
 
-        for (y = 0; y < h; y++) {
-            if ((y ^ parity) & 1) {
-                uint8_t *prev = &yadif->prev->data[i][y * refs];
-                uint8_t *cur  = &yadif->cur ->data[i][y * refs];
-                uint8_t *next = &yadif->next->data[i][y * refs];
-                uint8_t *dst  = &dstpic->data[i][y * dstpic->linesize[i]];
-                int     mode  = y == 1 || y + 2 == h ? 2 : yadif->mode;
-                if (yadif->req_align) {
-                    yadif->filter_line(dst + l_edge, prev + l_edge, cur + l_edge,
-                                       next + l_edge, w - l_edge_pix - 3,
-                                       y + 1 < h ? refs : -refs,
-                                       y ? -refs : refs,
-                                       parity ^ tff, mode);
-                    yadif->filter_edges(dst, prev, cur, next, w,
-                                         y + 1 < h ? refs : -refs,
-                                         y ? -refs : refs,
-                                         parity ^ tff, mode, l_edge_pix);
-                } else {
-                    yadif->filter_line(dst, prev, cur, next + l_edge, w,
-                                       y + 1 < h ? refs : -refs,
-                                       y ? -refs : refs,
-                                       parity ^ tff, mode);
-                }
-            } else {
-                memcpy(&dstpic->data[i][y * dstpic->linesize[i]],
-                       &yadif->cur->data[i][y * refs], w * df);
-            }
-        }
+        td.w       = w;
+        td.h       = h;
+        td.plane   = i;
+
+        ctx->internal->execute(ctx, filter_slice, &td, NULL, FFMIN(h, ctx->graph->nb_threads));
     }
 
     emms_c();
@@ -232,19 +255,19 @@ static int return_frame(AVFilterContext *ctx, int is_second)
     int tff, ret;
 
     if (yadif->parity == -1) {
-        tff = yadif->cur->video->interlaced ?
-              yadif->cur->video->top_field_first : 1;
+        tff = yadif->cur->interlaced_frame ?
+              yadif->cur->top_field_first : 1;
     } else {
         tff = yadif->parity ^ 1;
     }
 
     if (is_second) {
-        yadif->out = ff_get_video_buffer(link, PERM_RWP, link->w, link->h);
+        yadif->out = ff_get_video_buffer(link, link->w, link->h);
         if (!yadif->out)
             return AVERROR(ENOMEM);
 
-        avfilter_copy_buffer_ref_props(yadif->out, yadif->cur);
-        yadif->out->video->interlaced = 0;
+        av_frame_copy_props(yadif->out, yadif->cur);
+        yadif->out->interlaced_frame = 0;
     }
 
     filter(ctx, yadif->out, tff ^ !is_second, tff);
@@ -265,47 +288,46 @@ static int return_frame(AVFilterContext *ctx, int is_second)
     return ret;
 }
 
-static int filter_frame(AVFilterLink *link, AVFilterBufferRef *picref)
+static int filter_frame(AVFilterLink *link, AVFrame *frame)
 {
     AVFilterContext *ctx = link->dst;
     YADIFContext *yadif = ctx->priv;
 
-    av_assert0(picref);
+    av_assert0(frame);
 
     if (yadif->frame_pending)
         return_frame(ctx, 1);
 
     if (yadif->prev)
-        avfilter_unref_buffer(yadif->prev);
+        av_frame_free(&yadif->prev);
     yadif->prev = yadif->cur;
     yadif->cur  = yadif->next;
-    yadif->next = picref;
+    yadif->next = frame;
 
     if (!yadif->cur)
         return 0;
 
-    if (yadif->deint && !yadif->cur->video->interlaced) {
-        yadif->out  = avfilter_ref_buffer(yadif->cur, ~AV_PERM_WRITE);
+    if ((yadif->deint && !yadif->cur->interlaced_frame) || ctx->is_disabled) {
+        yadif->out  = av_frame_clone(yadif->cur);
         if (!yadif->out)
             return AVERROR(ENOMEM);
 
-        avfilter_unref_bufferp(&yadif->prev);
+        av_frame_free(&yadif->prev);
         if (yadif->out->pts != AV_NOPTS_VALUE)
             yadif->out->pts *= 2;
         return ff_filter_frame(ctx->outputs[0], yadif->out);
     }
 
     if (!yadif->prev &&
-        !(yadif->prev = avfilter_ref_buffer(yadif->cur, ~AV_PERM_WRITE)))
+        !(yadif->prev = av_frame_clone(yadif->cur)))
         return AVERROR(ENOMEM);
 
-    yadif->out = ff_get_video_buffer(ctx->outputs[0], PERM_RWP,
-                                     link->w, link->h);
+    yadif->out = ff_get_video_buffer(ctx->outputs[0], link->w, link->h);
     if (!yadif->out)
         return AVERROR(ENOMEM);
 
-    avfilter_copy_buffer_ref_props(yadif->out, yadif->cur);
-    yadif->out->video->interlaced = 0;
+    av_frame_copy_props(yadif->out, yadif->cur);
+    yadif->out->interlaced_frame = 0;
 
     if (yadif->out->pts != AV_NOPTS_VALUE)
         yadif->out->pts *= 2;
@@ -332,7 +354,7 @@ static int request_frame(AVFilterLink *link)
         ret  = ff_request_frame(link->src->inputs[0]);
 
         if (ret == AVERROR_EOF && yadif->cur) {
-            AVFilterBufferRef *next = avfilter_ref_buffer(yadif->next, ~AV_PERM_WRITE);
+            AVFrame *next = av_frame_clone(yadif->next);
 
             if (!next)
                 return AVERROR(ENOMEM);
@@ -349,40 +371,13 @@ static int request_frame(AVFilterLink *link)
     return 0;
 }
 
-#define OFFSET(x) offsetof(YADIFContext, x)
-#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
-
-#define CONST(name, help, val, unit) { name, help, 0, AV_OPT_TYPE_CONST, {.i64=val}, INT_MIN, INT_MAX, FLAGS, unit }
-
-static const AVOption yadif_options[] = {
-    { "mode",   "specify the interlacing mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64=YADIF_MODE_SEND_FRAME}, 0, 3, FLAGS, "mode"},
-    CONST("send_frame",           "send one frame for each frame",                                     YADIF_MODE_SEND_FRAME,           "mode"),
-    CONST("send_field",           "send one frame for each field",                                     YADIF_MODE_SEND_FIELD,           "mode"),
-    CONST("send_frame_nospatial", "send one frame for each frame, but skip spatial interlacing check", YADIF_MODE_SEND_FRAME_NOSPATIAL, "mode"),
-    CONST("send_field_nospatial", "send one frame for each field, but skip spatial interlacing check", YADIF_MODE_SEND_FIELD_NOSPATIAL, "mode"),
-
-    { "parity", "specify the assumed picture field parity", OFFSET(parity), AV_OPT_TYPE_INT, {.i64=YADIF_PARITY_AUTO}, -1, 1, FLAGS, "parity" },
-    CONST("tff",  "assume top field first",    YADIF_PARITY_TFF,  "parity"),
-    CONST("bff",  "assume bottom field first", YADIF_PARITY_BFF,  "parity"),
-    CONST("auto", "auto detect parity",        YADIF_PARITY_AUTO, "parity"),
-
-    { "deint", "specify which frames to deinterlace", OFFSET(deint), AV_OPT_TYPE_INT, {.i64=YADIF_DEINT_ALL}, 0, 1, FLAGS, "deint" },
-    CONST("all",        "deinterlace all frames",                       YADIF_DEINT_ALL,         "deint"),
-    CONST("interlaced", "only deinterlace frames marked as interlaced", YADIF_DEINT_INTERLACED,  "deint"),
-
-    {NULL},
-};
-
-AVFILTER_DEFINE_CLASS(yadif);
-
 static av_cold void uninit(AVFilterContext *ctx)
 {
     YADIFContext *yadif = ctx->priv;
 
-    avfilter_unref_bufferp(&yadif->prev);
-    avfilter_unref_bufferp(&yadif->cur );
-    avfilter_unref_bufferp(&yadif->next);
-    av_opt_free(yadif);
+    av_frame_free(&yadif->prev);
+    av_frame_free(&yadif->cur );
+    av_frame_free(&yadif->next);
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -426,24 +421,6 @@ static int query_formats(AVFilterContext *ctx)
     return 0;
 }
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
-{
-    YADIFContext *yadif = ctx->priv;
-    static const char *shorthand[] = { "mode", "parity", "deint", NULL };
-    int ret;
-
-    yadif->class = &yadif_class;
-    av_opt_set_defaults(yadif);
-
-    if ((ret = av_opt_set_from_string(yadif, args, shorthand, "=", ":")) < 0)
-        return ret;
-
-    av_log(ctx, AV_LOG_VERBOSE, "mode:%d parity:%d deint:%d\n",
-           yadif->mode, yadif->parity, yadif->deint);
-
-    return 0;
-}
-
 static int config_props(AVFilterLink *link)
 {
     AVFilterContext *ctx = link->src;
@@ -469,20 +446,46 @@ static int config_props(AVFilterLink *link)
     } else {
         s->filter_line  = filter_line_c;
         s->filter_edges = filter_edges;
-
-        if (ARCH_X86)
-            ff_yadif_init_x86(s);
     }
+
+    if (ARCH_X86)
+        ff_yadif_init_x86(s);
 
     return 0;
 }
+
+
+#define OFFSET(x) offsetof(YADIFContext, x)
+#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
+
+#define CONST(name, help, val, unit) { name, help, 0, AV_OPT_TYPE_CONST, {.i64=val}, INT_MIN, INT_MAX, FLAGS, unit }
+
+static const AVOption yadif_options[] = {
+    { "mode",   "specify the interlacing mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64=YADIF_MODE_SEND_FRAME}, 0, 3, FLAGS, "mode"},
+    CONST("send_frame",           "send one frame for each frame",                                     YADIF_MODE_SEND_FRAME,           "mode"),
+    CONST("send_field",           "send one frame for each field",                                     YADIF_MODE_SEND_FIELD,           "mode"),
+    CONST("send_frame_nospatial", "send one frame for each frame, but skip spatial interlacing check", YADIF_MODE_SEND_FRAME_NOSPATIAL, "mode"),
+    CONST("send_field_nospatial", "send one frame for each field, but skip spatial interlacing check", YADIF_MODE_SEND_FIELD_NOSPATIAL, "mode"),
+
+    { "parity", "specify the assumed picture field parity", OFFSET(parity), AV_OPT_TYPE_INT, {.i64=YADIF_PARITY_AUTO}, -1, 1, FLAGS, "parity" },
+    CONST("tff",  "assume top field first",    YADIF_PARITY_TFF,  "parity"),
+    CONST("bff",  "assume bottom field first", YADIF_PARITY_BFF,  "parity"),
+    CONST("auto", "auto detect parity",        YADIF_PARITY_AUTO, "parity"),
+
+    { "deint", "specify which frames to deinterlace", OFFSET(deint), AV_OPT_TYPE_INT, {.i64=YADIF_DEINT_ALL}, 0, 1, FLAGS, "deint" },
+    CONST("all",        "deinterlace all frames",                       YADIF_DEINT_ALL,         "deint"),
+    CONST("interlaced", "only deinterlace frames marked as interlaced", YADIF_DEINT_INTERLACED,  "deint"),
+
+    {NULL},
+};
+
+AVFILTER_DEFINE_CLASS(yadif);
 
 static const AVFilterPad avfilter_vf_yadif_inputs[] = {
     {
         .name             = "default",
         .type             = AVMEDIA_TYPE_VIDEO,
         .filter_frame     = filter_frame,
-        .min_perms        = AV_PERM_PRESERVE,
     },
     { NULL }
 };
@@ -502,12 +505,11 @@ AVFilter avfilter_vf_yadif = {
     .description   = NULL_IF_CONFIG_SMALL("Deinterlace the input image."),
 
     .priv_size     = sizeof(YADIFContext),
-    .init          = init,
+    .priv_class    = &yadif_class,
     .uninit        = uninit,
     .query_formats = query_formats,
 
     .inputs    = avfilter_vf_yadif_inputs,
     .outputs   = avfilter_vf_yadif_outputs,
-
-    .priv_class = &yadif_class,
+    .flags     = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
 };

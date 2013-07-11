@@ -22,6 +22,7 @@
 #include "avcodec.h"
 #include "get_bits.h"
 #include "dsputil.h"
+#include "internal.h"
 
 #define MAX_HUFF_CODES 16
 
@@ -264,12 +265,8 @@ static int mp_decode_frame(AVCodecContext *avctx,
     GetBitContext gb;
     int i, count1, count2, sz, ret;
 
-    mp->frame.reference = 3;
-    mp->frame.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE | FF_BUFFER_HINTS_REUSABLE;
-    if ((ret = avctx->reget_buffer(avctx, &mp->frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+    if ((ret = ff_reget_buffer(avctx, &mp->frame)) < 0)
         return ret;
-    }
 
     /* le32 bitstream msb first */
     av_fast_malloc(&mp->bswapbuf, &mp->bswapbuf_size, buf_size + FF_INPUT_BUFFER_PADDING_SIZE);
@@ -314,8 +311,9 @@ static int mp_decode_frame(AVCodecContext *avctx,
     ff_free_vlc(&mp->vlc);
 
 end:
+    if ((ret = av_frame_ref(data, &mp->frame)) < 0)
+        return ret;
     *got_frame       = 1;
-    *(AVFrame *)data = mp->frame;
     return buf_size;
 }
 
@@ -327,8 +325,7 @@ static av_cold int mp_decode_end(AVCodecContext *avctx)
     av_freep(&mp->vpt);
     av_freep(&mp->hpt);
     av_freep(&mp->bswapbuf);
-    if (mp->frame.data[0])
-        avctx->release_buffer(avctx, &mp->frame);
+    av_frame_unref(&mp->frame);
 
     return 0;
 }

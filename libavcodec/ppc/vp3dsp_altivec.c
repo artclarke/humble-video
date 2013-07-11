@@ -23,13 +23,12 @@
 #include "config.h"
 #include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
-#include "libavcodec/vp3dsp.h"
-
-#if HAVE_ALTIVEC
-
 #include "libavutil/ppc/types_altivec.h"
 #include "libavutil/ppc/util_altivec.h"
+#include "libavcodec/vp3dsp.h"
 #include "dsputil_altivec.h"
+
+#if HAVE_ALTIVEC
 
 static const vec_s16 constants =
     {0, 64277, 60547, 54491, 46341, 36410, 25080, 12785};
@@ -184,7 +183,6 @@ av_cold void ff_vp3dsp_init_ppc(VP3DSPContext *c, int flags)
     if (av_get_cpu_flags() & AV_CPU_FLAG_ALTIVEC) {
         c->idct_put  = vp3_idct_put_altivec;
         c->idct_add  = vp3_idct_add_altivec;
-        c->idct_perm = FF_TRANSPOSE_IDCT_PERM;
     }
 #endif
 }

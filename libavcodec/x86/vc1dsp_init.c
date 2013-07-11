@@ -27,7 +27,7 @@
 #include "libavutil/cpu.h"
 #include "libavutil/x86/cpu.h"
 #include "libavcodec/vc1dsp.h"
-#include "dsputil_mmx.h"
+#include "dsputil_x86.h"
 #include "vc1dsp.h"
 #include "config.h"
 
@@ -63,7 +63,7 @@ static void vc1_h_loop_filter16_sse4(uint8_t *src, int stride, int pq)
 }
 
 static void avg_vc1_mspel_mc00_mmxext(uint8_t *dst, const uint8_t *src,
-                                      int stride, int rnd)
+                                      ptrdiff_t stride, int rnd)
 {
     ff_avg_pixels8_mmxext(dst, src, stride, 8);
 }

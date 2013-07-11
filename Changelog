@@ -1,6 +1,78 @@
 Entries are sorted chronologically from oldest to youngest within each release,
 releases are sorted from youngest to oldest.
 
+version 2.0:
+
+- curves filter
+- reference-counting for AVFrame and AVPacket data
+- ffmpeg now fails when input options are used for output file
+  or vice versa
+- support for Monkey's Audio versions from 3.93
+- perms and aperms filters
+- audio filtering support in ffplay
+- 10% faster aac encoding on x86 and MIPS
+- sine audio filter source
+- WebP demuxing and decoding support
+- new ffmpeg options -filter_script and -filter_complex_script, which allow a
+  filtergraph description to be read from a file
+- OpenCL support
+- audio phaser filter
+- separatefields filter
+- libquvi demuxer
+- uniform options syntax across all filters
+- telecine filter
+- new interlace filter
+- smptehdbars source
+- inverse telecine filters (fieldmatch and decimate)
+- colorbalance filter
+- colorchannelmixer filter
+- The matroska demuxer can now output proper verbatim ASS packets. It will
+  become the default at the next libavformat major bump.
+- decent native animated GIF encoding
+- asetrate filter
+- interleave filter
+- timeline editing with filters
+- vidstabdetect and vidstabtransform filters for video stabilization using
+  the vid.stab library
+- astats filter
+- trim and atrim filters
+- ffmpeg -t and -ss (output-only) options are now sample-accurate when
+  transcoding audio
+- Matroska muxer can now put the index at the beginning of the file.
+- extractplanes filter
+- avectorscope filter
+- ADPCM DTK decoder
+- ADP demuxer
+- RSD demuxer
+- RedSpark demuxer
+- ADPCM IMA Radical decoder
+- zmq filters
+- DCT denoiser filter (dctdnoiz)
+- Wavelet denoiser filter ported from libmpcodecs as owdenoise (formerly "ow")
+- Apple Intermediate Codec decoder
+- Escape 130 video decoder
+- FTP protocol support
+- V4L2 output device
+- 3D LUT filter (lut3d)
+- SMPTE 302M audio encoder
+- support for slice multithreading in libavfilter
+- Hald CLUT support (generation and filtering)
+- VC-1 interlaced B-frame support
+- support for WavPack muxing (raw and in Matroska)
+- XVideo output device
+- vignette filter
+- True Audio (TTA) encoder
+- Go2Webinar decoder
+- mcdeint filter ported from libmpcodecs
+- sab filter ported from libmpcodecs
+- ffprobe -show_chapters option
+- WavPack encoding through libwavpack
+- rotate filter
+- spp filter ported from libmpcodecs
+- libgme support
+- psnr filter
+
+
 version 1.2:
 
 - VDPAU hardware acceleration through normal hwaccel

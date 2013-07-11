@@ -41,7 +41,7 @@ enum ColorMode    { CHANNEL, INTENSITY, NB_CLMODES };
 typedef struct {
     const AVClass *class;
     int w, h;
-    AVFilterBufferRef *outpicref;
+    AVFrame *outpicref;
     int req_fullfilled;
     int nb_display_channels;
     int channel_height;
@@ -97,20 +97,6 @@ static const struct {
     {    1,                  1,                  0,                   0 }
 };
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
-{
-    ShowSpectrumContext *showspectrum = ctx->priv;
-    int err;
-
-    showspectrum->class = &showspectrum_class;
-    av_opt_set_defaults(showspectrum);
-
-    if ((err = av_set_options_string(showspectrum, args, "=", ":")) < 0)
-        return err;
-
-    return 0;
-}
-
 static av_cold void uninit(AVFilterContext *ctx)
 {
     ShowSpectrumContext *showspectrum = ctx->priv;
@@ -122,7 +108,7 @@ static av_cold void uninit(AVFilterContext *ctx)
         av_freep(&showspectrum->rdft_data[i]);
     av_freep(&showspectrum->rdft_data);
     av_freep(&showspectrum->window_func_lut);
-    avfilter_unref_bufferp(&showspectrum->outpicref);
+    av_frame_free(&showspectrum->outpicref);
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -179,7 +165,7 @@ static int config_output(AVFilterLink *outlink)
     /* (re-)configuration if the video output changed (or first init) */
     if (rdft_bits != showspectrum->rdft_bits) {
         size_t rdft_size, rdft_listsize;
-        AVFilterBufferRef *outpicref;
+        AVFrame *outpicref;
 
         av_rdft_end(showspectrum->rdft);
         showspectrum->rdft = av_rdft_init(rdft_bits, DFT_R2C);
@@ -219,14 +205,17 @@ static int config_output(AVFilterLink *outlink)
             showspectrum->window_func_lut[i] = .5f * (1 - cos(2*M_PI*i / (win_size-1)));
 
         /* prepare the initial picref buffer (black frame) */
-        avfilter_unref_bufferp(&showspectrum->outpicref);
+        av_frame_free(&showspectrum->outpicref);
         showspectrum->outpicref = outpicref =
-            ff_get_video_buffer(outlink, AV_PERM_WRITE|AV_PERM_PRESERVE|AV_PERM_REUSE2,
-                                outlink->w, outlink->h);
+            ff_get_video_buffer(outlink, outlink->w, outlink->h);
         if (!outpicref)
             return AVERROR(ENOMEM);
         outlink->sample_aspect_ratio = (AVRational){1,1};
-        memset(outpicref->data[0], 0, outlink->h * outpicref->linesize[0]);
+        for (i = 0; i < outlink->h; i++) {
+            memset(outpicref->data[0] + i * outpicref->linesize[0],   0, outlink->w);
+            memset(outpicref->data[1] + i * outpicref->linesize[1], 128, outlink->w);
+            memset(outpicref->data[2] + i * outpicref->linesize[2], 128, outlink->w);
+        }
     }
 
     if (showspectrum->xpos >= outlink->w)
@@ -241,7 +230,7 @@ static int config_output(AVFilterLink *outlink)
     return 0;
 }
 
-inline static void push_frame(AVFilterLink *outlink)
+inline static int push_frame(AVFilterLink *outlink)
 {
     ShowSpectrumContext *showspectrum = outlink->src->priv;
 
@@ -251,7 +240,7 @@ inline static void push_frame(AVFilterLink *outlink)
     showspectrum->filled = 0;
     showspectrum->req_fullfilled = 1;
 
-    ff_filter_frame(outlink, avfilter_ref_buffer(showspectrum->outpicref, ~AV_PERM_WRITE));
+    return ff_filter_frame(outlink, av_frame_clone(showspectrum->outpicref));
 }
 
 static int request_frame(AVFilterLink *outlink)
@@ -270,12 +259,13 @@ static int request_frame(AVFilterLink *outlink)
     return ret;
 }
 
-static int plot_spectrum_column(AVFilterLink *inlink, AVFilterBufferRef *insamples, int nb_samples)
+static int plot_spectrum_column(AVFilterLink *inlink, AVFrame *insamples, int nb_samples)
 {
+    int ret;
     AVFilterContext *ctx = inlink->dst;
     AVFilterLink *outlink = ctx->outputs[0];
     ShowSpectrumContext *showspectrum = ctx->priv;
-    AVFilterBufferRef *outpicref = showspectrum->outpicref;
+    AVFrame *outpicref = showspectrum->outpicref;
 
     /* nb_freq contains the power of two superior or equal to the output image
      * height (or half the RDFT window size) */
@@ -454,27 +444,31 @@ static int plot_spectrum_column(AVFilterLink *inlink, AVFilterBufferRef *insampl
             av_rescale_q(showspectrum->consumed,
                          (AVRational){ 1, inlink->sample_rate },
                          outlink->time_base);
-        push_frame(outlink);
+        ret = push_frame(outlink);
+        if (ret < 0)
+            return ret;
     }
 
     return add_samples;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *insamples)
+static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
 {
     AVFilterContext *ctx = inlink->dst;
     ShowSpectrumContext *showspectrum = ctx->priv;
-    int left_samples = insamples->audio->nb_samples;
+    int ret = 0, left_samples = insamples->nb_samples;
 
     showspectrum->consumed = 0;
     while (left_samples) {
-        const int added_samples = plot_spectrum_column(inlink, insamples, left_samples);
-        showspectrum->consumed += added_samples;
-        left_samples -= added_samples;
+        int ret = plot_spectrum_column(inlink, insamples, left_samples);
+        if (ret < 0)
+            break;
+        showspectrum->consumed += ret;
+        left_samples -= ret;
     }
 
-    avfilter_unref_buffer(insamples);
-    return 0;
+    av_frame_free(&insamples);
+    return ret;
 }
 
 static const AVFilterPad showspectrum_inputs[] = {
@@ -482,7 +476,6 @@ static const AVFilterPad showspectrum_inputs[] = {
         .name         = "default",
         .type         = AVMEDIA_TYPE_AUDIO,
         .filter_frame = filter_frame,
-        .min_perms    = AV_PERM_READ,
     },
     { NULL }
 };
@@ -500,7 +493,6 @@ static const AVFilterPad showspectrum_outputs[] = {
 AVFilter avfilter_avf_showspectrum = {
     .name           = "showspectrum",
     .description    = NULL_IF_CONFIG_SMALL("Convert input audio to a spectrum video output."),
-    .init           = init,
     .uninit         = uninit,
     .query_formats  = query_formats,
     .priv_size      = sizeof(ShowSpectrumContext),

@@ -43,8 +43,6 @@
  * Only tracks with associated descriptors will be decoded. "Highly Desirable" SMPTE 377M D.1
  */
 
-//#define DEBUG
-
 #include "libavutil/aes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/mathematics.h"
@@ -149,6 +147,7 @@ typedef struct {
     int frame_layout; /* See MXFFrameLayout enum */
     int channels;
     int bits_per_sample;
+    int field_dominance;
     unsigned int component_depth;
     unsigned int horiz_subsampling;
     unsigned int vert_subsampling;
@@ -411,8 +410,7 @@ static int mxf_read_primer_pack(void *arg, AVIOContext *pb, int tag, int size, U
     int item_len = avio_rb32(pb);
 
     if (item_len != 18) {
-        av_log_ask_for_sample(pb, "unsupported primer pack item length %d\n",
-                              item_len);
+        avpriv_request_sample(pb, "Primer pack item length %d", item_len);
         return AVERROR_PATCHWELCOME;
     }
     if (item_num > 65536) {
@@ -838,6 +836,9 @@ static int mxf_read_generic_descriptor(void *arg, AVIOContext *pb, int tag, int 
     case 0x320E:
         descriptor->aspect_ratio.num = avio_rb32(pb);
         descriptor->aspect_ratio.den = avio_rb32(pb);
+        break;
+    case 0x3212:
+        descriptor->field_dominance = avio_r8(pb);
         break;
     case 0x3301:
         descriptor->component_depth = avio_rb32(pb);
@@ -1604,7 +1605,7 @@ static int mxf_parse_structural_metadata(MXFContext *mxf)
                 memcpy(st->codec->extradata, descriptor->extradata, descriptor->extradata_size);
                 st->codec->extradata_size = descriptor->extradata_size;
             }
-        } else if(st->codec->codec_id == CODEC_ID_H264) {
+        } else if(st->codec->codec_id == AV_CODEC_ID_H264) {
             ff_generate_avci_extradata(st);
         }
         if (st->codec->codec_type != AVMEDIA_TYPE_DATA && (*essence_container_ul)[15] > 0x01) {
@@ -1616,6 +1617,124 @@ static int mxf_parse_structural_metadata(MXFContext *mxf)
     ret = 0;
 fail_and_free:
     return ret;
+}
+
+static int mxf_read_utf16_string(AVIOContext *pb, int size, char** str)
+{
+    int ret;
+    size_t buf_size;
+
+    if (size < 0)
+        return AVERROR(EINVAL);
+
+    buf_size = size + size/2 + 1;
+    *str = av_malloc(buf_size);
+    if (!*str)
+        return AVERROR(ENOMEM);
+
+    if ((ret = avio_get_str16be(pb, size, *str, buf_size)) < 0) {
+        av_freep(str);
+        return ret;
+    }
+
+    return ret;
+}
+
+static int mxf_uid_to_str(UID uid, char **str)
+{
+    int i;
+    char *p;
+    p = *str = av_mallocz(sizeof(UID) * 2 + 4 + 1);
+    if (!p)
+        return AVERROR(ENOMEM);
+    for (i = 0; i < sizeof(UID); i++) {
+        snprintf(p, 2 + 1, "%.2x", uid[i]);
+        p += 2;
+        if (i == 3 || i == 5 || i == 7 || i == 9) {
+            snprintf(p, 1 + 1, "-");
+            p++;
+        }
+    }
+    return 0;
+}
+
+static int mxf_timestamp_to_str(uint64_t timestamp, char **str)
+{
+    struct tm time = {0};
+    time.tm_year = (timestamp >> 48) - 1900;
+    time.tm_mon  = (timestamp >> 40 & 0xFF) - 1;
+    time.tm_mday = (timestamp >> 32 & 0xFF);
+    time.tm_hour = (timestamp >> 24 & 0xFF);
+    time.tm_min  = (timestamp >> 16 & 0xFF);
+    time.tm_sec  = (timestamp >> 8  & 0xFF);
+
+    /* ensure month/day are valid */
+    time.tm_mon  = FFMAX(time.tm_mon, 0);
+    time.tm_mday = FFMAX(time.tm_mday, 1);
+
+    *str = av_mallocz(32);
+    if (!*str)
+        return AVERROR(ENOMEM);
+    strftime(*str, 32, "%Y-%m-%d %H:%M:%S", &time);
+
+    return 0;
+}
+
+#define SET_STR_METADATA(pb, name, str) do { \
+    if ((ret = mxf_read_utf16_string(pb, size, &str)) < 0) \
+        return ret; \
+    av_dict_set(&s->metadata, name, str, AV_DICT_DONT_STRDUP_VAL); \
+} while (0)
+
+#define SET_UID_METADATA(pb, name, var, str) do { \
+    avio_read(pb, var, 16); \
+    if ((ret = mxf_uid_to_str(var, &str)) < 0) \
+        return ret; \
+    av_dict_set(&s->metadata, name, str, AV_DICT_DONT_STRDUP_VAL); \
+} while (0)
+
+#define SET_TS_METADATA(pb, name, var, str) do { \
+    var = avio_rb64(pb); \
+    if ((ret = mxf_timestamp_to_str(var, &str)) < 0) \
+        return ret; \
+    av_dict_set(&s->metadata, name, str, AV_DICT_DONT_STRDUP_VAL); \
+} while (0)
+
+static int mxf_read_identification_metadata(void *arg, AVIOContext *pb, int tag, int size, UID _uid, int64_t klv_offset)
+{
+    MXFContext *mxf = arg;
+    AVFormatContext *s = mxf->fc;
+    int ret;
+    UID uid = { 0 };
+    char *str = NULL;
+    uint64_t ts;
+    switch (tag) {
+    case 0x3C01:
+        SET_STR_METADATA(pb, "company_name", str);
+        break;
+    case 0x3C02:
+        SET_STR_METADATA(pb, "product_name", str);
+        break;
+    case 0x3C04:
+        SET_STR_METADATA(pb, "product_version", str);
+        break;
+    case 0x3C05:
+        SET_UID_METADATA(pb, "product_uid", uid, str);
+        break;
+    case 0x3C06:
+        SET_TS_METADATA(pb, "modification_date", ts, str);
+        break;
+    case 0x3C08:
+        SET_STR_METADATA(pb, "application_platform", str);
+        break;
+    case 0x3C09:
+        SET_UID_METADATA(pb, "generation_uid", uid, str);
+        break;
+    case 0x3C0A:
+        SET_UID_METADATA(pb, "uid", uid, str);
+        break;
+    }
+    return 0;
 }
 
 static const MXFMetadataReadTableEntry mxf_metadata_read_table[] = {
@@ -1630,6 +1749,7 @@ static const MXFMetadataReadTableEntry mxf_metadata_read_table[] = {
     { { 0x06,0x0E,0x2B,0x34,0x02,0x05,0x01,0x01,0x0d,0x01,0x02,0x01,0x01,0x03,0x04,0x00 }, mxf_read_partition_pack },
     { { 0x06,0x0E,0x2B,0x34,0x02,0x05,0x01,0x01,0x0d,0x01,0x02,0x01,0x01,0x04,0x02,0x00 }, mxf_read_partition_pack },
     { { 0x06,0x0E,0x2B,0x34,0x02,0x05,0x01,0x01,0x0d,0x01,0x02,0x01,0x01,0x04,0x04,0x00 }, mxf_read_partition_pack },
+    { { 0x06,0x0E,0x2B,0x34,0x02,0x53,0x01,0x01,0x0D,0x01,0x01,0x01,0x01,0x01,0x30,0x00 }, mxf_read_identification_metadata },
     { { 0x06,0x0E,0x2B,0x34,0x02,0x53,0x01,0x01,0x0d,0x01,0x01,0x01,0x01,0x01,0x18,0x00 }, mxf_read_content_storage, 0, AnyType },
     { { 0x06,0x0E,0x2B,0x34,0x02,0x53,0x01,0x01,0x0d,0x01,0x01,0x01,0x01,0x01,0x37,0x00 }, mxf_read_source_package, sizeof(MXFPackage), SourcePackage },
     { { 0x06,0x0E,0x2B,0x34,0x02,0x53,0x01,0x01,0x0d,0x01,0x01,0x01,0x01,0x01,0x36,0x00 }, mxf_read_material_package, sizeof(MXFPackage), MaterialPackage },
@@ -2090,10 +2210,8 @@ static int mxf_read_packet_old(AVFormatContext *s, AVPacket *pkt)
     KLVPacket klv;
     MXFContext *mxf = s->priv_data;
 
-    while (!url_feof(s->pb)) {
+    while (klv_read_packet(&klv, s->pb) == 0) {
         int ret;
-        if (klv_read_packet(&klv, s->pb) < 0)
-            return -1;
         PRINT_KEY(s, "read packet", klv.key);
         av_dlog(s, "size %"PRIu64" offset %#"PRIx64"\n", klv.length, klv.offset);
         if (IS_KLV_KEY(klv.key, mxf_encrypted_triplet_key)) {
@@ -2129,9 +2247,11 @@ static int mxf_read_packet_old(AVFormatContext *s, AVPacket *pkt)
             if (next_ofs >= 0 && next_klv > next_ofs) {
                 /* if this check is hit then it's possible OPAtom was treated as OP1a
                  * truncate the packet since it's probably very large (>2 GiB is common) */
-                av_log_ask_for_sample(s,
-                    "KLV for edit unit %i extends into next edit unit - OPAtom misinterpreted as OP1a?\n",
-                    mxf->current_edit_unit);
+                avpriv_request_sample(s,
+                                      "OPAtom misinterpreted as OP1a?"
+                                      "KLV for edit unit %i extending into "
+                                      "next edit unit",
+                                      mxf->current_edit_unit);
                 klv.length = next_ofs - avio_tell(s->pb);
             }
 
@@ -2176,7 +2296,7 @@ static int mxf_read_packet_old(AVFormatContext *s, AVPacket *pkt)
         skip:
             avio_skip(s->pb, klv.length);
     }
-    return AVERROR_EOF;
+    return url_feof(s->pb) ? AVERROR_EOF : -1;
 }
 
 static int mxf_read_packet(AVFormatContext *s, AVPacket *pkt)
@@ -2319,6 +2439,7 @@ static int mxf_read_seek(AVFormatContext *s, int stream_index, int64_t sample_ti
     MXFContext* mxf = s->priv_data;
     int64_t seekpos;
     int i, ret;
+    int64_t ret64;
     MXFIndexTable *t;
     MXFTrack *source_track = st->priv_data;
 
@@ -2333,9 +2454,10 @@ static int mxf_read_seek(AVFormatContext *s, int stream_index, int64_t sample_ti
         sample_time = 0;
     seconds = av_rescale(sample_time, st->time_base.num, st->time_base.den);
 
-    if ((ret = avio_seek(s->pb, (s->bit_rate * seconds) >> 3, SEEK_SET)) < 0)
-        return ret;
+    if ((ret64 = avio_seek(s->pb, (s->bit_rate * seconds) >> 3, SEEK_SET)) < 0)
+        return ret64;
     ff_update_cur_dts(s, st, sample_time);
+    mxf->current_edit_unit = sample_time;
     } else {
         t = &mxf->index_tables[0];
 

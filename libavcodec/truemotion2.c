@@ -28,6 +28,7 @@
 #include "bytestream.h"
 #include "get_bits.h"
 #include "dsputil.h"
+#include "internal.h"
 
 #define TM2_ESCAPE 0x80000000
 #define TM2_DELTAS 64
@@ -230,7 +231,7 @@ static inline int tm2_read_header(TM2Context *ctx, const uint8_t *buf)
 
     switch (magic) {
     case TM2_OLD_HEADER_MAGIC:
-        av_log_missing_feature(ctx->avctx, "TM2 old header", 1);
+        avpriv_request_sample(ctx->avctx, "Old TM2 header");
         return 0;
     case TM2_NEW_HEADER_MAGIC:
         return 0;
@@ -866,12 +867,9 @@ static int decode_frame(AVCodecContext *avctx,
         av_log(avctx, AV_LOG_ERROR, "Cannot allocate temporary buffer\n");
         return AVERROR(ENOMEM);
     }
-    p->reference = 3;
-    p->buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE | FF_BUFFER_HINTS_REUSABLE;
-    if ((ret = avctx->reget_buffer(avctx, p)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+
+    if ((ret = ff_reget_buffer(avctx, p)) < 0)
         return ret;
-    }
 
     l->dsp.bswap_buf((uint32_t*)l->buffer, (const uint32_t*)buf, buf_size >> 2);
 
@@ -902,9 +900,9 @@ static int decode_frame(AVCodecContext *avctx,
 
     l->cur = !l->cur;
     *got_frame      = 1;
-    *(AVFrame*)data = l->pic;
+    ret = av_frame_ref(data, &l->pic);
 
-    return buf_size;
+    return (ret < 0) ? ret : buf_size;
 }
 
 static av_cold int decode_init(AVCodecContext *avctx)
@@ -918,9 +916,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
     }
 
     l->avctx       = avctx;
-    l->pic.data[0] = NULL;
-    avctx->pix_fmt = AV_PIX_FMT_BGR24;
     avcodec_get_frame_defaults(&l->pic);
+    avctx->pix_fmt = AV_PIX_FMT_BGR24;
 
     ff_dsputil_init(&l->dsp, avctx);
 
@@ -989,8 +986,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
     av_freep(&l->buffer);
     l->buffer_size = 0;
 
-    if (pic->data[0])
-        avctx->release_buffer(avctx, pic);
+    av_frame_unref(pic);
 
     return 0;
 }

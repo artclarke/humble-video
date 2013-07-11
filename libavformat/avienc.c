@@ -57,7 +57,7 @@ typedef struct {
 
 typedef struct  {
     int64_t frames_hdr_strm;
-    int audio_strm_length;
+    int64_t audio_strm_length;
     int packet_count;
     int entry;
 
@@ -587,7 +587,6 @@ static int avi_write_packet(AVFormatContext *s, AVPacket *pkt)
     if (size & 1)
         avio_w8(pb, 0);
 
-    avio_flush(pb);
     return 0;
 }
 

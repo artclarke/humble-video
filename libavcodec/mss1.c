@@ -25,6 +25,7 @@
  */
 
 #include "avcodec.h"
+#include "internal.h"
 #include "mss12.h"
 
 typedef struct MSS1Context {
@@ -150,13 +151,8 @@ static int mss1_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     init_get_bits(&gb, buf, buf_size * 8);
     arith_init(&acoder, &gb);
 
-    ctx->pic.reference    = 3;
-    ctx->pic.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_READABLE |
-                            FF_BUFFER_HINTS_PRESERVE | FF_BUFFER_HINTS_REUSABLE;
-    if ((ret = avctx->reget_buffer(avctx, &ctx->pic)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+    if ((ret = ff_reget_buffer(avctx, &ctx->pic)) < 0)
         return ret;
-    }
 
     c->pal_pic    =  ctx->pic.data[0] + ctx->pic.linesize[0] * (avctx->height - 1);
     c->pal_stride = -ctx->pic.linesize[0];
@@ -180,8 +176,10 @@ static int mss1_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     memcpy(ctx->pic.data[1], c->pal, AVPALETTE_SIZE);
     ctx->pic.palette_has_changed = pal_changed;
 
+    if ((ret = av_frame_ref(data, &ctx->pic)) < 0)
+        return ret;
+
     *got_frame      = 1;
-    *(AVFrame*)data = ctx->pic;
 
     /* always report that the buffer was completely consumed */
     return buf_size;
@@ -193,7 +191,8 @@ static av_cold int mss1_decode_init(AVCodecContext *avctx)
     int ret;
 
     c->ctx.avctx       = avctx;
-    avctx->coded_frame = &c->pic;
+
+    avcodec_get_frame_defaults(&c->pic);
 
     ret = ff_mss12_decode_init(&c->ctx, 0, &c->sc, NULL);
 
@@ -206,8 +205,7 @@ static av_cold int mss1_decode_end(AVCodecContext *avctx)
 {
     MSS1Context * const ctx = avctx->priv_data;
 
-    if (ctx->pic.data[0])
-        avctx->release_buffer(avctx, &ctx->pic);
+    av_frame_unref(&ctx->pic);
     ff_mss12_decode_end(&ctx->ctx);
 
     return 0;

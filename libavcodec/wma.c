@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/attributes.h"
 #include "avcodec.h"
 #include "sinewin.h"
 #include "wma.h"
@@ -30,9 +31,9 @@
 
 /* XXX: use same run/length optimization as mpeg decoders */
 //FIXME maybe split decode / encode or pass flag
-static void init_coef_vlc(VLC *vlc, uint16_t **prun_table,
-                          float **plevel_table, uint16_t **pint_table,
-                          const CoefVLCTable *vlc_table)
+static av_cold void init_coef_vlc(VLC *vlc, uint16_t **prun_table,
+                                  float **plevel_table, uint16_t **pint_table,
+                                  const CoefVLCTable *vlc_table)
 {
     int n = vlc_table->n;
     const uint8_t  *table_bits   = vlc_table->huffbits;
@@ -68,7 +69,7 @@ static void init_coef_vlc(VLC *vlc, uint16_t **prun_table,
     av_free(level_table);
 }
 
-int ff_wma_init(AVCodecContext *avctx, int flags2)
+av_cold int ff_wma_init(AVCodecContext *avctx, int flags2)
 {
     WMACodecContext *s = avctx->priv_data;
     int i;
@@ -389,11 +390,6 @@ int ff_wma_end(AVCodecContext *avctx)
         av_free(s->level_table[i]);
         av_free(s->int_table[i]);
     }
-
-#if FF_API_OLD_ENCODE_AUDIO
-    if (av_codec_is_encoder(avctx->codec))
-        av_freep(&avctx->coded_frame);
-#endif
 
     return 0;
 }

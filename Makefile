@@ -20,7 +20,7 @@ INSTPROGS   = $(PROGS-yes:%=%$(PROGSSUF)$(EXESUF))
 
 OBJS        = cmdutils.o $(EXEOBJS)
 OBJS-ffmpeg = ffmpeg_opt.o ffmpeg_filter.o
-TESTTOOLS   = audiogen videogen rotozoom tiny_psnr base64
+TESTTOOLS   = audiogen videogen rotozoom tiny_psnr tiny_ssim base64
 HOSTPROGS  := $(TESTTOOLS:%=tests/%) doc/print_options
 TOOLS       = qt-faststart trasher
 TOOLS-$(CONFIG_ZLIB) += cws2fws
@@ -28,7 +28,6 @@ TOOLS-$(CONFIG_ZLIB) += cws2fws
 BASENAMES   = ffmpeg ffplay ffprobe ffserver
 ALLPROGS    = $(BASENAMES:%=%$(PROGSSUF)$(EXESUF))
 ALLPROGS_G  = $(BASENAMES:%=%$(PROGSSUF)_g$(EXESUF))
-ALLMANPAGES = $(BASENAMES:%=%.1)
 
 FFLIBS-$(CONFIG_AVDEVICE) += avdevice
 FFLIBS-$(CONFIG_AVFILTER) += avfilter
@@ -44,7 +43,7 @@ FFLIBS := avutil
 DATA_FILES := $(wildcard $(SRC_PATH)/presets/*.ffpreset) $(SRC_PATH)/doc/ffprobe.xsd
 EXAMPLES_FILES := $(wildcard $(SRC_PATH)/doc/examples/*.c) $(SRC_PATH)/doc/examples/Makefile $(SRC_PATH)/doc/examples/README
 
-SKIPHEADERS = cmdutils_common_opts.h
+SKIPHEADERS = cmdutils_common_opts.h compat/w32pthreads.h
 
 include $(SRC_PATH)/common.mak
 
@@ -154,24 +153,15 @@ clean::
 	$(RM) $(ALLPROGS) $(ALLPROGS_G)
 	$(RM) $(CLEANSUFFIXES)
 	$(RM) $(CLEANSUFFIXES:%=tools/%)
-	$(RM) coverage.info
 	$(RM) -r coverage-html
+	$(RM) -rf coverage.info lcov
 
 distclean::
 	$(RM) $(DISTCLEANSUFFIXES)
-	$(RM) config.* .version version.h libavutil/avconfig.h libavcodec/codec_names.h
+	$(RM) config.* .config libavutil/avconfig.h .version version.h libavcodec/codec_names.h
 
 config:
 	$(SRC_PATH)/configure $(value FFMPEG_CONFIGURATION)
-
-# Without the sed genthml thinks "libavutil" and "./libavutil" are two different things
-coverage.info: $(wildcard *.gcda *.gcno */*.gcda */*.gcno */*/*.gcda */*/*.gcno)
-	$(Q)lcov -c -d . -b . | sed -e 's#/./#/#g' > $@
-
-coverage-html: coverage.info
-	$(Q)mkdir -p $@
-	$(Q)genhtml -o $@ $<
-	$(Q)touch $@
 
 check: all alltools examples testprogs fate
 

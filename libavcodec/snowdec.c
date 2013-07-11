@@ -345,7 +345,7 @@ static int decode_header(SnowContext *s){
         return -1;
     }
     if(FFMIN(s->avctx-> width>>s->chroma_h_shift,
-             s->avctx->height>>s->chroma_v_shift) >> (s->spatial_decomposition_count-1) <= 0){
+             s->avctx->height>>s->chroma_v_shift) >> (s->spatial_decomposition_count-1) <= 1){
         av_log(s->avctx, AV_LOG_ERROR, "spatial_decomposition_count %d too large for size\n", s->spatial_decomposition_count);
         return -1;
     }
@@ -551,9 +551,9 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     ff_snow_release_buffer(avctx);
 
     if(!(s->avctx->debug&2048))
-        *picture= s->current_picture;
+        av_frame_ref(picture, &s->current_picture);
     else
-        *picture= s->mconly_picture;
+        av_frame_ref(picture, &s->mconly_picture);
 
     *got_frame = 1;
 

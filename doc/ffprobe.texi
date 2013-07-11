@@ -209,6 +209,11 @@ multimedia stream.
 Each media stream information is printed within a dedicated section
 with name "STREAM".
 
+@item -show_chapters
+Show information about chapters stored in the format.
+
+Each chapter is printed within a dedicated section with name "CHAPTER".
+
 @item -count_frames
 Count the number of frames per stream and report it in the
 corresponding stream section.
@@ -487,10 +492,43 @@ DV, GXF and AVI timecodes are available in format metadata
 @end itemize
 @c man end TIMECODE
 
+@include config.texi
+@ifset config-all
+@ifset config-avutil
+@include utils.texi
+@end ifset
+@ifset config-avcodec
+@include codecs.texi
+@include bitstream_filters.texi
+@end ifset
+@ifset config-avformat
+@include formats.texi
+@include protocols.texi
+@end ifset
+@ifset config-avdevice
+@include devices.texi
+@end ifset
+@ifset config-swresample
+@include resampler.texi
+@end ifset
+@ifset config-swscale
+@include scaler.texi
+@end ifset
+@ifset config-avfilter
+@include filters.texi
+@end ifset
+@end ifset
+
 @chapter See Also
 
 @ifhtml
-@url{ffplay.html,ffmpeg}, @url{ffprobe.html,ffprobe}, @url{ffserver.html,ffserver},
+@ifset config-all
+@url{ffprobe.html,ffprobe},
+@end ifset
+@ifset config-not-all
+@url{ffprobe-all.html,ffprobe-all},
+@end ifset
+@url{ffmpeg.html,ffmpeg}, @url{ffplay.html,ffplay}, @url{ffserver.html,ffserver},
 @url{ffmpeg-utils.html,ffmpeg-utils},
 @url{ffmpeg-scaler.html,ffmpeg-scaler},
 @url{ffmpeg-resampler.html,ffmpeg-resampler},
@@ -503,6 +541,12 @@ DV, GXF and AVI timecodes are available in format metadata
 @end ifhtml
 
 @ifnothtml
+@ifset config-all
+ffprobe(1),
+@end ifset
+@ifset config-not-all
+ffprobe-all(1),
+@end ifset
 ffmpeg(1), ffplay(1), ffserver(1),
 ffmpeg-utils(1), ffmpeg-scaler(1), ffmpeg-resampler(1),
 ffmpeg-codecs(1), ffmpeg-bitstream-filters(1), ffmpeg-formats(1),

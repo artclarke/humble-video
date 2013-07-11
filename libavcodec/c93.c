@@ -21,6 +21,7 @@
 
 #include "avcodec.h"
 #include "bytestream.h"
+#include "internal.h"
 
 typedef struct {
     AVFrame pictures[2];
@@ -47,11 +48,10 @@ typedef enum {
 
 static av_cold int decode_init(AVCodecContext *avctx)
 {
-    C93DecoderContext * const c93 = avctx->priv_data;
-
-    avcodec_get_frame_defaults(&c93->pictures[0]);
-    avcodec_get_frame_defaults(&c93->pictures[1]);
+    C93DecoderContext *s = avctx->priv_data;
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
+    avcodec_get_frame_defaults(&s->pictures[0]);
+    avcodec_get_frame_defaults(&s->pictures[1]);
     return 0;
 }
 
@@ -59,10 +59,9 @@ static av_cold int decode_end(AVCodecContext *avctx)
 {
     C93DecoderContext * const c93 = avctx->priv_data;
 
-    if (c93->pictures[0].data[0])
-        avctx->release_buffer(avctx, &c93->pictures[0]);
-    if (c93->pictures[1].data[0])
-        avctx->release_buffer(avctx, &c93->pictures[1]);
+    av_frame_unref(&c93->pictures[0]);
+    av_frame_unref(&c93->pictures[1]);
+
     return 0;
 }
 
@@ -124,20 +123,14 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     C93DecoderContext * const c93 = avctx->priv_data;
     AVFrame * const newpic = &c93->pictures[c93->currentpic];
     AVFrame * const oldpic = &c93->pictures[c93->currentpic^1];
-    AVFrame *picture = data;
     GetByteContext gb;
     uint8_t *out;
     int stride, ret, i, x, y, b, bt = 0;
 
     c93->currentpic ^= 1;
 
-    newpic->reference = 3;
-    newpic->buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE |
-                         FF_BUFFER_HINTS_REUSABLE | FF_BUFFER_HINTS_READABLE;
-    if ((ret = avctx->reget_buffer(avctx, newpic)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+    if ((ret = ff_reget_buffer(avctx, newpic)) < 0)
         return ret;
-    }
 
     stride = newpic->linesize[0];
 
@@ -175,7 +168,14 @@ static int decode_frame(AVCodecContext *avctx, void *data,
             case C93_4X4_FROM_PREV:
                 for (j = 0; j < 8; j += 4) {
                     for (i = 0; i < 8; i += 4) {
-                        offset = bytestream2_get_le16(&gb);
+                        int offset = bytestream2_get_le16(&gb);
+                        int from_x = offset % WIDTH;
+                        int from_y = offset / WIDTH;
+                        if (block_type == C93_4X4_FROM_CURR && from_y == y+j &&
+                            (FFABS(from_x - x-i) < 4 || FFABS(from_x - x-i) > WIDTH-4)) {
+                            avpriv_request_sample(avctx, "block overlap %d %d %d %d\n", from_x, x+i, from_y, y+j);
+                            return AVERROR_INVALIDDATA;
+                        }
                         if ((ret = copy_block(avctx, &out[j*stride+i],
                                               copy_from, offset, 4, stride)) < 0)
                             return ret;
@@ -243,7 +243,8 @@ static int decode_frame(AVCodecContext *avctx, void *data,
             memcpy(newpic->data[1], oldpic->data[1], 256 * 4);
     }
 
-    *picture = *newpic;
+    if ((ret = av_frame_ref(data, newpic)) < 0)
+        return ret;
     *got_frame = 1;
 
     return buf_size;

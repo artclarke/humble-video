@@ -64,8 +64,8 @@ typedef struct VmdDemuxContext {
 
 static int vmd_probe(AVProbeData *p)
 {
-    int w, h;
-    if (p->buf_size < 16)
+    int w, h, sample_rate;
+    if (p->buf_size < 806)
         return 0;
     /* check if the first 2 bytes of the file contain the appropriate size
      * of a VMD header chunk */
@@ -73,23 +73,25 @@ static int vmd_probe(AVProbeData *p)
         return 0;
     w = AV_RL16(&p->buf[12]);
     h = AV_RL16(&p->buf[14]);
-    if (!w || w > 2048 || !h || h > 2048)
+    sample_rate = AV_RL16(&p->buf[804]);
+    if ((!w || w > 2048 || !h || h > 2048) &&
+        sample_rate != 22050)
         return 0;
 
     /* only return half certainty since this check is a bit sketchy */
-    return AVPROBE_SCORE_MAX / 2;
+    return AVPROBE_SCORE_EXTENSION;
 }
 
 static int vmd_read_header(AVFormatContext *s)
 {
     VmdDemuxContext *vmd = s->priv_data;
     AVIOContext *pb = s->pb;
-    AVStream *st = NULL, *vst;
+    AVStream *st = NULL, *vst = NULL;
     unsigned int toc_offset;
     unsigned char *raw_frame_table;
     int raw_frame_table_size;
     int64_t current_offset;
-    int i, j;
+    int i, j, width, height;
     unsigned int total_frames;
     int64_t current_audio_pts = 0;
     unsigned char chunk[BYTES_PER_FRAME_RECORD];
@@ -101,28 +103,33 @@ static int vmd_read_header(AVFormatContext *s)
     if (avio_read(pb, vmd->vmd_header, VMD_HEADER_SIZE) != VMD_HEADER_SIZE)
         return AVERROR(EIO);
 
-    if(vmd->vmd_header[24] == 'i' && vmd->vmd_header[25] == 'v' && vmd->vmd_header[26] == '3')
-        vmd->is_indeo3 = 1;
-    else
-        vmd->is_indeo3 = 0;
-    /* start up the decoders */
-    vst = avformat_new_stream(s, NULL);
-    if (!vst)
-        return AVERROR(ENOMEM);
-    avpriv_set_pts_info(vst, 33, 1, 10);
-    vmd->video_stream_index = vst->index;
-    vst->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-    vst->codec->codec_id = vmd->is_indeo3 ? AV_CODEC_ID_INDEO3 : AV_CODEC_ID_VMDVIDEO;
-    vst->codec->codec_tag = 0;  /* no fourcc */
-    vst->codec->width = AV_RL16(&vmd->vmd_header[12]);
-    vst->codec->height = AV_RL16(&vmd->vmd_header[14]);
-    if(vmd->is_indeo3 && vst->codec->width > 320){
-        vst->codec->width >>= 1;
-        vst->codec->height >>= 1;
+    width = AV_RL16(&vmd->vmd_header[12]);
+    height = AV_RL16(&vmd->vmd_header[14]);
+    if (width && height) {
+        if(vmd->vmd_header[24] == 'i' && vmd->vmd_header[25] == 'v' && vmd->vmd_header[26] == '3') {
+            vmd->is_indeo3 = 1;
+        } else {
+            vmd->is_indeo3 = 0;
+        }
+        /* start up the decoders */
+        vst = avformat_new_stream(s, NULL);
+        if (!vst)
+            return AVERROR(ENOMEM);
+        avpriv_set_pts_info(vst, 33, 1, 10);
+        vmd->video_stream_index = vst->index;
+        vst->codec->codec_type = AVMEDIA_TYPE_VIDEO;
+        vst->codec->codec_id = vmd->is_indeo3 ? AV_CODEC_ID_INDEO3 : AV_CODEC_ID_VMDVIDEO;
+        vst->codec->codec_tag = 0;  /* no fourcc */
+        vst->codec->width = width;
+        vst->codec->height = height;
+        if(vmd->is_indeo3 && vst->codec->width > 320){
+            vst->codec->width >>= 1;
+            vst->codec->height >>= 1;
+        }
+        vst->codec->extradata_size = VMD_HEADER_SIZE;
+        vst->codec->extradata = av_mallocz(VMD_HEADER_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
+        memcpy(vst->codec->extradata, vmd->vmd_header, VMD_HEADER_SIZE);
     }
-    vst->codec->extradata_size = VMD_HEADER_SIZE;
-    vst->codec->extradata = av_mallocz(VMD_HEADER_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
-    memcpy(vst->codec->extradata, vmd->vmd_header, VMD_HEADER_SIZE);
 
     /* if sample rate is 0, assume no audio */
     vmd->sample_rate = AV_RL16(&vmd->vmd_header[804]);
@@ -156,7 +163,8 @@ static int vmd_read_header(AVFormatContext *s)
         num = st->codec->block_align;
         den = st->codec->sample_rate * st->codec->channels;
         av_reduce(&num, &den, num, den, (1UL<<31)-1);
-        avpriv_set_pts_info(vst, 33, num, den);
+        if (vst)
+            avpriv_set_pts_info(vst, 33, num, den);
         avpriv_set_pts_info(st, 33, num, den);
     }
 

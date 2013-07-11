@@ -54,36 +54,20 @@ static const AVOption silencedetect_options[] = {
 
 AVFILTER_DEFINE_CLASS(silencedetect);
 
-static av_cold int init(AVFilterContext *ctx, const char *args)
-{
-    int ret;
-    SilenceDetectContext *silence = ctx->priv;
-
-    silence->class = &silencedetect_class;
-    av_opt_set_defaults(silence);
-
-    if ((ret = av_set_options_string(silence, args, "=", ":")) < 0)
-        return ret;
-
-    av_opt_free(silence);
-
-    return 0;
-}
-
-static char *get_metadata_val(AVFilterBufferRef *insamples, const char *key)
+static char *get_metadata_val(AVFrame *insamples, const char *key)
 {
     AVDictionaryEntry *e = av_dict_get(insamples->metadata, key, NULL, 0);
     return e && e->value ? e->value : NULL;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *insamples)
+static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
 {
     int i;
     SilenceDetectContext *silence = inlink->dst->priv;
     const int nb_channels           = av_get_channel_layout_nb_channels(inlink->channel_layout);
     const int srate                 = inlink->sample_rate;
-    const int nb_samples            = insamples->audio->nb_samples * nb_channels;
-    const int64_t nb_samples_notify = srate * silence->duration    * nb_channels;
+    const int nb_samples            = insamples->nb_samples     * nb_channels;
+    const int64_t nb_samples_notify = srate * silence->duration * nb_channels;
 
     // scale number of null samples to the new sample rate
     if (silence->last_sample_rate && silence->last_sample_rate != srate)
@@ -176,7 +160,6 @@ AVFilter avfilter_af_silencedetect = {
     .name          = "silencedetect",
     .description   = NULL_IF_CONFIG_SMALL("Detect silence."),
     .priv_size     = sizeof(SilenceDetectContext),
-    .init          = init,
     .query_formats = query_formats,
     .inputs        = silencedetect_inputs,
     .outputs       = silencedetect_outputs,
