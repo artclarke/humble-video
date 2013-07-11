@@ -8,7 +8,6 @@ SUBDIRS=customio
 
 check_PROGRAMS=\
   VideoPictureTester \
-  AudioSamplesTester \
   CodecTester \
   IndexEntryTester \
   ErrorTester \
@@ -23,7 +22,6 @@ check_PROGRAMS=\
 
 BUILT_SOURCES= \
   VideoPictureTest_CXXRunner.cpp \
-  AudioSamplesTest_CXXRunner.cpp \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
   ErrorTest_CXXRunner.cpp \
@@ -38,7 +36,6 @@ BUILT_SOURCES= \
 
 noinst_HEADERS = \
   VideoPictureTest.h \
-  AudioSamplesTest.h \
   CodecTest.h \
   IndexEntryTest.h \
   ErrorTest.h \
@@ -68,17 +65,6 @@ nodist_VideoPictureTester_SOURCES= \
   VideoPictureTest_CXXRunner.cpp
 
 VideoPictureTester_LDADD= \
-  $(top_builddir)/src/io/humble/libhumblevideo.la 
-
-AudioSamplesTester_SOURCES= \
-  AudioSamplesTest.cpp \
-  TestData.cpp \
-  Main.cpp
-
-nodist_AudioSamplesTester_SOURCES= \
-  AudioSamplesTest_CXXRunner.cpp
-
-AudioSamplesTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 CodecTester_SOURCES= \
