@@ -61,11 +61,7 @@ Packet*
 Packet :: make(int32_t size)
 {
   Global::init();
-  Packet* retval = make();
-  if (retval) {
-    if (retval->allocateNewPayload(size) < 0)
-      VS_REF_RELEASE(retval);
-  }
+  Packet* retval = PacketImpl::make(size);
   return retval;
 }
 

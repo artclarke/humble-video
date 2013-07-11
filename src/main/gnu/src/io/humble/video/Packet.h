@@ -277,12 +277,13 @@ public:
    * When requesting a packet size, the system
    *   may allocate a larger payloadSize.
    * </p>
-   * @param payloadSize The (minimum) payloadSize of this packet in bytes.
+   * @param payloadSize The (minimum) payloadSize of this packet in bytes. It is ok to
+   *   pass in 0 here, in which case the packet will later allocate memory if needed.
    *
    * @return >= 0 if successful.  < 0 if error.
    */
   virtual int32_t
-  allocateNewPayload(int32_t payloadSize)=0;
+  reset(int32_t payloadSize)=0;
 
 protected:
   Packet();

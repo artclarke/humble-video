@@ -11911,7 +11911,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Packet_1setConvergenceDura
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Packet_1allocateNewPayload(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Packet_1reset(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jint jresult = 0 ;
   io::humble::video::Packet *arg1 = (io::humble::video::Packet *) 0 ;
   int32_t arg2 ;
@@ -11934,7 +11934,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Packet_1allocateNewPayload
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)(arg1)->allocateNewPayload(arg2);
+      result = (int32_t)(arg1)->reset(arg2);
     }
     catch(std::invalid_argument & e)
     {

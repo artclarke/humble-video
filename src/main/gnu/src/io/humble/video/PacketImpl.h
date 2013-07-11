@@ -63,7 +63,7 @@ class VS_API_HUMBLEVIDEO PacketImpl : public io::humble::video::Packet
     virtual int64_t getDuration();
     virtual int64_t getPosition();
     virtual io::humble::ferry::IBuffer* getData();
-    virtual int32_t allocateNewPayload(int32_t payloadSize);
+    virtual int32_t reset(int32_t payloadSize);
     virtual bool isComplete();
     
     virtual void setKeyPacket(bool keyPacket);

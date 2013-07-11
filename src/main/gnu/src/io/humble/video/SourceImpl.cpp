@@ -298,9 +298,9 @@ SourceImpl::read(Packet* ipkt) {
   PacketImpl* pkt = dynamic_cast<PacketImpl*>(ipkt);
   if (pkt)
   {
+    pkt->reset(0);
     AVPacket* packet=pkt->getCtx();
 
-    av_init_packet(packet);
     int32_t numReads=0;
     do
     {

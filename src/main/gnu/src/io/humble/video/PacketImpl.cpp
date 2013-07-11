@@ -281,10 +281,15 @@ namespace io { namespace humble { namespace video {
   
 
   int32_t
-  PacketImpl::allocateNewPayload(int32_t payloadSize)
+  PacketImpl::reset(int32_t payloadSize)
   {
     av_free_packet(mPacket);
-    return av_new_packet(mPacket, payloadSize);
+    if (payloadSize > 0)
+      return av_new_packet(mPacket, payloadSize);
+    else {
+      av_init_packet(mPacket);
+      return 0;
+    }
   }
 
   void
