@@ -52,9 +52,6 @@ class VS_API_HUMBLEVIDEO PacketImpl : public io::humble::video::Packet
     virtual Rational* getTimeBase() { return mTimeBase.get(); }
     virtual void setTimeBase(Rational *aBase) { mTimeBase.reset(aBase, true); }
     
-    // Packet
-    virtual void reset();
-
     virtual int64_t getPts();
     virtual int64_t getDts();
     virtual int32_t getSize();
@@ -91,8 +88,11 @@ class VS_API_HUMBLEVIDEO PacketImpl : public io::humble::video::Packet
      */
     void wrapAVPacket(AVPacket* pkt);
     void wrapBuffer(io::humble::ferry::IBuffer *buffer);
-    // Used by the IBuffer to free buffers.
-    static void freeAVBuffer(void *buf, void *closure);
+    // Used by FFmpeg AVBufferRefs when they think the underlying
+    // buffer is to be freed. We'll just release the extra add ref we
+    // added to mBuffer.
+    static void AVBufferRefFreeFunc(void *closure, uint8_t *data);
+    static void IBufferFreeFunc(void *buf, void *closure);
 #endif // ! SWIG
 
   protected:
@@ -100,7 +100,6 @@ class VS_API_HUMBLEVIDEO PacketImpl : public io::humble::video::Packet
     virtual ~PacketImpl();
   private:
     AVPacket* mPacket;
-    io::humble::ferry::RefPointer<io::humble::ferry::IBuffer> mBuffer;
     io::humble::ferry::RefPointer<Rational> mTimeBase;
     bool mIsComplete;
 

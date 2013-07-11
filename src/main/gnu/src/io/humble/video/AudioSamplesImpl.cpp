@@ -33,19 +33,27 @@ namespace io { namespace humble { namespace video
   
   AudioSamplesImpl::AudioSamplesImpl()
   {
+    mFrame = avcodec_alloc_frame();
+    if (!mFrame)
+      throw std::bad_alloc();
     mSamples = 0;
-    mNumSamples = 0;
-    mSampleRate = 0;
-    mChannels = 1;
+    mFrame->opaque = this;
+    mFrame->nb_samples = 0;
+    mFrame->channels = 1;
+    mFrame->sample_rate = 0;
+//    mFrame->channel_layout = (int)AudioSamples::CH_SIDE_LEFT;
+    mFrame->format = (int) AudioSamples::SAMPLE_FMT_S16;
+    mFrame->pts = Global::NO_PTS;
+    // Audio is always a key frame;
+    mFrame->key_frame = 1;
     mIsComplete = false;
-    mSampleFmt = SAMPLE_FMT_S16;
-    mPts = Global::NO_PTS;
-    mRequestedSamples = 0;
+    mMaxRequestedSamples = 0;
     mTimeBase = Rational::make(1, Global::DEFAULT_PTS_PER_SECOND);
   }
 
   AudioSamplesImpl::~AudioSamplesImpl()
   {
+    avcodec_free_frame(&mFrame);
   }
 
 #define VS_AudioSamplesImpl_BUFFER_PADDING 64
@@ -54,13 +62,13 @@ namespace io { namespace humble { namespace video
   {
     if (!mSamples)
     {
-      int32_t bufSize = mRequestedSamples * getSampleSize() +
+      int32_t bufSize = mMaxRequestedSamples * getSampleSize() * getChannels() +
           VS_AudioSamplesImpl_BUFFER_PADDING;
 
       mSamples = IBuffer::make(this, bufSize);
       if (!mSamples)
         throw std::bad_alloc();
-      setBufferType(mSampleFmt, mSamples.value());
+      setBufferType((AudioSamples::Format)mFrame->format, mSamples.value());
 
       if (mSamples)
       {
@@ -68,32 +76,19 @@ namespace io { namespace humble { namespace video
         //don't set to zero; this means the memory is uninitialized
         //which helps find bugs with valgrind
         //memset(buf, 0, bufSize);
-        mNumSamples = 0;
+        mFrame->nb_samples = 0;
         VS_LOG_TRACE("Created AudioSamplesImpl(%d bytes)", bufSize);
       }
       
     }
   }
   
-  int32_t
-  AudioSamplesImpl::ensureCapacity(int32_t capacity)
+  bool
+  AudioSamplesImpl::isPlanar()
   {
-    if (mSamples && 
-        mSamples->getBufferSize() < (capacity + VS_AudioSamplesImpl_BUFFER_PADDING))
-    {
-      // crap; need to ditch and re-recreate
-      mSamples=0;
-    }
-    int32_t sampleSize = getSampleSize();
-    int32_t requiredSamples;
-    if (sampleSize > 0)
-      requiredSamples = capacity / getSampleSize();
-    else
-      requiredSamples = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-    mRequestedSamples = requiredSamples;
-    
-    return 0;
+    return av_sample_fmt_is_planar((enum AVSampleFormat)mFrame->format);
   }
+
   short*
   AudioSamplesImpl::getRawSamples(uint32_t startingSample)
   {
@@ -101,22 +96,16 @@ namespace io { namespace humble { namespace video
     allocInternalSamples();
     if (mSamples)
     {
+      //TODO: This is broken.
       uint32_t startingOffset = startingSample*getSampleSize();
-      uint32_t bufLen = (mNumSamples*getSampleSize())-startingOffset;
+      uint32_t bufLen = (mFrame->nb_samples*getSampleSize())-startingOffset;
       retval = (short*)mSamples->getBytes(startingOffset, bufLen);
     }
     return retval;
   }
-
-  AudioSamplesImpl*
-  AudioSamplesImpl::make(uint32_t numSamples,
-      uint32_t numChannels)
-  {
-    return make(numSamples, numChannels, AudioSamples::SAMPLE_FMT_S16);
-  }
   
   AudioSamplesImpl*
-  AudioSamplesImpl::make(uint32_t numSamples,
+  AudioSamplesImpl::make(int32_t numSamples,
       uint32_t numChannels,
       AudioSamples::Format format)
   {
@@ -128,16 +117,19 @@ namespace io { namespace humble { namespace video
       {
         // FFMPEG actually requires a minimum buffer size, so we
         // make sure we're always at least that large.
-        retval->mChannels = numChannels;
-        retval->mSampleFmt = format;
-        retval->mRequestedSamples = numSamples;
+        retval->mFrame->channels = numChannels;
+        retval->mFrame->format = format;
+        retval->mFrame->nb_samples = 0;
+        retval->mMaxRequestedSamples = numSamples;
       }
     }
     return retval;
   }
   
   AudioSamplesImpl*
-  AudioSamplesImpl::make(IBuffer* buffer, int channels,
+  AudioSamplesImpl::make(IBuffer* buffer,
+      int32_t numSamples,
+      int32_t channels,
       AudioSamples::Format format)
   {
     if (!buffer)
@@ -149,12 +141,10 @@ namespace io { namespace humble { namespace video
     if (buffer->getBufferSize()<= 0)
       return 0;
     
-    int bytesPerSample = AudioSamples::findSampleBitDepth(format)/8*channels;
-    int samplesRequested = buffer->getBufferSize()/bytesPerSample;
     AudioSamplesImpl* retval = 0;
     try
     {
-      retval = make(samplesRequested, channels, format);
+      retval = make(numSamples, channels, format);
       if (!retval)
         return 0;
       retval->setData(buffer);
@@ -178,7 +168,7 @@ namespace io { namespace humble { namespace video
   {
     if (!buffer) return;
     mSamples.reset(buffer, true);
-    setBufferType(mSampleFmt, buffer);
+    setBufferType((AudioSamples::Format)mFrame->format, buffer);
   }
   
   bool
@@ -190,48 +180,38 @@ namespace io { namespace humble { namespace video
   AudioSamples::Format
   AudioSamplesImpl::getFormat()
   {
-    return mSampleFmt;
+    return (AudioSamples::Format)mFrame->format;
   }
 
   int32_t
   AudioSamplesImpl::getSampleRate()
   {
-    return mSampleRate;
+    return mFrame->sample_rate;
   }
 
   int32_t
   AudioSamplesImpl::getChannels()
   {
-    return mChannels;
+    return mFrame->channels;
   }
 
-  uint32_t
+  int32_t
   AudioSamplesImpl::getNumSamples()
   {
-    return mNumSamples;
+    return mFrame->nb_samples;
   }
 
-  uint32_t
+  int32_t
   AudioSamplesImpl::getMaxBufferSize()
   {
     allocInternalSamples();
     return mSamples->getBufferSize()-VS_AudioSamplesImpl_BUFFER_PADDING;
   }
 
-  uint32_t
-  AudioSamplesImpl::getSampleBitDepth()
-  {
-    return AudioSamples::findSampleBitDepth(mSampleFmt);
-  }
-
-  uint32_t
+  int32_t
   AudioSamplesImpl::getSampleSize()
   {
-    uint32_t bits = getSampleBitDepth();
-    if (bits < 8)
-      bits = 8;
-
-    return bits/8 * getChannels();
+    return av_get_bytes_per_sample((enum AVSampleFormat)mFrame->format);
   }
 
   IBuffer*
@@ -244,14 +224,14 @@ namespace io { namespace humble { namespace video
     return retval;
   }
 
-  uint32_t
+  int32_t
   AudioSamplesImpl::getMaxSamples()
   {
     return getMaxBufferSize() / getSampleSize();
   }
 
   void
-  AudioSamplesImpl::setComplete(bool complete, uint32_t numSamples,
+  AudioSamplesImpl::setComplete(bool complete, int32_t numSamples,
       int32_t sampleRate, int32_t channels, Format format,
       int64_t pts)
   {
@@ -259,16 +239,16 @@ namespace io { namespace humble { namespace video
     if (channels <= 0)
       channels = 1;
 
-    mChannels = channels;
-    mSampleRate = sampleRate;
-    mSampleFmt = format;
+    mFrame->channels = channels;
+    mFrame->sample_rate = sampleRate;
+    mFrame->format = format;
     if (mSamples)
       // if we've allocated a buffer, reset the type
-      setBufferType(mSampleFmt, mSamples.value());
+      setBufferType((AudioSamples::Format)mFrame->format, mSamples.value());
 
     if (mIsComplete)
     {
-      mNumSamples = FFMIN(numSamples,
+      mFrame->nb_samples = FFMIN(numSamples,
           getMaxBufferSize()/(getSampleSize()));
 #if 0
       {
@@ -281,7 +261,7 @@ namespace io { namespace humble { namespace video
       }
 #endif // VS_DEBUG
     } else {
-      mNumSamples = 0;
+      mFrame->nb_samples = 0;
     }
     setPts(pts);
   }
@@ -289,77 +269,29 @@ namespace io { namespace humble { namespace video
   int64_t
   AudioSamplesImpl::getPts()
   {
-    return mPts;
+    return mFrame->pts;
   }
   
   void
   AudioSamplesImpl::setPts(int64_t aValue)
   {
-    mPts = aValue;
+    mFrame->pts = aValue;
   }
 
   int64_t
   AudioSamplesImpl::getNextPts()
   {
     int64_t retval = Global::NO_PTS;
-    if (mPts != Global::NO_PTS)
-      retval = mPts + AudioSamples::samplesToDefaultPts(this->getNumSamples(), this->getSampleRate());
+    if (mFrame->pts != Global::NO_PTS)
+      retval = mFrame->pts + AudioSamples::samplesToDefaultPts(this->getNumSamples(), this->getSampleRate());
 
     return retval;
   }
 
   int32_t
-  AudioSamplesImpl::setSample(uint32_t sampleIndex, int32_t channel, Format format, int32_t sample)
+  AudioSamplesImpl::getSize()
   {
-    int32_t retval = -1;
-    try {
-      if (channel < 0 || channel >= mChannels)
-        throw std::invalid_argument("cannot setSample for given channel");
-      if (format != SAMPLE_FMT_S16)
-        throw std::invalid_argument("only support format: SAMPLE_FMT_S16");
-      if (sampleIndex >= this->getMaxSamples())
-        throw std::invalid_argument("sampleIndex out of bounds");
-
-      short *rawSamples = this->getRawSamples(0);
-      if (!rawSamples)
-        throw std::runtime_error("no samples buffer set in AudioSamplesImpl");
-
-      rawSamples[sampleIndex*mChannels + channel] = (short)sample;
-      retval = 0;
-    }
-    catch (std::exception & e)
-    {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      retval = -1;
-    }
-    return retval;
-  }
-
-  int32_t
-  AudioSamplesImpl::getSample(uint32_t sampleIndex, int32_t channel, Format format)
-  {
-    int32_t retval = 0;
-    try
-    {
-      if (channel < 0 || channel >= mChannels)
-        throw std::invalid_argument("cannot getSample for given channel");
-      if (format != SAMPLE_FMT_S16)
-        throw std::invalid_argument("only support format: SAMPLE_FMT_S16");
-      if (sampleIndex >= this->getNumSamples())
-        throw std::invalid_argument("sampleIndex out of bounds");
-
-      short *rawSamples = this->getRawSamples(0);
-      if (!rawSamples)
-        throw std::runtime_error("no samples buffer set in AudioSamplesImpl");
-
-      retval = rawSamples[sampleIndex*mChannels + channel];
-    }
-    catch(std::exception & e)
-    {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      retval = 0;
-    }
-    return retval;
+    return getSampleSize()*getChannels()*getNumSamples();
   }
 
   void

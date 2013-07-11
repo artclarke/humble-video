@@ -24,30 +24,16 @@
 namespace io { namespace humble { namespace video
 {
 
-  AudioSamples :: AudioSamples()
+  AudioSamples::AudioSamples()
   {
   }
 
-  AudioSamples :: ~AudioSamples()
+  AudioSamples::~AudioSamples()
   {
   }
   
-  uint32_t
-  AudioSamples :: findSampleBitDepth(Format format)
-  {
-    int bits = av_get_bytes_per_sample((enum AVSampleFormat) format)<<3;
-    return bits;
-  }
-
   AudioSamples*
-  AudioSamples :: make(uint32_t numSamples, uint32_t numChannels)
-  {
-    Global::init();
-    return AudioSamplesImpl::make(numSamples, numChannels);
-  }
-
-  AudioSamples*
-  AudioSamples :: make(uint32_t numSamples, uint32_t numChannels,
+  AudioSamples::make(int32_t numSamples, uint32_t numChannels,
       AudioSamples::Format format)
   {
     Global::init();
@@ -56,15 +42,17 @@ namespace io { namespace humble { namespace video
   
 
   AudioSamples*
-  AudioSamples :: make(io::humble::ferry::IBuffer* buffer, int channels,
+  AudioSamples::make(io::humble::ferry::IBuffer* buffer,
+      int32_t numSamples,
+      int32_t channels,
       AudioSamples::Format format)
   {
     Global::init();
-    return AudioSamplesImpl::make(buffer, channels, format);
+    return AudioSamplesImpl::make(buffer, numSamples, channels, format);
   }
   
   int64_t
-  AudioSamples :: samplesToDefaultPts(int64_t samples, int sampleRate)
+  AudioSamples::samplesToDefaultPts(int64_t samples, int sampleRate)
   {
     // Note: These need to always round up!  a "partial sample" actually must
     // be whole (and similar with time stamps).
@@ -81,7 +69,7 @@ namespace io { namespace humble { namespace video
   }
 
   int64_t
-  AudioSamples :: defaultPtsToSamples(int64_t duration, int sampleRate)
+  AudioSamples::defaultPtsToSamples(int64_t duration, int sampleRate)
   {
     int64_t retval = 0;
     Global::init();

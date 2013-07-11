@@ -116,6 +116,7 @@ namespace io { namespace humble { namespace video
         PixelFormat::Type format, int width, int height);
 
   protected:
+    AVFrame* getCtx() { return getAVFrame(); }
     VideoPictureImpl();
     virtual ~VideoPictureImpl();
     

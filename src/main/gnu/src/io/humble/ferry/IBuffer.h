@@ -108,8 +108,8 @@ public:
   static IBuffer*
   make(io::humble::ferry::RefCounted* requestor, int32_t bufferSize);
 
-  /*
-   * Added for 3.1
+  /**
+   * Types of data that are in this buffer.
    */
   typedef enum {
     IBUFFER_UINT8,

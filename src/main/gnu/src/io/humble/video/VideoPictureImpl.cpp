@@ -47,9 +47,7 @@ namespace io { namespace humble { namespace video
 
   VideoPictureImpl :: ~VideoPictureImpl()
   {
-    if (mFrame)
-      av_free(mFrame);
-    mFrame = 0;
+    avcodec_free_frame(&mFrame);
   }
 
   VideoPictureImpl*
@@ -80,14 +78,15 @@ namespace io { namespace humble { namespace video
   
   VideoPictureImpl*
   VideoPictureImpl :: make(
-      io::humble::ferry::IBuffer* buffer, PixelFormat::Type format,
+      io::humble::ferry::IBuffer* buffer,
+      PixelFormat::Type format,
       int width, int height)
   {
     if (!buffer)
       return 0;
     VideoPictureImpl *retval = 0;
     try {
-      retval = make(format, width,height);
+      retval = make(format, width, height);
       if (!retval)
         throw std::bad_alloc();
       
@@ -211,7 +210,7 @@ namespace io { namespace humble { namespace video
     avpicture_fill((AVPicture*)frame, buffer, (AVPixelFormat) frame->format,
         frame->width, frame->height);
     frame->quality = getQuality();
-    frame->type = FF_BUFFER_TYPE_USER;
+//    frame->type = FF_BUFFER_TYPE_USER;
   }
 
   void
@@ -418,7 +417,7 @@ namespace io { namespace humble { namespace video
     if (imageSize != bufSize)
       throw std::runtime_error("could not fill picture");
 
-    mFrame->type = FF_BUFFER_TYPE_USER;
+//    mFrame->type = FF_BUFFER_TYPE_USER;
     VS_ASSERT(mFrame->data[0] != 0, "Empty buffer");
   }
 

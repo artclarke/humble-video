@@ -677,30 +677,6 @@ public void get(int srcPos, double[] dest, int destPos, int length)
   }
 
 /**
- * Sets the underlying buffer used by this object.  
- * <p>  
- * This is an advanced method and is not recommended for use by those 
- *  
- * who don't fully understand how IBuffers work. Implementations of 
- *  
- * {@link MediaData} may behave in undefined ways if the buffer you 
- *  
- * pass in is not big enough for what you ask them to do (e.g. they 
- * may  
- * discard your buffer and allocate a larger one if they need more space). 
- *  
- * It is up to the caller to ensure the buffer passed in is large enough, 
- *  
- *  
- * </p>  
- * @param	buffer The buffer to set. If null, this method  
- * is ignored.  
- */
-  protected void setData_internal(IBuffer buffer) {
-    VideoJNI.MediaData_setData_internal(swigCPtr, this, IBuffer.getCPtr(buffer), buffer);
-  }
-
-/**
  * Returns whether or not we think this buffer has been filled  
  * with data.  
  *  

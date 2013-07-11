@@ -229,7 +229,7 @@ public:
 
     /* video codecs */
     CODEC_ID_MPEG1VIDEO = AV_CODEC_ID_MPEG1VIDEO,
-    // preferred ID for MPEG-1/2 video decoding
+    /** preferred ID for MPEG-1/2 video decoding */
     CODEC_ID_MPEG2VIDEO = AV_CODEC_ID_MPEG2VIDEO,
     CODEC_ID_MPEG2VIDEO_XVMC = AV_CODEC_ID_MPEG2VIDEO_XVMC,
     CODEC_ID_H261 = AV_CODEC_ID_H261,
@@ -285,7 +285,6 @@ public:
     CODEC_ID_MSZH = AV_CODEC_ID_MSZH,
     CODEC_ID_ZLIB = AV_CODEC_ID_ZLIB,
     CODEC_ID_QTRLE = AV_CODEC_ID_QTRLE,
-    CODEC_ID_SNOW = AV_CODEC_ID_SNOW,
     CODEC_ID_TSCC = AV_CODEC_ID_TSCC,
     CODEC_ID_ULTI = AV_CODEC_ID_ULTI,
     CODEC_ID_QDRAW = AV_CODEC_ID_QDRAW,
@@ -399,7 +398,11 @@ public:
     CODEC_ID_CLLC = AV_CODEC_ID_CLLC,
     CODEC_ID_MSS2 = AV_CODEC_ID_MSS2,
     CODEC_ID_VP9 = AV_CODEC_ID_VP9,
-    AV_CODEC_ID_BRENDER_PIX = MKBETAG('B','P','I','X'),
+    CODEC_ID_AIC = AV_CODEC_ID_AIC,
+    CODEC_ID_ESCAPE130_DEPRECATED = AV_CODEC_ID_ESCAPE130_DEPRECATED,
+    CODEC_ID_G2M_DEPRECATED = AV_CODEC_ID_G2M_DEPRECATED,
+
+    AV_CODEC_ID_BRENDER_PIX= MKBETAG('B','P','I','X'),
     CODEC_ID_Y41P = AV_CODEC_ID_Y41P,
     CODEC_ID_ESCAPE130 = AV_CODEC_ID_ESCAPE130,
     CODEC_ID_EXR = AV_CODEC_ID_EXR,
@@ -421,9 +424,12 @@ public:
     CODEC_ID_SGIRLE = AV_CODEC_ID_SGIRLE,
     CODEC_ID_MVC1 = AV_CODEC_ID_MVC1,
     CODEC_ID_MVC2 = AV_CODEC_ID_MVC2,
+    CODEC_ID_SNOW = AV_CODEC_ID_SNOW,
+    CODEC_ID_WEBP = AV_CODEC_ID_WEBP,
+    CODEC_ID_SMVJPEG = AV_CODEC_ID_SMVJPEG,
 
     /* various PCM "codecs" */
-    // A dummy id pointing at the start of audio codecs
+    /** A dummy id pointing at the start of audio codecs */
     CODEC_ID_FIRST_AUDIO = AV_CODEC_ID_FIRST_AUDIO,
     CODEC_ID_PCM_S16LE = AV_CODEC_ID_PCM_S16LE,
     CODEC_ID_PCM_S16BE = AV_CODEC_ID_PCM_S16BE,
@@ -491,6 +497,8 @@ public:
     CODEC_ID_VIMA = AV_CODEC_ID_VIMA,
     CODEC_ID_ADPCM_AFC = AV_CODEC_ID_ADPCM_AFC,
     CODEC_ID_ADPCM_IMA_OKI = AV_CODEC_ID_ADPCM_IMA_OKI,
+    CODEC_ID_ADPCM_DTK = AV_CODEC_ID_ADPCM_DTK,
+    CODEC_ID_ADPCM_IMA_RAD = AV_CODEC_ID_ADPCM_IMA_RAD,
 
     /* AMR */
     CODEC_ID_AMR_NB = AV_CODEC_ID_AMR_NB,
@@ -508,7 +516,7 @@ public:
 
     /* audio codecs */
     CODEC_ID_MP2 = AV_CODEC_ID_MP2,
-    // preferred ID for decoding MPEG audio layer 1, 2 or 3
+    /** preferred ID for decoding MPEG audio layer 1, 2 or 3 */
     CODEC_ID_MP3 = AV_CODEC_ID_MP3,
     CODEC_ID_AAC = AV_CODEC_ID_AAC,
     CODEC_ID_AC3 = AV_CODEC_ID_AC3,
@@ -526,7 +534,7 @@ public:
     CODEC_ID_SHORTEN = AV_CODEC_ID_SHORTEN,
     CODEC_ID_ALAC = AV_CODEC_ID_ALAC,
     CODEC_ID_WESTWOOD_SND1 = AV_CODEC_ID_WESTWOOD_SND1,
-    // as in Berlin toast format
+    /** as in Berlin toast format */
     CODEC_ID_GSM = AV_CODEC_ID_GSM,
     CODEC_ID_QDM2 = AV_CODEC_ID_QDM2,
     CODEC_ID_COOK = AV_CODEC_ID_COOK,
@@ -539,7 +547,7 @@ public:
     CODEC_ID_IMC = AV_CODEC_ID_IMC,
     CODEC_ID_MUSEPACK7 = AV_CODEC_ID_MUSEPACK7,
     CODEC_ID_MLP = AV_CODEC_ID_MLP,
-    /* as found in WAV */
+    /** as found in WAV */
     CODEC_ID_GSM_MS = AV_CODEC_ID_GSM_MS,
     CODEC_ID_ATRAC3 = AV_CODEC_ID_ATRAC3,
     CODEC_ID_VOXWARE = AV_CODEC_ID_VOXWARE,
@@ -575,9 +583,6 @@ public:
     CODEC_ID_COMFORT_NOISE = AV_CODEC_ID_COMFORT_NOISE,
     CODEC_ID_TAK_DEPRECATED = AV_CODEC_ID_TAK_DEPRECATED,
     CODEC_ID_FFWAVESYNTH = AV_CODEC_ID_FFWAVESYNTH,
-#if LIBAVCODEC_VERSION_MAJOR <= 54
-    CODEC_ID_8SVX_RAW = AV_CODEC_ID_8SVX_RAW,
-#endif
     CODEC_ID_SONIC = AV_CODEC_ID_SONIC,
     CODEC_ID_SONIC_LS = AV_CODEC_ID_SONIC_LS,
     CODEC_ID_PAF_AUDIO = AV_CODEC_ID_PAF_AUDIO,
@@ -587,11 +592,12 @@ public:
     CODEC_ID_SMV = AV_CODEC_ID_SMV,
 
     /* subtitle codecs */
-    // A dummy ID pointing at the start of subtitle codecs.
+    /** A dummy ID pointing at the start of subtitle codecs. */
     CODEC_ID_FIRST_SUBTITLE = AV_CODEC_ID_FIRST_SUBTITLE,
     CODEC_ID_DVD_SUBTITLE = AV_CODEC_ID_DVD_SUBTITLE,
     CODEC_ID_DVB_SUBTITLE = AV_CODEC_ID_DVB_SUBTITLE,
-    CODEC_ID_TEXT = AV_CODEC_ID_TEXT,  ///< raw UTF-8 text
+    /** raw UTF-8 text */
+    CODEC_ID_TEXT = AV_CODEC_ID_TEXT,
     CODEC_ID_XSUB = AV_CODEC_ID_XSUB,
     CODEC_ID_SSA = AV_CODEC_ID_SSA,
     CODEC_ID_MOV_TEXT = AV_CODEC_ID_MOV_TEXT,
@@ -610,9 +616,11 @@ public:
     CODEC_ID_MPL2 = AV_CODEC_ID_MPL2,
     CODEC_ID_VPLAYER = AV_CODEC_ID_VPLAYER,
     CODEC_ID_PJS = AV_CODEC_ID_PJS,
+    /** ASS as defined in Matroska */
+    CODEC_ID_ASS = AV_CODEC_ID_ASS,
 
     /* other specific kind of codecs (generally used for attachments) */
-    // A dummy ID pointing at the start of various fake codecs.
+    /** A dummy ID pointing at the start of various fake codecs. */
     CODEC_ID_FIRST_UNKNOWN = AV_CODEC_ID_FIRST_UNKNOWN,
     CODEC_ID_TTF = AV_CODEC_ID_TTF,
     CODEC_ID_BINTEXT = AV_CODEC_ID_BINTEXT,
@@ -620,16 +628,20 @@ public:
     CODEC_ID_IDF = AV_CODEC_ID_IDF,
     CODEC_ID_OTF = AV_CODEC_ID_OTF,
     CODEC_ID_SMPTE_KLV = AV_CODEC_ID_SMPTE_KLV,
+    CODEC_ID_DVD_NAV = AV_CODEC_ID_DVD_NAV,
 
-    // codec_id is not known (like AV_CODEC_ID_NONE) but lavf should attempt to identify it
+
+    /** codec_id is not known (like AV_CODEC_ID_NONE) but lavf should attempt to identify it */
     CODEC_ID_PROBE = AV_CODEC_ID_PROBE,
 
-    /**_FAKE_ codec to indicate a raw MPEG-2 TS stream (only used by libavformat) */
+    /** _FAKE_ codec to indicate a raw MPEG-2 TS stream (only used by libavformat) */
     CODEC_ID_MPEG2TS = AV_CODEC_ID_MPEG2TS,
-    /**< _FAKE_ codec to indicate a MPEG-4 Systems stream (only used by libavformat) */
+    /** _FAKE_ codec to indicate a MPEG-4 Systems
+     * stream (only used by libavformat) */
     CODEC_ID_MPEG4SYSTEMS = AV_CODEC_ID_MPEG4SYSTEMS,
-    // Dummy codec for streams containing only metadata information.
+    /** Dummy codec for streams containing only metadata information. */
     CODEC_ID_FFMETADATA = AV_CODEC_ID_FFMETADATA,
+
   } ID;
 
   /**

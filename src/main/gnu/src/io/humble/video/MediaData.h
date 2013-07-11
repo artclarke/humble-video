@@ -24,6 +24,7 @@
 #include <io/humble/ferry/RefCounted.h>
 #include <io/humble/ferry/IBuffer.h>
 #include <io/humble/video/Rational.h>
+#include <io/humble/video/KeyValueBag.h>
 
 namespace io { namespace humble { namespace video {
 
@@ -85,22 +86,6 @@ public:
   virtual bool isKey()=0;
 
   /**
-   * Sets the underlying buffer used by this object.
-   * <p>
-   * This is an advanced method and is not recommended for use by those
-   * who don't fully understand how IBuffers work.  Implementations of
-   * {@link MediaData} may behave in undefined ways if the buffer you
-   * pass in is not big enough for what you ask them to do (e.g. they may
-   * discard your buffer and allocate a larger one if they need more space).
-   * It is up to the caller to ensure the buffer passed in is large enough,
-   * and is not simultaneously in use by another part of the system.
-   * </p>
-   * @param buffer The buffer to set.  If null, this method
-   *   is ignored.
-   */
-  virtual void setData(io::humble::ferry::IBuffer* buffer)=0;
-
-  /**
    * Returns whether or not we think this buffer has been filled
    * with data.
    * 
@@ -120,9 +105,61 @@ protected:
  */
 class VS_API_HUMBLEVIDEO MediaRawData: public io::humble::video::MediaData
 {
-  protected:
+public:
+  /** Get the presentation time stamp */
+  virtual int64_t getPts() { return getCtx()->pts; }
+  /** Get any meta-data associated with this media item */
+  virtual KeyValueBag* getMetaData();
+
+  /**
+   * pts copied from the Packet that was decoded to produce this frame
+   * - encoding: unused
+   * - decoding: Read by user.
+   */
+  virtual int64_t getPacketPts() { return getCtx()->pkt_pts; }
+
+  /**
+   * dts copied from the Packet that triggered returning this frame
+   * - encoding: unused
+   * - decoding: Read by user.
+   */
+  virtual int64_t getPacketDts() { return getCtx()->pkt_dts; }
+
+  /**
+   * size of the corresponding packet containing the compressed
+   * frame.
+   * It is set to a negative value if unknown.
+   * - encoding: unused
+   * - decoding: set by libavcodec, read by user.
+   */
+  virtual int32_t getPacketSize() { return getCtx()->pkt_size; };
+
+  /**
+   * duration of the corresponding packet, expressed in
+   * ContainerStream.getTimeBase() units, 0 if unknown.
+   * - encoding: unused
+   * - decoding: Read by user.
+   */
+  virtual int64_t getPacketDuration() { return getCtx()->pkt_duration; }
+
+  /**
+    * frame timestamp estimated using various heuristics, in stream time base
+    * - encoding: unused
+    * - decoding: set by libavcodec, read by user.
+    */
+   virtual int64_t getBestEffortTimeStamp() { return getCtx()->best_effort_timestamp; }
+
+   /**
+    * Total size in bytes of the decoded media.
+    *
+    * @return number of bytes of decoded media
+    */
+   virtual int32_t getSize()=0;
+
+protected:
     MediaRawData() {}
     virtual ~MediaRawData() {}
+    virtual AVFrame *getCtx()=0;
 };
 /**
  * The parent class for all Encoded media data.

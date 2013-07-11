@@ -298,12 +298,9 @@ SourceImpl::read(Packet* ipkt) {
   PacketImpl* pkt = dynamic_cast<PacketImpl*>(ipkt);
   if (pkt)
   {
-    AVPacket tmpPacket;
-    AVPacket* packet=0;
+    AVPacket* packet=pkt->getCtx();
 
-    packet = &tmpPacket;
     av_init_packet(packet);
-    pkt->reset();
     int32_t numReads=0;
     do
     {
@@ -314,12 +311,6 @@ SourceImpl::read(Packet* ipkt) {
     while (retval == AVERROR(EAGAIN) &&
         (mReadRetryMax < 0 || numReads <= mReadRetryMax));
 
-    if (retval >= 0)
-      pkt->wrapAVPacket(packet);
-    av_free_packet(packet);
-
-    // Get a pointer to the wrapped packet
-    packet = pkt->getCtx();
     // and dump it's contents
     VS_LOG_TRACE("read: %lld, %lld, %d, %d, %d, %lld, %lld: %p",
         pkt->getDts(),

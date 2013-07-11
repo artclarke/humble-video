@@ -38,8 +38,8 @@ namespace io { namespace humble { namespace video {
     if (!mPacket)
       throw std::bad_alloc();
     
-    // initialize because ffmpeg doesn't
     av_init_packet(mPacket);
+    // initialize because ffmpeg doesn't
     mPacket->data = 0;
     mPacket->size = 0;
     mIsComplete = false;
@@ -47,9 +47,8 @@ namespace io { namespace humble { namespace video {
 
   PacketImpl::~PacketImpl()
   {
-    reset();
-    av_free(mPacket);
-    mPacket = 0;
+    av_free_packet(mPacket);
+    av_freep(&mPacket);
   }
 
   int64_t
@@ -84,7 +83,7 @@ namespace io { namespace humble { namespace video {
   int32_t
   PacketImpl::getMaxSize()
   {
-    return (mBuffer ? mBuffer->getBufferSize() : -1);
+    return (mPacket->buf ? mPacket->buf->size : -1);
   }
   int32_t
   PacketImpl::getStreamIndex()
@@ -159,48 +158,32 @@ namespace io { namespace humble { namespace video {
   IBuffer *
   PacketImpl::getData()
   {
-    return mBuffer.get();
+    if (!mPacket->data || !mPacket->buf)
+      return 0;
+
+    // create a new reference
+    AVBufferRef * b = av_buffer_ref(mPacket->buf);
+    // and create an IBuffer wrapping it.
+    return IBuffer::make(this, mPacket->data, mPacket->size,
+        IBufferFreeFunc, b);
   }
   
   void
   PacketImpl::wrapAVPacket(AVPacket* pkt)
   {
-    // WE ALWAYS COPY the data; Let Ffmpeg do what it wants
-    // to with it's own memory.
     VS_ASSERT(mPacket, "No packet?");
+    av_free_packet(mPacket);
+    av_init_packet(mPacket);
     
-    // Make sure we have a buffer at least as large as this packet
-    // This overwrites data, which we'll patch below.
-    (void) this->allocateNewPayload(pkt->size);
-
-    // Keep a copy of this, because we're going to nuke
-    // it temporarily.
-    uint8_t* data_buf = mPacket->data;
-    void (*orig_destruct)(struct AVPacket *) = mPacket->destruct;
-    
-    // copy all data members, including data and size,
-    // but we'll overwrite those next.
-    *mPacket = *pkt;
-    // Reset the data buf.
-    mPacket->data = data_buf;
-    mPacket->destruct = orig_destruct;
-    mPacket->size = pkt->size;
-
-    // Copy the contents of the new packet into data.
-    if (pkt->data && pkt->size)
-      memcpy(mPacket->data, pkt->data, pkt->size);
+    int32_t retval = av_copy_packet(mPacket, pkt);
+    VS_ASSERT(retval >= 0, "Failed to copy packet");
+    if (retval < 0) {
+      VS_LOG_ERROR("Failed to copy packet");
+      throw std::bad_alloc();
+    }
     
     // And assume we're now complete.
     setComplete(true, mPacket->size);
-  }
-
-  void
-  PacketImpl::reset()
-  {
-    av_free_packet(mPacket);
-    av_init_packet(mPacket);
-    setComplete(false, 0);
-    // Don't reset the buffer though; we can potentially reuse it.
   }
 
   PacketImpl*
@@ -209,7 +192,7 @@ namespace io { namespace humble { namespace video {
     PacketImpl* retval= 0;
     try {
       retval = PacketImpl::make();
-      if (retval->allocateNewPayload(payloadSize) < 0)
+      if (av_new_packet(retval->mPacket, payloadSize) < 0)
       {
         throw std::bad_alloc();
       }
@@ -239,43 +222,51 @@ namespace io { namespace humble { namespace video {
   PacketImpl::make (PacketImpl* packet, bool copyData)
   {
     PacketImpl* retval=0;
-    IBuffer *buffer=0;
-    Rational* timeBase = 0;
+    RefPointer<Rational> timeBase;
     try
     {
       if (!packet)
         throw std::runtime_error("need packet to copy");
 
-      if (copyData)
+      // use the nice copy method.
+      retval = make();
+      int32_t r = av_copy_packet(retval->mPacket, packet->mPacket);
+      if (r < 0) {
+        VS_LOG_ERROR("Could not copy packet");
+        throw std::bad_alloc();
+      }
+      int32_t numBytes = packet->getSize();
+      if (copyData && numBytes > 0)
       {
-        int32_t numBytes = packet->getSize();
-        retval = make(numBytes);
         if (!retval || !retval->mPacket || !retval->mPacket->data)
           throw std::bad_alloc();
-        if (numBytes > 0 && packet->mPacket->data)
-          memcpy(retval->mPacket->data, packet->mPacket->data,
-              numBytes);
-      } else {
-        buffer=packet->getData();
-        retval = make(buffer);
-        if (!retval)
+
+        // we don't just want to reference count the data -- we want
+        // to copy it. So we're going to create a new copy.
+        RefPointer<IBuffer> copy = IBuffer::make(retval, numBytes + FF_INPUT_BUFFER_PADDING_SIZE);
+        if (!copy)
           throw std::bad_alloc();
+        uint8_t* data = (uint8_t*)copy->getBytes(0, numBytes);
+
+        // copy the data into our IBuffer backed data
+        memcpy(data, packet->mPacket->data,
+            numBytes);
+
+        // now, release the reference currently in the packet
+        if (retval->mPacket->buf)
+          av_buffer_unref(&retval->mPacket->buf);
+        // create a new reference wrapping our IBuffer (and create a reference
+        // to delete
+        copy->acquire();
+        retval->mPacket->buf = av_buffer_create(data, copy->getBufferSize(),
+            AVBufferRefFreeFunc, copy.value(), 0);
+        // and set the data member to the copy
+        retval->mPacket->data = data;
+
       }
-      // Keep a copy of this, because we're going to nuke
-      // it temporarily.
-      uint8_t* data_buf = retval->mPacket->data;
-      void (*orig_destruct)(struct AVPacket *) = retval->mPacket->destruct;
-
-      // copy all data members, including data and size,
-      // but we'll overwrite those next.
-      *(retval->mPacket) = *(packet->mPacket);
-
-      retval->mPacket->data = data_buf;
-      retval->mPacket->destruct = orig_destruct;
-
       // separate here to catch addRef()
       timeBase = packet->getTimeBase();
-      retval->setTimeBase(timeBase);
+      retval->setTimeBase(timeBase.value());
 
       retval->setComplete(retval->mPacket->size > 0,
           retval->mPacket->size);
@@ -284,57 +275,16 @@ namespace io { namespace humble { namespace video {
     {
       VS_REF_RELEASE(retval);
     }
-    VS_REF_RELEASE(buffer);
-    VS_REF_RELEASE(timeBase);
     
     return retval;
   }
   
+
   int32_t
   PacketImpl::allocateNewPayload(int32_t payloadSize)
   {
-    int32_t retval = -1;
-    reset();
-    uint8_t* payload = 0;
-
-    // Some FFMPEG encoders will read past the end of a
-    // buffer, so you need to allocate extra; yuck.
-    if (!mBuffer || mBuffer->getBufferSize() < payloadSize)
-    {
-      // buffer isn't big enough; we need to make a new one.
-      payload = (uint8_t*) av_malloc(payloadSize+FF_INPUT_BUFFER_PADDING_SIZE);
-      if (!payload)
-        throw std::bad_alloc();
-      
-      // we don't use the JVM for packets because Ffmpeg is REAL squirly about that
-      mBuffer = Buffer::make(0, payload,
-          payloadSize,
-          PacketImpl::freeAVBuffer, 0);
-      if (!mBuffer) {
-        av_free(payload);
-        throw std::bad_alloc();
-      }
-      // and memset the padding area.
-      memset(payload + payloadSize,
-          0,
-          FF_INPUT_BUFFER_PADDING_SIZE);
-    } else {
-      payload = (uint8_t*)mBuffer->getBytes(0, payloadSize);
-    }
-    VS_ASSERT(mPacket, "Should already have a packet");
-    VS_ASSERT(mBuffer, "Should have allocated a buffer");
-    VS_ASSERT(payload, "Should have allocated a payload");
-    if (mBuffer && mPacket)
-    {
-      mPacket->data = payload;
-
-      // And start out at zero.
-      mPacket->size = 0;
-      this->setComplete(false, 0);
-
-      retval = 0;
-    }
-    return retval;
+    av_free_packet(mPacket);
+    return av_new_packet(mPacket, payloadSize);
   }
 
   void
@@ -346,24 +296,28 @@ namespace io { namespace humble { namespace video {
   void
   PacketImpl::wrapBuffer(IBuffer *buffer)
   {
-    if (buffer != mBuffer.value())
-    {
-      reset();
-      // and acquire this buffer.
-      mBuffer.reset(buffer, true);
-    }
-    if (mBuffer)
-    {
-      // and patch up our AVPacket
-      VS_ASSERT(mPacket, "No AVPacket");
-      if (mPacket)
-      {
-        mPacket->size = mBuffer->getBufferSize();
-        mPacket->data = (uint8_t*)mBuffer->getBytes(0, mPacket->size);
-        // And assume we're now complete.
-        setComplete(true, mPacket->size);
-      }
-    }
+    if (!buffer)
+      return;
+    int32_t size = buffer->getBufferSize()-FF_INPUT_BUFFER_PADDING_SIZE;
+    if (size <= 0)
+      throw std::bad_alloc();
+
+    uint8_t* data = (uint8_t*)buffer->getBytes(0, size);
+
+    buffer->acquire(); // reference for av_buffer_create to manage.
+    // let's create a av buffer reference
+    if (mPacket->buf)
+      av_buffer_unref(&mPacket->buf);
+    mPacket->buf = av_buffer_create(
+        data,
+        size,
+        PacketImpl::AVBufferRefFreeFunc,
+        buffer,
+        0);
+    mPacket->size = size;
+    mPacket->data = data;
+    // And assume we're now complete.
+    setComplete(true, size);
   }
   bool
   PacketImpl::isComplete()
@@ -372,13 +326,22 @@ namespace io { namespace humble { namespace video {
   }
   
   void
-  PacketImpl::freeAVBuffer(void * buf, void * closure)
+  PacketImpl::AVBufferRefFreeFunc(void * closure, uint8_t * buf)
   {
+    IBuffer* b = (IBuffer*)closure;
     // We know that FFMPEG allocated this with av_malloc, but
     // that might change in future versions; so this is
     // inherently somewhat dangerous.
-    (void) closure;
-    av_free(buf);
+    (void) buf;
+    if (b)
+      b->release();
+  }
+  void
+  PacketImpl::IBufferFreeFunc(void * buf, void * closure)
+  {
+    AVBufferRef *b = (AVBufferRef*) closure;
+    (void) buf;
+    av_buffer_unref(&b);
   }
 
   int64_t

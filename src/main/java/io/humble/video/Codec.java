@@ -680,6 +680,9 @@ public class Codec extends RefCounted {
    */
     CODEC_ID_NONE(VideoJNI.Codec_CODEC_ID_NONE_get()),
     CODEC_ID_MPEG1VIDEO(VideoJNI.Codec_CODEC_ID_MPEG1VIDEO_get()),
+  /**
+   * preferred ID for MPEG-1/2 video decoding
+   */
     CODEC_ID_MPEG2VIDEO(VideoJNI.Codec_CODEC_ID_MPEG2VIDEO_get()),
     CODEC_ID_MPEG2VIDEO_XVMC(VideoJNI.Codec_CODEC_ID_MPEG2VIDEO_XVMC_get()),
     CODEC_ID_H261(VideoJNI.Codec_CODEC_ID_H261_get()),
@@ -735,7 +738,6 @@ public class Codec extends RefCounted {
     CODEC_ID_MSZH(VideoJNI.Codec_CODEC_ID_MSZH_get()),
     CODEC_ID_ZLIB(VideoJNI.Codec_CODEC_ID_ZLIB_get()),
     CODEC_ID_QTRLE(VideoJNI.Codec_CODEC_ID_QTRLE_get()),
-    CODEC_ID_SNOW(VideoJNI.Codec_CODEC_ID_SNOW_get()),
     CODEC_ID_TSCC(VideoJNI.Codec_CODEC_ID_TSCC_get()),
     CODEC_ID_ULTI(VideoJNI.Codec_CODEC_ID_ULTI_get()),
     CODEC_ID_QDRAW(VideoJNI.Codec_CODEC_ID_QDRAW_get()),
@@ -849,6 +851,9 @@ public class Codec extends RefCounted {
     CODEC_ID_CLLC(VideoJNI.Codec_CODEC_ID_CLLC_get()),
     CODEC_ID_MSS2(VideoJNI.Codec_CODEC_ID_MSS2_get()),
     CODEC_ID_VP9(VideoJNI.Codec_CODEC_ID_VP9_get()),
+    CODEC_ID_AIC(VideoJNI.Codec_CODEC_ID_AIC_get()),
+    CODEC_ID_ESCAPE130_DEPRECATED(VideoJNI.Codec_CODEC_ID_ESCAPE130_DEPRECATED_get()),
+    CODEC_ID_G2M_DEPRECATED(VideoJNI.Codec_CODEC_ID_G2M_DEPRECATED_get()),
     AV_CODEC_ID_BRENDER_PIX(VideoJNI.Codec_AV_CODEC_ID_BRENDER_PIX_get()),
     CODEC_ID_Y41P(VideoJNI.Codec_CODEC_ID_Y41P_get()),
     CODEC_ID_ESCAPE130(VideoJNI.Codec_CODEC_ID_ESCAPE130_get()),
@@ -870,6 +875,12 @@ public class Codec extends RefCounted {
     CODEC_ID_SGIRLE(VideoJNI.Codec_CODEC_ID_SGIRLE_get()),
     CODEC_ID_MVC1(VideoJNI.Codec_CODEC_ID_MVC1_get()),
     CODEC_ID_MVC2(VideoJNI.Codec_CODEC_ID_MVC2_get()),
+    CODEC_ID_SNOW(VideoJNI.Codec_CODEC_ID_SNOW_get()),
+    CODEC_ID_WEBP(VideoJNI.Codec_CODEC_ID_WEBP_get()),
+    CODEC_ID_SMVJPEG(VideoJNI.Codec_CODEC_ID_SMVJPEG_get()),
+  /**
+   * A dummy id pointing at the start of audio codecs
+   */
     CODEC_ID_FIRST_AUDIO(VideoJNI.Codec_CODEC_ID_FIRST_AUDIO_get()),
     CODEC_ID_PCM_S16LE(VideoJNI.Codec_CODEC_ID_PCM_S16LE_get()),
     CODEC_ID_PCM_S16BE(VideoJNI.Codec_CODEC_ID_PCM_S16BE_get()),
@@ -935,6 +946,8 @@ public class Codec extends RefCounted {
     CODEC_ID_VIMA(VideoJNI.Codec_CODEC_ID_VIMA_get()),
     CODEC_ID_ADPCM_AFC(VideoJNI.Codec_CODEC_ID_ADPCM_AFC_get()),
     CODEC_ID_ADPCM_IMA_OKI(VideoJNI.Codec_CODEC_ID_ADPCM_IMA_OKI_get()),
+    CODEC_ID_ADPCM_DTK(VideoJNI.Codec_CODEC_ID_ADPCM_DTK_get()),
+    CODEC_ID_ADPCM_IMA_RAD(VideoJNI.Codec_CODEC_ID_ADPCM_IMA_RAD_get()),
     CODEC_ID_AMR_NB(VideoJNI.Codec_CODEC_ID_AMR_NB_get()),
     CODEC_ID_AMR_WB(VideoJNI.Codec_CODEC_ID_AMR_WB_get()),
     CODEC_ID_RA_144(VideoJNI.Codec_CODEC_ID_RA_144_get()),
@@ -944,6 +957,9 @@ public class Codec extends RefCounted {
     CODEC_ID_XAN_DPCM(VideoJNI.Codec_CODEC_ID_XAN_DPCM_get()),
     CODEC_ID_SOL_DPCM(VideoJNI.Codec_CODEC_ID_SOL_DPCM_get()),
     CODEC_ID_MP2(VideoJNI.Codec_CODEC_ID_MP2_get()),
+  /**
+   * preferred ID for decoding MPEG audio layer 1, 2 or 3
+   */
     CODEC_ID_MP3(VideoJNI.Codec_CODEC_ID_MP3_get()),
     CODEC_ID_AAC(VideoJNI.Codec_CODEC_ID_AAC_get()),
     CODEC_ID_AC3(VideoJNI.Codec_CODEC_ID_AC3_get()),
@@ -961,6 +977,9 @@ public class Codec extends RefCounted {
     CODEC_ID_SHORTEN(VideoJNI.Codec_CODEC_ID_SHORTEN_get()),
     CODEC_ID_ALAC(VideoJNI.Codec_CODEC_ID_ALAC_get()),
     CODEC_ID_WESTWOOD_SND1(VideoJNI.Codec_CODEC_ID_WESTWOOD_SND1_get()),
+  /**
+   * as in Berlin toast format
+   */
     CODEC_ID_GSM(VideoJNI.Codec_CODEC_ID_GSM_get()),
     CODEC_ID_QDM2(VideoJNI.Codec_CODEC_ID_QDM2_get()),
     CODEC_ID_COOK(VideoJNI.Codec_CODEC_ID_COOK_get()),
@@ -973,6 +992,9 @@ public class Codec extends RefCounted {
     CODEC_ID_IMC(VideoJNI.Codec_CODEC_ID_IMC_get()),
     CODEC_ID_MUSEPACK7(VideoJNI.Codec_CODEC_ID_MUSEPACK7_get()),
     CODEC_ID_MLP(VideoJNI.Codec_CODEC_ID_MLP_get()),
+  /**
+   * as found in WAV
+   */
     CODEC_ID_GSM_MS(VideoJNI.Codec_CODEC_ID_GSM_MS_get()),
     CODEC_ID_ATRAC3(VideoJNI.Codec_CODEC_ID_ATRAC3_get()),
     CODEC_ID_VOXWARE(VideoJNI.Codec_CODEC_ID_VOXWARE_get()),
@@ -1008,7 +1030,6 @@ public class Codec extends RefCounted {
     CODEC_ID_COMFORT_NOISE(VideoJNI.Codec_CODEC_ID_COMFORT_NOISE_get()),
     CODEC_ID_TAK_DEPRECATED(VideoJNI.Codec_CODEC_ID_TAK_DEPRECATED_get()),
     CODEC_ID_FFWAVESYNTH(VideoJNI.Codec_CODEC_ID_FFWAVESYNTH_get()),
-    CODEC_ID_8SVX_RAW(VideoJNI.Codec_CODEC_ID_8SVX_RAW_get()),
     CODEC_ID_SONIC(VideoJNI.Codec_CODEC_ID_SONIC_get()),
     CODEC_ID_SONIC_LS(VideoJNI.Codec_CODEC_ID_SONIC_LS_get()),
     CODEC_ID_PAF_AUDIO(VideoJNI.Codec_CODEC_ID_PAF_AUDIO_get()),
@@ -1016,6 +1037,9 @@ public class Codec extends RefCounted {
     CODEC_ID_TAK(VideoJNI.Codec_CODEC_ID_TAK_get()),
     CODEC_ID_EVRC(VideoJNI.Codec_CODEC_ID_EVRC_get()),
     CODEC_ID_SMV(VideoJNI.Codec_CODEC_ID_SMV_get()),
+  /**
+   * A dummy ID pointing at the start of subtitle codecs.
+   */
     CODEC_ID_FIRST_SUBTITLE(VideoJNI.Codec_CODEC_ID_FIRST_SUBTITLE_get()),
     CODEC_ID_DVD_SUBTITLE(VideoJNI.Codec_CODEC_ID_DVD_SUBTITLE_get()),
     CODEC_ID_DVB_SUBTITLE(VideoJNI.Codec_CODEC_ID_DVB_SUBTITLE_get()),
@@ -1041,6 +1065,13 @@ public class Codec extends RefCounted {
     CODEC_ID_MPL2(VideoJNI.Codec_CODEC_ID_MPL2_get()),
     CODEC_ID_VPLAYER(VideoJNI.Codec_CODEC_ID_VPLAYER_get()),
     CODEC_ID_PJS(VideoJNI.Codec_CODEC_ID_PJS_get()),
+  /**
+   * ASS as defined in Matroska
+   */
+    CODEC_ID_ASS(VideoJNI.Codec_CODEC_ID_ASS_get()),
+  /**
+   * A dummy ID pointing at the start of various fake codecs.
+   */
     CODEC_ID_FIRST_UNKNOWN(VideoJNI.Codec_CODEC_ID_FIRST_UNKNOWN_get()),
     CODEC_ID_TTF(VideoJNI.Codec_CODEC_ID_TTF_get()),
     CODEC_ID_BINTEXT(VideoJNI.Codec_CODEC_ID_BINTEXT_get()),
@@ -1048,14 +1079,25 @@ public class Codec extends RefCounted {
     CODEC_ID_IDF(VideoJNI.Codec_CODEC_ID_IDF_get()),
     CODEC_ID_OTF(VideoJNI.Codec_CODEC_ID_OTF_get()),
     CODEC_ID_SMPTE_KLV(VideoJNI.Codec_CODEC_ID_SMPTE_KLV_get()),
+    CODEC_ID_DVD_NAV(VideoJNI.Codec_CODEC_ID_DVD_NAV_get()),
+  /**
+   * codec_id is not known (like AV_CODEC_ID_NONE) but lavf should attempt 
+   * to identify it
+   */
     CODEC_ID_PROBE(VideoJNI.Codec_CODEC_ID_PROBE_get()),
   /**
-   * _FAKE_ codec to indicate a MPEG-4 Systems stream (only used by libavformat) 
    * _FAKE_ codec to indicate a raw MPEG-2 TS stream (only used by libavformat) 
    *
    */
     CODEC_ID_MPEG2TS(VideoJNI.Codec_CODEC_ID_MPEG2TS_get()),
+  /**
+   * _FAKE_ codec to indicate a MPEG-4 Systems
+   * stream (only used by libavformat)
+   */
     CODEC_ID_MPEG4SYSTEMS(VideoJNI.Codec_CODEC_ID_MPEG4SYSTEMS_get()),
+  /**
+   * Dummy codec for streams containing only metadata information.
+   */
     CODEC_ID_FFMETADATA(VideoJNI.Codec_CODEC_ID_FFMETADATA_get());
 
     public final int swigValue() {

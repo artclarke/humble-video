@@ -111,4 +111,77 @@ public class MediaRawData extends MediaData {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+/**
+ * Get the presentation time stamp  
+ */
+  public long getPts() {
+    return VideoJNI.MediaRawData_getPts(swigCPtr, this);
+  }
+
+/**
+ * Get any meta-data associated with this media item  
+ */
+  public KeyValueBag getMetaData() {
+    long cPtr = VideoJNI.MediaRawData_getMetaData(swigCPtr, this);
+    return (cPtr == 0) ? null : new KeyValueBag(cPtr, false);
+  }
+
+/**
+ * pts copied from the Packet that was decoded to produce this frame 
+ *  
+ * - encoding: unused  
+ * - decoding: Read by user.  
+ */
+  public long getPacketPts() {
+    return VideoJNI.MediaRawData_getPacketPts(swigCPtr, this);
+  }
+
+/**
+ * dts copied from the Packet that triggered returning this frame  
+ * - encoding: unused  
+ * - decoding: Read by user.  
+ */
+  public long getPacketDts() {
+    return VideoJNI.MediaRawData_getPacketDts(swigCPtr, this);
+  }
+
+/**
+ * size of the corresponding packet containing the compressed  
+ * frame.  
+ * It is set to a negative value if unknown.  
+ * - encoding: unused  
+ * - decoding: set by libavcodec, read by user.  
+ */
+  public int getPacketSize() {
+    return VideoJNI.MediaRawData_getPacketSize(swigCPtr, this);
+  }
+
+/**
+ * duration of the corresponding packet, expressed in  
+ * ContainerStream.getTimeBase() units, 0 if unknown.  
+ * - encoding: unused  
+ * - decoding: Read by user.  
+ */
+  public long getPacketDuration() {
+    return VideoJNI.MediaRawData_getPacketDuration(swigCPtr, this);
+  }
+
+/**
+ * frame timestamp estimated using various heuristics, in stream time 
+ * base  
+ * - encoding: unused  
+ * - decoding: set by libavcodec, read by user.  
+ */
+  public long getBestEffortTimeStamp() {
+    return VideoJNI.MediaRawData_getBestEffortTimeStamp(swigCPtr, this);
+  }
+
+/**
+ * Total size in bytes of the decoded media.  
+ * @return	number of bytes of decoded media  
+ */
+  public int getSize() {
+    return VideoJNI.MediaRawData_getSize(swigCPtr, this);
+  }
+
 }

@@ -94,7 +94,7 @@ namespace io { namespace humble { namespace video
     Global::init();
     Codec *retval = 0;
     AVCodec *codec = 0;
-    enum CodecID ffmpeg_id = (enum CodecID) id;
+    enum AVCodecID ffmpeg_id = (enum AVCodecID) id;
     Global::lock();
     codec = avcodec_find_encoder(ffmpeg_id);
     Global::unlock();
@@ -136,7 +136,7 @@ namespace io { namespace humble { namespace video
     AVCodec *codec = 0;
 
     Global::lock();
-    codec = avcodec_find_decoder((enum CodecID) id);
+    codec = avcodec_find_decoder((enum AVCodecID) id);
     Global::unlock();
     
     if (codec)
@@ -206,7 +206,7 @@ namespace io { namespace humble { namespace video
 
     if (oFmt)
     {
-      enum CodecID id = av_guess_codec(oFmt, shortName, url,
+      enum AVCodecID id = av_guess_codec(oFmt, shortName, url,
           mimeType, (enum AVMediaType) type);
       retval = Codec::findEncodingCodecByIntID((int)id);
     }

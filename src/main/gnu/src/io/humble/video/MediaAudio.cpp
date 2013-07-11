@@ -16,24 +16,27 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
+/*
+ * Audio.cpp
+ *
+ *  Created on: Jul 10, 2013
+ *      Author: aclarke
+ */
 
-#include "MediaData.h"
-#include "KeyValueBagImpl.h"
+#include "MediaAudio.h"
 
-namespace io { namespace humble { namespace video {
+namespace io {
+namespace humble {
+namespace video {
 
-MediaData :: MediaData()
-{
+MediaAudio::MediaAudio() {
+
 }
 
-MediaData :: ~MediaData()
-{
+MediaAudio::~MediaAudio() {
+
 }
 
-KeyValueBag*
-MediaRawData::getMetaData()
-{
-  return KeyValueBagImpl::make(getCtx()->metadata);
-}
-
-}}}
+} /* namespace video */
+} /* namespace humble */
+} /* namespace io */
