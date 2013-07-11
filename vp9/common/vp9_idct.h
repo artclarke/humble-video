@@ -25,7 +25,10 @@
 #define pair_set_epi16(a, b) \
   _mm_set1_epi32(((uint16_t)(a)) + (((uint16_t)(b)) << 16))
 
-// Constants are round(16384 * cos(k*Pi/64)) where k = 1 to 31.
+// Constants:
+//  for (int i = 1; i< 32; ++i)
+//    printf("static const int cospi_%d_64 = %.0f;\n", i,
+//           round(16384 * cos(i*M_PI/64)));
 // Note: sin(k*Pi/64) = cos((32-k)*Pi/64)
 static const int cospi_1_64  = 16364;
 static const int cospi_2_64  = 16305;
@@ -68,12 +71,6 @@ static const int sinpi_4_9 = 15212;
 static INLINE int dct_const_round_shift(int input) {
   int rv = ROUND_POWER_OF_TWO(input, DCT_CONST_BITS);
   assert(INT16_MIN <= rv && rv <= INT16_MAX);
-  return rv;
-}
-
-static INLINE int dct_32_round(int input) {
-  int rv = ROUND_POWER_OF_TWO(input, DCT_CONST_BITS);
-  assert(-131072 <= rv && rv <= 131071);
   return rv;
 }
 

@@ -8,10 +8,14 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VP9_ENCODER_X86_VP9_DCT_MMX_H_
-#define VP9_ENCODER_X86_VP9_DCT_MMX_H_
+#ifndef VP9_COMMON_VP9_COMMON_DATA_H_
+#define VP9_COMMON_VP9_COMMON_DATA_H_
 
-extern void vp9_short_fdct4x4_mmx(short *input, short *output, int pitch);
+#include "vp9/common/vp9_enums.h"
 
+extern const int b_width_log2_lookup[BLOCK_SIZE_TYPES];
+extern const int b_height_log2_lookup[BLOCK_SIZE_TYPES];
+extern const int mi_width_log2_lookup[BLOCK_SIZE_TYPES];
+extern const int mi_height_log2_lookup[BLOCK_SIZE_TYPES];
 
-#endif /* VP9_ENCODER_X86_VP9_DCT_MMX_H_ */
+#endif    // VP9_COMMON_VP9_COMMON_DATA_H

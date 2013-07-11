@@ -22,12 +22,11 @@
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
-#define ROUND_POWER_OF_TWO(value, n) (((value) + (1 << ((n) - 1))) >> (n))
+#define ROUND_POWER_OF_TWO(value, n) \
+    (((value) + (1 << ((n) - 1))) >> (n))
 
-/* If we don't want to use ROUND_POWER_OF_TWO macro
-static INLINE int16_t round_power_of_two(int16_t value, int n) {
-  return (value + (1 << (n - 1))) >> n;
-}*/
+#define ALIGN_POWER_OF_TWO(value, n) \
+    (((value) + ((1 << (n)) - 1)) & ~((1 << (n)) - 1))
 
 // Only need this for fixed-size arrays, for structs just assign.
 #define vp9_copy(dest, src) {            \
@@ -56,9 +55,34 @@ static INLINE double fclamp(double value, double low, double high) {
   return value < low ? low : (value > high ? high : value);
 }
 
-static INLINE int multiple8(int value) {
-  return (value + 7) & ~7;
+static int get_unsigned_bits(unsigned int num_values) {
+  int cat = 0;
+  if (num_values <= 1)
+    return 0;
+  num_values--;
+  while (num_values > 0) {
+    cat++;
+    num_values >>= 1;
+  }
+  return cat;
 }
+
+#if CONFIG_DEBUG
+#define CHECK_MEM_ERROR(cm, lval, expr) do { \
+  lval = (expr); \
+  if (!lval) \
+    vpx_internal_error(&cm->error, VPX_CODEC_MEM_ERROR, \
+                       "Failed to allocate "#lval" at %s:%d", \
+                       __FILE__, __LINE__); \
+  } while (0)
+#else
+#define CHECK_MEM_ERROR(cm, lval, expr) do { \
+  lval = (expr); \
+  if (!lval) \
+    vpx_internal_error(&cm->error, VPX_CODEC_MEM_ERROR, \
+                       "Failed to allocate "#lval); \
+  } while (0)
+#endif
 
 #define SYNC_CODE_0 0x49
 #define SYNC_CODE_1 0x83

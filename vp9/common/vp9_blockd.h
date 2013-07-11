@@ -20,6 +20,7 @@
 #include "vpx_ports/mem.h"
 #include "vp9/common/vp9_common.h"
 #include "vp9/common/vp9_enums.h"
+#include "vp9/common/vp9_common_data.h"
 
 #define BLOCK_SIZE_GROUPS   4
 #define MAX_MB_SEGMENTS     8
@@ -122,21 +123,12 @@ typedef enum {
 
 #define WHT_UPSCALE_FACTOR 2
 
-#define TX_SIZE_PROBS  6  // (TX_SIZE_MAX_SB * (TX_SIZE_MAX_SB - 1) / 2)
-
-#define get_tx_probs(c, b) ((b) < BLOCK_SIZE_MB16X16 ? \
-                            (c)->fc.tx_probs_8x8p :    \
-                            (b) < BLOCK_SIZE_SB32X32 ? \
-                            (c)->fc.tx_probs_16x16p : (c)->fc.tx_probs_32x32p)
-
 /* For keyframes, intra block modes are predicted by the (already decoded)
    modes for the Y blocks to the left and above us; for interframes, there
    is a single probability table. */
 
 union b_mode_info {
-  struct {
-    MB_PREDICTION_MODE first;
-  } as_mode;
+  MB_PREDICTION_MODE as_mode;
   int_mv as_mv[2];  // first, second inter predictor motion vectors
 };
 
@@ -150,60 +142,18 @@ typedef enum {
 } MV_REFERENCE_FRAME;
 
 static INLINE int b_width_log2(BLOCK_SIZE_TYPE sb_type) {
-  switch (sb_type) {
-    case BLOCK_SIZE_SB4X8:
-    case BLOCK_SIZE_AB4X4: return 0;
-    case BLOCK_SIZE_SB8X4:
-    case BLOCK_SIZE_SB8X8:
-    case BLOCK_SIZE_SB8X16: return 1;
-    case BLOCK_SIZE_SB16X8:
-    case BLOCK_SIZE_MB16X16:
-    case BLOCK_SIZE_SB16X32: return 2;
-    case BLOCK_SIZE_SB32X16:
-    case BLOCK_SIZE_SB32X32:
-    case BLOCK_SIZE_SB32X64: return 3;
-    case BLOCK_SIZE_SB64X32:
-    case BLOCK_SIZE_SB64X64: return 4;
-    default: assert(0);
-      return -1;
-  }
+  return b_width_log2_lookup[sb_type];
 }
-
 static INLINE int b_height_log2(BLOCK_SIZE_TYPE sb_type) {
-  switch (sb_type) {
-    case BLOCK_SIZE_SB8X4:
-    case BLOCK_SIZE_AB4X4: return 0;
-    case BLOCK_SIZE_SB4X8:
-    case BLOCK_SIZE_SB8X8:
-    case BLOCK_SIZE_SB16X8: return 1;
-    case BLOCK_SIZE_SB8X16:
-    case BLOCK_SIZE_MB16X16:
-    case BLOCK_SIZE_SB32X16: return 2;
-    case BLOCK_SIZE_SB16X32:
-    case BLOCK_SIZE_SB32X32:
-    case BLOCK_SIZE_SB64X32: return 3;
-    case BLOCK_SIZE_SB32X64:
-    case BLOCK_SIZE_SB64X64: return 4;
-    default: assert(0);
-      return -1;
-  }
+  return b_height_log2_lookup[sb_type];
 }
 
 static INLINE int mi_width_log2(BLOCK_SIZE_TYPE sb_type) {
-  int a = b_width_log2(sb_type) - 1;
-  // align 4x4 block to mode_info
-  if (a < 0)
-    a = 0;
-  assert(a >= 0);
-  return a;
+  return mi_width_log2_lookup[sb_type];
 }
 
 static INLINE int mi_height_log2(BLOCK_SIZE_TYPE sb_type) {
-  int a = b_height_log2(sb_type) - 1;
-  if (a < 0)
-    a = 0;
-  assert(a >= 0);
-  return a;
+  return mi_height_log2_lookup[sb_type];
 }
 
 typedef struct {
@@ -214,7 +164,7 @@ typedef struct {
   int_mv ref_mvs[MAX_REF_FRAMES][MAX_MV_REF_CANDIDATES];
   int_mv best_mv, best_second_mv;
 
-  int mb_mode_context[MAX_REF_FRAMES];
+  uint8_t mb_mode_context[MAX_REF_FRAMES];
 
   unsigned char mb_skip_coeff;                                /* does this mb has coefficients at all, 1=no coefficients, 0=need decode tokens */
   unsigned char segment_id;           // Segment id for current frame
@@ -237,6 +187,11 @@ typedef struct {
   union b_mode_info bmi[4];
 } MODE_INFO;
 
+enum mv_precision {
+  MV_PRECISION_Q3,
+  MV_PRECISION_Q4
+};
+
 #define VP9_REF_SCALE_SHIFT 14
 struct scale_factors {
   int x_scale_fp;   // horizontal fixed point scale factor
@@ -249,9 +204,8 @@ struct scale_factors {
   int (*scale_value_x)(int val, const struct scale_factors *scale);
   int (*scale_value_y)(int val, const struct scale_factors *scale);
   void (*set_scaled_offsets)(struct scale_factors *scale, int row, int col);
-  int_mv32 (*scale_mv_q3_to_q4)(const int_mv *src_mv,
-                                const struct scale_factors *scale);
-  int32_t (*scale_mv_component_q4)(int mv_q4, int scale_fp, int offset_q4);
+  MV32 (*scale_mv_q3_to_q4)(const MV *mv, const struct scale_factors *scale);
+  MV32 (*scale_mv_q4)(const MV *mv, const struct scale_factors *scale);
 
   convolve_fn_t predict[2][2][2];  // horiz, vert, avg
 };
@@ -334,6 +288,7 @@ typedef struct macroblockd {
   signed char last_ref_lf_deltas[MAX_REF_LF_DELTAS];
   /* 0 = Intra, Last, GF, ARF */
   signed char ref_lf_deltas[MAX_REF_LF_DELTAS];
+
   /* 0 = ZERO_MV, MV */
   signed char last_mode_lf_deltas[MAX_MODE_LF_DELTAS];
   /* 0 = ZERO_MV, MV */
@@ -396,38 +351,21 @@ static int *get_sb_index(MACROBLOCKD *xd, BLOCK_SIZE_TYPE subsize) {
 static INLINE void update_partition_context(MACROBLOCKD *xd,
                                             BLOCK_SIZE_TYPE sb_type,
                                             BLOCK_SIZE_TYPE sb_size) {
-  int bsl = b_width_log2(sb_size), bs = (1 << bsl) / 2;
-  int bwl = b_width_log2(sb_type);
-  int bhl = b_height_log2(sb_type);
-  int boffset = b_width_log2(BLOCK_SIZE_SB64X64) - bsl;
-  int i;
+  const int bsl = b_width_log2(sb_size), bs = (1 << bsl) / 2;
+  const int bwl = b_width_log2(sb_type);
+  const int bhl = b_height_log2(sb_type);
+  const int boffset = b_width_log2(BLOCK_SIZE_SB64X64) - bsl;
+  const char pcval0 = ~(0xe << boffset);
+  const char pcval1 = ~(0xf << boffset);
+  const char pcvalue[2] = {pcval0, pcval1};
+
+  assert(MAX(bwl, bhl) <= bsl);
 
   // update the partition context at the end notes. set partition bits
   // of block sizes larger than the current one to be one, and partition
   // bits of smaller block sizes to be zero.
-  if ((bwl == bsl) && (bhl == bsl)) {
-    for (i = 0; i < bs; i++)
-      xd->left_seg_context[i] = ~(0xf << boffset);
-    for (i = 0; i < bs; i++)
-      xd->above_seg_context[i] = ~(0xf << boffset);
-  } else if ((bwl == bsl) && (bhl < bsl)) {
-    for (i = 0; i < bs; i++)
-      xd->left_seg_context[i] = ~(0xe << boffset);
-    for (i = 0; i < bs; i++)
-      xd->above_seg_context[i] = ~(0xf << boffset);
-  }  else if ((bwl < bsl) && (bhl == bsl)) {
-    for (i = 0; i < bs; i++)
-      xd->left_seg_context[i] = ~(0xf << boffset);
-    for (i = 0; i < bs; i++)
-      xd->above_seg_context[i] = ~(0xe << boffset);
-  } else if ((bwl < bsl) && (bhl < bsl)) {
-    for (i = 0; i < bs; i++)
-      xd->left_seg_context[i] = ~(0xe << boffset);
-    for (i = 0; i < bs; i++)
-      xd->above_seg_context[i] = ~(0xe << boffset);
-  } else {
-    assert(0);
-  }
+  vpx_memset(xd->above_seg_context, pcvalue[bwl == bsl], bs);
+  vpx_memset(xd->left_seg_context, pcvalue[bhl == bsl], bs);
 }
 
 static INLINE int partition_plane_context(MACROBLOCKD *xd,
@@ -453,10 +391,9 @@ static INLINE int partition_plane_context(MACROBLOCKD *xd,
 
 static BLOCK_SIZE_TYPE get_subsize(BLOCK_SIZE_TYPE bsize,
                                    PARTITION_TYPE partition) {
-  BLOCK_SIZE_TYPE subsize;
+  BLOCK_SIZE_TYPE subsize = bsize;
   switch (partition) {
     case PARTITION_NONE:
-      subsize = bsize;
       break;
     case PARTITION_HORZ:
       if (bsize == BLOCK_SIZE_SB64X64)
@@ -500,61 +437,42 @@ static BLOCK_SIZE_TYPE get_subsize(BLOCK_SIZE_TYPE bsize,
   return subsize;
 }
 
-// transform mapping
-static TX_TYPE txfm_map(MB_PREDICTION_MODE bmode) {
-  switch (bmode) {
-    case TM_PRED :
-    case D135_PRED :
-      return ADST_ADST;
+extern const TX_TYPE mode2txfm_map[MB_MODE_COUNT];
 
-    case V_PRED :
-    case D117_PRED :
-    case D63_PRED:
-      return ADST_DCT;
-
-    case H_PRED :
-    case D153_PRED :
-    case D27_PRED :
-      return DCT_ADST;
-
-    default:
-      return DCT_DCT;
-  }
-}
-
-static TX_TYPE get_tx_type_4x4(const MACROBLOCKD *xd, int ib) {
-  TX_TYPE tx_type;
-  MODE_INFO *mi = xd->mode_info_context;
+static INLINE TX_TYPE get_tx_type_4x4(const MACROBLOCKD *xd, int ib) {
+  MODE_INFO *const mi = xd->mode_info_context;
   MB_MODE_INFO *const mbmi = &mi->mbmi;
+
   if (xd->lossless || mbmi->ref_frame[0] != INTRA_FRAME)
     return DCT_DCT;
-  if (mbmi->sb_type < BLOCK_SIZE_SB8X8) {
-    tx_type = txfm_map(mi->bmi[ib].as_mode.first);
-  } else {
-    assert(mbmi->mode <= TM_PRED);
-    tx_type = txfm_map(mbmi->mode);
-  }
-  return tx_type;
+
+  return mode2txfm_map[mbmi->sb_type < BLOCK_SIZE_SB8X8 ?
+                       mi->bmi[ib].as_mode : mbmi->mode];
 }
 
-static TX_TYPE get_tx_type_8x8(const MACROBLOCKD *xd, int ib) {
-  TX_TYPE tx_type = DCT_DCT;
-  if (xd->mode_info_context->mbmi.mode <= TM_PRED) {
-    tx_type = txfm_map(xd->mode_info_context->mbmi.mode);
-  }
-  return tx_type;
+static INLINE TX_TYPE get_tx_type_8x8(const MACROBLOCKD *xd) {
+  return mode2txfm_map[xd->mode_info_context->mbmi.mode];
 }
 
-static TX_TYPE get_tx_type_16x16(const MACROBLOCKD *xd, int ib) {
-  TX_TYPE tx_type = DCT_DCT;
-  if (xd->mode_info_context->mbmi.mode <= TM_PRED) {
-    tx_type = txfm_map(xd->mode_info_context->mbmi.mode);
-  }
-  return tx_type;
+static INLINE TX_TYPE get_tx_type_16x16(const MACROBLOCKD *xd) {
+  return  mode2txfm_map[xd->mode_info_context->mbmi.mode];
 }
 
-void vp9_setup_block_dptrs(MACROBLOCKD *xd,
-                           int subsampling_x, int subsampling_y);
+static void setup_block_dptrs(MACROBLOCKD *xd, int ss_x, int ss_y) {
+  int i;
+
+  for (i = 0; i < MAX_MB_PLANE; i++) {
+    xd->plane[i].plane_type = i ? PLANE_TYPE_UV : PLANE_TYPE_Y_WITH_DC;
+    xd->plane[i].subsampling_x = i ? ss_x : 0;
+    xd->plane[i].subsampling_y = i ? ss_y : 0;
+  }
+#if CONFIG_ALPHA
+  // TODO(jkoleszar): Using the Y w/h for now
+  xd->plane[3].subsampling_x = 0;
+  xd->plane[3].subsampling_y = 0;
+#endif
+}
+
 
 static TX_SIZE get_uv_tx_size(const MB_MODE_INFO *mbmi) {
   const TX_SIZE size = mbmi->txfm_size;

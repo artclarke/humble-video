@@ -15,6 +15,7 @@
 #include <vp9/encoder/vp9_rdopt.h>
 #include <vp9/common/vp9_blockd.h>
 #include <vp9/common/vp9_reconinter.h>
+#include <vp9/common/vp9_reconintra.h>
 #include <vp9/common/vp9_systemdependent.h>
 #include <vp9/encoder/vp9_segmentation.h>
 
@@ -35,8 +36,9 @@ static unsigned int do_16x16_motion_iteration(VP9_COMP *cpi,
   int_mv ref_full;
 
   // Further step/diamond searches as necessary
-  int step_param = cpi->sf.first_step +
+  int step_param = cpi->sf.reduce_first_step_size +
       (cpi->speed < 8 ? (cpi->speed > 5 ? 1 : 0) : 2);
+  step_param = MIN(step_param, (cpi->sf.max_step_search_steps - 2));
 
   vp9_clamp_mv_min_max(x, ref_mv);
 
@@ -145,16 +147,11 @@ static int find_best_16x16_intra(VP9_COMP *cpi,
   // we're intentionally not doing 4x4, we just want a rough estimate
   for (mode = DC_PRED; mode <= TM_PRED; mode++) {
     unsigned int err;
-    const int bwl = b_width_log2(BLOCK_SIZE_MB16X16),  bw = 4 << bwl;
-    const int bhl = b_height_log2(BLOCK_SIZE_MB16X16), bh = 4 << bhl;
 
     xd->mode_info_context->mbmi.mode = mode;
-    vp9_build_intra_predictors(x->plane[0].src.buf, x->plane[0].src.stride,
-                               xd->plane[0].dst.buf, xd->plane[0].dst.stride,
-                               xd->mode_info_context->mbmi.mode,
-                               bw, bh,
-                               xd->up_available, xd->left_available,
-                               xd->right_available);
+    vp9_predict_intra_block(xd, 0, 2, TX_16X16, mode,
+                            x->plane[0].src.buf, x->plane[0].src.stride,
+                            xd->plane[0].dst.buf, xd->plane[0].dst.stride);
     err = vp9_sad16x16(x->plane[0].src.buf, x->plane[0].src.stride,
                        xd->plane[0].dst.buf, xd->plane[0].dst.stride, best_err);
 
@@ -323,8 +320,9 @@ static void separate_arf_mbs(VP9_COMP *cpi) {
 
   int *arf_not_zz;
 
-  CHECK_MEM_ERROR(arf_not_zz,
-                  vpx_calloc(cm->mb_rows * cm->mb_cols * sizeof(*arf_not_zz), 1));
+  CHECK_MEM_ERROR(cm, arf_not_zz,
+                  vpx_calloc(cm->mb_rows * cm->mb_cols * sizeof(*arf_not_zz),
+                             1));
 
   // We are not interested in results beyond the alt ref itself.
   if (n_frames > cpi->frames_till_gf_update_due)
