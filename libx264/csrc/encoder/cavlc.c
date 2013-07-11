@@ -213,11 +213,14 @@ static void x264_cavlc_qp_delta( x264_t *h )
     bs_t *s = &h->out.bs;
     int i_dqp = h->mb.i_qp - h->mb.i_last_qp;
 
-    /* Avoid writing a delta quant if we have an empty i16x16 block, e.g. in a completely flat background area */
+    /* Avoid writing a delta quant if we have an empty i16x16 block, e.g. in a completely
+     * flat background area. Don't do this if it would raise the quantizer, since that could
+     * cause unexpected deblocking artifacts. */
     if( h->mb.i_type == I_16x16 && !(h->mb.i_cbp_luma | h->mb.i_cbp_chroma)
         && !h->mb.cache.non_zero_count[x264_scan8[LUMA_DC]]
         && !h->mb.cache.non_zero_count[x264_scan8[CHROMA_DC+0]]
-        && !h->mb.cache.non_zero_count[x264_scan8[CHROMA_DC+1]] )
+        && !h->mb.cache.non_zero_count[x264_scan8[CHROMA_DC+1]]
+        && h->mb.i_qp > h->mb.i_last_qp )
     {
 #if !RDO_SKIP_BS
         h->mb.i_qp = h->mb.i_last_qp;

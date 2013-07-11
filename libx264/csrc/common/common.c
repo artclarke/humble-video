@@ -1037,6 +1037,8 @@ int x264_param_parse( x264_param_t *p, const char *name, const char *value )
         p->b_fake_interlaced = atobool(value);
     OPT("frame-packing")
         p->i_frame_packing = atoi(value);
+    OPT("stitchable")
+        p->b_stitchable = atobool(value);
     OPT("opencl")
         p->b_opencl = atobool( value );
     OPT("opencl-clbin")
@@ -1330,6 +1332,8 @@ char *x264_param2string( x264_param_t *p, int b_res )
     s += sprintf( s, " decimate=%d", p->analyse.b_dct_decimate );
     s += sprintf( s, " interlaced=%s", p->b_interlaced ? p->b_tff ? "tff" : "bff" : p->b_fake_interlaced ? "fake" : "0" );
     s += sprintf( s, " bluray_compat=%d", p->b_bluray_compat );
+    if( p->b_stitchable )
+        s += sprintf( s, " stitchable=%d", p->b_stitchable );
 
     s += sprintf( s, " constrained_intra=%d", p->b_constrained_intra );
 

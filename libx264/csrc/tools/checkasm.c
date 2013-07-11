@@ -388,7 +388,8 @@ static int check_pixel( int cpu_ref, int cpu_new )
     ok = 1; used_asm = 0; \
     for( int i = 0; i < 7; i++ ) \
     { \
-        int res_c[4]={0}, res_asm[4]={0}; \
+        ALIGNED_16( int res_c[4] ) = {0}; \
+        ALIGNED_16( int res_asm[4] ) = {0}; \
         if( pixel_asm.sad_x##N[i] && pixel_asm.sad_x##N[i] != pixel_ref.sad_x##N[i] ) \
         { \
             set_func_name( "sad_x%d_%s", N, pixel_names[i] ); \
@@ -541,7 +542,8 @@ static int check_pixel( int cpu_ref, int cpu_new )
 #define TEST_INTRA_X3( name, i8x8, ... ) \
     if( pixel_asm.name && pixel_asm.name != pixel_ref.name ) \
     { \
-        int res_c[3], res_asm[3]; \
+        ALIGNED_16( int res_c[3] ); \
+        ALIGNED_16( int res_asm[3] ); \
         set_func_name( #name ); \
         used_asm = 1; \
         call_c( pixel_c.name, pbuf1+48, i8x8 ? edge : pbuf3+48, res_c ); \

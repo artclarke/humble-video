@@ -40,13 +40,18 @@ void x264_weights_analyse( x264_t *h, x264_frame_t *fenc, x264_frame_t *ref, int
 #define CL_QUEUE_THREAD_HANDLE_AMD 0x403E
 
 #define OCLCHECK( method, ... )\
+do\
+{\
+    if( h->opencl.b_fatal_error )\
+        return -1;\
     status = ocl->method( __VA_ARGS__ );\
     if( status != CL_SUCCESS ) {\
         h->param.b_opencl = 0;\
         h->opencl.b_fatal_error = 1;\
         x264_log( h, X264_LOG_ERROR, # method " error '%d'\n", status );\
-        return status;\
-    }
+        return -1;\
+    }\
+} while( 0 )
 
 void x264_opencl_flush( x264_t *h )
 {
@@ -152,6 +157,7 @@ int x264_opencl_lowres_init( x264_t *h, x264_frame_t *fenc, int lambda )
         CREATEBUF( fenc->opencl.lowres_mv_costs1,  CL_MEM_READ_WRITE, mb_count * sizeof(int16_t) * (h->param.i_bframe + 1) );
     }
 #undef CREATEBUF
+#undef CREATEIMAGE
 
     /* Copy image to the GPU, downscale to unpadded 8x8, then continue for all scales */
 
