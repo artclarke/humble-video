@@ -1,6 +1,6 @@
 /autom4te.cache
 config.h.in~
 .*.swp
-/.project
-/.cproject
+.project
+.cproject
 /.autotools
