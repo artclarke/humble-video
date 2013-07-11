@@ -21,7 +21,7 @@
 #define AUDIOSAMPLES_H_
 
 #include <io/humble/video/HumbleVideo.h>
-#include <io/humble/video/MediaData.h>
+#include <io/humble/video/MediaRaw.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/ferry/IBuffer.h>
 namespace io { namespace humble { namespace video
@@ -34,7 +34,7 @@ namespace io { namespace humble { namespace video
    * The timestamp value in decoded data is always in Microseonds.
    * 
    */
-  class VS_API_HUMBLEVIDEO AudioSamples : public MediaRawData
+  class VS_API_HUMBLEVIDEO AudioSamples : public MediaRaw
   {
   public:
     // AudioSamples

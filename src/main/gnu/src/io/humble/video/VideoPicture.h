@@ -21,7 +21,7 @@
 #define VIDEOPICTURE_H_
 
 #include <io/humble/video/HumbleVideo.h>
-#include <io/humble/video/MediaData.h>
+#include <io/humble/video/MediaRaw.h>
 #include <io/humble/ferry/IBuffer.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/PixelFormat.h>
@@ -36,7 +36,7 @@ namespace io { namespace humble { namespace video
    * All timestamps for this object are always in Microseconds.
    * </p>
    */
-  class VS_API_HUMBLEVIDEO VideoPicture : public MediaRawData
+  class VS_API_HUMBLEVIDEO VideoPicture : public MediaRaw
   {
   public:
     /**

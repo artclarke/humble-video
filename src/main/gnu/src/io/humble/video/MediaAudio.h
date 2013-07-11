@@ -35,7 +35,7 @@ namespace video {
 /**
  * A class that defines metadata about audio formats.
  */
-class VS_API_HUMBLEVIDEO AudioFormat : public io::humble::ferry::RefCounted
+class VS_API_HUMBLEVIDEO AudioFormat : public virtual MediaRaw
 {
   /**
    * The format we use to represent audio.
@@ -375,7 +375,7 @@ protected:
  * {@link MediaAudio#getDataLineSize(int)} is the buffer size, in bytes, for the 1 plane.
  * </p>
  */
-class VS_API_HUMBLEVIDEO MediaAudio : public MediaRawData
+class VS_API_HUMBLEVIDEO MediaAudio : public MediaRaw
 {
 
 public:

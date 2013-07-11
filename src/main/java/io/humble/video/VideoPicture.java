@@ -17,7 +17,7 @@ import io.humble.ferry.*;
  * All timestamps for this object are always in Microseconds.  
  * </p>  
  */
-public class VideoPicture extends MediaRawData {
+public class VideoPicture extends MediaRaw {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**

@@ -14,7 +14,7 @@ import io.humble.ferry.*;
  * samples relative to other items in a given {@link Container}.  
  * The timestamp value in decoded data is always in Microseonds.  
  */
-public class AudioSamples extends MediaRawData {
+public class AudioSamples extends MediaRaw {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**

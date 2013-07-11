@@ -123,6 +123,10 @@ public class Packet extends MediaEncodedData {
 
 /**
  * Allocate a new packet that wraps an existing IBuffer.  
+ * NOTE: At least 16 bytes of the passed in buffer will be used  
+ * for header information, so the resulting {@link Packet.getSize() 
+ * }  
+ * will be smaller than {@link IBuffer.getBufferSize() }.  
  * @param	buffer The IBuffer to wrap.  
  * @return	a new packet or null on error.  
  */

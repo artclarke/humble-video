@@ -100,7 +100,7 @@ libhumble_video_la_DEPENDENCIES =
 am_libhumble_video_la_OBJECTS = PixelFormat.lo AudioSamples.lo \
 	AudioSamplesImpl.lo VideoPicture.lo VideoPictureImpl.lo \
 	KeyValueBag.lo KeyValueBagImpl.lo Property.lo PropertyImpl.lo \
-	Rational.lo RationalImpl.lo Codec.lo MediaData.lo \
+	Rational.lo RationalImpl.lo Codec.lo Media.lo MediaRaw.lo \
 	IndexEntry.lo IndexEntryImpl.lo Error.lo ErrorImpl.lo \
 	Packet.lo PacketImpl.lo ContainerFormat.lo Configurable.lo \
 	ContainerStream.lo Container.lo SourceFormat.lo Source.lo \
@@ -442,7 +442,8 @@ libhumble_video_la_SOURCES = \
   Rational.cpp \
   RationalImpl.cpp \
   Codec.cpp \
-  MediaData.cpp \
+  Media.cpp \
+  MediaRaw.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
   Error.cpp \
@@ -484,8 +485,10 @@ libhumble_video_la_HEADERS = \
   Rational.h \
   RationalImpl.h \
   Rational.swg \
-  MediaData.h \
-  MediaData.swg \
+  Media.h \
+  Media.swg \
+  MediaRaw.h \
+  MediaRaw.swg \
   IndexEntry.h \
   IndexEntryImpl.h \
   IndexEntry.swg \
@@ -592,7 +595,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntryImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBag.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagImpl.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaData.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Media.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaRaw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Packet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PacketImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PixelFormat.Plo@am__quote@

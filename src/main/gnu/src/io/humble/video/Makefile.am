@@ -24,7 +24,8 @@ libhumble_video_la_SOURCES= \
   Rational.cpp \
   RationalImpl.cpp \
   Codec.cpp \
-  MediaData.cpp \
+  Media.cpp \
+  MediaRaw.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
   Error.cpp \
@@ -66,8 +67,10 @@ libhumble_video_la_HEADERS= \
   Rational.h \
   RationalImpl.h \
   Rational.swg \
-  MediaData.h \
-  MediaData.swg \
+  Media.h \
+  Media.swg \
+  MediaRaw.h \
+  MediaRaw.swg \
   IndexEntry.h \
   IndexEntryImpl.h \
   IndexEntry.swg \
