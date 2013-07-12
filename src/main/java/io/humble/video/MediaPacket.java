@@ -12,7 +12,7 @@ import io.humble.ferry.*;
  * A packet of data that was read from a {@link Source} or  
  * will be written to a {@link Sink}.  
  */
-public class Packet extends MediaEncoded {
+public class MediaPacket extends MediaEncoded {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -30,18 +30,18 @@ public class Packet extends MediaEncoded {
   /**
    * Internal Only.
    */
-  protected Packet(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGPacketUpcast(cPtr), cMemoryOwn);
+  protected MediaPacket(long cPtr, boolean cMemoryOwn) {
+    super(VideoJNI.SWIGMediaPacketUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
   /**
    * Internal Only.
    */
-  protected Packet(long cPtr, boolean cMemoryOwn,
+  protected MediaPacket(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGPacketUpcast(cPtr),
+    super(VideoJNI.SWIGMediaPacketUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -54,7 +54,7 @@ public class Packet extends MediaEncoded {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(Packet obj) {
+  protected static long getCPtr(MediaPacket obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -72,17 +72,17 @@ public class Packet extends MediaEncoded {
   }
   
   /**
-   * Create a new Packet object that is actually referring to the
+   * Create a new MediaPacket object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
    */
   @Override
-  public Packet copyReference() {
+  public MediaPacket copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new Packet(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new MediaPacket(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -95,8 +95,8 @@ public class Packet extends MediaEncoded {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof Packet)
-      equal = (((Packet)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof MediaPacket)
+      equal = (((MediaPacket)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -116,9 +116,9 @@ public class Packet extends MediaEncoded {
 /**
  * Create a new {@link Packet}  
  */
-  public static Packet make() {
-    long cPtr = VideoJNI.Packet_make__SWIG_0();
-    return (cPtr == 0) ? null : new Packet(cPtr, false);
+  public static MediaPacket make() {
+    long cPtr = VideoJNI.MediaPacket_make__SWIG_0();
+    return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
   }
 
 /**
@@ -126,7 +126,7 @@ public class Packet extends MediaEncoded {
  * @return	The raw data, or null if not accessible.  
  */
   public IBuffer getData() {
-    long cPtr = VideoJNI.Packet_getData(swigCPtr, this);
+    long cPtr = VideoJNI.MediaPacket_getData(swigCPtr, this);
     return (cPtr == 0) ? null : new IBuffer(cPtr, false);
   }
 
@@ -139,9 +139,9 @@ public class Packet extends MediaEncoded {
  * @param	buffer The IBuffer to wrap.  
  * @return	a new packet or null on error.  
  */
-  public static Packet make(IBuffer buffer) {
-    long cPtr = VideoJNI.Packet_make__SWIG_1(IBuffer.getCPtr(buffer), buffer);
-    return (cPtr == 0) ? null : new Packet(cPtr, false);
+  public static MediaPacket make(IBuffer buffer) {
+    long cPtr = VideoJNI.MediaPacket_make__SWIG_1(IBuffer.getCPtr(buffer), buffer);
+    return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
   }
 
 /**
@@ -157,9 +157,9 @@ public class Packet extends MediaEncoded {
  * data buffer that packet uses  
  * @return	a new packet or null on error.  
  */
-  public static Packet make(Packet packet, boolean copyData) {
-    long cPtr = VideoJNI.Packet_make__SWIG_2(Packet.getCPtr(packet), packet, copyData);
-    return (cPtr == 0) ? null : new Packet(cPtr, false);
+  public static MediaPacket make(MediaPacket packet, boolean copyData) {
+    long cPtr = VideoJNI.MediaPacket_make__SWIG_2(MediaPacket.getCPtr(packet), packet, copyData);
+    return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
   }
 
 /**
@@ -173,9 +173,9 @@ public class Packet extends MediaEncoded {
  * want to put in this packet.  
  * @return	a new packet, or null on error.  
  */
-  public static Packet make(int size) {
-    long cPtr = VideoJNI.Packet_make__SWIG_3(size);
-    return (cPtr == 0) ? null : new Packet(cPtr, false);
+  public static MediaPacket make(int size) {
+    long cPtr = VideoJNI.MediaPacket_make__SWIG_3(size);
+    return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
   }
 
 /**
@@ -186,7 +186,7 @@ public class Packet extends MediaEncoded {
  * @return	Get the Presentation Timestamp for this packet.  
  */
   public long getPts() {
-    return VideoJNI.Packet_getPts(swigCPtr, this);
+    return VideoJNI.MediaPacket_getPts(swigCPtr, this);
   }
 
 /**
@@ -195,7 +195,7 @@ public class Packet extends MediaEncoded {
  * @see		#getPts()  
  */
   public void setPts(long aPts) {
-    VideoJNI.Packet_setPts(swigCPtr, this, aPts);
+    VideoJNI.MediaPacket_setPts(swigCPtr, this, aPts);
   }
 
 /**
@@ -223,7 +223,7 @@ public class Packet extends MediaEncoded {
  * to the start of reading packets).  
  */
   public long getDts() {
-    return VideoJNI.Packet_getDts(swigCPtr, this);
+    return VideoJNI.MediaPacket_getDts(swigCPtr, this);
   }
 
 /**
@@ -232,7 +232,7 @@ public class Packet extends MediaEncoded {
  * @see		#getDts()  
  */
   public void setDts(long aDts) {
-    VideoJNI.Packet_setDts(swigCPtr, this, aDts);
+    VideoJNI.MediaPacket_setDts(swigCPtr, this, aDts);
   }
 
 /**
@@ -240,7 +240,7 @@ public class Packet extends MediaEncoded {
  * @return	Size (in bytes) of payload currently in packet.  
  */
   public int getSize() {
-    return VideoJNI.Packet_getSize(swigCPtr, this);
+    return VideoJNI.MediaPacket_getSize(swigCPtr, this);
   }
 
 /**
@@ -250,7 +250,7 @@ public class Packet extends MediaEncoded {
  *		  
  */
   public int getMaxSize() {
-    return VideoJNI.Packet_getMaxSize(swigCPtr, this);
+    return VideoJNI.MediaPacket_getMaxSize(swigCPtr, this);
   }
 
 /**
@@ -259,7 +259,7 @@ public class Packet extends MediaEncoded {
  * @return	Stream in container that this packet has data for.  
  */
   public int getStreamIndex() {
-    return VideoJNI.Packet_getStreamIndex(swigCPtr, this);
+    return VideoJNI.MediaPacket_getStreamIndex(swigCPtr, this);
   }
 
 /**
@@ -270,7 +270,7 @@ public class Packet extends MediaEncoded {
  * @return	Any flags on the packet.  
  */
   public int getFlags() {
-    return VideoJNI.Packet_getFlags(swigCPtr, this);
+    return VideoJNI.MediaPacket_getFlags(swigCPtr, this);
   }
 
 /**
@@ -280,7 +280,7 @@ public class Packet extends MediaEncoded {
  * @return	true if key; false otherwise.  
  */
   public boolean isKeyPacket() {
-    return VideoJNI.Packet_isKeyPacket(swigCPtr, this);
+    return VideoJNI.MediaPacket_isKeyPacket(swigCPtr, this);
   }
 
 /**
@@ -289,7 +289,7 @@ public class Packet extends MediaEncoded {
  * @return	Duration of this packet, in same time-base as the PTS.  
  */
   public long getDuration() {
-    return VideoJNI.Packet_getDuration(swigCPtr, this);
+    return VideoJNI.MediaPacket_getDuration(swigCPtr, this);
   }
 
 /**
@@ -298,7 +298,7 @@ public class Packet extends MediaEncoded {
  * unknown.  
  */
   public long getPosition() {
-    return VideoJNI.Packet_getPosition(swigCPtr, this);
+    return VideoJNI.MediaPacket_getPosition(swigCPtr, this);
   }
 
 /**
@@ -306,7 +306,7 @@ public class Packet extends MediaEncoded {
  * @param	keyPacket true for yes, false for no.  
  */
   public void setKeyPacket(boolean keyPacket) {
-    VideoJNI.Packet_setKeyPacket(swigCPtr, this, keyPacket);
+    VideoJNI.MediaPacket_setKeyPacket(swigCPtr, this, keyPacket);
   }
 
 /**
@@ -314,7 +314,7 @@ public class Packet extends MediaEncoded {
  * @param	flags Flags to set  
  */
   public void setFlags(int flags) {
-    VideoJNI.Packet_setFlags(swigCPtr, this, flags);
+    VideoJNI.MediaPacket_setFlags(swigCPtr, this, flags);
   }
 
 /**
@@ -323,7 +323,7 @@ public class Packet extends MediaEncoded {
  *		 IContainer} this packet will be written to.  
  */
   public void setStreamIndex(int streamIndex) {
-    VideoJNI.Packet_setStreamIndex(swigCPtr, this, streamIndex);
+    VideoJNI.MediaPacket_setStreamIndex(swigCPtr, this, streamIndex);
   }
 
 /**
@@ -332,7 +332,7 @@ public class Packet extends MediaEncoded {
  * @see		#getDuration()  
  */
   public void setDuration(long duration) {
-    VideoJNI.Packet_setDuration(swigCPtr, this, duration);
+    VideoJNI.MediaPacket_setDuration(swigCPtr, this, duration);
   }
 
 /**
@@ -341,7 +341,7 @@ public class Packet extends MediaEncoded {
  * @see		#getPosition()  
  */
   public void setPosition(long position) {
-    VideoJNI.Packet_setPosition(swigCPtr, this, position);
+    VideoJNI.MediaPacket_setPosition(swigCPtr, this, position);
   }
 
 /**
@@ -372,7 +372,7 @@ public class Packet extends MediaEncoded {
  * @return	the convergence duration  
  */
   public long getConvergenceDuration() {
-    return VideoJNI.Packet_getConvergenceDuration(swigCPtr, this);
+    return VideoJNI.MediaPacket_getConvergenceDuration(swigCPtr, this);
   }
 
 /**
@@ -380,7 +380,7 @@ public class Packet extends MediaEncoded {
  * @param	duration the new duration  
  */
   public void setConvergenceDuration(long duration) {
-    VideoJNI.Packet_setConvergenceDuration(swigCPtr, this, duration);
+    VideoJNI.MediaPacket_setConvergenceDuration(swigCPtr, this, duration);
   }
 
 /**
@@ -401,7 +401,7 @@ public class Packet extends MediaEncoded {
  * @return	>= 0 if successful. < 0 if error.  
  */
   public int reset(int payloadSize) {
-    return VideoJNI.Packet_reset(swigCPtr, this, payloadSize);
+    return VideoJNI.MediaPacket_reset(swigCPtr, this, payloadSize);
   }
 
 }

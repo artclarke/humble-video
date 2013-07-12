@@ -268,8 +268,8 @@ public class Source extends Container {
  * @param	packet [In/Out] The packet the Source will read into.  
  * @return	0 if successful, or <0 if not.  
  */
-  public int read(Packet packet) {
-    return VideoJNI.Source_read(swigCPtr, this, Packet.getCPtr(packet), packet);
+  public int read(MediaPacket packet) {
+    return VideoJNI.Source_read(swigCPtr, this, MediaPacket.getCPtr(packet), packet);
   }
 
 /**

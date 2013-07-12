@@ -17,7 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-%typemap (javacode) io::humble::video::Packet,io::humble::video::Packet*,io::humble::video::Packet& %{
+%typemap (javacode) io::humble::video::MediaPacket,io::humble::video::MediaPacket*,io::humble::video::MediaPacket& %{
 %}
 
-%include <io/humble/video/Packet.h>
+%include <io/humble/video/MediaPacket.h>

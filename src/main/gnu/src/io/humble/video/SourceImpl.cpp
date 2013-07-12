@@ -27,7 +27,7 @@
 #include <io/humble/video/customio/URLProtocolManager.h>
 #include "Global.h"
 #include "SourceImpl.h"
-#include "PacketImpl.h"
+#include "MediaPacketImpl.h"
 #include "KeyValueBagImpl.h"
 #include "SourceStreamImpl.h"
 
@@ -293,9 +293,9 @@ SourceImpl::getSourceStream(int32_t position) {
 }
 
 int32_t
-SourceImpl::read(Packet* ipkt) {
+SourceImpl::read(MediaPacket* ipkt) {
   int32_t retval = -1;
-  PacketImpl* pkt = dynamic_cast<PacketImpl*>(ipkt);
+  MediaPacketImpl* pkt = dynamic_cast<MediaPacketImpl*>(ipkt);
   if (pkt)
   {
     pkt->reset(0);

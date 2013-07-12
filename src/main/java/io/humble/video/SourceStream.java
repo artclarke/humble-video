@@ -140,9 +140,9 @@ public class SourceStream extends ContainerStream {
  * this returns a read-only copy of the packet containing the  
  * picture (needs to be decoded separately).  
  */
-  public Packet getAttachedPic() {
+  public MediaPacket getAttachedPic() {
     long cPtr = VideoJNI.SourceStream_getAttachedPic(swigCPtr, this);
-    return (cPtr == 0) ? null : new Packet(cPtr, false);
+    return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
   }
 
 }

@@ -18,8 +18,8 @@
  *******************************************************************************/
 
 #include "Global.h"
-#include "Packet.h"
-#include "PacketImpl.h"
+#include "MediaPacket.h"
+#include "MediaPacketImpl.h"
 
 using namespace io::humble::ferry;
 
@@ -27,41 +27,41 @@ namespace io {
 namespace humble {
 namespace video {
 
-Packet::Packet() {
+MediaPacket::MediaPacket() {
 }
 
-Packet::~Packet() {
+MediaPacket::~MediaPacket() {
 }
 
-Packet*
-Packet :: make()
+MediaPacket*
+MediaPacket :: make()
 {
   Global::init();
-  return PacketImpl::make();
+  return MediaPacketImpl::make();
 }
 
-Packet*
-Packet::make(IBuffer* buffer)
+MediaPacket*
+MediaPacket::make(IBuffer* buffer)
 {
   Global::init();
   if (!buffer)
     throw std::invalid_argument("no buffer");
 
-  return PacketImpl::make(buffer);
+  return MediaPacketImpl::make(buffer);
 }
 
-Packet*
-Packet :: make(Packet* packet, bool copyData)
+MediaPacket*
+MediaPacket :: make(MediaPacket* packet, bool copyData)
 {
   Global::init();
-  return PacketImpl::make(dynamic_cast<PacketImpl*>(packet), copyData);
+  return MediaPacketImpl::make(dynamic_cast<MediaPacketImpl*>(packet), copyData);
 }
 
-Packet*
-Packet :: make(int32_t size)
+MediaPacket*
+MediaPacket :: make(int32_t size)
 {
   Global::init();
-  Packet* retval = PacketImpl::make(size);
+  MediaPacket* retval = MediaPacketImpl::make(size);
   return retval;
 }
 

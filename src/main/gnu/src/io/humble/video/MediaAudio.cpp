@@ -37,6 +37,34 @@ MediaAudio::~MediaAudio() {
 
 }
 
+MediaAudio*
+MediaAudio::make(int32_t maxSamples, int32_t channels,
+    AudioFormat::Type format) {
+  (void) maxSamples;
+  (void) channels;
+  (void) format;
+  return 0;
+}
+
+/**
+ * Create a MediaAudio using the given buffer.
+ *
+ * Note: that the {@link IBuffer.getBufferSize()} constraints the max number
+ * of samples we can place in here, and HumbleVideo needs to reserve some
+ * of the buffer for, um, stuff (assume at least 64 bytes). So {@link #getMaxNumSamples()}
+ * may not return as many as you think you can fit in here.
+ *
+ * @return A {@link MediaAudio} object, or null on failure.
+ */
+MediaAudio*
+MediaAudio::make(io::humble::ferry::IBuffer *buffer, int32_t channels,
+    AudioFormat::Type format) {
+  (void) buffer;
+  (void) channels;
+  (void) format;
+  return 0;
+}
+
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

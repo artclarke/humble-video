@@ -31,8 +31,8 @@ libhumble_video_la_SOURCES= \
   IndexEntryImpl.cpp \
   Error.cpp \
   ErrorImpl.cpp \
-  Packet.cpp \
-  PacketImpl.cpp \
+  MediaPacket.cpp \
+  MediaPacketImpl.cpp \
   ContainerFormat.cpp \
   Configurable.cpp \
   ContainerStream.cpp \
@@ -80,9 +80,9 @@ libhumble_video_la_HEADERS= \
   Error.h \
   ErrorImpl.h \
   Error.swg \
-  Packet.h \
-  PacketImpl.h \
-  Packet.swg \
+  MediaPacket.h \
+  MediaPacketImpl.h \
+  MediaPacket.swg \
   Property.h \
   PropertyImpl.h \
   Property.swg \

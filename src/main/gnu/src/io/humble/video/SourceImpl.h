@@ -70,7 +70,7 @@ public:
   getSourceStream(int32_t streamIndex);
 
   virtual int32_t
-  read(Packet *packet);
+  read(MediaPacket *packet);
 
   virtual int32_t
   queryStreamMetaData();

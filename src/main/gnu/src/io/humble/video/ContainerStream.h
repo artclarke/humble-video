@@ -26,7 +26,7 @@ namespace io { namespace humble { namespace video
   class Container;
   class Rational;
   class KeyValueBag;
-  class Packet;
+  class MediaPacket;
   class IndexEntry;
   
   /**

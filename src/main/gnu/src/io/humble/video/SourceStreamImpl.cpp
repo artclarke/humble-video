@@ -28,7 +28,7 @@
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/Container.h>
 #include <io/humble/video/KeyValueBagImpl.h>
-#include <io/humble/video/PacketImpl.h>
+#include <io/humble/video/MediaPacketImpl.h>
 #include <io/humble/video/IndexEntry.h>
 
 #include "FfmpegIncludes.h"
@@ -49,12 +49,12 @@ SourceStreamImpl::~SourceStreamImpl() {
   reset();
 }
 
-Packet*
+MediaPacket*
 SourceStreamImpl::getAttachedPic() {
-  PacketImpl* retval = 0;
+  MediaPacketImpl* retval = 0;
 
   if (mStream && mStream->attached_pic.size > 0) {
-    retval = PacketImpl::make();
+    retval = MediaPacketImpl::make();
     if (retval) {
       retval->wrapAVPacket(&mStream->attached_pic);
     }
@@ -330,7 +330,7 @@ SourceStreamImpl::setMetaData(KeyValueBag * copy) {
 }
 
 int32_t
-SourceStreamImpl::stampOutputPacket(Packet* packet) {
+SourceStreamImpl::stampOutputPacket(MediaPacket* packet) {
   if (!packet) return -1;
 
 //    VS_LOG_DEBUG("input:  duration: %lld; dts: %lld; pts: %lld;",

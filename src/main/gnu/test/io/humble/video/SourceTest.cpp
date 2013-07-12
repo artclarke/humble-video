@@ -243,7 +243,7 @@ SourceTest::testRead()
   TS_ASSERT(source->getState() == Container::STATE_OPENED);
 
   int64_t pktsRead = 0;
-  RefPointer<Packet> pkt = Packet::make();
+  RefPointer<MediaPacket> pkt = MediaPacket::make();
   do {
     retval = source->read(pkt.value());
     if (retval >= 0)

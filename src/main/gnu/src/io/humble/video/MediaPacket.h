@@ -17,8 +17,8 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef PACKET_H_
-#define PACKET_H_
+#ifndef MEDIAPACKET_H_
+#define MEDIAPACKET_H_
 
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/ferry/RefPointer.h>
@@ -32,7 +32,7 @@ namespace video {
  * A packet of data that was read from a {@link Source} or
  * will be written to a {@link Sink}.
  */
-class VS_API_HUMBLEVIDEO Packet : public io::humble::video::MediaEncoded
+class VS_API_HUMBLEVIDEO MediaPacket : public io::humble::video::MediaEncoded
 {
   /*
    * Note: This class is a pure-virtual interface. Actual
@@ -43,7 +43,7 @@ public:
   /**
    * Create a new {@link Packet}
    */
-  static Packet*
+  static MediaPacket*
   make();
 
   /**
@@ -64,7 +64,7 @@ public:
    * @param buffer The IBuffer to wrap.
    * @return a new packet or null on error.
    */
-  static Packet*
+  static MediaPacket*
   make(io::humble::ferry::IBuffer* buffer);
 
   /**
@@ -82,8 +82,8 @@ public:
    *
    * @return a new packet or null on error.
    */
-  static Packet*
-  make(Packet *packet, bool copyData);
+  static MediaPacket*
+  make(MediaPacket *packet, bool copyData);
 
   /**
    * Allocate a new packet.
@@ -97,7 +97,7 @@ public:
    *
    * @return a new packet, or null on error.
    */
-  static Packet*
+  static MediaPacket*
   make(int32_t size);
 
   /**
@@ -298,12 +298,12 @@ public:
   reset(int32_t payloadSize)=0;
 
 protected:
-  Packet();
+  MediaPacket();
   virtual
-  ~Packet();
+  ~MediaPacket();
 };
 
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
-#endif /* PACKET_H_ */
+#endif /* MEDIAPACKET_H_ */

@@ -17,32 +17,32 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef PACKETIMPL_H_
-#define PACKETIMPL_H_
+#ifndef MEDIAPACKETIMPL_H_
+#define MEDIAPACKETIMPL_H_
 
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/IBuffer.h>
-#include <io/humble/video/Packet.h>
+#include <io/humble/video/MediaPacket.h>
 
 namespace io {
 namespace humble {
 namespace video {
 
-class VS_API_HUMBLEVIDEO PacketImpl : public io::humble::video::Packet
+class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
 {
   public:
     /* The default make() method doesn't add a payload */
-    VS_JNIUTILS_REFCOUNTED_OBJECT(PacketImpl);
+    VS_JNIUTILS_REFCOUNTED_OBJECT(MediaPacketImpl);
   public:
     /* This make allocates a default payload of size payloadSize */
-    static PacketImpl* make(int32_t payloadSize);
+    static MediaPacketImpl* make(int32_t payloadSize);
     /* This make a packet that just wraps a given IBuffer */
-    static PacketImpl* make(io::humble::ferry::IBuffer* buffer);
+    static MediaPacketImpl* make(io::humble::ferry::IBuffer* buffer);
     /* This makes a packet wrapping the buffer in another packet and copying
      * it's settings
      */
-    static PacketImpl* make(PacketImpl* packet, bool);
+    static MediaPacketImpl* make(MediaPacketImpl* packet, bool);
   public:
 
     // Data
@@ -96,8 +96,8 @@ class VS_API_HUMBLEVIDEO PacketImpl : public io::humble::video::Packet
 #endif // ! SWIG
 
   protected:
-    PacketImpl();
-    virtual ~PacketImpl();
+    MediaPacketImpl();
+    virtual ~MediaPacketImpl();
   private:
     AVPacket* mPacket;
     io::humble::ferry::RefPointer<Rational> mTimeBase;
@@ -108,4 +108,4 @@ class VS_API_HUMBLEVIDEO PacketImpl : public io::humble::video::Packet
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
-#endif /* PACKETIMPL_H_ */
+#endif /* MEDIAPACKETIMPL_H_ */

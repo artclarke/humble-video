@@ -29,7 +29,7 @@
 namespace io { namespace humble { namespace video
 {
   class Container;
-  class Packet;
+  class MediaPacket;
 
   class SourceStreamImpl : public SourceStream
   {
@@ -73,7 +73,7 @@ namespace io { namespace humble { namespace video
     virtual KeyValueBag* getMetaData();
     virtual void setMetaData(KeyValueBag* metaData);
 
-    virtual int32_t stampOutputPacket(Packet* packet);
+    virtual int32_t stampOutputPacket(MediaPacket* packet);
     virtual IndexEntry* findTimeStampEntryInIndex(
         int64_t wantedTimeStamp, int32_t flags);
     virtual int32_t findTimeStampPositionInIndex(
@@ -81,7 +81,7 @@ namespace io { namespace humble { namespace video
     virtual IndexEntry* getIndexEntry(int32_t position);
     virtual int32_t addIndexEntry(IndexEntry* entry);
     void setId(int32_t id);
-    virtual Packet* getAttachedPic();
+    virtual MediaPacket* getAttachedPic();
     virtual ContainerStream::Disposition getDisposition();
 
   protected:

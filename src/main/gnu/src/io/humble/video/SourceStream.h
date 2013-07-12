@@ -44,7 +44,7 @@ public:
    * this returns a read-only copy of the packet containing the
    * picture (needs to be decoded separately).
    */
-  virtual Packet* getAttachedPic()=0;
+  virtual MediaPacket* getAttachedPic()=0;
 
 protected:
   SourceStream();

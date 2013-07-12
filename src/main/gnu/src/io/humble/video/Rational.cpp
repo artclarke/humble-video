@@ -78,21 +78,18 @@ namespace io { namespace humble { namespace video
     Rational*
     Rational :: make()
     {
-      Global::init();
       return RationalImpl::make();
     }
     
     Rational*
     Rational :: make(double d)
     {
-      Global::init();
       return RationalImpl::make(d);
     }
     
     Rational*
     Rational :: make(Rational *aSrc)
     {
-      Global::init();
       RationalImpl* src = dynamic_cast<RationalImpl*>(aSrc);
       Rational* retval = 0;
       if (src)
@@ -105,7 +102,6 @@ namespace io { namespace humble { namespace video
     Rational*
     Rational :: make(int32_t num, int32_t den)
     {
-      Global::init();
       return RationalImpl::make(num, den);
     }
     

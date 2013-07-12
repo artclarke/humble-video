@@ -19,13 +19,13 @@ PacketTest::tearDown() {
 
 void
 PacketTest::testCreationAndDestruction() {
-  packet = Packet::make();
+  packet = MediaPacket::make();
   TSM_ASSERT("was able to allocate packet", packet);
 }
 
 void
 PacketTest::testGetDefaults() {
-  packet = Packet::make();
+  packet = MediaPacket::make();
   TSM_ASSERT("was able to allocate packet", packet);
 
   // everything else should be garbage.
@@ -37,7 +37,7 @@ PacketTest::testGetDefaults() {
 void
 PacketTest::testCopyPacket() {
   const int32_t size = 512;
-  packet = Packet::make(size);
+  packet = MediaPacket::make(size);
   TSM_ASSERT("was able to allocate packet", packet);
 
   // everything else should be garbage.
@@ -72,7 +72,7 @@ PacketTest::testCopyPacket() {
   bool tests[] =
     { true, false };
   for (size_t i = 0; i < (sizeof(tests) / sizeof(tests[0])); i++) {
-    RefPointer<Packet> newPacket = Packet::make(packet.value(), tests[i]);
+    RefPointer<MediaPacket> newPacket = MediaPacket::make(packet.value(), tests[i]);
     TSM_ASSERT("should not be empty", newPacket);
 
     // let's make sure that when not copying, the data is the same.
@@ -113,7 +113,7 @@ PacketTest::testWrapIBuffer()
   for(int i = 0; i < size; i++)
     d[i] = i % 16;
 
-  packet = Packet::make(buf.value());
+  packet = MediaPacket::make(buf.value());
 
   RefPointer<IBuffer> data = packet->getData();
   TSM_ASSERT_DIFFERS("should be different IBuffer objects since once in a packet, AV manages buffer",

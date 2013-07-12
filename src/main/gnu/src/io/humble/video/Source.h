@@ -20,7 +20,7 @@
 #ifndef SOURCE_H_
 #define SOURCE_H_
 
-#include <io/humble/video/Packet.h>
+#include <io/humble/video/MediaPacket.h>
 #include <io/humble/video/Container.h>
 #include <io/humble/video/SourceStream.h>
 #include <io/humble/video/SourceFormat.h>
@@ -173,7 +173,7 @@ public:
    * @return 0 if successful, or <0 if not.
    */
   virtual int32_t
-  read(Packet *packet)=0;
+  read(MediaPacket *packet)=0;
 
   /**
    * Attempts to read all the meta data in this stream, potentially by reading ahead

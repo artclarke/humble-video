@@ -17,7 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#include "PacketImpl.h"
+#include "MediaPacketImpl.h"
 
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/Buffer.h>
@@ -32,7 +32,7 @@ using namespace io::humble::ferry;
   
 namespace io { namespace humble { namespace video {
 
-  PacketImpl::PacketImpl()
+  MediaPacketImpl::MediaPacketImpl()
   {
     mPacket = (AVPacket*)av_malloc(sizeof(AVPacket));
     if (!mPacket)
@@ -45,64 +45,64 @@ namespace io { namespace humble { namespace video {
     mIsComplete = false;
   }
 
-  PacketImpl::~PacketImpl()
+  MediaPacketImpl::~MediaPacketImpl()
   {
     av_free_packet(mPacket);
     av_freep(&mPacket);
   }
 
   int64_t
-  PacketImpl::getPts()
+  MediaPacketImpl::getPts()
   {
     return mPacket->pts;
   }
   
   void
-  PacketImpl::setPts(int64_t aPts)
+  MediaPacketImpl::setPts(int64_t aPts)
   {
     mPacket->pts = aPts;
   }
   
   int64_t
-  PacketImpl::getDts()
+  MediaPacketImpl::getDts()
   {
     return mPacket->dts;
   }
   
   void
-  PacketImpl::setDts(int64_t aDts)
+  MediaPacketImpl::setDts(int64_t aDts)
   {
     mPacket->dts = aDts;
   }
   
   int32_t
-  PacketImpl::getSize()
+  MediaPacketImpl::getSize()
   {
     return mPacket->size;
   }
   int32_t
-  PacketImpl::getMaxSize()
+  MediaPacketImpl::getMaxSize()
   {
     return (mPacket->buf ? mPacket->buf->size : -1);
   }
   int32_t
-  PacketImpl::getStreamIndex()
+  MediaPacketImpl::getStreamIndex()
   {
     return mPacket->stream_index;
   }
   int32_t
-  PacketImpl::getFlags()
+  MediaPacketImpl::getFlags()
   {
     return mPacket->flags;
   }
   bool
-  PacketImpl::isKeyPacket()
+  MediaPacketImpl::isKeyPacket()
   {
     return mPacket->flags & AV_PKT_FLAG_KEY;
   }
 
   void
-  PacketImpl::setKeyPacket(bool bKeyPacket)
+  MediaPacketImpl::setKeyPacket(bool bKeyPacket)
   {
     if (bKeyPacket)
       mPacket->flags |= AV_PKT_FLAG_KEY;
@@ -111,13 +111,13 @@ namespace io { namespace humble { namespace video {
   }
 
   void
-  PacketImpl::setFlags(int32_t flags)
+  MediaPacketImpl::setFlags(int32_t flags)
   {
     mPacket->flags = flags;
   }
 
   void
-  PacketImpl::setComplete(bool complete, int32_t size)
+  MediaPacketImpl::setComplete(bool complete, int32_t size)
   {
     mIsComplete = complete;
     if (mIsComplete)
@@ -127,36 +127,36 @@ namespace io { namespace humble { namespace video {
   }
   
   void
-  PacketImpl::setStreamIndex(int32_t streamIndex)
+  MediaPacketImpl::setStreamIndex(int32_t streamIndex)
   {
     mPacket->stream_index = streamIndex;
   }
   int64_t
-  PacketImpl::getDuration()
+  MediaPacketImpl::getDuration()
   {
     return mPacket->duration;
   }
   
   void
-  PacketImpl::setDuration(int64_t duration)
+  MediaPacketImpl::setDuration(int64_t duration)
   {
     mPacket->duration = duration;
   }
   
   int64_t
-  PacketImpl::getPosition()
+  MediaPacketImpl::getPosition()
   {
     return mPacket->pos;
   }
   
   void
-  PacketImpl::setPosition(int64_t position)
+  MediaPacketImpl::setPosition(int64_t position)
   {
     mPacket->pos = position;
   }
   
   IBuffer *
-  PacketImpl::getData()
+  MediaPacketImpl::getData()
   {
     if (!mPacket->data || !mPacket->buf)
       return 0;
@@ -169,7 +169,7 @@ namespace io { namespace humble { namespace video {
   }
   
   void
-  PacketImpl::wrapAVPacket(AVPacket* pkt)
+  MediaPacketImpl::wrapAVPacket(AVPacket* pkt)
   {
     VS_ASSERT(mPacket, "No packet?");
     av_free_packet(mPacket);
@@ -186,12 +186,12 @@ namespace io { namespace humble { namespace video {
     setComplete(true, mPacket->size);
   }
 
-  PacketImpl*
-  PacketImpl::make (int32_t payloadSize)
+  MediaPacketImpl*
+  MediaPacketImpl::make (int32_t payloadSize)
   {
-    PacketImpl* retval= 0;
+    MediaPacketImpl* retval= 0;
     try {
-      retval = PacketImpl::make();
+      retval = MediaPacketImpl::make();
       if (av_new_packet(retval->mPacket, payloadSize) < 0)
       {
         throw std::bad_alloc();
@@ -206,11 +206,11 @@ namespace io { namespace humble { namespace video {
     return retval;
   }
   
-  PacketImpl*
-  PacketImpl::make (IBuffer* buffer)
+  MediaPacketImpl*
+  MediaPacketImpl::make (IBuffer* buffer)
   {
-    PacketImpl *retval= 0;
-    retval = PacketImpl::make();
+    MediaPacketImpl *retval= 0;
+    retval = MediaPacketImpl::make();
     if (retval)
     {
       retval->wrapBuffer(buffer);
@@ -218,10 +218,10 @@ namespace io { namespace humble { namespace video {
     return retval;
   }
   
-  PacketImpl*
-  PacketImpl::make (PacketImpl* packet, bool copyData)
+  MediaPacketImpl*
+  MediaPacketImpl::make (MediaPacketImpl* packet, bool copyData)
   {
-    PacketImpl* retval=0;
+    MediaPacketImpl* retval=0;
     RefPointer<Rational> timeBase;
     try
     {
@@ -281,7 +281,7 @@ namespace io { namespace humble { namespace video {
   
 
   int32_t
-  PacketImpl::reset(int32_t payloadSize)
+  MediaPacketImpl::reset(int32_t payloadSize)
   {
     av_free_packet(mPacket);
     if (payloadSize > 0)
@@ -293,13 +293,13 @@ namespace io { namespace humble { namespace video {
   }
 
   void
-  PacketImpl::setData(IBuffer* buffer)
+  MediaPacketImpl::setData(IBuffer* buffer)
   {
     wrapBuffer(buffer);
   }
   
   void
-  PacketImpl::wrapBuffer(IBuffer *buffer)
+  MediaPacketImpl::wrapBuffer(IBuffer *buffer)
   {
     if (!buffer)
       return;
@@ -316,7 +316,7 @@ namespace io { namespace humble { namespace video {
     mPacket->buf = av_buffer_create(
         data,
         size,
-        PacketImpl::AVBufferRefFreeFunc,
+        MediaPacketImpl::AVBufferRefFreeFunc,
         buffer,
         0);
     mPacket->size = size;
@@ -325,13 +325,13 @@ namespace io { namespace humble { namespace video {
     setComplete(true, size);
   }
   bool
-  PacketImpl::isComplete()
+  MediaPacketImpl::isComplete()
   {
     return mIsComplete && mPacket->data;
   }
   
   void
-  PacketImpl::AVBufferRefFreeFunc(void * closure, uint8_t * buf)
+  MediaPacketImpl::AVBufferRefFreeFunc(void * closure, uint8_t * buf)
   {
     IBuffer* b = (IBuffer*)closure;
     // We know that FFMPEG allocated this with av_malloc, but
@@ -342,7 +342,7 @@ namespace io { namespace humble { namespace video {
       b->release();
   }
   void
-  PacketImpl::IBufferFreeFunc(void * buf, void * closure)
+  MediaPacketImpl::IBufferFreeFunc(void * buf, void * closure)
   {
     AVBufferRef *b = (AVBufferRef*) closure;
     (void) buf;
@@ -350,13 +350,13 @@ namespace io { namespace humble { namespace video {
   }
 
   int64_t
-  PacketImpl::getConvergenceDuration()
+  MediaPacketImpl::getConvergenceDuration()
   {
     return mPacket->convergence_duration;
   }
   
   void
-  PacketImpl::setConvergenceDuration(int64_t duration)
+  MediaPacketImpl::setConvergenceDuration(int64_t duration)
   {
     mPacket->convergence_duration = duration;
   }
