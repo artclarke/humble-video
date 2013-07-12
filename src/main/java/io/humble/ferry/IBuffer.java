@@ -1058,8 +1058,6 @@ public class IBuffer extends RefCounted {
       retval.mark();
       retval.limit(this.getSize());
     }
-      
-    }
     return retval;
   }
 

@@ -1049,8 +1049,6 @@
       retval.mark();
       retval.limit(this.getSize());
     }
-      
-    }
     return retval;
   }
 
