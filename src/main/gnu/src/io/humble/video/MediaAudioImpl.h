@@ -37,11 +37,11 @@ class MediaAudioImpl : public io::humble::video::MediaAudio
   VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MediaAudioImpl)
 public:
   static MediaAudioImpl*
-  make(int32_t numSamples, int32_t channels, AudioChannel::Layout channelLayout,
+  make(int32_t numSamples, int32_t sampleRate, int32_t channels, AudioChannel::Layout channelLayout,
         AudioFormat::Type format);
 
   static MediaAudioImpl*
-  make(io::humble::ferry::IBuffer *buffer, int32_t numSamples, int32_t channels,
+  make(io::humble::ferry::IBuffer *buffer, int32_t numSamples, int32_t sampleRate, int32_t channels,
       AudioChannel::Layout channelLayout, AudioFormat::Type format);
 
   virtual io::humble::ferry::IBuffer*
@@ -59,9 +59,8 @@ public:
   virtual int32_t
   getBytesPerSample();
 
-  virtual void
-  setComplete(bool complete, uint32_t numSamples, int32_t sampleRate,
-      int32_t channels, AudioFormat::Type format, int64_t pts);
+  virtual int32_t
+  setComplete(int32_t numSamples, int64_t pts);
 
   virtual int32_t
   getSampleRate();
@@ -83,14 +82,21 @@ public:
 
   virtual AudioChannel::Layout getChannelLayout();
 
+  virtual int32_t
+  getNumSamples();
+
 protected:
   MediaAudioImpl();
   virtual
   ~MediaAudioImpl();
   AVFrame* getCtx();
 private:
+  static void
+  setBufferType(AudioFormat::Type format,
+      io::humble::ferry::IBuffer* buffer);
+
   AVFrame* mFrame;
-  bool     mComplete;
+  int32_t  mMaxSamples;
 };
 
 } /* namespace video */

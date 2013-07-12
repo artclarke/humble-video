@@ -40,7 +40,7 @@ MediaAudioImpl::MediaAudioImpl() {
   mFrame = av_frame_alloc();
   if (!mFrame) throw std::bad_alloc();
   mFrame->opaque = this;
-  mComplete = false;
+  mMaxSamples = 0;
 }
 
 MediaAudioImpl::~MediaAudioImpl() {
@@ -48,9 +48,8 @@ MediaAudioImpl::~MediaAudioImpl() {
 }
 
 MediaAudioImpl*
-MediaAudioImpl::make(int32_t numSamples, int32_t channels,
-    AudioChannel::Layout layout,
-    AudioFormat::Type format) {
+MediaAudioImpl::make(int32_t numSamples, int32_t sampleRate, int32_t channels,
+    AudioChannel::Layout layout, AudioFormat::Type format) {
   if (numSamples <= 0) {
     VS_LOG_ERROR("No samples specified");
     return 0;
@@ -64,20 +63,19 @@ MediaAudioImpl::make(int32_t numSamples, int32_t channels,
     return 0;
   }
 
-  int32_t bufSize = av_samples_get_buffer_size(0, channels, numSamples, (enum AVSampleFormat)format, 0);
+  int32_t bufSize = av_samples_get_buffer_size(0, channels, numSamples,
+      (enum AVSampleFormat) format, 0);
   RefPointer<IBuffer> buffer = IBuffer::make(0, bufSize);
-  MediaAudioImpl* retval = make(buffer.value(), numSamples, channels, layout, format);
-  if (retval)
-    buffer->setJavaAllocator(retval->getJavaAllocator());
+  MediaAudioImpl* retval = make(buffer.value(), numSamples, sampleRate, channels, layout,
+      format);
+  if (retval) buffer->setJavaAllocator(retval->getJavaAllocator());
   return retval;
 }
 
 MediaAudioImpl*
-MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer,
-    int32_t numSamples,
-    int32_t channels,
-    AudioChannel::Layout layout,
-    AudioFormat::Type format) {
+MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer, int32_t numSamples,
+    int32_t sampleRate,
+    int32_t channels, AudioChannel::Layout layout, AudioFormat::Type format) {
   if (channels <= 0) {
     VS_LOG_ERROR("No channels specified");
     return 0;
@@ -92,9 +90,11 @@ MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer,
   }
   // get the required buf size
   int32_t linesize = 0;
-  int32_t bufSize = av_samples_get_buffer_size(&linesize, channels, numSamples, (enum AVSampleFormat)format, 0);
+  int32_t bufSize = av_samples_get_buffer_size(&linesize, channels, numSamples,
+      (enum AVSampleFormat) format, 0);
   if (bufSize < buffer->getBufferSize()) {
-    VS_LOG_ERROR("passed in buffer too small to fit requested num samples: %d", numSamples);
+    VS_LOG_ERROR("passed in buffer too small to fit requested num samples: %d",
+        numSamples);
     return 0;
   }
 
@@ -104,15 +104,19 @@ MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer,
   // must let mFrame->buf[] and mFrame->extended_buf[] win.
   RefPointer<MediaAudioImpl> retval = make();
   AVFrame* frame = retval->mFrame;
-  frame->nb_samples = numSamples;
-  frame->channels = channels;
+  av_frame_set_sample_rate(frame, sampleRate);
+  av_frame_set_channels(frame, channels);
+  av_frame_set_channel_layout(frame, layout);
+  retval->mMaxSamples = numSamples;
+  frame->nb_samples = 0;
   frame->format = format;
-  frame->channel_layout = layout;
+  // we're going to tell the world this buffer now contains the right kind of data
+  setBufferType((AudioFormat::Type)frame->format, buffer);
 
   // now we have to layout the audio FFmpeg makes this hard if you pass
   // in your own buffers.
-  int planar   = av_sample_fmt_is_planar((enum AVSampleFormat)frame->format);
-  int planes   = planar ? channels : 1;
+  bool planar = retval->isPlanar();
+  int planes = planar ? channels : 1;
   int ret;
 
   if (!frame->linesize[0]) {
@@ -120,53 +124,63 @@ MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer,
   }
   // now, let's fill all of those extended_data objects.
   if (planes > AV_NUM_DATA_POINTERS) {
-      frame->extended_data = (uint8_t**)av_mallocz(planes *
-                                        sizeof(*frame->extended_data));
-      frame->extended_buf  = (AVBufferRef**)av_mallocz((planes - AV_NUM_DATA_POINTERS) *
-                                        sizeof(*frame->extended_buf));
-      if (!frame->extended_data || !frame->extended_buf) {
-          av_freep(&frame->extended_data);
-          av_freep(&frame->extended_buf);
-          return 0;
-      }
-      frame->nb_extended_buf = planes - AV_NUM_DATA_POINTERS;
-  } else
-      frame->extended_data = frame->data;
+    frame->extended_data = (uint8_t**) av_mallocz(
+        planes * sizeof(*frame->extended_data));
+    frame->extended_buf = (AVBufferRef**) av_mallocz(
+        (planes - AV_NUM_DATA_POINTERS) * sizeof(*frame->extended_buf));
+    if (!frame->extended_data || !frame->extended_buf) {
+      av_freep(&frame->extended_data);
+      av_freep(&frame->extended_buf);
+      return 0;
+    }
+    frame->nb_extended_buf = planes - AV_NUM_DATA_POINTERS;
+  } else frame->extended_data = frame->data;
 
   // now, let's fill in those buffers.
   frame->buf[0] = AVBufferSupport::wrapIBuffer(buffer);
   // all the rest should be zero.
 
   // fill in the extended_data planes
-  uint8_t* buf = (uint8_t*)buffer->getBytes(0, bufSize);
-  ret = av_samples_fill_arrays(frame->extended_data, &frame->linesize[0],
-      buf,
-      frame->channels,
-      frame->nb_samples,
-      (enum AVSampleFormat)frame->format,
+  uint8_t* buf = (uint8_t*) buffer->getBytes(0, bufSize);
+  ret = av_samples_fill_arrays(frame->extended_data, &frame->linesize[0], buf,
+      retval->getChannels(), frame->nb_samples, (enum AVSampleFormat) frame->format,
       0);
-  if (ret <= 0)
-    return 0;
-
-  // patch up the first line.
-  frame->data[0] = frame->extended_data[0];
+  if (ret <= 0) return 0;
 
   // now create references to our one mega buffer in all other pointers
-  for (int32_t i = 1; i < FFMIN(planes, AV_NUM_DATA_POINTERS); i++) {
+  for (int32_t i = 0; i < FFMIN(planes, AV_NUM_DATA_POINTERS); i++) {
     frame->data[i] = frame->extended_data[i];
-    frame->buf[i] = av_buffer_ref(frame->buf[0]);
+    frame->buf[i] = AVBufferSupport::wrapIBuffer(buffer, frame->extended_data[i], frame->linesize[0]);
   }
   // and add refs for the final buffers
   for (int32_t i = 0; i < planes - AV_NUM_DATA_POINTERS; i++) {
-    frame->extended_buf[i] = av_buffer_ref(frame->buf[0]);
+    frame->extended_buf[i] = AVBufferSupport::wrapIBuffer(buffer, frame->extended_data[i+AV_NUM_DATA_POINTERS], frame->linesize[0]);
   }
   return retval.get();
 }
 
 io::humble::ferry::IBuffer*
 MediaAudioImpl::getData(int32_t plane) {
-  (void) plane;
-  return 0;
+  // we get the buffer for the given plane if it exists, and wrap
+  // it in an IBuffer
+  if (plane < 0) {
+    VS_LOG_ERROR("plane must be > 0");
+    return 0;
+  }
+
+  if (plane >= getNumDataPlanes()) {
+    VS_LOG_ERROR("plane must be <= getNumDataPlane()");
+    return 0;
+  }
+
+  // now we're guaranteed that we should have a plane.
+  RefPointer<IBuffer> buffer;
+  if (plane < AV_NUM_DATA_POINTERS) buffer = AVBufferSupport::wrapAVBuffer(this,
+      mFrame->buf[plane], mFrame->extended_data[plane], mFrame->linesize[0]);
+  else buffer = AVBufferSupport::wrapAVBuffer(this,
+      mFrame->extended_buf[plane - AV_NUM_DATA_POINTERS], mFrame->extended_data[plane], mFrame->linesize[0]);
+  setBufferType((AudioFormat::Type)mFrame->format, buffer.value());
+  return buffer.get();
 }
 
 int32_t
@@ -176,13 +190,13 @@ MediaAudioImpl::getDataPlaneSize() {
 
 int32_t
 MediaAudioImpl::getNumDataPlanes() {
-  if (isPlanar()) return mFrame->channels;
+  if (isPlanar()) return av_frame_get_channels(mFrame);
   else return 1;
 }
 
 int32_t
 MediaAudioImpl::getMaxNumSamples() {
-  return mFrame->nb_samples;
+  return mMaxSamples;
 }
 
 int32_t
@@ -190,26 +204,25 @@ MediaAudioImpl::getBytesPerSample() {
   return AudioFormat::getBytesPerSample((AudioFormat::Type) mFrame->format);
 }
 
-void
-MediaAudioImpl::setComplete(bool complete, uint32_t numSamples,
-    int32_t sampleRate, int32_t channels, AudioFormat::Type format,
-    int64_t pts) {
-  (void) complete;
-  (void) numSamples;
-  (void) sampleRate;
-  (void) channels;
-  (void) format;
-  (void) pts;
+int32_t
+MediaAudioImpl::setComplete(int32_t numSamples, int64_t pts) {
+  if (numSamples < 0 || numSamples > mMaxSamples) {
+    VS_LOG_ERROR("invalid number of samples to put in this MediaAudio object: %d", numSamples);
+    return -1;
+  }
+  mFrame->pts = pts;
+  mFrame->nb_samples = numSamples;
+  return 0;
 }
 
 int32_t
 MediaAudioImpl::getSampleRate() {
-  return mFrame->sample_rate;
+  return av_frame_get_sample_rate(mFrame);
 }
 
 int32_t
 MediaAudioImpl::getChannels() {
-  return mFrame->channels;
+  return av_frame_get_channels(mFrame);
 }
 
 AudioFormat::Type
@@ -217,9 +230,14 @@ MediaAudioImpl::getFormat() {
   return (AudioFormat::Type) mFrame->format;
 }
 
+int32_t
+MediaAudioImpl::getNumSamples() {
+  return mFrame->nb_samples;
+}
+
 bool
 MediaAudioImpl::isComplete() {
-  return mComplete;
+  return mFrame->nb_samples > 0;
 }
 
 bool
@@ -234,12 +252,45 @@ MediaAudioImpl::isPlanar() {
 
 AudioChannel::Layout
 MediaAudioImpl::getChannelLayout() {
-  return (AudioChannel::Layout) mFrame->channel_layout;
+  return (AudioChannel::Layout) av_frame_get_channel_layout(mFrame);
 }
 
 AVFrame*
 MediaAudioImpl::getCtx() {
   return mFrame;
+}
+
+void
+MediaAudioImpl::setBufferType(AudioFormat::Type format,
+    IBuffer* buffer)
+{
+  if (!buffer)
+    return;
+  switch(format)
+  {
+    case AudioFormat::SAMPLE_FMT_DBL:
+    case AudioFormat::SAMPLE_FMT_DBLP:
+      buffer->setType(IBuffer::IBUFFER_DBL64);
+      break;
+    case AudioFormat::SAMPLE_FMT_FLT:
+    case AudioFormat::SAMPLE_FMT_FLTP:
+      buffer->setType(IBuffer::IBUFFER_FLT32);
+      break;
+    case AudioFormat::SAMPLE_FMT_S16:
+    case AudioFormat::SAMPLE_FMT_S16P:
+      buffer->setType(IBuffer::IBUFFER_SINT16);
+      break;
+    case AudioFormat::SAMPLE_FMT_S32:
+    case AudioFormat::SAMPLE_FMT_S32P:
+      buffer->setType(IBuffer::IBUFFER_SINT32);
+      break;
+    case AudioFormat::SAMPLE_FMT_U8:
+    case AudioFormat::SAMPLE_FMT_U8P:
+      buffer->setType(IBuffer::IBUFFER_UINT8);
+      break;
+    default:
+      break;
+  }
 }
 
 } /* namespace video */

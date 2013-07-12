@@ -8660,26 +8660,28 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getLayout
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3, jint jarg4) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3, jint jarg4, jint jarg5) {
   jlong jresult = 0 ;
   int32_t arg1 ;
   int32_t arg2 ;
-  io::humble::video::AudioChannel::Layout arg3 ;
-  io::humble::video::AudioFormat::Type arg4 ;
+  int32_t arg3 ;
+  io::humble::video::AudioChannel::Layout arg4 ;
+  io::humble::video::AudioFormat::Type arg5 ;
   io::humble::video::MediaAudio *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   arg1 = (int32_t)jarg1; 
   arg2 = (int32_t)jarg2; 
-  arg3 = (io::humble::video::AudioChannel::Layout)jarg3; 
-  arg4 = (io::humble::video::AudioFormat::Type)jarg4; 
+  arg3 = (int32_t)jarg3; 
+  arg4 = (io::humble::video::AudioChannel::Layout)jarg4; 
+  arg5 = (io::humble::video::AudioFormat::Type)jarg5; 
   {
     // JNIHelper.swg: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::MediaAudio *)io::humble::video::MediaAudio::make(arg1,arg2,arg3,arg4);
+      result = (io::humble::video::MediaAudio *)io::humble::video::MediaAudio::make(arg1,arg2,arg3,arg4,arg5);
     }
     catch(std::invalid_argument & e)
     {
@@ -8735,13 +8737,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4, jint jarg5) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4, jint jarg5, jint jarg6) {
   jlong jresult = 0 ;
   io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
   int32_t arg2 ;
   int32_t arg3 ;
-  io::humble::video::AudioChannel::Layout arg4 ;
-  io::humble::video::AudioFormat::Type arg5 ;
+  int32_t arg4 ;
+  io::humble::video::AudioChannel::Layout arg5 ;
+  io::humble::video::AudioFormat::Type arg6 ;
   io::humble::video::MediaAudio *result = 0 ;
   
   (void)jenv;
@@ -8750,14 +8753,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
   arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
   arg2 = (int32_t)jarg2; 
   arg3 = (int32_t)jarg3; 
-  arg4 = (io::humble::video::AudioChannel::Layout)jarg4; 
-  arg5 = (io::humble::video::AudioFormat::Type)jarg5; 
+  arg4 = (int32_t)jarg4; 
+  arg5 = (io::humble::video::AudioChannel::Layout)jarg5; 
+  arg6 = (io::humble::video::AudioFormat::Type)jarg6; 
   {
     // JNIHelper.swg: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::MediaAudio *)io::humble::video::MediaAudio::make(arg1,arg2,arg3,arg4,arg5);
+      result = (io::humble::video::MediaAudio *)io::humble::video::MediaAudio::make(arg1,arg2,arg3,arg4,arg5,arg6);
     }
     catch(std::invalid_argument & e)
     {
@@ -9123,6 +9127,83 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getMaxNumSampl
 }
 
 
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getNumSamples(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  io::humble::video::MediaAudio *arg1 = (io::humble::video::MediaAudio *) 0 ;
+  int32_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::MediaAudio **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (int32_t)(arg1)->getNumSamples();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getBytesPerSample(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   io::humble::video::MediaAudio *arg1 = (io::humble::video::MediaAudio *) 0 ;
@@ -9200,30 +9281,24 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getBytesPerSam
 }
 
 
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1setComplete(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2, jlong jarg3, jint jarg4, jint jarg5, jint jarg6, jlong jarg7) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1setComplete(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3) {
+  jint jresult = 0 ;
   io::humble::video::MediaAudio *arg1 = (io::humble::video::MediaAudio *) 0 ;
-  bool arg2 ;
-  uint32_t arg3 ;
-  int32_t arg4 ;
-  int32_t arg5 ;
-  io::humble::video::AudioFormat::Type arg6 ;
-  int64_t arg7 ;
+  int32_t arg2 ;
+  int64_t arg3 ;
+  int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(io::humble::video::MediaAudio **)&jarg1; 
-  arg2 = jarg2 ? true : false; 
-  arg3 = (uint32_t)jarg3; 
-  arg4 = (int32_t)jarg4; 
-  arg5 = (int32_t)jarg5; 
-  arg6 = (io::humble::video::AudioFormat::Type)jarg6; 
-  arg7 = (int64_t)jarg7; 
+  arg2 = (int32_t)jarg2; 
+  arg3 = (int64_t)jarg3; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
       "invalid native object; delete() likely already called");
-    return ;
+    return 0;
   }
   
   {
@@ -9231,7 +9306,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1setComplete(JN
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      (arg1)->setComplete(arg2,arg3,arg4,arg5,arg6,arg7);
+      result = (int32_t)(arg1)->setComplete(arg2,arg3);
     }
     catch(std::invalid_argument & e)
     {
@@ -9241,7 +9316,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1setComplete(JN
         jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
         jenv->ThrowNew(cls, e.what());
       }
-      return ;
+      return 0;
     }
     catch(std::bad_alloc & e)
     {
@@ -9257,7 +9332,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1setComplete(JN
           helper->throwOutOfMemoryError();
         }
       }
-      return ;
+      return 0;
     }
     catch(std::exception & e)
     {
@@ -9267,7 +9342,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1setComplete(JN
         jclass cls=jenv->FindClass("java/lang/RuntimeException");
         jenv->ThrowNew(cls, e.what());
       }
-      return ;
+      return 0;
     }
     catch(...)
     {
@@ -9277,11 +9352,13 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1setComplete(JN
         jclass cls=jenv->FindClass("java/lang/RuntimeException");
         jenv->ThrowNew(cls, "Unhandled and unknown native exception");
       }
-      return ;
+      return 0;
     }
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
+  jresult = (jint)result; 
+  return jresult;
 }
 
 

@@ -398,13 +398,14 @@ public:
   /**
    * Create a MediaAudio and the underlying data. Will allocate a buffer to back this data.
    * @param numSamples The number of samples of audio that will be placed in this {@link MediaAudio} object.
+   * @param sampleRate The sample rate (per second) of this audio.
    * @param channels The number of channels of audio that will be placed in this {@link MediaAudio} object.
    * @paray channelLayout The channel layout of audio that will be placed in this {@link MediaAudio} object.
    * @param format The format of the audio placed in this {@link MediaAudio} object.
    * @return A {@link MediaAudio} object, or null on failure.
    */
   static MediaAudio*
-  make(int32_t numSamples, int32_t channels, AudioChannel::Layout channelLayout,
+  make(int32_t numSamples, int32_t sampleRate, int32_t channels, AudioChannel::Layout channelLayout,
       AudioFormat::Type format);
   /**
    * Create a MediaAudio using the given buffer.
@@ -417,6 +418,7 @@ public:
    * @param buffer A buffer to back the audio with. If not large enough to hold all the samples (with alignment on 32-bit boundaries if planar),
    *    then an error results.
    * @param numSamples The number of samples of audio that will be placed in this {@link MediaAudio} object.
+   * @param sampleRate The sample rate (per second) of this audio.
    * @param channels The number of channels of audio that will be placed in this {@link MediaAudio} object.
    * @paray channelLayout The channel layout of audio that will be placed in this {@link MediaAudio} object.
    * @param format The format of the audio placed in this {@link MediaAudio} object.
@@ -424,7 +426,8 @@ public:
    * @return A {@link MediaAudio} object, or null on failure.
    */
   static MediaAudio*
-  make(io::humble::ferry::IBuffer *buffer, int32_t numSamples, int32_t channels,
+  make(io::humble::ferry::IBuffer *buffer, int32_t numSamples,
+      int32_t sampleRate, int32_t channels,
       AudioChannel::Layout channelLayout, AudioFormat::Type format);
 
   /**
@@ -455,6 +458,12 @@ public:
   getMaxNumSamples()=0;
 
   /**
+   * @return the actual number of samples in this object
+   */
+  virtual int32_t
+  getNumSamples()=0;
+
+  /**
    * Number of bytes in one sample of one channel of audio in this object.
    */
   virtual int32_t
@@ -464,18 +473,14 @@ public:
    * Call this if you modify the samples and are now done.  This
    * updates the pertinent information in the structure.
    *
-   * @param complete Is this set of samples complete?
-   * @param numSamples Number of samples in this update (note that
-   *   4 shorts of 16-bit audio in stereo is actually 1 sample).
-   * @param sampleRate The sample rate (in Hz) of this set of samples.
-   * @param channels The number of channels in this set of samples.
-   * @param format The sample-format of this set of samples.
+   * @param numSamples Number of samples in this update (if > 0 then this audio sample is complete).  Must be < {@link #getMaxNumSamples()}.
    * @param pts The presentation time stamp of the starting sample in this buffer.
    *   Caller must ensure pts is in units of 1/1,000,000 of a second
+   *
+   * @return >= 0 on success; < 0 if parameters do not match how this buffer was set up.
    */
-  virtual void
-  setComplete(bool complete, uint32_t numSamples, int32_t sampleRate,
-      int32_t channels, AudioFormat::Type format, int64_t pts)=0;
+  virtual int32_t
+  setComplete(int32_t numSamples, int64_t pts)=0;
 
   /**
    * Sample rate of audio, or 0 if unknown.

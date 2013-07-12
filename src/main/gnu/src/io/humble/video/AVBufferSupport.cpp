@@ -37,17 +37,17 @@ AVBufferSupport::AVBufferSupport() {
 AVBufferSupport::~AVBufferSupport() {
 }
 
-/**
- * Wraps a AVBufferRef in an IBuffer.
- */
 IBuffer*
 AVBufferSupport::wrapAVBuffer(RefCounted* requestor, AVBufferRef* ref) {
+  if (!ref) return 0;
+  return wrapAVBuffer(requestor, ref, ref->data, ref->size);
+}
+
+IBuffer*
+AVBufferSupport::wrapAVBuffer(RefCounted* requestor, AVBufferRef* ref, void *data, int32_t size) {
   // acquire for the IBuffer release method.
   AVBufferRef* ourRef = av_buffer_ref(ref);
   if (!ourRef) return 0;
-
-  int32_t size = ourRef->size;
-  uint8_t* data = ourRef->data;
 
   IBuffer* retval = IBuffer::make(requestor, data, size,
       AVBufferSupport::avBufferRelease, ourRef);
@@ -62,9 +62,15 @@ AVBufferSupport::wrapIBuffer(IBuffer* buf) {
   if (!buf) return 0;
   int32_t size = buf->getBufferSize();
   uint8_t* data = (uint8_t*) buf->getBytes(0, size);
+  return wrapIBuffer(buf, data, size);
+}
+AVBufferRef*
+AVBufferSupport::wrapIBuffer(IBuffer* buf, void* data, int32_t size)
+{
+  if (!buf) return 0;
   // acquire the buffer for the AVBufferRef
   buf->acquire();
-  AVBufferRef* retval = av_buffer_create(data, size,
+  AVBufferRef* retval = av_buffer_create((uint8_t*)data, size,
       AVBufferSupport::bufferRelease, buf, 0);
   if (!retval) buf->release();
   return retval;

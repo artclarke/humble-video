@@ -139,6 +139,7 @@ public class MediaAudio extends MediaRaw {
  * to back this data.  
  * @param	numSamples The number of samples of audio that will be placed 
  *		 in this {@link MediaAudio} object.  
+ * @param	sampleRate The sample rate (per second) of this audio.  
  * @param	channels The number of channels of audio that will be placed 
  *		 in this {@link MediaAudio} object.  
  * channelLayout The channel layout of audio that will be placed in 
@@ -147,8 +148,8 @@ public class MediaAudio extends MediaRaw {
  *		 object.  
  * @return	A {@link MediaAudio} object, or null on failure.  
  */
-  public static MediaAudio make(int numSamples, int channels, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
-    long cPtr = VideoJNI.MediaAudio_make__SWIG_0(numSamples, channels, channelLayout.swigValue(), format.swigValue());
+  public static MediaAudio make(int numSamples, int sampleRate, int channels, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
+    long cPtr = VideoJNI.MediaAudio_make__SWIG_0(numSamples, sampleRate, channels, channelLayout.swigValue(), format.swigValue());
     return (cPtr == 0) ? null : new MediaAudio(cPtr, false);
   }
 
@@ -167,6 +168,7 @@ public class MediaAudio extends MediaRaw {
  * then an error results.  
  * @param	numSamples The number of samples of audio that will be placed 
  *		 in this {@link MediaAudio} object.  
+ * @param	sampleRate The sample rate (per second) of this audio.  
  * @param	channels The number of channels of audio that will be placed 
  *		 in this {@link MediaAudio} object.  
  * channelLayout The channel layout of audio that will be placed in 
@@ -175,8 +177,8 @@ public class MediaAudio extends MediaRaw {
  *		 object.  
  * @return	A {@link MediaAudio} object, or null on failure.  
  */
-  public static MediaAudio make(IBuffer buffer, int numSamples, int channels, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
-    long cPtr = VideoJNI.MediaAudio_make__SWIG_1(IBuffer.getCPtr(buffer), buffer, numSamples, channels, channelLayout.swigValue(), format.swigValue());
+  public static MediaAudio make(IBuffer buffer, int numSamples, int sampleRate, int channels, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
+    long cPtr = VideoJNI.MediaAudio_make__SWIG_1(IBuffer.getCPtr(buffer), buffer, numSamples, sampleRate, channels, channelLayout.swigValue(), format.swigValue());
     return (cPtr == 0) ? null : new MediaAudio(cPtr, false);
   }
 
@@ -217,6 +219,13 @@ public class MediaAudio extends MediaRaw {
   }
 
 /**
+ * @return	the actual number of samples in this object  
+ */
+  public int getNumSamples() {
+    return VideoJNI.MediaAudio_getNumSamples(swigCPtr, this);
+  }
+
+/**
  * Number of bytes in one sample of one channel of audio in this object. 
  *  
  */
@@ -227,19 +236,17 @@ public class MediaAudio extends MediaRaw {
 /**
  * Call this if you modify the samples and are now done. This  
  * updates the pertinent information in the structure.  
- * @param	complete Is this set of samples complete?  
- * @param	numSamples Number of samples in this update (note that  
- * 4 shorts of 16-bit audio in stereo is actually 1 sample).  
- * @param	sampleRate The sample rate (in Hz) of this set of samples. 
+ * @param	numSamples Number of samples in this update (if > 0 then this 
+ *		 audio sample is complete). Must be < {@link #getMaxNumSamples()}. 
  *		  
- * @param	channels The number of channels in this set of samples.  
- * @param	format The sample-format of this set of samples.  
  * @param	pts The presentation time stamp of the starting sample in 
  *		 this buffer.  
  * Caller must ensure pts is in units of 1/1,000,000 of a second  
+ * @return	>= 0 on success; < 0 if parameters do not match how this 
+ *		 buffer was set up.  
  */
-  public void setComplete(boolean complete, long numSamples, int sampleRate, int channels, AudioFormat.Type format, long pts) {
-    VideoJNI.MediaAudio_setComplete(swigCPtr, this, complete, numSamples, sampleRate, channels, format.swigValue(), pts);
+  public int setComplete(int numSamples, long pts) {
+    return VideoJNI.MediaAudio_setComplete(swigCPtr, this, numSamples, pts);
   }
 
 /**

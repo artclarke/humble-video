@@ -40,10 +40,13 @@ public:
    * Wraps a AVBufferRef in an IBuffer.
    */
   static io::humble::ferry::IBuffer* wrapAVBuffer(io::humble::ferry::RefCounted* requestor, AVBufferRef* ref);
+  static io::humble::ferry::IBuffer* wrapAVBuffer(io::humble::ferry::RefCounted* requestor, AVBufferRef* ref,
+      void* data, int32_t size);
   /**
    * Wraps an AVBufferRef in a IBuffer
    */
   static AVBufferRef* wrapIBuffer(io::humble::ferry::IBuffer* buf);
+  static AVBufferRef* wrapIBuffer(io::humble::ferry::IBuffer* buf, void *data, int32_t size);
 
 private:
   static void bufferRelease(void * closure, uint8_t * buf);

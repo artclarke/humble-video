@@ -33,7 +33,7 @@ namespace video {
 KeyValueBag*
 MediaRaw::getMetaData()
 {
-  return KeyValueBagImpl::make(getCtx()->metadata);
+  return KeyValueBagImpl::make(av_frame_get_metadata(getCtx()));
 }
 
 

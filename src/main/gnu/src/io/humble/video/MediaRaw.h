@@ -96,7 +96,7 @@ public:
    * - encoding: unused
    * - decoding: set by libavcodec, read by user.
    */
-  virtual int32_t getPacketSize() { return getCtx()->pkt_size; };
+  virtual int32_t getPacketSize() { return av_frame_get_pkt_size(getCtx()); };
 
   /**
    * duration of the corresponding packet, expressed in
@@ -104,14 +104,14 @@ public:
    * - encoding: unused
    * - decoding: Read by user.
    */
-  virtual int64_t getPacketDuration() { return getCtx()->pkt_duration; }
+  virtual int64_t getPacketDuration() { return av_frame_get_pkt_duration(getCtx()); }
 
   /**
     * frame timestamp estimated using various heuristics, in stream time base
     * - encoding: unused
     * - decoding: set by libavcodec, read by user.
     */
-   virtual int64_t getBestEffortTimeStamp() { return getCtx()->best_effort_timestamp; }
+   virtual int64_t getBestEffortTimeStamp() { return av_frame_get_best_effort_timestamp(getCtx()); }
 
 #ifndef SWIG
    virtual AVFrame *getCtx()=0;

@@ -39,15 +39,17 @@ MediaAudio::~MediaAudio() {
 }
 
 MediaAudio*
-MediaAudio::make(int32_t numSamples, int32_t channels, AudioChannel::Layout channelLayout,
+MediaAudio::make(int32_t numSamples, int32_t sampleRate,
+    int32_t channels, AudioChannel::Layout channelLayout,
     AudioFormat::Type format) {
-  return MediaAudioImpl::make(numSamples, channels, channelLayout, format);
+  return MediaAudioImpl::make(numSamples, sampleRate, channels, channelLayout, format);
 }
 
 MediaAudio*
-MediaAudio::make(io::humble::ferry::IBuffer *buffer, int32_t numSamples, int32_t channels,
+MediaAudio::make(io::humble::ferry::IBuffer *buffer, int32_t numSamples,
+    int32_t sampleRate, int32_t channels,
     AudioChannel::Layout channelLayout, AudioFormat::Type format) {
-  return MediaAudioImpl::make(buffer, numSamples, channels, channelLayout, format);
+  return MediaAudioImpl::make(buffer, numSamples, sampleRate, channels, channelLayout, format);
 }
 
 } /* namespace video */
