@@ -12,6 +12,7 @@ check_PROGRAMS=\
   IndexEntryTester \
   ErrorTester \
   MediaPacketTester \
+  MediaAudioTester \
   KeyValueBagTester \
   SourceTester \
   SourceFormatTester \
@@ -26,6 +27,7 @@ BUILT_SOURCES= \
   IndexEntryTest_CXXRunner.cpp \
   ErrorTest_CXXRunner.cpp \
   MediaPacketTest_CXXRunner.cpp \
+  MediaAudioTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
   SourceTest_CXXRunner.cpp \
   SourceFormatTest_CXXRunner.cpp \
@@ -40,6 +42,7 @@ noinst_HEADERS = \
   IndexEntryTest.h \
   ErrorTest.h \
   MediaPacketTest.h \
+  MediaAudioTest.h \
   KeyValueBagTest.h \
   SourceTest.h \
   SourceFormatTest.h \
@@ -100,12 +103,24 @@ ErrorTester_LDADD= \
 
 MediaPacketTester_SOURCES= \
   MediaPacketTest.cpp \
+  TestData.cpp \
   Main.cpp
 
 nodist_MediaPacketTester_SOURCES= \
   MediaPacketTest_CXXRunner.cpp
 
 MediaPacketTester_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
+MediaAudioTester_SOURCES= \
+  MediaAudioTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_MediaAudioTester_SOURCES= \
+  MediaAudioTest_CXXRunner.cpp
+
+MediaAudioTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 KeyValueBagTester_SOURCES= \
