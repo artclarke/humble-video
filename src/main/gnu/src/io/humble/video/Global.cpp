@@ -140,24 +140,17 @@ namespace io { namespace humble { namespace video
     return retval;
   }
   
-  Global* Global :: sGlobal = 0;
-
+  Global*
+  Global::getCtx()
+  {
+    /** Guaranteed to be thread-safe per C/C++ instantiation rules */
+    static Global singleton;
+    return &singleton;
+  }
   void
   Global :: init()
   {
-    if (!sGlobal)
-    {
-      av_lockmgr_register(humblevideo_lockmgr_cb);
-      av_log_set_callback(humblevideo_log_callback);
-      av_log_set_level(AV_LOG_ERROR); // Only log errors by default
-      av_register_all();
-      avformat_network_init();
-      // and set up filter support
-      avfilter_register_all();
-
-      // turn down logging
-      sGlobal = new Global();
-    }
+    (void) getCtx();
   }
   void
   Global :: deinit()
@@ -171,7 +164,6 @@ namespace io { namespace humble { namespace video
     Global *val = (Global*)closure;
     if (!vm && val) {
       av_lockmgr_register(0);
-      delete val;
     }
   }
 
@@ -181,6 +173,14 @@ namespace io { namespace humble { namespace video
         Global::destroyStaticGlobal,
         this);
     mLock = io::humble::ferry::Mutex::make();
+    mDefaultTimeBase = Rational::make(1, Global::DEFAULT_PTS_PER_SECOND);
+    av_lockmgr_register(humblevideo_lockmgr_cb);
+    av_log_set_callback(humblevideo_log_callback);
+    av_log_set_level(AV_LOG_ERROR); // Only log errors by default
+    av_register_all();
+    avformat_network_init();
+    // and set up filter support
+    avfilter_register_all();
   }
 
   Global :: ~Global()
@@ -192,24 +192,19 @@ namespace io { namespace humble { namespace video
   void
   Global :: lock()
   {
-    Global::init();
-    if (sGlobal && sGlobal->mLock)
-      sGlobal->mLock->lock();
+    Global* ctx = Global::getCtx();
+    if (ctx && ctx->mLock)
+      ctx->mLock->lock();
   }
 
   void
   Global :: unlock()
   {
-    Global::init();
-    if (sGlobal && sGlobal->mLock)
-      sGlobal->mLock->unlock();
+    Global* ctx = Global::getCtx();
+    if (ctx && ctx->mLock)
+      ctx->mLock->unlock();
   }
 
-  int64_t
-  Global :: getVersion()
-  {
-    return ((int64_t)getVersionMajor())<<48 | ((int64_t)getVersionMinor())<<32 | (int64_t)getVersionRevision();
-  }
   int32_t
   Global :: getVersionMajor()
   {
@@ -221,12 +216,6 @@ namespace io { namespace humble { namespace video
   {
     Global::init();
     return VS_LIB_MINOR_VERSION;
-  }
-  int32_t
-  Global :: getVersionRevision()
-  {
-    Global::init();
-    return VS_REVISION;
   }
   
   const char *
@@ -281,5 +270,13 @@ namespace io { namespace humble { namespace video
     else
       av_log_set_level(AV_LOG_DEBUG);
 //    fprintf(stderr, "FFmpeg logging level = %d\n", av_log_get_level());
+  }
+
+  Rational*
+  Global::getDefaultTimeBase()
+  {
+    Global* ctx = Global::getCtx();
+
+    return ctx ? ctx->mDefaultTimeBase.get() : 0;
   }
 }}}

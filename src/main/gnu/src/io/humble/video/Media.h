@@ -21,6 +21,7 @@
 #define MEDIADATA_H_
 
 #include <io/humble/video/HumbleVideo.h>
+#include <io/humble/video/Global.h>
 #include <io/humble/ferry/RefCounted.h>
 #include <io/humble/ferry/IBuffer.h>
 #include <io/humble/video/Rational.h>
@@ -58,27 +59,6 @@ public:
   virtual Rational* getTimeBase()=0;
   
   /**
-   * Set the time base that time stamps of this object are represented in.
-   * 
-   * @param aBase the new time base.  If null an exception is thrown.
-   */
-  virtual void setTimeBase(Rational *aBase)=0;
-  
-  /**
-   * Get any underlying raw data available for this object.
-   * 
-   * @return The raw data, or null if not accessible.
-   */
-  virtual io::humble::ferry::IBuffer* getData()=0;
-  
-  /**
-   * Get the size in bytes of the raw data available for this object.
-   * 
-   * @return the size in bytes, or -1 if it cannot be computed.
-   */
-  virtual int32_t getSize()=0;
-  
-  /**
    * Is this object a key object?  i.e. it can be interpreted without needing any other media objects
    * 
    * @return true if it's a key, false if not
@@ -105,9 +85,16 @@ protected:
  */
 class VS_API_HUMBLEVIDEO MediaEncodedData: public io::humble::video::MediaData
 {
-  protected:
-    MediaEncodedData() {}
-    virtual ~MediaEncodedData() {}
+public:
+  /**
+   * Set the time base that time stamps of this object are represented in.
+   *
+   * @param aBase the new time base.  If null an exception is thrown.
+   */
+  virtual void setTimeBase(Rational *aBase)=0;
+protected:
+  MediaEncodedData() {}
+  virtual ~MediaEncodedData() {}
 };
 }}}
 

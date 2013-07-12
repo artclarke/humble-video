@@ -22,8 +22,10 @@
 
 #include <io/humble/ferry/Mutex.h>
 #include <io/humble/ferry/RefCounted.h>
+#include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/config.h>
 #include <io/humble/video/HumbleVideo.h>
+#include <io/humble/video/Rational.h>
 
 namespace io { namespace humble { namespace video
 {
@@ -48,15 +50,8 @@ namespace io { namespace humble { namespace video
      */
     static const int64_t DEFAULT_PTS_PER_SECOND=1000000;
 
-    /**
-     * Returns a 64 bit version number for this library.
-     * 
-     * @return a 64-bit integer version number for this library.  The top 16 bits is
-     * the {@link #getVersionMajor()} value.  The next 16-bits are the {@link #getVersionMinor()}
-     * value, and the last 32-bits are the {@link #getVersionRevision()} value.
-     */
-    static int64_t getVersion();
-    
+    static Rational* getDefaultTimeBase();
+
     /**
      * Get the major version number of this library.
      * @return the major version number of this library or 0 if unknown.
@@ -67,11 +62,7 @@ namespace io { namespace humble { namespace video
      * @return the minor version number of this library or 0 if unknown.
      */
     static int32_t getVersionMinor();
-    /**
-     * Get the revision number of this library.
-     * @return the revision number of this library, or 0 if unknown.
-     */
-    static int32_t getVersionRevision();
+
     /**
      * Get a string representation of the version of this library.
      * @return the version of this library in string form.
@@ -162,8 +153,9 @@ namespace io { namespace humble { namespace video
     ~Global();
 
     static void destroyStaticGlobal(JavaVM*, void*closure);
-    static Global* sGlobal;
+    static Global* getCtx();
     io::humble::ferry::Mutex* mLock;
+    io::humble::ferry::RefPointer<Rational> mDefaultTimeBase;
   };
 }}}
 

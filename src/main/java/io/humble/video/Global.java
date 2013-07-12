@@ -120,17 +120,9 @@ public class Global extends RefCounted {
   public static final java.util.concurrent.TimeUnit DEFAULT_TIME_UNIT =
     java.util.concurrent.TimeUnit.MICROSECONDS;
 
-/**
- * Returns a 64 bit version number for this library.  
- * @return	a 64-bit integer version number for this library. The top 
- *		 16 bits is  
- * the {@link #getVersionMajor()} value. The next 16-bits are the {@link 
- * #getVersionMinor()}  
- * value, and the last 32-bits are the {@link #getVersionRevision()} 
- * value.  
- */
-  public static long getVersion() {
-    return VideoJNI.Global_getVersion();
+  public static Rational getDefaultTimeBase() {
+    long cPtr = VideoJNI.Global_getDefaultTimeBase();
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
 /**
@@ -149,14 +141,6 @@ public class Global extends RefCounted {
  */
   public static int getVersionMinor() {
     return VideoJNI.Global_getVersionMinor();
-  }
-
-/**
- * Get the revision number of this library.  
- * @return	the revision number of this library, or 0 if unknown.  
- */
-  public static int getVersionRevision() {
-    return VideoJNI.Global_getVersionRevision();
   }
 
 /**

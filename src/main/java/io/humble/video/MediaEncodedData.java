@@ -111,4 +111,13 @@ public class MediaEncodedData extends MediaData {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+/**
+ * Set the time base that time stamps of this object are represented 
+ * in.  
+ *  
+ */
+  public void setTimeBase(Rational aBase) {
+    VideoJNI.MediaEncodedData_setTimeBase(swigCPtr, this, Rational.getCPtr(aBase), aBase);
+  }
+
 }

@@ -35,8 +35,9 @@ namespace video {
 /**
  * A class that defines metadata about audio formats.
  */
-class VS_API_HUMBLEVIDEO AudioFormat : public virtual MediaRaw
+class VS_API_HUMBLEVIDEO AudioFormat : public virtual io::humble::ferry::RefCounted
 {
+public:
   /**
    * The format we use to represent audio.
    */
@@ -120,7 +121,7 @@ class VS_API_HUMBLEVIDEO AudioFormat : public virtual MediaRaw
    */
   static Type
   getPlanarSampleFormat(Type sample_fmt) {
-    return av_get_planar_sample_fmt((enum AVSampleFormat) sample_fmt);
+    return (Type) av_get_planar_sample_fmt((enum AVSampleFormat) sample_fmt);
   }
 
   /**
@@ -160,6 +161,7 @@ class VS_API_HUMBLEVIDEO AudioChannel : public io::humble::ferry::RefCounted
   // This object is ALL static ALL the time.
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(AudioChannel)
   ;
+public:
   typedef enum Type
   {
     CH_UNKNOWN = 0,
@@ -300,7 +302,7 @@ VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(AudioChannel)
    */
   static Type
   getChannelFromLayoutAtIndex(Layout layout, int32_t index) {
-    return av_channel_layout_extract_channel((uint64_t) layout, index);
+    return (Type)av_channel_layout_extract_channel((uint64_t) layout, index);
   }
 
   /**
@@ -403,52 +405,34 @@ public:
   /**
    * Get any underlying raw data available for this object.
    *
+   * @param plane The plane number if {@link getFormat()} is Planar (rather than packed) audio.  Pass zero for packed data.
    * @return The raw data, or null if not accessible.
    */
   virtual io::humble::ferry::IBuffer*
-  getData()=0;
+  getData(int32_t plane)=0;
 
   /**
    * The total number of bytes in {@link #getData()} that represent valid audio data.
-   */
-  virtual int32_t
-  getDataSize()=0;
-
-  /**
-   * Returns an buffer pointing to the plane of data for the given channel
-   * number. If !{@link #isPlanar} this returns the same as {@link #getData()}.
    *
-   * @return The buffer of data, or null if channel < 0 || channel >= {@link #getNumChannels()}
-   */
-  virtual io::humble::ferry::IBuffer*
-  getChannelData(int32_t channel)=0;
-
-  /**
-   * The total number of bytes in the data-plane for the given channel that represents valid
-   * audio data.  If !{@link #isPlanar()} this returns the same as {@link #getDataSize()}.
-   * @return The number of bytes, < 0 on error.
+   * @return The size in bytes of that plane of audio data.
    */
   virtual int32_t
-  getChannelDataSize(int32_t channel)=0;
+  getDataPlaneSize()=0;
+
+  /** Returns the number of data planes in this object. */
+  virtual int32_t
+  getNumDataPlanes()=0;
 
   /**
    * @return maximum of samples of {@link #getChannels()} {@link #getFormat()} audio that can be put in this {@link AudioSamples} object.
    */
-  int32_t
+  virtual int32_t
   getMaxNumSamples()=0;
-  /**
-   * Get the maximum number of bytes of audio data that can be put in this object.
-   *
-   * Note: this will be smaller than {@link #getData()}.getBufferSize() due to Humble Video
-   * header stuff.
-   */
-  int32_t
-  getMaxBytes()=0;
 
   /**
    * Number of bytes in one sample of one channel of audio in this object.
    */
-  int32_t
+  virtual int32_t
   getBytesPerSample()=0;
 
   /**
@@ -466,7 +450,7 @@ public:
    */
   virtual void
   setComplete(bool complete, uint32_t numSamples, int32_t sampleRate,
-      int32_t channels, AudioSamples::Format format, int64_t pts)=0;
+      int32_t channels, AudioFormat::Type format, int64_t pts)=0;
 
   /**
    * Sample rate of audio, or 0 if unknown.
@@ -501,7 +485,7 @@ public:
   /**
    * What is the channel layout of the audio in this buffer?
    */
-  virtual AudioChannel::Layout getChannelLayout = 0;
+  virtual AudioChannel::Layout getChannelLayout() = 0;
 
 protected:
   MediaAudio();

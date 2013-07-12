@@ -113,6 +113,42 @@ public class MediaRaw extends MediaData {
   
 
 /**
+ * Get the time stamp of this object in getTimeBase() units.  
+ * @return	the time stamp  
+ */
+  public long getTimeStamp() {
+    return VideoJNI.MediaRaw_getTimeStamp(swigCPtr, this);
+  }
+
+/**
+ * Set the time stamp for this object in getTimeBase() units.  
+ * @param	aTimeStamp The time stamp  
+ */
+  public void setTimeStamp(long aTimeStamp) {
+    VideoJNI.MediaRaw_setTimeStamp(swigCPtr, this, aTimeStamp);
+  }
+
+/**
+ * Get the time base that time stamps of this object are represented 
+ * in.  
+ * Caller must release the returned value.  
+ * @return	the time base.  
+ */
+  public Rational getTimeBase() {
+    long cPtr = VideoJNI.MediaRaw_getTimeBase(swigCPtr, this);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
+  }
+
+/**
+ * Is this object a key object? i.e. it can be interpreted without needing 
+ * any other media objects  
+ * @return	true if it's a key, false if not  
+ */
+  public boolean isKey() {
+    return VideoJNI.MediaRaw_isKey(swigCPtr, this);
+  }
+
+/**
  * Get the presentation time stamp  
  */
   public long getPts() {

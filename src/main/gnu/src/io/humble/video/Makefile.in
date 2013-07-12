@@ -101,11 +101,11 @@ am_libhumble_video_la_OBJECTS = PixelFormat.lo AudioSamples.lo \
 	AudioSamplesImpl.lo VideoPicture.lo VideoPictureImpl.lo \
 	KeyValueBag.lo KeyValueBagImpl.lo Property.lo PropertyImpl.lo \
 	Rational.lo RationalImpl.lo Codec.lo Media.lo MediaRaw.lo \
-	IndexEntry.lo IndexEntryImpl.lo Error.lo ErrorImpl.lo \
-	Packet.lo PacketImpl.lo ContainerFormat.lo Configurable.lo \
-	ContainerStream.lo Container.lo SourceFormat.lo Source.lo \
-	SourceImpl.lo SourceStream.lo SourceStreamImpl.lo \
-	SinkFormat.lo Global.lo
+	MediaAudio.lo IndexEntry.lo IndexEntryImpl.lo Error.lo \
+	ErrorImpl.lo Packet.lo PacketImpl.lo ContainerFormat.lo \
+	Configurable.lo ContainerStream.lo Container.lo \
+	SourceFormat.lo Source.lo SourceImpl.lo SourceStream.lo \
+	SourceStreamImpl.lo SinkFormat.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -444,6 +444,7 @@ libhumble_video_la_SOURCES = \
   Codec.cpp \
   Media.cpp \
   MediaRaw.cpp \
+  MediaAudio.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
   Error.cpp \
@@ -489,6 +490,8 @@ libhumble_video_la_HEADERS = \
   Media.swg \
   MediaRaw.h \
   MediaRaw.swg \
+  MediaAudio.h \
+  MediaAudio.swg \
   IndexEntry.h \
   IndexEntryImpl.h \
   IndexEntry.swg \
@@ -596,6 +599,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBag.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Media.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaRaw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Packet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PacketImpl.Plo@am__quote@

@@ -47,6 +47,14 @@ public:
   make();
 
   /**
+   * Get any underlying raw data available for this packet.
+   *
+   * @return The raw data, or null if not accessible.
+   */
+  virtual io::humble::ferry::IBuffer* getData()=0;
+
+
+  /**
    * Allocate a new packet that wraps an existing IBuffer.
    *
    * NOTE: At least 16 bytes of the passed in buffer will be used

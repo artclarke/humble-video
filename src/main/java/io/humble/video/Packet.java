@@ -122,6 +122,15 @@ public class Packet extends MediaEncodedData {
   }
 
 /**
+ * Get any underlying raw data available for this packet.  
+ * @return	The raw data, or null if not accessible.  
+ */
+  public IBuffer getData() {
+    long cPtr = VideoJNI.Packet_getData(swigCPtr, this);
+    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+  }
+
+/**
  * Allocate a new packet that wraps an existing IBuffer.  
  * NOTE: At least 16 bytes of the passed in buffer will be used  
  * for header information, so the resulting {@link Packet.getSize() 

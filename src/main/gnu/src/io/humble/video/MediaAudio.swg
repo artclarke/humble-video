@@ -17,23 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#include "MediaData.h"
-#include "KeyValueBagImpl.h"
+%typemap (javacode) io::humble::video::MediaAudio,io::humble::video::MediaAudio*,io::humble::video::MediaAudio& %{
+%}
 
-namespace io { namespace humble { namespace video {
-
-MediaData :: MediaData()
-{
-}
-
-MediaData :: ~MediaData()
-{
-}
-
-KeyValueBag*
-MediaRawData::getMetaData()
-{
-  return KeyValueBagImpl::make(getCtx()->metadata);
-}
-
-}}}
+%include <io/humble/video/MediaAudio.h>
