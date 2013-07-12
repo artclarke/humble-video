@@ -213,12 +213,4 @@ public class MediaRaw extends Media {
     return VideoJNI.MediaRaw_getBestEffortTimeStamp(swigCPtr, this);
   }
 
-/**
- * Total size in bytes of the decoded media.  
- * @return	number of bytes of decoded media  
- */
-  public int getSize() {
-    return VideoJNI.MediaRaw_getSize(swigCPtr, this);
-  }
-
 }

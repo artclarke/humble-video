@@ -16,23 +16,45 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
+/*
+ * AVBufferSupport.h
+ *
+ *  Created on: Jul 12, 2013
+ *      Author: aclarke
+ */
 
-#include "Media.h"
-#include "KeyValueBagImpl.h"
+#ifndef AVBUFFERSUPPORT_H_
+#define AVBUFFERSUPPORT_H_
 
+#include <io/humble/video/HumbleVideo.h>
+#include <io/humble/ferry/RefCounted.h>
 #include <io/humble/ferry/IBuffer.h>
+namespace io {
+namespace humble {
+namespace video {
 
-using namespace io::humble::ferry;
-
-namespace io { namespace humble { namespace video {
-
-Media :: Media()
+class AVBufferSupport
 {
-}
+public:
+  /**
+   * Wraps a AVBufferRef in an IBuffer.
+   */
+  static io::humble::ferry::IBuffer* wrapAVBuffer(io::humble::ferry::RefCounted* requestor, AVBufferRef* ref);
+  /**
+   * Wraps an AVBufferRef in a IBuffer
+   */
+  static AVBufferRef* wrapIBuffer(io::humble::ferry::IBuffer* buf);
 
-Media :: ~Media()
-{
-}
+private:
+  static void bufferRelease(void * closure, uint8_t * buf);
+  static void avBufferRelease(void * buf, void * closure);
 
+  AVBufferSupport();
+  virtual
+  ~AVBufferSupport();
+};
 
-}}}
+} /* namespace video */
+} /* namespace humble */
+} /* namespace io */
+#endif /* AVBUFFERSUPPORT_H_ */

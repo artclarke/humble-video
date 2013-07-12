@@ -62,7 +62,7 @@ PacketTest::testCopyPacket() {
   // let's get access to the data
 
   RefPointer<IBuffer> data = packet->getData();
-  TS_ASSERT_EQUALS(size, data->getBufferSize());
+  TS_ASSERT_EQUALS(size+16, data->getBufferSize());
   TS_ASSERT_EQUALS(size, packet->getSize());
   uint8_t* raw = (uint8_t*) data->getBytes(0, size);
   for (int i = 0; i < size; i++)
@@ -89,7 +89,7 @@ PacketTest::testCopyPacket() {
 
     RefPointer<IBuffer> buf = newPacket->getData();
     TS_ASSERT_EQUALS(size, newPacket->getSize());
-    TS_ASSERT_EQUALS(size, buf->getBufferSize());
+    TS_ASSERT_EQUALS(size+16, buf->getBufferSize());
     uint8_t* d = (uint8_t*) buf->getBytes(0, size);
     if (!tests[i]) {
       TS_ASSERT_EQUALS(d, raw);
@@ -118,9 +118,9 @@ PacketTest::testWrapIBuffer()
   RefPointer<IBuffer> data = packet->getData();
   TSM_ASSERT_DIFFERS("should be different IBuffer objects since once in a packet, AV manages buffer",
       buf.value(), data.value());
-  TS_ASSERT_EQUALS(size-16, data->getBufferSize());
-  TS_ASSERT_EQUALS(size-16, packet->getSize());
-  uint8_t* raw = (uint8_t*) data->getBytes(0, size-16);
-  for (int j = 0; j < size-16; j++)
+  TS_ASSERT_EQUALS(size, data->getBufferSize());
+  TS_ASSERT_EQUALS(size, packet->getSize());
+  uint8_t* raw = (uint8_t*) data->getBytes(0, size);
+  for (int j = 0; j < size; j++)
     TS_ASSERT_EQUALS(raw[j], j % 16);
 }

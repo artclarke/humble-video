@@ -88,11 +88,6 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
      */
     void wrapAVPacket(AVPacket* pkt);
     void wrapBuffer(io::humble::ferry::IBuffer *buffer);
-    // Used by FFmpeg AVBufferRefs when they think the underlying
-    // buffer is to be freed. We'll just release the extra add ref we
-    // added to mBuffer.
-    static void AVBufferRefFreeFunc(void *closure, uint8_t *data);
-    static void IBufferFreeFunc(void *buf, void *closure);
 #endif // ! SWIG
 
   protected:

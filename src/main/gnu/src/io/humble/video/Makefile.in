@@ -97,15 +97,16 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_video_la_DEPENDENCIES =
-am_libhumble_video_la_OBJECTS = PixelFormat.lo AudioSamples.lo \
-	AudioSamplesImpl.lo VideoPicture.lo VideoPictureImpl.lo \
-	KeyValueBag.lo KeyValueBagImpl.lo Property.lo PropertyImpl.lo \
-	Rational.lo RationalImpl.lo Codec.lo Media.lo MediaRaw.lo \
-	MediaAudio.lo IndexEntry.lo IndexEntryImpl.lo Error.lo \
-	ErrorImpl.lo MediaPacket.lo MediaPacketImpl.lo \
-	ContainerFormat.lo Configurable.lo ContainerStream.lo \
-	Container.lo SourceFormat.lo Source.lo SourceImpl.lo \
-	SourceStream.lo SourceStreamImpl.lo SinkFormat.lo Global.lo
+am_libhumble_video_la_OBJECTS = AVBufferSupport.lo PixelFormat.lo \
+	AudioSamples.lo AudioSamplesImpl.lo VideoPicture.lo \
+	VideoPictureImpl.lo KeyValueBag.lo KeyValueBagImpl.lo \
+	Property.lo PropertyImpl.lo Rational.lo RationalImpl.lo \
+	Codec.lo Media.lo MediaRaw.lo MediaAudio.lo MediaAudioImpl.lo \
+	IndexEntry.lo IndexEntryImpl.lo Error.lo ErrorImpl.lo \
+	MediaPacket.lo MediaPacketImpl.lo ContainerFormat.lo \
+	Configurable.lo ContainerStream.lo Container.lo \
+	SourceFormat.lo Source.lo SourceImpl.lo SourceStream.lo \
+	SourceStreamImpl.lo SinkFormat.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -430,6 +431,7 @@ SUFFIXES = .i
 noinst_LTLIBRARIES = libhumble-video.la
 libhumble_video_la_LIBADD = $(VS_PKG_LIBRARIES)
 libhumble_video_la_SOURCES = \
+  AVBufferSupport.cpp \
   PixelFormat.cpp \
   AudioSamples.cpp \
   AudioSamplesImpl.cpp \
@@ -445,6 +447,7 @@ libhumble_video_la_SOURCES = \
   Media.cpp \
   MediaRaw.cpp \
   MediaAudio.cpp \
+  MediaAudioImpl.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
   Error.cpp \
@@ -469,6 +472,7 @@ nodist_libhumble_video_la_SOURCES = \
 libhumble_video_ladir = $(includedir)/$(VS_CPP_PATH)
 libhumble_video_la_HEADERS = \
   HumbleVideo.h \
+  AVBufferSupport.h \
   Codec.h \
   Codec.swg \
   FfmpegIncludes.h \
@@ -491,6 +495,7 @@ libhumble_video_la_HEADERS = \
   MediaRaw.h \
   MediaRaw.swg \
   MediaAudio.h \
+  MediaAudioImpl.h \
   MediaAudio.swg \
   IndexEntry.h \
   IndexEntryImpl.h \
@@ -583,6 +588,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AVBufferSupport.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioSamples.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioSamplesImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Codec.Plo@am__quote@
@@ -600,6 +606,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Media.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudio.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudioImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacketImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaRaw.Plo@am__quote@

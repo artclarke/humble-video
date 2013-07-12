@@ -18,6 +18,7 @@
  *******************************************************************************/
 
 #include "MediaPacketImpl.h"
+#include "AVBufferSupport.h"
 
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/Buffer.h>
@@ -161,11 +162,7 @@ namespace io { namespace humble { namespace video {
     if (!mPacket->data || !mPacket->buf)
       return 0;
 
-    // create a new reference
-    AVBufferRef * b = av_buffer_ref(mPacket->buf);
-    // and create an IBuffer wrapping it.
-    return IBuffer::make(this, mPacket->data, mPacket->size,
-        IBufferFreeFunc, b);
+    return AVBufferSupport::wrapAVBuffer(this, mPacket->buf);
   }
   
   void
@@ -255,13 +252,10 @@ namespace io { namespace humble { namespace video {
         // now, release the reference currently in the packet
         if (retval->mPacket->buf)
           av_buffer_unref(&retval->mPacket->buf);
-        // create a new reference wrapping our IBuffer (and create a reference
-        // to delete
-        copy->acquire();
-        retval->mPacket->buf = av_buffer_create(data, copy->getBufferSize(),
-            AVBufferRefFreeFunc, copy.value(), 0);
+        retval->mPacket->buf = AVBufferSupport::wrapIBuffer(copy.value());
         // and set the data member to the copy
-        retval->mPacket->data = data;
+        retval->mPacket->data = retval->mPacket->buf->data;
+        retval->mPacket->size = numBytes;
 
       }
       // separate here to catch addRef()
@@ -303,50 +297,25 @@ namespace io { namespace humble { namespace video {
   {
     if (!buffer)
       return;
-    int32_t size = buffer->getBufferSize()-FF_INPUT_BUFFER_PADDING_SIZE;
-    if (size <= 0)
-      throw std::bad_alloc();
 
-    uint8_t* data = (uint8_t*)buffer->getBytes(0, size);
-
-    buffer->acquire(); // reference for av_buffer_create to manage.
     // let's create a av buffer reference
     if (mPacket->buf)
       av_buffer_unref(&mPacket->buf);
-    mPacket->buf = av_buffer_create(
-        data,
-        size,
-        MediaPacketImpl::AVBufferRefFreeFunc,
-        buffer,
-        0);
-    mPacket->size = size;
-    mPacket->data = data;
-    // And assume we're now complete.
-    setComplete(true, size);
+    mPacket->buf = AVBufferSupport::wrapIBuffer(buffer);
+    if (mPacket->buf) {
+      mPacket->size = mPacket->buf->size;
+      mPacket->data = mPacket->buf->data;;
+      // And assume we're now complete.
+      setComplete(true, mPacket->size);
+    } else {
+      VS_LOG_ERROR("Error wrapping buffer");
+      throw std::bad_alloc();
+    }
   }
   bool
   MediaPacketImpl::isComplete()
   {
     return mIsComplete && mPacket->data;
-  }
-  
-  void
-  MediaPacketImpl::AVBufferRefFreeFunc(void * closure, uint8_t * buf)
-  {
-    IBuffer* b = (IBuffer*)closure;
-    // We know that FFMPEG allocated this with av_malloc, but
-    // that might change in future versions; so this is
-    // inherently somewhat dangerous.
-    (void) buf;
-    if (b)
-      b->release();
-  }
-  void
-  MediaPacketImpl::IBufferFreeFunc(void * buf, void * closure)
-  {
-    AVBufferRef *b = (AVBufferRef*) closure;
-    (void) buf;
-    av_buffer_unref(&b);
   }
 
   int64_t

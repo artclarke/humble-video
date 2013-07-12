@@ -12,6 +12,7 @@ noinst_LTLIBRARIES = libhumble-video.la
 libhumble_video_la_LIBADD= $(VS_PKG_LIBRARIES)
 
 libhumble_video_la_SOURCES= \
+  AVBufferSupport.cpp \
   PixelFormat.cpp \
   AudioSamples.cpp \
   AudioSamplesImpl.cpp \
@@ -27,6 +28,7 @@ libhumble_video_la_SOURCES= \
   Media.cpp \
   MediaRaw.cpp \
   MediaAudio.cpp \
+  MediaAudioImpl.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
   Error.cpp \
@@ -51,6 +53,7 @@ nodist_libhumble_video_la_SOURCES= \
 libhumble_video_ladir=$(includedir)/$(VS_CPP_PATH)
 libhumble_video_la_HEADERS= \
   HumbleVideo.h \
+  AVBufferSupport.h \
   Codec.h \
   Codec.swg \
   FfmpegIncludes.h \
@@ -73,6 +76,7 @@ libhumble_video_la_HEADERS= \
   MediaRaw.h \
   MediaRaw.swg \
   MediaAudio.h \
+  MediaAudioImpl.h \
   MediaAudio.swg \
   IndexEntry.h \
   IndexEntryImpl.h \

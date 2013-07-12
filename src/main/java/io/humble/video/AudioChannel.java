@@ -162,6 +162,25 @@ public class AudioChannel extends RefCounted {
 
 /**
  * Get the index of a channel in channel_layout.  
+ * <p>  
+ * Use this method to find out which index into channel data corresponds 
+ *  
+ * to the channel you care about. The way you use this differs depending 
+ *  
+ * on whether your audio is packed or planar. To illustrate, let's assume 
+ *  
+ * you have CH_LAYOUT_STEREO audio, and you ask for the index of CH_FRONT_LEFT, 
+ *  
+ * and we return 1 (indexes are zero based).  
+ * </p><p>  
+ * If packed, then audio is laid out in one big buffer as "RLRLRLRLRLRLRLRL" 
+ * audio,  
+ * and every 2nd (1+1) sample is the left channel  
+ * </p><p>  
+ * If planar, then audio is out in two buffer as "RRRRRRRR" and "LLLLLLLL", 
+ * and the  
+ * second plan (1+1) is the left channel.  
+ * </p>  
  * @param	channel a channel layout describing exactly one channel which 
  *		 must be  
  * present in channel_layout.  

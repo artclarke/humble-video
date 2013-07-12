@@ -155,23 +155,10 @@ namespace io { namespace humble { namespace video
   void
   Global :: deinit()
   {
-    avformat_network_deinit();
-  }
-
-  void
-  Global :: destroyStaticGlobal(JavaVM*vm,void*closure)
-  {
-    Global *val = (Global*)closure;
-    if (!vm && val) {
-      av_lockmgr_register(0);
-    }
   }
 
   Global :: Global()
   {
-    io::humble::ferry::JNIHelper::sRegisterTerminationCallback(
-        Global::destroyStaticGlobal,
-        this);
     mLock = io::humble::ferry::Mutex::make();
     mDefaultTimeBase = Rational::make(1, Global::DEFAULT_PTS_PER_SECOND);
     av_lockmgr_register(humblevideo_lockmgr_cb);
@@ -185,6 +172,8 @@ namespace io { namespace humble { namespace video
 
   Global :: ~Global()
   {
+    avformat_network_deinit();
+    av_lockmgr_register(0);
     if (mLock)
       mLock->release();
   }
@@ -222,7 +211,7 @@ namespace io { namespace humble { namespace video
   Global :: getVersionStr()
   {
     Global::init();
-    return PACKAGE_VERSION "."  VS_STRINGIFY(VS_REVISION);
+    return PACKAGE_VERSION;
   }
   int32_t
   Global :: getAVFormatVersion()

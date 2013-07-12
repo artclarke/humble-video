@@ -113,13 +113,6 @@ public:
     */
    virtual int64_t getBestEffortTimeStamp() { return getCtx()->best_effort_timestamp; }
 
-   /**
-    * Total size in bytes of the decoded media.
-    *
-    * @return number of bytes of decoded media
-    */
-   virtual int32_t getSize()=0;
-
 #ifndef SWIG
    virtual AVFrame *getCtx()=0;
 #endif

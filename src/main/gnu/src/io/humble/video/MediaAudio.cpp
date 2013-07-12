@@ -24,6 +24,7 @@
  */
 
 #include "MediaAudio.h"
+#include "MediaAudioImpl.h"
 
 namespace io {
 namespace humble {
@@ -40,10 +41,7 @@ MediaAudio::~MediaAudio() {
 MediaAudio*
 MediaAudio::make(int32_t maxSamples, int32_t channels,
     AudioFormat::Type format) {
-  (void) maxSamples;
-  (void) channels;
-  (void) format;
-  return 0;
+  return MediaAudioImpl::make(maxSamples, channels, format);
 }
 
 /**
@@ -59,10 +57,7 @@ MediaAudio::make(int32_t maxSamples, int32_t channels,
 MediaAudio*
 MediaAudio::make(io::humble::ferry::IBuffer *buffer, int32_t channels,
     AudioFormat::Type format) {
-  (void) buffer;
-  (void) channels;
-  (void) format;
-  return 0;
+  return MediaAudioImpl::make(buffer, channels, format);
 }
 
 } /* namespace video */

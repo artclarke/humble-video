@@ -141,7 +141,6 @@ class VideoJNI {
   public final static native int MediaRaw_getPacketSize(long jarg1, MediaRaw jarg1_);
   public final static native long MediaRaw_getPacketDuration(long jarg1, MediaRaw jarg1_);
   public final static native long MediaRaw_getBestEffortTimeStamp(long jarg1, MediaRaw jarg1_);
-  public final static native int MediaRaw_getSize(long jarg1, MediaRaw jarg1_);
   public final static native int AudioFormat_SAMPLE_FMT_NONE_get();
   public final static native int AudioFormat_SAMPLE_FMT_U8_get();
   public final static native int AudioFormat_SAMPLE_FMT_S16_get();

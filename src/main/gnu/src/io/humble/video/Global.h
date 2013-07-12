@@ -153,9 +153,8 @@ namespace io { namespace humble { namespace video
 
   private:
     Global();
-    ~Global();
+    virtual ~Global();
 
-    static void destroyStaticGlobal(JavaVM*, void*closure);
     static Global* getCtx();
     io::humble::ferry::Mutex* mLock;
     io::humble::ferry::RefPointer<Rational> mDefaultTimeBase;
