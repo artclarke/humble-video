@@ -4935,15 +4935,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Property_1getFlagConstant
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaData_1getTimeStamp(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Media_1getTimeStamp(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::MediaData *arg1 = (io::humble::video::MediaData *) 0 ;
+  io::humble::video::Media *arg1 = (io::humble::video::Media *) 0 ;
   int64_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::MediaData **)&jarg1; 
+  arg1 = *(io::humble::video::Media **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -5012,14 +5012,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaData_1getTimeStamp(J
 }
 
 
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaData_1setTimeStamp(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  io::humble::video::MediaData *arg1 = (io::humble::video::MediaData *) 0 ;
+SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Media_1setTimeStamp(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  io::humble::video::Media *arg1 = (io::humble::video::Media *) 0 ;
   int64_t arg2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::MediaData **)&jarg1; 
+  arg1 = *(io::humble::video::Media **)&jarg1; 
   arg2 = (int64_t)jarg2; 
   
   if (!arg1) {
@@ -5087,15 +5087,15 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaData_1setTimeStamp(JN
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaData_1getTimeBase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Media_1getTimeBase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::MediaData *arg1 = (io::humble::video::MediaData *) 0 ;
+  io::humble::video::Media *arg1 = (io::humble::video::Media *) 0 ;
   io::humble::video::Rational *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::MediaData **)&jarg1; 
+  arg1 = *(io::humble::video::Media **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -5164,15 +5164,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaData_1getTimeBase(JN
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaData_1isKey(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Media_1isKey(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
-  io::humble::video::MediaData *arg1 = (io::humble::video::MediaData *) 0 ;
+  io::humble::video::Media *arg1 = (io::humble::video::Media *) 0 ;
   bool result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::MediaData **)&jarg1; 
+  arg1 = *(io::humble::video::Media **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -5241,15 +5241,15 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaData_1isKey(JNIEn
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaData_1isComplete(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Media_1isComplete(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
-  io::humble::video::MediaData *arg1 = (io::humble::video::MediaData *) 0 ;
+  io::humble::video::Media *arg1 = (io::humble::video::Media *) 0 ;
   bool result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::MediaData **)&jarg1; 
+  arg1 = *(io::humble::video::Media **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -5318,15 +5318,15 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaData_1isComplete(
 }
 
 
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaEncodedData_1setTimeBase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  io::humble::video::MediaEncodedData *arg1 = (io::humble::video::MediaEncodedData *) 0 ;
+SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaEncoded_1setTimeBase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  io::humble::video::MediaEncoded *arg1 = (io::humble::video::MediaEncoded *) 0 ;
   io::humble::video::Rational *arg2 = (io::humble::video::Rational *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   (void)jarg2_;
-  arg1 = *(io::humble::video::MediaEncodedData **)&jarg1; 
+  arg1 = *(io::humble::video::MediaEncoded **)&jarg1; 
   arg2 = *(io::humble::video::Rational **)&jarg2; 
   
   if (!arg1) {
@@ -32897,19 +32897,19 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGPropertyUpcast(JNIEnv
     return baseptr;
 }
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaDataUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
-    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::MediaData **)&jarg1;
+    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::Media **)&jarg1;
     return baseptr;
 }
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaEncodedDataUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaEncodedUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
-    *(io::humble::video::MediaData **)&baseptr = *(io::humble::video::MediaEncodedData **)&jarg1;
+    *(io::humble::video::Media **)&baseptr = *(io::humble::video::MediaEncoded **)&jarg1;
     return baseptr;
 }
 
@@ -32917,7 +32917,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaRawUpcast(JNIEnv
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
-    *(io::humble::video::MediaData **)&baseptr = *(io::humble::video::MediaRaw **)&jarg1;
+    *(io::humble::video::Media **)&baseptr = *(io::humble::video::MediaRaw **)&jarg1;
     return baseptr;
 }
 
@@ -32973,7 +32973,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGPacketUpcast(JNIEnv *
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
-    *(io::humble::video::MediaEncodedData **)&baseptr = *(io::humble::video::Packet **)&jarg1;
+    *(io::humble::video::MediaEncoded **)&baseptr = *(io::humble::video::Packet **)&jarg1;
     return baseptr;
 }
 

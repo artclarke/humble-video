@@ -36,7 +36,7 @@ namespace video {
 /**
  * The parent class for all Raw media data.
  */
-class VS_API_HUMBLEVIDEO MediaRaw: public io::humble::video::MediaData
+class VS_API_HUMBLEVIDEO MediaRaw: public io::humble::video::Media
 {
 public:
   /**

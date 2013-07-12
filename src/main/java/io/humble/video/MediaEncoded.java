@@ -11,7 +11,7 @@ import io.humble.ferry.*;
 /**
  * The parent class for all Encoded media data.  
  */
-public class MediaEncodedData extends MediaData {
+public class MediaEncoded extends Media {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -29,18 +29,18 @@ public class MediaEncodedData extends MediaData {
   /**
    * Internal Only.
    */
-  protected MediaEncodedData(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGMediaEncodedDataUpcast(cPtr), cMemoryOwn);
+  protected MediaEncoded(long cPtr, boolean cMemoryOwn) {
+    super(VideoJNI.SWIGMediaEncodedUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
   /**
    * Internal Only.
    */
-  protected MediaEncodedData(long cPtr, boolean cMemoryOwn,
+  protected MediaEncoded(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGMediaEncodedDataUpcast(cPtr),
+    super(VideoJNI.SWIGMediaEncodedUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -53,7 +53,7 @@ public class MediaEncodedData extends MediaData {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(MediaEncodedData obj) {
+  protected static long getCPtr(MediaEncoded obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -71,17 +71,17 @@ public class MediaEncodedData extends MediaData {
   }
   
   /**
-   * Create a new MediaEncodedData object that is actually referring to the
+   * Create a new MediaEncoded object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
    */
   @Override
-  public MediaEncodedData copyReference() {
+  public MediaEncoded copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new MediaEncodedData(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new MediaEncoded(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -94,8 +94,8 @@ public class MediaEncodedData extends MediaData {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof MediaEncodedData)
-      equal = (((MediaEncodedData)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof MediaEncoded)
+      equal = (((MediaEncoded)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -117,7 +117,7 @@ public class MediaEncodedData extends MediaData {
  *  
  */
   public void setTimeBase(Rational aBase) {
-    VideoJNI.MediaEncodedData_setTimeBase(swigCPtr, this, Rational.getCPtr(aBase), aBase);
+    VideoJNI.MediaEncoded_setTimeBase(swigCPtr, this, Rational.getCPtr(aBase), aBase);
   }
 
 }

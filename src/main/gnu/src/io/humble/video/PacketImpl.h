@@ -45,7 +45,7 @@ class VS_API_HUMBLEVIDEO PacketImpl : public io::humble::video::Packet
     static PacketImpl* make(PacketImpl* packet, bool);
   public:
 
-    // MediaData
+    // Data
     virtual int64_t getTimeStamp() { return getDts(); }
     virtual void setTimeStamp(int64_t aTimeStamp) { setDts(aTimeStamp); }
     virtual bool isKey() { return isKeyPacket(); }

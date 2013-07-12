@@ -1054,6 +1054,11 @@ public class IBuffer extends RefCounted {
       
       // and tell Java this byte buffer is in native order
       retval.order(java.nio.ByteOrder.nativeOrder());
+      retval.position(0);
+      retval.mark();
+      retval.limit(this.getSize());
+    }
+      
     }
     return retval;
   }
@@ -1261,6 +1266,9 @@ public class IBuffer extends RefCounted {
   }
 
   public enum Type {
+  /**
+   * Types of data that are in this buffer.
+   */
     IBUFFER_UINT8,
     IBUFFER_SINT8,
     IBUFFER_UINT16,

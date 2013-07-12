@@ -1045,6 +1045,11 @@
       
       // and tell Java this byte buffer is in native order
       retval.order(java.nio.ByteOrder.nativeOrder());
+      retval.position(0);
+      retval.mark();
+      retval.limit(this.getSize());
+    }
+      
     }
     return retval;
   }

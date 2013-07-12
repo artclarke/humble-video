@@ -120,6 +120,9 @@ public class Global extends RefCounted {
   public static final java.util.concurrent.TimeUnit DEFAULT_TIME_UNIT =
     java.util.concurrent.TimeUnit.MICROSECONDS;
 
+/**
+ * The default timebase used by media if not otherwise specified.  
+ */
   public static Rational getDefaultTimeBase() {
     long cPtr = VideoJNI.Global_getDefaultTimeBase();
     return (cPtr == 0) ? null : new Rational(cPtr, false);
@@ -218,7 +221,7 @@ public class Global extends RefCounted {
 
 /**
  * A value that means no time stamp is set for a given object.  
- * if the {@link IMediaData#getTimeStamp()} method of an  
+ * if the {@link Media#getTimeStamp()} method of an  
  * object returns this value it means the time stamp wasn't set.  
  */
   public final static long NO_PTS = VideoJNI.Global_NO_PTS_get();

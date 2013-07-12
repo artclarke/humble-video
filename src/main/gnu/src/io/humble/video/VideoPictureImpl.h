@@ -33,7 +33,7 @@ namespace io { namespace humble { namespace video
   {
     VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(VideoPictureImpl);
   public:
-    // IMediaData
+    // Media
     virtual int64_t getTimeStamp() { return getPts(); }
     virtual void setTimeStamp(int64_t aTimeStamp) { setPts(aTimeStamp); }
     virtual bool isKey() { return isKeyFrame(); }

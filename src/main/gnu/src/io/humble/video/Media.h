@@ -32,7 +32,7 @@ namespace io { namespace humble { namespace video {
 /**
  * The parent class of all media objects than can be gotten from or added to a {@link Stream}.
  */
-class VS_API_HUMBLEVIDEO MediaData: public io::humble::ferry::RefCounted
+class VS_API_HUMBLEVIDEO Media: public io::humble::ferry::RefCounted
 {
 public:
   /**
@@ -76,14 +76,14 @@ public:
 
   
 protected:
-  MediaData();
-  virtual ~MediaData();
+  Media();
+  virtual ~Media();
 };
 
 /**
  * The parent class for all Encoded media data.
  */
-class VS_API_HUMBLEVIDEO MediaEncodedData: public io::humble::video::MediaData
+class VS_API_HUMBLEVIDEO MediaEncoded: public io::humble::video::Media
 {
 public:
   /**
@@ -93,8 +93,8 @@ public:
    */
   virtual void setTimeBase(Rational *aBase)=0;
 protected:
-  MediaEncodedData() {}
-  virtual ~MediaEncodedData() {}
+  MediaEncoded() {}
+  virtual ~MediaEncoded() {}
 };
 }}}
 

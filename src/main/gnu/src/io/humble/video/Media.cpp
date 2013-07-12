@@ -22,11 +22,11 @@
 
 namespace io { namespace humble { namespace video {
 
-MediaData :: MediaData()
+Media :: Media()
 {
 }
 
-MediaData :: ~MediaData()
+Media :: ~Media()
 {
 }
 

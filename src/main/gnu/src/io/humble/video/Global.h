@@ -38,7 +38,7 @@ namespace io { namespace humble { namespace video
   public:
     /**
      * A value that means no time stamp is set for a given object.
-     * if the {@link IMediaData#getTimeStamp()} method of an
+     * if the {@link Media#getTimeStamp()} method of an
      * object returns this value it means the time stamp wasn't set.
      */
     static const int64_t NO_PTS=0x8000000000000000LL;
@@ -50,6 +50,9 @@ namespace io { namespace humble { namespace video
      */
     static const int64_t DEFAULT_PTS_PER_SECOND=1000000;
 
+    /**
+     * The default timebase used by media if not otherwise specified.
+     */
     static Rational* getDefaultTimeBase();
 
     /**

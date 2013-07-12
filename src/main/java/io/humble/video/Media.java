@@ -9,9 +9,10 @@
 package io.humble.video;
 import io.humble.ferry.*;
 /**
- * The parent class for all Raw media data.  
+ * The parent class of all media objects than can be gotten from or 
+ * added to a {@link Stream}.  
  */
-public class MediaRaw extends Media {
+public class Media extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -29,18 +30,18 @@ public class MediaRaw extends Media {
   /**
    * Internal Only.
    */
-  protected MediaRaw(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGMediaRawUpcast(cPtr), cMemoryOwn);
+  protected Media(long cPtr, boolean cMemoryOwn) {
+    super(VideoJNI.SWIGMediaUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
   /**
    * Internal Only.
    */
-  protected MediaRaw(long cPtr, boolean cMemoryOwn,
+  protected Media(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGMediaRawUpcast(cPtr),
+    super(VideoJNI.SWIGMediaUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -53,7 +54,7 @@ public class MediaRaw extends Media {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(MediaRaw obj) {
+  protected static long getCPtr(Media obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -71,17 +72,17 @@ public class MediaRaw extends Media {
   }
   
   /**
-   * Create a new MediaRaw object that is actually referring to the
+   * Create a new Media object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
    */
   @Override
-  public MediaRaw copyReference() {
+  public Media copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new MediaRaw(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new Media(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -94,8 +95,8 @@ public class MediaRaw extends Media {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof MediaRaw)
-      equal = (((MediaRaw)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof Media)
+      equal = (((Media)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -112,12 +113,73 @@ public class MediaRaw extends Media {
   // JNIHelper.swg: End generated code
   
 
+  // used to correct timezone offsets for timestamp format 
+
+  private static final long TIME_OFFSET = -java.util.Calendar.getInstance()
+    .getTimeZone().getRawOffset();
+
+  /** The default time stamp format. */
+  
+  public static final String DEFAULT_TIME_STAMP_FORMAT =
+    "%1$tH:%1$tM:%1$tS.%1$tL";
+
+  /**
+   * Get a string representation of the time stamp for this {@link
+   * Media}.  The time is formatted as: <b>HH:MM:SS.ms</b>
+   *
+   * @return the printable string form of the time stamp of this media
+   *
+   * @see #getFormattedTimeStamp(String)
+   * @see #DEFAULT_TIME_STAMP_FORMAT
+   */
+
+  public String getFormattedTimeStamp()
+  {
+    return getFormattedTimeStamp(DEFAULT_TIME_STAMP_FORMAT);
+  }
+
+  /**
+   * Get a string representation of the time stamp for this {@link
+   * Media}.  The format of the resulting string is specified by
+   * the format parameter.  See {@link java.util.Formatter} for 
+   * details on how to specify formats, however a good place to start
+   * is with the following format: <b>%1$tH:%1$tM:%1$tS.%1$tL</b>
+   *
+   * @param format the format for the time stamp string
+   *
+   * @return the printable string form of the timestamp
+   * 
+   * @see #getFormattedTimeStamp()
+   * @see #DEFAULT_TIME_STAMP_FORMAT
+   * @see java.util.Formatter
+   */
+
+  public String getFormattedTimeStamp(String format)
+  {
+    String retval = null;
+    java.util.Formatter formatter = new java.util.Formatter();
+
+    try {
+      Rational timeBase = getTimeBase();
+      if (timeBase == null)
+        timeBase = Rational.make(1,(int)Global.DEFAULT_PTS_PER_SECOND);
+      retval = formatter.format(format,
+          (long)(getTimeStamp() * timeBase.getDouble() * 1000) +
+          TIME_OFFSET).toString();
+      timeBase.delete();
+    } finally {
+      formatter.close();
+    }
+    return retval;
+  }
+  
+
 /**
  * Get the time stamp of this object in getTimeBase() units.  
  * @return	the time stamp  
  */
   public long getTimeStamp() {
-    return VideoJNI.MediaRaw_getTimeStamp(swigCPtr, this);
+    return VideoJNI.Media_getTimeStamp(swigCPtr, this);
   }
 
 /**
@@ -125,7 +187,7 @@ public class MediaRaw extends Media {
  * @param	aTimeStamp The time stamp  
  */
   public void setTimeStamp(long aTimeStamp) {
-    VideoJNI.MediaRaw_setTimeStamp(swigCPtr, this, aTimeStamp);
+    VideoJNI.Media_setTimeStamp(swigCPtr, this, aTimeStamp);
   }
 
 /**
@@ -135,7 +197,7 @@ public class MediaRaw extends Media {
  * @return	the time base.  
  */
   public Rational getTimeBase() {
-    long cPtr = VideoJNI.MediaRaw_getTimeBase(swigCPtr, this);
+    long cPtr = VideoJNI.Media_getTimeBase(swigCPtr, this);
     return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
@@ -145,80 +207,16 @@ public class MediaRaw extends Media {
  * @return	true if it's a key, false if not  
  */
   public boolean isKey() {
-    return VideoJNI.MediaRaw_isKey(swigCPtr, this);
+    return VideoJNI.Media_isKey(swigCPtr, this);
   }
 
 /**
- * Get the presentation time stamp  
- */
-  public long getPts() {
-    return VideoJNI.MediaRaw_getPts(swigCPtr, this);
-  }
-
-/**
- * Get any meta-data associated with this media item  
- */
-  public KeyValueBag getMetaData() {
-    long cPtr = VideoJNI.MediaRaw_getMetaData(swigCPtr, this);
-    return (cPtr == 0) ? null : new KeyValueBag(cPtr, false);
-  }
-
-/**
- * pts copied from the Packet that was decoded to produce this frame 
+ * Returns whether or not we think this buffer has been filled  
+ * with data.  
  *  
- * - encoding: unused  
- * - decoding: Read by user.  
  */
-  public long getPacketPts() {
-    return VideoJNI.MediaRaw_getPacketPts(swigCPtr, this);
-  }
-
-/**
- * dts copied from the Packet that triggered returning this frame  
- * - encoding: unused  
- * - decoding: Read by user.  
- */
-  public long getPacketDts() {
-    return VideoJNI.MediaRaw_getPacketDts(swigCPtr, this);
-  }
-
-/**
- * size of the corresponding packet containing the compressed  
- * frame.  
- * It is set to a negative value if unknown.  
- * - encoding: unused  
- * - decoding: set by libavcodec, read by user.  
- */
-  public int getPacketSize() {
-    return VideoJNI.MediaRaw_getPacketSize(swigCPtr, this);
-  }
-
-/**
- * duration of the corresponding packet, expressed in  
- * ContainerStream.getTimeBase() units, 0 if unknown.  
- * - encoding: unused  
- * - decoding: Read by user.  
- */
-  public long getPacketDuration() {
-    return VideoJNI.MediaRaw_getPacketDuration(swigCPtr, this);
-  }
-
-/**
- * frame timestamp estimated using various heuristics, in stream time 
- * base  
- * - encoding: unused  
- * - decoding: set by libavcodec, read by user.  
- */
-  public long getBestEffortTimeStamp() {
-    return VideoJNI.MediaRaw_getBestEffortTimeStamp(swigCPtr, this);
-  }
-
-/**
- * Total size in bytes of the decoded media.  
- * @return	number of bytes of decoded media  
- */
-  public int getSize() {
-    return VideoJNI.MediaRaw_getSize(swigCPtr, this);
+  public boolean isComplete() {
+    return VideoJNI.Media_isComplete(swigCPtr, this);
   }
 
 }

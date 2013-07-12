@@ -32,7 +32,7 @@ namespace video {
  * A packet of data that was read from a {@link Source} or
  * will be written to a {@link Sink}.
  */
-class VS_API_HUMBLEVIDEO Packet : public io::humble::video::MediaEncodedData
+class VS_API_HUMBLEVIDEO Packet : public io::humble::video::MediaEncoded
 {
   /*
    * Note: This class is a pure-virtual interface. Actual

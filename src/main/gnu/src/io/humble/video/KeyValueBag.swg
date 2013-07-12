@@ -37,7 +37,7 @@
   }
   
   /**
-   * Get the set of keys currently in this {@link IMediaData} object
+   * Get the set of keys currently in this {@link KeyValueBag} object
    * as an unordered collection.
    * @return the keys.
    */
