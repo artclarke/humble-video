@@ -206,7 +206,7 @@ public class RefCounted {
  *		 issues, you should not rely on this value,  
  * as it may change before the method returns to you.  
  */
-  public int acquire() {
+  protected int acquire() {
     return FerryJNI.RefCounted_acquire(swigCPtr, this);
   }
 
@@ -228,7 +228,7 @@ public class RefCounted {
  *		 issues, you should not rely on this value,  
  * as it may change before the method returns to you.  
  */
-  public int release() {
+  protected int release() {
     return FerryJNI.RefCounted_release(swigCPtr, this);
   }
 
