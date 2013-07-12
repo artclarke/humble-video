@@ -12941,9 +12941,6 @@
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
-   fun:malloc
+   ...
    fun:atexit_register
-   fun:__cxa_atexit
-   fun:_Z41__static_initialization_and_destruction_0ii
-   fun:_GLOBAL__I__Z11VS_TestMainiPPc
 }
