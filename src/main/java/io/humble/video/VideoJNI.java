@@ -223,8 +223,8 @@ class VideoJNI {
   public final static native String AudioChannel_getChannelName(int jarg1);
   public final static native String AudioChannel_getChannelDescription(int jarg1);
   public final static native String AudioChannel_getLayoutName(int jarg1);
-  public final static native long MediaAudio_make__SWIG_0(int jarg1, int jarg2, int jarg3);
-  public final static native long MediaAudio_make__SWIG_1(long jarg1, IBuffer jarg1_, int jarg2, int jarg3);
+  public final static native long MediaAudio_make__SWIG_0(int jarg1, int jarg2, int jarg3, int jarg4);
+  public final static native long MediaAudio_make__SWIG_1(long jarg1, IBuffer jarg1_, int jarg2, int jarg3, int jarg4, int jarg5);
   public final static native long MediaAudio_getData(long jarg1, MediaAudio jarg1_, int jarg2);
   public final static native int MediaAudio_getDataPlaneSize(long jarg1, MediaAudio jarg1_);
   public final static native int MediaAudio_getNumDataPlanes(long jarg1, MediaAudio jarg1_);

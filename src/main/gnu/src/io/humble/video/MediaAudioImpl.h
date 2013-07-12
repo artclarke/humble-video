@@ -37,11 +37,12 @@ class MediaAudioImpl : public io::humble::video::MediaAudio
   VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MediaAudioImpl)
 public:
   static MediaAudioImpl*
-  make(int32_t maxSamples, int32_t channels, AudioFormat::Type format);
+  make(int32_t numSamples, int32_t channels, AudioChannel::Layout channelLayout,
+        AudioFormat::Type format);
 
   static MediaAudioImpl*
-  make(io::humble::ferry::IBuffer *buffer, int32_t channels,
-      AudioFormat::Type format);
+  make(io::humble::ferry::IBuffer *buffer, int32_t numSamples, int32_t channels,
+      AudioChannel::Layout channelLayout, AudioFormat::Type format);
 
   virtual io::humble::ferry::IBuffer*
   getData(int32_t plane);

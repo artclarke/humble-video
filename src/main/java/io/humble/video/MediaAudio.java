@@ -135,11 +135,20 @@ public class MediaAudio extends MediaRaw {
   
 
 /**
- * Create a MediaAudio and the underlying data.  
+ * Create a MediaAudio and the underlying data. Will allocate a buffer 
+ * to back this data.  
+ * @param	numSamples The number of samples of audio that will be placed 
+ *		 in this {@link MediaAudio} object.  
+ * @param	channels The number of channels of audio that will be placed 
+ *		 in this {@link MediaAudio} object.  
+ * channelLayout The channel layout of audio that will be placed in 
+ * this {@link MediaAudio} object.  
+ * @param	format The format of the audio placed in this {@link MediaAudio} 
+ *		 object.  
  * @return	A {@link MediaAudio} object, or null on failure.  
  */
-  public static MediaAudio make(int maxSamples, int channels, AudioFormat.Type format) {
-    long cPtr = VideoJNI.MediaAudio_make__SWIG_0(maxSamples, channels, format.swigValue());
+  public static MediaAudio make(int numSamples, int channels, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
+    long cPtr = VideoJNI.MediaAudio_make__SWIG_0(numSamples, channels, channelLayout.swigValue(), format.swigValue());
     return (cPtr == 0) ? null : new MediaAudio(cPtr, false);
   }
 
@@ -152,10 +161,22 @@ public class MediaAudio extends MediaRaw {
  * of the buffer for, um, stuff (assume at least 64 bytes). So {@link 
  * #getMaxNumSamples()}  
  * may not return as many as you think you can fit in here.  
+ * @param	buffer A buffer to back the audio with. If not large enough 
+ *		 to hold all the samples (with alignment on 32-bit 
+ *		 boundaries if planar),  
+ * then an error results.  
+ * @param	numSamples The number of samples of audio that will be placed 
+ *		 in this {@link MediaAudio} object.  
+ * @param	channels The number of channels of audio that will be placed 
+ *		 in this {@link MediaAudio} object.  
+ * channelLayout The channel layout of audio that will be placed in 
+ * this {@link MediaAudio} object.  
+ * @param	format The format of the audio placed in this {@link MediaAudio} 
+ *		 object.  
  * @return	A {@link MediaAudio} object, or null on failure.  
  */
-  public static MediaAudio make(IBuffer buffer, int channels, AudioFormat.Type format) {
-    long cPtr = VideoJNI.MediaAudio_make__SWIG_1(IBuffer.getCPtr(buffer), buffer, channels, format.swigValue());
+  public static MediaAudio make(IBuffer buffer, int numSamples, int channels, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
+    long cPtr = VideoJNI.MediaAudio_make__SWIG_1(IBuffer.getCPtr(buffer), buffer, numSamples, channels, channelLayout.swigValue(), format.swigValue());
     return (cPtr == 0) ? null : new MediaAudio(cPtr, false);
   }
 

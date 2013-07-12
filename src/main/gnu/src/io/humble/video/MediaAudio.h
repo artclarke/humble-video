@@ -316,7 +316,7 @@ public:
    */
   static Type
   getChannelFromLayoutAtIndex(Layout layout, int32_t index) {
-    return (Type)av_channel_layout_extract_channel((uint64_t) layout, index);
+    return (Type) av_channel_layout_extract_channel((uint64_t) layout, index);
   }
 
   /**
@@ -396,12 +396,16 @@ class VS_API_HUMBLEVIDEO MediaAudio : public MediaRaw
 
 public:
   /**
-   * Create a MediaAudio and the underlying data.
+   * Create a MediaAudio and the underlying data. Will allocate a buffer to back this data.
+   * @param numSamples The number of samples of audio that will be placed in this {@link MediaAudio} object.
+   * @param channels The number of channels of audio that will be placed in this {@link MediaAudio} object.
+   * @paray channelLayout The channel layout of audio that will be placed in this {@link MediaAudio} object.
+   * @param format The format of the audio placed in this {@link MediaAudio} object.
    * @return A {@link MediaAudio} object, or null on failure.
    */
   static MediaAudio*
-  make(int32_t maxSamples, int32_t channels, AudioFormat::Type format);
-
+  make(int32_t numSamples, int32_t channels, AudioChannel::Layout channelLayout,
+      AudioFormat::Type format);
   /**
    * Create a MediaAudio using the given buffer.
    *
@@ -410,11 +414,18 @@ public:
    * of the buffer for, um, stuff (assume at least 64 bytes). So {@link #getMaxNumSamples()}
    * may not return as many as you think you can fit in here.
    *
+   * @param buffer A buffer to back the audio with. If not large enough to hold all the samples (with alignment on 32-bit boundaries if planar),
+   *    then an error results.
+   * @param numSamples The number of samples of audio that will be placed in this {@link MediaAudio} object.
+   * @param channels The number of channels of audio that will be placed in this {@link MediaAudio} object.
+   * @paray channelLayout The channel layout of audio that will be placed in this {@link MediaAudio} object.
+   * @param format The format of the audio placed in this {@link MediaAudio} object.
+   *
    * @return A {@link MediaAudio} object, or null on failure.
    */
   static MediaAudio*
-  make(io::humble::ferry::IBuffer *buffer, int32_t channels,
-      AudioFormat::Type format);
+  make(io::humble::ferry::IBuffer *buffer, int32_t numSamples, int32_t channels,
+      AudioChannel::Layout channelLayout, AudioFormat::Type format);
 
   /**
    * Get any underlying raw data available for this object.
@@ -499,7 +510,8 @@ public:
   /**
    * What is the channel layout of the audio in this buffer?
    */
-  virtual AudioChannel::Layout getChannelLayout() = 0;
+  virtual AudioChannel::Layout
+  getChannelLayout() = 0;
 
 protected:
   MediaAudio();

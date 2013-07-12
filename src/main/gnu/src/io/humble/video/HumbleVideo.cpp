@@ -8660,24 +8660,26 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getLayout
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3, jint jarg4) {
   jlong jresult = 0 ;
   int32_t arg1 ;
   int32_t arg2 ;
-  io::humble::video::AudioFormat::Type arg3 ;
+  io::humble::video::AudioChannel::Layout arg3 ;
+  io::humble::video::AudioFormat::Type arg4 ;
   io::humble::video::MediaAudio *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   arg1 = (int32_t)jarg1; 
   arg2 = (int32_t)jarg2; 
-  arg3 = (io::humble::video::AudioFormat::Type)jarg3; 
+  arg3 = (io::humble::video::AudioChannel::Layout)jarg3; 
+  arg4 = (io::humble::video::AudioFormat::Type)jarg4; 
   {
     // JNIHelper.swg: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::MediaAudio *)io::humble::video::MediaAudio::make(arg1,arg2,arg3);
+      result = (io::humble::video::MediaAudio *)io::humble::video::MediaAudio::make(arg1,arg2,arg3,arg4);
     }
     catch(std::invalid_argument & e)
     {
@@ -8733,11 +8735,13 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4, jint jarg5) {
   jlong jresult = 0 ;
   io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
   int32_t arg2 ;
-  io::humble::video::AudioFormat::Type arg3 ;
+  int32_t arg3 ;
+  io::humble::video::AudioChannel::Layout arg4 ;
+  io::humble::video::AudioFormat::Type arg5 ;
   io::humble::video::MediaAudio *result = 0 ;
   
   (void)jenv;
@@ -8745,13 +8749,15 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
   (void)jarg1_;
   arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
   arg2 = (int32_t)jarg2; 
-  arg3 = (io::humble::video::AudioFormat::Type)jarg3; 
+  arg3 = (int32_t)jarg3; 
+  arg4 = (io::humble::video::AudioChannel::Layout)jarg4; 
+  arg5 = (io::humble::video::AudioFormat::Type)jarg5; 
   {
     // JNIHelper.swg: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::MediaAudio *)io::humble::video::MediaAudio::make(arg1,arg2,arg3);
+      result = (io::humble::video::MediaAudio *)io::humble::video::MediaAudio::make(arg1,arg2,arg3,arg4,arg5);
     }
     catch(std::invalid_argument & e)
     {
