@@ -1182,7 +1182,7 @@ public class IBuffer extends RefCounted {
 /**
  * Internal only. Do not use.  
  */
-  public java.nio.ByteBuffer java_getByteBuffer(int offset, int length) {
+  private java.nio.ByteBuffer java_getByteBuffer(int offset, int length) {
     return FerryJNI.IBuffer_java_getByteBuffer(swigCPtr, this, offset, length);
   }
 

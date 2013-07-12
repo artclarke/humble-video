@@ -1119,7 +1119,7 @@ typedef jobject jNioByteArray;
    * Internal only.  Do not use.
    */
    
-  %javamethodmodifiers java_getByteBuffer() "private"
+  %javamethodmodifiers java_getByteBuffer(int32_t, int32_t) "private"
   jNioByteArray java_getByteBuffer(int32_t offset, int32_t length)
   {
     void * buffer = 0;

@@ -16,44 +16,6 @@ package io.humble.ferry;
  * constructed with special factory methods, usually called  
  * make(...).  
  * </p>  
- * <h2>Special note for developers in languages other than C++</h2> 
- *  
- * <p>  
- * You should not need to worry about this class very much. Feel  
- * free to ignore it.  
- * </p>  
- * <h2>Special note for C++ Users</h2>  
- * <p>  
- * Users of RefCounted objects in Native (C++) code must make  
- * sure they acquire() a reference to an object if they  
- * intend to keep using it after they have returned from  
- * the method it was passed to, and  
- * must call release() when done to ensure memory is freed.  
- * </p>  
- * <p>  
- * Methods that return RefCounted objects on the stack are  
- * expected to acquire() the reference for the caller, and  
- * callers <b>must</b> release() any RefCounted object  
- * returned on the stack.  
- * <p>  
- * For example:  
- * </p>  
- * <code>  
- * <pre>  
- * RefCounted methodReturningRefCountedObject();  
- * {  
- * mValueToReturn->acquire(); acquire for caller  
- * return mValueToReturn; and return  
- * }  
- * {  
- * RefCounted *value = methodReturningRefCountedObject();  
- * ...  
- * caller must release  
- * if (value)  
- * value->release();  
- * }  
- * </pre>  
- * </code>  
  */
 public class RefCounted {
   // JNIHelper.swg: Start generated code
