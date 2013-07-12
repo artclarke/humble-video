@@ -44,7 +44,6 @@ MediaAudioImpl::MediaAudioImpl() {
 }
 
 MediaAudioImpl::~MediaAudioImpl() {
-  av_frame_unref(mFrame);
   av_frame_free(&mFrame);
 }
 
@@ -155,10 +154,6 @@ MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer, int32_t numSamples,
     }
     frame->nb_extended_buf = planes - AV_NUM_DATA_POINTERS;
   } else frame->extended_data = frame->data;
-
-  // now, let's fill in those buffers.
-  frame->buf[0] = AVBufferSupport::wrapIBuffer(buffer);
-  // all the rest should be zero.
 
   // fill in the extended_data planes
   uint8_t* buf = (uint8_t*) buffer->getBytes(0, bufSize);
