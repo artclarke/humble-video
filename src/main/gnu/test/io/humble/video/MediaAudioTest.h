@@ -28,12 +28,6 @@
 
 #include <io/humble/testutils/TestUtils.h>
 #include <io/humble/video/MediaAudio.h>
-using namespace io::humble::video;
-using namespace io::humble::ferry;
-
-namespace io {
-namespace humble {
-namespace video {
 
 class MediaAudioTest : public CxxTest::TestSuite
 {
@@ -44,8 +38,4 @@ public:
   void testCreation();
   void testCreationFromBuffer();
 };
-
-} /* namespace video */
-} /* namespace humble */
-} /* namespace io */
 #endif /* MEDIAAUDIOTEST_H_ */

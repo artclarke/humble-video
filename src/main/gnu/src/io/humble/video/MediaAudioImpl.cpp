@@ -44,6 +44,7 @@ MediaAudioImpl::MediaAudioImpl() {
 }
 
 MediaAudioImpl::~MediaAudioImpl() {
+  av_frame_unref(mFrame);
   av_frame_free(&mFrame);
 }
 
@@ -76,8 +77,16 @@ MediaAudioImpl*
 MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer, int32_t numSamples,
     int32_t sampleRate,
     int32_t channels, AudioChannel::Layout layout, AudioFormat::Type format) {
+  if (numSamples <= 0) {
+    VS_LOG_ERROR("No samples specified");
+    return 0;
+  }
   if (channels <= 0) {
     VS_LOG_ERROR("No channels specified");
+    return 0;
+  }
+  if (sampleRate <= 0) {
+    VS_LOG_ERROR("No sample rate speified");
     return 0;
   }
   if (format == AudioFormat::SAMPLE_FMT_NONE) {
@@ -87,6 +96,17 @@ MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer, int32_t numSamples,
   if (!buffer) {
     VS_LOG_ERROR("No audio buffer specified");
     return 0;
+  }
+  if (layout != AudioChannel::CH_LAYOUT_UNKNOWN) {
+    // let's do a sanity check
+    if (channels != AudioChannel::getNumChannelsInLayout(layout)) {
+      VS_LOG_ERROR("Passed in channel layout does not match number of channels. Layout: %s. Expected Channels: %d. Actual Channels: %d",
+          AudioChannel::getLayoutName(layout),
+          AudioChannel::getNumChannelsInLayout(layout),
+          channels
+          );
+      return 0;
+    }
   }
   // get the required buf size
   int32_t linesize = 0;
@@ -143,9 +163,9 @@ MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer, int32_t numSamples,
   // fill in the extended_data planes
   uint8_t* buf = (uint8_t*) buffer->getBytes(0, bufSize);
   ret = av_samples_fill_arrays(frame->extended_data, &frame->linesize[0], buf,
-      retval->getChannels(), frame->nb_samples, (enum AVSampleFormat) frame->format,
+      retval->getChannels(), retval->mMaxSamples, (enum AVSampleFormat) frame->format,
       0);
-  if (ret <= 0) return 0;
+  if (ret < 0) return 0;
 
   // now create references to our one mega buffer in all other pointers
   for (int32_t i = 0; i < FFMIN(planes, AV_NUM_DATA_POINTERS); i++) {
