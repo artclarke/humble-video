@@ -19,5 +19,7 @@
 
 %typemap(javapackage) io::humble::ferry::RefCounted, io::humble::ferry::RefCounted*, io::humble::ferry::RefCounted& "io.humble.ferry"
 %javamethodmodifiers io::humble::ferry::RefCounted::getCurrentRefCount() "private"
+%javamethodmodifiers io::humble::ferry::RefCounted::acquire() "protected"
+%javamethodmodifiers io::humble::ferry::RefCounted::release() "protected"
 %rename("getCurrentNativeRefCount") io::humble::ferry::RefCounted::getCurrentRefCount();
 %include <io/humble/ferry/RefCounted.h>
