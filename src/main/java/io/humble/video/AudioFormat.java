@@ -188,6 +188,30 @@ public class AudioFormat extends RefCounted {
     return VideoJNI.AudioFormat_isPlanar(sample_fmt.swigValue());
   }
 
+/**
+ * Get the size of a buffer in bytes that would be required to hold 
+ * the  
+ * number of samples of audio in the given format and with the given 
+ * number of channels.  
+ */
+  public static int getBufferSizeNeeded(int numSamples, int numChannels, AudioFormat.Type format) {
+    return VideoJNI.AudioFormat_getBufferSizeNeeded(numSamples, numChannels, format.swigValue());
+  }
+
+/**
+ * Get the size of a plane of audio bytes that would be required to 
+ * hold the  
+ * number of samples of audio in the given format and with the given 
+ * number of channels.  
+ * <p>  
+ * If format is packed, then this method returns the same number as 
+ * {@link #getBufferSizeNeeded(int, int, Type)}.  
+ * </p>  
+ */
+  public static int getDataPlaneSizeNeeded(int numSamples, int numChannels, AudioFormat.Type format) {
+    return VideoJNI.AudioFormat_getDataPlaneSizeNeeded(numSamples, numChannels, format.swigValue());
+  }
+
   public enum Type {
   /**
    * The format we use to represent audio.

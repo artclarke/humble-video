@@ -33,127 +33,6 @@ namespace humble {
 namespace video {
 
 /**
- * A class that defines metadata about audio formats.
- */
-class VS_API_HUMBLEVIDEO AudioFormat : public virtual io::humble::ferry::RefCounted
-{
-public:
-  /**
-   * The format we use to represent audio.
-   */
-  typedef enum Type
-  {
-    /** No format */
-    SAMPLE_FMT_NONE = AV_SAMPLE_FMT_NONE,
-    /** unsigned 8 bits */
-    SAMPLE_FMT_U8 = AV_SAMPLE_FMT_U8,
-    /** signed 16 bits */
-    SAMPLE_FMT_S16 = AV_SAMPLE_FMT_S16,
-    /** signed 32 bits */
-    SAMPLE_FMT_S32 = AV_SAMPLE_FMT_S32,
-    /** float */
-    SAMPLE_FMT_FLT = AV_SAMPLE_FMT_FLT,
-    /** double */
-    SAMPLE_FMT_DBL = AV_SAMPLE_FMT_DBL,
-
-    /** unsigned 8 bits, planar */
-    SAMPLE_FMT_U8P = AV_SAMPLE_FMT_U8P,
-    /** signed 16 bits, planar */
-    SAMPLE_FMT_S16P = AV_SAMPLE_FMT_S16P,
-    /** signed 32 bits, planar */
-    SAMPLE_FMT_S32P = AV_SAMPLE_FMT_S32P,
-    /** float, planar */
-    SAMPLE_FMT_FLTP = AV_SAMPLE_FMT_FLTP,
-    /** double, planar */
-    SAMPLE_FMT_DBLP = AV_SAMPLE_FMT_DBLP,
-  } Type;
-  /**
-   * Return the name of format, or NULL if format is not
-   * recognized.
-   */
-  static const char*
-  getName(Type format) {
-    return av_get_sample_fmt_name((enum AVSampleFormat) format);
-  }
-  /**
-   * Return a sample format corresponding to name, or SAMPLE_FMT_NONE
-   * on error.
-   */
-  static Type
-  getSampleFormat(const char* name) {
-    return (Type) av_get_sample_fmt(name);
-  }
-
-  /**
-   * Return the planar<->packed alternative form of the given sample format, or
-   * SAMPLE_FMT_NONE on error. If the passed sample_fmt is already in the
-   * requested planar/packed format, the format returned is the same as the
-   * input.
-   */
-  static Type
-  getAlternateSampleFormat(Type sample_fmt, bool planar) {
-    return (Type) av_get_alt_sample_fmt((enum AVSampleFormat) sample_fmt,
-        (int) planar);
-  }
-
-  /**
-   * Get the packed alternative form of the given sample format.
-   *
-   * If the passed sample_fmt is already in packed format, the format returned is
-   * the same as the input.
-   *
-   * @return  the packed alternative form of the given sample format or
-   AV_SAMPLE_FMT_NONE on error.
-   */
-  static Type
-  getPackedSampleFormat(Type sample_fmt) {
-    return (Type) av_get_packed_sample_fmt((enum AVSampleFormat) sample_fmt);
-  }
-
-  /**
-   * Get the planar alternative form of the given sample format.
-   *
-   * If the passed sample_fmt is already in planar format, the format returned is
-   * the same as the input.
-   *
-   * @return  the planar alternative form of the given sample format or
-   SAMPLE_FMT_NONE on error.
-   */
-  static Type
-  getPlanarSampleFormat(Type sample_fmt) {
-    return (Type) av_get_planar_sample_fmt((enum AVSampleFormat) sample_fmt);
-  }
-
-  /**
-   * Return number of bytes per sample.
-   *
-   * @param sample_fmt the sample format
-   * @return number of bytes per sample or zero if unknown for the given
-   * sample format
-   */
-  static int32_t
-  getBytesPerSample(Type sample_fmt) {
-    return av_get_bytes_per_sample((enum AVSampleFormat) sample_fmt);
-  }
-
-  /**
-   * Check if the sample format is planar.
-   *
-   * @param sample_fmt the sample format to inspect
-   * @return 1 if the sample format is planar, 0 if it is interleaved
-   */
-  static bool
-  isPlanar(Type sample_fmt) {
-    return av_sample_fmt_is_planar((enum AVSampleFormat) sample_fmt);
-  }
-
-protected:
-  AudioFormat();
-  virtual
-  ~AudioFormat();
-};
-
-/**
  * A class that defines meta-data about audio channels and layouts.
  */
 class VS_API_HUMBLEVIDEO AudioChannel : public io::humble::ferry::RefCounted
@@ -372,6 +251,151 @@ protected:
   virtual
   ~AudioChannel();
 };
+
+/**
+ * A class that defines metadata about audio formats.
+ */
+class VS_API_HUMBLEVIDEO AudioFormat : public virtual io::humble::ferry::RefCounted
+{
+public:
+  /**
+   * The format we use to represent audio.
+   */
+  typedef enum Type
+  {
+    /** No format */
+    SAMPLE_FMT_NONE = AV_SAMPLE_FMT_NONE,
+    /** unsigned 8 bits */
+    SAMPLE_FMT_U8 = AV_SAMPLE_FMT_U8,
+    /** signed 16 bits */
+    SAMPLE_FMT_S16 = AV_SAMPLE_FMT_S16,
+    /** signed 32 bits */
+    SAMPLE_FMT_S32 = AV_SAMPLE_FMT_S32,
+    /** float */
+    SAMPLE_FMT_FLT = AV_SAMPLE_FMT_FLT,
+    /** double */
+    SAMPLE_FMT_DBL = AV_SAMPLE_FMT_DBL,
+
+    /** unsigned 8 bits, planar */
+    SAMPLE_FMT_U8P = AV_SAMPLE_FMT_U8P,
+    /** signed 16 bits, planar */
+    SAMPLE_FMT_S16P = AV_SAMPLE_FMT_S16P,
+    /** signed 32 bits, planar */
+    SAMPLE_FMT_S32P = AV_SAMPLE_FMT_S32P,
+    /** float, planar */
+    SAMPLE_FMT_FLTP = AV_SAMPLE_FMT_FLTP,
+    /** double, planar */
+    SAMPLE_FMT_DBLP = AV_SAMPLE_FMT_DBLP,
+  } Type;
+  /**
+   * Return the name of format, or NULL if format is not
+   * recognized.
+   */
+  static const char*
+  getName(Type format) {
+    return av_get_sample_fmt_name((enum AVSampleFormat) format);
+  }
+  /**
+   * Return a sample format corresponding to name, or SAMPLE_FMT_NONE
+   * on error.
+   */
+  static Type
+  getSampleFormat(const char* name) {
+    return (Type) av_get_sample_fmt(name);
+  }
+
+  /**
+   * Return the planar<->packed alternative form of the given sample format, or
+   * SAMPLE_FMT_NONE on error. If the passed sample_fmt is already in the
+   * requested planar/packed format, the format returned is the same as the
+   * input.
+   */
+  static Type
+  getAlternateSampleFormat(Type sample_fmt, bool planar) {
+    return (Type) av_get_alt_sample_fmt((enum AVSampleFormat) sample_fmt,
+        (int) planar);
+  }
+
+  /**
+   * Get the packed alternative form of the given sample format.
+   *
+   * If the passed sample_fmt is already in packed format, the format returned is
+   * the same as the input.
+   *
+   * @return  the packed alternative form of the given sample format or
+   AV_SAMPLE_FMT_NONE on error.
+   */
+  static Type
+  getPackedSampleFormat(Type sample_fmt) {
+    return (Type) av_get_packed_sample_fmt((enum AVSampleFormat) sample_fmt);
+  }
+
+  /**
+   * Get the planar alternative form of the given sample format.
+   *
+   * If the passed sample_fmt is already in planar format, the format returned is
+   * the same as the input.
+   *
+   * @return  the planar alternative form of the given sample format or
+   SAMPLE_FMT_NONE on error.
+   */
+  static Type
+  getPlanarSampleFormat(Type sample_fmt) {
+    return (Type) av_get_planar_sample_fmt((enum AVSampleFormat) sample_fmt);
+  }
+
+  /**
+   * Return number of bytes per sample.
+   *
+   * @param sample_fmt the sample format
+   * @return number of bytes per sample or zero if unknown for the given
+   * sample format
+   */
+  static int32_t
+  getBytesPerSample(Type sample_fmt) {
+    return av_get_bytes_per_sample((enum AVSampleFormat) sample_fmt);
+  }
+
+  /**
+   * Check if the sample format is planar.
+   *
+   * @param sample_fmt the sample format to inspect
+   * @return 1 if the sample format is planar, 0 if it is interleaved
+   */
+  static bool
+  isPlanar(Type sample_fmt) {
+    return av_sample_fmt_is_planar((enum AVSampleFormat) sample_fmt);
+  }
+
+  /**
+   * Get the size of a buffer in bytes that would be required to hold the
+   * number of samples of audio in the given format and with the given number of channels.
+   */
+  static int32_t
+  getBufferSizeNeeded(int32_t numSamples, int32_t numChannels, Type format) {
+    return av_samples_get_buffer_size(0, numChannels, numSamples, (enum AVSampleFormat) format, 0);
+  }
+
+  /**
+   * Get the size of a plane of audio bytes that would be required to hold the
+   * number of samples of audio in the given format and with the given number of channels.
+   * <p>
+   * If format is packed, then this method returns the same number as {@link #getBufferSizeNeeded(int, int, Type)}.
+   * </p>
+   */
+  static int32_t
+  getDataPlaneSizeNeeded(int32_t numSamples, int32_t numChannels, Type format) {
+    int32_t linesize = 0;
+    (void) av_samples_get_buffer_size(&linesize, numChannels, numSamples, (enum AVSampleFormat) format, 0);
+    return linesize;
+  }
+
+protected:
+  AudioFormat();
+  virtual
+  ~AudioFormat();
+};
+
 
 /**
  * Raw audio data.

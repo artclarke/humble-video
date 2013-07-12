@@ -36,6 +36,7 @@ public:
   virtual
   ~MediaAudioTest();
   void testCreation();
-  void testCreationFromBuffer();
+  void testCreationFromBufferPacked();
+  void testCreationFromBufferPlanar();
 };
 #endif /* MEDIAAUDIOTEST_H_ */
