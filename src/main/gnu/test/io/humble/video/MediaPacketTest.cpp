@@ -1,30 +1,30 @@
-#include "PacketTest.h"
+#include "MediaPacketTest.h"
 
-PacketTest::PacketTest() {
+MediaPacketTest::MediaPacketTest() {
 }
 
-PacketTest::~PacketTest() {
+MediaPacketTest::~MediaPacketTest() {
   tearDown();
 }
 
 void
-PacketTest::setUp() {
+MediaPacketTest::setUp() {
   packet = 0;
 }
 
 void
-PacketTest::tearDown() {
+MediaPacketTest::tearDown() {
   packet = 0;
 }
 
 void
-PacketTest::testCreationAndDestruction() {
+MediaPacketTest::testCreationAndDestruction() {
   packet = MediaPacket::make();
   TSM_ASSERT("was able to allocate packet", packet);
 }
 
 void
-PacketTest::testGetDefaults() {
+MediaPacketTest::testGetDefaults() {
   packet = MediaPacket::make();
   TSM_ASSERT("was able to allocate packet", packet);
 
@@ -35,7 +35,7 @@ PacketTest::testGetDefaults() {
 }
 
 void
-PacketTest::testCopyPacket() {
+MediaPacketTest::testCopyPacket() {
   const int32_t size = 512;
   packet = MediaPacket::make(size);
   TSM_ASSERT("was able to allocate packet", packet);
@@ -105,7 +105,7 @@ PacketTest::testCopyPacket() {
 }
 
 void
-PacketTest::testWrapIBuffer()
+MediaPacketTest::testWrapIBuffer()
 {
   const int size = 512;
   RefPointer<IBuffer> buf = IBuffer::make(0, size);

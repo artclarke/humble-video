@@ -11,7 +11,7 @@ check_PROGRAMS=\
   CodecTester \
   IndexEntryTester \
   ErrorTester \
-  PacketTester \
+  MediaPacketTester \
   KeyValueBagTester \
   SourceTester \
   SourceFormatTester \
@@ -25,7 +25,7 @@ BUILT_SOURCES= \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
   ErrorTest_CXXRunner.cpp \
-  PacketTest_CXXRunner.cpp \
+  MediaPacketTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
   SourceTest_CXXRunner.cpp \
   SourceFormatTest_CXXRunner.cpp \
@@ -39,7 +39,7 @@ noinst_HEADERS = \
   CodecTest.h \
   IndexEntryTest.h \
   ErrorTest.h \
-  PacketTest.h \
+  MediaPacketTest.h \
   KeyValueBagTest.h \
   SourceTest.h \
   SourceFormatTest.h \
@@ -98,14 +98,14 @@ nodist_ErrorTester_SOURCES= \
 ErrorTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-PacketTester_SOURCES= \
-  PacketTest.cpp \
+MediaPacketTester_SOURCES= \
+  MediaPacketTest.cpp \
   Main.cpp
 
-nodist_PacketTester_SOURCES= \
-  PacketTest_CXXRunner.cpp
+nodist_MediaPacketTester_SOURCES= \
+  MediaPacketTest_CXXRunner.cpp
 
-PacketTester_LDADD= \
+MediaPacketTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 KeyValueBagTester_SOURCES= \

@@ -80,7 +80,7 @@ build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = VideoPictureTester$(EXEEXT) CodecTester$(EXEEXT) \
 	IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
-	PacketTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
+	MediaPacketTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
 	SourceTester$(EXEEXT) SourceFormatTester$(EXEEXT) \
 	SourceStreamTester$(EXEEXT) SinkFormatTester$(EXEEXT) \
 	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
@@ -132,11 +132,13 @@ KeyValueBagTester_OBJECTS = $(am_KeyValueBagTester_OBJECTS) \
 	$(nodist_KeyValueBagTester_OBJECTS)
 KeyValueBagTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_PacketTester_OBJECTS = PacketTest.$(OBJEXT) Main.$(OBJEXT)
-nodist_PacketTester_OBJECTS = PacketTest_CXXRunner.$(OBJEXT)
-PacketTester_OBJECTS = $(am_PacketTester_OBJECTS) \
-	$(nodist_PacketTester_OBJECTS)
-PacketTester_DEPENDENCIES =  \
+am_MediaPacketTester_OBJECTS = MediaPacketTest.$(OBJEXT) \
+	Main.$(OBJEXT)
+nodist_MediaPacketTester_OBJECTS =  \
+	MediaPacketTest_CXXRunner.$(OBJEXT)
+MediaPacketTester_OBJECTS = $(am_MediaPacketTester_OBJECTS) \
+	$(nodist_MediaPacketTester_OBJECTS)
+MediaPacketTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_PropertyTester_OBJECTS = PropertyTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_PropertyTester_OBJECTS = PropertyTest_CXXRunner.$(OBJEXT)
@@ -225,8 +227,9 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(nodist_IndexEntryTester_SOURCES) \
 	$(KeyValueBagTester_SOURCES) \
-	$(nodist_KeyValueBagTester_SOURCES) $(PacketTester_SOURCES) \
-	$(nodist_PacketTester_SOURCES) $(PropertyTester_SOURCES) \
+	$(nodist_KeyValueBagTester_SOURCES) \
+	$(MediaPacketTester_SOURCES) \
+	$(nodist_MediaPacketTester_SOURCES) $(PropertyTester_SOURCES) \
 	$(nodist_PropertyTester_SOURCES) $(RationalTester_SOURCES) \
 	$(nodist_RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
 	$(nodist_SinkFormatTester_SOURCES) \
@@ -238,7 +241,7 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(nodist_VideoPictureTester_SOURCES)
 DIST_SOURCES = $(CodecTester_SOURCES) $(ErrorTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(KeyValueBagTester_SOURCES) \
-	$(PacketTester_SOURCES) $(PropertyTester_SOURCES) \
+	$(MediaPacketTester_SOURCES) $(PropertyTester_SOURCES) \
 	$(RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
 	$(SourceFormatTester_SOURCES) $(SourceStreamTester_SOURCES) \
 	$(SourceTester_SOURCES) $(VideoPictureTester_SOURCES)
@@ -699,7 +702,7 @@ BUILT_SOURCES = \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
   ErrorTest_CXXRunner.cpp \
-  PacketTest_CXXRunner.cpp \
+  MediaPacketTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
   SourceTest_CXXRunner.cpp \
   SourceFormatTest_CXXRunner.cpp \
@@ -713,7 +716,7 @@ noinst_HEADERS = \
   CodecTest.h \
   IndexEntryTest.h \
   ErrorTest.h \
-  PacketTest.h \
+  MediaPacketTest.h \
   KeyValueBagTest.h \
   SourceTest.h \
   SourceFormatTest.h \
@@ -770,14 +773,14 @@ nodist_ErrorTester_SOURCES = \
 ErrorTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-PacketTester_SOURCES = \
-  PacketTest.cpp \
+MediaPacketTester_SOURCES = \
+  MediaPacketTest.cpp \
   Main.cpp
 
-nodist_PacketTester_SOURCES = \
-  PacketTest_CXXRunner.cpp
+nodist_MediaPacketTester_SOURCES = \
+  MediaPacketTest_CXXRunner.cpp
 
-PacketTester_LDADD = \
+MediaPacketTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 KeyValueBagTester_SOURCES = \
@@ -913,9 +916,9 @@ KeyValueBagTester$(EXEEXT): $(KeyValueBagTester_OBJECTS) $(KeyValueBagTester_DEP
 	@rm -f KeyValueBagTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(KeyValueBagTester_OBJECTS) $(KeyValueBagTester_LDADD) $(LIBS)
 
-PacketTester$(EXEEXT): $(PacketTester_OBJECTS) $(PacketTester_DEPENDENCIES) $(EXTRA_PacketTester_DEPENDENCIES) 
-	@rm -f PacketTester$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(PacketTester_OBJECTS) $(PacketTester_LDADD) $(LIBS)
+MediaPacketTester$(EXEEXT): $(MediaPacketTester_OBJECTS) $(MediaPacketTester_DEPENDENCIES) $(EXTRA_MediaPacketTester_DEPENDENCIES) 
+	@rm -f MediaPacketTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(MediaPacketTester_OBJECTS) $(MediaPacketTester_LDADD) $(LIBS)
 
 PropertyTester$(EXEEXT): $(PropertyTester_OBJECTS) $(PropertyTester_DEPENDENCIES) $(EXTRA_PropertyTester_DEPENDENCIES) 
 	@rm -f PropertyTester$(EXEEXT)
@@ -960,8 +963,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PacketTest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PacketTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacketTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacketTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RationalTest.Po@am__quote@
@@ -1273,9 +1276,9 @@ ErrorTester.log: ErrorTester$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-PacketTester.log: PacketTester$(EXEEXT)
-	@p='PacketTester$(EXEEXT)'; \
-	b='PacketTester'; \
+MediaPacketTester.log: MediaPacketTester$(EXEEXT)
+	@p='MediaPacketTester$(EXEEXT)'; \
+	b='MediaPacketTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
