@@ -282,16 +282,16 @@ public class Codec extends RefCounted {
    * @return a list
    */
 
-  public java.util.List<Long>
+  public java.util.List<AudioChannel.Layout>
   getSupportedAudioChannelLayouts()
   {
-    java.util.List<Long> retval =
-      new java.util.LinkedList<Long>();
+    java.util.List<AudioChannel.Layout> retval =
+      new java.util.LinkedList<AudioChannel.Layout>();
     int count = getNumSupportedAudioChannelLayouts();
     for(int i=0;i<count;i++)
     {
-      long layout = getSupportedAudioChannelLayout(i);
-      if (layout != 0)
+      AudioChannel.Layout layout = getSupportedAudioChannelLayout(i);
+      if (layout != AudioChannel.Layout.CH_LAYOUT_UNKNOWN)
         retval.add(layout);
     }
     return retval;
