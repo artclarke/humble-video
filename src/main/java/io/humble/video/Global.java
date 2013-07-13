@@ -114,8 +114,7 @@ public class Global extends RefCounted {
   
 
   /**
-   * The default unit of time that {@link IAudioSamples} and
-   * {@link IVideoPicture} time stamps are represented in.
+   * The default unit of time that {@link MediaRaw} time stamps are represented in.
    */
   public static final java.util.concurrent.TimeUnit DEFAULT_TIME_UNIT =
     java.util.concurrent.TimeUnit.MICROSECONDS;
@@ -227,7 +226,7 @@ public class Global extends RefCounted {
   public final static long NO_PTS = VideoJNI.Global_NO_PTS_get();
 /**
  * The default time units per second that we use for decoded  
- * {@link IAudioSamples} and {@link IVideoPicture} objects.  
+ * {@link MediaRaw} objects.  
  * This means that 1 tick of a time stamp is 1 Microsecond.  
  */
   public final static long DEFAULT_PTS_PER_SECOND = VideoJNI.Global_DEFAULT_PTS_PER_SECOND_get();

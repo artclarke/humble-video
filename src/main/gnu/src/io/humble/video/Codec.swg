@@ -185,16 +185,16 @@
    * @return a list
    */
 
-  public java.util.List<AudioSamples.Format>
-  getSupportedAudioSampleFormats()
+  public java.util.List<AudioFormat.Type>
+  getSupportedAudioFormats()
   {
-    java.util.List<AudioSamples.Format> retval =
-      new java.util.LinkedList<AudioSamples.Format>();
-    int count = getNumSupportedAudioSampleFormats();
+    java.util.List<AudioFormat.Type> retval =
+      new java.util.LinkedList<AudioFormat.Type>();
+    int count = getNumSupportedAudioFormats();
     for(int i=0;i<count;i++)
     {
-      AudioSamples.Format fmt = getSupportedAudioSampleFormat(i);
-      if (fmt != null && fmt != AudioSamples.Format.SAMPLE_FMT_NONE)
+      AudioFormat.Type fmt = getSupportedAudioFormat(i);
+      if (fmt != null && fmt != AudioFormat.Type.SAMPLE_FMT_NONE)
         retval.add(fmt);
     }
     return retval;

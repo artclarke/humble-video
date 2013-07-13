@@ -305,7 +305,7 @@ namespace io { namespace humble { namespace video
   }
 
   int32_t
-  Codec::getNumSupportedAudioSampleFormats()
+  Codec::getNumSupportedAudioFormats()
   {
     int i = 0;
     for(const enum AVSampleFormat* p=mCodec->sample_fmts;
@@ -315,16 +315,16 @@ namespace io { namespace humble { namespace video
     return i;
   }
   
-  AudioSamples::Format
-  Codec::getSupportedAudioSampleFormat(int32_t index)
+  AudioFormat::Type
+  Codec::getSupportedAudioFormat(int32_t index)
   {
     int i = 0;
     for(const enum AVSampleFormat* p=mCodec->sample_fmts;
       p && (*p != AV_SAMPLE_FMT_NONE);
       p++,i++)
       if (index == i)
-        return (AudioSamples::Format)*p;
-    return AudioSamples::SAMPLE_FMT_NONE;
+        return (AudioFormat::Type)*p;
+    return AudioFormat::SAMPLE_FMT_NONE;
     
   }
 
@@ -338,7 +338,7 @@ namespace io { namespace humble { namespace video
       ;
     return i;
   }
-  int64_t
+  AudioChannel::Layout
   Codec::getSupportedAudioChannelLayout(int32_t index)
   {
     int i = 0;
@@ -346,8 +346,8 @@ namespace io { namespace humble { namespace video
       p && *p;
       p++,i++)
       if (index == i)
-        return (int64_t)*p;
-    return 0;
+        return (AudioChannel::Layout)*p;
+    return AudioChannel::CH_LAYOUT_UNKNOWN;
   }
 
   int32_t

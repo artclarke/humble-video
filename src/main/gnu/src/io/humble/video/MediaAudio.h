@@ -27,7 +27,9 @@
 #define AUDIO_H_
 
 #include <io/humble/ferry/IBuffer.h>
-#include "AudioSamples.h"
+#include <io/humble/video/HumbleVideo.h>
+#include <io/humble/video/MediaRaw.h>
+
 namespace io {
 namespace humble {
 namespace video {
@@ -396,7 +398,6 @@ protected:
   ~AudioFormat();
 };
 
-
 /**
  * Raw audio data.
  * <p>
@@ -476,7 +477,7 @@ public:
   getNumDataPlanes()=0;
 
   /**
-   * @return maximum of samples of {@link #getChannels()} {@link #getFormat()} audio that can be put in this {@link AudioSamples} object.
+   * @return maximum of samples of {@link #getChannels()} {@link #getFormat()} audio that can be put in this {@link MediaAudio} object.
    */
   virtual int32_t
   getMaxNumSamples()=0;

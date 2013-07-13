@@ -20,8 +20,7 @@
 %typemap (javacode) io::humble::video::Global,io::humble::video::Global*,io::humble::video::Global& %{
 
   /**
-   * The default unit of time that {@link IAudioSamples} and
-   * {@link IVideoPicture} time stamps are represented in.
+   * The default unit of time that {@link MediaRaw} time stamps are represented in.
    */
   public static final java.util.concurrent.TimeUnit DEFAULT_TIME_UNIT =
     java.util.concurrent.TimeUnit.MICROSECONDS;

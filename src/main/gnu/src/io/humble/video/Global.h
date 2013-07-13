@@ -44,7 +44,7 @@ namespace io { namespace humble { namespace video
     static const int64_t NO_PTS=0x8000000000000000LL;
     /**
      * The default time units per second that we use for decoded
-     * {@link IAudioSamples} and {@link IVideoPicture} objects. 
+     * {@link MediaRaw} objects.
      *
      * This means that 1 tick of a time stamp is 1 Microsecond.
      */

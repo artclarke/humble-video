@@ -32,7 +32,6 @@
 #include <io/humble/video/MediaRaw.h>
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaPacket.h>
-#include <io/humble/video/AudioSamples.h>
 #include <io/humble/video/VideoPicture.h>
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/Global.h>
@@ -130,7 +129,6 @@ import io.humble.ferry.IBuffer;
 %include <io/humble/video/MediaRaw.swg>
 %include <io/humble/video/MediaAudio.swg>
 %include <io/humble/video/MediaPacket.swg>
-%include <io/humble/video/AudioSamples.swg>
 %include <io/humble/video/VideoPicture.swg>
 %include <io/humble/video/Configurable.swg>
 %include <io/humble/video/Codec.swg>

@@ -197,17 +197,17 @@ CodecTest :: testGetSupportedAudioSampleFormats()
 {
   codec = Codec::findDecodingCodecByName("aac");
   TSM_ASSERT("got codec", codec);
-  int32_t num= codec->getNumSupportedAudioSampleFormats();
+  int32_t num= codec->getNumSupportedAudioFormats();
   TSM_ASSERT("should be more than none", num > 0);
   for(int i = 0; i < num; i++)
   {
-    AudioSamples::Format fmt = codec->getSupportedAudioSampleFormat(i);
-    TSM_ASSERT("should be non null", fmt != AudioSamples::SAMPLE_FMT_NONE);
+    AudioFormat::Type fmt = codec->getSupportedAudioFormat(i);
+    TSM_ASSERT("should be non null", fmt != AudioFormat::SAMPLE_FMT_NONE);
   }
   TSM_ASSERT("should fail quietly",
-      AudioSamples::SAMPLE_FMT_NONE == codec->getSupportedAudioSampleFormat(-1));
+      AudioFormat::SAMPLE_FMT_NONE == codec->getSupportedAudioFormat(-1));
   TSM_ASSERT("should fail quietly",
-      AudioSamples::SAMPLE_FMT_NONE == codec->getSupportedAudioSampleFormat(0x7FFFFFFF));
+      AudioFormat::SAMPLE_FMT_NONE == codec->getSupportedAudioFormat(0x7FFFFFFF));
 }
 
 void

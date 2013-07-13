@@ -14,8 +14,6 @@ libhumble_video_la_LIBADD= $(VS_PKG_LIBRARIES)
 libhumble_video_la_SOURCES= \
   AVBufferSupport.cpp \
   PixelFormat.cpp \
-  AudioSamples.cpp \
-  AudioSamplesImpl.cpp \
   VideoPicture.cpp \
   VideoPictureImpl.cpp \
   KeyValueBag.cpp \
@@ -59,9 +57,6 @@ libhumble_video_la_HEADERS= \
   FfmpegIncludes.h \
   Global.swg \
   PixelFormat.h \
-  AudioSamples.h \
-  AudioSamples.swg \
-  AudioSamplesImpl.h \
   VideoPicture.h \
   VideoPicture.swg \
   VideoPictureImpl.h \

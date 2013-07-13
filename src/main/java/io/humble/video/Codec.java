@@ -253,16 +253,16 @@ public class Codec extends RefCounted {
    * @return a list
    */
 
-  public java.util.List<AudioSamples.Format>
-  getSupportedAudioSampleFormats()
+  public java.util.List<AudioFormat.Type>
+  getSupportedAudioFormats()
   {
-    java.util.List<AudioSamples.Format> retval =
-      new java.util.LinkedList<AudioSamples.Format>();
-    int count = getNumSupportedAudioSampleFormats();
+    java.util.List<AudioFormat.Type> retval =
+      new java.util.LinkedList<AudioFormat.Type>();
+    int count = getNumSupportedAudioFormats();
     for(int i=0;i<count;i++)
     {
-      AudioSamples.Format fmt = getSupportedAudioSampleFormat(i);
-      if (fmt != null && fmt != AudioSamples.Format.SAMPLE_FMT_NONE)
+      AudioFormat.Type fmt = getSupportedAudioFormat(i);
+      if (fmt != null && fmt != AudioFormat.Type.SAMPLE_FMT_NONE)
         retval.add(fmt);
     }
     return retval;
@@ -540,20 +540,20 @@ public class Codec extends RefCounted {
  * for encoding. Not all codecs will report this.  
  * @return	the number or 0 if we don't know.  
  */
-  public int getNumSupportedAudioSampleFormats() {
-    return VideoJNI.Codec_getNumSupportedAudioSampleFormats(swigCPtr, this);
+  public int getNumSupportedAudioFormats() {
+    return VideoJNI.Codec_getNumSupportedAudioFormats(swigCPtr, this);
   }
 
 /**
  * Get the supported sample format at this index.  
  * @param	index the index in our list.  
- * @return	the format, or {@link AudioSamples.Format.SAMPLE_FMT_NONE} 
- *		 if  
+ * @return	the format, or {@link AudioFormat.Type.SAMPLE_FMT_NONE} if 
+ *		  
  * unknown, index < 0 or index >=  
  * {@link #getNumSupportedAudioSampleFormats()}.  
  */
-  public AudioSamples.Format getSupportedAudioSampleFormat(int index) {
-    return AudioSamples.Format.swigToEnum(VideoJNI.Codec_getSupportedAudioSampleFormat(swigCPtr, this, index));
+  public AudioFormat.Type getSupportedAudioFormat(int index) {
+    return AudioFormat.Type.swigToEnum(VideoJNI.Codec_getSupportedAudioFormat(swigCPtr, this, index));
   }
 
 /**
@@ -570,15 +570,14 @@ public class Codec extends RefCounted {
  * Get the supported audio channel layout at this index.  
  * The value returned is a bit flag representing the different  
  * types of audio layout this codec can support. Test the values  
- * by bit-comparing them to the {@link IAudioSamples.ChannelLayout} 
- *  
+ * by bit-comparing them to the {@link AudioChannel.Layout}  
  * enum types.  
  * @param	index the index  
  * @return	the channel layout, or 0 if unknown, index < 0 or  
  * index >= {@link #getNumSupportedAudioChannelLayouts}.  
  */
-  public long getSupportedAudioChannelLayout(int index) {
-    return VideoJNI.Codec_getSupportedAudioChannelLayout(swigCPtr, this, index);
+  public AudioChannel.Layout getSupportedAudioChannelLayout(int index) {
+    return AudioChannel.Layout.swigToEnum(VideoJNI.Codec_getSupportedAudioChannelLayout(swigCPtr, this, index));
   }
 
 /**

@@ -29,7 +29,7 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/PixelFormat.h>
-#include <io/humble/video/AudioSamples.h>
+#include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/Rational.h>
 
 namespace io {
@@ -965,19 +965,19 @@ public:
    * @return the number or 0 if we don't know.
    */
   virtual int32_t
-  getNumSupportedAudioSampleFormats();
+  getNumSupportedAudioFormats();
 
   /**
    * Get the supported sample format at this index.
    *
    * @param index the index in our list.
    *
-   * @return the format, or {@link AudioSamples.Format.SAMPLE_FMT_NONE} if
+   * @return the format, or {@link AudioFormat.Type.SAMPLE_FMT_NONE} if
    *   unknown, index < 0 or index >=
    *   {@link #getNumSupportedAudioSampleFormats()}.
    */
-  virtual AudioSamples::Format
-  getSupportedAudioSampleFormat(int32_t index);
+  virtual AudioFormat::Type
+  getSupportedAudioFormat(int32_t index);
 
   /**
    * Get the number of different audio channel layouts this codec supports
@@ -994,7 +994,7 @@ public:
    *
    * The value returned is a bit flag representing the different
    * types of audio layout this codec can support.  Test the values
-   * by bit-comparing them to the {@link IAudioSamples.ChannelLayout}
+   * by bit-comparing them to the {@link AudioChannel.Layout}
    * enum types.
    *
    * @param index the index
@@ -1002,7 +1002,7 @@ public:
    * @return the channel layout, or 0 if unknown, index < 0 or
    *   index >= {@link #getNumSupportedAudioChannelLayouts}.
    */
-  virtual int64_t
+  virtual AudioChannel::Layout
   getSupportedAudioChannelLayout(int32_t index);
 
   /**

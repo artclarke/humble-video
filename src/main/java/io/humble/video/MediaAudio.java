@@ -211,7 +211,7 @@ public class MediaAudio extends MediaRaw {
 
 /**
  * @return	maximum of samples of {@link #getChannels()} {@link #getFormat()} 
- *		 audio that can be put in this {@link AudioSamples} 
+ *		 audio that can be put in this {@link MediaAudio} 
  *		 object.  
  */
   public int getMaxNumSamples() {
