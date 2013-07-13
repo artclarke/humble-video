@@ -973,6 +973,7 @@ class VideoJNI {
   public final static native long SWIGAudioChannelUpcast(long jarg1);
   public final static native long SWIGAudioFormatUpcast(long jarg1);
   public final static native long SWIGMediaAudioUpcast(long jarg1);
+  public final static native long SWIGMediaPictureUpcast(long jarg1);
   public final static native long SWIGMediaPacketUpcast(long jarg1);
   public final static native long SWIGVideoPictureUpcast(long jarg1);
   public final static native long SWIGConfigurableUpcast(long jarg1);

@@ -217,6 +217,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <io/humble/video/Media.h>
 #include <io/humble/video/MediaRaw.h>
 #include <io/humble/video/MediaAudio.h>
+#include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaPacket.h>
 #include <io/humble/video/VideoPicture.h>
 #include <io/humble/video/Configurable.h>
@@ -31124,6 +31125,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaAudioUpcast(JNIE
     (void)jenv;
     (void)jcls;
     *(io::humble::video::MediaRaw **)&baseptr = *(io::humble::video::MediaAudio **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaPictureUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::video::MediaRaw **)&baseptr = *(io::humble::video::MediaPicture **)&jarg1;
     return baseptr;
 }
 

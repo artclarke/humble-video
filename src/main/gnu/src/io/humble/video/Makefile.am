@@ -27,6 +27,8 @@ libhumble_video_la_SOURCES= \
   MediaRaw.cpp \
   MediaAudio.cpp \
   MediaAudioImpl.cpp \
+  MediaPicture.cpp \
+  MediaPictureImpl.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
   Error.cpp \
@@ -73,6 +75,9 @@ libhumble_video_la_HEADERS= \
   MediaAudio.h \
   MediaAudioImpl.h \
   MediaAudio.swg \
+  MediaPicture.h \
+  MediaPictureImpl.h \
+  MediaPicture.swg \
   IndexEntry.h \
   IndexEntryImpl.h \
   IndexEntry.swg \
