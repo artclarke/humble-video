@@ -34,11 +34,6 @@ MediaAudio::MediaAudio() {
 
 }
 
-MediaAudio*
-MediaAudio::make(MediaAudio* src, bool copy) {
-  return MediaAudioImpl::make(dynamic_cast<MediaAudioImpl*>(src), copy);
-}
-
 MediaAudio::~MediaAudio() {
 
 }
@@ -47,6 +42,7 @@ MediaAudio*
 MediaAudio::make(int32_t numSamples, int32_t sampleRate,
     int32_t channels, AudioChannel::Layout channelLayout,
     AudioFormat::Type format) {
+  Global::init();
   return MediaAudioImpl::make(numSamples, sampleRate, channels, channelLayout, format);
 }
 
@@ -54,7 +50,14 @@ MediaAudio*
 MediaAudio::make(io::humble::ferry::IBuffer *buffer, int32_t numSamples,
     int32_t sampleRate, int32_t channels,
     AudioChannel::Layout channelLayout, AudioFormat::Type format) {
+  Global::init();
   return MediaAudioImpl::make(buffer, numSamples, sampleRate, channels, channelLayout, format);
+}
+
+MediaAudio*
+MediaAudio::make(MediaAudio* src, bool copy) {
+  Global::init();
+  return MediaAudioImpl::make(dynamic_cast<MediaAudioImpl*>(src), copy);
 }
 
 } /* namespace video */
