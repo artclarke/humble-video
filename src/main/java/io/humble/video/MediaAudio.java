@@ -183,6 +183,33 @@ public class MediaAudio extends MediaRaw {
   }
 
 /**
+ * Create a MediaAudio by either referencing or copying another MediaAudio. 
+ *  
+ * <p>  
+ * This method is very useful when you want to change some meta-data 
+ * about MediaAudio (such as  
+ * changing a timestamp) without effecting other users of the same underlying 
+ * data.  
+ * </p>  
+ * <p>  
+ * It can also be useful to create a copy of the raw audio data in the 
+ * buffers in the  
+ * event you are doing audio manipulation and do not want to effect 
+ * other people  
+ * using the audio.  
+ * </p>  
+ * @param	src MediaAudio to reference  
+ * @param	copy true if we should copy all data. false if we should just 
+ *		 gain a reference to the same underlying data in 
+ *		 src.  
+ * @return	a {@link MediaAudio} object, or null on failure.  
+ */
+  public static MediaAudio make(MediaAudio src, boolean copy) {
+    long cPtr = VideoJNI.MediaAudio_make__SWIG_2(MediaAudio.getCPtr(src), src, copy);
+    return (cPtr == 0) ? null : new MediaAudio(cPtr, false);
+  }
+
+/**
  * Get any underlying raw data available for this object.  
  * @param	plane The plane number if {@link getFormat()} is Planar (rather 
  *		 

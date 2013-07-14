@@ -41,6 +41,7 @@ MediaAudioImpl::MediaAudioImpl() {
   if (!mFrame) throw std::bad_alloc();
   mFrame->opaque = this;
   mMaxSamples = 0;
+  mComplete = false;
 }
 
 MediaAudioImpl::~MediaAudioImpl() {
@@ -127,7 +128,7 @@ MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer, int32_t numSamples,
   av_frame_set_channels(frame, channels);
   av_frame_set_channel_layout(frame, layout);
   retval->mMaxSamples = numSamples;
-  frame->nb_samples = 0;
+  frame->nb_samples = numSamples;
   frame->format = format;
   // we're going to tell the world this buffer now contains the right kind of data
   setBufferType((AudioFormat::Type)frame->format, buffer);
@@ -170,6 +171,42 @@ MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer, int32_t numSamples,
   // and add refs for the final buffers
   for (int32_t i = 0; i < planes - AV_NUM_DATA_POINTERS; i++) {
     frame->extended_buf[i] = AVBufferSupport::wrapIBuffer(buffer, frame->extended_data[i+AV_NUM_DATA_POINTERS], frame->linesize[0]);
+  }
+  return retval.get();
+}
+
+
+MediaAudioImpl*
+MediaAudioImpl::make(MediaAudioImpl* src, bool copy) {
+  RefPointer<MediaAudioImpl> retval;
+
+  if (!src) return 0;
+
+  if (copy) {
+    // first create a new mediaaudio object to copy into
+    retval = make(src->getMaxNumSamples(),
+        src->getSampleRate(),
+        src->getChannels(),
+        src->getChannelLayout(),
+        src->getFormat());
+
+    // then copy the data into retval
+    int32_t n = src->getNumDataPlanes();
+    for(int32_t i = 0; i < n; i++ )
+    {
+      AVBufferRef* dstBuf = av_frame_get_plane_buffer(retval->mFrame, i);
+      AVBufferRef* srcBuf = av_frame_get_plane_buffer(src->mFrame, i);
+      VS_ASSERT(dstBuf, "should always have buffer");
+      VS_ASSERT(srcBuf, "should always have buffer");
+      memcpy(dstBuf->data, srcBuf->data, srcBuf->size);
+    }
+  } else {
+    // first create a new media audio object to reference into
+    retval = make();
+
+    // then do the reference
+    retval->mMaxSamples = src->mMaxSamples;
+    av_frame_ref(retval->mFrame, src->mFrame);
   }
   return retval.get();
 }
@@ -221,12 +258,13 @@ MediaAudioImpl::getBytesPerSample() {
 
 int32_t
 MediaAudioImpl::setComplete(int32_t numSamples, int64_t pts) {
-  if (numSamples < 0 || numSamples > mMaxSamples) {
+  if (numSamples <= 0 || numSamples > mMaxSamples) {
     VS_LOG_ERROR("invalid number of samples to put in this MediaAudio object: %d", numSamples);
     return -1;
   }
   mFrame->pts = pts;
   mFrame->nb_samples = numSamples;
+  mComplete = true;
   return 0;
 }
 
@@ -252,7 +290,7 @@ MediaAudioImpl::getNumSamples() {
 
 bool
 MediaAudioImpl::isComplete() {
-  return mFrame->nb_samples > 0;
+  return mComplete && mFrame->nb_samples > 0;
 }
 
 bool

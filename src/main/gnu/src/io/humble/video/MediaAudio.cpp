@@ -34,6 +34,11 @@ MediaAudio::MediaAudio() {
 
 }
 
+MediaAudio*
+MediaAudio::make(MediaAudio* src, bool copy) {
+  return MediaAudioImpl::make(dynamic_cast<MediaAudioImpl*>(src), copy);
+}
+
 MediaAudio::~MediaAudio() {
 
 }

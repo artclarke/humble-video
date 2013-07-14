@@ -44,6 +44,9 @@ public:
   make(io::humble::ferry::IBuffer *buffer, int32_t numSamples, int32_t sampleRate, int32_t channels,
       AudioChannel::Layout channelLayout, AudioFormat::Type format);
 
+  static MediaAudioImpl*
+  make(MediaAudioImpl* src, bool copy);
+
   virtual io::humble::ferry::IBuffer*
   getData(int32_t plane);
 
@@ -97,6 +100,7 @@ private:
 
   AVFrame* mFrame;
   int32_t  mMaxSamples;
+  bool     mComplete;
 };
 
 } /* namespace video */
