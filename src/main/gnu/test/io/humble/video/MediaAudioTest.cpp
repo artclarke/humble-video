@@ -180,8 +180,8 @@ void
 MediaAudioTest::testCreationFromBufferPlanar() {
   const int32_t numSamples = 155; // I choose an odd number because HV will align up to 32
   const int32_t sampleRate = 22050;
-  const int32_t channels = 8;
-  const AudioChannel::Layout layout = AudioChannel::CH_LAYOUT_7POINT1;
+  const int32_t channels = 15; // choose a large # of channels to make sure we expand the Frame
+  const AudioChannel::Layout layout = AudioChannel::CH_LAYOUT_UNKNOWN;
   const AudioFormat::Type format = AudioFormat::SAMPLE_FMT_DBLP;
 
   int32_t bufSize = AudioFormat::getBufferSizeNeeded(numSamples, channels, format);
