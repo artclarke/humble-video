@@ -81,10 +81,10 @@ host_triplet = @host@
 check_PROGRAMS = VideoPictureTester$(EXEEXT) CodecTester$(EXEEXT) \
 	IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
 	MediaPacketTester$(EXEEXT) MediaAudioTester$(EXEEXT) \
-	KeyValueBagTester$(EXEEXT) SourceTester$(EXEEXT) \
-	SourceFormatTester$(EXEEXT) SourceStreamTester$(EXEEXT) \
-	SinkFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
-	RationalTester$(EXEEXT)
+	MediaPictureTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
+	SourceTester$(EXEEXT) SourceFormatTester$(EXEEXT) \
+	SourceStreamTester$(EXEEXT) SinkFormatTester$(EXEEXT) \
+	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mk/depcomp $(noinst_HEADERS) \
@@ -147,6 +147,14 @@ nodist_MediaPacketTester_OBJECTS =  \
 MediaPacketTester_OBJECTS = $(am_MediaPacketTester_OBJECTS) \
 	$(nodist_MediaPacketTester_OBJECTS)
 MediaPacketTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_MediaPictureTester_OBJECTS = MediaPictureTest.$(OBJEXT) \
+	TestData.$(OBJEXT) Main.$(OBJEXT)
+nodist_MediaPictureTester_OBJECTS =  \
+	MediaPictureTest_CXXRunner.$(OBJEXT)
+MediaPictureTester_OBJECTS = $(am_MediaPictureTester_OBJECTS) \
+	$(nodist_MediaPictureTester_OBJECTS)
+MediaPictureTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_PropertyTester_OBJECTS = PropertyTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_PropertyTester_OBJECTS = PropertyTest_CXXRunner.$(OBJEXT)
@@ -238,7 +246,9 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(nodist_KeyValueBagTester_SOURCES) \
 	$(MediaAudioTester_SOURCES) $(nodist_MediaAudioTester_SOURCES) \
 	$(MediaPacketTester_SOURCES) \
-	$(nodist_MediaPacketTester_SOURCES) $(PropertyTester_SOURCES) \
+	$(nodist_MediaPacketTester_SOURCES) \
+	$(MediaPictureTester_SOURCES) \
+	$(nodist_MediaPictureTester_SOURCES) $(PropertyTester_SOURCES) \
 	$(nodist_PropertyTester_SOURCES) $(RationalTester_SOURCES) \
 	$(nodist_RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
 	$(nodist_SinkFormatTester_SOURCES) \
@@ -251,10 +261,10 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 DIST_SOURCES = $(CodecTester_SOURCES) $(ErrorTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(KeyValueBagTester_SOURCES) \
 	$(MediaAudioTester_SOURCES) $(MediaPacketTester_SOURCES) \
-	$(PropertyTester_SOURCES) $(RationalTester_SOURCES) \
-	$(SinkFormatTester_SOURCES) $(SourceFormatTester_SOURCES) \
-	$(SourceStreamTester_SOURCES) $(SourceTester_SOURCES) \
-	$(VideoPictureTester_SOURCES)
+	$(MediaPictureTester_SOURCES) $(PropertyTester_SOURCES) \
+	$(RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
+	$(SourceFormatTester_SOURCES) $(SourceStreamTester_SOURCES) \
+	$(SourceTester_SOURCES) $(VideoPictureTester_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -714,6 +724,7 @@ BUILT_SOURCES = \
   ErrorTest_CXXRunner.cpp \
   MediaPacketTest_CXXRunner.cpp \
   MediaAudioTest_CXXRunner.cpp \
+  MediaPictureTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
   SourceTest_CXXRunner.cpp \
   SourceFormatTest_CXXRunner.cpp \
@@ -729,6 +740,7 @@ noinst_HEADERS = \
   ErrorTest.h \
   MediaPacketTest.h \
   MediaAudioTest.h \
+  MediaPictureTest.h \
   KeyValueBagTest.h \
   SourceTest.h \
   SourceFormatTest.h \
@@ -805,6 +817,17 @@ nodist_MediaAudioTester_SOURCES = \
   MediaAudioTest_CXXRunner.cpp
 
 MediaAudioTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
+MediaPictureTester_SOURCES = \
+  MediaPictureTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_MediaPictureTester_SOURCES = \
+  MediaPictureTest_CXXRunner.cpp
+
+MediaPictureTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 KeyValueBagTester_SOURCES = \
@@ -948,6 +971,10 @@ MediaPacketTester$(EXEEXT): $(MediaPacketTester_OBJECTS) $(MediaPacketTester_DEP
 	@rm -f MediaPacketTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(MediaPacketTester_OBJECTS) $(MediaPacketTester_LDADD) $(LIBS)
 
+MediaPictureTester$(EXEEXT): $(MediaPictureTester_OBJECTS) $(MediaPictureTester_DEPENDENCIES) $(EXTRA_MediaPictureTester_DEPENDENCIES) 
+	@rm -f MediaPictureTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(MediaPictureTester_OBJECTS) $(MediaPictureTester_LDADD) $(LIBS)
+
 PropertyTester$(EXEEXT): $(PropertyTester_OBJECTS) $(PropertyTester_DEPENDENCIES) $(EXTRA_PropertyTester_DEPENDENCIES) 
 	@rm -f PropertyTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(PropertyTester_OBJECTS) $(PropertyTester_LDADD) $(LIBS)
@@ -995,6 +1022,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudioTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacketTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacketTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RationalTest.Po@am__quote@
@@ -1316,6 +1345,13 @@ MediaPacketTester.log: MediaPacketTester$(EXEEXT)
 MediaAudioTester.log: MediaAudioTester$(EXEEXT)
 	@p='MediaAudioTester$(EXEEXT)'; \
 	b='MediaAudioTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+MediaPictureTester.log: MediaPictureTester$(EXEEXT)
+	@p='MediaPictureTester$(EXEEXT)'; \
+	b='MediaPictureTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
