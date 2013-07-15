@@ -58,6 +58,7 @@ namespace io { namespace humble { namespace ferry
   IBuffer :: make(io::humble::ferry::RefCounted* requestor,
       Type type, int32_t numElements, bool zero)
   {
+    VS_LOG_TRACE("making a buffer");
     return Buffer::make(requestor, type, numElements, zero);
   }
   

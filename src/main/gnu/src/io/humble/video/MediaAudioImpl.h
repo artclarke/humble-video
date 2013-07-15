@@ -62,7 +62,7 @@ public:
   virtual int32_t
   getBytesPerSample();
 
-  virtual int32_t
+  virtual void
   setComplete(int32_t numSamples, int64_t pts);
 
   virtual int32_t

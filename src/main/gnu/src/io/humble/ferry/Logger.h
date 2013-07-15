@@ -28,6 +28,7 @@
 
 #include <io/humble/ferry/Ferry.h>
 #include <io/humble/ferry/Mutex.h>
+#include <io/humble/ferry/HumbleException.h>
 
 namespace io { namespace humble { namespace ferry {
   /**
@@ -205,6 +206,24 @@ namespace io { namespace humble { namespace ferry {
 // don't insert anything if we're not debugging
 #define VS_ASSERT( expr, msg ) (void) vs_logger_static_context;
 #endif // VS_DEBUG
+
+/**
+ * Log the passed in error, and then throw it.
+ */
+#define VS_THROW(e) do { \
+  const HumbleStackTrace& __humble_trace = (e); \
+  const std::exception* __humble_err = dynamic_cast<const std::exception*>(&__humble_trace); \
+  if (__humble_err) \
+    VS_LOG_ERROR(__humble_err->what()); \
+  else \
+    VS_LOG_ERROR("unknown exception thrown"); \
+  int __humble_num_frames = __humble_trace.getNumFrames(); \
+  for(int __humble_i = 0; __humble_i < __humble_num_frames; __humble_i++) { \
+    const char* __humble_frame = __humble_trace.getFrameDescription(__humble_i); \
+    VS_LOG_ERROR("Stack frame [%d]: %s", __humble_i, __humble_frame); \
+  } \
+  __humble_trace.raise(); \
+} while (0)
 
 /*
  *  Now, some logic to turn logging off on the compile line if needed.

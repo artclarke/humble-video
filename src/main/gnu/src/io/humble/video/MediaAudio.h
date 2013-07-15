@@ -521,10 +521,9 @@ public:
    * @param numSamples Number of samples in this update (if > 0 then this audio sample is complete).  Must be < {@link #getMaxNumSamples()}.
    * @param pts The presentation time stamp of the starting sample in this buffer.
    *   Caller must ensure pts is in units of 1/1,000,000 of a second
-   *
-   * @return >= 0 on success; < 0 if parameters do not match how this buffer was set up.
+   * @throws InvalidArgument if numSamples <= 0 or > {@link #getMaxNumSamples()}.
    */
-  virtual int32_t
+  virtual void
   setComplete(int32_t numSamples, int64_t pts)=0;
 
   /**
