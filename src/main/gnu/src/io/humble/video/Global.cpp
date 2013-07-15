@@ -40,6 +40,7 @@ namespace io { namespace humble { namespace video
 {
   using namespace io::humble::ferry;
 
+  Global* Global::sGlobal = 0;
   /*
    * This function will be called back by Ffmpeg anytime
    * it wants to log.  We then use it to dump
@@ -140,40 +141,48 @@ namespace io { namespace humble { namespace video
     return retval;
   }
   
-  Global*
-  Global::getCtx()
-  {
-    /** Guaranteed to be thread-safe per C/C++ instantiation rules */
-    static Global singleton;
-    return &singleton;
-  }
   void
   Global :: init()
   {
-    (void) getCtx();
+    if (!sGlobal) {
+      av_lockmgr_register(humblevideo_lockmgr_cb);
+      av_log_set_callback(humblevideo_log_callback);
+      av_log_set_level (AV_LOG_ERROR); // Only log errors by default
+      av_register_all();
+      avformat_network_init();
+      // and set up filter support
+      avfilter_register_all();
+
+      // turn down logging
+      sGlobal = new Global();
+    }
   }
   void
   Global :: deinit()
   {
+    avformat_network_deinit();
+  }
+  void
+  Global :: destroyStaticGlobal(JavaVM*vm,void*closure)
+  {
+    Global *val = (Global*)closure;
+    if (!vm && val) {
+      av_lockmgr_register(0);
+      delete val;
+    }
   }
 
   Global :: Global()
   {
+    io::humble::ferry::JNIHelper::sRegisterTerminationCallback(
+        Global::destroyStaticGlobal,
+        this);
     mLock = io::humble::ferry::Mutex::make();
     mDefaultTimeBase = Rational::make(1, Global::DEFAULT_PTS_PER_SECOND);
-    av_lockmgr_register(humblevideo_lockmgr_cb);
-    av_log_set_callback(humblevideo_log_callback);
-    av_log_set_level(AV_LOG_ERROR); // Only log errors by default
-    av_register_all();
-    avformat_network_init();
-    // and set up filter support
-    avfilter_register_all();
   }
 
   Global :: ~Global()
   {
-    avformat_network_deinit();
-    av_lockmgr_register(0);
     if (mLock)
       mLock->release();
   }
@@ -181,7 +190,7 @@ namespace io { namespace humble { namespace video
   void
   Global :: lock()
   {
-    Global* ctx = Global::getCtx();
+    Global* ctx = sGlobal;
     if (ctx && ctx->mLock)
       ctx->mLock->lock();
   }
@@ -189,7 +198,7 @@ namespace io { namespace humble { namespace video
   void
   Global :: unlock()
   {
-    Global* ctx = Global::getCtx();
+    Global* ctx = sGlobal;
     if (ctx && ctx->mLock)
       ctx->mLock->unlock();
   }
@@ -264,7 +273,7 @@ namespace io { namespace humble { namespace video
   Rational*
   Global::getDefaultTimeBase()
   {
-    Global* ctx = Global::getCtx();
+    Global* ctx = sGlobal;
 
     return ctx ? ctx->mDefaultTimeBase.get() : 0;
   }

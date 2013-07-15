@@ -29,6 +29,7 @@
 
 namespace io { namespace humble { namespace video
 {
+
 /**
  * A collection of static functions that refer to the entire package (like version getters).
  *
@@ -154,8 +155,9 @@ namespace io { namespace humble { namespace video
   private:
     Global();
     virtual ~Global();
+    static void destroyStaticGlobal(JavaVM*vm,void*closure);
 
-    static Global* getCtx();
+    static Global* sGlobal;
     io::humble::ferry::Mutex* mLock;
     io::humble::ferry::RefPointer<Rational> mDefaultTimeBase;
   };
