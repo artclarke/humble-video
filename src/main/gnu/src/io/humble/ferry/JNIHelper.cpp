@@ -34,18 +34,28 @@
 extern void VSJNI_MemoryManagerInit(JavaVM* aJVM);
 
 namespace io { namespace humble { namespace ferry {
+  JNIHelper* JNIHelper::sSingleton = 0;
   volatile bool JNIHelper::sDebuggerAttached = false;
 
   JNIHelper*
   JNIHelper :: getHelper()
   {
-    static JNIHelper singleton;
-    return &singleton;
+    JNIHelper *retval = 0;
+    retval = sSingleton;
+    if (!retval) {
+      retval = new JNIHelper();
+      sSingleton = retval;
+    }
+    return retval;
   }
 
   void
   JNIHelper :: shutdownHelper()
   {
+    if (sSingleton) {
+      delete sSingleton;
+      sSingleton = 0;
+    }
   }
 
   JNIHelper :: JNIHelper()
@@ -61,7 +71,6 @@ namespace io { namespace humble { namespace ferry {
     mThread_class = 0;
     mThread_isInterrupted_mid = 0;
     mThread_currentThread_mid = 0;
-    mThread_interrupt_mid = 0;
     
     mInterruptedException_class = 0;
   }
@@ -281,7 +290,7 @@ namespace io { namespace humble { namespace ferry {
         }
       }
     }
-    catch (std::exception & e)
+    catch (std::exception e)
     {
       std::cerr << "Got exception while checking for debugger: "
         << e.what()
