@@ -234,7 +234,7 @@ class VideoJNI {
   public final static native int MediaAudio_getMaxNumSamples(long jarg1, MediaAudio jarg1_);
   public final static native int MediaAudio_getNumSamples(long jarg1, MediaAudio jarg1_);
   public final static native int MediaAudio_getBytesPerSample(long jarg1, MediaAudio jarg1_);
-  public final static native int MediaAudio_setComplete(long jarg1, MediaAudio jarg1_, int jarg2, long jarg3);
+  public final static native void MediaAudio_setComplete(long jarg1, MediaAudio jarg1_, int jarg2, long jarg3);
   public final static native int MediaAudio_getSampleRate(long jarg1, MediaAudio jarg1_);
   public final static native int MediaAudio_getChannels(long jarg1, MediaAudio jarg1_);
   public final static native int MediaAudio_getFormat(long jarg1, MediaAudio jarg1_);
@@ -936,7 +936,7 @@ class VideoJNI {
   public final static native int Source_open(long jarg1, Source jarg1_, String jarg2, long jarg3, SourceFormat jarg3_, boolean jarg4, boolean jarg5, long jarg6, KeyValueBag jarg6_, long jarg7, KeyValueBag jarg7_);
   public final static native int Source_close(long jarg1, Source jarg1_);
   public final static native long Source_getSourceStream(long jarg1, Source jarg1_, int jarg2);
-  public final static native int Source_read(long jarg1, Source jarg1_, long jarg2, MediaPacket jarg2_);
+  public final static native int Source_read(long jarg1, Source jarg1_, long jarg2, MediaPacket jarg2_) throws java.lang.InterruptedException;
   public final static native int Source_queryStreamMetaData(long jarg1, Source jarg1_);
   public final static native long Source_getDuration(long jarg1, Source jarg1_);
   public final static native long Source_getStartTime(long jarg1, Source jarg1_);

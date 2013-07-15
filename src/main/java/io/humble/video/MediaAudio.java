@@ -269,11 +269,11 @@ public class MediaAudio extends MediaRaw {
  * @param	pts The presentation time stamp of the starting sample in 
  *		 this buffer.  
  * Caller must ensure pts is in units of 1/1,000,000 of a second  
- * @return	>= 0 on success; < 0 if parameters do not match how this 
- *		 buffer was set up.  
+ * @throws	InvalidArgument if numSamples <= 0 or > {@link #getMaxNumSamples()}. 
+ *		  
  */
-  public int setComplete(int numSamples, long pts) {
-    return VideoJNI.MediaAudio_setComplete(swigCPtr, this, numSamples, pts);
+  public void setComplete(int numSamples, long pts) {
+    VideoJNI.MediaAudio_setComplete(swigCPtr, this, numSamples, pts);
   }
 
 /**
