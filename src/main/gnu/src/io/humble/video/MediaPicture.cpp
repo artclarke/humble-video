@@ -24,18 +24,47 @@
  */
 
 #include "MediaPicture.h"
+#include <io/humble/ferry/HumbleException.h>
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/RefPointer.h>
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 namespace io {
 namespace humble {
 namespace video {
 
+using namespace io::humble::ferry;
+
+PixelComponentDescriptor*
+PixelComponentDescriptor::make(AVComponentDescriptor* ctx) {
+  if (!ctx)
+    VS_THROW(HumbleInvalidArgument("null context"));
+  RefPointer<PixelComponentDescriptor> retval = make();
+  retval->mCtx = ctx;
+  return retval.get();
+}
+
+PixelFormatDescriptor*
+PixelFormatDescriptor::make(AVPixFmtDescriptor* ctx) {
+  if (!ctx)
+    VS_THROW(HumbleInvalidArgument("null context"));
+  RefPointer<PixelFormatDescriptor> retval = make();
+  retval->mCtx = ctx;
+  return retval.get();
+}
+PixelComponentDescriptor*
+PixelFormatDescriptor::getComponentDescriptor(int32_t c) {
+  if (c < 0 || c > 3)
+    VS_THROW(HumbleInvalidArgument("component must be >= 0 and <= 3"));
+  return PixelComponentDescriptor::make(&mCtx->comp[c]);
+}
+
 MediaPicture::MediaPicture() {
-  // TODO Auto-generated constructor stub
 
 }
 
 MediaPicture::~MediaPicture() {
-  // TODO Auto-generated destructor stub
 }
 
 } /* namespace video */

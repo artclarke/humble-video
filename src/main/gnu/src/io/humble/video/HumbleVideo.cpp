@@ -10115,6 +10115,2583 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getChannelLayo
 }
 
 
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1getPlane(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  io::humble::video::PixelComponentDescriptor *arg1 = (io::humble::video::PixelComponentDescriptor *) 0 ;
+  uint16_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::PixelComponentDescriptor **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (uint16_t)(arg1)->getPlane();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1getStepMinus1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  io::humble::video::PixelComponentDescriptor *arg1 = (io::humble::video::PixelComponentDescriptor *) 0 ;
+  uint16_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::PixelComponentDescriptor **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (uint16_t)(arg1)->getStepMinus1();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1getOffsetPlus1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  io::humble::video::PixelComponentDescriptor *arg1 = (io::humble::video::PixelComponentDescriptor *) 0 ;
+  uint16_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::PixelComponentDescriptor **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (uint16_t)(arg1)->getOffsetPlus1();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1getShift(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  io::humble::video::PixelComponentDescriptor *arg1 = (io::humble::video::PixelComponentDescriptor *) 0 ;
+  uint16_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::PixelComponentDescriptor **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (uint16_t)(arg1)->getShift();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1getDepthMinus1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  io::humble::video::PixelComponentDescriptor *arg1 = (io::humble::video::PixelComponentDescriptor *) 0 ;
+  uint16_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::PixelComponentDescriptor **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (uint16_t)(arg1)->getDepthMinus1();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1getName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  io::humble::video::PixelFormatDescriptor *arg1 = (io::humble::video::PixelFormatDescriptor *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::PixelFormatDescriptor **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (char *)(arg1)->getName();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  if(result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1getNumComponents(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  io::humble::video::PixelFormatDescriptor *arg1 = (io::humble::video::PixelFormatDescriptor *) 0 ;
+  uint8_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::PixelFormatDescriptor **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (uint8_t)(arg1)->getNumComponents();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1getLog2ChromaWidth(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  io::humble::video::PixelFormatDescriptor *arg1 = (io::humble::video::PixelFormatDescriptor *) 0 ;
+  uint8_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::PixelFormatDescriptor **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (uint8_t)(arg1)->getLog2ChromaWidth();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1getLog2ChromaHeight(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  io::humble::video::PixelFormatDescriptor *arg1 = (io::humble::video::PixelFormatDescriptor *) 0 ;
+  uint8_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::PixelFormatDescriptor **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (uint8_t)(arg1)->getLog2ChromaHeight();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1getFlags(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  io::humble::video::PixelFormatDescriptor *arg1 = (io::humble::video::PixelFormatDescriptor *) 0 ;
+  uint8_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::PixelFormatDescriptor **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (uint8_t)(arg1)->getFlags();
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1getComponentDescriptor(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  io::humble::video::PixelFormatDescriptor *arg1 = (io::humble::video::PixelFormatDescriptor *) 0 ;
+  int32_t arg2 ;
+  io::humble::video::PixelComponentDescriptor *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::PixelFormatDescriptor **)&jarg1; 
+  arg2 = (int32_t)jarg2; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // JNIHelper.swg: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (io::humble::video::PixelComponentDescriptor *)(arg1)->getComponentDescriptor(arg2);
+    }
+    catch(std::invalid_argument & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(std::bad_alloc & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        // OK, this is bad and may mean we can't do things like 
+        // allocate a new class at this time; but we should have
+        // one lying around
+        io::humble::ferry::JNIHelper *helper = 
+        io::humble::ferry::JNIHelper::getHelper();
+        if (helper) {
+          helper->throwOutOfMemoryError();
+        }
+      }
+      return 0;
+    }
+    catch(std::exception & e)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, e.what());
+      }
+      return 0;
+    }
+    catch(...)
+    {
+      // we don't let a native exception override a java exception
+      if (!jenv->ExceptionCheck())
+      {
+        jclass cls=jenv->FindClass("java/lang/RuntimeException");
+        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
+      }
+      return 0;
+    }
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // JNIHelper.swg: End generated code
+  }
+  *(io::humble::video::PixelComponentDescriptor **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1NONE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_NONE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV420P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV420P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUYV422_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUYV422;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB24_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB24;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR24_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR24;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV422P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV422P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV444P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV444P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV410P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV410P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV411P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV411P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GRAY8_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GRAY8;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1MONOWHITE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_MONOWHITE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1MONOBLACK_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_MONOBLACK;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1PAL8_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_PAL8;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVJ420P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVJ420P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVJ422P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVJ422P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVJ444P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVJ444P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1XVMC_1MPEG2_1MC_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_XVMC_MPEG2_MC;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1XVMC_1MPEG2_1IDCT_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_XVMC_MPEG2_IDCT;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1UYVY422_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_UYVY422;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1UYYVYY411_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_UYYVYY411;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR8_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR8;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR4_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR4;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR4_1BYTE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR4_BYTE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB8_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB8;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB4_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB4;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB4_1BYTE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB4_BYTE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1NV12_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_NV12;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1NV21_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_NV21;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1ARGB_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_ARGB;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGBA_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGBA;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1ABGR_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_ABGR;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGRA_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGRA;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GRAY16BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GRAY16BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GRAY16LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GRAY16LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV440P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV440P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVJ440P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVJ440P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA420P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA420P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1VDPAU_1H264_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_VDPAU_H264;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1VDPAU_1MPEG1_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_VDPAU_MPEG1;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1VDPAU_1MPEG2_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_VDPAU_MPEG2;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1VDPAU_1WMV3_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_VDPAU_WMV3;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1VDPAU_1VC1_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_VDPAU_VC1;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB48BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB48BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB48LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB48LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB565BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB565BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB565LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB565LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB555BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB555BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB555LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB555LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR565BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR565BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR565LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR565LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR555BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR555BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR555LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR555LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1VAAPI_1MOCO_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_VAAPI_MOCO;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1VAAPI_1IDCT_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_VAAPI_IDCT;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1VAAPI_1VLD_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_VAAPI_VLD;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV420P16LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV420P16LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV420P16BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV420P16BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV422P16LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV422P16LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV422P16BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV422P16BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV444P16LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV444P16LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV444P16BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV444P16BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1VDPAU_1MPEG4_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_VDPAU_MPEG4;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1DXVA2_1VLD_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_DXVA2_VLD;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB444LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB444LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB444BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB444BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR444LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR444LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR444BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR444BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GRAY8A_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GRAY8A;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR48BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR48BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR48LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR48LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV420P9BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV420P9BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV420P9LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV420P9LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV420P10BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV420P10BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV420P10LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV420P10LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV422P10BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV422P10BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV422P10LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV422P10LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV444P9BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV444P9BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV444P9LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV444P9LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV444P10BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV444P10BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV444P10LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV444P10LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV422P9BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV422P9BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV422P9LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV422P9LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1VDA_1VLD_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_VDA_VLD;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRP_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRP;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRP9BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRP9BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRP9LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRP9LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRP10BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRP10BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRP10LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRP10LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRP16BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRP16BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRP16LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRP16LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA422P_1LIBAV_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA422P_LIBAV;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA444P_1LIBAV_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA444P_LIBAV;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA420P9BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA420P9BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA420P9LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA420P9LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA422P9BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA422P9BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA422P9LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA422P9LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA444P9BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA444P9BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA444P9LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA444P9LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA420P10BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA420P10BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA420P10LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA420P10LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA422P10BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA422P10BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA422P10LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA422P10LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA444P10BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA444P10BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA444P10LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA444P10LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA420P16BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA420P16BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA420P16LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA420P16LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA422P16BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA422P16BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA422P16LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA422P16LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA444P16BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA444P16BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA444P16LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA444P16LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1VDPAU_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_VDPAU;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1XYZ12LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_XYZ12LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1XYZ12BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_XYZ12BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGBA64BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGBA64BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGBA64LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGBA64LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGRA64BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGRA64BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGRA64LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGRA64LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_10RGB_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_0RGB;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1RGB0_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_RGB0;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_10BGR_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_0BGR;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1BGR0_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_BGR0;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA444P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA444P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVA422P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVA422P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV420P12BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV420P12BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV420P12LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV420P12LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV420P14BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV420P14BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV420P14LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV420P14LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV422P12BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV422P12BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV422P12LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV422P12LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV422P14BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV422P14BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV422P14LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV422P14LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV444P12BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV444P12BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV444P12LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV444P12LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV444P14BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV444P14BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUV444P14LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUV444P14LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRP12BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRP12BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRP12LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRP12LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRP14BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRP14BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRP14LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRP14LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRAP_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRAP;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRAP16BE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRAP16BE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1GBRAP16LE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_GBRAP16LE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1YUVJ411P_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_YUVJ411P;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PictureFormat_1PIX_1FMT_1NB_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::PictureFormat::Type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::PictureFormat::Type)io::humble::video::PictureFormat::PIX_FMT_NB;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   io::humble::video::MediaPacket *result = 0 ;
@@ -30779,6 +33356,30 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaAudioUpcast(JNIE
     (void)jenv;
     (void)jcls;
     *(io::humble::video::MediaRaw **)&baseptr = *(io::humble::video::MediaAudio **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGPixelComponentDescriptorUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::PixelComponentDescriptor **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGPixelFormatDescriptorUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::PixelFormatDescriptor **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGPictureFormatUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::PictureFormat **)&jarg1;
     return baseptr;
 }
 
