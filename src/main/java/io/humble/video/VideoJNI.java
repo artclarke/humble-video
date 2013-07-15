@@ -217,7 +217,7 @@ class VideoJNI {
   public final static native int AudioFormat_SAMPLE_FMT_FLTP_get();
   public final static native int AudioFormat_SAMPLE_FMT_DBLP_get();
   public final static native String AudioFormat_getName(int jarg1);
-  public final static native int AudioFormat_getSampleFormat(String jarg1);
+  public final static native int AudioFormat_getFormat(String jarg1);
   public final static native int AudioFormat_getAlternateSampleFormat(int jarg1, boolean jarg2);
   public final static native int AudioFormat_getPackedSampleFormat(int jarg1);
   public final static native int AudioFormat_getPlanarSampleFormat(int jarg1);

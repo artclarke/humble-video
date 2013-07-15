@@ -124,8 +124,8 @@ public class AudioFormat extends RefCounted {
  *  
  * on error.  
  */
-  public static AudioFormat.Type getSampleFormat(String name) {
-    return AudioFormat.Type.swigToEnum(VideoJNI.AudioFormat_getSampleFormat(name));
+  public static AudioFormat.Type getFormat(String name) {
+    return AudioFormat.Type.swigToEnum(VideoJNI.AudioFormat_getFormat(name));
   }
 
 /**

@@ -8239,7 +8239,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getName(JN
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getSampleFormat(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getFormat(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
   io::humble::video::AudioFormat::Type result;
@@ -8256,7 +8256,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getSampleForm
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::AudioFormat::Type)io::humble::video::AudioFormat::getSampleFormat((char const *)arg1);
+      result = (io::humble::video::AudioFormat::Type)io::humble::video::AudioFormat::getFormat((char const *)arg1);
     }
     catch(std::invalid_argument & e)
     {

@@ -302,7 +302,7 @@ public:
    * on error.
    */
   static Type
-  getSampleFormat(const char* name) {
+  getFormat(const char* name) {
     return (Type) av_get_sample_fmt(name);
   }
 
