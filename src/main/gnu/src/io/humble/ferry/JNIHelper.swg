@@ -486,3 +486,17 @@
 // as a java.nio.ByteBuffer type
 %typemap(jtype)  jNioByteArray, const jNioByteArray &  "java.nio.ByteBuffer";
 %typemap(jstype) jNioByteArray, const jNioByteArray &  "java.nio.ByteBuffer";
+
+// This makes any method that declares they throw a HumbleInterruptedException
+// also throw the java.lang.InterruptedException
+%typemap(throws, throws="java.lang.InterruptedException") io::humble::ferry::HumbleInterruptedException %{
+    // we don't let a native exception override a java exception
+  if (!jenv->ExceptionCheck())
+  {
+    jclass excep = jenv->FindClass("java/lang/InterruptedException");
+    if (excep)
+      jenv->ThrowNew(excep, $1.what());
+  }
+  return $null;
+%}
+

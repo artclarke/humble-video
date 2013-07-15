@@ -67,7 +67,8 @@ public:
    * Each subclass must define this so we can
    * raise in place with true polymorphic support.
    */
-  virtual void raise() const = 0;
+  virtual void
+  raise() const = 0;
   HumbleStackTrace(const HumbleStackTrace &);
 protected:
   HumbleStackTrace();
@@ -85,13 +86,17 @@ class VS_API_FERRY HumbleInvalidArgument : public virtual std::invalid_argument,
     public virtual HumbleStackTrace
 {
 public:
+  explicit
   HumbleInvalidArgument(const std::string & arg) :
       std::invalid_argument(arg) {
   }
   virtual
   ~HumbleInvalidArgument() throw () {
   }
-  virtual void raise() const { throw *this; }
+  virtual void
+  raise() const {
+    throw *this;
+  }
 
 };
 
@@ -99,26 +104,50 @@ class VS_API_FERRY HumbleRuntimeError : public virtual std::runtime_error,
     public virtual HumbleStackTrace
 {
 public:
+  explicit
   HumbleRuntimeError(const std::string & arg) :
       std::runtime_error(arg) {
   }
   virtual
   ~HumbleRuntimeError() throw () {
   }
-  virtual void raise() const { throw *this; }
+  virtual void
+  raise() const {
+    throw *this;
+  }
+};
+
+class VS_API_FERRY HumbleInterruptedException : public virtual HumbleRuntimeError
+{
+public:
+  HumbleInterruptedException() :
+      std::runtime_error("thread interrupted"), HumbleRuntimeError(
+          "thread interrupted") {
+  }
+  virtual
+  ~HumbleInterruptedException() throw () {
+  }
+  virtual void
+  raise() const {
+    throw *this;
+  }
 };
 
 class VS_API_FERRY HumbleBadAlloc : public virtual std::bad_alloc,
     public virtual HumbleStackTrace
 {
 public:
+  explicit
   HumbleBadAlloc() :
       std::bad_alloc() {
   }
   virtual
   ~HumbleBadAlloc() throw () {
   }
-  virtual void raise() const { throw *this; }
+  virtual void
+  raise() const {
+    throw *this;
+  }
 };
 
 } /* namespace ferry */

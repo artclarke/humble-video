@@ -70,7 +70,7 @@ public:
   getSourceStream(int32_t streamIndex);
 
   virtual int32_t
-  read(MediaPacket *packet);
+  read(MediaPacket *packet) throw(io::humble::ferry::HumbleInterruptedException);
 
   virtual int32_t
   queryStreamMetaData();

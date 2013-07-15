@@ -26,6 +26,7 @@
 #include <io/humble/video/SourceFormat.h>
 
 #include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/HumbleException.h>
 
 namespace io {
 namespace humble {
@@ -173,7 +174,7 @@ public:
    * @return 0 if successful, or <0 if not.
    */
   virtual int32_t
-  read(MediaPacket *packet)=0;
+  read(MediaPacket *packet) throw(io::humble::ferry::HumbleInterruptedException)=0;
 
   /**
    * Attempts to read all the meta data in this stream, potentially by reading ahead

@@ -293,7 +293,7 @@ SourceImpl::getSourceStream(int32_t position) {
 }
 
 int32_t
-SourceImpl::read(MediaPacket* ipkt) {
+SourceImpl::read(MediaPacket* ipkt) throw(io::humble::ferry::HumbleInterruptedException) {
   int32_t retval = -1;
   MediaPacketImpl* pkt = dynamic_cast<MediaPacketImpl*>(ipkt);
   if (pkt)

@@ -29365,7 +29365,21 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1read(JNIEnv *jenv,
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)(arg1)->read(arg2);
+      try {
+        result = (int32_t)(arg1)->read(arg2);
+      }
+      catch(io::humble::ferry::HumbleInterruptedException &_e) {
+        // we don't let a native exception override a java exception
+        if (!jenv->ExceptionCheck())
+        {
+          jclass excep = jenv->FindClass("java/lang/InterruptedException");
+          if (excep)
+          jenv->ThrowNew(excep, (&_e)->what());
+        }
+        return 0;
+        
+      }
+      
     }
     catch(std::invalid_argument & e)
     {
