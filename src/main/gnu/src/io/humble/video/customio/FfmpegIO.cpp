@@ -34,6 +34,8 @@
 using namespace io::humble::ferry;
 using namespace io::humble::video::customio;
 
+// we need to have a non-exception raising  interrupt check here
+#undef VS_CHECK_INTERRUPT
 #define VS_CHECK_INTERRUPT(retval, __COND__) do { \
     if (__COND__) { \
       JNIHelper* helper = JNIHelper::getHelper(); \

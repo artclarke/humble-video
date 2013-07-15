@@ -21,9 +21,10 @@
 #define JNIHELPER_H_
 
 #include <list>
+#include <inttypes.h>
 
 #include <io/humble/ferry/Ferry.h>
-#include <inttypes.h>
+#include <io/humble/ferry/HumbleException.h>
 
 namespace io { namespace humble { namespace ferry {
 /**
@@ -195,7 +196,7 @@ class JNIHelper
     if (__COND__) { \
       JNIHelper* helper = JNIHelper::getHelper(); \
       if (helper && helper->isInterrupted()) \
-        (retval) = EINTR > 0 ? -EINTR : EINTR; \
+        throw HumbleInterruptedException(); \
         } \
 } while(0)
 

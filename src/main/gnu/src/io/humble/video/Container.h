@@ -25,6 +25,7 @@
 #ifndef CONTAINER_H_
 #define CONTAINER_H_
 
+#include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/Property.h>

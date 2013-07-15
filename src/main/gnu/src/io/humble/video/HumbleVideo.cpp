@@ -28417,62 +28417,21 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1getNumStreams(J
     return 0;
   }
   
-  {
-    // JNIHelper.swg: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      result = (int32_t)(arg1)->getNumStreams();
-    }
-    catch(std::invalid_argument & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(std::bad_alloc & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        // OK, this is bad and may mean we can't do things like 
-        // allocate a new class at this time; but we should have
-        // one lying around
-        io::humble::ferry::JNIHelper *helper = 
-        io::humble::ferry::JNIHelper::getHelper();
-        if (helper) {
-          helper->throwOutOfMemoryError();
-        }
-      }
-      return 0;
-    }
-    catch(std::exception & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(...)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
-      }
-      return 0;
-    }
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // JNIHelper.swg: End generated code
+  try {
+    result = (int32_t)(arg1)->getNumStreams();
   }
+  catch(io::humble::ferry::HumbleInterruptedException &_e) {
+    // we don't let a native exception override a java exception
+    if (!jenv->ExceptionCheck())
+    {
+      jclass excep = jenv->FindClass("java/lang/InterruptedException");
+      if (excep)
+      jenv->ThrowNew(excep, (&_e)->what());
+    }
+    return 0;
+    
+  }
+  
   jresult = (jint)result; 
   return jresult;
 }
@@ -28496,62 +28455,21 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Container_1getStream(JNIE
     return 0;
   }
   
-  {
-    // JNIHelper.swg: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      result = (io::humble::video::ContainerStream *)(arg1)->getStream(arg2);
-    }
-    catch(std::invalid_argument & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(std::bad_alloc & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        // OK, this is bad and may mean we can't do things like 
-        // allocate a new class at this time; but we should have
-        // one lying around
-        io::humble::ferry::JNIHelper *helper = 
-        io::humble::ferry::JNIHelper::getHelper();
-        if (helper) {
-          helper->throwOutOfMemoryError();
-        }
-      }
-      return 0;
-    }
-    catch(std::exception & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(...)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
-      }
-      return 0;
-    }
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // JNIHelper.swg: End generated code
+  try {
+    result = (io::humble::video::ContainerStream *)(arg1)->getStream(arg2);
   }
+  catch(io::humble::ferry::HumbleInterruptedException &_e) {
+    // we don't let a native exception override a java exception
+    if (!jenv->ExceptionCheck())
+    {
+      jclass excep = jenv->FindClass("java/lang/InterruptedException");
+      if (excep)
+      jenv->ThrowNew(excep, (&_e)->what());
+    }
+    return 0;
+    
+  }
+  
   *(io::humble::video::ContainerStream **)&jresult = result; 
   return jresult;
 }
@@ -28932,11 +28850,9 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getSourceFormat(J
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1setInputBufferLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jint jresult = 0 ;
+SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Source_1setInputBufferLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   io::humble::video::Source *arg1 = (io::humble::video::Source *) 0 ;
   int32_t arg2 ;
-  int32_t result;
   
   (void)jenv;
   (void)jcls;
@@ -28947,7 +28863,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1setInputBufferLeng
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
       "invalid native object; delete() likely already called");
-    return 0;
+    return ;
   }
   
   {
@@ -28955,7 +28871,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1setInputBufferLeng
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)(arg1)->setInputBufferLength(arg2);
+      (arg1)->setInputBufferLength(arg2);
     }
     catch(std::invalid_argument & e)
     {
@@ -28965,7 +28881,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1setInputBufferLeng
         jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
         jenv->ThrowNew(cls, e.what());
       }
-      return 0;
+      return ;
     }
     catch(std::bad_alloc & e)
     {
@@ -28981,7 +28897,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1setInputBufferLeng
           helper->throwOutOfMemoryError();
         }
       }
-      return 0;
+      return ;
     }
     catch(std::exception & e)
     {
@@ -28991,7 +28907,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1setInputBufferLeng
         jclass cls=jenv->FindClass("java/lang/RuntimeException");
         jenv->ThrowNew(cls, e.what());
       }
-      return 0;
+      return ;
     }
     catch(...)
     {
@@ -29001,13 +28917,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1setInputBufferLeng
         jclass cls=jenv->FindClass("java/lang/RuntimeException");
         jenv->ThrowNew(cls, "Unhandled and unknown native exception");
       }
-      return 0;
+      return ;
     }
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  jresult = (jint)result; 
-  return jresult;
 }
 
 
@@ -29123,62 +29037,21 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1open(JNIEnv *jenv,
     return 0;
   }
   
-  {
-    // JNIHelper.swg: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      result = (int32_t)(arg1)->open((char const *)arg2,arg3,arg4,arg5,arg6,arg7);
-    }
-    catch(std::invalid_argument & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(std::bad_alloc & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        // OK, this is bad and may mean we can't do things like 
-        // allocate a new class at this time; but we should have
-        // one lying around
-        io::humble::ferry::JNIHelper *helper = 
-        io::humble::ferry::JNIHelper::getHelper();
-        if (helper) {
-          helper->throwOutOfMemoryError();
-        }
-      }
-      return 0;
-    }
-    catch(std::exception & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(...)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
-      }
-      return 0;
-    }
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // JNIHelper.swg: End generated code
+  try {
+    result = (int32_t)(arg1)->open((char const *)arg2,arg3,arg4,arg5,arg6,arg7);
   }
+  catch(io::humble::ferry::HumbleInterruptedException &_e) {
+    // we don't let a native exception override a java exception
+    if (!jenv->ExceptionCheck())
+    {
+      jclass excep = jenv->FindClass("java/lang/InterruptedException");
+      if (excep)
+      jenv->ThrowNew(excep, (&_e)->what());
+    }
+    return 0;
+    
+  }
+  
   jresult = (jint)result; 
   if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
   return jresult;
@@ -29201,62 +29074,21 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1close(JNIEnv *jenv
     return 0;
   }
   
-  {
-    // JNIHelper.swg: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      result = (int32_t)(arg1)->close();
-    }
-    catch(std::invalid_argument & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(std::bad_alloc & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        // OK, this is bad and may mean we can't do things like 
-        // allocate a new class at this time; but we should have
-        // one lying around
-        io::humble::ferry::JNIHelper *helper = 
-        io::humble::ferry::JNIHelper::getHelper();
-        if (helper) {
-          helper->throwOutOfMemoryError();
-        }
-      }
-      return 0;
-    }
-    catch(std::exception & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(...)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
-      }
-      return 0;
-    }
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // JNIHelper.swg: End generated code
+  try {
+    result = (int32_t)(arg1)->close();
   }
+  catch(io::humble::ferry::HumbleInterruptedException &_e) {
+    // we don't let a native exception override a java exception
+    if (!jenv->ExceptionCheck())
+    {
+      jclass excep = jenv->FindClass("java/lang/InterruptedException");
+      if (excep)
+      jenv->ThrowNew(excep, (&_e)->what());
+    }
+    return 0;
+    
+  }
+  
   jresult = (jint)result; 
   return jresult;
 }
@@ -29280,62 +29112,21 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getSourceStream(J
     return 0;
   }
   
-  {
-    // JNIHelper.swg: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      result = (io::humble::video::SourceStream *)(arg1)->getSourceStream(arg2);
-    }
-    catch(std::invalid_argument & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(std::bad_alloc & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        // OK, this is bad and may mean we can't do things like 
-        // allocate a new class at this time; but we should have
-        // one lying around
-        io::humble::ferry::JNIHelper *helper = 
-        io::humble::ferry::JNIHelper::getHelper();
-        if (helper) {
-          helper->throwOutOfMemoryError();
-        }
-      }
-      return 0;
-    }
-    catch(std::exception & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(...)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
-      }
-      return 0;
-    }
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // JNIHelper.swg: End generated code
+  try {
+    result = (io::humble::video::SourceStream *)(arg1)->getSourceStream(arg2);
   }
+  catch(io::humble::ferry::HumbleInterruptedException &_e) {
+    // we don't let a native exception override a java exception
+    if (!jenv->ExceptionCheck())
+    {
+      jclass excep = jenv->FindClass("java/lang/InterruptedException");
+      if (excep)
+      jenv->ThrowNew(excep, (&_e)->what());
+    }
+    return 0;
+    
+  }
+  
   *(io::humble::video::SourceStream **)&jresult = result; 
   return jresult;
 }
@@ -29360,76 +29151,21 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1read(JNIEnv *jenv,
     return 0;
   }
   
-  {
-    // JNIHelper.swg: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      try {
-        result = (int32_t)(arg1)->read(arg2);
-      }
-      catch(io::humble::ferry::HumbleInterruptedException &_e) {
-        // we don't let a native exception override a java exception
-        if (!jenv->ExceptionCheck())
-        {
-          jclass excep = jenv->FindClass("java/lang/InterruptedException");
-          if (excep)
-          jenv->ThrowNew(excep, (&_e)->what());
-        }
-        return 0;
-        
-      }
-      
-    }
-    catch(std::invalid_argument & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(std::bad_alloc & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        // OK, this is bad and may mean we can't do things like 
-        // allocate a new class at this time; but we should have
-        // one lying around
-        io::humble::ferry::JNIHelper *helper = 
-        io::humble::ferry::JNIHelper::getHelper();
-        if (helper) {
-          helper->throwOutOfMemoryError();
-        }
-      }
-      return 0;
-    }
-    catch(std::exception & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(...)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
-      }
-      return 0;
-    }
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // JNIHelper.swg: End generated code
+  try {
+    result = (int32_t)(arg1)->read(arg2);
   }
+  catch(io::humble::ferry::HumbleInterruptedException &_e) {
+    // we don't let a native exception override a java exception
+    if (!jenv->ExceptionCheck())
+    {
+      jclass excep = jenv->FindClass("java/lang/InterruptedException");
+      if (excep)
+      jenv->ThrowNew(excep, (&_e)->what());
+    }
+    return 0;
+    
+  }
+  
   jresult = (jint)result; 
   return jresult;
 }
@@ -29451,62 +29187,21 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1queryStreamMetaDat
     return 0;
   }
   
-  {
-    // JNIHelper.swg: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      result = (int32_t)(arg1)->queryStreamMetaData();
-    }
-    catch(std::invalid_argument & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(std::bad_alloc & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        // OK, this is bad and may mean we can't do things like 
-        // allocate a new class at this time; but we should have
-        // one lying around
-        io::humble::ferry::JNIHelper *helper = 
-        io::humble::ferry::JNIHelper::getHelper();
-        if (helper) {
-          helper->throwOutOfMemoryError();
-        }
-      }
-      return 0;
-    }
-    catch(std::exception & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(...)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
-      }
-      return 0;
-    }
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // JNIHelper.swg: End generated code
+  try {
+    result = (int32_t)(arg1)->queryStreamMetaData();
   }
+  catch(io::humble::ferry::HumbleInterruptedException &_e) {
+    // we don't let a native exception override a java exception
+    if (!jenv->ExceptionCheck())
+    {
+      jclass excep = jenv->FindClass("java/lang/InterruptedException");
+      if (excep)
+      jenv->ThrowNew(excep, (&_e)->what());
+    }
+    return 0;
+    
+  }
+  
   jresult = (jint)result; 
   return jresult;
 }
@@ -30822,62 +30517,21 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1seek(JNIEnv *jenv,
     return 0;
   }
   
-  {
-    // JNIHelper.swg: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      result = (int32_t)(arg1)->seek(arg2,arg3,arg4,arg5,arg6);
-    }
-    catch(std::invalid_argument & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(std::bad_alloc & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        // OK, this is bad and may mean we can't do things like 
-        // allocate a new class at this time; but we should have
-        // one lying around
-        io::humble::ferry::JNIHelper *helper = 
-        io::humble::ferry::JNIHelper::getHelper();
-        if (helper) {
-          helper->throwOutOfMemoryError();
-        }
-      }
-      return 0;
-    }
-    catch(std::exception & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(...)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
-      }
-      return 0;
-    }
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // JNIHelper.swg: End generated code
+  try {
+    result = (int32_t)(arg1)->seek(arg2,arg3,arg4,arg5,arg6);
   }
+  catch(io::humble::ferry::HumbleInterruptedException &_e) {
+    // we don't let a native exception override a java exception
+    if (!jenv->ExceptionCheck())
+    {
+      jclass excep = jenv->FindClass("java/lang/InterruptedException");
+      if (excep)
+      jenv->ThrowNew(excep, (&_e)->what());
+    }
+    return 0;
+    
+  }
+  
   jresult = (jint)result; 
   return jresult;
 }
@@ -30976,62 +30630,21 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1play(JNIEnv *jenv,
     return 0;
   }
   
-  {
-    // JNIHelper.swg: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      result = (int32_t)(arg1)->play();
-    }
-    catch(std::invalid_argument & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(std::bad_alloc & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        // OK, this is bad and may mean we can't do things like 
-        // allocate a new class at this time; but we should have
-        // one lying around
-        io::humble::ferry::JNIHelper *helper = 
-        io::humble::ferry::JNIHelper::getHelper();
-        if (helper) {
-          helper->throwOutOfMemoryError();
-        }
-      }
-      return 0;
-    }
-    catch(std::exception & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(...)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
-      }
-      return 0;
-    }
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // JNIHelper.swg: End generated code
+  try {
+    result = (int32_t)(arg1)->play();
   }
+  catch(io::humble::ferry::HumbleInterruptedException &_e) {
+    // we don't let a native exception override a java exception
+    if (!jenv->ExceptionCheck())
+    {
+      jclass excep = jenv->FindClass("java/lang/InterruptedException");
+      if (excep)
+      jenv->ThrowNew(excep, (&_e)->what());
+    }
+    return 0;
+    
+  }
+  
   jresult = (jint)result; 
   return jresult;
 }
@@ -31053,62 +30666,21 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1pause(JNIEnv *jenv
     return 0;
   }
   
-  {
-    // JNIHelper.swg: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      result = (int32_t)(arg1)->pause();
-    }
-    catch(std::invalid_argument & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(std::bad_alloc & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        // OK, this is bad and may mean we can't do things like 
-        // allocate a new class at this time; but we should have
-        // one lying around
-        io::humble::ferry::JNIHelper *helper = 
-        io::humble::ferry::JNIHelper::getHelper();
-        if (helper) {
-          helper->throwOutOfMemoryError();
-        }
-      }
-      return 0;
-    }
-    catch(std::exception & e)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, e.what());
-      }
-      return 0;
-    }
-    catch(...)
-    {
-      // we don't let a native exception override a java exception
-      if (!jenv->ExceptionCheck())
-      {
-        jclass cls=jenv->FindClass("java/lang/RuntimeException");
-        jenv->ThrowNew(cls, "Unhandled and unknown native exception");
-      }
-      return 0;
-    }
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // JNIHelper.swg: End generated code
+  try {
+    result = (int32_t)(arg1)->pause();
   }
+  catch(io::humble::ferry::HumbleInterruptedException &_e) {
+    // we don't let a native exception override a java exception
+    if (!jenv->ExceptionCheck())
+    {
+      jclass excep = jenv->FindClass("java/lang/InterruptedException");
+      if (excep)
+      jenv->ThrowNew(excep, (&_e)->what());
+    }
+    return 0;
+    
+  }
+  
   jresult = (jint)result; 
   return jresult;
 }

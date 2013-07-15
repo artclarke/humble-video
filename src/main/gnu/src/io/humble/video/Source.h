@@ -72,9 +72,9 @@ public:
    * If called when a Container is open, the call is ignored and -1 is returned.
    *
    * @param size The suggested buffer size.
-   * @return size on success; <0 on error.
+   * @throws InvalidArgument if size <= 0
    */
-  virtual int32_t
+  virtual void
   setInputBufferLength(int32_t size)=0;
 
   /**
@@ -174,7 +174,7 @@ public:
    * @return 0 if successful, or <0 if not.
    */
   virtual int32_t
-  read(MediaPacket *packet) throw(io::humble::ferry::HumbleInterruptedException)=0;
+  read(MediaPacket *packet)=0;
 
   /**
    * Attempts to read all the meta data in this stream, potentially by reading ahead

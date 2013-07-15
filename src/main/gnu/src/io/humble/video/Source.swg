@@ -20,4 +20,29 @@
 %typemap (javacode) io::humble::video::Source,io::humble::video::Source*,io::humble::video::Source& %{
 %}
 
+/**
+ * Tell users which methods can block (and hence, can be interrupted).
+ */
+%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Source::open;
+%javaexception("java.lang.InterruptedException") io::humble::video::Source::open;
+%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Source::read;
+%javaexception("java.lang.InterruptedException") io::humble::video::Source::read;
+%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Source::seek;
+%javaexception("java.lang.InterruptedException") io::humble::video::Source::seek;
+%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Source::play;
+%javaexception("java.lang.InterruptedException") io::humble::video::Source::play;
+%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Source::pause;
+%javaexception("java.lang.InterruptedException") io::humble::video::Source::pause;
+%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Source::close;
+%javaexception("java.lang.InterruptedException") io::humble::video::Source::close;
+%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Source::getNumStreams;
+%javaexception("java.lang.InterruptedException") io::humble::video::Source::getNumStreams;
+%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Source::getStream;
+%javaexception("java.lang.InterruptedException") io::humble::video::Source::getStream;
+%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Source::getSourceStream;
+%javaexception("java.lang.InterruptedException") io::humble::video::Source::getSourceStream;
+%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Source::queryStreamMetaData;
+%javaexception("java.lang.InterruptedException") io::humble::video::Source::queryStreamMetaData;
+
+
 %include <io/humble/video/Source.h>

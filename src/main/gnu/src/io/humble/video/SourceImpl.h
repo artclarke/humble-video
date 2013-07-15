@@ -48,7 +48,7 @@ public:
   virtual SourceFormat *
   getSourceFormat() { return mFormat.get(); }
 
-  virtual int32_t
+  virtual void
   setInputBufferLength(int32_t size);
 
   virtual int32_t
@@ -70,7 +70,7 @@ public:
   getSourceStream(int32_t streamIndex);
 
   virtual int32_t
-  read(MediaPacket *packet) throw(io::humble::ferry::HumbleInterruptedException);
+  read(MediaPacket *packet);
 
   virtual int32_t
   queryStreamMetaData();

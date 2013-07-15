@@ -150,10 +150,10 @@ public class Source extends Container {
  * If called when a Container is open, the call is ignored and -1 is 
  * returned.  
  * @param	size The suggested buffer size.  
- * @return	size on success; <0 on error.  
+ * @throws	InvalidArgument if size <= 0  
  */
-  public int setInputBufferLength(int size) {
-    return VideoJNI.Source_setInputBufferLength(swigCPtr, this, size);
+  public void setInputBufferLength(int size) {
+    VideoJNI.Source_setInputBufferLength(swigCPtr, this, size);
   }
 
 /**
@@ -216,7 +216,7 @@ public class Source extends Container {
  * {@link Source}.  
  * @return	>= 0 on success; < 0 on error.  
  */
-  public int open(String url, SourceFormat format, boolean streamsCanBeAddedDynamically, boolean queryStreamMetaData, KeyValueBag options, KeyValueBag optionsNotSet) {
+  public int open(String url, SourceFormat format, boolean streamsCanBeAddedDynamically, boolean queryStreamMetaData, KeyValueBag options, KeyValueBag optionsNotSet) throws java.lang.InterruptedException {
     return VideoJNI.Source_open(swigCPtr, this, url, SourceFormat.getCPtr(format), format, streamsCanBeAddedDynamically, queryStreamMetaData, KeyValueBag.getCPtr(options), options, KeyValueBag.getCPtr(optionsNotSet), optionsNotSet);
   }
 
@@ -237,7 +237,7 @@ public class Source extends Container {
  * </p>  
  * @return	>= 0 on success; < 0 on error.  
  */
-  public int close() {
+  public int close() throws java.lang.InterruptedException {
     return VideoJNI.Source_close(swigCPtr, this);
   }
 
@@ -247,7 +247,7 @@ public class Source extends Container {
  * @return	The stream at that position in the container, or null if 
  *		 none there.  
  */
-  public SourceStream getSourceStream(int streamIndex) {
+  public SourceStream getSourceStream(int streamIndex) throws java.lang.InterruptedException {
     long cPtr = VideoJNI.Source_getSourceStream(swigCPtr, this, streamIndex);
     return (cPtr == 0) ? null : new SourceStream(cPtr, false);
   }
@@ -294,7 +294,7 @@ public class Source extends Container {
  * </p>  
  * @return	>= 0 on success; <0 on failure.  
  */
-  public int queryStreamMetaData() {
+  public int queryStreamMetaData() throws java.lang.InterruptedException {
     return VideoJNI.Source_queryStreamMetaData(swigCPtr, this);
   }
 
@@ -516,7 +516,7 @@ public class Source extends Container {
  *  
  * ABI compatibility yet!  
  */
-  public int seek(int stream_index, long min_ts, long ts, long max_ts, int flags) {
+  public int seek(int stream_index, long min_ts, long ts, long max_ts, int flags) throws java.lang.InterruptedException {
     return VideoJNI.Source_seek(swigCPtr, this, stream_index, min_ts, ts, max_ts, flags);
   }
 
@@ -531,7 +531,7 @@ public class Source extends Container {
 /**
  *  
  */
-  public int play() {
+  public int play() throws java.lang.InterruptedException {
     return VideoJNI.Source_play(swigCPtr, this);
   }
 
@@ -541,7 +541,7 @@ public class Source extends Container {
  * @return	0 on success; <0 if state is not {@link #State.STATE_PLAYING} 
  *		 or error.  
  */
-  public int pause() {
+  public int pause() throws java.lang.InterruptedException {
     return VideoJNI.Source_pause(swigCPtr, this);
   }
 

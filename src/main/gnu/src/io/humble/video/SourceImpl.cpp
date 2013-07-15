@@ -176,15 +176,13 @@ SourceImpl::open(const char *url, SourceFormat* format,
   return retval;
 }
 
-int32_t
+void
 SourceImpl::setInputBufferLength(int32_t size) {
-  if (mState != Container::STATE_INITED)
-    return -1;
   if (size <= 0)
-    return -1;
-  int32_t retval = mInputBufferLength;
+    VS_THROW(HumbleInvalidArgument("size <= 0"));
+  if (mState != Container::STATE_INITED)
+    VS_THROW(HumbleRuntimeError("Source object has already been opened"));
   mInputBufferLength = size;
-  return retval;
 }
 
 int32_t
@@ -198,8 +196,7 @@ SourceImpl::getNumStreams() {
   if (!(mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
       mState == Container::STATE_PAUSED)) {
-    VS_LOG_WARN("Attempt to query number of streams in container (%s) when not opened, playing or paused is ignored", getURL());
-    return -1;
+    VS_THROW(HumbleRuntimeError("Attempt to query number of streams in source when not opened, playing or paused is ignored"));
   }
   if ((int32_t) mCtx->nb_streams != mNumStreams)
     doSetupSourceStreams();
@@ -215,8 +212,7 @@ SourceImpl::close() {
   if (!(mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
       mState == Container::STATE_PAUSED)) {
-    VS_LOG_WARN("Attempt to close container (%s) when not opened, playing or paused is ignored", getURL());
-    return -1;
+    VS_THROW(HumbleRuntimeError("Attempt to close container when not opened, playing or paused"));
   }
 
   // tell the streams we're closing.
@@ -275,8 +271,7 @@ SourceImpl::getSourceStream(int32_t position) {
   if (!(mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
       mState == Container::STATE_PAUSED)) {
-    VS_LOG_WARN("Attempt to get source stream from container (%s) when not opened, playing or paused is ignored", getURL());
-    return 0;
+    VS_THROW(HumbleRuntimeError("Attempt to get source stream from source when not opened, playing or paused is ignored"));
   }
   SourceStream *retval = 0;
   if ((int32_t)mCtx->nb_streams != mNumStreams)
@@ -293,7 +288,7 @@ SourceImpl::getSourceStream(int32_t position) {
 }
 
 int32_t
-SourceImpl::read(MediaPacket* ipkt) throw(io::humble::ferry::HumbleInterruptedException) {
+SourceImpl::read(MediaPacket* ipkt) {
   int32_t retval = -1;
   MediaPacketImpl* pkt = dynamic_cast<MediaPacketImpl*>(ipkt);
   if (pkt)
@@ -346,8 +341,7 @@ SourceImpl::queryStreamMetaData() {
   if (!(mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
       mState == Container::STATE_PAUSED)) {
-    VS_LOG_WARN("Attempt to query stream information from container (%s) when not opened, playing or paused is ignored", getURL());
-    return -1;
+    VS_THROW(HumbleRuntimeError("Attempt to query stream information from container when not opened, playing or paused"));
   }
   if (!mStreamInfoGotten) {
     retval = avformat_find_stream_info(this->getFormatCtx(), 0);
@@ -480,8 +474,7 @@ SourceImpl::seek(int32_t stream_index, int64_t min_ts, int64_t ts,
     int64_t max_ts, int32_t flags) {
   if (mState != Container::STATE_OPENED)
   {
-    VS_LOG_WARN("Can only seek on OPEN (not paused or playing) containers.");
-    return -1;
+    VS_THROW(HumbleRuntimeError("Can only seek on OPEN (not paused or playing) sources"));
   }
   int32_t retval = avformat_seek_file(this->getFormatCtx(),
       stream_index,
@@ -499,8 +492,7 @@ int32_t
 SourceImpl::pause() {
   if (mState != Container::STATE_PLAYING)
   {
-    VS_LOG_WARN("Can only pause containers in PLAYING state. Current state: %d", mState);
-    return -1;
+    VS_THROW(HumbleRuntimeError("Can only pause containers in PLAYING state."));
   }
   int32_t retval = av_read_pause(this->getFormatCtx());
   VS_CHECK_INTERRUPT(retval, true);
@@ -513,7 +505,7 @@ int32_t
 SourceImpl::play() {
   if (mState != Container::STATE_PAUSED || mState != Container::STATE_OPENED)
   {
-    VS_LOG_WARN("Can only play containers in OPENED or PAUSED states. Current state: %d", mState);
+    VS_THROW(HumbleRuntimeError("Can only play containers in OPENED or PAUSED states"));
     return -1;
   }
   int32_t retval = av_read_play(this->getFormatCtx());
