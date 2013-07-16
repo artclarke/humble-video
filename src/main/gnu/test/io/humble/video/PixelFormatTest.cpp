@@ -42,6 +42,15 @@ PixelFormatTest::~PixelFormatTest() {
 }
 
 void
+PixelFormatTest::testGetDescriptor() {
+  PixelFormat::Type t = PixelFormat::PIX_FMT_YUV420P;
+  RefPointer<PixelFormatDescriptor> d = PixelFormat::getDescriptor(t);
+
+  TS_ASSERT(d);
+  TS_ASSERT_EQUALS(t, d->getFormat());
+
+}
+void
 PixelFormatTest::testGetInstalledFormats() {
   int32_t n = PixelFormat::getNumInstalledFormats();
 

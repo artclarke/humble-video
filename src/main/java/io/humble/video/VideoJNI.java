@@ -192,7 +192,7 @@ class VideoJNI {
   public final static native int PixelFormatDescriptor_getBitsPerPixel(long jarg1, PixelFormatDescriptor jarg1_);
   public final static native int PixelFormatDescriptor_getPaddedBitsPerPixel(long jarg1, PixelFormatDescriptor jarg1_);
   public final static native long PixelFormatDescriptor_getComponentDescriptor(long jarg1, PixelFormatDescriptor jarg1_, int jarg2);
-  public final static native int PixelFormatDescriptor_getPixelType(long jarg1, PixelFormatDescriptor jarg1_);
+  public final static native int PixelFormatDescriptor_getFormat(long jarg1, PixelFormatDescriptor jarg1_);
   public final static native int Rational_ROUND_ZERO_get();
   public final static native int Rational_ROUND_INF_get();
   public final static native int Rational_ROUND_DOWN_get();

@@ -3475,7 +3475,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1ge
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1getPixelType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1getFormat(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   io::humble::video::PixelFormatDescriptor *arg1 = (io::humble::video::PixelFormatDescriptor *) 0 ;
   io::humble::video::PixelFormat::Type result;
@@ -3496,7 +3496,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1get
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::PixelFormat::Type)(arg1)->getPixelType();
+      result = (io::humble::video::PixelFormat::Type)(arg1)->getFormat();
     }
     catch(std::invalid_argument & e)
     {

@@ -35,6 +35,7 @@ public:
   virtual
   ~PixelFormatTest();
 
+  void testGetDescriptor();
   void testGetInstalledFormats();
 };
 

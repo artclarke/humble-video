@@ -201,8 +201,8 @@ public class PixelFormatDescriptor extends RefCounted {
  *		 if desc  
  * is not a valid pointer to a pixel format descriptor.  
  */
-  public PixelFormat.Type getPixelType() {
-    return PixelFormat.Type.swigToEnum(VideoJNI.PixelFormatDescriptor_getPixelType(swigCPtr, this));
+  public PixelFormat.Type getFormat() {
+    return PixelFormat.Type.swigToEnum(VideoJNI.PixelFormatDescriptor_getFormat(swigCPtr, this));
   }
 
 }

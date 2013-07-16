@@ -573,7 +573,7 @@ public:
    * @return an PixelFormat id described by desc, or PixelFormat.Type.PIX_FMT_NONE if desc
    * is not a valid pointer to a pixel format descriptor.
    */
-  PixelFormat::Type getPixelType() { return (PixelFormat::Type)av_pix_fmt_desc_get_id(mCtx); }
+  PixelFormat::Type getFormat() { return (PixelFormat::Type)av_pix_fmt_desc_get_id(mCtx); }
 #ifndef SWIG
   static PixelFormatDescriptor* make(const AVPixFmtDescriptor* ctx);
 #endif // ! SWIG
