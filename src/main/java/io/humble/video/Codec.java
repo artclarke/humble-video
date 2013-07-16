@@ -204,7 +204,7 @@ public class Codec extends RefCounted {
     for(int i=0;i<count;i++)
     {
       PixelFormat.Type type = getSupportedVideoPixelFormat(i);
-      if (type != null && type != PixelFormat.Type.FMT_NONE)
+      if (type != null && type != PixelFormat.Type.PIX_FMT_NONE)
         retval.add(type);
     }
     return retval;

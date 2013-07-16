@@ -9,14 +9,8 @@
 package io.humble.video;
 import io.humble.ferry.*;
 /**
- * Information about how video data is formatted in an {@link IVideoPicture} 
- * object.  
- * This specifies the color space and how many bits pixel data takes. 
- * It also  
- * includes some utility methods for dealing with {@link Type#YUV420P} 
- * data; the  
- * most common type of encoding used in video files I've run across. 
  *  
+ * meta data about them.  
  */
 public class PixelFormat extends RefCounted {
   // JNIHelper.swg: Start generated code
@@ -118,21 +112,96 @@ public class PixelFormat extends RefCounted {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+/**
+ * Return the pixel format corresponding to name.  
+ * If there is no pixel format with name name, then looks for a  
+ * pixel format with the name corresponding to the native endian  
+ * format of name.  
+ * For example in a little-endian system, first looks for "gray16", 
+ *  
+ * then for "gray16le".  
+ * Finally if no pixel format has been found, returns AV_PIX_FMT_NONE. 
+ *  
+ */
+  public static PixelFormat.Type getFormat(String name) {
+    return PixelFormat.Type.swigToEnum(VideoJNI.PixelFormat_getFormat(name));
+  }
+
+/**
+ * Return the short name for a pixel format, NULL in case pix_fmt is 
+ *  
+ * unknown.  
+ */
+  public static String getFormatName(PixelFormat.Type pix_fmt) {
+    return VideoJNI.PixelFormat_getFormatName(pix_fmt.swigValue());
+  }
+
+/**
+ * @return	a pixel format descriptor for provided pixel format or NULL 
+ *		 if  
+ * this pixel format is unknown.  
+ */
+  public static PixelFormatDescriptor getDescriptor(PixelFormat.Type pix_fmt) {
+    long cPtr = VideoJNI.PixelFormat_getDescriptor(pix_fmt.swigValue());
+    return (cPtr == 0) ? null : new PixelFormatDescriptor(cPtr, false);
+  }
+
+/**
+ * Returns the total number of pixel format descriptors known to humble 
+ * video.  
+ */
+  public static int getNumInstalledFormats() {
+    return VideoJNI.PixelFormat_getNumInstalledFormats();
+  }
+
+/**
+ * Returns the 'i'th pixel format descriptor that is known to humble 
+ * video  
+ * @param	i The i'th pixel format descriptor in the list of installed 
+ *		 descriptors.  
+ */
+  public static PixelFormatDescriptor getInstalledFormatDescriptor(int i) {
+    long cPtr = VideoJNI.PixelFormat_getInstalledFormatDescriptor(i);
+    return (cPtr == 0) ? null : new PixelFormatDescriptor(cPtr, false);
+  }
+
+/**
+ * @return	number of planes in pix_fmt, a negative ERROR if pix_fmt 
+ *		 is not a  
+ * valid pixel format.  
+ */
+  public static int getNumPlanes(PixelFormat.Type pix_fmt) {
+    return VideoJNI.PixelFormat_getNumPlanes(pix_fmt.swigValue());
+  }
+
+/**
+ * Utility function to swap the endianness of a pixel format.  
+ * pix_fmt the pixel format  
+ * @return	pixel format with swapped endianness if it exists,  
+ * otherwise AV_PIX_FMT_NONE  
+ */
+  public static PixelFormat.Type swapEndianness(PixelFormat.Type pix_fmt) {
+    return PixelFormat.Type.swigToEnum(VideoJNI.PixelFormat_swapEndianness(pix_fmt.swigValue()));
+  }
+
   public enum Type {
   /**
-   * Pixel format. Notes:
-   * RGB32 is handled in an endian-specific manner. A RGBA
+   * Pixel format.
+   * 
+   * PIX_FMT_RGB32 is handled in an endian-specific manner. An RGBA
    * color is put together as:
    * (A << 24) | (R << 16) | (G << 8) | B
-   * This is stored as BGRA on little endian CPU architectures and ARGB 
+   * This is stored as BGRA on little-endian CPU architectures and ARGB 
    * on
-   * big endian CPUs.
-   * When the pixel format is palettized RGB (PAL8), the palettized
+   * big-endian CPUs.
+   * 
+   * When the pixel format is palettized RGB (PIX_FMT_PAL8), the palettized 
+   *
    * image data is stored in AVFrame.data[0]. The palette is transported 
    * in
-   * AVFrame.data[1] and, is 1024 bytes long (256 4-byte entries) and 
+   *
+   * formatted the same as in PIX_FMT_RGB32 described above (i.e., it 
    * is
-   * formatted the same as in RGB32 described above (i.e., it is
    * also endian-specific). Note also that the individual RGB palette 
    *
    * components stored in AVFrame.data[1] should be in the range 0..255. 
@@ -141,650 +210,697 @@ public class PixelFormat extends RefCounted {
    *
    * to run on the IBM VGA graphics adapter use 6-bit palette components. 
    *
-   * None
+   * 
+   * For all the 8bit per pixel formats, an RGB32 palette is in data[1] 
+   * like
+   * for pal8. This palette is filled in automatically by the function 
+   *
+   * allocating the picture.
+   * 
+   * Make sure that all newly added big-endian formats have pix_fmt & 
+   * 1 == 1
+   * and that all newly added little-endian formats have pix_fmt & 1 == 
+   * 0.
+   * This allows simpler detection of big vs little-endian.
    */
-    FMT_NONE(VideoJNI.PixelFormat_FMT_NONE_get()),
+    PIX_FMT_NONE(VideoJNI.PixelFormat_PIX_FMT_NONE_get()),
   /**
    * planar YUV 4:2:0, 12bpp, (1 Cr & Cb sample per 2x2 Y samples)
    */
-    FMT_YUV420P,
+    PIX_FMT_YUV420P(VideoJNI.PixelFormat_PIX_FMT_YUV420P_get()),
   /**
    * packed YUV 4:2:2, 16bpp, Y0 Cb Y1 Cr
    */
-    FMT_YUYV422,
+    PIX_FMT_YUYV422(VideoJNI.PixelFormat_PIX_FMT_YUYV422_get()),
   /**
    * packed RGB 8:8:8, 24bpp, RGBRGB...
    */
-    FMT_RGB24,
+    PIX_FMT_RGB24(VideoJNI.PixelFormat_PIX_FMT_RGB24_get()),
   /**
    * packed RGB 8:8:8, 24bpp, BGRBGR...
    */
-    FMT_BGR24,
+    PIX_FMT_BGR24(VideoJNI.PixelFormat_PIX_FMT_BGR24_get()),
   /**
    * planar YUV 4:2:2, 16bpp, (1 Cr & Cb sample per 2x1 Y samples)
    */
-    FMT_YUV422P,
+    PIX_FMT_YUV422P(VideoJNI.PixelFormat_PIX_FMT_YUV422P_get()),
   /**
    * planar YUV 4:4:4, 24bpp, (1 Cr & Cb sample per 1x1 Y samples)
    */
-    FMT_YUV444P,
+    PIX_FMT_YUV444P(VideoJNI.PixelFormat_PIX_FMT_YUV444P_get()),
   /**
    * planar YUV 4:1:0, 9bpp, (1 Cr & Cb sample per 4x4 Y samples)
    */
-    FMT_YUV410P,
+    PIX_FMT_YUV410P(VideoJNI.PixelFormat_PIX_FMT_YUV410P_get()),
   /**
    * planar YUV 4:1:1, 12bpp, (1 Cr & Cb sample per 4x1 Y samples)
    */
-    FMT_YUV411P,
+    PIX_FMT_YUV411P(VideoJNI.PixelFormat_PIX_FMT_YUV411P_get()),
   /**
    * Y , 8bpp
    */
-    FMT_GRAY8,
+    PIX_FMT_GRAY8(VideoJNI.PixelFormat_PIX_FMT_GRAY8_get()),
   /**
    * Y , 1bpp, 0 is white, 1 is black, in each byte pixels are ordered 
    * from the msb to the lsb
    */
-    FMT_MONOWHITE,
+    PIX_FMT_MONOWHITE(VideoJNI.PixelFormat_PIX_FMT_MONOWHITE_get()),
   /**
    * Y , 1bpp, 0 is black, 1 is white, in each byte pixels are ordered 
    * from the msb to the lsb
    */
-    FMT_MONOBLACK,
+    PIX_FMT_MONOBLACK(VideoJNI.PixelFormat_PIX_FMT_MONOBLACK_get()),
   /**
    * 8 bit with PIX_FMT_RGB32 palette
    */
-    FMT_PAL8,
+    PIX_FMT_PAL8(VideoJNI.PixelFormat_PIX_FMT_PAL8_get()),
   /**
    * planar YUV 4:2:0, 12bpp, full scale (JPEG), deprecated in favor of 
    * PIX_FMT_YUV420P and setting color_range
    */
-    FMT_YUVJ420P,
+    PIX_FMT_YUVJ420P(VideoJNI.PixelFormat_PIX_FMT_YUVJ420P_get()),
   /**
    * planar YUV 4:2:2, 16bpp, full scale (JPEG), deprecated in favor of 
    * PIX_FMT_YUV422P and setting color_range
    */
-    FMT_YUVJ422P,
+    PIX_FMT_YUVJ422P(VideoJNI.PixelFormat_PIX_FMT_YUVJ422P_get()),
   /**
    * planar YUV 4:4:4, 24bpp, full scale (JPEG), deprecated in favor of 
    * PIX_FMT_YUV444P and setting color_range
    */
-    FMT_YUVJ444P,
+    PIX_FMT_YUVJ444P(VideoJNI.PixelFormat_PIX_FMT_YUVJ444P_get()),
   /**
    * XVideo Motion Acceleration via common packet passing
    */
-    FMT_XVMC_MPEG2_MC,
-    FMT_XVMC_MPEG2_IDCT,
+    PIX_FMT_XVMC_MPEG2_MC(VideoJNI.PixelFormat_PIX_FMT_XVMC_MPEG2_MC_get()),
+    PIX_FMT_XVMC_MPEG2_IDCT(VideoJNI.PixelFormat_PIX_FMT_XVMC_MPEG2_IDCT_get()),
   /**
    * packed YUV 4:2:2, 16bpp, Cb Y0 Cr Y1
    */
-    FMT_UYVY422,
+    PIX_FMT_UYVY422(VideoJNI.PixelFormat_PIX_FMT_UYVY422_get()),
   /**
    * packed YUV 4:1:1, 12bpp, Cb Y0 Y1 Cr Y2 Y3
    */
-    FMT_UYYVYY411,
+    PIX_FMT_UYYVYY411(VideoJNI.PixelFormat_PIX_FMT_UYYVYY411_get()),
   /**
    * packed RGB 3:3:2, 8bpp, (msb)2B 3G 3R(lsb)
    */
-    FMT_BGR8,
+    PIX_FMT_BGR8(VideoJNI.PixelFormat_PIX_FMT_BGR8_get()),
   /**
    * packed RGB 1:2:1 bitstream, 4bpp, (msb)1B 2G 1R(lsb), a byte contains 
    * two pixels, the first pixel in the byte is the one composed by the 
    * 4 msb bits
    */
-    FMT_BGR4,
+    PIX_FMT_BGR4(VideoJNI.PixelFormat_PIX_FMT_BGR4_get()),
   /**
    * packed RGB 1:2:1, 8bpp, (msb)1B 2G 1R(lsb)
    */
-    FMT_BGR4_BYTE,
+    PIX_FMT_BGR4_BYTE(VideoJNI.PixelFormat_PIX_FMT_BGR4_BYTE_get()),
   /**
    * packed RGB 3:3:2, 8bpp, (msb)2R 3G 3B(lsb)
    */
-    FMT_RGB8,
+    PIX_FMT_RGB8(VideoJNI.PixelFormat_PIX_FMT_RGB8_get()),
   /**
    * packed RGB 1:2:1 bitstream, 4bpp, (msb)1R 2G 1B(lsb), a byte contains 
    * two pixels, the first pixel in the byte is the one composed by the 
    * 4 msb bits
    */
-    FMT_RGB4,
+    PIX_FMT_RGB4(VideoJNI.PixelFormat_PIX_FMT_RGB4_get()),
   /**
    * packed RGB 1:2:1, 8bpp, (msb)1R 2G 1B(lsb)
    */
-    FMT_RGB4_BYTE,
+    PIX_FMT_RGB4_BYTE(VideoJNI.PixelFormat_PIX_FMT_RGB4_BYTE_get()),
   /**
    * planar YUV 4:2:0, 12bpp, 1 plane for Y and 1 plane for the UV components, 
    * which are interleaved (first byte U and the following byte V)
    */
-    FMT_NV12,
+    PIX_FMT_NV12(VideoJNI.PixelFormat_PIX_FMT_NV12_get()),
   /**
    * as above, but U and V bytes are swapped
    */
-    FMT_NV21,
+    PIX_FMT_NV21(VideoJNI.PixelFormat_PIX_FMT_NV21_get()),
   /**
    * packed ARGB 8:8:8:8, 32bpp, ARGBARGB...
    */
-    FMT_ARGB,
+    PIX_FMT_ARGB(VideoJNI.PixelFormat_PIX_FMT_ARGB_get()),
   /**
    * packed RGBA 8:8:8:8, 32bpp, RGBARGBA...
    */
-    FMT_RGBA,
+    PIX_FMT_RGBA(VideoJNI.PixelFormat_PIX_FMT_RGBA_get()),
   /**
    * packed ABGR 8:8:8:8, 32bpp, ABGRABGR...
    */
-    FMT_ABGR,
+    PIX_FMT_ABGR(VideoJNI.PixelFormat_PIX_FMT_ABGR_get()),
   /**
    * packed BGRA 8:8:8:8, 32bpp, BGRABGRA...
    */
-    FMT_BGRA,
+    PIX_FMT_BGRA(VideoJNI.PixelFormat_PIX_FMT_BGRA_get()),
   /**
    * Y , 16bpp, big-endian
    */
-    FMT_GRAY16BE,
+    PIX_FMT_GRAY16BE(VideoJNI.PixelFormat_PIX_FMT_GRAY16BE_get()),
   /**
    * Y , 16bpp, little-endian
    */
-    FMT_GRAY16LE,
+    PIX_FMT_GRAY16LE(VideoJNI.PixelFormat_PIX_FMT_GRAY16LE_get()),
   /**
    * planar YUV 4:4:0 (1 Cr & Cb sample per 1x2 Y samples)
    */
-    FMT_YUV440P,
+    PIX_FMT_YUV440P(VideoJNI.PixelFormat_PIX_FMT_YUV440P_get()),
   /**
    * planar YUV 4:4:0 full scale (JPEG), deprecated in favor of PIX_FMT_YUV440P 
    * and setting color_range
    */
-    FMT_YUVJ440P,
+    PIX_FMT_YUVJ440P(VideoJNI.PixelFormat_PIX_FMT_YUVJ440P_get()),
   /**
    * planar YUV 4:2:0, 20bpp, (1 Cr & Cb sample per 2x2 Y & A samples) 
    *
    */
-    FMT_YUVA420P,
+    PIX_FMT_YUVA420P(VideoJNI.PixelFormat_PIX_FMT_YUVA420P_get()),
   /**
    * H.264 HW decoding with VDPAU, data[0] contains a vdpau_render_state 
    * struct which contains the bitstream of the slices as well as various 
    * fields extracted from headers
    */
-    FMT_VDPAU_H264,
+    PIX_FMT_VDPAU_H264(VideoJNI.PixelFormat_PIX_FMT_VDPAU_H264_get()),
   /**
    * MPEG-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state 
    * struct which contains the bitstream of the slices as well as various 
    * fields extracted from headers
    */
-    FMT_VDPAU_MPEG1,
+    PIX_FMT_VDPAU_MPEG1(VideoJNI.PixelFormat_PIX_FMT_VDPAU_MPEG1_get()),
   /**
    * MPEG-2 HW decoding with VDPAU, data[0] contains a vdpau_render_state 
    * struct which contains the bitstream of the slices as well as various 
    * fields extracted from headers
    */
-    FMT_VDPAU_MPEG2,
+    PIX_FMT_VDPAU_MPEG2(VideoJNI.PixelFormat_PIX_FMT_VDPAU_MPEG2_get()),
   /**
    * WMV3 HW decoding with VDPAU, data[0] contains a vdpau_render_state 
    * struct which contains the bitstream of the slices as well as various 
    * fields extracted from headers
    */
-    FMT_VDPAU_WMV3,
+    PIX_FMT_VDPAU_WMV3(VideoJNI.PixelFormat_PIX_FMT_VDPAU_WMV3_get()),
   /**
    * VC-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state 
    * struct which contains the bitstream of the slices as well as various 
    * fields extracted from headers
    */
-    FMT_VDPAU_VC1,
+    PIX_FMT_VDPAU_VC1(VideoJNI.PixelFormat_PIX_FMT_VDPAU_VC1_get()),
   /**
    * packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each 
    * R/G/B component is stored as big-endian
    */
-    FMT_RGB48BE,
+    PIX_FMT_RGB48BE(VideoJNI.PixelFormat_PIX_FMT_RGB48BE_get()),
   /**
    * packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each 
    * R/G/B component is stored as little-endian
    */
-    FMT_RGB48LE,
+    PIX_FMT_RGB48LE(VideoJNI.PixelFormat_PIX_FMT_RGB48LE_get()),
   /**
    * packed RGB 5:6:5, 16bpp, (msb) 5R 6G 5B(lsb), big-endian
    */
-    FMT_RGB565BE,
+    PIX_FMT_RGB565BE(VideoJNI.PixelFormat_PIX_FMT_RGB565BE_get()),
   /**
    * packed RGB 5:6:5, 16bpp, (msb) 5R 6G 5B(lsb), little-endian
    */
-    FMT_RGB565LE,
+    PIX_FMT_RGB565LE(VideoJNI.PixelFormat_PIX_FMT_RGB565LE_get()),
   /**
    * packed RGB 5:5:5, 16bpp, (msb)1A 5R 5G 5B(lsb), big-endian, most 
    * significant bit to 0
    */
-    FMT_RGB555BE,
+    PIX_FMT_RGB555BE(VideoJNI.PixelFormat_PIX_FMT_RGB555BE_get()),
   /**
    * packed RGB 5:5:5, 16bpp, (msb)1A 5R 5G 5B(lsb), little-endian, most 
    * significant bit to 0
    */
-    FMT_RGB555LE,
+    PIX_FMT_RGB555LE(VideoJNI.PixelFormat_PIX_FMT_RGB555LE_get()),
   /**
    * packed BGR 5:6:5, 16bpp, (msb) 5B 6G 5R(lsb), big-endian
    */
-    FMT_BGR565BE,
+    PIX_FMT_BGR565BE(VideoJNI.PixelFormat_PIX_FMT_BGR565BE_get()),
   /**
    * packed BGR 5:6:5, 16bpp, (msb) 5B 6G 5R(lsb), little-endian
    */
-    FMT_BGR565LE,
+    PIX_FMT_BGR565LE(VideoJNI.PixelFormat_PIX_FMT_BGR565LE_get()),
   /**
    * packed BGR 5:5:5, 16bpp, (msb)1A 5B 5G 5R(lsb), big-endian, most 
    * significant bit to 1
    */
-    FMT_BGR555BE,
+    PIX_FMT_BGR555BE(VideoJNI.PixelFormat_PIX_FMT_BGR555BE_get()),
   /**
    * packed BGR 5:5:5, 16bpp, (msb)1A 5B 5G 5R(lsb), little-endian, most 
    * significant bit to 1
    */
-    FMT_BGR555LE,
+    PIX_FMT_BGR555LE(VideoJNI.PixelFormat_PIX_FMT_BGR555LE_get()),
   /**
    * HW acceleration through VA API at motion compensation entry-point, 
    * Picture.data[3] contains a vaapi_render_state struct which contains 
    * macroblocks as well as various fields extracted from headers
    */
-    FMT_VAAPI_MOCO,
+    PIX_FMT_VAAPI_MOCO(VideoJNI.PixelFormat_PIX_FMT_VAAPI_MOCO_get()),
   /**
    * HW acceleration through VA API at IDCT entry-point, Picture.data[3] 
    * contains a vaapi_render_state struct which contains fields extracted 
    * from headers
    */
-    FMT_VAAPI_IDCT,
+    PIX_FMT_VAAPI_IDCT(VideoJNI.PixelFormat_PIX_FMT_VAAPI_IDCT_get()),
   /**
    * HW decoding through VA API, Picture.data[3] contains a vaapi_render_state 
    * struct which contains the bitstream of the slices as well as various 
    * fields extracted from headers
    */
-    FMT_VAAPI_VLD,
+    PIX_FMT_VAAPI_VLD(VideoJNI.PixelFormat_PIX_FMT_VAAPI_VLD_get()),
   /**
    * planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian 
    *
    */
-    FMT_YUV420P16LE,
+    PIX_FMT_YUV420P16LE(VideoJNI.PixelFormat_PIX_FMT_YUV420P16LE_get()),
   /**
    * planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian 
    *
    */
-    FMT_YUV420P16BE,
+    PIX_FMT_YUV420P16BE(VideoJNI.PixelFormat_PIX_FMT_YUV420P16BE_get()),
   /**
    * planar YUV 4:2:2, 32bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian 
    *
    */
-    FMT_YUV422P16LE,
+    PIX_FMT_YUV422P16LE(VideoJNI.PixelFormat_PIX_FMT_YUV422P16LE_get()),
   /**
    * planar YUV 4:2:2, 32bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian 
    *
    */
-    FMT_YUV422P16BE,
+    PIX_FMT_YUV422P16BE(VideoJNI.PixelFormat_PIX_FMT_YUV422P16BE_get()),
   /**
    * planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian 
    *
    */
-    FMT_YUV444P16LE,
+    PIX_FMT_YUV444P16LE(VideoJNI.PixelFormat_PIX_FMT_YUV444P16LE_get()),
   /**
    * planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian 
    *
    */
-    FMT_YUV444P16BE,
+    PIX_FMT_YUV444P16BE(VideoJNI.PixelFormat_PIX_FMT_YUV444P16BE_get()),
   /**
    * MPEG4 HW decoding with VDPAU, data[0] contains a vdpau_render_state 
    * struct which contains the bitstream of the slices as well as various 
    * fields extracted from headers
    */
-    FMT_VDPAU_MPEG4,
+    PIX_FMT_VDPAU_MPEG4(VideoJNI.PixelFormat_PIX_FMT_VDPAU_MPEG4_get()),
   /**
    * HW decoding through DXVA2, Picture.data[3] contains a LPDIRECT3DSURFACE9 
    * pointer
    */
-    FMT_DXVA2_VLD,
+    PIX_FMT_DXVA2_VLD(VideoJNI.PixelFormat_PIX_FMT_DXVA2_VLD_get()),
   /**
    * packed RGB 4:4:4, 16bpp, (msb)4A 4R 4G 4B(lsb), little-endian, most 
    * significant bits to 0
    */
-    FMT_RGB444LE,
+    PIX_FMT_RGB444LE(VideoJNI.PixelFormat_PIX_FMT_RGB444LE_get()),
   /**
    * packed RGB 4:4:4, 16bpp, (msb)4A 4R 4G 4B(lsb), big-endian, most 
    * significant bits to 0
    */
-    FMT_RGB444BE,
+    PIX_FMT_RGB444BE(VideoJNI.PixelFormat_PIX_FMT_RGB444BE_get()),
   /**
    * packed BGR 4:4:4, 16bpp, (msb)4A 4B 4G 4R(lsb), little-endian, most 
    * significant bits to 1
    */
-    FMT_BGR444LE,
+    PIX_FMT_BGR444LE(VideoJNI.PixelFormat_PIX_FMT_BGR444LE_get()),
   /**
    * packed BGR 4:4:4, 16bpp, (msb)4A 4B 4G 4R(lsb), big-endian, most 
    * significant bits to 1
    */
-    FMT_BGR444BE,
+    PIX_FMT_BGR444BE(VideoJNI.PixelFormat_PIX_FMT_BGR444BE_get()),
   /**
    * 8bit gray, 8bit alpha
    */
-    FMT_GRAY8A,
+    PIX_FMT_GRAY8A(VideoJNI.PixelFormat_PIX_FMT_GRAY8A_get()),
   /**
    * packed RGB 16:16:16, 48bpp, 16B, 16G, 16R, the 2-byte value for each 
    * R/G/B component is stored as big-endian
    */
-    FMT_BGR48BE,
+    PIX_FMT_BGR48BE(VideoJNI.PixelFormat_PIX_FMT_BGR48BE_get()),
   /**
    * packed RGB 16:16:16, 48bpp, 16B, 16G, 16R, the 2-byte value for each 
    * R/G/B component is stored as little-endian
    */
-    FMT_BGR48LE,
+    PIX_FMT_BGR48LE(VideoJNI.PixelFormat_PIX_FMT_BGR48LE_get()),
   /**
    * planar YUV 4:2:0, 13.5bpp, (1 Cr & Cb sample per 2x2 Y samples), 
    * big-endian
    */
-    FMT_YUV420P9BE,
+    PIX_FMT_YUV420P9BE(VideoJNI.PixelFormat_PIX_FMT_YUV420P9BE_get()),
   /**
    * planar YUV 4:2:0, 13.5bpp, (1 Cr & Cb sample per 2x2 Y samples), 
    * little-endian
    */
-    FMT_YUV420P9LE,
+    PIX_FMT_YUV420P9LE(VideoJNI.PixelFormat_PIX_FMT_YUV420P9LE_get()),
   /**
    * planar YUV 4:2:0, 15bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian 
    *
    */
-    FMT_YUV420P10BE,
+    PIX_FMT_YUV420P10BE(VideoJNI.PixelFormat_PIX_FMT_YUV420P10BE_get()),
   /**
    * planar YUV 4:2:0, 15bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian 
    *
    */
-    FMT_YUV420P10LE,
+    PIX_FMT_YUV420P10LE(VideoJNI.PixelFormat_PIX_FMT_YUV420P10LE_get()),
   /**
    * planar YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian 
    *
    */
-    FMT_YUV422P10BE,
+    PIX_FMT_YUV422P10BE(VideoJNI.PixelFormat_PIX_FMT_YUV422P10BE_get()),
   /**
    * planar YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian 
    *
    */
-    FMT_YUV422P10LE,
+    PIX_FMT_YUV422P10LE(VideoJNI.PixelFormat_PIX_FMT_YUV422P10LE_get()),
   /**
    * planar YUV 4:4:4, 27bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian 
    *
    */
-    FMT_YUV444P9BE,
+    PIX_FMT_YUV444P9BE(VideoJNI.PixelFormat_PIX_FMT_YUV444P9BE_get()),
   /**
    * planar YUV 4:4:4, 27bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian 
    *
    */
-    FMT_YUV444P9LE,
+    PIX_FMT_YUV444P9LE(VideoJNI.PixelFormat_PIX_FMT_YUV444P9LE_get()),
   /**
    * planar YUV 4:4:4, 30bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian 
    *
    */
-    FMT_YUV444P10BE,
+    PIX_FMT_YUV444P10BE(VideoJNI.PixelFormat_PIX_FMT_YUV444P10BE_get()),
   /**
    * planar YUV 4:4:4, 30bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian 
    *
    */
-    FMT_YUV444P10LE,
+    PIX_FMT_YUV444P10LE(VideoJNI.PixelFormat_PIX_FMT_YUV444P10LE_get()),
   /**
    * planar YUV 4:2:2, 18bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian 
    *
    */
-    FMT_YUV422P9BE,
+    PIX_FMT_YUV422P9BE(VideoJNI.PixelFormat_PIX_FMT_YUV422P9BE_get()),
   /**
    * planar YUV 4:2:2, 18bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian 
    *
    */
-    FMT_YUV422P9LE,
+    PIX_FMT_YUV422P9LE(VideoJNI.PixelFormat_PIX_FMT_YUV422P9LE_get()),
   /**
    * hardware decoding through VDA
    */
-    FMT_VDA_VLD,
+    PIX_FMT_VDA_VLD(VideoJNI.PixelFormat_PIX_FMT_VDA_VLD_get()),
   /**
    * planar GBR 4:4:4 24bpp
    */
-    FMT_GBRP,
+    PIX_FMT_GBRP(VideoJNI.PixelFormat_PIX_FMT_GBRP_get()),
   /**
    * planar GBR 4:4:4 27bpp, big-endian
    */
-    FMT_GBRP9BE,
+    PIX_FMT_GBRP9BE(VideoJNI.PixelFormat_PIX_FMT_GBRP9BE_get()),
   /**
    * planar GBR 4:4:4 27bpp, little-endian
    */
-    FMT_GBRP9LE,
+    PIX_FMT_GBRP9LE(VideoJNI.PixelFormat_PIX_FMT_GBRP9LE_get()),
   /**
    * planar GBR 4:4:4 30bpp, big-endian
    */
-    FMT_GBRP10BE,
+    PIX_FMT_GBRP10BE(VideoJNI.PixelFormat_PIX_FMT_GBRP10BE_get()),
   /**
    * planar GBR 4:4:4 30bpp, little-endian
    */
-    FMT_GBRP10LE,
+    PIX_FMT_GBRP10LE(VideoJNI.PixelFormat_PIX_FMT_GBRP10LE_get()),
   /**
    * planar GBR 4:4:4 48bpp, big-endian
    */
-    FMT_GBRP16BE,
+    PIX_FMT_GBRP16BE(VideoJNI.PixelFormat_PIX_FMT_GBRP16BE_get()),
   /**
    * planar GBR 4:4:4 48bpp, little-endian
    */
-    FMT_GBRP16LE,
+    PIX_FMT_GBRP16LE(VideoJNI.PixelFormat_PIX_FMT_GBRP16LE_get()),
   /**
    * planar YUV 4:2:2 24bpp, (1 Cr & Cb sample per 2x1 Y & A samples) 
    *
    */
-    FMT_YUVA422P_LIBAV,
+    PIX_FMT_YUVA422P_LIBAV(VideoJNI.PixelFormat_PIX_FMT_YUVA422P_LIBAV_get()),
   /**
    * planar YUV 4:4:4 32bpp, (1 Cr & Cb sample per 1x1 Y & A samples) 
    *
    */
-    FMT_YUVA444P_LIBAV,
+    PIX_FMT_YUVA444P_LIBAV(VideoJNI.PixelFormat_PIX_FMT_YUVA444P_LIBAV_get()),
   /**
    * planar YUV 4:2:0 22.5bpp, (1 Cr & Cb sample per 2x2 Y & A samples), 
    * big-endian
    */
-    FMT_YUVA420P9BE,
+    PIX_FMT_YUVA420P9BE(VideoJNI.PixelFormat_PIX_FMT_YUVA420P9BE_get()),
   /**
    * planar YUV 4:2:0 22.5bpp, (1 Cr & Cb sample per 2x2 Y & A samples), 
    * little-endian
    */
-    FMT_YUVA420P9LE,
+    PIX_FMT_YUVA420P9LE(VideoJNI.PixelFormat_PIX_FMT_YUVA420P9LE_get()),
   /**
    * planar YUV 4:2:2 27bpp, (1 Cr & Cb sample per 2x1 Y & A samples), 
    * big-endian
    */
-    FMT_YUVA422P9BE,
+    PIX_FMT_YUVA422P9BE(VideoJNI.PixelFormat_PIX_FMT_YUVA422P9BE_get()),
   /**
    * planar YUV 4:2:2 27bpp, (1 Cr & Cb sample per 2x1 Y & A samples), 
    * little-endian
    */
-    FMT_YUVA422P9LE,
+    PIX_FMT_YUVA422P9LE(VideoJNI.PixelFormat_PIX_FMT_YUVA422P9LE_get()),
   /**
    * planar YUV 4:4:4 36bpp, (1 Cr & Cb sample per 1x1 Y & A samples), 
    * big-endian
    */
-    FMT_YUVA444P9BE,
+    PIX_FMT_YUVA444P9BE(VideoJNI.PixelFormat_PIX_FMT_YUVA444P9BE_get()),
   /**
    * planar YUV 4:4:4 36bpp, (1 Cr & Cb sample per 1x1 Y & A samples), 
    * little-endian
    */
-    FMT_YUVA444P9LE,
+    PIX_FMT_YUVA444P9LE(VideoJNI.PixelFormat_PIX_FMT_YUVA444P9LE_get()),
   /**
    * planar YUV 4:2:0 25bpp, (1 Cr & Cb sample per 2x2 Y & A samples, 
    * big-endian)
    */
-    FMT_YUVA420P10BE,
+    PIX_FMT_YUVA420P10BE(VideoJNI.PixelFormat_PIX_FMT_YUVA420P10BE_get()),
   /**
    * planar YUV 4:2:0 25bpp, (1 Cr & Cb sample per 2x2 Y & A samples, 
    * little-endian)
    */
-    FMT_YUVA420P10LE,
+    PIX_FMT_YUVA420P10LE(VideoJNI.PixelFormat_PIX_FMT_YUVA420P10LE_get()),
   /**
    * planar YUV 4:2:2 30bpp, (1 Cr & Cb sample per 2x1 Y & A samples, 
    * big-endian)
    */
-    FMT_YUVA422P10BE,
+    PIX_FMT_YUVA422P10BE(VideoJNI.PixelFormat_PIX_FMT_YUVA422P10BE_get()),
   /**
    * planar YUV 4:2:2 30bpp, (1 Cr & Cb sample per 2x1 Y & A samples, 
    * little-endian)
    */
-    FMT_YUVA422P10LE,
+    PIX_FMT_YUVA422P10LE(VideoJNI.PixelFormat_PIX_FMT_YUVA422P10LE_get()),
   /**
    * planar YUV 4:4:4 40bpp, (1 Cr & Cb sample per 1x1 Y & A samples, 
    * big-endian)
    */
-    FMT_YUVA444P10BE,
+    PIX_FMT_YUVA444P10BE(VideoJNI.PixelFormat_PIX_FMT_YUVA444P10BE_get()),
   /**
    * planar YUV 4:4:4 40bpp, (1 Cr & Cb sample per 1x1 Y & A samples, 
    * little-endian)
    */
-    FMT_YUVA444P10LE,
+    PIX_FMT_YUVA444P10LE(VideoJNI.PixelFormat_PIX_FMT_YUVA444P10LE_get()),
   /**
    * planar YUV 4:2:0 40bpp, (1 Cr & Cb sample per 2x2 Y & A samples, 
    * big-endian)
    */
-    FMT_YUVA420P16BE,
+    PIX_FMT_YUVA420P16BE(VideoJNI.PixelFormat_PIX_FMT_YUVA420P16BE_get()),
   /**
    * planar YUV 4:2:0 40bpp, (1 Cr & Cb sample per 2x2 Y & A samples, 
    * little-endian)
    */
-    FMT_YUVA420P16LE,
+    PIX_FMT_YUVA420P16LE(VideoJNI.PixelFormat_PIX_FMT_YUVA420P16LE_get()),
   /**
    * planar YUV 4:2:2 48bpp, (1 Cr & Cb sample per 2x1 Y & A samples, 
    * big-endian)
    */
-    FMT_YUVA422P16BE,
+    PIX_FMT_YUVA422P16BE(VideoJNI.PixelFormat_PIX_FMT_YUVA422P16BE_get()),
   /**
    * planar YUV 4:2:2 48bpp, (1 Cr & Cb sample per 2x1 Y & A samples, 
    * little-endian)
    */
-    FMT_YUVA422P16LE,
+    PIX_FMT_YUVA422P16LE(VideoJNI.PixelFormat_PIX_FMT_YUVA422P16LE_get()),
   /**
    * planar YUV 4:4:4 64bpp, (1 Cr & Cb sample per 1x1 Y & A samples, 
    * big-endian)
    */
-    FMT_YUVA444P16BE,
+    PIX_FMT_YUVA444P16BE(VideoJNI.PixelFormat_PIX_FMT_YUVA444P16BE_get()),
   /**
    * planar YUV 4:4:4 64bpp, (1 Cr & Cb sample per 1x1 Y & A samples, 
    * little-endian)
    */
-    FMT_YUVA444P16LE,
+    PIX_FMT_YUVA444P16LE(VideoJNI.PixelFormat_PIX_FMT_YUVA444P16LE_get()),
   /**
    * HW acceleration through VDPAU, Picture.data[3] contains a VdpVideoSurface 
    *
    */
-    FMT_VDPAU,
+    PIX_FMT_VDPAU(VideoJNI.PixelFormat_PIX_FMT_VDPAU_get()),
+  /**
+   * packed XYZ 4:4:4, 36 bpp, (msb) 12X, 12Y, 12Z (lsb), the 2-byte value 
+   * for each X/Y/Z is stored as little-endian, the 4 lower bits are 
+   * set to 0
+   */
+    PIX_FMT_XYZ12LE(VideoJNI.PixelFormat_PIX_FMT_XYZ12LE_get()),
+  /**
+   * packed XYZ 4:4:4, 36 bpp, (msb) 12X, 12Y, 12Z (lsb), the 2-byte value 
+   * for each X/Y/Z is stored as big-endian, the 4 lower bits are set 
+   * to 0
+   */
+    PIX_FMT_XYZ12BE(VideoJNI.PixelFormat_PIX_FMT_XYZ12BE_get()),
   /**
    * packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value 
    * for each R/G/B/A component is stored as big-endian
    */
-    FMT_RGBA64BE(VideoJNI.PixelFormat_FMT_RGBA64BE_get()),
+    PIX_FMT_RGBA64BE(VideoJNI.PixelFormat_PIX_FMT_RGBA64BE_get()),
   /**
    * packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value 
    * for each R/G/B/A component is stored as little-endian
    */
-    FMT_RGBA64LE,
+    PIX_FMT_RGBA64LE(VideoJNI.PixelFormat_PIX_FMT_RGBA64LE_get()),
   /**
    * packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value 
    * for each R/G/B/A component is stored as big-endian
    */
-    FMT_BGRA64BE,
+    PIX_FMT_BGRA64BE(VideoJNI.PixelFormat_PIX_FMT_BGRA64BE_get()),
   /**
    * packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value 
    * for each R/G/B/A component is stored as little-endian
    */
-    FMT_BGRA64LE,
+    PIX_FMT_BGRA64LE(VideoJNI.PixelFormat_PIX_FMT_BGRA64LE_get()),
   /**
    * packed RGB 8:8:8, 32bpp, 0RGB0RGB...
    */
-    FMT_0RGB(VideoJNI.PixelFormat_FMT_0RGB_get()),
+    PIX_FMT_0RGB(VideoJNI.PixelFormat_PIX_FMT_0RGB_get()),
   /**
    * packed RGB 8:8:8, 32bpp, RGB0RGB0...
    */
-    FMT_RGB0,
+    PIX_FMT_RGB0(VideoJNI.PixelFormat_PIX_FMT_RGB0_get()),
   /**
    * packed BGR 8:8:8, 32bpp, 0BGR0BGR...
    */
-    FMT_0BGR,
+    PIX_FMT_0BGR(VideoJNI.PixelFormat_PIX_FMT_0BGR_get()),
   /**
    * packed BGR 8:8:8, 32bpp, BGR0BGR0...
    */
-    FMT_BGR0,
+    PIX_FMT_BGR0(VideoJNI.PixelFormat_PIX_FMT_BGR0_get()),
   /**
    * planar YUV 4:4:4 32bpp, (1 Cr & Cb sample per 1x1 Y & A samples) 
    *
    */
-    FMT_YUVA444P,
+    PIX_FMT_YUVA444P(VideoJNI.PixelFormat_PIX_FMT_YUVA444P_get()),
   /**
    * planar YUV 4:2:2 24bpp, (1 Cr & Cb sample per 2x1 Y & A samples) 
    *
    */
-    FMT_YUVA422P,
+    PIX_FMT_YUVA422P(VideoJNI.PixelFormat_PIX_FMT_YUVA422P_get()),
   /**
    * planar YUV 4:2:0,18bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian 
    *
    */
-    FMT_YUV420P12BE,
+    PIX_FMT_YUV420P12BE(VideoJNI.PixelFormat_PIX_FMT_YUV420P12BE_get()),
   /**
    * planar YUV 4:2:0,18bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian 
    *
    */
-    FMT_YUV420P12LE,
+    PIX_FMT_YUV420P12LE(VideoJNI.PixelFormat_PIX_FMT_YUV420P12LE_get()),
   /**
    * planar YUV 4:2:0,21bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian 
    *
    */
-    FMT_YUV420P14BE,
+    PIX_FMT_YUV420P14BE(VideoJNI.PixelFormat_PIX_FMT_YUV420P14BE_get()),
   /**
    * planar YUV 4:2:0,21bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian 
    *
    */
-    FMT_YUV420P14LE,
+    PIX_FMT_YUV420P14LE(VideoJNI.PixelFormat_PIX_FMT_YUV420P14LE_get()),
   /**
    * planar YUV 4:2:2,24bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian 
    *
    */
-    FMT_YUV422P12BE,
+    PIX_FMT_YUV422P12BE(VideoJNI.PixelFormat_PIX_FMT_YUV422P12BE_get()),
   /**
    * planar YUV 4:2:2,24bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian 
    *
    */
-    FMT_YUV422P12LE,
+    PIX_FMT_YUV422P12LE(VideoJNI.PixelFormat_PIX_FMT_YUV422P12LE_get()),
   /**
    * planar YUV 4:2:2,28bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian 
    *
    */
-    FMT_YUV422P14BE,
+    PIX_FMT_YUV422P14BE(VideoJNI.PixelFormat_PIX_FMT_YUV422P14BE_get()),
   /**
    * planar YUV 4:2:2,28bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian 
    *
    */
-    FMT_YUV422P14LE,
+    PIX_FMT_YUV422P14LE(VideoJNI.PixelFormat_PIX_FMT_YUV422P14LE_get()),
   /**
    * planar YUV 4:4:4,36bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian 
    *
    */
-    FMT_YUV444P12BE,
+    PIX_FMT_YUV444P12BE(VideoJNI.PixelFormat_PIX_FMT_YUV444P12BE_get()),
   /**
    * planar YUV 4:4:4,36bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian 
    *
    */
-    FMT_YUV444P12LE,
+    PIX_FMT_YUV444P12LE(VideoJNI.PixelFormat_PIX_FMT_YUV444P12LE_get()),
   /**
    * planar YUV 4:4:4,42bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian 
    *
    */
-    FMT_YUV444P14BE,
+    PIX_FMT_YUV444P14BE(VideoJNI.PixelFormat_PIX_FMT_YUV444P14BE_get()),
   /**
    * planar YUV 4:4:4,42bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian 
    *
    */
-    FMT_YUV444P14LE,
+    PIX_FMT_YUV444P14LE(VideoJNI.PixelFormat_PIX_FMT_YUV444P14LE_get()),
   /**
    * planar GBR 4:4:4 36bpp, big-endian
    */
-    FMT_GBRP12BE,
+    PIX_FMT_GBRP12BE(VideoJNI.PixelFormat_PIX_FMT_GBRP12BE_get()),
   /**
    * planar GBR 4:4:4 36bpp, little-endian
    */
-    FMT_GBRP12LE,
+    PIX_FMT_GBRP12LE(VideoJNI.PixelFormat_PIX_FMT_GBRP12LE_get()),
   /**
    * planar GBR 4:4:4 42bpp, big-endian
    */
-    FMT_GBRP14BE,
+    PIX_FMT_GBRP14BE(VideoJNI.PixelFormat_PIX_FMT_GBRP14BE_get()),
   /**
    * planar GBR 4:4:4 42bpp, little-endian
    */
-    FMT_GBRP14LE;
+    PIX_FMT_GBRP14LE(VideoJNI.PixelFormat_PIX_FMT_GBRP14LE_get()),
+  /**
+   * planar GBRA 4:4:4:4 32bpp
+   */
+    PIX_FMT_GBRAP(VideoJNI.PixelFormat_PIX_FMT_GBRAP_get()),
+  /**
+   * planar GBRA 4:4:4:4 64bpp, big-endian
+   */
+    PIX_FMT_GBRAP16BE(VideoJNI.PixelFormat_PIX_FMT_GBRAP16BE_get()),
+  /**
+   * planar GBRA 4:4:4:4 64bpp, little-endian
+   */
+    PIX_FMT_GBRAP16LE(VideoJNI.PixelFormat_PIX_FMT_GBRAP16LE_get()),
+  /**
+   * planar YUV 4:1:1, 12bpp, (1 Cr & Cb sample per 4x1 Y samples) full 
+   * scale (JPEG), deprecated in favor of PIX_FMT_YUV411P and setting 
+   * color_range
+   */
+    PIX_FMT_YUVJ411P(VideoJNI.PixelFormat_PIX_FMT_YUVJ411P_get()),
+  /**
+   * number of pixel formats, DO NOT USE THIS if you want to link with 
+   * shared libav* because the number of formats might differ between 
+   * versions
+   */
+    PIX_FMT_NB(VideoJNI.PixelFormat_PIX_FMT_NB_get());
 
     public final int swigValue() {
       return swigValue;
@@ -813,49 +929,6 @@ public class PixelFormat extends RefCounted {
 
     @SuppressWarnings("unused")
     private Type(Type swigEnum) {
-      this.swigValue = swigEnum.swigValue;
-      SwigNext.next = this.swigValue+1;
-    }
-
-    private final int swigValue;
-
-    private static class SwigNext {
-      private static int next = 0;
-    }
-  }
-
-  public enum YUVColorComponent {
-    YUV_Y(VideoJNI.PixelFormat_YUV_Y_get()),
-    YUV_U(VideoJNI.PixelFormat_YUV_U_get()),
-    YUV_V(VideoJNI.PixelFormat_YUV_V_get());
-
-    public final int swigValue() {
-      return swigValue;
-    }
-
-    public static YUVColorComponent swigToEnum(int swigValue) {
-      YUVColorComponent[] swigValues = YUVColorComponent.class.getEnumConstants();
-      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
-        return swigValues[swigValue];
-      for (YUVColorComponent swigEnum : swigValues)
-        if (swigEnum.swigValue == swigValue)
-          return swigEnum;
-      throw new IllegalArgumentException("No enum " + YUVColorComponent.class + " with value " + swigValue);
-    }
-
-    @SuppressWarnings("unused")
-    private YUVColorComponent() {
-      this.swigValue = SwigNext.next++;
-    }
-
-    @SuppressWarnings("unused")
-    private YUVColorComponent(int swigValue) {
-      this.swigValue = swigValue;
-      SwigNext.next = swigValue+1;
-    }
-
-    @SuppressWarnings("unused")
-    private YUVColorComponent(YUVColorComponent swigEnum) {
       this.swigValue = swigEnum.swigValue;
       SwigNext.next = this.swigValue+1;
     }

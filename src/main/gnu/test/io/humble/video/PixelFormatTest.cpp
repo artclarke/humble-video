@@ -17,32 +17,49 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * MediaPicture.cpp
+ * PixelFormatTest.cpp
  *
- *  Created on: Jul 13, 2013
+ *  Created on: Jul 16, 2013
  *      Author: aclarke
  */
 
-#include "MediaPicture.h"
-#include <io/humble/ferry/HumbleException.h>
-#include <io/humble/ferry/Logger.h>
+#include "PixelFormatTest.h"
 #include <io/humble/ferry/RefPointer.h>
+#include <io/humble/video/PixelFormat.h>
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/LoggerStack.h>
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
-namespace io {
-namespace humble {
-namespace video {
-
 using namespace io::humble::ferry;
+using namespace io::humble::video;
 
-MediaPicture::MediaPicture() {
+PixelFormatTest::PixelFormatTest() {
 
 }
 
-MediaPicture::~MediaPicture() {
+PixelFormatTest::~PixelFormatTest() {
 }
 
-} /* namespace video */
-} /* namespace humble */
-} /* namespace io */
+void
+PixelFormatTest::testGetInstalledFormats() {
+  int32_t n = PixelFormat::getNumInstalledFormats();
+
+  TS_ASSERT_LESS_THAN(30, n);
+
+  // now get all of them
+  for(int32_t i = 0; i < n; i++) {
+    RefPointer<PixelFormatDescriptor> d = PixelFormat::getInstalledFormatDescriptor(i);
+
+    TS_ASSERT(d);
+
+    {
+      LoggerStack stack;
+      stack.setGlobalLevel(Logger::LEVEL_DEBUG, false);
+
+      VS_LOG_DEBUG("Got Descriptor: %s", d->getName());
+    }
+
+
+  }
+}

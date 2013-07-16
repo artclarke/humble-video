@@ -171,12 +171,12 @@ CodecTest :: testGetSupportedVideoPixelFormats()
   for(int i = 0; i < num; i++)
   {
     PixelFormat::Type type = codec->getSupportedVideoPixelFormat(i);
-    TSM_ASSERT("should be non null", type != PixelFormat::FMT_NONE);
+    TSM_ASSERT("should be non null", type != PixelFormat::PIX_FMT_NONE);
   }
   TSM_ASSERT("should fail quietly",
-      PixelFormat::FMT_NONE == codec->getSupportedVideoPixelFormat(-1));
+      PixelFormat::PIX_FMT_NONE == codec->getSupportedVideoPixelFormat(-1));
   TSM_ASSERT("should fail quietly",
-      PixelFormat::FMT_NONE == codec->getSupportedVideoPixelFormat(0x7FFFFFFF));
+      PixelFormat::PIX_FMT_NONE == codec->getSupportedVideoPixelFormat(0x7FFFFFFF));
 }
 
 void

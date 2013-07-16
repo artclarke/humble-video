@@ -17,32 +17,25 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * MediaPicture.cpp
+ * PixelFormatTest.h
  *
- *  Created on: Jul 13, 2013
+ *  Created on: Jul 16, 2013
  *      Author: aclarke
  */
 
-#include "MediaPicture.h"
-#include <io/humble/ferry/HumbleException.h>
-#include <io/humble/ferry/Logger.h>
-#include <io/humble/ferry/RefPointer.h>
+#ifndef PIXELFORMATTEST_H_
+#define PIXELFORMATTEST_H_
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+#include <io/humble/testutils/TestUtils.h>
 
-namespace io {
-namespace humble {
-namespace video {
+class PixelFormatTest : public CxxTest::TestSuite
+{
+public:
+  PixelFormatTest();
+  virtual
+  ~PixelFormatTest();
 
-using namespace io::humble::ferry;
+  void testGetInstalledFormats();
+};
 
-MediaPicture::MediaPicture() {
-
-}
-
-MediaPicture::~MediaPicture() {
-}
-
-} /* namespace video */
-} /* namespace humble */
-} /* namespace io */
+#endif /* PIXELFORMATTEST_H_ */

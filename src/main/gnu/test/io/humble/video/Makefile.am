@@ -8,6 +8,7 @@ SUBDIRS=customio
 
 check_PROGRAMS=\
   VideoPictureTester \
+  PixelFormatTester \
   CodecTester \
   IndexEntryTester \
   ErrorTester \
@@ -24,6 +25,7 @@ check_PROGRAMS=\
 
 BUILT_SOURCES= \
   VideoPictureTest_CXXRunner.cpp \
+  PixelFormatTest_CXXRunner.cpp \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
   ErrorTest_CXXRunner.cpp \
@@ -40,6 +42,7 @@ BUILT_SOURCES= \
 
 noinst_HEADERS = \
   VideoPictureTest.h \
+  PixelFormatTest.h \
   CodecTest.h \
   IndexEntryTest.h \
   ErrorTest.h \
@@ -71,6 +74,17 @@ nodist_VideoPictureTester_SOURCES= \
   VideoPictureTest_CXXRunner.cpp
 
 VideoPictureTester_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
+PixelFormatTester_SOURCES= \
+  PixelFormatTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_PixelFormatTester_SOURCES= \
+  PixelFormatTest_CXXRunner.cpp
+
+PixelFormatTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 CodecTester_SOURCES= \

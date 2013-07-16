@@ -78,7 +78,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = VideoPictureTester$(EXEEXT) CodecTester$(EXEEXT) \
+check_PROGRAMS = VideoPictureTester$(EXEEXT) \
+	PixelFormatTester$(EXEEXT) CodecTester$(EXEEXT) \
 	IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
 	MediaPacketTester$(EXEEXT) MediaAudioTester$(EXEEXT) \
 	MediaPictureTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
@@ -155,6 +156,14 @@ nodist_MediaPictureTester_OBJECTS =  \
 MediaPictureTester_OBJECTS = $(am_MediaPictureTester_OBJECTS) \
 	$(nodist_MediaPictureTester_OBJECTS)
 MediaPictureTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_PixelFormatTester_OBJECTS = PixelFormatTest.$(OBJEXT) \
+	TestData.$(OBJEXT) Main.$(OBJEXT)
+nodist_PixelFormatTester_OBJECTS =  \
+	PixelFormatTest_CXXRunner.$(OBJEXT)
+PixelFormatTester_OBJECTS = $(am_PixelFormatTester_OBJECTS) \
+	$(nodist_PixelFormatTester_OBJECTS)
+PixelFormatTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_PropertyTester_OBJECTS = PropertyTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_PropertyTester_OBJECTS = PropertyTest_CXXRunner.$(OBJEXT)
@@ -248,7 +257,9 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(MediaPacketTester_SOURCES) \
 	$(nodist_MediaPacketTester_SOURCES) \
 	$(MediaPictureTester_SOURCES) \
-	$(nodist_MediaPictureTester_SOURCES) $(PropertyTester_SOURCES) \
+	$(nodist_MediaPictureTester_SOURCES) \
+	$(PixelFormatTester_SOURCES) \
+	$(nodist_PixelFormatTester_SOURCES) $(PropertyTester_SOURCES) \
 	$(nodist_PropertyTester_SOURCES) $(RationalTester_SOURCES) \
 	$(nodist_RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
 	$(nodist_SinkFormatTester_SOURCES) \
@@ -261,10 +272,11 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 DIST_SOURCES = $(CodecTester_SOURCES) $(ErrorTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(KeyValueBagTester_SOURCES) \
 	$(MediaAudioTester_SOURCES) $(MediaPacketTester_SOURCES) \
-	$(MediaPictureTester_SOURCES) $(PropertyTester_SOURCES) \
-	$(RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
-	$(SourceFormatTester_SOURCES) $(SourceStreamTester_SOURCES) \
-	$(SourceTester_SOURCES) $(VideoPictureTester_SOURCES)
+	$(MediaPictureTester_SOURCES) $(PixelFormatTester_SOURCES) \
+	$(PropertyTester_SOURCES) $(RationalTester_SOURCES) \
+	$(SinkFormatTester_SOURCES) $(SourceFormatTester_SOURCES) \
+	$(SourceStreamTester_SOURCES) $(SourceTester_SOURCES) \
+	$(VideoPictureTester_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -719,6 +731,7 @@ VS_TEST = 1
 SUBDIRS = customio
 BUILT_SOURCES = \
   VideoPictureTest_CXXRunner.cpp \
+  PixelFormatTest_CXXRunner.cpp \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
   ErrorTest_CXXRunner.cpp \
@@ -735,6 +748,7 @@ BUILT_SOURCES = \
 
 noinst_HEADERS = \
   VideoPictureTest.h \
+  PixelFormatTest.h \
   CodecTest.h \
   IndexEntryTest.h \
   ErrorTest.h \
@@ -764,6 +778,17 @@ nodist_VideoPictureTester_SOURCES = \
   VideoPictureTest_CXXRunner.cpp
 
 VideoPictureTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
+PixelFormatTester_SOURCES = \
+  PixelFormatTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_PixelFormatTester_SOURCES = \
+  PixelFormatTest_CXXRunner.cpp
+
+PixelFormatTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 CodecTester_SOURCES = \
@@ -975,6 +1000,10 @@ MediaPictureTester$(EXEEXT): $(MediaPictureTester_OBJECTS) $(MediaPictureTester_
 	@rm -f MediaPictureTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(MediaPictureTester_OBJECTS) $(MediaPictureTester_LDADD) $(LIBS)
 
+PixelFormatTester$(EXEEXT): $(PixelFormatTester_OBJECTS) $(PixelFormatTester_DEPENDENCIES) $(EXTRA_PixelFormatTester_DEPENDENCIES) 
+	@rm -f PixelFormatTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(PixelFormatTester_OBJECTS) $(PixelFormatTester_LDADD) $(LIBS)
+
 PropertyTester$(EXEEXT): $(PropertyTester_OBJECTS) $(PropertyTester_DEPENDENCIES) $(EXTRA_PropertyTester_DEPENDENCIES) 
 	@rm -f PropertyTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(PropertyTester_OBJECTS) $(PropertyTester_LDADD) $(LIBS)
@@ -1024,6 +1053,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacketTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PixelFormatTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PixelFormatTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RationalTest.Po@am__quote@
@@ -1310,6 +1341,13 @@ recheck: all $(check_PROGRAMS)
 VideoPictureTester.log: VideoPictureTester$(EXEEXT)
 	@p='VideoPictureTester$(EXEEXT)'; \
 	b='VideoPictureTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+PixelFormatTester.log: PixelFormatTester$(EXEEXT)
+	@p='PixelFormatTester$(EXEEXT)'; \
+	b='PixelFormatTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

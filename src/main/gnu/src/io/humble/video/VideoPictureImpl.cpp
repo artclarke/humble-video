@@ -41,7 +41,7 @@ namespace io { namespace humble { namespace video
     mFrame->width = -1;
     mFrame->height = -1;
 
-    mFrame->format = (int) PixelFormat::FMT_NONE;
+    mFrame->format = (int) PixelFormat::PIX_FMT_NONE;
     mTimeBase = Rational::make(1, Global::DEFAULT_PTS_PER_SECOND);
   }
 
@@ -345,7 +345,7 @@ namespace io { namespace humble { namespace video
 
       if (!mFrame)
         throw std::runtime_error("no AVFrame allocated");
-      if (format != PixelFormat::FMT_NONE && mFrame->format != (int)PixelFormat::FMT_NONE && (int)format != mFrame->format)
+      if (format != PixelFormat::PIX_FMT_NONE && mFrame->format != (int)PixelFormat::PIX_FMT_NONE && (int)format != mFrame->format)
         throw std::runtime_error("pixel formats don't match");
       if (width > 0 && mFrame->width >0 && width != mFrame->width)
         throw std::runtime_error("width does not match");

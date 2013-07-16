@@ -52,14 +52,14 @@ VideoPictureTest::testCreationAndDestruction()
 {
   RefPointer<VideoPicture> frame = 0;
 
-  frame = VideoPicture::make(PixelFormat::FMT_YUV420P, 320, 240);
+  frame = VideoPicture::make(PixelFormat::PIX_FMT_YUV420P, 320, 240);
   TSM_ASSERT("got no frame", frame);
   TSM_ASSERT("not a key frame", frame->isKeyFrame());
   TSM_ASSERT("not complete", !frame->isComplete());
   TSM_ASSERT_EQUALS("wrong width", frame->getWidth(), 320);
   TSM_ASSERT_EQUALS("wrong height", frame->getHeight(), 240);
   TSM_ASSERT_EQUALS("wrong pixel format", frame->getPixelType(),
-      PixelFormat::FMT_YUV420P);
+      PixelFormat::PIX_FMT_YUV420P);
 }
 
 #ifdef FULL_TESTS
@@ -122,7 +122,7 @@ VideoPictureTest::testDecodingIntoReusedFrame()
           numFrames++;
           if (frame->isKeyFrame())
             numKeyFrames++;
-          if (hr->expected_pixel_format != PixelFormat::FMT_NONE)
+          if (hr->expected_pixel_format != PixelFormat::PIX_FMT_NONE)
             TSM_ASSERT_EQUALS("unexpected pixel type",
                 frame->getPixelType(),
                 hr->expected_pixel_format);
@@ -630,16 +630,16 @@ VideoPictureTest::testGetAndSetPts()
 {
   RefPointer<VideoPicture> frame = 0;
 
-  frame = VideoPicture::make(PixelFormat::FMT_YUV420P, 320, 240);
+  frame = VideoPicture::make(PixelFormat::PIX_FMT_YUV420P, 320, 240);
   TSM_ASSERT("got no frame", frame);
   TSM_ASSERT("not a key frame", frame->isKeyFrame());
   TSM_ASSERT("not complete", !frame->isComplete());
   TSM_ASSERT_EQUALS("wrong width", frame->getWidth(), 320);
   TSM_ASSERT_EQUALS("wrong height", frame->getHeight(), 240);
   TSM_ASSERT_EQUALS("wrong pixel format", frame->getPixelType(),
-      PixelFormat::FMT_YUV420P);
+      PixelFormat::PIX_FMT_YUV420P);
 
-  frame->setComplete(true, PixelFormat::FMT_YUV420P, 320, 240, 1);
+  frame->setComplete(true, PixelFormat::PIX_FMT_YUV420P, 320, 240, 1);
   TSM_ASSERT_EQUALS("unexpected pts", frame->getPts(), 1);
   frame->setPts(2);
   TSM_ASSERT_EQUALS("unexpected pts", frame->getPts(), 2);

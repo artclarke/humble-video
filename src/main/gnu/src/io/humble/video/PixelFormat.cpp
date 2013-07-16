@@ -22,79 +22,81 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/IBuffer.h>
+#include <io/humble/video/Global.h>
+
 #include <io/humble/video/PixelFormat.h>
 
-#if 0
 VS_LOG_SETUP(VS_CPP_PACKAGE);
-#endif
 
-namespace io { namespace humble { namespace video
+namespace io {
+namespace humble {
+namespace video {
+using namespace io::humble::ferry;
+
+PixelFormatDescriptor*
+PixelFormat::getDescriptor(PixelFormat::Type pix_fmt) {
+  Global::init();
+
+  const AVPixFmtDescriptor *ctx = av_pix_fmt_desc_get(
+      (enum AVPixelFormat) pix_fmt);
+  if (ctx) return PixelFormatDescriptor::make(ctx);
+  else return 0;
+}
+
+PixelComponentDescriptor*
+PixelComponentDescriptor::make(const AVComponentDescriptor* ctx) {
+  Global::init();
+
+  if (!ctx)
+    VS_THROW(HumbleInvalidArgument("null context"));
+  RefPointer<PixelComponentDescriptor> retval = make();
+  retval->mCtx = ctx;
+  return retval.get();
+}
+
+PixelFormatDescriptor*
+PixelFormatDescriptor::make(const AVPixFmtDescriptor* ctx) {
+  Global::init();
+
+  if (!ctx)
+    VS_THROW(HumbleInvalidArgument("null context"));
+  RefPointer<PixelFormatDescriptor> retval = make();
+  retval->mCtx = ctx;
+  return retval.get();
+}
+PixelComponentDescriptor*
+PixelFormatDescriptor::getComponentDescriptor(int32_t c) {
+  if (c < 0 || c > 3)
+    VS_THROW(HumbleInvalidArgument("component must be >= 0 and <= 3"));
+  return PixelComponentDescriptor::make(&mCtx->comp[c]);
+}
+
+int32_t
+PixelFormat::getNumInstalledFormats()
 {
-  using namespace io::humble::ferry;
-  
-  PixelFormat :: PixelFormat()
-  {
-  
-  }
-  
-  PixelFormat :: ~PixelFormat()
-  {
-    
-  }
-#if 0
-  unsigned char
-  PixelFormat :: getYUV420PPixel(IVideoPicture *frame, int x, int y, YUVColorComponent c)
-  {
-    unsigned char result = 0;
-    
-    int offset = getYUV420PPixelOffset(frame, x, y, c);
-    RefPointer<IBuffer> buffer = frame->getData();
-    unsigned char * bytes = (unsigned char*)buffer->getBytes(0, offset+1);
-    
-    if (!bytes)
-      throw std::runtime_error("could not find bytes in frame");
-    result = bytes[offset];
-    return result;
-  }
+  Global::init();
+  // not fast at all, but hey, optimize later.
+  const AVPixFmtDescriptor* last = 0;
+  int32_t i = 0;
+  for(; (last=av_pix_fmt_desc_next(last)); i++)
+    /* yup; that's it. */ ;
+  return i;
+}
 
-  void
-  PixelFormat :: setYUV420PPixel(IVideoPicture *frame, int x, int y, YUVColorComponent c, unsigned char value)
-  {
-    int offset = getYUV420PPixelOffset(frame, x, y, c);
-    RefPointer<IBuffer> buffer = frame->getData();
-    unsigned char * bytes = (unsigned char*)buffer->getBytes(0, offset+1);
-    
-    if (!bytes)
-    {
-      VS_LOG_DEBUG("Could not find buffer of length: %d", offset+1);
-      throw std::runtime_error("could not find bytes in frame");
-    }
-    bytes[offset] = value;
-  }
+PixelFormatDescriptor*
+PixelFormat::getInstalledFormatDescriptor(int32_t n)
+{
+  Global::init();
+  // not fast at all, but hey, optimize later.
+  const AVPixFmtDescriptor* last = 0;
+  int32_t i = 0;
+  for(; (last=av_pix_fmt_desc_next(last)); i++)
+    if (i == n)
+      break;
+  return last ? PixelFormatDescriptor::make(last) : 0;
+}
 
-  int
-  PixelFormat :: getYUV420PPixelOffset(IVideoPicture *frame, int x, int y, YUVColorComponent c)
-  {
-    if (!frame)
-      throw std::runtime_error("no frame");
-    
-    int width = frame->getWidth();
-    if (x < 0 || x >= width)
-      throw std::runtime_error("x value invalid for input frame");
-    
-    int height = frame->getHeight();
-    if (y < 0 || y >= height)
-      throw std::runtime_error("y value invalid for input frame");
-    
-    if (frame->getPixelType() != YUV420P)
-      throw std::runtime_error("pixel type of input frame is incorrect");
 
-    int offset = PixelFormat::getFastYUV420PPixelOffset(frame->getWidth(), frame->getHeight(), x, y, c);
-    VS_LOG_TRACE("w: %d; h: %d; x: %d; y: %d; c: %d; offset: %d",
-        frame->getWidth(), frame->getHeight(), x, y, c, offset);
-    return offset;
-    
-  }
-#endif // 0
-
-}}}
+}
+}
+}

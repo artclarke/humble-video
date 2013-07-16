@@ -112,6 +112,78 @@ public class PictureFormat extends RefCounted {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+/**
+ * Return the pixel format corresponding to name.  
+ * If there is no pixel format with name name, then looks for a  
+ * pixel format with the name corresponding to the native endian  
+ * format of name.  
+ * For example in a little-endian system, first looks for "gray16", 
+ *  
+ * then for "gray16le".  
+ * Finally if no pixel format has been found, returns AV_PIX_FMT_NONE. 
+ *  
+ */
+  public static PictureFormat.Type getFormat(String name) {
+    return PictureFormat.Type.swigToEnum(VideoJNI.PictureFormat_getFormat(name));
+  }
+
+/**
+ * Return the short name for a pixel format, NULL in case pix_fmt is 
+ *  
+ * unknown.  
+ */
+  public static String getFormatName(PictureFormat.Type pix_fmt) {
+    return VideoJNI.PictureFormat_getFormatName(pix_fmt.swigValue());
+  }
+
+/**
+ * @return	a pixel format descriptor for provided pixel format or NULL 
+ *		 if  
+ * this pixel format is unknown.  
+ */
+  public static PixelFormatDescriptor getDescriptor(PictureFormat.Type pix_fmt) {
+    long cPtr = VideoJNI.PictureFormat_getDescriptor(pix_fmt.swigValue());
+    return (cPtr == 0) ? null : new PixelFormatDescriptor(cPtr, false);
+  }
+
+/**
+ * Returns the total number of pixel format descriptors known to humble 
+ * video.  
+ */
+  public static int getNumInstalledFormats() {
+    return VideoJNI.PictureFormat_getNumInstalledFormats();
+  }
+
+/**
+ * Returns the 'i'th pixel format descriptor that is known to humble 
+ * video  
+ * @param	i The i'th pixel format descriptor in the list of installed 
+ *		 descriptors.  
+ */
+  public static PixelFormatDescriptor getInstalledFormatDescriptor(int i) {
+    long cPtr = VideoJNI.PictureFormat_getInstalledFormatDescriptor(i);
+    return (cPtr == 0) ? null : new PixelFormatDescriptor(cPtr, false);
+  }
+
+/**
+ * @return	number of planes in pix_fmt, a negative ERROR if pix_fmt 
+ *		 is not a  
+ * valid pixel format.  
+ */
+  public static int getNumPlanes(PictureFormat.Type pix_fmt) {
+    return VideoJNI.PictureFormat_getNumPlanes(pix_fmt.swigValue());
+  }
+
+/**
+ * Utility function to swap the endianness of a pixel format.  
+ * pix_fmt the pixel format  
+ * @return	pixel format with swapped endianness if it exists,  
+ * otherwise AV_PIX_FMT_NONE  
+ */
+  public static PictureFormat.Type swapEndianness(PictureFormat.Type pix_fmt) {
+    return PictureFormat.Type.swigToEnum(VideoJNI.PictureFormat_swapEndianness(pix_fmt.swigValue()));
+  }
+
   public enum Type {
   /**
    * Pixel format.

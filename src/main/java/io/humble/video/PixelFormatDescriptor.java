@@ -161,6 +161,29 @@ public class PixelFormatDescriptor extends RefCounted {
   }
 
 /**
+ * Return the number of bits per pixel used by the pixel format  
+ * described by pixdesc. Note that this is not the same as the number 
+ *  
+ * of bits per sample.  
+ * The returned number of bits refers to the number of bits actually 
+ *  
+ * used for storing the pixel information, that is padding bits are 
+ *  
+ * not counted.  
+ */
+  public int getBitsPerPixel() {
+    return VideoJNI.PixelFormatDescriptor_getBitsPerPixel(swigCPtr, this);
+  }
+
+/**
+ * Return the number of bits per pixel for the pixel format  
+ * described by pixdesc, including any padding or unused bits.  
+ */
+  public int getPaddedBitsPerPixel() {
+    return VideoJNI.PixelFormatDescriptor_getPaddedBitsPerPixel(swigCPtr, this);
+  }
+
+/**
  * Parameters that describe how pixels are packed.  
  * If the format has 2 or 4 components, then alpha is last.  
  * If the format has 1 or 2 components, then luma is 0.  
@@ -171,6 +194,15 @@ public class PixelFormatDescriptor extends RefCounted {
   public PixelComponentDescriptor getComponentDescriptor(int component) {
     long cPtr = VideoJNI.PixelFormatDescriptor_getComponentDescriptor(swigCPtr, this, component);
     return (cPtr == 0) ? null : new PixelComponentDescriptor(cPtr, false);
+  }
+
+/**
+ * @return	an PixelFormat id described by desc, or PixelFormat.Type.PIX_FMT_NONE 
+ *		 if desc  
+ * is not a valid pointer to a pixel format descriptor.  
+ */
+  public PixelFormat.Type getPixelType() {
+    return PixelFormat.Type.swigToEnum(VideoJNI.PixelFormatDescriptor_getPixelType(swigCPtr, this));
   }
 
 }

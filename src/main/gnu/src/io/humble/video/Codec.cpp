@@ -279,7 +279,7 @@ namespace io { namespace humble { namespace video
     p++,i++)
       if (index == i)
         return (PixelFormat::Type)*p;
-    return PixelFormat::FMT_NONE;
+    return PixelFormat::PIX_FMT_NONE;
   }
 
   int32_t
