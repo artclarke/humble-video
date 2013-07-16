@@ -26,7 +26,6 @@
 #ifdef PixelFormat
 #undef PixelFormat
 #endif // PixelFormat
-
 namespace io {
 namespace humble {
 namespace video {
@@ -404,38 +403,52 @@ public:
    *
    * Finally if no pixel format has been found, returns AV_PIX_FMT_NONE.
    */
-  static PixelFormat::Type getFormat(const char* name) { return name && *name ? (PixelFormat::Type) av_get_pix_fmt(name) : PixelFormat::PIX_FMT_NONE; }
+  static PixelFormat::Type
+  getFormat(const char* name) {
+    return
+        name && *name ?
+            (PixelFormat::Type) av_get_pix_fmt(name) : PixelFormat::PIX_FMT_NONE;
+  }
 
   /**
    * Return the short name for a pixel format, NULL in case pix_fmt is
    * unknown.
    *
    */
-  static const char* getFormatName(PixelFormat::Type pix_fmt) { return av_get_pix_fmt_name((enum AVPixelFormat)pix_fmt); }
+  static const char*
+  getFormatName(PixelFormat::Type pix_fmt) {
+    return av_get_pix_fmt_name((enum AVPixelFormat) pix_fmt);
+  }
 
   /**
    * @return a pixel format descriptor for provided pixel format or NULL if
    * this pixel format is unknown.
    */
-  static PixelFormatDescriptor* getDescriptor(PixelFormat::Type pix_fmt);
+  static PixelFormatDescriptor*
+  getDescriptor(PixelFormat::Type pix_fmt);
 
   /**
    * Returns the total number of pixel format descriptors known to humble video.
    */
-  static int32_t getNumInstalledFormats();
+  static int32_t
+  getNumInstalledFormats();
 
   /**
    * Returns the 'i'th pixel format descriptor that is known to humble video
    *
    * @param i The i'th pixel format descriptor in the list of installed descriptors.
    */
-  static PixelFormatDescriptor* getInstalledFormatDescriptor(int32_t i);
+  static PixelFormatDescriptor*
+  getInstalledFormatDescriptor(int32_t i);
 
   /**
    * @return number of planes in pix_fmt, a negative ERROR if pix_fmt is not a
    * valid pixel format.
    */
-  static int32_t getNumPlanes(PixelFormat::Type pix_fmt) { return av_pix_fmt_count_planes((enum AVPixelFormat)pix_fmt); }
+  static int32_t
+  getNumPlanes(PixelFormat::Type pix_fmt) {
+    return av_pix_fmt_count_planes((enum AVPixelFormat) pix_fmt);
+  }
 
   /**
    * Utility function to swap the endianness of a pixel format.
@@ -445,7 +458,11 @@ public:
    * @return pixel format with swapped endianness if it exists,
    * otherwise AV_PIX_FMT_NONE
    */
-  static PixelFormat::Type swapEndianness(PixelFormat::Type pix_fmt) { return (PixelFormat::Type) av_pix_fmt_swap_endianness((enum AVPixelFormat) pix_fmt); }
+  static PixelFormat::Type
+  swapEndianness(PixelFormat::Type pix_fmt) {
+    return (PixelFormat::Type) av_pix_fmt_swap_endianness(
+        (enum AVPixelFormat) pix_fmt);
+  }
 
 private:
   // make private
@@ -456,37 +473,56 @@ private:
   }
 };
 
-
-class PixelComponentDescriptor : public io::humble::ferry::RefCounted {
-  VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(PixelComponentDescriptor)
+class PixelComponentDescriptor : public io::humble::ferry::RefCounted
+{
+VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(PixelComponentDescriptor)
 public:
-               /** which of the 4 planes contains the component */
-    uint16_t getPlane() { return mCtx->plane; }
+  /** which of the 4 planes contains the component */
+  uint16_t
+  getPlane() {
+    return mCtx->plane;
+  }
 
-    /**
-     * Number of elements between 2 horizontally consecutive pixels minus 1.
-     * Elements are bits for bitstream formats, bytes otherwise.
-     */
-    uint16_t getStepMinus1() { return mCtx->step_minus1; }
+  /**
+   * Number of elements between 2 horizontally consecutive pixels minus 1.
+   * Elements are bits for bitstream formats, bytes otherwise.
+   */
+  uint16_t
+  getStepMinus1() {
+    return mCtx->step_minus1;
+  }
 
-    /**
-     * Number of elements before the component of the first pixel plus 1.
-     * Elements are bits for bitstream formats, bytes otherwise.
-     */
-    uint16_t getOffsetPlus1() { return mCtx->offset_plus1; }
-    /** number of least significant bits that must be shifted away to get the value */
-    uint16_t getShift() { return mCtx->shift; }
-    /** number of bits in the component minus 1 */
-    uint16_t getDepthMinus1() { return mCtx->depth_minus1; }
+  /**
+   * Number of elements before the component of the first pixel plus 1.
+   * Elements are bits for bitstream formats, bytes otherwise.
+   */
+  uint16_t
+  getOffsetPlus1() {
+    return mCtx->offset_plus1;
+  }
+  /** number of least significant bits that must be shifted away to get the value */
+  uint16_t
+  getShift() {
+    return mCtx->shift;
+  }
+  /** number of bits in the component minus 1 */
+  uint16_t
+  getDepthMinus1() {
+    return mCtx->depth_minus1;
+  }
 #ifndef SWIG
-    static PixelComponentDescriptor* make(const AVComponentDescriptor* ctx);
+  static PixelComponentDescriptor*
+  make(const AVComponentDescriptor* ctx);
 #endif // ! SWIG
 private:
-    PixelComponentDescriptor() :mCtx(0) {}
-    virtual ~PixelComponentDescriptor() {}
-    const AVComponentDescriptor* mCtx;
+  PixelComponentDescriptor() :
+      mCtx(0) {
+  }
+  virtual
+  ~PixelComponentDescriptor() {
+  }
+  const AVComponentDescriptor* mCtx;
 };
-
 
 /**
  * Descriptor that unambiguously describes how the bits of a pixel are
@@ -501,6 +537,44 @@ class PixelFormatDescriptor : public io::humble::ferry::RefCounted
 {
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(PixelFormatDescriptor)
 public:
+  typedef enum Flag
+  {
+    /**
+     * Pixel format is big-endian.
+     */
+    PIX_FMT_FLAG_BE = AV_PIX_FMT_FLAG_BE,
+    /**
+     * Pixel format has a palette in data[1], values are indexes in this palette.
+     */
+    PIX_FMT_FLAG_PAL = AV_PIX_FMT_FLAG_PAL,
+    /**
+     * All values of a component are bit-wise packed end to end.
+     */
+    PIX_FMT_FLAG_BITSTREAM = AV_PIX_FMT_FLAG_BITSTREAM,
+    /**
+     * Pixel format is an HW accelerated format.
+     */
+    PIX_FMT_FLAG_HWACCEL = AV_PIX_FMT_FLAG_HWACCEL,
+    /**
+     * At least one pixel component is not in the first data plane.
+     */
+    PIX_FMT_FLAG_PLANAR = AV_PIX_FMT_FLAG_PLANAR,
+    /**
+     * The pixel format contains RGB-like data (as opposed to YUV/grayscale).
+     */
+    PIX_FMT_FLAG_RGB = AV_PIX_FMT_FLAG_RGB,
+    /**
+     * The pixel format is "pseudo-paletted". This means that FFmpeg treats it as
+     * paletted internally, but the palette is generated by the decoder and is not
+     * stored in the file.
+     */
+    PIX_FMT_FLAG_PSEUDOPAL = AV_PIX_FMT_FLAG_PSEUDOPAL,
+    /**
+     * The pixel format has an alpha channel.
+     */
+    PIX_FMT_FLAG_ALPHA = AV_PIX_FMT_FLAG_ALPHA,
+  } Flag;
+
   /** Get the name of this pixel descriptor */
   const char *
   getName() {
@@ -537,9 +611,20 @@ public:
     return mCtx->log2_chroma_h;
   }
 
+  /**
+   * Get the flags for this Pixel Format. This is a bitmask of the {@link PixelFormatDescriptor.Flag} enum values.
+   */
   uint8_t
   getFlags() {
     return mCtx->flags;
+  }
+
+  /**
+   * Is the given flag set on this format?
+   */
+  bool
+  getFlag(PixelFormatDescriptor::Flag flag) {
+    return mCtx->flags & flag;
   }
 
   /**
@@ -551,13 +636,19 @@ public:
    * used for storing the pixel information, that is padding bits are
    * not counted.
    */
-  int32_t getBitsPerPixel() { return av_get_bits_per_pixel(mCtx); }
+  int32_t
+  getBitsPerPixel() {
+    return av_get_bits_per_pixel(mCtx);
+  }
 
   /**
    * Return the number of bits per pixel for the pixel format
    * described by pixdesc, including any padding or unused bits.
    */
-  int32_t getPaddedBitsPerPixel() { return av_get_padded_bits_per_pixel(mCtx); }
+  int32_t
+  getPaddedBitsPerPixel() {
+    return av_get_padded_bits_per_pixel(mCtx);
+  }
 
   /**
    * Parameters that describe how pixels are packed.
@@ -567,23 +658,31 @@ public:
    * if the RGB flag is set then 0 is red, 1 is green and 2 is blue;
    * otherwise 0 is luma, 1 is chroma-U and 2 is chroma-V.
    */
-  PixelComponentDescriptor* getComponentDescriptor(int32_t component);
+  PixelComponentDescriptor*
+  getComponentDescriptor(int32_t component);
 
   /**
    * @return an PixelFormat id described by desc, or PixelFormat.Type.PIX_FMT_NONE if desc
    * is not a valid pointer to a pixel format descriptor.
    */
-  PixelFormat::Type getFormat() { return (PixelFormat::Type)av_pix_fmt_desc_get_id(mCtx); }
+  PixelFormat::Type
+  getFormat() {
+    return (PixelFormat::Type) av_pix_fmt_desc_get_id(mCtx);
+  }
 #ifndef SWIG
-  static PixelFormatDescriptor* make(const AVPixFmtDescriptor* ctx);
+  static PixelFormatDescriptor*
+  make(const AVPixFmtDescriptor* ctx);
 #endif // ! SWIG
 private:
-  PixelFormatDescriptor() : mCtx(0) {}
-  virtual ~PixelFormatDescriptor() {}
+  PixelFormatDescriptor() :
+      mCtx(0) {
+  }
+  virtual
+  ~PixelFormatDescriptor() {
+  }
   const AVPixFmtDescriptor* mCtx;
 
 };
-
 
 }
 }
