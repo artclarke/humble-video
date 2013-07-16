@@ -41,6 +41,8 @@ extern "C"
 
 #include <libavutil/avutil.h>
 #include <libavutil/pixdesc.h>
+#include "libavutil/imgutils.h"
+
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 //#include <libavdevice/avdevice.h>

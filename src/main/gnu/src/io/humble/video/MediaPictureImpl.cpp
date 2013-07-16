@@ -76,12 +76,56 @@ MediaPictureImpl::make(int32_t width, int32_t height,
 MediaPictureImpl*
 MediaPictureImpl::make(IBuffer* buffer, int32_t width, int32_t height,
     PixelFormat::Type format) {
-  // TODO: Implement
-  (void) buffer;
-  (void) width;
-  (void) height;
-  (void) format;
-  return 0;
+  if (width <= 0) {
+    VS_THROW(HumbleInvalidArgument("width must be > 0"));
+  }
+
+  if (height <= 0) {
+    VS_THROW(HumbleInvalidArgument("height must be > 0"));
+  }
+
+  if (format == PixelFormat::PIX_FMT_NONE) {
+    VS_THROW(HumbleInvalidArgument("pixel format must be specifie"));
+  }
+
+  if (!buffer) {
+    VS_THROW(HumbleInvalidArgument("must pass non null buffer"));
+  }
+
+  // let's figure out how big of a buffer we need
+  int32_t bufSize = av_image_get_buffer_size((enum AVPixelFormat) format, width,
+      height, 1);
+  if (bufSize < buffer->getBufferSize()) {
+    VS_THROW(
+        HumbleInvalidArgument(
+            "passed in buffer too small to fit requested image parameters"));
+  }
+
+  RefPointer<MediaPictureImpl> retval = make();
+  AVFrame* frame = retval->mFrame;
+  frame->width = width;
+  frame->height = height;
+  frame->format = format;
+
+  // buffer is large enough; let's fill the data pointers
+  uint8_t* data = (uint8_t*) buffer->getBytes(0, bufSize);
+
+  int32_t imgSize = av_image_fill_arrays(frame->data, frame->linesize,
+      data,
+      (enum AVPixelFormat) frame->format,
+      frame->width,
+      frame->height,
+      1);
+  if (imgSize != bufSize) {
+    VS_ASSERT(imgSize == bufSize, "these should always be equal");
+    VS_THROW(HumbleRuntimeError("could not fill image with data"));
+  }
+
+  // now fill in the AVBufferRefs where we pass of to FFmpeg care
+  // of our buffer. Be kind FFmpeg.  Be kind.
+
+  // and we're done.
+  return retval.get();
 }
 
 MediaPictureImpl*
@@ -111,8 +155,9 @@ MediaPictureImpl::getDataPlaneSize() {
 
 int64_t
 MediaPictureImpl::getError(int32_t plane) {
-  (void) plane;
-  return 0;
+  if (plane < 0 || plane >= 4)
+  VS_THROW(HumbleInvalidArgument("plane must be between 0 and 3"));
+  return mFrame->error[plane];
 }
 
 int32_t
