@@ -40,6 +40,7 @@ extern "C"
 
 
 #include <libavutil/avutil.h>
+#include <libavutil/common.h>
 #include <libavutil/pixdesc.h>
 #include "libavutil/imgutils.h"
 

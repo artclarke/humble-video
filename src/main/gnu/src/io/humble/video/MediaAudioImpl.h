@@ -51,7 +51,7 @@ public:
   getData(int32_t plane);
 
   virtual int32_t
-  getDataPlaneSize();
+  getDataPlaneSize(int32_t plane);
 
   virtual int32_t
   getNumDataPlanes();

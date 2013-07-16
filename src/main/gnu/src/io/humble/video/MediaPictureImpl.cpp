@@ -110,19 +110,36 @@ MediaPictureImpl::make(IBuffer* buffer, int32_t width, int32_t height,
   // buffer is large enough; let's fill the data pointers
   uint8_t* data = (uint8_t*) buffer->getBytes(0, bufSize);
 
-  int32_t imgSize = av_image_fill_arrays(frame->data, frame->linesize,
-      data,
-      (enum AVPixelFormat) frame->format,
-      frame->width,
-      frame->height,
-      1);
+  int32_t imgSize = av_image_fill_arrays(frame->data, frame->linesize, data,
+      (enum AVPixelFormat) frame->format, frame->width, frame->height, 1);
   if (imgSize != bufSize) {
     VS_ASSERT(imgSize == bufSize, "these should always be equal");
     VS_THROW(HumbleRuntimeError("could not fill image with data"));
   }
 
+  // now, set up the reference buffers
+  frame->extended_data = frame->data;
+  for (int32_t i = 0; i < AV_NUM_DATA_POINTERS; i++) {
+    if (frame->data[i])
+      frame->buf[i] = AVBufferSupport::wrapIBuffer(buffer, frame->data[i], frame->linesize[0]);
+  }
   // now fill in the AVBufferRefs where we pass of to FFmpeg care
   // of our buffer. Be kind FFmpeg.  Be kind.
+  RefPointer<PixelFormatDescriptor> desc = PixelFormat::getDescriptor((PixelFormat::Type)frame->format);
+
+  if (!desc) {
+    VS_THROW(HumbleRuntimeError("could not get format descriptor"));
+  }
+  if (desc->getFlag(PixelFormatDescriptor::PIX_FMT_FLAG_PAL) ||
+      desc->getFlag(PixelFormatDescriptor::PIX_FMT_FLAG_PSEUDOPAL)) {
+    av_buffer_unref(&frame->buf[1]);
+    frame->buf[1] = AVBufferSupport::wrapIBuffer(IBuffer::make(retval.value(), 1024));
+    if (!frame->buf[1]) {
+      VS_THROW(HumbleRuntimeError("memory failure"));
+    }
+
+    frame->data[1] = frame->buf[1]->data;
+  }
 
   // and we're done.
   return retval.get();
@@ -130,11 +147,34 @@ MediaPictureImpl::make(IBuffer* buffer, int32_t width, int32_t height,
 
 MediaPictureImpl*
 MediaPictureImpl::make(MediaPictureImpl* src, bool copy) {
-  // TODO: Implement
-  (void) src;
-  (void) copy;
-  return 0;
-}
+  RefPointer<MediaPictureImpl> retval;
+
+  if (!src) VS_THROW(HumbleInvalidArgument("no src object to copy from"));
+
+  if (copy) {
+    // first create a new mediaaudio object to copy into
+    retval = make(src->getWidth(), src->getHeight(), src->getFormat());
+    retval->mComplete = src->mComplete;
+
+    // then copy the data into retval
+    int32_t n = src->getNumDataPlanes();
+    for(int32_t i = 0; i < n; i++ )
+    {
+      AVBufferRef* dstBuf = av_frame_get_plane_buffer(retval->mFrame, i);
+      AVBufferRef* srcBuf = av_frame_get_plane_buffer(src->mFrame, i);
+      VS_ASSERT(dstBuf, "should always have buffer");
+      VS_ASSERT(srcBuf, "should always have buffer");
+      memcpy(dstBuf->data, srcBuf->data, srcBuf->size);
+    }
+  } else {
+    // first create a new media audio object to reference into
+    retval = make();
+
+    // then do the reference
+    retval->mComplete = src->mComplete;
+    av_frame_ref(retval->mFrame, src->mFrame);
+  }
+  return retval.get();}
 
 void
 MediaPictureImpl::setComplete(bool val, int64_t timestamp) {
@@ -144,13 +184,32 @@ MediaPictureImpl::setComplete(bool val, int64_t timestamp) {
 
 IBuffer*
 MediaPictureImpl::getData(int32_t plane) {
-  (void) plane;
-  return 0;
-}
+  // we get the buffer for the given plane if it exists, and wrap
+  // it in an IBuffer
+  if (plane < 0) {
+    VS_THROW(HumbleInvalidArgument("plane must be >= 0"));
+  }
+
+  if (plane >= 4) {
+    VS_THROW(HumbleInvalidArgument("plane must be < getNumDataPlanes()"));
+  }
+
+  // now we're guaranteed that we should have a plane.
+  RefPointer<IBuffer> buffer;
+  if (mFrame->buf[plane])
+    buffer = AVBufferSupport::wrapAVBuffer(this,
+        mFrame->buf[plane], mFrame->data[plane], mFrame->linesize[0]);
+  return buffer.get();}
 
 int32_t
-MediaPictureImpl::getDataPlaneSize() {
-  return 0;
+MediaPictureImpl::getDataPlaneSize(int32_t plane) {
+  if (plane < 0) {
+    VS_THROW(HumbleInvalidArgument("plane must be >= 0"));
+  }
+  if (plane >= 4) {
+    VS_THROW(HumbleInvalidArgument("plane must be < getNumDataPlanes()"));
+  }
+  return mFrame->linesize[plane];
 }
 
 int64_t
@@ -162,7 +221,11 @@ MediaPictureImpl::getError(int32_t plane) {
 
 int32_t
 MediaPictureImpl::getNumDataPlanes() {
-  return 0;
+  int32_t i = 0;
+  for(; i < AV_NUM_DATA_POINTERS; i++)
+    if (!mFrame->data[i])
+      break;
+  return i == 0 ? 0 : i-1;
 }
 
 } /* namespace video */

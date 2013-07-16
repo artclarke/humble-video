@@ -490,7 +490,7 @@ public:
    * @return The size in bytes of that plane of audio data.
    */
   virtual int32_t
-  getDataPlaneSize()=0;
+  getDataPlaneSize(int32_t plane)=0;
 
   /** Returns the number of data planes in this object. */
   virtual int32_t

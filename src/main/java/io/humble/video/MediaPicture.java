@@ -171,8 +171,8 @@ public class MediaPicture extends MediaRaw {
  * image data.  
  * @return	The size in bytes of that plane of image data.  
  */
-  public int getDataPlaneSize() {
-    return VideoJNI.MediaPicture_getDataPlaneSize(swigCPtr, this);
+  public int getDataPlaneSize(int plane) {
+    return VideoJNI.MediaPicture_getDataPlaneSize(swigCPtr, this, plane);
   }
 
 /**

@@ -12511,15 +12511,17 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getData(JNIEn
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getDataPlaneSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getDataPlaneSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jint jresult = 0 ;
   io::humble::video::MediaAudio *arg1 = (io::humble::video::MediaAudio *) 0 ;
+  int32_t arg2 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(io::humble::video::MediaAudio **)&jarg1; 
+  arg2 = (int32_t)jarg2; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -12532,7 +12534,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getDataPlaneSi
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)(arg1)->getDataPlaneSize();
+      result = (int32_t)(arg1)->getDataPlaneSize(arg2);
     }
     catch(std::invalid_argument & e)
     {
@@ -13908,15 +13910,17 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getData(JNI
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getDataPlaneSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getDataPlaneSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jint jresult = 0 ;
   io::humble::video::MediaPicture *arg1 = (io::humble::video::MediaPicture *) 0 ;
+  int32_t arg2 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(io::humble::video::MediaPicture **)&jarg1; 
+  arg2 = (int32_t)jarg2; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -13929,7 +13933,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getDataPlane
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)(arg1)->getDataPlaneSize();
+      result = (int32_t)(arg1)->getDataPlaneSize(arg2);
     }
     catch(std::invalid_argument & e)
     {

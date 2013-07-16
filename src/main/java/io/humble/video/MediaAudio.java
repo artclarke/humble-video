@@ -225,8 +225,8 @@ public class MediaAudio extends MediaRaw {
  * audio data.  
  * @return	The size in bytes of that plane of audio data.  
  */
-  public int getDataPlaneSize() {
-    return VideoJNI.MediaAudio_getDataPlaneSize(swigCPtr, this);
+  public int getDataPlaneSize(int plane) {
+    return VideoJNI.MediaAudio_getDataPlaneSize(swigCPtr, this, plane);
   }
 
 /**

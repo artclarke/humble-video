@@ -397,7 +397,7 @@ class VideoJNI {
   public final static native long MediaAudio_make__SWIG_1(long jarg1, IBuffer jarg1_, int jarg2, int jarg3, int jarg4, int jarg5, int jarg6);
   public final static native long MediaAudio_make__SWIG_2(long jarg1, MediaAudio jarg1_, boolean jarg2);
   public final static native long MediaAudio_getData(long jarg1, MediaAudio jarg1_, int jarg2);
-  public final static native int MediaAudio_getDataPlaneSize(long jarg1, MediaAudio jarg1_);
+  public final static native int MediaAudio_getDataPlaneSize(long jarg1, MediaAudio jarg1_, int jarg2);
   public final static native int MediaAudio_getNumDataPlanes(long jarg1, MediaAudio jarg1_);
   public final static native int MediaAudio_getMaxNumSamples(long jarg1, MediaAudio jarg1_);
   public final static native int MediaAudio_getNumSamples(long jarg1, MediaAudio jarg1_);
@@ -422,7 +422,7 @@ class VideoJNI {
   public final static native long MediaPicture_make__SWIG_1(long jarg1, IBuffer jarg1_, int jarg2, int jarg3, int jarg4);
   public final static native long MediaPicture_make__SWIG_2(long jarg1, MediaPicture jarg1_, boolean jarg2);
   public final static native long MediaPicture_getData(long jarg1, MediaPicture jarg1_, int jarg2);
-  public final static native int MediaPicture_getDataPlaneSize(long jarg1, MediaPicture jarg1_);
+  public final static native int MediaPicture_getDataPlaneSize(long jarg1, MediaPicture jarg1_, int jarg2);
   public final static native int MediaPicture_getNumDataPlanes(long jarg1, MediaPicture jarg1_);
   public final static native void MediaPicture_setComplete(long jarg1, MediaPicture jarg1_, boolean jarg2, long jarg3);
   public final static native boolean MediaPicture_isComplete(long jarg1, MediaPicture jarg1_);

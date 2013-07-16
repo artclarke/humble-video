@@ -183,6 +183,8 @@ MediaAudioImpl::make(MediaAudioImpl* src, bool copy) {
         src->getChannelLayout(),
         src->getFormat());
 
+    retval->mComplete = src->mComplete;
+
     // then copy the data into retval
     int32_t n = src->getNumDataPlanes();
     for(int32_t i = 0; i < n; i++ )
@@ -199,6 +201,7 @@ MediaAudioImpl::make(MediaAudioImpl* src, bool copy) {
 
     // then do the reference
     retval->mMaxSamples = src->mMaxSamples;
+    retval->mComplete = src->mComplete;
     av_frame_ref(retval->mFrame, src->mFrame);
   }
   return retval.get();
@@ -209,11 +212,11 @@ MediaAudioImpl::getData(int32_t plane) {
   // we get the buffer for the given plane if it exists, and wrap
   // it in an IBuffer
   if (plane < 0) {
-    VS_THROW(HumbleInvalidArgument("plane must be > 0"));
+    VS_THROW(HumbleInvalidArgument("plane must be >= 0"));
   }
 
   if (plane >= getNumDataPlanes()) {
-    VS_THROW(HumbleInvalidArgument("plane must be <= getNumDataPlane()"));
+    VS_THROW(HumbleInvalidArgument("plane must be < getNumDataPlane()"));
   }
 
   // now we're guaranteed that we should have a plane.
@@ -227,8 +230,11 @@ MediaAudioImpl::getData(int32_t plane) {
 }
 
 int32_t
-MediaAudioImpl::getDataPlaneSize() {
-  return mFrame->linesize[0];
+MediaAudioImpl::getDataPlaneSize(int32_t plane) {
+  int32_t n = getNumDataPlanes();
+  if (plane < 0 || plane >= n)
+    VS_THROW(HumbleInvalidArgument("plane is out of range"));
+  return mFrame->linesize[plane];
 }
 
 int32_t
