@@ -24,11 +24,10 @@
  */
 
 #include "MediaPicture.h"
+#include "MediaPictureImpl.h"
+#include "Global.h"
 #include <io/humble/ferry/HumbleException.h>
-#include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/RefPointer.h>
-
-VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 namespace io {
 namespace humble {
@@ -41,6 +40,28 @@ MediaPicture::MediaPicture() {
 }
 
 MediaPicture::~MediaPicture() {
+}
+
+MediaPicture*
+MediaPicture::make(int32_t width, int32_t height, PixelFormat::Type format)
+{
+  Global::init();
+  return MediaPictureImpl::make(width, height, format);
+}
+
+MediaPicture*
+MediaPicture::make(io::humble::ferry::IBuffer* buffer, int32_t width, int32_t height,
+    PixelFormat::Type format)
+{
+  Global::init();
+  return MediaPictureImpl::make(buffer, width, height, format);
+}
+
+MediaPicture*
+MediaPicture::make(MediaPicture* src, bool copy)
+{
+  Global::init();
+  return MediaPictureImpl::make(dynamic_cast<MediaPictureImpl*>(src), copy);
 }
 
 } /* namespace video */

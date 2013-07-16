@@ -26,6 +26,8 @@
 #ifndef MEDIAPICTUREIMPL_H_
 #define MEDIAPICTUREIMPL_H_
 
+#include <io/humble/ferry/HumbleException.h>
+#include <io/humble/ferry/Logger.h>
 #include <io/humble/video/MediaPicture.h>
 
 namespace io {
@@ -34,10 +36,107 @@ namespace video {
 
 class VS_API_HUMBLEVIDEO MediaPictureImpl : public io::humble::video::MediaPicture
 {
+VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MediaPictureImpl)
+public:
+  static MediaPictureImpl*
+  make(int32_t width, int32_t height, PixelFormat::Type format);
+
+  static MediaPictureImpl*
+  make(io::humble::ferry::IBuffer* buffer, int32_t width, int32_t height,
+      PixelFormat::Type format);
+
+  static MediaPictureImpl*
+  make(MediaPictureImpl* src, bool copy);
+
+  virtual io::humble::ferry::IBuffer*
+  getData(int32_t plane);
+
+  virtual int32_t
+  getDataPlaneSize();
+
+  virtual int32_t
+  getNumDataPlanes();
+
+  virtual void
+  setComplete(bool val, int64_t timestamp);
+
+  virtual bool
+  isComplete() { return mComplete; }
+
+  virtual int32_t
+  getWidth() {
+    return getCtx()->width;
+  }
+
+  virtual int32_t
+  getHeight() {
+    return getCtx()->height;
+  }
+
+  virtual PixelFormat::Type
+  getFormat() {
+    return (PixelFormat::Type) getCtx()->format;
+  }
+
+  virtual int32_t
+  getCodedPictureNumber() {
+    return getCtx()->coded_picture_number;
+  }
+
+  virtual void
+  setCodedPictureNumber(int32_t n) {
+    getCtx()->coded_picture_number = n;
+  }
+
+  virtual int32_t
+  getDisplayPictureNumber() { return getCtx()->display_picture_number; }
+
+  virtual void
+  setDisplayPictureNumber(int32_t n) { getCtx()->display_picture_number = n; }
+
+  virtual int32_t
+  getQuality() { return getCtx()->quality; }
+
+  virtual void
+  setQuality(int32_t q) { getCtx()->quality = q; }
+
+  virtual int64_t
+  getError(int32_t dataPlane);
+
+  virtual int32_t
+  getRepeatPicture() { return getCtx()->repeat_pict; }
+  virtual void
+  setRepeatPicture(int32_t n) { getCtx()->repeat_pict = n; }
+
+  virtual bool
+  isInterlacedFrame() { return getCtx()->interlaced_frame; }
+  virtual void
+  setInterlacedFrame(bool val) { getCtx()->interlaced_frame = val; }
+
+  virtual bool
+  isTopFieldFirst() { return getCtx()->top_field_first; }
+  virtual void
+  setTopFieldFirst(bool val) { getCtx()->top_field_first = val; }
+
+  virtual bool
+  isPaletteChanged() { return getCtx()->palette_has_changed; }
+  virtual void
+  setPaletteChange(bool val) { getCtx()->palette_has_changed = val; }
+
+  virtual MediaPicture::Type getType() { return (MediaPicture::Type) getCtx()->pict_type; }
+  virtual void setType(MediaPicture::Type type) { getCtx()->pict_type = (enum AVPictureType)type; }
+
 protected:
   MediaPictureImpl();
   virtual
   ~MediaPictureImpl();
+  AVFrame*
+  getCtx() {
+    return mFrame;
+  }
+private:
+  AVFrame* mFrame;
+  bool     mComplete;
 };
 
 } /* namespace video */
