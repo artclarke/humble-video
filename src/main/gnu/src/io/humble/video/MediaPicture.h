@@ -127,6 +127,14 @@ public:
   getNumDataPlanes()=0;
 
   /**
+   * The width in pixels of a line of the image in the given plane.
+   * @plane The plane from the data. Not all images have more than one plane. None have more than 4.
+   * @return The width in pixels, or 0 on error.
+   */
+  virtual int32_t
+  getLineSize(int32_t plane)=0;
+
+  /**
    * Set this frame to complete with the given timestamp.
    */
   virtual void

@@ -183,6 +183,16 @@ public class MediaPicture extends MediaRaw {
   }
 
 /**
+ * The width in pixels of a line of the image in the given plane.  
+ * The plane from the data. Not all images have more than one plane. 
+ * None have more than 4.  
+ * @return	The width in pixels, or 0 on error.  
+ */
+  public int getLineSize(int plane) {
+    return VideoJNI.MediaPicture_getLineSize(swigCPtr, this, plane);
+  }
+
+/**
  * Set this frame to complete with the given timestamp.  
  */
   public void setComplete(boolean val, long timestamp) {

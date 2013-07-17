@@ -182,10 +182,9 @@ MediaPictureImpl::setComplete(bool val, int64_t timestamp) {
   mFrame->pts = timestamp;
 }
 
-IBuffer*
-MediaPictureImpl::getData(int32_t plane) {
-  // we get the buffer for the given plane if it exists, and wrap
-  // it in an IBuffer
+void
+MediaPictureImpl::validatePlane(int32_t plane)
+{
   if (plane < 0) {
     VS_THROW(HumbleInvalidArgument("plane must be >= 0"));
   }
@@ -194,6 +193,12 @@ MediaPictureImpl::getData(int32_t plane) {
     VS_THROW(HumbleInvalidArgument("plane must be < getNumDataPlanes()"));
   }
 
+}
+IBuffer*
+MediaPictureImpl::getData(int32_t plane) {
+  validatePlane(plane);
+  // we get the buffer for the given plane if it exists, and wrap
+  // it in an IBuffer
   // now we're guaranteed that we should have a plane.
   RefPointer<IBuffer> buffer;
   if (mFrame->buf[plane])
@@ -203,19 +208,18 @@ MediaPictureImpl::getData(int32_t plane) {
 
 int32_t
 MediaPictureImpl::getDataPlaneSize(int32_t plane) {
-  if (plane < 0) {
-    VS_THROW(HumbleInvalidArgument("plane must be >= 0"));
-  }
-  if (plane >= 4) {
-    VS_THROW(HumbleInvalidArgument("plane must be < getNumDataPlanes()"));
-  }
+  validatePlane(plane);
+  return mFrame->buf[plane] ? mFrame->buf[plane]->size : 0;
+}
+int32_t
+MediaPictureImpl::getLineSize(int32_t plane) {
+  validatePlane(plane);
   return mFrame->linesize[plane];
 }
 
 int64_t
 MediaPictureImpl::getError(int32_t plane) {
-  if (plane < 0 || plane >= 4)
-  VS_THROW(HumbleInvalidArgument("plane must be between 0 and 3"));
+  validatePlane(plane);
   return mFrame->error[plane];
 }
 

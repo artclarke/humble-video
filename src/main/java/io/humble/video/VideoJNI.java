@@ -424,6 +424,7 @@ class VideoJNI {
   public final static native long MediaPicture_getData(long jarg1, MediaPicture jarg1_, int jarg2);
   public final static native int MediaPicture_getDataPlaneSize(long jarg1, MediaPicture jarg1_, int jarg2);
   public final static native int MediaPicture_getNumDataPlanes(long jarg1, MediaPicture jarg1_);
+  public final static native int MediaPicture_getLineSize(long jarg1, MediaPicture jarg1_, int jarg2);
   public final static native void MediaPicture_setComplete(long jarg1, MediaPicture jarg1_, boolean jarg2, long jarg3);
   public final static native boolean MediaPicture_isComplete(long jarg1, MediaPicture jarg1_);
   public final static native int MediaPicture_getWidth(long jarg1, MediaPicture jarg1_);

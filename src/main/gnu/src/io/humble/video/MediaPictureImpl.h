@@ -55,6 +55,9 @@ public:
   getDataPlaneSize(int32_t plane);
 
   virtual int32_t
+  getLineSize(int32_t plane);
+
+  virtual int32_t
   getNumDataPlanes();
 
   virtual void
@@ -135,6 +138,7 @@ protected:
     return mFrame;
   }
 private:
+  void validatePlane(int32_t plane);
   AVFrame* mFrame;
   bool     mComplete;
 };
