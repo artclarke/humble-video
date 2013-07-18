@@ -23,8 +23,12 @@
  *      Author: aclarke
  */
 
+#include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/MediaPicture.h>
 #include "MediaPictureTest.h"
+
+using namespace io::humble::ferry;
+using namespace io::humble::video;
 
 MediaPictureTest::MediaPictureTest() {
 }
@@ -34,7 +38,8 @@ MediaPictureTest::~MediaPictureTest() {
 
 void
 MediaPictureTest::testCreation() {
-
+  RefPointer<MediaPicture> picture = MediaPicture::make(1024, 1024, PixelFormat::PIX_FMT_YUV420P);
+  TS_ASSERT(picture);
 }
 
 void
