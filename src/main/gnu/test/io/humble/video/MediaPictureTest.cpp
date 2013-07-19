@@ -38,8 +38,42 @@ MediaPictureTest::~MediaPictureTest() {
 
 void
 MediaPictureTest::testCreation() {
-  RefPointer<MediaPicture> picture = MediaPicture::make(1024, 1024, PixelFormat::PIX_FMT_YUV420P);
+  const PixelFormat::Type format = PixelFormat::PIX_FMT_YUV420P;
+  const int32_t width = 17; // use a prime
+  const int32_t height = 191; // use a prime
+  RefPointer<MediaPicture> picture = MediaPicture::make(width, height, PixelFormat::PIX_FMT_YUV420P);
   TS_ASSERT(picture);
+
+  // let's test the data planes.
+  RefPointer<PixelFormatDescriptor> pixDesc = PixelFormat::getDescriptor(format);
+  TS_ASSERT(pixDesc);
+
+  TS_ASSERT_EQUALS(3, pixDesc->getNumComponents());
+
+  TS_ASSERT_EQUALS(pixDesc->getNumComponents(), picture->getNumDataPlanes());
+
+  // This part of the test is meant for running under valgrind.
+  // it touches each valid 'pixel' in the image and sets it to a
+  // value. If Valgrind gives any errors about reaching outsides of
+  // memory bounds, then there's a bug somewhere downstream in humble.
+  RefPointer<IBuffer> buf;
+
+  for(int32_t i = 0; i < pixDesc->getNumComponents(); i++) {
+    buf = picture->getData(i);
+    TS_ASSERT(buf);
+    uint8_t* data = (uint8_t*)buf->getBytes(0, buf->getBufferSize());
+    // and we're going to set every bit and byte
+    for(int32_t w = 0; w < width; w++)
+      for(int32_t h = 0; h< height; h++) {
+        RefPointer<PixelComponentDescriptor> compDesc = pixDesc->getComponentDescriptor(i);
+        // adjust width and height to correct
+        int32_t shiftWidth = i == 0 ? w : (w >> pixDesc->getLog2ChromaWidth());
+        int32_t shiftHeight = i == 0 ? h : (h >> pixDesc->getLog2ChromaHeight());
+        int32_t index = shiftHeight*(i == 0 ? width : (width >> pixDesc->getLog2ChromaWidth()))+shiftWidth;
+        data[index] = (uint8_t)(((width*h)+w)/256);
+      }
+
+  }
 }
 
 void

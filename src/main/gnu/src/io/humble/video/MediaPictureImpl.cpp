@@ -229,7 +229,7 @@ MediaPictureImpl::getNumDataPlanes() {
   for(; i < AV_NUM_DATA_POINTERS; i++)
     if (!mFrame->data[i])
       break;
-  return i == 0 ? 0 : i-1;
+  return i;
 }
 
 } /* namespace video */
