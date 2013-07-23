@@ -118,6 +118,13 @@ MediaPictureTest::testCreationInvalidParameters() {
 
 void
 MediaPictureTest::testCreationFromBuffer() {
+  RefPointer<MediaPicture> picture;
+  const PixelFormat::Type format = PixelFormat::PIX_FMT_YUV420P;
+  const int32_t width = 17; // use a prime
+  const int32_t height = 191; // use a prime
+  int32_t bufSize = PixelFormat::getBufferSizeNeeded(width, height, format);
+  RefPointer<IBuffer> buf = IBuffer::make(0, bufSize);
 
-
+  picture = MediaPicture::make(buf.value(), width, height, format);
+  TS_ASSERT(picture);
 }

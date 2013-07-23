@@ -63,8 +63,7 @@ MediaPictureImpl::make(int32_t width, int32_t height,
   VS_THROW(HumbleInvalidArgument("pixel format must be specifie"));
 
   // let's figure out how big of a buffer we need
-  int32_t bufSize = av_image_get_buffer_size((enum AVPixelFormat) format, width,
-      height,1);
+  int32_t bufSize = PixelFormat::getBufferSizeNeeded(width, height, format);
 
   RefPointer<IBuffer> buffer = IBuffer::make(0, bufSize);
   MediaPictureImpl* retval = make(buffer.value(), width, height, format);
@@ -93,8 +92,7 @@ MediaPictureImpl::make(IBuffer* buffer, int32_t width, int32_t height,
   }
 
   // let's figure out how big of a buffer we need
-  int32_t bufSize = av_image_get_buffer_size((enum AVPixelFormat) format, width,
-      height, 1);
+  int32_t bufSize = PixelFormat::getBufferSizeNeeded(width, height, format);
   if (bufSize < buffer->getBufferSize()) {
     VS_THROW(
         HumbleInvalidArgument(
