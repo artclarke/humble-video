@@ -184,6 +184,14 @@ public class PixelFormat extends RefCounted {
     return PixelFormat.Type.swigToEnum(VideoJNI.PixelFormat_swapEndianness(pix_fmt.swigValue()));
   }
 
+/**
+ * Find the buffer size that would be necessary to store an image  
+ * with the given qualities.  
+ */
+  public static int getBufferSizeNeeded(int width, int height, PixelFormat.Type pix_fmt) {
+    return VideoJNI.PixelFormat_getBufferSizeNeeded(width, height, pix_fmt.swigValue());
+  }
+
   public enum Type {
   /**
    * Pixel format.

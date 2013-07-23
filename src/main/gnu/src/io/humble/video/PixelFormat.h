@@ -464,6 +464,13 @@ public:
         (enum AVPixelFormat) pix_fmt);
   }
 
+  /**
+   * Find the buffer size that would be necessary to store an image
+   * with the given qualities.
+   */
+  static
+  int32_t getBufferSizeNeeded(int32_t width, int32_t height, PixelFormat::Type pix_fmt);
+
 private:
   // make private
   PixelFormat() {

@@ -179,6 +179,7 @@ class VideoJNI {
   public final static native long PixelFormat_getInstalledFormatDescriptor(int jarg1);
   public final static native int PixelFormat_getNumPlanes(int jarg1);
   public final static native int PixelFormat_swapEndianness(int jarg1);
+  public final static native int PixelFormat_getBufferSizeNeeded(int jarg1, int jarg2, int jarg3);
   public final static native int PixelComponentDescriptor_getPlane(long jarg1, PixelComponentDescriptor jarg1_);
   public final static native int PixelComponentDescriptor_getStepMinus1(long jarg1, PixelComponentDescriptor jarg1_);
   public final static native int PixelComponentDescriptor_getOffsetPlus1(long jarg1, PixelComponentDescriptor jarg1_);

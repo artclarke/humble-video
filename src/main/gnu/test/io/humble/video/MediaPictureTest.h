@@ -38,6 +38,7 @@ public:
   ~MediaPictureTest();
 
   void testCreation();
+  void testCreationInvalidParameters();
   void testCreationFromBuffer();
 
 };

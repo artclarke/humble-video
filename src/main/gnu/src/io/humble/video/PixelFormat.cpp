@@ -96,6 +96,11 @@ PixelFormat::getInstalledFormatDescriptor(int32_t n)
   return last ? PixelFormatDescriptor::make(last) : 0;
 }
 
+int32_t
+PixelFormat::getBufferSizeNeeded(int32_t width, int32_t height, PixelFormat::Type pix_fmt)
+{
+  return av_image_get_buffer_size((enum AVPixelFormat)pix_fmt, width, height, 1);
+}
 
 }
 }

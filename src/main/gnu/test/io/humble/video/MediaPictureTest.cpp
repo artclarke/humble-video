@@ -24,6 +24,9 @@
  */
 
 #include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/LoggerStack.h>
+#include <io/humble/ferry/HumbleException.h>
+
 #include <io/humble/video/MediaPicture.h>
 #include "MediaPictureTest.h"
 
@@ -41,7 +44,7 @@ MediaPictureTest::testCreation() {
   const PixelFormat::Type format = PixelFormat::PIX_FMT_YUV420P;
   const int32_t width = 17; // use a prime
   const int32_t height = 191; // use a prime
-  RefPointer<MediaPicture> picture = MediaPicture::make(width, height, PixelFormat::PIX_FMT_YUV420P);
+  RefPointer<MediaPicture> picture = MediaPicture::make(width, height, format);
   TS_ASSERT(picture);
 
   // let's test the data planes.
@@ -77,6 +80,44 @@ MediaPictureTest::testCreation() {
 }
 
 void
+MediaPictureTest::testCreationInvalidParameters() {
+  RefPointer<MediaPicture> picture;
+  const PixelFormat::Type format = PixelFormat::PIX_FMT_YUV420P;
+  const int32_t width = 17; // use a prime
+  const int32_t height = 191; // use a prime
+  int32_t bufSize = PixelFormat::getBufferSizeNeeded(width, height, format);
+  RefPointer<IBuffer> buf = IBuffer::make(0, bufSize);
+
+  // and this method is going to spew lots of log
+  // error unlesss we turn them off.
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
+
+  TS_ASSERT_THROWS(
+          MediaPicture::make(0, height, format),
+          HumbleInvalidArgument);
+  TS_ASSERT_THROWS(
+          MediaPicture::make(width, 0, format),
+          HumbleInvalidArgument);
+  TS_ASSERT_THROWS(
+          MediaPicture::make(width, height, PixelFormat::PIX_FMT_NONE),
+          HumbleInvalidArgument);
+  TS_ASSERT_THROWS(
+          MediaPicture::make(buf.value(), 0, height, format),
+          HumbleInvalidArgument);
+  TS_ASSERT_THROWS(
+          MediaPicture::make(buf.value(), width, 0, format),
+          HumbleInvalidArgument);
+  TS_ASSERT_THROWS(
+          MediaPicture::make(buf.value(), width, height, PixelFormat::PIX_FMT_NONE),
+          HumbleInvalidArgument);
+  TS_ASSERT_THROWS(
+          MediaPicture::make(0, width, height, format),
+          HumbleInvalidArgument);
+}
+
+void
 MediaPictureTest::testCreationFromBuffer() {
+
 
 }
