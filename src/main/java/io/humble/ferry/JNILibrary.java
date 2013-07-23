@@ -322,10 +322,8 @@ public class JNILibrary implements Comparable<JNILibrary> {
   }
 
   private static File getTmpDir() {
-    File tmpdir = new File(System.getProperty("java.io.tmpdir"));
-    File humbledir = new File(tmpdir, "humble");
-    humbledir.mkdirs();
-    return humbledir.exists() ? humbledir : tmpdir;
+    final File tmpdir = new File(System.getProperty("java.io.tmpdir"));
+    return tmpdir;
   }
 
   /**
