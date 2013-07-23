@@ -45,7 +45,6 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
     static MediaPacketImpl* make(MediaPacketImpl* packet, bool);
   public:
 
-    // Data
     virtual int64_t getTimeStamp() { return getDts(); }
     virtual void setTimeStamp(int64_t aTimeStamp) { setDts(aTimeStamp); }
     virtual bool isKey() { return isKeyPacket(); }
@@ -77,6 +76,10 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
     virtual int64_t getConvergenceDuration();
     virtual void setConvergenceDuration(int64_t duration);
     virtual void setData(io::humble::ferry::IBuffer* buffer);
+
+    virtual int32_t getNumSideDataElems();
+    virtual io::humble::ferry::IBuffer* getSideData(int32_t n);
+    virtual SideDataType getSideDataType(int32_t n);
 
 #ifndef SWIG
     AVPacket *getCtx() { return mPacket; }

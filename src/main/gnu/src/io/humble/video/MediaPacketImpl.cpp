@@ -329,4 +329,40 @@ namespace io { namespace humble { namespace video {
   {
     mPacket->convergence_duration = duration;
   }
+
+  int32_t
+  MediaPacketImpl::getNumSideDataElems()
+  {
+    return mPacket->side_data_elems;
+  }
+
+  static void
+  MediaPacketImpl_freeSideData(void *, void* closure) {
+    MediaPacketImpl* packet = (MediaPacketImpl*)closure;
+    VS_REF_RELEASE(packet);
+  }
+  IBuffer*
+  MediaPacketImpl::getSideData(int32_t n) {
+    if(n < 0 || n > getNumSideDataElems()) {
+      throw HumbleInvalidArgument("n outside of bounds");
+    }
+    if (!mPacket->side_data)
+      throw HumbleRuntimeError("no data where data expected");
+
+    // now wrap the data in an IBuffer, but also reference the
+    // containing packet so the data doesn't get freed before
+    // we're done.
+    return IBuffer::make(this, mPacket->side_data[n].data, mPacket->side_data[n].size,
+        MediaPacketImpl_freeSideData, this);
+  }
+  MediaPacket::SideDataType
+  MediaPacketImpl::getSideDataType(int32_t n) {
+    if(n < 0 || n > getNumSideDataElems()) {
+      throw HumbleInvalidArgument("n outside of bounds");
+    }
+    if (!mPacket->side_data)
+      throw HumbleRuntimeError("no data where data expected");
+    return (MediaPacket::SideDataType)mPacket->side_data[n].type;
+  }
+
 }}}

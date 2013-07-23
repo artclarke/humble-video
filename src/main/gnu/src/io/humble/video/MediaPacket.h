@@ -40,19 +40,114 @@ class VS_API_HUMBLEVIDEO MediaPacket : public io::humble::video::MediaEncoded
    */
 public:
 
+  typedef enum SideDataType {
+    DATA_UNKNOWN = -1,
+
+    DATA_PALETTE = AV_PKT_DATA_PALETTE,
+    DATA_NEW_EXTRADATA = AV_PKT_DATA_NEW_EXTRADATA,
+
+    /**
+     * An AV_PKT_DATA_PARAM_CHANGE side data packet is laid out as follows:
+     * @code
+     * u32le param_flags
+     * if (param_flags & AV_SIDE_DATA_PARAM_CHANGE_CHANNEL_COUNT)
+     *     s32le channel_count
+     * if (param_flags & AV_SIDE_DATA_PARAM_CHANGE_CHANNEL_LAYOUT)
+     *     u64le channel_layout
+     * if (param_flags & AV_SIDE_DATA_PARAM_CHANGE_SAMPLE_RATE)
+     *     s32le sample_rate
+     * if (param_flags & AV_SIDE_DATA_PARAM_CHANGE_DIMENSIONS)
+     *     s32le width
+     *     s32le height
+     * @endcode
+     */
+    DATA_PARAM_CHANGE = AV_PKT_DATA_PARAM_CHANGE,
+
+    /**
+     * An AV_PKT_DATA_H263_MB_INFO side data packet contains a number of
+     * structures with info about macroblocks relevant to splitting the
+     * packet into smaller packets on macroblock edges (e.g. as for RFC 2190).
+     * That is, it does not necessarily contain info about all macroblocks,
+     * as long as the distance between macroblocks in the info is smaller
+     * than the target payload size.
+     * Each MB info structure is 12 bytes, and is laid out as follows:
+     * @code
+     * u32le bit offset from the start of the packet
+     * u8    current quantizer at the start of the macroblock
+     * u8    GOB number
+     * u16le macroblock address within the GOB
+     * u8    horizontal MV predictor
+     * u8    vertical MV predictor
+     * u8    horizontal MV predictor for block number 3
+     * u8    vertical MV predictor for block number 3
+     * @endcode
+     */
+    DATA_H263_MB_INFO = AV_PKT_DATA_H263_MB_INFO,
+
+    /**
+     * Recommmends skipping the specified number of samples
+     * @code
+     * u32le number of samples to skip from start of this packet
+     * u32le number of samples to skip from end of this packet
+     * u8    reason for start skip
+     * u8    reason for end   skip (0=padding silence, 1=convergence)
+     * @endcode
+     */
+    DATA_SKIP_SAMPLES = AV_PKT_DATA_SKIP_SAMPLES,
+
+    /**
+     * An AV_PKT_DATA_JP_DUALMONO side data packet indicates that
+     * the packet may contain "dual mono" audio specific to Japanese DTV
+     * and if it is true, recommends only the selected channel to be used.
+     * @code
+     * u8    selected channels (0=mail/left, 1=sub/right, 2=both)
+     * @endcode
+     */
+    DATA_JP_DUALMONO = AV_PKT_DATA_JP_DUALMONO,
+
+    /**
+     * A list of zero terminated key/value strings. There is no end marker for
+     * the list, so it is required to rely on the side data size to stop.
+     */
+    DATA_STRINGS_METADATA = AV_PKT_DATA_STRINGS_METADATA,
+
+    /**
+     * Subtitle event position
+     * @code
+     * u32le x1
+     * u32le y1
+     * u32le x2
+     * u32le y2
+     * @endcode
+     */
+    DATA_SUBTITLE_POSITION = AV_PKT_DATA_SUBTITLE_POSITION,
+
+    /**
+     * Data found in BlockAdditional element of matroska container. There is
+     * no end marker for the data, so it is required to rely on the side data
+     * size to recognize the end. 8 byte id (as found in BlockAddId) followed
+     * by data.
+     */
+    DATA_MATROSKA_BLOCKADDITIONAL = AV_PKT_DATA_MATROSKA_BLOCKADDITIONAL,
+
+    /**
+     * The optional first identifier line of a WebVTT cue.
+     */
+    DATA_WEBVTT_IDENTIFIER = AV_PKT_DATA_WEBVTT_IDENTIFIER,
+
+    /**
+     * The optional settings (rendering instructions) that immediately
+     * follow the timestamp specifier of a WebVTT cue.
+     */
+    DATA_WEBVTT_SETTINGS = AV_PKT_DATA_WEBVTT_SETTINGS,
+
+  } SideDataType;
+
   /**
    * Create a new {@link Packet}
    */
   static MediaPacket*
   make();
-
-  /**
-   * Get any underlying raw data available for this packet.
-   *
-   * @return The raw data, or null if not accessible.
-   */
-  virtual io::humble::ferry::IBuffer* getData()=0;
-
 
   /**
    * Allocate a new packet that wraps an existing IBuffer.
@@ -99,6 +194,42 @@ public:
    */
   static MediaPacket*
   make(int32_t size);
+
+
+  /**
+   * Get any underlying raw data available for this packet.
+   *
+   * @return The raw data, or null if not accessible.
+   */
+  virtual io::humble::ferry::IBuffer* getData()=0;
+
+  /**
+   * Get the number of side data elements in this packet.
+   */
+  virtual int32_t getNumSideDataElems()=0;
+
+  /**
+   * Get the n'th item of SideData.
+   * <p>
+   * WARNING: Callers must ensure that the the packet object
+   * this is called form is NOT reset or destroyed while using this buffer,
+   * as unfortunately we cannot ensure this buffer survives the
+   * underlying packet data.
+   * </p>
+   *
+   * @param n The n'th item to get.
+   * @return the data, or null if none found
+   * @throws InvalidArgument if n < 0 || n >= {@link #getNumSideDataElems()}
+   */
+  virtual io::humble::ferry::IBuffer* getSideData(int32_t n)=0;
+  /**
+   * Get the n'th item of SideData.
+   *
+   * @param n The n'th item to get.
+   * @return the data, or {@link SideDataType.DATA_UNKNOWN} if none found
+   * @throws InvalidArgument if n < 0 || n >= {@link #getNumSideDataElems()}
+   */
+  virtual SideDataType getSideDataType(int32_t n) = 0;
 
   /**
    * Get the Presentation Time Stamp (PTS) for this packet.

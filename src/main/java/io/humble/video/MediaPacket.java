@@ -122,15 +122,6 @@ public class MediaPacket extends MediaEncoded {
   }
 
 /**
- * Get any underlying raw data available for this packet.  
- * @return	The raw data, or null if not accessible.  
- */
-  public IBuffer getData() {
-    long cPtr = VideoJNI.MediaPacket_getData(swigCPtr, this);
-    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
-  }
-
-/**
  * Allocate a new packet that wraps an existing IBuffer.  
  * NOTE: At least 16 bytes of the passed in buffer will be used  
  * for header information, so the resulting {@link Packet.getSize() 
@@ -176,6 +167,53 @@ public class MediaPacket extends MediaEncoded {
   public static MediaPacket make(int size) {
     long cPtr = VideoJNI.MediaPacket_make__SWIG_3(size);
     return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
+  }
+
+/**
+ * Get any underlying raw data available for this packet.  
+ * @return	The raw data, or null if not accessible.  
+ */
+  public IBuffer getData() {
+    long cPtr = VideoJNI.MediaPacket_getData(swigCPtr, this);
+    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+  }
+
+/**
+ * Get the number of side data elements in this packet.  
+ */
+  public int getNumSideDataElems() {
+    return VideoJNI.MediaPacket_getNumSideDataElems(swigCPtr, this);
+  }
+
+/**
+ * Get the n'th item of SideData.  
+ * <p>  
+ * WARNING: Callers must ensure that the the packet object  
+ * this is called form is NOT reset or destroyed while using this buffer, 
+ *  
+ * as unfortunately we cannot ensure this buffer survives the  
+ * underlying packet data.  
+ * </p>  
+ * @param	n The n'th item to get.  
+ * @return	the data, or null if none found  
+ * @throws	InvalidArgument if n < 0 || n >= {@link #getNumSideDataElems()} 
+ *		  
+ */
+  public IBuffer getSideData(int n) {
+    long cPtr = VideoJNI.MediaPacket_getSideData(swigCPtr, this, n);
+    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+  }
+
+/**
+ * Get the n'th item of SideData.  
+ * @param	n The n'th item to get.  
+ * @return	the data, or {@link SideDataType.DATA_UNKNOWN} if none found 
+ *		  
+ * @throws	InvalidArgument if n < 0 || n >= {@link #getNumSideDataElems()} 
+ *		  
+ */
+  public MediaPacket.SideDataType getSideDataType(int n) {
+    return MediaPacket.SideDataType.swigToEnum(VideoJNI.MediaPacket_getSideDataType(swigCPtr, this, n));
   }
 
 /**
@@ -402,6 +440,130 @@ public class MediaPacket extends MediaEncoded {
  */
   public int reset(int payloadSize) {
     return VideoJNI.MediaPacket_reset(swigCPtr, this, payloadSize);
+  }
+
+  public enum SideDataType {
+    DATA_UNKNOWN(VideoJNI.MediaPacket_DATA_UNKNOWN_get()),
+    DATA_PALETTE(VideoJNI.MediaPacket_DATA_PALETTE_get()),
+    DATA_NEW_EXTRADATA(VideoJNI.MediaPacket_DATA_NEW_EXTRADATA_get()),
+  /**
+   * An AV_PKT_DATA_PARAM_CHANGE side data packet is laid out as follows: 
+   *
+   * code u32le param_flags param_flags if (param_flags & AV_SIDE_DATA_PARAM_CHANGE_CHANNEL_COUNT) 
+   * AV_SIDE_DATA_PARAM_CHANGE_CHANNEL_COUNT) s32le channel_count channel_count 
+   * if (param_flags & AV_SIDE_DATA_PARAM_CHANGE_CHANNEL_LAYOUT) AV_SIDE_DATA_PARAM_CHANGE_CHANNEL_LAYOUT) 
+   * u64le channel_layout channel_layout if (param_flags & AV_SIDE_DATA_PARAM_CHANGE_SAMPLE_RATE) 
+   * AV_SIDE_DATA_PARAM_CHANGE_SAMPLE_RATE) s32le sample_rate sample_rate 
+   * if (param_flags & AV_SIDE_DATA_PARAM_CHANGE_DIMENSIONS) AV_SIDE_DATA_PARAM_CHANGE_DIMENSIONS) 
+   * s32le width width s32le height height 
+   */
+    DATA_PARAM_CHANGE(VideoJNI.MediaPacket_DATA_PARAM_CHANGE_get()),
+  /**
+   * An AV_PKT_DATA_H263_MB_INFO side data packet contains a number of 
+   *
+   * structures with info about macroblocks relevant to splitting the 
+   *
+   * packet into smaller packets on macroblock edges (e.g. as for RFC 
+   * 2190).
+   * That is, it does not necessarily contain info about all macroblocks, 
+   *
+   * as long as the distance between macroblocks in the info is smaller 
+   *
+   * than the target payload size.
+   *
+   * code u32le bit offset from the start of the packet packet u8 current 
+   * quantizer at the start of the macroblock macroblock u8 GOB number 
+   * number u16le macroblock address within the GOB GOB u8 horizontal 
+   * MV predictor predictor u8 vertical MV predictor predictor u8 horizontal 
+   * MV predictor for block number 3 3 u8 vertical MV predictor for block 
+   * number 3 3 
+   */
+    DATA_H263_MB_INFO(VideoJNI.MediaPacket_DATA_H263_MB_INFO_get()),
+  /**
+   * Recommmends skipping the specified number of samples
+   * code u32le number of samples to skip from start of this packet packet 
+   * u32le number of samples to skip from end of this packet packet u8 
+   * reason for start skip skip u8 reason for end skip (0=padding silence, 
+   * 1=convergence) 1=convergence) 
+   */
+    DATA_SKIP_SAMPLES(VideoJNI.MediaPacket_DATA_SKIP_SAMPLES_get()),
+  /**
+   * An AV_PKT_DATA_JP_DUALMONO side data packet indicates that
+   * the packet may contain "dual mono" audio specific to Japanese DTV 
+   *
+   * and if it is true, recommends only the selected channel to be used. 
+   *
+   *
+   */
+    DATA_JP_DUALMONO(VideoJNI.MediaPacket_DATA_JP_DUALMONO_get()),
+  /**
+   * A list of zero terminated key/value strings. There is no end marker 
+   * for
+   * the list, so it is required to rely on the side data size to stop. 
+   *
+   */
+    DATA_STRINGS_METADATA(VideoJNI.MediaPacket_DATA_STRINGS_METADATA_get()),
+  /**
+   * Subtitle event position
+   * code u32le x1 x1 u32le y1 y1 u32le x2 x2 u32le y2 y2 
+   */
+    DATA_SUBTITLE_POSITION(VideoJNI.MediaPacket_DATA_SUBTITLE_POSITION_get()),
+  /**
+   * Data found in BlockAdditional element of matroska container. There 
+   * is
+   * no end marker for the data, so it is required to rely on the side 
+   * data
+   * size to recognize the end. 8 byte id (as found in BlockAddId) followed 
+   *
+   * by data.
+   */
+    DATA_MATROSKA_BLOCKADDITIONAL(VideoJNI.MediaPacket_DATA_MATROSKA_BLOCKADDITIONAL_get()),
+  /**
+   * The optional first identifier line of a WebVTT cue.
+   */
+    DATA_WEBVTT_IDENTIFIER(VideoJNI.MediaPacket_DATA_WEBVTT_IDENTIFIER_get()),
+  /**
+   *
+   * follow the timestamp specifier of a WebVTT cue.
+   */
+    DATA_WEBVTT_SETTINGS(VideoJNI.MediaPacket_DATA_WEBVTT_SETTINGS_get());
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static SideDataType swigToEnum(int swigValue) {
+      SideDataType[] swigValues = SideDataType.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (SideDataType swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + SideDataType.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private SideDataType() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private SideDataType(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private SideDataType(SideDataType swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
   }
 
 }
