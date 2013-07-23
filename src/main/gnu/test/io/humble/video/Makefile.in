@@ -78,8 +78,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = VideoPictureTester$(EXEEXT) \
-	PixelFormatTester$(EXEEXT) CodecTester$(EXEEXT) \
+check_PROGRAMS = PixelFormatTester$(EXEEXT) CodecTester$(EXEEXT) \
 	IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
 	MediaPacketTester$(EXEEXT) MediaAudioTester$(EXEEXT) \
 	MediaPictureTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
@@ -206,14 +205,6 @@ SourceTester_OBJECTS = $(am_SourceTester_OBJECTS) \
 	$(nodist_SourceTester_OBJECTS)
 SourceTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_VideoPictureTester_OBJECTS = VideoPictureTest.$(OBJEXT) \
-	TestData.$(OBJEXT) Main.$(OBJEXT)
-nodist_VideoPictureTester_OBJECTS =  \
-	VideoPictureTest_CXXRunner.$(OBJEXT)
-VideoPictureTester_OBJECTS = $(am_VideoPictureTester_OBJECTS) \
-	$(nodist_VideoPictureTester_OBJECTS)
-VideoPictureTester_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -267,16 +258,14 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(nodist_SourceFormatTester_SOURCES) \
 	$(SourceStreamTester_SOURCES) \
 	$(nodist_SourceStreamTester_SOURCES) $(SourceTester_SOURCES) \
-	$(nodist_SourceTester_SOURCES) $(VideoPictureTester_SOURCES) \
-	$(nodist_VideoPictureTester_SOURCES)
+	$(nodist_SourceTester_SOURCES)
 DIST_SOURCES = $(CodecTester_SOURCES) $(ErrorTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(KeyValueBagTester_SOURCES) \
 	$(MediaAudioTester_SOURCES) $(MediaPacketTester_SOURCES) \
 	$(MediaPictureTester_SOURCES) $(PixelFormatTester_SOURCES) \
 	$(PropertyTester_SOURCES) $(RationalTester_SOURCES) \
 	$(SinkFormatTester_SOURCES) $(SourceFormatTester_SOURCES) \
-	$(SourceStreamTester_SOURCES) $(SourceTester_SOURCES) \
-	$(VideoPictureTester_SOURCES)
+	$(SourceStreamTester_SOURCES) $(SourceTester_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -730,7 +719,6 @@ VS_CPP_NAMESPACE = io::humble::video
 VS_TEST = 1
 SUBDIRS = customio
 BUILT_SOURCES = \
-  VideoPictureTest_CXXRunner.cpp \
   PixelFormatTest_CXXRunner.cpp \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
@@ -747,7 +735,6 @@ BUILT_SOURCES = \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
-  VideoPictureTest.h \
   PixelFormatTest.h \
   CodecTest.h \
   IndexEntryTest.h \
@@ -769,17 +756,6 @@ inst_checkdir = $(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS = $(check_PROGRAMS)
-VideoPictureTester_SOURCES = \
-  VideoPictureTest.cpp \
-  TestData.cpp \
-  Main.cpp
-
-nodist_VideoPictureTester_SOURCES = \
-  VideoPictureTest_CXXRunner.cpp
-
-VideoPictureTester_LDADD = \
-  $(top_builddir)/src/io/humble/libhumblevideo.la 
-
 PixelFormatTester_SOURCES = \
   PixelFormatTest.cpp \
   TestData.cpp \
@@ -1028,10 +1004,6 @@ SourceTester$(EXEEXT): $(SourceTester_OBJECTS) $(SourceTester_DEPENDENCIES) $(EX
 	@rm -f SourceTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(SourceTester_OBJECTS) $(SourceTester_LDADD) $(LIBS)
 
-VideoPictureTester$(EXEEXT): $(VideoPictureTester_OBJECTS) $(VideoPictureTester_DEPENDENCIES) $(EXTRA_VideoPictureTester_DEPENDENCIES) 
-	@rm -f VideoPictureTester$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(VideoPictureTester_OBJECTS) $(VideoPictureTester_LDADD) $(LIBS)
-
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -1068,8 +1040,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestData.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VideoPictureTest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VideoPictureTest_CXXRunner.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1338,13 +1308,6 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
-VideoPictureTester.log: VideoPictureTester$(EXEEXT)
-	@p='VideoPictureTester$(EXEEXT)'; \
-	b='VideoPictureTester'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
 PixelFormatTester.log: PixelFormatTester$(EXEEXT)
 	@p='PixelFormatTester$(EXEEXT)'; \
 	b='PixelFormatTester'; \

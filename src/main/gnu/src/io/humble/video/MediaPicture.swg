@@ -18,6 +18,29 @@
  *******************************************************************************/
 
 %typemap (javacode) io::humble::video::MediaPicture,io::humble::video::MediaPicture*,io::humble::video::MediaPicture& %{
+  /**
+   * info about this packet
+   * @return information about this packet
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("width:"+getWidth()+";");
+    result.append("height:"+getHeight()+";");
+    result.append("format:"+getFormat()+";");
+    result.append("time stamp:"+getTimeStamp()+";");
+    result.append("complete:"+isComplete()+";");
+    result.append("key:"+isKey()+";");
+    Rational timeBase = Global.getDefaultTimeBase();
+    result.append("time base:"+timeBase+";");
+    if (timeBase != null) timeBase.delete();
+    result.append("]");
+    return result.toString();
+  }
+
 %}
 
 %include <io/humble/video/MediaPicture.h>

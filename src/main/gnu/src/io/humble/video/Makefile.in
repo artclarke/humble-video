@@ -98,15 +98,14 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_video_la_DEPENDENCIES =
 am_libhumble_video_la_OBJECTS = AVBufferSupport.lo PixelFormat.lo \
-	VideoPicture.lo VideoPictureImpl.lo KeyValueBag.lo \
-	KeyValueBagImpl.lo Property.lo PropertyImpl.lo Rational.lo \
-	RationalImpl.lo Codec.lo Media.lo MediaRaw.lo MediaAudio.lo \
-	MediaAudioImpl.lo MediaPicture.lo MediaPictureImpl.lo \
-	IndexEntry.lo IndexEntryImpl.lo Error.lo ErrorImpl.lo \
-	MediaPacket.lo MediaPacketImpl.lo ContainerFormat.lo \
-	Configurable.lo ContainerStream.lo Container.lo \
-	SourceFormat.lo Source.lo SourceImpl.lo SourceStream.lo \
-	SourceStreamImpl.lo SinkFormat.lo Global.lo
+	KeyValueBag.lo KeyValueBagImpl.lo Property.lo PropertyImpl.lo \
+	Rational.lo RationalImpl.lo Codec.lo Media.lo MediaRaw.lo \
+	MediaAudio.lo MediaAudioImpl.lo MediaPicture.lo \
+	MediaPictureImpl.lo IndexEntry.lo IndexEntryImpl.lo Error.lo \
+	ErrorImpl.lo MediaPacket.lo MediaPacketImpl.lo \
+	ContainerFormat.lo Configurable.lo ContainerStream.lo \
+	Container.lo SourceFormat.lo Source.lo SourceImpl.lo \
+	SourceStream.lo SourceStreamImpl.lo SinkFormat.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -433,8 +432,6 @@ libhumble_video_la_LIBADD = $(VS_PKG_LIBRARIES)
 libhumble_video_la_SOURCES = \
   AVBufferSupport.cpp \
   PixelFormat.cpp \
-  VideoPicture.cpp \
-  VideoPictureImpl.cpp \
   KeyValueBag.cpp \
   KeyValueBagImpl.cpp \
   Property.cpp \
@@ -478,9 +475,6 @@ libhumble_video_la_HEADERS = \
   FfmpegIncludes.h \
   Global.swg \
   PixelFormat.h \
-  VideoPicture.h \
-  VideoPicture.swg \
-  VideoPictureImpl.h \
   KeyValueBag.h \
   KeyValueBagImpl.h \
   KeyValueBag.swg \
@@ -621,8 +615,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceStream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceStreamImpl.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VideoPicture.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VideoPictureImpl.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
