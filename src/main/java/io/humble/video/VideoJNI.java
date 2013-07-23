@@ -1166,6 +1166,9 @@ class VideoJNI {
   public final static native long SWIGSinkFormatUpcast(long jarg1);
   public final static native long SWIGSourceFormatUpcast(long jarg1);
   public final static native long SWIGIndexEntryUpcast(long jarg1);
+  public final static native long SWIGCoderUpcast(long jarg1);
+  public final static native long SWIGDecoderUpcast(long jarg1);
+  public final static native long SWIGEncoderUpcast(long jarg1);
   public final static native long SWIGContainerStreamUpcast(long jarg1);
   public final static native long SWIGContainerUpcast(long jarg1);
   public final static native long SWIGSourceStreamUpcast(long jarg1);

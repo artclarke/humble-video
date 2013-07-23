@@ -35,6 +35,9 @@ libhumble_video_la_SOURCES= \
   MediaPacketImpl.cpp \
   ContainerFormat.cpp \
   Configurable.cpp \
+  Coder.cpp \
+  Decoder.cpp \
+  Encoder.cpp \
   ContainerStream.cpp \
   Container.cpp \
   SourceFormat.cpp \
@@ -93,6 +96,12 @@ libhumble_video_la_HEADERS= \
   SourceFormat.swg \
   Configurable.h \
   Configurable.swg \
+  Coder.h \
+  Coder.swg \
+  Decoder.h \
+  Decoder.swg \
+  Encoder.h \
+  Encoder.swg \
   ContainerStream.h \
   ContainerStream.swg \
   Container.h \

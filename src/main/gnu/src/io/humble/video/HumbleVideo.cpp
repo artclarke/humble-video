@@ -227,6 +227,9 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <io/humble/video/SourceFormat.h>
 #include <io/humble/video/IndexEntry.h>
 #include <io/humble/video/ContainerStream.h>
+#include <io/humble/video/Coder.h>
+#include <io/humble/video/Decoder.h>
+#include <io/humble/video/Encoder.h>
 #include <io/humble/video/Container.h>
 #include <io/humble/video/SourceStream.h>
 #include <io/humble/video/Source.h>
@@ -35115,6 +35118,30 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGIndexEntryUpcast(JNIE
     (void)jenv;
     (void)jcls;
     *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::video::IndexEntry **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGCoderUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::video::Configurable **)&baseptr = *(io::humble::video::Coder **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGDecoderUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::video::Coder **)&baseptr = *(io::humble::video::Decoder **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGEncoderUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::video::Coder **)&baseptr = *(io::humble::video::Encoder **)&jarg1;
     return baseptr;
 }
 
