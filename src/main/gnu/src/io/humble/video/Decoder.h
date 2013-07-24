@@ -114,11 +114,16 @@ public:
   virtual int32_t decodeSubtitle(MediaSubtitle * output,
       MediaPacket *packet, int32_t byteOffset)=0;
 
-
+#ifndef SWIG
+  virtual void* getCtx() { return getCodecCtx(); }
+  virtual AVCodecContext* getCodecCtx() { return mCtx; }
+#endif
 protected:
   Decoder();
   virtual
   ~Decoder();
+private:
+  AVCodecContext* mCtx;
 };
 
 } /* namespace video */

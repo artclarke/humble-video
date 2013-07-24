@@ -211,7 +211,7 @@ public class Coder extends Configurable {
   }
 
 /**
- * Get the sample rate we use for this stream.  
+ * Get the sample rate we use for this coder.  
  * @return	The sample rate (in Hz) we use for this stream, or -1 if 
  *		 unknown or video.  
  */

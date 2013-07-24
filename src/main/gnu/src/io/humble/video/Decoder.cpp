@@ -33,9 +33,11 @@ namespace humble {
 namespace video {
 
 Decoder::Decoder() {
+  mCtx = 0;
 }
 
 Decoder::~Decoder() {
+  av_free(mCtx);
 }
 
 Decoder*
@@ -43,6 +45,10 @@ Decoder::make(Codec* codec)
 {
   if (!codec)
     throw HumbleInvalidArgument("no codec passed in");
+
+  if (!codec->canDecode())
+    throw HumbleInvalidArgument("passed in codec cannot decode");
+
   return 0;
 }
 
