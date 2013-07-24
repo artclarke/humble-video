@@ -27,6 +27,7 @@
 #define CODER_H_
 
 #include <io/humble/video/Configurable.h>
+#include <io/humble/video/Codec.h>
 
 namespace io {
 namespace humble {
@@ -34,6 +35,7 @@ namespace video {
 
 class VS_API_HUMBLEVIDEO Coder : public io::humble::video::Configurable
 {
+public:
   typedef enum Flag {
     FLAG_UNALIGNED = CODEC_FLAG_UNALIGNED,
     /** Use fixed qscale. */
@@ -102,6 +104,158 @@ class VS_API_HUMBLEVIDEO Coder : public io::humble::video::Configurable
     /** Show all frames before the first keyframe */
     FLAG2_SHOW_ALL = CODEC_FLAG2_SHOW_ALL,
   } Flag2;
+
+  /**
+   * Open this Coder, using the given bag of Codec-specific options.
+   *
+   * @param inputOptions If non-null, a bag of codec-specific options.
+   * @param unsetOptions If non-null, the bag will be emptied and then filled with
+   *                     the options in <code>inputOptions</code> that were not set.
+   *
+   */
+  virtual void open(KeyValueBag* inputOptions, KeyValueBag* unsetOptions)=0;
+
+  /**
+   * Close this coder and free all memory.
+   */
+  virtual void close()=0;
+
+  /**
+   * The Codec this StreamCoder will use.
+   *
+   * @return The Codec used by this StreamCoder, or 0 (null) if none.
+   */
+  virtual Codec* getCodec()=0;
+
+  /**
+   * A short hand for getCodec().getType().
+   *
+   * @return The Type of the Codec we'll use.
+   */
+  virtual MediaDescriptor::Type getCodecType()=0;
+
+  /**
+   *
+   * A short hand for getCodec().getID().
+   *
+   * @return The ID of the Codec we'll use.
+   */
+  virtual Codec::ID getCodecID()=0;
+
+  /**
+   * The height, in pixels.
+   *
+   * @return The height of the video frames in the attached stream
+   *   or -1 if an audio stream, or we cannot determine the height.
+   */
+  virtual int32_t getHeight()=0;
+
+  /**
+   * Set the height, in pixels.
+   *
+   * @see #getHeight()
+   *
+   * @param height Sets the height of video frames we'll encode.  No-op when DECODING.
+   */
+  virtual void setHeight(int32_t height)=0;
+
+  /**
+   * The width, in pixels.
+   *
+   * @return The width of the video frames in the attached stream
+   *   or -1 if an audio stream, or we cannot determine the width.
+   */
+  virtual int32_t getWidth()=0;
+
+  /**
+   * Set the width, in pixels
+   *
+   * @see #getWidth()
+   *
+   * @param width Sets the width of video frames we'll encode.  No-op when DECODING.
+   */
+  virtual void setWidth(int32_t width)=0;
+
+  /**
+   * For Video streams, get the Pixel Format in use by the stream.
+   *
+   * @return the Pixel format, or PixelFormat::PIX_FMT_NONE if audio.
+   */
+  virtual PixelFormat::Type getPixelFormat()=0;
+
+  /**
+   * Set the pixel format to ENCODE with.  Ignored if audio or
+   * DECODING.
+   *
+   * @param pixelFmt Pixel format to use.
+   */
+  virtual void setPixelType(PixelFormat::Type pixelFmt)=0;
+
+  /**
+   * Get the sample rate we use for this stream.
+   *
+   * @return The sample rate (in Hz) we use for this stream, or -1 if unknown or video.
+   */
+  virtual int32_t getSampleRate()=0;
+
+  /**
+   * Set the sample rate to use when ENCODING.  Ignored if DECODING
+   * or a non-audio stream.
+   *
+   * @param sampleRate New sample rate (in Hz) to use.
+   */
+  virtual void setSampleRate(int32_t sampleRate)=0;
+
+  /**
+   * Get the audio sample format.
+   *
+   * @return The sample format of samples for encoding/decoding.
+   */
+  virtual AudioFormat::Type getSampleFormat()=0;
+
+  /**
+   * Set the sample format when ENCODING.  Ignored if DECODING
+   * or if the coder is already open.
+   *
+   * @param format The sample format.
+   */
+  virtual void setSampleFormat(AudioFormat::Type format)=0;
+
+  /**
+   * Get the number of channels in this audio stream
+   *
+   * @return The sample rate (in Hz) we use for this stream, or 0 if unknown.
+   */
+  virtual int32_t getChannels()=0;
+
+  /**
+   * Set the number of channels to use when ENCODING.  Ignored if a
+   * non audio stream, or if DECODING.
+   *
+   * @param channels The number of channels we'll encode with.
+   */
+  virtual void setChannels(int32_t channels)=0;
+
+  /**
+   * Get the time base this stream will ENCODE in, or the time base we
+   * detect while DECODING.
+   *
+   * @return The time base this StreamCoder is using.
+   */
+  virtual Rational* getTimeBase()=0;
+
+  /**
+   * Set the time base we'll use to ENCODE with.  A no-op when DECODING.
+   *
+   * As a convenience, we forward this call to the Stream#setTimeBase()
+   * method.
+   *
+   * @see #getTimeBase()
+   *
+   * @param newTimeBase The new time base to use.
+   */
+  virtual void setTimeBase(Rational* newTimeBase)=0;
+
 protected:
   Coder();
   virtual

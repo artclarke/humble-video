@@ -17,43 +17,36 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * Encoder.cpp
+ * MediaSubtitleImpl.h
  *
  *  Created on: Jul 23, 2013
  *      Author: aclarke
  */
 
-#include "Encoder.h"
-#include <io/humble/ferry/HumbleException.h>
+#ifndef MEDIASUBTITLEIMPL_H_
+#define MEDIASUBTITLEIMPL_H_
 
-using namespace io::humble::ferry;
+#include "MediaSubtitle.h"
 
 namespace io {
 namespace humble {
 namespace video {
 
-Encoder::Encoder() {
-}
-
-Encoder::~Encoder() {
-}
-
-Encoder*
-Encoder::make(Codec* codec)
+class MediaSubtitleImpl : public io::humble::video::MediaSubtitle
 {
-  if (!codec)
-    throw HumbleInvalidArgument("no codec passed in");
-  return 0;
-}
-
-Encoder*
-Encoder::make(Encoder* src)
-{
-  if (!src)
-    throw HumbleInvalidArgument("no Encoder to copy");
-  return 0;
-}
+  VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MediaSubtitleImpl);
+protected:
+  MediaSubtitleImpl();
+  virtual
+  ~MediaSubtitleImpl();
+  virtual bool isComplete() { return mComplete; }
+  virtual AVFrame* getCtx() { return 0; }
+private:
+  bool mComplete;
+  AVSubtitle* mCtx;
+};
 
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
+#endif /* MEDIASUBTITLEIMPL_H_ */

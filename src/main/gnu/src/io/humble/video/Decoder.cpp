@@ -24,18 +24,34 @@
  */
 
 #include "Decoder.h"
+#include <io/humble/ferry/HumbleException.h>
+
+using namespace io::humble::ferry;
 
 namespace io {
 namespace humble {
 namespace video {
 
 Decoder::Decoder() {
-  // TODO Auto-generated constructor stub
-
 }
 
 Decoder::~Decoder() {
-  // TODO Auto-generated destructor stub
+}
+
+Decoder*
+Decoder::make(Codec* codec)
+{
+  if (!codec)
+    throw HumbleInvalidArgument("no codec passed in");
+  return 0;
+}
+
+Decoder*
+Decoder::make(Decoder* src)
+{
+  if (!src)
+    throw HumbleInvalidArgument("no Encoder to copy");
+  return 0;
 }
 
 } /* namespace video */

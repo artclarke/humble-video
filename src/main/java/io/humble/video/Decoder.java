@@ -109,4 +109,90 @@ public class Decoder extends Coder {
   // JNIHelper.swg: End generated code
   
 
+/**
+ *  
+ * @return	a {@link Decoder}  
+ * @throws	InvalidArgument if codec is null or codec cannot decode. 
+ *		  
+ */
+  public static Decoder make(Codec codec) {
+    long cPtr = VideoJNI.Decoder_make__SWIG_0(Codec.getCPtr(codec), codec);
+    return (cPtr == 0) ? null : new Decoder(cPtr, false);
+  }
+
+/**
+ * Creates a {@link Decoder} from a given {@link Decoder}  
+ * @return	a {@link Decoder}  
+ * @throws	InvalidArgument if src is null  
+ */
+  public static Decoder make(Decoder src) {
+    long cPtr = VideoJNI.Decoder_make__SWIG_1(Decoder.getCPtr(src), src);
+    return (cPtr == 0) ? null : new Decoder(cPtr, false);
+  }
+
+/**
+ * Flush this {@link Decoder}, getting rid of any cached packets (call 
+ * after seek).  
+ * Next packet given to decode should be a key packet.  
+ */
+  public void flush() {
+    VideoJNI.Decoder_flush(swigCPtr, this);
+  }
+
+/**
+ * Decode this packet into output. It will  
+ * try to fill up the audio samples object, starting  
+ * from the byteOffset inside this packet.  
+ * <p>  
+ * The caller is responsible for allocating the  
+ * MediaAudio object. This function will overwrite  
+ * any data in the samples object.  
+ * </p>  
+ * @param	output The MediaAudio we decode to. Caller must check if it 
+ *		 is complete on return.  
+ * @param	packet The packet we're attempting to decode from.  
+ *  
+ * @return	number of bytes actually processed from the packet, or negative 
+ *		 for error  
+ */
+  public int decodeAudio(MediaAudio output, MediaPacket packet, int byteOffset) {
+    return VideoJNI.Decoder_decodeAudio(swigCPtr, this, MediaAudio.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
+  }
+
+/**
+ * Decode this packet into output.  
+ * The caller is responsible for allocating the  
+ * MediaPicture object. This function will potentially  
+ * overwrite any data in the frame object, but  
+ * you should pass the same MediaPicture into this function  
+ * repeatedly until Media.isComplete() is true.  
+ * @param	output The MediaPicture we decode. Caller must check if it 
+ *		 is complete on return.  
+ * @param	packet The packet we're attempting to decode from.  
+ *  
+ * @return	number of bytes actually processed from the packet, or negative 
+ *		 for error  
+ */
+  public int decodeVideo(MediaPicture output, MediaPacket packet, int byteOffset) {
+    return VideoJNI.Decoder_decodeVideo(swigCPtr, this, MediaPicture.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
+  }
+
+/**
+ * Decode this packet into output.  
+ * The caller is responsible for allocating the  
+ * MediaPicture object. This function will potentially  
+ * overwrite any data in the frame object, but  
+ * you should pass the same MediaPicture into this function  
+ * repeatedly until Media.isComplete() is true.  
+ * @param	output The MediaPicture we decode. Caller must check if it 
+ *		 is complete on return.  
+ * @param	packet The packet we're attempting to decode from.  
+ *  
+ * @return	number of bytes actually processed from the packet, or negative 
+ *		 for error  
+ */
+  public int decodeSubtitle(MediaSubtitle output, MediaPacket packet, int byteOffset) {
+    return VideoJNI.Decoder_decodeSubtitle(swigCPtr, this, MediaSubtitle.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
+  }
+
 }

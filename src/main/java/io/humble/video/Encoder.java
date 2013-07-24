@@ -109,4 +109,87 @@ public class Encoder extends Coder {
   // JNIHelper.swg: End generated code
   
 
+/**
+ *  
+ * @return	a {@link Encoder}  
+ * @throws	InvalidArgument if codec is null or codec cannot decode. 
+ *		  
+ */
+  public static Encoder make(Codec codec) {
+    long cPtr = VideoJNI.Encoder_make__SWIG_0(Codec.getCPtr(codec), codec);
+    return (cPtr == 0) ? null : new Encoder(cPtr, false);
+  }
+
+/**
+ * Creates a {@link Encoder} from a given {@link Encoder}  
+ * @return	a {@link Encoder}  
+ * @throws	InvalidArgument if src is null  
+ */
+  public static Encoder make(Encoder src) {
+    long cPtr = VideoJNI.Encoder_make__SWIG_1(Encoder.getCPtr(src), src);
+    return (cPtr == 0) ? null : new Encoder(cPtr, false);
+  }
+
+/**
+ * Encode the given MediaPicture using this encoder.  
+ * The MediaPicture will allocate a buffer to use internally for this, 
+ * and  
+ * will free it when the frame destroys itself.  
+ * Also, when done in order to flush the encoder, caller should call 
+ *  
+ * this method passing in 0 (null) for frame to tell the encoder  
+ * to flush any data it was keeping a hold of.  
+ * @param	output [out] The packet to encode into. It will point  
+ * to a buffer allocated in the frame. Caller should check MediaPacket.isComplete() 
+ *  
+ * after call to find out if we had enough information to encode a full 
+ * packet.  
+ * @param	frame [in/out] The frame to encode  
+ * @param	suggestedBufferSize The suggested buffer size to allocate 
+ *		 or -1 for choose ourselves.  
+ * If -1 we'll allocate a buffer exactly the same size (+1) as the decoded 
+ * frame  
+ * with the guess that you're encoding a frame because you want to use 
+ * LESS space  
+ * than that.  
+ * return >= 0 on success; <0 on error.  
+ */
+  public int encodeVideo(MediaPacket output, MediaPicture frame, int suggestedBufferSize) {
+    return VideoJNI.Encoder_encodeVideo(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaPicture.getCPtr(frame), frame, suggestedBufferSize);
+  }
+
+/**
+ * Encode the given MediaAudio using this encoder.  
+ * Callers should call this repeatedly on a set of samples until  
+ * we consume all the samples.  
+ * Also, when done in order to flush the encoder, caller should call 
+ *  
+ *  
+ * to flush any data it was keeping a hold of.  
+ * @param	output [out] The packet to encode into. It will point  
+ * to a buffer allocated in the frame. Caller should check MediaPacket.isComplete() 
+ *  
+ * after call to find out if we had enough information to encode a full 
+ * packet.  
+ * @param	samples [in] The samples to consume  
+ * @param	sampleToStartFrom [in] Which sample you want to start with 
+ *		  
+ * This is usually zero, but if you're using a codec that  
+ * packetizes output with small number of samples, you may  
+ * need to call encodeAudio repeatedly with different starting  
+ * samples to consume all of your samples.  
+ * @return	number of samples we consumed when encoding, or negative 
+ *		 for errors.  
+ */
+  public int encodeAudio(MediaPacket output, MediaAudio samples, int sampleToStartFrom) {
+    return VideoJNI.Encoder_encodeAudio(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaAudio.getCPtr(samples), samples, sampleToStartFrom);
+  }
+
+/**
+ * Not final API yet; do not use.  
+ */
+  public int encodeSubtitle(MediaPacket output, MediaSubtitle subtitles) {
+    return VideoJNI.Encoder_encodeSubtitle(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaSubtitle.getCPtr(subtitles), subtitles);
+  }
+
 }
