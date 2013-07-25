@@ -32,7 +32,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-MediaSubtitle::MediaSubtitle() : mCtx(0) {
+MediaSubtitle::MediaSubtitle() : mCtx(0), mComplete(false){
 
 }
 
