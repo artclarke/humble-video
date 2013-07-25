@@ -109,4 +109,141 @@ public class MediaSubtitle extends MediaRaw {
   // JNIHelper.swg: End generated code
   
 
+  public int getFormat() {
+    return VideoJNI.MediaSubtitle_getFormat(swigCPtr, this);
+  }
+
+/**
+ * Get the start display time in ms, relative to the {@link #getTimeStamp()}. 
+ *  
+ */
+  public long getStartDisplayTime() {
+    return VideoJNI.MediaSubtitle_getStartDisplayTime(swigCPtr, this);
+  }
+
+/**
+ * Get the end display time in ms, relative to {@link #getTimeStamp()}. 
+ *  
+ */
+  public long getEndDisplayTime() {
+    return VideoJNI.MediaSubtitle_getEndDisplayTime(swigCPtr, this);
+  }
+
+/**
+ * Get the number of rectangles this subtitle draws  
+ */
+  public int getNumRectangles() {
+    return VideoJNI.MediaSubtitle_getNumRectangles(swigCPtr, this);
+  }
+
+/**
+ * Get the presentation timestamp of this subtitle  
+ */
+  public long getTimeStamp() {
+    return VideoJNI.MediaSubtitle_getTimeStamp(swigCPtr, this);
+  }
+
+  public MediaSubtitleRectangle getRectangle(int n) {
+    long cPtr = VideoJNI.MediaSubtitle_getRectangle(swigCPtr, this, n);
+    return (cPtr == 0) ? null : new MediaSubtitleRectangle(cPtr, false);
+  }
+
+  public void setTimeStamp(long timeStamp) {
+    VideoJNI.MediaSubtitle_setTimeStamp(swigCPtr, this, timeStamp);
+  }
+
+  public boolean isKey() {
+    return VideoJNI.MediaSubtitle_isKey(swigCPtr, this);
+  }
+
+  public long getPts() {
+    return VideoJNI.MediaSubtitle_getPts(swigCPtr, this);
+  }
+
+  public long getPacketPts() {
+    return VideoJNI.MediaSubtitle_getPacketPts(swigCPtr, this);
+  }
+
+  public long getPacketDts() {
+    return VideoJNI.MediaSubtitle_getPacketDts(swigCPtr, this);
+  }
+
+  public int getPacketSize() {
+    return VideoJNI.MediaSubtitle_getPacketSize(swigCPtr, this);
+  }
+
+  public long getPacketDuration() {
+    return VideoJNI.MediaSubtitle_getPacketDuration(swigCPtr, this);
+  }
+
+  public long getBestEffortTimeStamp() {
+    return VideoJNI.MediaSubtitle_getBestEffortTimeStamp(swigCPtr, this);
+  }
+
+  public boolean isComplete() {
+    return VideoJNI.MediaSubtitle_isComplete(swigCPtr, this);
+  }
+
+/**
+ * Sets the subtitle to be complete.  
+ */
+  public void setComplete(boolean complete, long timestamp) {
+    VideoJNI.MediaSubtitle_setComplete(swigCPtr, this, complete, timestamp);
+  }
+
+  public enum Type {
+    SUBTITLE_NONE,
+  /**
+   * A bitmap.
+   */
+    SUBTITLE_BITMAP,
+  /**
+   * Plain text, the text field must be set by the decoder and is
+   * authoritative. ass and pict fields may contain approximations.
+   */
+    SUBTITLE_TEXT,
+  /**
+   *
+   *
+   */
+    SUBTITLE_ASS;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static Type swigToEnum(int swigValue) {
+      Type[] swigValues = Type.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (Type swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + Type.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private Type() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private Type(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private Type(Type swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
 }

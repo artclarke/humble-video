@@ -24,18 +24,70 @@
  */
 
 #include "MediaSubtitle.h"
+#include <io/humble/ferry/RefPointer.h>
+
+using namespace io::humble::ferry;
 
 namespace io {
 namespace humble {
 namespace video {
 
-MediaSubtitle::MediaSubtitle() {
-  // TODO Auto-generated constructor stub
+MediaSubtitle::MediaSubtitle() : mCtx(0) {
 
 }
 
 MediaSubtitle::~MediaSubtitle() {
-  // TODO Auto-generated destructor stub
+}
+
+MediaSubtitle*
+MediaSubtitle::make(AVSubtitle* ctx)
+{
+  if (!ctx)
+    throw HumbleInvalidArgument("no context");
+  RefPointer<MediaSubtitle> retval = MediaSubtitle::make();
+  retval->mCtx = ctx;
+  return retval.get();
+}
+
+MediaSubtitleRectangle*
+MediaSubtitle::getRectangle(int32_t n)
+{
+  if (n < 0 || n >= (int32_t)mCtx->num_rects)
+    throw HumbleInvalidArgument("attempt to get out-of-range rectangle");
+
+  if (!mCtx->rects)
+    throw HumbleRuntimeError("no rectangles");
+
+  return MediaSubtitleRectangle::make(mCtx->rects[n]);
+}
+
+MediaSubtitleRectangle*
+MediaSubtitleRectangle::make(AVSubtitleRect* ctx) {
+  if (!ctx)
+    throw HumbleInvalidArgument("no context");
+  RefPointer<MediaSubtitleRectangle> retval = make();
+  retval->mCtx = ctx;
+  return retval.get();
+}
+int32_t
+MediaSubtitleRectangle::getPictureLinesize(int line) {
+  if (line < 0 || line >= 4)
+    throw HumbleInvalidArgument("line must be between 0 and 3");
+  return mCtx->pict.linesize[line];
+}
+IBuffer*
+MediaSubtitleRectangle::getPictureData(int line)
+{
+  if (line < 0 || line >= 4)
+    throw HumbleInvalidArgument("line must be between 0 and 3");
+  // add ref ourselves for the IBuffer
+  this->acquire();
+  // create a buffer
+  RefPointer<IBuffer> retval = IBuffer::make(this, mCtx->pict.data[line], mCtx->pict.linesize[line],
+      IBuffer::refCountedFreeFunc, this);
+  if (!retval)
+    this->release();
+  return retval.get();
 }
 
 } /* namespace video */

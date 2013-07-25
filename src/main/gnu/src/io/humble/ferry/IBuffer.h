@@ -52,6 +52,15 @@ public:
 #ifndef SWIG
   typedef void
   (*FreeFunc)(void * mem, void *closure);
+  /**
+   * A version of FreeFunc that assumes that mem is handled by a RefCounted
+   * closure.
+   */
+  static void refCountedFreeFunc(void* mem, void* closure) {
+    RefCounted* ref = static_cast<RefCounted*>(closure);
+    (void) mem;
+    VS_REF_RELEASE(ref);
+  }
 
   /**
    * Returns up to length bytes, starting at offset in the
