@@ -69,7 +69,7 @@ namespace io { namespace humble { namespace video
   }
 
   Codec *
-  Codec::make(AVCodec *aCodec)
+  Codec::make(const AVCodec *aCodec)
   {
     Global::init();
     Codec *retval = 0;

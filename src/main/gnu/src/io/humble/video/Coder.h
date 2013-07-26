@@ -26,6 +26,7 @@
 #ifndef CODER_H_
 #define CODER_H_
 
+#include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/Codec.h>
 
@@ -125,14 +126,26 @@ public:
    *
    * @return The Codec used by this StreamCoder, or 0 (null) if none.
    */
-  virtual Codec* getCodec()=0;
+  virtual Codec* getCodec() {
+    if (!mCodec) {
+      const AVCodec* codec = getCodecCtx()->codec;
+      if (!codec)
+        throw io::humble::ferry::HumbleRuntimeError("No codec set on coder");
+      mCodec = Codec::make(getCodecCtx()->codec);
+    }
+    return mCodec.get();
+  }
 
   /**
    * A short hand for getCodec().getType().
    *
    * @return The Type of the Codec we'll use.
    */
-  virtual MediaDescriptor::Type getCodecType()=0;
+  virtual MediaDescriptor::Type getCodecType() {
+    if (!mCodec)
+      mCodec = getCodec();
+    return mCodec->getType();
+  }
 
   /**
    *
@@ -140,7 +153,11 @@ public:
    *
    * @return The ID of the Codec we'll use.
    */
-  virtual Codec::ID getCodecID()=0;
+  virtual Codec::ID getCodecID() {
+    if (!mCodec)
+      mCodec = getCodec();
+    return mCodec->getID();
+  }
 
   /**
    * The height, in pixels.
@@ -264,6 +281,8 @@ protected:
   Coder();
   virtual
   ~Coder();
+private:
+  io::humble::ferry::RefPointer<Codec> mCodec;
 };
 
 } /* namespace video */

@@ -1024,16 +1024,16 @@ public:
 
 #ifndef SWIG
   static Codec*
-  make(AVCodec* codec);
+  make(const AVCodec* codec);
 
-  AVCodec* getCtx() { return mCodec; }
+  const AVCodec* getCtx() { return mCodec; }
 #endif // ! SWIG
 private:
   Codec();
   virtual
   ~Codec();
 
-  AVCodec* mCodec;
+  const AVCodec* mCodec;
 };
 
 /**
