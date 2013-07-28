@@ -37,6 +37,12 @@ namespace video {
 class VS_API_HUMBLEVIDEO Coder : public io::humble::video::Configurable
 {
 public:
+  typedef enum State {
+    STATE_INITED,
+    STATE_OPENED,
+    STATE_ERROR,
+  } State;
+
   typedef enum Flag {
     FLAG_UNALIGNED = CODEC_FLAG_UNALIGNED,
     /** Use fixed qscale. */
@@ -257,6 +263,11 @@ public:
    * @param newTimeBase The new time base to use.
    */
   virtual void setTimeBase(Rational* newTimeBase)=0;
+
+  /**
+   * Get the state of this coder.
+   */
+  virtual State getState()=0;
 
 #ifndef SWIG
   virtual AVCodecContext* getCodecCtx()=0;

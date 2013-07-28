@@ -109,6 +109,11 @@ public:
   virtual int32_t encodeSubtitle(MediaPacket* output,
       MediaSubtitle* subtitles)=0;
 
+  /**
+   * Get the state of this Decoder.
+   */
+  virtual State getState() { return mState; }
+
 #ifndef SWIG
   virtual void* getCtx() { return getCodecCtx(); }
   virtual AVCodecContext* getCodecCtx() { return mCtx; }
@@ -120,6 +125,7 @@ protected:
   ~Encoder();
 private:
   AVCodecContext* mCtx;
+  State mState;
 };
 
 } /* namespace video */

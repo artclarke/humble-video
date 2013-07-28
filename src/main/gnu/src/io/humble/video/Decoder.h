@@ -127,6 +127,11 @@ public:
   virtual Rational* getTimeBase();
   virtual void setTimeBase(Rational* newTimeBase);
 
+  /**
+   * Get the state of this Decoder.
+   */
+  virtual State getState() { return mState; }
+
 
 #ifndef SWIG
   virtual void* getCtx() { return getCodecCtx(); }
@@ -139,11 +144,7 @@ protected:
 private:
   AVCodecContext* mCtx;
   io::humble::ferry::RefPointer<Rational> mTimebase;
-  typedef enum State {
-    STATE_INITED,
-    STATE_OPENED,
-    STATE_ERROR,
-  } State;
+
   State mState;
 };
 

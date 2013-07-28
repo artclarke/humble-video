@@ -72,8 +72,8 @@ Decoder::open(KeyValueBag* inputOptions, KeyValueBag* aUnsetOptions) {
       av_dict_copy(&tmp, options->getDictionary(), 0);
     }
 
-
-    retval = avcodec_open2(mCtx, 0, &tmp);
+    RefPointer<Codec> codec = getCodec();
+    retval = avcodec_open2(mCtx, codec->getCtx(), &tmp);
 
     if (retval < 0)
     {

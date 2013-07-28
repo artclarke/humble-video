@@ -45,3 +45,29 @@ DecoderTest::testCreation()
   RefPointer<Codec> copyCodec = copy->getCodec();
   TS_ASSERT_EQUALS(codec->getID(), copyCodec->getID());
 }
+
+void
+DecoderTest::testOpen() {
+  RefPointer<Codec> codec = Codec::findDecodingCodec(Codec::CODEC_ID_H264);
+  RefPointer<Decoder> decoder = Decoder::make(codec.value());
+  TS_ASSERT(decoder);
+
+  TS_ASSERT_EQUALS(Coder::STATE_INITED, decoder->getState());
+
+  RefPointer<Decoder> copy;
+  copy = Decoder::make(decoder.value());
+  TS_ASSERT_EQUALS(Coder::STATE_INITED, copy->getState());
+
+  // try opening both codecs
+  decoder->open(0, 0);
+
+  TS_ASSERT_EQUALS(Coder::STATE_OPENED, decoder->getState());
+
+  copy = Decoder::make(decoder.value());
+  TS_ASSERT_EQUALS(Coder::STATE_INITED, copy->getState());
+
+  copy->open(0, 0);
+  TS_ASSERT_EQUALS(Coder::STATE_OPENED, copy->getState());
+
+
+}
