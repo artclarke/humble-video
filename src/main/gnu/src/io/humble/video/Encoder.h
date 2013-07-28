@@ -115,7 +115,7 @@ public:
 #endif
 
 protected:
-  Encoder();
+  Encoder(Codec*);
   virtual
   ~Encoder();
 private:

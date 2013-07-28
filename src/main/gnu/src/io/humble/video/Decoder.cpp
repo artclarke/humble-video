@@ -38,10 +38,26 @@ namespace io {
 namespace humble {
 namespace video {
 
-Decoder::Decoder() {
+Decoder::Decoder(Codec* codec) : Coder(codec) {
+  if (!codec)
+    throw HumbleInvalidArgument("no codec passed in");
+
+  if (!codec->canDecode())
+    throw HumbleInvalidArgument("passed in codec cannot decode");
+
+  mCtx = avcodec_alloc_context3(codec->getCtx());
+  if (!mCtx)
+    throw HumbleRuntimeError("could not allocate decoder context");
+
   mState = STATE_INITED;
-  mCtx = 0;
+
   VS_LOG_TRACE("Created decoder");
+}
+
+
+Decoder::~Decoder() {
+  (void) avcodec_close(mCtx);
+  av_free(mCtx);
 }
 
 void
@@ -115,11 +131,6 @@ Decoder::decodeSubtitle(MediaSubtitle* output, MediaPacket* packet,
   return -1;
 }
 
-Decoder::~Decoder() {
-  (void) avcodec_close(mCtx);
-  av_free(mCtx);
-}
-
 Rational*
 Decoder::getTimeBase() {
   if (!mTimebase || mTimebase->getNumerator() != mCtx->time_base.num || mTimebase->getDenominator() != mCtx->time_base.den)
@@ -146,11 +157,9 @@ Decoder::make(Codec* codec)
   if (!codec->canDecode())
     throw HumbleInvalidArgument("passed in codec cannot decode");
 
-  RefPointer<Decoder> retval = make();
-  retval->mCtx = avcodec_alloc_context3(codec->getCtx());
-  if (!retval->mCtx)
-    throw HumbleRuntimeError("could not allocate decoder context");
-
+  RefPointer<Decoder> retval;
+  // new Decoder DOES NOT increment refcount but the reset should catch it.
+  retval.reset(new Decoder(codec), true);
   return retval.get();
 }
 
@@ -160,20 +169,23 @@ Decoder::make(Decoder* src)
   if (!src)
     throw HumbleInvalidArgument("no Decoder to copy");
 
-  return make(src->mCtx);
+  RefPointer<Codec> codec = src->getCodec();
+  return make(codec.value(), src->mCtx);
 }
 
 Decoder*
-Decoder::make(const AVCodecContext* src) {
+Decoder::make(Codec* codec, const AVCodecContext* src) {
   if (!src)
     throw HumbleInvalidArgument("no Decoder to copy");
-  if (!src->codec)
+  if (!src->codec_id)
     throw HumbleRuntimeError("No codec set on coder???");
 
-  RefPointer<Decoder> retval = make();
+  RefPointer<Decoder> retval = make(codec);
+  // free the mCtx
+  (void) avcodec_close(retval->mCtx);
+  av_free(retval->mCtx);
   retval->mCtx = avcodec_alloc_context3(0);
-  if (!retval->mCtx)
-    throw HumbleRuntimeError("could not allocate decoder context");
+  // create again for the copy
 
   // now copy the codecs.
   if (avcodec_copy_context(retval->mCtx, src) < 0)

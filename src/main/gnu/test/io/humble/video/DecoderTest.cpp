@@ -38,4 +38,10 @@ DecoderTest::testCreation()
   RefPointer<Codec> codec = Codec::findDecodingCodec(Codec::CODEC_ID_H264);
   RefPointer<Decoder> decoder = Decoder::make(codec.value());
   TS_ASSERT(decoder);
+
+  RefPointer<Decoder> copy = Decoder::make(decoder.value());
+  TS_ASSERT(copy);
+
+  RefPointer<Codec> copyCodec = copy->getCodec();
+  TS_ASSERT_EQUALS(codec->getID(), copyCodec->getID());
 }

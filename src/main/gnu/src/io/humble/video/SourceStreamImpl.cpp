@@ -444,7 +444,10 @@ SourceStreamImpl::getDecoder() {
     if (mStream->codec) {
       // make a copy of the decoder so we decouple it from the container
       // completely
-      mDecoder = Decoder::make(mStream->codec);
+      RefPointer<Codec> codec = Codec::findDecodingCodec((Codec::ID)mStream->codec->codec_id);
+      if (!codec)
+        throw HumbleRuntimeError("could not find decoding codec");
+      mDecoder = Decoder::make(codec.value(), mStream->codec);
     }
   }
   return mDecoder.get();

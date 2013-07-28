@@ -32,7 +32,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-Encoder::Encoder() {
+Encoder::Encoder(Codec* codec) : Coder(codec) {
   mCtx=0;
 }
 

@@ -40,7 +40,6 @@ namespace video {
 
 class VS_API_HUMBLEVIDEO Decoder : public io::humble::video::Coder
 {
-  VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(Decoder);
 public:
   /**
    * Create a {@link Decoder} that will use the given {@link Codec}.
@@ -57,7 +56,7 @@ public:
    */
   static Decoder* make(Decoder* src);
 #ifndef SWIG
-  static Decoder* make(const AVCodecContext* src);
+  static Decoder* make(Codec* codec, const AVCodecContext* src);
 #endif // ! SWIG
 
   /**
@@ -134,7 +133,7 @@ public:
   virtual AVCodecContext* getCodecCtx() { return mCtx; }
 #endif
 protected:
-  Decoder();
+  Decoder(Codec* codec);
   virtual
   ~Decoder();
 private:

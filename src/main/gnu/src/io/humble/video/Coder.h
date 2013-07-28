@@ -122,12 +122,6 @@ public:
    * @return The Codec used by this StreamCoder, or 0 (null) if none.
    */
   virtual Codec* getCodec() {
-    if (!mCodec) {
-      const AVCodec* codec = getCodecCtx()->codec;
-      if (!codec)
-        throw io::humble::ferry::HumbleRuntimeError("No codec set on coder");
-      mCodec = Codec::make(getCodecCtx()->codec);
-    }
     return mCodec.get();
   }
 
@@ -137,8 +131,6 @@ public:
    * @return The Type of the Codec we'll use.
    */
   virtual MediaDescriptor::Type getCodecType() {
-    if (!mCodec)
-      mCodec = getCodec();
     return mCodec->getType();
   }
 
@@ -149,8 +141,6 @@ public:
    * @return The ID of the Codec we'll use.
    */
   virtual Codec::ID getCodecID() {
-    if (!mCodec)
-      mCodec = getCodec();
     return mCodec->getID();
   }
 
@@ -273,7 +263,7 @@ public:
 #endif
 
 protected:
-  Coder();
+  Coder(Codec* codec);
   virtual
   ~Coder();
 private:

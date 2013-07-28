@@ -24,18 +24,22 @@
  */
 
 #include "Coder.h"
+#include <io/humble/ferry/HumbleException.h>
+
 
 namespace io {
 namespace humble {
 namespace video {
 
-Coder::Coder() {
-  // TODO Auto-generated constructor stub
+using namespace io::humble::ferry;
 
+Coder::Coder(Codec* codec) {
+  if (!codec)
+    throw HumbleInvalidArgument("no codec passed in");
+  mCodec.reset(codec, true);
 }
 
 Coder::~Coder() {
-  // TODO Auto-generated destructor stub
 }
 
 } /* namespace video */
