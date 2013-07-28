@@ -1126,7 +1126,6 @@ class VideoJNI {
   public final static native int Coder_FLAG2_CHUNKS_get();
   public final static native int Coder_FLAG2_SHOW_ALL_get();
   public final static native void Coder_open(long jarg1, Coder jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_);
-  public final static native void Coder_close(long jarg1, Coder jarg1_);
   public final static native long Coder_getCodec(long jarg1, Coder jarg1_);
   public final static native int Coder_getCodecType(long jarg1, Coder jarg1_);
   public final static native int Coder_getCodecID(long jarg1, Coder jarg1_);
@@ -1147,7 +1146,6 @@ class VideoJNI {
   public final static native long Decoder_make__SWIG_0(long jarg1, Codec jarg1_);
   public final static native long Decoder_make__SWIG_1(long jarg1, Decoder jarg1_);
   public final static native void Decoder_open(long jarg1, Decoder jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_);
-  public final static native void Decoder_close(long jarg1, Decoder jarg1_);
   public final static native void Decoder_flush(long jarg1, Decoder jarg1_);
   public final static native int Decoder_decodeAudio(long jarg1, Decoder jarg1_, long jarg2, MediaAudio jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native int Decoder_decodeVideo(long jarg1, Decoder jarg1_, long jarg2, MediaPicture jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);

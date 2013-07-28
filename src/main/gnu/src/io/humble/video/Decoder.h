@@ -66,11 +66,6 @@ public:
   virtual void open(KeyValueBag* inputOptions, KeyValueBag* unsetOptions);
 
   /**
-   * {@inheritDoc}
-   */
-  virtual void close();
-
-  /**
    * Flush this {@link Decoder}, getting rid of any cached packets (call after seek).
    * Next packet given to decode should be a key packet.
    */
@@ -148,7 +143,6 @@ private:
   typedef enum State {
     STATE_INITED,
     STATE_OPENED,
-    STATE_CLOSED,
     STATE_ERROR,
   } State;
   State mState;

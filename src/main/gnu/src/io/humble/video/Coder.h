@@ -117,11 +117,6 @@ public:
   virtual void open(KeyValueBag* inputOptions, KeyValueBag* unsetOptions)=0;
 
   /**
-   * Close this coder and free all memory.
-   */
-  virtual void close()=0;
-
-  /**
    * The Codec this StreamCoder will use.
    *
    * @return The Codec used by this StreamCoder, or 0 (null) if none.

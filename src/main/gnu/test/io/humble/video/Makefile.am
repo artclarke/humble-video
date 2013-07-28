@@ -7,6 +7,7 @@ include @top_builddir@/mk/Makefile.global
 SUBDIRS=customio
 
 check_PROGRAMS=\
+  DecoderTester \
   PixelFormatTester \
   CodecTester \
   IndexEntryTester \
@@ -23,6 +24,7 @@ check_PROGRAMS=\
   RationalTester 
 
 BUILT_SOURCES= \
+  DecoderTest_CXXRunner.cpp \
   PixelFormatTest_CXXRunner.cpp \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
@@ -39,6 +41,7 @@ BUILT_SOURCES= \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  DecoderTest.h \
   PixelFormatTest.h \
   CodecTest.h \
   IndexEntryTest.h \
@@ -61,6 +64,17 @@ inst_checkdir=$(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS=$(check_PROGRAMS)
+
+DecoderTester_SOURCES= \
+  DecoderTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_DecoderTester_SOURCES= \
+  DecoderTest_CXXRunner.cpp
+
+DecoderTester_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 PixelFormatTester_SOURCES= \
   PixelFormatTest.cpp \

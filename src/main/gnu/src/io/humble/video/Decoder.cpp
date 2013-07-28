@@ -41,6 +41,7 @@ namespace video {
 Decoder::Decoder() {
   mState = STATE_INITED;
   mCtx = 0;
+  VS_LOG_TRACE("Created decoder");
 }
 
 void
@@ -81,18 +82,6 @@ Decoder::open(KeyValueBag* inputOptions, KeyValueBag* aUnsetOptions) {
 }
 
 void
-Decoder::close() {
-  if (mState != STATE_OPENED)
-    throw HumbleRuntimeError("Attempt to close Decoder that is not opened");
-  int retval = avcodec_close(mCtx);
-  if (retval < 0) {
-    mState = STATE_ERROR;
-    throw HumbleRuntimeError("Error when closing Decoder");
-  }
-  mState = STATE_CLOSED;
-}
-
-void
 Decoder::flush() {
   if (mState != STATE_OPENED)
     throw HumbleRuntimeError("Attempt to flush Decoder when not opened");
@@ -127,10 +116,7 @@ Decoder::decodeSubtitle(MediaSubtitle* output, MediaPacket* packet,
 }
 
 Decoder::~Decoder() {
-  if (mState == STATE_OPENED) {
-    VS_LOG_ERROR("Programmer error: Decoder.close() was not called before the Decoder was destroyed");
-    close();
-  }
+  (void) avcodec_close(mCtx);
   av_free(mCtx);
 }
 

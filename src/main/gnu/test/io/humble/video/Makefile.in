@@ -78,13 +78,14 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = PixelFormatTester$(EXEEXT) CodecTester$(EXEEXT) \
-	IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
-	MediaPacketTester$(EXEEXT) MediaAudioTester$(EXEEXT) \
-	MediaPictureTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
-	SourceTester$(EXEEXT) SourceFormatTester$(EXEEXT) \
-	SourceStreamTester$(EXEEXT) SinkFormatTester$(EXEEXT) \
-	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
+check_PROGRAMS = DecoderTester$(EXEEXT) PixelFormatTester$(EXEEXT) \
+	CodecTester$(EXEEXT) IndexEntryTester$(EXEEXT) \
+	ErrorTester$(EXEEXT) MediaPacketTester$(EXEEXT) \
+	MediaAudioTester$(EXEEXT) MediaPictureTester$(EXEEXT) \
+	KeyValueBagTester$(EXEEXT) SourceTester$(EXEEXT) \
+	SourceFormatTester$(EXEEXT) SourceStreamTester$(EXEEXT) \
+	SinkFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
+	RationalTester$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mk/depcomp $(noinst_HEADERS) \
@@ -113,6 +114,13 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+am_DecoderTester_OBJECTS = DecoderTest.$(OBJEXT) TestData.$(OBJEXT) \
+	Main.$(OBJEXT)
+nodist_DecoderTester_OBJECTS = DecoderTest_CXXRunner.$(OBJEXT)
+DecoderTester_OBJECTS = $(am_DecoderTester_OBJECTS) \
+	$(nodist_DecoderTester_OBJECTS)
+DecoderTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_ErrorTester_OBJECTS = ErrorTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_ErrorTester_OBJECTS = ErrorTest_CXXRunner.$(OBJEXT)
 ErrorTester_OBJECTS = $(am_ErrorTester_OBJECTS) \
@@ -240,6 +248,7 @@ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
+	$(DecoderTester_SOURCES) $(nodist_DecoderTester_SOURCES) \
 	$(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(nodist_IndexEntryTester_SOURCES) \
 	$(KeyValueBagTester_SOURCES) \
@@ -259,13 +268,14 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(SourceStreamTester_SOURCES) \
 	$(nodist_SourceStreamTester_SOURCES) $(SourceTester_SOURCES) \
 	$(nodist_SourceTester_SOURCES)
-DIST_SOURCES = $(CodecTester_SOURCES) $(ErrorTester_SOURCES) \
-	$(IndexEntryTester_SOURCES) $(KeyValueBagTester_SOURCES) \
-	$(MediaAudioTester_SOURCES) $(MediaPacketTester_SOURCES) \
-	$(MediaPictureTester_SOURCES) $(PixelFormatTester_SOURCES) \
-	$(PropertyTester_SOURCES) $(RationalTester_SOURCES) \
-	$(SinkFormatTester_SOURCES) $(SourceFormatTester_SOURCES) \
-	$(SourceStreamTester_SOURCES) $(SourceTester_SOURCES)
+DIST_SOURCES = $(CodecTester_SOURCES) $(DecoderTester_SOURCES) \
+	$(ErrorTester_SOURCES) $(IndexEntryTester_SOURCES) \
+	$(KeyValueBagTester_SOURCES) $(MediaAudioTester_SOURCES) \
+	$(MediaPacketTester_SOURCES) $(MediaPictureTester_SOURCES) \
+	$(PixelFormatTester_SOURCES) $(PropertyTester_SOURCES) \
+	$(RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
+	$(SourceFormatTester_SOURCES) $(SourceStreamTester_SOURCES) \
+	$(SourceTester_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -719,6 +729,7 @@ VS_CPP_NAMESPACE = io::humble::video
 VS_TEST = 1
 SUBDIRS = customio
 BUILT_SOURCES = \
+  DecoderTest_CXXRunner.cpp \
   PixelFormatTest_CXXRunner.cpp \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
@@ -735,6 +746,7 @@ BUILT_SOURCES = \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  DecoderTest.h \
   PixelFormatTest.h \
   CodecTest.h \
   IndexEntryTest.h \
@@ -756,6 +768,17 @@ inst_checkdir = $(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS = $(check_PROGRAMS)
+DecoderTester_SOURCES = \
+  DecoderTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_DecoderTester_SOURCES = \
+  DecoderTest_CXXRunner.cpp
+
+DecoderTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 PixelFormatTester_SOURCES = \
   PixelFormatTest.cpp \
   TestData.cpp \
@@ -952,6 +975,10 @@ CodecTester$(EXEEXT): $(CodecTester_OBJECTS) $(CodecTester_DEPENDENCIES) $(EXTRA
 	@rm -f CodecTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(CodecTester_OBJECTS) $(CodecTester_LDADD) $(LIBS)
 
+DecoderTester$(EXEEXT): $(DecoderTester_OBJECTS) $(DecoderTester_DEPENDENCIES) $(EXTRA_DecoderTester_DEPENDENCIES) 
+	@rm -f DecoderTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DecoderTester_OBJECTS) $(DecoderTester_LDADD) $(LIBS)
+
 ErrorTester$(EXEEXT): $(ErrorTester_OBJECTS) $(ErrorTester_DEPENDENCIES) $(EXTRA_ErrorTester_DEPENDENCIES) 
 	@rm -f ErrorTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(ErrorTester_OBJECTS) $(ErrorTester_LDADD) $(LIBS)
@@ -1012,6 +1039,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CodecTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CodecTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecoderTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecoderTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntryTest.Po@am__quote@
@@ -1308,6 +1337,13 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+DecoderTester.log: DecoderTester$(EXEEXT)
+	@p='DecoderTester$(EXEEXT)'; \
+	b='DecoderTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 PixelFormatTester.log: PixelFormatTester$(EXEEXT)
 	@p='PixelFormatTester$(EXEEXT)'; \
 	b='PixelFormatTester'; \

@@ -138,13 +138,6 @@ public class Decoder extends Coder {
   }
 
 /**
- * {@inheritDoc}  
- */
-  public void close() {
-    VideoJNI.Decoder_close(swigCPtr, this);
-  }
-
-/**
  * Flush this {@link Decoder}, getting rid of any cached packets (call 
  * after seek).  
  * Next packet given to decode should be a key packet.  

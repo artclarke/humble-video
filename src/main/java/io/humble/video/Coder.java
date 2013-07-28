@@ -122,13 +122,6 @@ public class Coder extends Configurable {
   }
 
 /**
- * Close this coder and free all memory.  
- */
-  public void close() {
-    VideoJNI.Coder_close(swigCPtr, this);
-  }
-
-/**
  * The Codec this StreamCoder will use.  
  * @return	The Codec used by this StreamCoder, or 0 (null) if none. 
  *		  
