@@ -77,6 +77,7 @@ IndexEntryImpl*
 IndexEntryImpl::make(int64_t position, int64_t timeStamp,
     int32_t flags, int32_t size, int32_t minDistance)
 {
+  VS_LOG_TRACE("Making index entry");
   IndexEntryImpl* retval = make();
   if (retval) {
     retval->mEntry.pos = position;

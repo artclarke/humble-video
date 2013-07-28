@@ -30,10 +30,13 @@
 #include <io/humble/video/KeyValueBagImpl.h>
 #include <io/humble/video/MediaPacketImpl.h>
 #include <io/humble/video/IndexEntry.h>
+#include <io/humble/video/Decoder.h>
 
 #include "FfmpegIncludes.h"
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
+
+using namespace io::humble::ferry;
 
 namespace io {
 namespace humble {
@@ -433,6 +436,18 @@ void
 SourceStreamImpl::setId(int32_t aId) {
   if (!mStream) return;
   mStream->id = aId;
+}
+
+Decoder*
+SourceStreamImpl::getDecoder() {
+  if (!mDecoder) {
+    if (mStream->codec) {
+      // make a copy of the decoder so we decouple it from the container
+      // completely
+      mDecoder = Decoder::make(mStream->codec);
+    }
+  }
+  return mDecoder.get();
 }
 }
 }

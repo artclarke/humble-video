@@ -33,6 +33,7 @@ namespace io {
 namespace humble {
 namespace video {
 
+class Decoder;
 /**
  * A {@link ContainerStream} class that was read from a {@link Source}.
  */
@@ -45,6 +46,10 @@ public:
    * picture (needs to be decoded separately).
    */
   virtual MediaPacket* getAttachedPic()=0;
+  /**
+   * Get the decoder that can decode the information in this source stream.
+   */
+  virtual Decoder* getDecoder()=0;
 
 protected:
   SourceStream();

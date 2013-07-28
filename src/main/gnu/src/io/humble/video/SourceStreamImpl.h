@@ -25,6 +25,7 @@
 #include <io/humble/video/FfmpegIncludes.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/KeyValueBag.h>
+#include <io/humble/video/Decoder.h>
 
 namespace io { namespace humble { namespace video
 {
@@ -83,6 +84,7 @@ namespace io { namespace humble { namespace video
     void setId(int32_t id);
     virtual MediaPacket* getAttachedPic();
     virtual ContainerStream::Disposition getDisposition();
+    virtual Decoder* getDecoder();
 
   protected:
     SourceStreamImpl();
@@ -94,6 +96,7 @@ namespace io { namespace humble { namespace video
     Container* mContainer;
     io::humble::ferry::RefPointer<KeyValueBag> mMetaData;
     int64_t mLastDts;
+    io::humble::ferry::RefPointer<Decoder> mDecoder;
   };
 
 }}}

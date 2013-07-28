@@ -145,4 +145,13 @@ public class SourceStream extends ContainerStream {
     return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
   }
 
+/**
+ * Get the decoder that can decode the information in this source stream. 
+ *  
+ */
+  public Decoder getDecoder() {
+    long cPtr = VideoJNI.SourceStream_getDecoder(swigCPtr, this);
+    return (cPtr == 0) ? null : new Decoder(cPtr, false);
+  }
+
 }

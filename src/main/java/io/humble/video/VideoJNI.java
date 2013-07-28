@@ -1146,10 +1146,14 @@ class VideoJNI {
   public final static native void Coder_setTimeBase(long jarg1, Coder jarg1_, long jarg2, Rational jarg2_);
   public final static native long Decoder_make__SWIG_0(long jarg1, Codec jarg1_);
   public final static native long Decoder_make__SWIG_1(long jarg1, Decoder jarg1_);
+  public final static native void Decoder_open(long jarg1, Decoder jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_);
+  public final static native void Decoder_close(long jarg1, Decoder jarg1_);
   public final static native void Decoder_flush(long jarg1, Decoder jarg1_);
   public final static native int Decoder_decodeAudio(long jarg1, Decoder jarg1_, long jarg2, MediaAudio jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native int Decoder_decodeVideo(long jarg1, Decoder jarg1_, long jarg2, MediaPicture jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native int Decoder_decodeSubtitle(long jarg1, Decoder jarg1_, long jarg2, MediaSubtitle jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
+  public final static native long Decoder_getTimeBase(long jarg1, Decoder jarg1_);
+  public final static native void Decoder_setTimeBase(long jarg1, Decoder jarg1_, long jarg2, Rational jarg2_);
   public final static native long Encoder_make__SWIG_0(long jarg1, Codec jarg1_);
   public final static native long Encoder_make__SWIG_1(long jarg1, Encoder jarg1_);
   public final static native int Encoder_encodeVideo(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaPicture jarg3_, int jarg4);
@@ -1208,6 +1212,7 @@ class VideoJNI {
   public final static native int Container_getNumStreams(long jarg1, Container jarg1_) throws java.lang.InterruptedException;
   public final static native long Container_getStream(long jarg1, Container jarg1_, int jarg2) throws java.lang.InterruptedException;
   public final static native long SourceStream_getAttachedPic(long jarg1, SourceStream jarg1_);
+  public final static native long SourceStream_getDecoder(long jarg1, SourceStream jarg1_);
   public final static native long Source_make();
   public final static native long Source_getFormat(long jarg1, Source jarg1_);
   public final static native int Source_getState(long jarg1, Source jarg1_);

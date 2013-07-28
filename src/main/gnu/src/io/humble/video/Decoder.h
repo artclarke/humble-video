@@ -26,6 +26,8 @@
 #ifndef DECODER_H_
 #define DECODER_H_
 
+#include <io/humble/ferry/RefPointer.h>
+#include <io/humble/video/Rational.h>
 #include <io/humble/video/Coder.h>
 #include <io/humble/video/MediaPacket.h>
 #include <io/humble/video/MediaAudio.h>
@@ -38,6 +40,7 @@ namespace video {
 
 class VS_API_HUMBLEVIDEO Decoder : public io::humble::video::Coder
 {
+  VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(Decoder);
 public:
   /**
    * Create a {@link Decoder} that will use the given {@link Codec}.
@@ -53,12 +56,25 @@ public:
    * @throws InvalidArgument if src is null
    */
   static Decoder* make(Decoder* src);
+#ifndef SWIG
+  static Decoder* make(const AVCodecContext* src);
+#endif // ! SWIG
+
+  /**
+   * {@inheritDoc}
+   */
+  virtual void open(KeyValueBag* inputOptions, KeyValueBag* unsetOptions);
+
+  /**
+   * {@inheritDoc}
+   */
+  virtual void close();
 
   /**
    * Flush this {@link Decoder}, getting rid of any cached packets (call after seek).
    * Next packet given to decode should be a key packet.
    */
-  virtual void flush()=0;
+  virtual void flush();
 
   /**
    * Decode this packet into output.  It will
@@ -76,7 +92,7 @@ public:
    * @return number of bytes actually processed from the packet, or negative for error
    */
   virtual int32_t decodeAudio(MediaAudio * output,
-      MediaPacket *packet, int32_t byteOffset)=0;
+      MediaPacket *packet, int32_t byteOffset);
 
   /**
    * Decode this packet into output.
@@ -94,7 +110,7 @@ public:
    * @return number of bytes actually processed from the packet, or negative for error
    */
   virtual int32_t decodeVideo(MediaPicture * output,
-      MediaPacket *packet, int32_t byteOffset)=0;
+      MediaPacket *packet, int32_t byteOffset);
 
   /**
    * Decode this packet into output.
@@ -112,7 +128,11 @@ public:
    * @return number of bytes actually processed from the packet, or negative for error
    */
   virtual int32_t decodeSubtitle(MediaSubtitle * output,
-      MediaPacket *packet, int32_t byteOffset)=0;
+      MediaPacket *packet, int32_t byteOffset);
+
+  virtual Rational* getTimeBase();
+  virtual void setTimeBase(Rational* newTimeBase);
+
 
 #ifndef SWIG
   virtual void* getCtx() { return getCodecCtx(); }
@@ -124,6 +144,14 @@ protected:
   ~Decoder();
 private:
   AVCodecContext* mCtx;
+  io::humble::ferry::RefPointer<Rational> mTimebase;
+  typedef enum State {
+    STATE_INITED,
+    STATE_OPENED,
+    STATE_CLOSED,
+    STATE_ERROR,
+  } State;
+  State mState;
 };
 
 } /* namespace video */
