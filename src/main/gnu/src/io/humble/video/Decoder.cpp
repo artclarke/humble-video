@@ -27,7 +27,12 @@
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
+#include <io/humble/video/Error.h>
 #include <io/humble/video/IndexEntryImpl.h>
+#include <io/humble/video/MediaAudioImpl.h>
+#include <io/humble/video/MediaPictureImpl.h>
+#include <io/humble/video/MediaPacketImpl.h>
+#include <io/humble/video/MediaSubtitleImpl.h>
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
@@ -58,13 +63,85 @@ Decoder::flush() {
   avcodec_flush_buffers(mCtx);
 }
 
+void
+Decoder::ensureAudioParamsMatch(MediaAudio* audio)
+{
+  if (!audio)
+    VS_THROW(HumbleInvalidArgument("null audio passed to decoder"));
+
+  if (getChannels() != audio->getChannels())
+    VS_THROW(HumbleInvalidArgument("audio channels does not match what decoder expects"));
+
+  if (getSampleRate() != audio->getSampleRate())
+    VS_THROW(HumbleInvalidArgument("audio sample rate does not match what decoder expects"));
+
+  if (getSampleFormat() != audio->getFormat())
+    VS_THROW(HumbleInvalidArgument("audio sample format does not match what decoder expects"));
+
+}
 int32_t
-Decoder::decodeAudio(MediaAudio* output, MediaPacket* packet,
+Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
     int32_t byteOffset) {
-  (void) output;
-  (void) packet;
-  (void) byteOffset;
-  return -1;
+  MediaAudioImpl* output = dynamic_cast<MediaAudioImpl*>(aOutput);
+  MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(aPacket);
+
+  if (byteOffset < 0) {
+    VS_THROW(HumbleInvalidArgument("byteOffset must be >= 0"));
+  }
+  if (STATE_OPENED != getState())
+    VS_THROW(HumbleRuntimeError("Attempt to decodeAudio, but Decoder is not opened"));
+
+  // let's check the audio parameters.
+  ensureAudioParamsMatch(aOutput);
+
+  if (packet) {
+    if (!packet->isComplete()) {
+      VS_THROW(HumbleRuntimeError("Passed in a non-null but not complete packet; this is an error"));
+    }
+    if (byteOffset >= packet->getSize()) {
+      VS_THROW(HumbleRuntimeError("Byteoffset is greater than total length of data in packet"));
+    }
+  } else {
+    if (byteOffset > 0) {
+      VS_LOG_WARN("Passing null packet with a non zero byte offset makes no sense");
+    }
+  }
+
+
+  // arguments now confirmed; let's do a decode
+  int32_t retval = -1;
+  int got_frame = 0;
+
+  // let's get the ffmpeg structures
+  AVPacket* inPkt = packet ? packet->getCtx() : 0;
+  AVFrame* frame = output->getCtx();
+
+  // now we're going to copy the inPkt to do the byte-offset stuff. This
+  // will copy by reference.
+  AVPacket tmp;
+  AVPacket* pkt = &tmp;
+  av_init_packet(pkt);
+  if (inPkt) {
+    // copy in the actual packet
+    av_copy_packet(pkt, inPkt);
+    // now, adjust the data and size pointers
+    pkt->data = pkt->data + byteOffset;
+    pkt->size = pkt->size - byteOffset;
+  }
+  // try out decode
+  retval = avcodec_decode_audio4(mCtx, frame, &got_frame, pkt);
+  // always free the packet so that we don't have an exception make us leak it.
+  av_free_packet(pkt);
+  // now, what did all that mean?
+  if (retval < 0) {
+    // let's make an error
+    RefPointer<Error> error;
+    VS_THROW(HumbleRuntimeError("Error while decoding"));
+  }
+  if (got_frame)
+    output->setComplete(frame->nb_samples, true);
+
+  return retval;
 }
 
 int32_t

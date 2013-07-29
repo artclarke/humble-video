@@ -111,6 +111,13 @@ public:
   virtual
   ~HumbleRuntimeError() throw () {
   }
+  /**
+   * Raises a HumbleRuntimeError with a sprintf style string.
+   * Does not allocate memory per se, but has a limit of 1k on
+   * the message size.
+   */
+  static HumbleRuntimeError make(const char* format, ...);
+
   virtual void
   raise() const {
     throw *this;

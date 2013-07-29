@@ -127,6 +127,10 @@ protected:
   virtual
   ~Decoder();
 private:
+  /**
+   * Make sure the audio passed in has parameters that match this decoder.
+   */
+  void ensureAudioParamsMatch(MediaAudio* audio);
 };
 
 } /* namespace video */

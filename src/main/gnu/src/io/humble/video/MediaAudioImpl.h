@@ -88,11 +88,11 @@ public:
   virtual int32_t
   getNumSamples();
 
+  virtual AVFrame* getCtx();
 protected:
   MediaAudioImpl();
   virtual
   ~MediaAudioImpl();
-  AVFrame* getCtx();
 private:
   static void
   setBufferType(AudioFormat::Type format,
