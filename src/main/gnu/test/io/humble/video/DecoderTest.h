@@ -37,7 +37,9 @@ public:
   virtual
   ~DecoderTest();
   void testCreation();
+  void testCreationWithErrors();
   void testOpen();
+  void testOpenWithOptions();
 };
 
 #endif /* DECODERTEST_H_ */

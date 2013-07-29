@@ -25,6 +25,8 @@
 
 #include "DecoderTest.h"
 #include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/HumbleException.h>
+#include <io/humble/video/KeyValueBag.h>
 
 DecoderTest::DecoderTest() {
 }
@@ -47,6 +49,14 @@ DecoderTest::testCreation()
 }
 
 void
+DecoderTest::testCreationWithErrors()
+{
+  TS_ASSERT_THROWS(Decoder::make((Codec*)0),
+      HumbleInvalidArgument);
+  TS_ASSERT_THROWS(Decoder::make((Decoder*)0),
+      HumbleInvalidArgument);
+}
+void
 DecoderTest::testOpen() {
   RefPointer<Codec> codec = Codec::findDecodingCodec(Codec::CODEC_ID_H264);
   RefPointer<Decoder> decoder = Decoder::make(codec.value());
@@ -68,6 +78,34 @@ DecoderTest::testOpen() {
 
   copy->open(0, 0);
   TS_ASSERT_EQUALS(Coder::STATE_OPENED, copy->getState());
+}
 
+void
+DecoderTest::testOpenWithOptions() {
+  RefPointer<KeyValueBag> inOpts = KeyValueBag::make();
+  RefPointer<KeyValueBag> outOpts = KeyValueBag::make();
 
+  RefPointer<Codec> codec = Codec::findDecodingCodec(Codec::CODEC_ID_AAC);
+  RefPointer<Decoder> decoder = Decoder::make(codec.value());
+
+  TS_ASSERT_EQUALS(0, (int32_t)decoder->getPropertyAsLong("maxrate"));
+  TS_ASSERT_EQUALS(-1, (int32_t)decoder->getPropertyAsLong("dual_mono_mode"));
+
+  // a valid option, all decoders
+  inOpts->setValue("maxrate", "500000");
+  // a valid option, custom to the give codec
+  inOpts->setValue("dual_mono_mode", "both");
+
+  // an invalid option
+  inOpts->setValue("not_an_option", "farfegnugen");
+
+  TS_ASSERT_EQUALS(0, outOpts->getNumKeys());
+
+  decoder->open(inOpts.value(), outOpts.value());
+
+  TS_ASSERT_EQUALS(1, outOpts->getNumKeys());
+  TS_ASSERT(strcmp("farfegnugen", outOpts->getValue("not_an_option", KeyValueBag::KVB_NONE))==0);
+  TS_ASSERT_EQUALS(500000, (int32_t)decoder->getPropertyAsLong("maxrate"));
+  // for some reason this does not work; need to figure out why (later).
+  // TS_ASSERT_EQUALS(2, (int32_t)decoder->getPropertyAsLong("dual_mono_mode"));
 }

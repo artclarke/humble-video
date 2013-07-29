@@ -27,7 +27,6 @@
 #define DECODER_H_
 
 #include <io/humble/ferry/RefPointer.h>
-#include <io/humble/video/Rational.h>
 #include <io/humble/video/Coder.h>
 #include <io/humble/video/MediaPacket.h>
 #include <io/humble/video/MediaAudio.h>
@@ -58,11 +57,6 @@ public:
 #ifndef SWIG
   static Decoder* make(Codec* codec, const AVCodecContext* src);
 #endif // ! SWIG
-
-  /**
-   * {@inheritDoc}
-   */
-  virtual void open(KeyValueBag* inputOptions, KeyValueBag* unsetOptions);
 
   /**
    * Flush this {@link Decoder}, getting rid of any cached packets (call after seek).
@@ -124,15 +118,6 @@ public:
   virtual int32_t decodeSubtitle(MediaSubtitle * output,
       MediaPacket *packet, int32_t byteOffset);
 
-  virtual Rational* getTimeBase();
-  virtual void setTimeBase(Rational* newTimeBase);
-
-  /**
-   * Get the state of this Decoder.
-   */
-  virtual State getState() { return mState; }
-
-
 #ifndef SWIG
   virtual void* getCtx() { return getCodecCtx(); }
   virtual AVCodecContext* getCodecCtx() { return mCtx; }
@@ -142,10 +127,6 @@ protected:
   virtual
   ~Decoder();
 private:
-  AVCodecContext* mCtx;
-  io::humble::ferry::RefPointer<Rational> mTimebase;
-
-  State mState;
 };
 
 } /* namespace video */

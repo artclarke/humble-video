@@ -24,8 +24,11 @@
  */
 
 #include "Coder.h"
+#include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/HumbleException.h>
+#include <io/humble/video/KeyValueBagImpl.h>
 
+VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 namespace io {
 namespace humble {
@@ -37,10 +40,79 @@ Coder::Coder(Codec* codec) {
   if (!codec)
     throw HumbleInvalidArgument("no codec passed in");
   mCodec.reset(codec, true);
+
+
+  mCtx = avcodec_alloc_context3(codec->getCtx());
+  if (!mCtx)
+    throw HumbleRuntimeError("could not allocate decoder context");
+
+  mState = STATE_INITED;
+
+  VS_LOG_TRACE("Created decoder");
+
 }
 
 Coder::~Coder() {
+  (void) avcodec_close(mCtx);
+  av_free(mCtx);
 }
+
+void
+Coder::open(KeyValueBag* inputOptions, KeyValueBag* aUnsetOptions) {
+  int32_t retval = -1;
+  AVDictionary* tmp=0;
+  try {
+      // Time to set options
+    if (inputOptions) {
+      KeyValueBagImpl* options = dynamic_cast<KeyValueBagImpl*>(inputOptions);
+      // make a copy of the data returned.
+      av_dict_copy(&tmp, options->getDictionary(), 0);
+    }
+
+    RefPointer<Codec> codec = getCodec();
+    retval = avcodec_open2(mCtx, codec->getCtx(), &tmp);
+
+    if (retval < 0)
+    {
+      mState = STATE_ERROR;
+      throw HumbleRuntimeError("could not open codec");
+    }
+    mState  = STATE_OPENED;
+
+    if (aUnsetOptions)
+    {
+      KeyValueBagImpl* unsetOptions = dynamic_cast<KeyValueBagImpl*>(aUnsetOptions);
+      unsetOptions->copy(tmp);
+    }
+  } catch (std::exception & e) {
+    if (tmp)
+      av_dict_free(&tmp);
+    tmp = 0;
+    throw e;
+  }
+  if (tmp)
+    av_dict_free(&tmp);
+}
+
+
+Rational*
+Coder::getTimeBase() {
+  if (!mTimebase || mTimebase->getNumerator() != mCtx->time_base.num || mTimebase->getDenominator() != mCtx->time_base.den)
+    mTimebase = Rational::make(mCtx->time_base.num, mCtx->time_base.den);
+  return mTimebase.get();
+}
+
+void
+Coder::setTimeBase(Rational* newTimeBase) {
+  if (!newTimeBase)
+    throw HumbleInvalidArgument("no timebase passed in");
+  if (mState != STATE_INITED)
+    throw HumbleRuntimeError("can only setTimeBase on Decoder before open() is called.");
+  mTimebase.reset(newTimeBase, true);
+  mCtx->time_base.num = newTimeBase->getNumerator();
+  mCtx->time_base.den = newTimeBase->getDenominator();
+}
+
 
 } /* namespace video */
 } /* namespace humble */

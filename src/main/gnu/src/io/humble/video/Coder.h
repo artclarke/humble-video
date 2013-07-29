@@ -29,6 +29,7 @@
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/Codec.h>
+#include <io/humble/video/Rational.h>
 
 namespace io {
 namespace humble {
@@ -120,7 +121,7 @@ public:
    *                     the options in <code>inputOptions</code> that were not set.
    *
    */
-  virtual void open(KeyValueBag* inputOptions, KeyValueBag* unsetOptions)=0;
+  virtual void open(KeyValueBag* inputOptions, KeyValueBag* unsetOptions);
 
   /**
    * The Codec this StreamCoder will use.
@@ -156,7 +157,7 @@ public:
    * @return The height of the video frames in the attached stream
    *   or -1 if an audio stream, or we cannot determine the height.
    */
-  virtual int32_t getHeight() { return getCodecCtx()->height; }
+  virtual int32_t getHeight() { return mCtx->height; }
 
   /**
    * Set the height, in pixels.
@@ -165,7 +166,7 @@ public:
    *
    * @param height Sets the height of video frames we'll encode.  No-op when DECODING.
    */
-  virtual void setHeight(int32_t height) { getCodecCtx()->height = height; }
+  virtual void setHeight(int32_t height) { mCtx->height = height; }
 
   /**
    * The width, in pixels.
@@ -173,7 +174,7 @@ public:
    * @return The width of the video frames in the attached stream
    *   or -1 if an audio stream, or we cannot determine the width.
    */
-  virtual int32_t getWidth() { return getCodecCtx()->width; }
+  virtual int32_t getWidth() { return mCtx->width; }
 
   /**
    * Set the width, in pixels
@@ -182,14 +183,14 @@ public:
    *
    * @param width Sets the width of video frames we'll encode.  No-op when DECODING.
    */
-  virtual void setWidth(int32_t width) { getCodecCtx()->width = width; }
+  virtual void setWidth(int32_t width) { mCtx->width = width; }
 
   /**
    * For Video streams, get the Pixel Format in use by the stream.
    *
    * @return the Pixel format, or PixelFormat::PIX_FMT_NONE if audio.
    */
-  virtual PixelFormat::Type getPixelFormat() { return (PixelFormat::Type)getCodecCtx()->pix_fmt; }
+  virtual PixelFormat::Type getPixelFormat() { return (PixelFormat::Type)mCtx->pix_fmt; }
 
   /**
    * Set the pixel format to ENCODE with.  Ignored if audio or
@@ -197,14 +198,14 @@ public:
    *
    * @param pixelFmt Pixel format to use.
    */
-  virtual void setPixelType(PixelFormat::Type pixelFmt) { getCodecCtx()->pix_fmt = (enum AVPixelFormat)pixelFmt; }
+  virtual void setPixelType(PixelFormat::Type pixelFmt) { mCtx->pix_fmt = (enum AVPixelFormat)pixelFmt; }
 
   /**
    * Get the sample rate we use for this coder.
    *
    * @return The sample rate (in Hz) we use for this stream, or -1 if unknown or video.
    */
-  virtual int32_t getSampleRate() { return getCodecCtx()->sample_rate; }
+  virtual int32_t getSampleRate() { return mCtx->sample_rate; }
 
   /**
    * Set the sample rate to use when ENCODING.  Ignored if DECODING
@@ -212,14 +213,14 @@ public:
    *
    * @param sampleRate New sample rate (in Hz) to use.
    */
-  virtual void setSampleRate(int32_t sampleRate) { getCodecCtx()->sample_rate=sampleRate; }
+  virtual void setSampleRate(int32_t sampleRate) { mCtx->sample_rate=sampleRate; }
 
   /**
    * Get the audio sample format.
    *
    * @return The sample format of samples for encoding/decoding.
    */
-  virtual AudioFormat::Type getSampleFormat() { return (AudioFormat::Type)getCodecCtx()->sample_fmt; }
+  virtual AudioFormat::Type getSampleFormat() { return (AudioFormat::Type)mCtx->sample_fmt; }
 
   /**
    * Set the sample format when ENCODING.  Ignored if DECODING
@@ -227,14 +228,14 @@ public:
    *
    * @param format The sample format.
    */
-  virtual void setSampleFormat(AudioFormat::Type format) { getCodecCtx()->sample_fmt = (enum AVSampleFormat)format; }
+  virtual void setSampleFormat(AudioFormat::Type format) { mCtx->sample_fmt = (enum AVSampleFormat)format; }
 
   /**
    * Get the number of channels in this audio stream
    *
    * @return The sample rate (in Hz) we use for this stream, or 0 if unknown.
    */
-  virtual int32_t getChannels() { return getCodecCtx()->channels; }
+  virtual int32_t getChannels() { return mCtx->channels; }
 
   /**
    * Set the number of channels to use when ENCODING.  Ignored if a
@@ -242,7 +243,7 @@ public:
    *
    * @param channels The number of channels we'll encode with.
    */
-  virtual void setChannels(int32_t channels) { getCodecCtx()->channels = channels; }
+  virtual void setChannels(int32_t channels) { mCtx->channels = channels; }
 
   /**
    * Get the time base this stream will ENCODE in, or the time base we
@@ -250,7 +251,7 @@ public:
    *
    * @return The time base this StreamCoder is using.
    */
-  virtual Rational* getTimeBase()=0;
+  virtual Rational* getTimeBase();
 
   /**
    * Set the time base we'll use to ENCODE with.  A no-op when DECODING.
@@ -262,23 +263,24 @@ public:
    *
    * @param newTimeBase The new time base to use.
    */
-  virtual void setTimeBase(Rational* newTimeBase)=0;
+  virtual void setTimeBase(Rational* newTimeBase);
 
   /**
    * Get the state of this coder.
    */
-  virtual State getState()=0;
-
-#ifndef SWIG
-  virtual AVCodecContext* getCodecCtx()=0;
-#endif
+  virtual State getState() { return mState; }
 
 protected:
+  virtual void setState(State state) { mState = state; }
   Coder(Codec* codec);
   virtual
   ~Coder();
+  AVCodecContext *mCtx;
 private:
   io::humble::ferry::RefPointer<Codec> mCodec;
+  io::humble::ferry::RefPointer<Rational> mTimebase;
+
+  State mState;
 };
 
 } /* namespace video */
