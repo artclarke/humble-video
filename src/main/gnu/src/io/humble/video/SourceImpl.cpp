@@ -297,6 +297,7 @@ SourceImpl::read(MediaPacket* ipkt) {
     AVPacket* packet=pkt->getCtx();
 
     int32_t numReads=0;
+    pkt->setComplete(false, pkt->getSize());
     do
     {
       retval = av_read_frame(this->getFormatCtx(),
@@ -318,17 +319,20 @@ SourceImpl::read(MediaPacket* ipkt) {
         packet->data);
 
     // and let's try to set the packet time base if known
-    if (pkt->getStreamIndex() >= 0)
-    {
-      RefPointer<SourceStream> stream = this->getSourceStream(pkt->getStreamIndex());
-      if (stream)
+    if (retval >= 0) {
+      if (pkt->getStreamIndex() >= 0)
       {
-        RefPointer<Rational> streamBase = stream->getTimeBase();
-        if (streamBase)
+        RefPointer<SourceStream> stream = this->getSourceStream(pkt->getStreamIndex());
+        if (stream)
         {
-          pkt->setTimeBase(streamBase.value());
+          RefPointer<Rational> streamBase = stream->getTimeBase();
+          if (streamBase)
+          {
+            pkt->setTimeBase(streamBase.value());
+          }
         }
       }
+      pkt->setComplete(true, pkt->getSize());
     }
   }
   VS_CHECK_INTERRUPT(retval, true);

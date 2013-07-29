@@ -30,6 +30,7 @@
 
 #include <io/humble/video/Codec.h>
 #include <io/humble/video/PixelFormat.h>
+#include <io/humble/video/MediaAudio.h>
 
 class TestData
 {
@@ -49,15 +50,16 @@ public:
     int width;
     int height;
     int gops;
-    //  PixelFormat pixel_format;
+    io::humble::video::PixelFormat::Type pixel_format;
+    io::humble::video::AudioFormat::Type audio_format;
     int bit_rate;
     int sample_rate;
     int channels;
-    int32_t duration;
+    int64_t duration;
     int64_t filesize;
     int32_t bitrate;
-    io::humble::video::Codec::ID *codec_ids;
-    io::humble::video::MediaDescriptor::Type *codec_types;
+    io::humble::video::Codec::ID codec_ids[];
+    io::humble::video::MediaDescriptor::Type codec_types[];
   };
   void fillPath(TestData::Fixture* f, char *dst, size_t size);
 
@@ -74,6 +76,18 @@ public:
       return &mFixtures[i];
     else
       return 0;
+  }
+  Fixture* getFixture(const char* url) {
+    if (!url || !*url)
+      return 0;
+    Fixture* cmp=0;
+    for(int32_t i = 0; i < mNumFixtures; i++) {
+      cmp = &mFixtures[i];
+      if (cmp->url && cmp->url[0] && strcmp(cmp->url, url)==0)
+        break;
+      cmp = 0;
+    }
+    return cmp;
   }
   private:
   int32_t mNumFixtures;

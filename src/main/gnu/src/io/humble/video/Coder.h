@@ -246,6 +246,16 @@ public:
   virtual void setChannels(int32_t channels) { mCtx->channels = channels; }
 
   /**
+   * Get the channel layout.
+   */
+  virtual AudioChannel::Layout getChannelLayout() { return (AudioChannel::Layout)mCtx->channel_layout; }
+
+  /** Set the channel layout */
+  virtual void setChannelLayout(AudioChannel::Layout layout) {
+    mCtx->channel_layout = layout;
+  }
+
+  /**
    * Get the time base this stream will ENCODE in, or the time base we
    * detect while DECODING.
    *

@@ -130,6 +130,10 @@ public class Decoder extends Coder {
     return (cPtr == 0) ? null : new Decoder(cPtr, false);
   }
 
+  public int getFrameSize() {
+    return VideoJNI.Decoder_getFrameSize(swigCPtr, this);
+  }
+
 /**
  * Flush this {@link Decoder}, getting rid of any cached packets (call 
  * after seek).  

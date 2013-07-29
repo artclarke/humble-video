@@ -1141,11 +1141,14 @@ class VideoJNI {
   public final static native void Coder_setSampleFormat(long jarg1, Coder jarg1_, int jarg2);
   public final static native int Coder_getChannels(long jarg1, Coder jarg1_);
   public final static native void Coder_setChannels(long jarg1, Coder jarg1_, int jarg2);
+  public final static native int Coder_getChannelLayout(long jarg1, Coder jarg1_);
+  public final static native void Coder_setChannelLayout(long jarg1, Coder jarg1_, int jarg2);
   public final static native long Coder_getTimeBase(long jarg1, Coder jarg1_);
   public final static native void Coder_setTimeBase(long jarg1, Coder jarg1_, long jarg2, Rational jarg2_);
   public final static native int Coder_getState(long jarg1, Coder jarg1_);
   public final static native long Decoder_make__SWIG_0(long jarg1, Codec jarg1_);
   public final static native long Decoder_make__SWIG_1(long jarg1, Decoder jarg1_);
+  public final static native int Decoder_getFrameSize(long jarg1, Decoder jarg1_);
   public final static native void Decoder_flush(long jarg1, Decoder jarg1_);
   public final static native int Decoder_decodeAudio(long jarg1, Decoder jarg1_, long jarg2, MediaAudio jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native int Decoder_decodeVideo(long jarg1, Decoder jarg1_, long jarg2, MediaPicture jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);

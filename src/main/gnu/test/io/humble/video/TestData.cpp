@@ -81,17 +81,48 @@ TestData::setupFixtures() {
   fixture.width = 424;
   fixture.height = 176;
   fixture.gops = 12;
-//    fixture.pixel_format=IPixelFormat::YUV420P;
+  fixture.pixel_format = PixelFormat::PIX_FMT_YUV420P;
   fixture.bit_rate = 64000;
   fixture.sample_rate = 22050;
   fixture.channels = 1;
+  fixture.audio_format = AudioFormat::SAMPLE_FMT_S16P;
 //  fixture.codec_types = {
 //    MediaDescriptor::Type::MEDIA_VIDEO,
 //    MediaDescriptor::Type::MEDIA_AUDIO,
 //    MediaDescriptor::Type::MEDIA_UNKNOWN
 //  };
-//  fixture.codec_ids = {Codec::ID_FLV1, Codec::ID_MP3, Codec::ID_NONE};
+//  fixture.codec_ids = {Codec::CODEC_ID_FLV1, Codec::CODEC_ID_MP3, Codec::CODEC_ID_NONE};
 
   addFixture(&fixture);
+
+  fixture.url = "testfile.mp3";
+  fixture.num_streams = 1;
+  fixture.duration = Global::NO_PTS;
+  fixture.filesize = -1;
+  fixture.bitrate = -1;
+  fixture.audio_packets = 0;
+  fixture.video_packets = 0;
+  // 1 frame per packet
+  fixture.video_frames = 0;
+  fixture.video_key_frames = 0;
+  fixture.audio_samples = -1;
+  fixture.packets = fixture.audio_packets + fixture.video_packets;
+  fixture.frame_rate = 0;
+  fixture.time_base = .0010; // This is the default BEFORE we read any packets
+  fixture.width = 0;
+  fixture.height = 0;
+  fixture.gops = 0;
+  fixture.pixel_format = PixelFormat::PIX_FMT_NONE;
+  fixture.audio_format = AudioFormat::SAMPLE_FMT_S16P;
+  fixture.bit_rate = -1;
+  fixture.sample_rate = 44100;
+  fixture.channels = 2;
+//  fixture.codec_types = {
+//    MediaDescriptor::Type::MEDIA_AUDIO,
+//    MediaDescriptor::Type::MEDIA_UNKNOWN
+//  };
+//  fixture.codec_ids = {Codec::CODEC_ID_MP3, Codec::CODEC_ID_NONE};
+  addFixture(&fixture);
+
 }
 

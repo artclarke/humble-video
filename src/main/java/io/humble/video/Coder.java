@@ -257,6 +257,20 @@ public class Coder extends Configurable {
   }
 
 /**
+ * Get the channel layout.  
+ */
+  public AudioChannel.Layout getChannelLayout() {
+    return AudioChannel.Layout.swigToEnum(VideoJNI.Coder_getChannelLayout(swigCPtr, this));
+  }
+
+/**
+ * Set the channel layout  
+ */
+  public void setChannelLayout(AudioChannel.Layout layout) {
+    VideoJNI.Coder_setChannelLayout(swigCPtr, this, layout.swigValue());
+  }
+
+/**
  * Get the time base this stream will ENCODE in, or the time base we 
  *  
  * detect while DECODING.  

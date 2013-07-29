@@ -58,6 +58,7 @@ public:
   static Decoder* make(Codec* codec, const AVCodecContext* src);
 #endif // ! SWIG
 
+  virtual int32_t getFrameSize();
   /**
    * Flush this {@link Decoder}, getting rid of any cached packets (call after seek).
    * Next packet given to decode should be a key packet.
