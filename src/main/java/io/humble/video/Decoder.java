@@ -131,13 +131,6 @@ public class Decoder extends Coder {
   }
 
 /**
- * {@inheritDoc}  
- */
-  public void open(KeyValueBag inputOptions, KeyValueBag unsetOptions) {
-    VideoJNI.Decoder_open(swigCPtr, this, KeyValueBag.getCPtr(inputOptions), inputOptions, KeyValueBag.getCPtr(unsetOptions), unsetOptions);
-  }
-
-/**
  * Flush this {@link Decoder}, getting rid of any cached packets (call 
  * after seek).  
  * Next packet given to decode should be a key packet.  
@@ -200,15 +193,6 @@ public class Decoder extends Coder {
  */
   public int decodeSubtitle(MediaSubtitle output, MediaPacket packet, int byteOffset) {
     return VideoJNI.Decoder_decodeSubtitle(swigCPtr, this, MediaSubtitle.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
-  }
-
-  public Rational getTimeBase() {
-    long cPtr = VideoJNI.Decoder_getTimeBase(swigCPtr, this);
-    return (cPtr == 0) ? null : new Rational(cPtr, false);
-  }
-
-  public void setTimeBase(Rational newTimeBase) {
-    VideoJNI.Decoder_setTimeBase(swigCPtr, this, Rational.getCPtr(newTimeBase), newTimeBase);
   }
 
 }

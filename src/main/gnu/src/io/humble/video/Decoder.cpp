@@ -135,8 +135,8 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   // now, what did all that mean?
   if (retval < 0) {
     // let's make an error
-    RefPointer<Error> error;
-    VS_THROW(HumbleRuntimeError("Error while decoding"));
+    RefPointer<Error> error = Error::make(retval);
+    VS_THROW(HumbleRuntimeError::make("Error while decoding: %s", error ? error->getDescription() : ""));
   }
   if (got_frame)
     output->setComplete(frame->nb_samples, true);
