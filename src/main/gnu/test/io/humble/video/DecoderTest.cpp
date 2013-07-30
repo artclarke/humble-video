@@ -239,7 +239,7 @@ DecoderTest::testDecodeVideo() {
 
 //  TS_SKIP("Not yet implemented");
 
-  TestData::Fixture* fixture=mFixtures.getFixture("testfile.flv");
+  TestData::Fixture* fixture=mFixtures.getFixture("testfile_h264_mp4a_tmcd.mov");
   TS_ASSERT(fixture);
   char filepath[2048];
   mFixtures.fillPath(fixture, filepath, sizeof(filepath));
@@ -260,7 +260,7 @@ DecoderTest::testDecodeVideo() {
   TS_ASSERT(decoder);
   RefPointer<Codec> codec = decoder->getCodec();
   TS_ASSERT(codec);
-  TS_ASSERT_EQUALS(Codec::CODEC_ID_FLV1, codec->getID());
+  TS_ASSERT_EQUALS(Codec::CODEC_ID_H264, codec->getID());
 
   decoder->open(0, 0);
 

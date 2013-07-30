@@ -69,7 +69,9 @@ Coder::Coder(Codec* codec, const AVCodecContext* src) {
 
 Coder::~Coder() {
   (void) avcodec_close(mCtx);
-  av_free(mCtx);
+  if (mCtx->extradata)
+    av_freep(&mCtx->extradata);
+  av_freep(&mCtx);
 }
 
 void

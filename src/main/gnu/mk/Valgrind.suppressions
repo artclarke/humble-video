@@ -12944,3 +12944,22 @@
    ...
    fun:atexit_register
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   ...
+   fun:gmtsub
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   ...
+   fun:strftime_l
+}
+{
+    mac_os_x_is_fun
+    Memcheck:Leak  
+    fun:malloc   
+    fun:realloc  
+    fun:new_sem_from_pool
+}
