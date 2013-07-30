@@ -181,16 +181,16 @@ DecoderTest::testDecodeAudio() {
         if (audio->isComplete()) {
           writeAudio(output, audio.value());
         }
-        // now, handle the case where bytesRead is 0; we need to flush any
-        // cached packets
-        do {
-          decoder->decodeAudio(audio.value(), 0, 0);
-          if (audio->isComplete()) {
-            writeAudio(output, audio.value());
-          }
-        } while (audio->isComplete());
         byteOffset += bytesRead;
       } while(byteOffset < packet->getSize());
+      // now, handle the case where bytesRead is 0; we need to flush any
+      // cached packets
+      do {
+        decoder->decodeAudio(audio.value(), 0, 0);
+        if (audio->isComplete()) {
+          writeAudio(output, audio.value());
+        }
+      } while (audio->isComplete());
     }
 
   }
@@ -284,16 +284,16 @@ DecoderTest::testDecodeVideo() {
         if (picture->isComplete()) {
           writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
         }
-        // now, handle the case where bytesRead is 0; we need to flush any
-        // cached packets
-        do {
-          decoder->decodeVideo(picture.value(), 0, 0);
-          if (picture->isComplete()) {
-            writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
-          }
-        } while (picture->isComplete());
         byteOffset += bytesRead;
       } while(byteOffset < packet->getSize());
+      // now, handle the case where bytesRead is 0; we need to flush any
+      // cached packets
+      do {
+        decoder->decodeVideo(picture.value(), 0, 0);
+        if (picture->isComplete()) {
+          writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
+        }
+      } while (picture->isComplete());
     }
 
   }
