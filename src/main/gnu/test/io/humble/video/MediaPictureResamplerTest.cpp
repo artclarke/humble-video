@@ -25,6 +25,8 @@
 
 #include "MediaPictureResamplerTest.h"
 #include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/LoggerStack.h>
+
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaPictureResampler.h>
 #include <io/humble/video/Source.h>
@@ -145,4 +147,33 @@ MediaPictureResamplerTest::testRescale() {
       break;
   }
   source->close();
+}
+
+void
+MediaPictureResamplerTest::testCreation()
+{
+  RefPointer<MediaPictureResampler> resampler;
+
+  int32_t oWidth = 200;
+  int32_t oHeight = 100;
+  PixelFormat::Type oFormat = PixelFormat::PIX_FMT_YUV420P;
+
+  int32_t iWidth = 100;
+  int32_t iHeight = 100;
+  PixelFormat::Type iFormat = PixelFormat::PIX_FMT_ABGR;
+
+  {
+    LoggerStack stack;
+    stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
+
+    TS_ASSERT_THROWS(MediaPictureResampler::make(0, oHeight, oFormat, iWidth, iHeight, iFormat, 0),HumbleInvalidArgument);
+    TS_ASSERT_THROWS(MediaPictureResampler::make(oWidth, 0, oFormat, iWidth, iHeight, iFormat, 0),HumbleInvalidArgument);
+    TS_ASSERT_THROWS(MediaPictureResampler::make(oWidth, oHeight, PixelFormat::PIX_FMT_NONE, iWidth, iHeight, iFormat, 0),HumbleInvalidArgument);
+    TS_ASSERT_THROWS(MediaPictureResampler::make(oWidth, oHeight, oFormat, 0, iHeight, iFormat, 0),HumbleInvalidArgument);
+    TS_ASSERT_THROWS(MediaPictureResampler::make(oWidth, oHeight, oFormat, iWidth, 0, iFormat, 0),HumbleInvalidArgument);
+    TS_ASSERT_THROWS(MediaPictureResampler::make(oWidth, oHeight, oFormat, iWidth, iHeight, PixelFormat::PIX_FMT_NONE, 0),HumbleInvalidArgument);
+  }
+
+  resampler = MediaPictureResampler::make(oWidth, oHeight, oFormat, iWidth, iHeight, iFormat, 0);
+  TS_ASSERT(resampler);
 }

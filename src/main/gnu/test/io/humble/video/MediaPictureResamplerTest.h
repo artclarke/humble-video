@@ -37,6 +37,7 @@ public:
   MediaPictureResamplerTest();
   virtual
   ~MediaPictureResamplerTest();
+  void testCreation();
   void testRescale();
 private:
   void writePicture(const char* prefix, int32_t* frameNo,
