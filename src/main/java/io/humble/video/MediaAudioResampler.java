@@ -113,43 +113,76 @@ public class MediaAudioResampler extends Configurable {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+/**
+ * Create a new {@link MediaAudioResampler}.  
+ */
   public static MediaAudioResampler make(AudioChannel.Layout outLayout, int outSampleRate, AudioFormat.Type outFormat, AudioChannel.Layout inLayout, int inSampleRate, AudioFormat.Type inFormat) {
     long cPtr = VideoJNI.MediaAudioResampler_make(outLayout.swigValue(), outSampleRate, outFormat.swigValue(), inLayout.swigValue(), inSampleRate, inFormat.swigValue());
     return (cPtr == 0) ? null : new MediaAudioResampler(cPtr, false);
   }
 
+/**
+ * Get output channel layout.  
+ */
   public AudioChannel.Layout getOutputLayout() {
     return AudioChannel.Layout.swigToEnum(VideoJNI.MediaAudioResampler_getOutputLayout(swigCPtr, this));
   }
 
+/**
+ * Get input channel layout.  
+ */
   public AudioChannel.Layout getInputLayout() {
     return AudioChannel.Layout.swigToEnum(VideoJNI.MediaAudioResampler_getInputLayout(swigCPtr, this));
   }
 
+/**
+ * Get output sample rate.  
+ */
   public int getOutputSampleRate() {
     return VideoJNI.MediaAudioResampler_getOutputSampleRate(swigCPtr, this);
   }
 
+/**
+ * Get input sample rate.  
+ */
   public int getInputSampleRate() {
     return VideoJNI.MediaAudioResampler_getInputSampleRate(swigCPtr, this);
   }
 
+/**
+ * Get output audio format.  
+ */
   public AudioFormat.Type getOutputFormat() {
     return AudioFormat.Type.swigToEnum(VideoJNI.MediaAudioResampler_getOutputFormat(swigCPtr, this));
   }
 
+/**
+ * Get input audio format.  
+ */
   public AudioFormat.Type getInputFormat() {
     return AudioFormat.Type.swigToEnum(VideoJNI.MediaAudioResampler_getInputFormat(swigCPtr, this));
   }
 
+/**
+ * Get number of input channels (derived from {@link #getInputLayout()}). 
+ *  
+ */
   public int getInputChannels() {
     return VideoJNI.MediaAudioResampler_getInputChannels(swigCPtr, this);
   }
 
+/**
+ * Get number of output channels (derived from {@link #getOutputLayout()}). 
+ *  
+ */
   public int getOutputChannels() {
     return VideoJNI.MediaAudioResampler_getOutputChannels(swigCPtr, this);
   }
 
+/**
+ * Opens the resampler so it can be ready for resampling.  
+ * You should NOT set options after you open this object.  
+ */
   public void open() {
     VideoJNI.MediaAudioResampler_open(swigCPtr, this);
   }
@@ -256,6 +289,53 @@ public class MediaAudioResampler extends Configurable {
  */
   public long getDelay(long base) {
     return VideoJNI.MediaAudioResampler_getDelay(swigCPtr, this, base);
+  }
+
+  public MediaAudioResampler.State getState() {
+    return MediaAudioResampler.State.swigToEnum(VideoJNI.MediaAudioResampler_getState(swigCPtr, this));
+  }
+
+  public enum State {
+    STATE_INITED,
+    STATE_OPENED,
+    STATE_ERROR;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static State swigToEnum(int swigValue) {
+      State[] swigValues = State.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (State swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + State.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private State() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private State(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private State(State swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
   }
 
 }

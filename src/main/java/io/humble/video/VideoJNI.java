@@ -574,6 +574,7 @@ class VideoJNI {
   public final static native int MediaAudioResampler_dropOutput(long jarg1, MediaAudioResampler jarg1_, int jarg2);
   public final static native int MediaAudioResampler_injectSilence(long jarg1, MediaAudioResampler jarg1_, int jarg2);
   public final static native long MediaAudioResampler_getDelay(long jarg1, MediaAudioResampler jarg1_, long jarg2);
+  public final static native int MediaAudioResampler_getState(long jarg1, MediaAudioResampler jarg1_);
   public final static native int MediaDescriptor_MEDIA_UNKNOWN_get();
   public final static native int MediaDescriptor_MEDIA_VIDEO_get();
   public final static native int MediaDescriptor_MEDIA_AUDIO_get();

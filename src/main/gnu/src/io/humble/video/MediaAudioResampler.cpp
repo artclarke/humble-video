@@ -40,6 +40,7 @@ VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 MediaAudioResampler::MediaAudioResampler() {
   mCtx = swr_alloc();
+  mState = STATE_INITED;
   if (!mCtx) {
     VS_THROW(HumbleBadAlloc());
   }
@@ -150,9 +151,11 @@ void
 MediaAudioResampler::open() {
   int retval = swr_init(mCtx);
   if (retval < 0) {
+    mState = STATE_ERROR;
     RefPointer<Error> error = Error::make(retval);
     VS_THROW(HumbleRuntimeError::make("Could not open audio resampler: %s", error ? error->getDescription() : ""));
   }
+  mState = STATE_OPENED;
 }
 
 int32_t
@@ -160,16 +163,23 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
   MediaAudioImpl* out = dynamic_cast<MediaAudioImpl*>(aOut);
   MediaAudioImpl* in = dynamic_cast<MediaAudioImpl*>(aIn);
 
+  if (mState != STATE_OPENED)
+    VS_THROW(HumbleRuntimeError("Must call open() on resampler before using"));
   if (in) {
     if (in->getFormat() != getInputFormat())
-      VS_THROW(HumbleInvalidArgument("audio format does not match what resampler expected"));
+      VS_THROW(HumbleInvalidArgument("input audio format does not match what resampler expected"));
     if (in->getSampleRate() != getInputSampleRate())
-      VS_THROW(HumbleInvalidArgument("audio sample rate does not match what resampler expected"));
+      VS_THROW(HumbleInvalidArgument("input audio sample rate does not match what resampler expected"));
     if (in->getChannelLayout() != getInputLayout())
-      VS_THROW(HumbleInvalidArgument("audio channel layout does not match what resampler expected"));
+      VS_THROW(HumbleInvalidArgument("input audio channel layout does not match what resampler expected"));
   }
   if (out) {
-    // TODO: Check parameters
+    if (out->getFormat() != getOutputFormat())
+      VS_THROW(HumbleInvalidArgument("output audio format does not match what resampler expected"));
+    if (out->getSampleRate() != getOutputSampleRate())
+      VS_THROW(HumbleInvalidArgument("output audio sample rate does not match what resampler expected"));
+    if (out->getChannelLayout() != getOutputLayout())
+      VS_THROW(HumbleInvalidArgument("output audio channel layout does not match what resampler expected"));
   }
   AVFrame* outFrame = out ? out->getCtx() : 0;
   AVFrame* inFrame = in ? in->getCtx() : 0;

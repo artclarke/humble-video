@@ -43,6 +43,9 @@ namespace video {
 class MediaAudioResampler : public io::humble::video::Configurable
 {
 public:
+  /**
+   * Create a new {@link MediaAudioResampler}.
+   */
   static MediaAudioResampler*
   make(
       AudioChannel::Layout outLayout,
@@ -53,16 +56,45 @@ public:
       AudioFormat::Type inFormat
       );
 
+  /**
+   * Get output channel layout.
+   */
   virtual AudioChannel::Layout getOutputLayout();
+  /**
+   * Get input channel layout.
+   */
   virtual AudioChannel::Layout getInputLayout();
+  /**
+   * Get output sample rate.
+   */
   virtual int32_t getOutputSampleRate();
+  /**
+   * Get input sample rate.
+   */
   virtual int32_t getInputSampleRate();
+  /**
+   * Get output audio format.
+   */
   virtual AudioFormat::Type getOutputFormat();
+  /**
+   * Get input audio format.
+   */
   virtual AudioFormat::Type getInputFormat();
+  /**
+   * Get number of input channels (derived from {@link #getInputLayout()}).
+   */
   virtual int32_t getInputChannels();
+  /**
+   * Get number of output channels (derived from {@link #getOutputLayout()}).
+   */
   virtual int32_t getOutputChannels();
 
+  /**
+   * Opens the resampler so it can be ready for resampling.
+   * You should NOT set options after you open this object.
+   */
   virtual void open();
+
   /**
    * Convert audio.
    *
@@ -119,19 +151,19 @@ public:
    * @param stride  offset between lines of the matrix
    * @return  AVERROR error code in case of failure.
    */
-  //void setMatrix(const double *matrix, int stride);
+  //virtual void setMatrix(const double *matrix, int stride);
 
   /**
    * Drops the specified number of output samples.
    * @return # of samples dropped.
    */
-  int32_t dropOutput(int32_t count);
+  virtual int32_t dropOutput(int32_t count);
 
   /**
    * Injects the specified number of silence samples.
    * @return # of samples injected.
    */
-  int32_t injectSilence(int32_t count);
+  virtual int32_t injectSilence(int32_t count);
 
   /**
    * Gets the delay the next input sample will experience relative to the next output sample.
@@ -152,8 +184,14 @@ public:
    *              an exact rounding free delay can be found by using LCM(in_sample_rate, out_sample_rate)
    * @returns     the delay in 1/base units.
    */
-  int64_t getDelay(int64_t base);
+  virtual int64_t getDelay(int64_t base);
 
+  typedef enum State {
+    STATE_INITED,
+    STATE_OPENED,
+    STATE_ERROR
+  } State;
+  virtual State getState() { return mState; }
 protected:
   void* getCtx() { return mCtx; }
   MediaAudioResampler();
@@ -161,6 +199,7 @@ protected:
   ~MediaAudioResampler();
 private:
   SwrContext* mCtx;
+  State mState;
 };
 
 } /* namespace video */
