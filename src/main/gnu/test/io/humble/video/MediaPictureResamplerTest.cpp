@@ -140,7 +140,9 @@ MediaPictureResamplerTest::testRescale() {
         }
       } while (picture->isComplete());
     }
-
+    if ((int32_t)(frameNo/30) > 10)
+      // 20 pictures should be enough to see if it's working.
+      break;
   }
   source->close();
 }
