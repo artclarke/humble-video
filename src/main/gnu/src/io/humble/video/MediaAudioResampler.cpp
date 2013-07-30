@@ -55,6 +55,19 @@ MediaAudioResampler::make(AudioChannel::Layout outLayout, int32_t outSampleRate,
     int32_t inSampleRate, AudioFormat::Type inFormat) {
   RefPointer<MediaAudioResampler> retval;
 
+  if (outLayout == AudioChannel::CH_LAYOUT_UNKNOWN)
+    VS_THROW(HumbleInvalidArgument("outLayout must not be CH_LAYOUT_UNKNOWN"));
+  if (outSampleRate <= 0)
+    VS_THROW(HumbleInvalidArgument("outSampleRate must be > 0"));
+  if (outFormat == AudioFormat::SAMPLE_FMT_NONE)
+    VS_THROW(HumbleInvalidArgument("outFormat must not be SAMPLE_FMT_NONE"));
+  if (inLayout == AudioChannel::CH_LAYOUT_UNKNOWN)
+    VS_THROW(HumbleInvalidArgument("inLayout must not be CH_LAYOUT_UNKNOWN"));
+  if (inSampleRate <= 0)
+    VS_THROW(HumbleInvalidArgument("inSampleRate must be > 0"));
+  if (inFormat == AudioFormat::SAMPLE_FMT_NONE)
+    VS_THROW(HumbleInvalidArgument("inFormat must not be SAMPLE_FMT_NONE"));
+
   retval.reset(new MediaAudioResampler(), true);
 
   av_opt_set_int(retval->mCtx, "ocl", outLayout,   0);
