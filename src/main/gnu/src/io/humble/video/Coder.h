@@ -288,7 +288,7 @@ protected:
   virtual int prepareFrame(AVFrame* frame, int flags) {
     return avcodec_default_get_buffer2(mCtx, frame, flags);
   }
-  Coder(Codec* codec);
+  Coder(Codec* codec, const AVCodecContext* src);
   virtual
   ~Coder();
   AVCodecContext *mCtx;

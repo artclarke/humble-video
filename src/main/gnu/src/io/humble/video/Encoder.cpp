@@ -32,12 +32,10 @@ namespace io {
 namespace humble {
 namespace video {
 
-Encoder::Encoder(Codec* codec) : Coder(codec) {
-  mCtx=0;
+Encoder::Encoder(Codec* codec, const AVCodecContext* src) : Coder(codec, src) {
 }
 
 Encoder::~Encoder() {
-  av_free(mCtx);
 }
 
 Encoder*

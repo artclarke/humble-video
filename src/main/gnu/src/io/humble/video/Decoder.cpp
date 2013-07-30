@@ -42,7 +42,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-Decoder::Decoder(Codec* codec) : Coder(codec) {
+Decoder::Decoder(Codec* codec, const AVCodecContext* src) : Coder(codec, src) {
   if (!codec)
     throw HumbleInvalidArgument("no codec passed in");
 
@@ -104,7 +104,8 @@ Decoder::prepareFrame(AVFrame* frame, int flags) {
   switch (getCodecType()) {
   case MediaDescriptor::MEDIA_AUDIO: {
     MediaAudioImpl* audio = dynamic_cast<MediaAudioImpl*>(mCachedMedia.value());
-    if (audio->getSampleRate() != frame->sample_rate ||
+    if (!audio ||
+        audio->getSampleRate() != frame->sample_rate ||
         audio->getChannelLayout() != frame->channel_layout ||
         audio->getFormat() != frame->format)
       return Coder::prepareFrame(frame, flags);
@@ -115,7 +116,8 @@ Decoder::prepareFrame(AVFrame* frame, int flags) {
   break;
   case MediaDescriptor::MEDIA_VIDEO: {
     MediaPictureImpl* pict = dynamic_cast<MediaPictureImpl*>(mCachedMedia.value());
-    if (pict->getWidth() != frame->width ||
+    if (!pict ||
+        pict->getWidth() != frame->width ||
         pict->getHeight() != frame->height ||
         pict->getFormat() != frame->format)
       return Coder::prepareFrame(frame, flags);
@@ -128,7 +130,7 @@ Decoder::prepareFrame(AVFrame* frame, int flags) {
     VS_LOG_ERROR("Got unknown codec type to allocate for");
     break;
   }
-  return -1;
+  return 0;
 }
 
 int32_t
@@ -244,7 +246,7 @@ Decoder::make(Codec* codec)
 
   RefPointer<Decoder> retval;
   // new Decoder DOES NOT increment refcount but the reset should catch it.
-  retval.reset(new Decoder(codec), true);
+  retval.reset(new Decoder(codec, 0), true);
   return retval.get();
 }
 
@@ -265,16 +267,9 @@ Decoder::make(Codec* codec, const AVCodecContext* src) {
   if (!src->codec_id)
     throw HumbleRuntimeError("No codec set on coder???");
 
-  RefPointer<Decoder> retval = make(codec);
-  // free the mCtx
-  (void) avcodec_close(retval->mCtx);
-  av_free(retval->mCtx);
-  retval->mCtx = avcodec_alloc_context3(0);
-  // create again for the copy
-
-  // now copy the codecs.
-  if (avcodec_copy_context(retval->mCtx, src) < 0)
-    throw HumbleRuntimeError("Could not copy source context");
+  RefPointer<Decoder> retval;
+  // new Decoder DOES NOT increment refcount but the reset should catch it.
+  retval.reset(new Decoder(codec, src), true);
   return retval.get();
 }
 

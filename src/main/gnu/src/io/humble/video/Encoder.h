@@ -109,13 +109,8 @@ public:
   virtual int32_t encodeSubtitle(MediaPacket* output,
       MediaSubtitle* subtitles)=0;
 
-
-#ifndef SWIG
-  virtual void* getCtx() { return mCtx; }
-#endif
-
 protected:
-  Encoder(Codec*);
+  Encoder(Codec*, const AVCodecContext* src);
   virtual
   ~Encoder();
 private:

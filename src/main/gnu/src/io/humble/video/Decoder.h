@@ -124,7 +124,7 @@ public:
   virtual AVCodecContext* getCodecCtx() { return mCtx; }
 #endif
 protected:
-  Decoder(Codec* codec);
+  Decoder(Codec* codec, const AVCodecContext* src);
   virtual
   ~Decoder();
 

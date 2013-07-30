@@ -36,15 +36,27 @@ namespace video {
 
 using namespace io::humble::ferry;
 
-Coder::Coder(Codec* codec) {
+Coder::Coder(Codec* codec, const AVCodecContext* src) {
   if (!codec)
     throw HumbleInvalidArgument("no codec passed in");
   mCodec.reset(codec, true);
 
 
-  mCtx = avcodec_alloc_context3(codec->getCtx());
-  if (!mCtx)
-    throw HumbleRuntimeError("could not allocate decoder context");
+  if (!src) {
+    mCtx = avcodec_alloc_context3(codec->getCtx());
+    if (!mCtx)
+      throw HumbleRuntimeError("could not allocate decoder context");
+  } else {
+    // create again for the copy
+    mCtx = avcodec_alloc_context3(0);
+    if (!mCtx)
+      throw HumbleRuntimeError("could not allocate decoder context");
+    // now copy the codecs.
+    if (avcodec_copy_context(mCtx, src) < 0)
+      throw HumbleRuntimeError("Could not copy source context");
+
+  }
+  // set fields we override/use
   mCtx->refcounted_frames = 1;
   mCtx->get_buffer2 = Coder::getBuffer;
   mCtx->opaque = this;
