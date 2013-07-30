@@ -207,16 +207,29 @@ DecoderTest::writePicture(const char* prefix, int32_t* frameNo, MediaPicture* pi
   // write data as PGM file.
   snprintf(filename, sizeof(filename), "%s-%06d.pgm", prefix, *frameNo);
   // only write every n'th frame to save disk space
+  RefPointer<IBuffer> buf = picture->getData(0);
+  uint8_t* data = (uint8_t*)buf->getBytes(0, buf->getBufferSize());
   if (!((*frameNo) % 30)) {
     FILE* output = fopen(filename, "wb");
     TS_ASSERT(output);
     fprintf(output,"P5\n%d %d\n%d\n",picture->getWidth(),picture->getHeight(),255);
-    RefPointer<IBuffer> buf = picture->getData(0);
-    uint8_t* data = (uint8_t*)buf->getBytes(0, buf->getBufferSize());
     for(int32_t i=0;i<picture->getHeight();i++)
         fwrite(data + i * picture->getLineSize(0),1,picture->getWidth(),output);
     fclose(output);
   }
+#ifdef DECODER_TEST_ASCII_ART
+  // now for fun, ascii art
+  puts("\033c");
+  uint8_t* p0=data;
+  for (int32_t y = 0; y < picture->getHeight(); y++) {
+    uint8_t* p = p0;
+    for (int32_t x = 0; x < picture->getWidth(); x++)
+      putchar((int)(" .-+#"[*(p++) / 52]));
+    putchar('\n');
+    p0 += picture->getLineSize(0);
+    fflush(stdout);
+  }
+#endif
 
   (*frameNo)++;
 }
