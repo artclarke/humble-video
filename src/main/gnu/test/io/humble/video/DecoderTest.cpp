@@ -143,7 +143,8 @@ DecoderTest::testDecodeAudio() {
   int32_t numStreams = source->getNumStreams();
   TS_ASSERT_EQUALS(fixture->num_streams, numStreams);
 
-  RefPointer<SourceStream> stream = source->getSourceStream(0);
+  int32_t streamToDecode = 0;
+  RefPointer<SourceStream> stream = source->getSourceStream(streamToDecode);
   TS_ASSERT(stream);
   RefPointer<Decoder> decoder = stream->getDecoder();
   TS_ASSERT(decoder);
@@ -170,7 +171,8 @@ DecoderTest::testDecodeAudio() {
 
   while(source->read(packet.value()) >= 0) {
     // got a packet; now we try to decode it.
-    if (packet->isComplete()) {
+    if (packet->getStreamIndex() == streamToDecode &&
+        packet->isComplete()) {
       int32_t bytesRead = 0;
       int32_t byteOffset=0;
       do {
