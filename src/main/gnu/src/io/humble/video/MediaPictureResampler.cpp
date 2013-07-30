@@ -22,26 +22,26 @@
 #include <io/humble/video/MediaPictureResamplerImpl.h>
 
 namespace io { namespace humble { namespace video
-  {
+{
 
-  MediaPictureResampler :: MediaPictureResampler()
-  {
-  }
+MediaPictureResampler :: MediaPictureResampler()
+{
+}
 
-  MediaPictureResampler :: ~MediaPictureResampler()
-  {
-  }
+MediaPictureResampler :: ~MediaPictureResampler()
+{
+}
 
-  MediaPictureResampler*
-  MediaPictureResampler :: make(
-      int32_t outputWidth, int32_t outputHeight,
-      PixelFormat::Type outputFmt,
-      int32_t inputWidth, int32_t inputHeight,
-      PixelFormat::Type inputFmt)
-  {
-    Global::init();
-    return MediaPictureResamplerImpl::make(outputWidth, outputHeight, outputFmt,
-        inputWidth, inputHeight, inputFmt);
-  }
+MediaPictureResampler*
+MediaPictureResampler :: make(
+    int32_t outputWidth, int32_t outputHeight,
+    PixelFormat::Type outputFmt,
+    int32_t inputWidth, int32_t inputHeight,
+    PixelFormat::Type inputFmt)
+{
+  Global::init();
+  return MediaPictureResamplerImpl::make(outputWidth, outputHeight, outputFmt,
+      inputWidth, inputHeight, inputFmt);
+}
 
-  }}}
+}}}

@@ -31,43 +31,43 @@
 struct SwsContext;
 
 namespace io { namespace humble { namespace video
-  {
+{
 
-  class MediaPictureResamplerImpl : public MediaPictureResampler
-  {
-  private:
-    VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MediaPictureResamplerImpl)
-  public:
-    virtual int32_t getInputWidth();
-    virtual int32_t getInputHeight();
-    virtual PixelFormat::Type getInputFormat();
-    
-    virtual int32_t getOutputWidth();
-    virtual int32_t getOutputHeight();
-    virtual PixelFormat::Type getOutputFormat();
-    
-    virtual int32_t resample(MediaPicture *pOutFrame, MediaPicture *pInFrame);
-    
-    static MediaPictureResamplerImpl* make(
-        int32_t outputWidth, int32_t outputHeight,
-        PixelFormat::Type outputFmt,
-        int32_t inputWidth, int32_t inputHeight,
-        PixelFormat::Type inputFmt);
-  protected:
-    virtual void* getCtx() { return mContext; }
-    MediaPictureResamplerImpl();
-    virtual ~MediaPictureResamplerImpl();
-  private:
-    int32_t mIHeight;
-    int32_t mIWidth;
-    int32_t mOHeight;
-    int32_t mOWidth;
-    PixelFormat::Type mIPixelFmt;
-    PixelFormat::Type mOPixelFmt;
-    
-    SwsContext* mContext;
-  };
+class MediaPictureResamplerImpl : public MediaPictureResampler
+{
+private:
+  VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MediaPictureResamplerImpl)
+public:
+virtual int32_t getInputWidth();
+virtual int32_t getInputHeight();
+virtual PixelFormat::Type getInputFormat();
 
-  }}}
+virtual int32_t getOutputWidth();
+virtual int32_t getOutputHeight();
+virtual PixelFormat::Type getOutputFormat();
+
+virtual int32_t resample(MediaPicture *pOutFrame, MediaPicture *pInFrame);
+
+static MediaPictureResamplerImpl* make(
+    int32_t outputWidth, int32_t outputHeight,
+    PixelFormat::Type outputFmt,
+    int32_t inputWidth, int32_t inputHeight,
+    PixelFormat::Type inputFmt);
+protected:
+virtual void* getCtx() { return mContext; }
+MediaPictureResamplerImpl();
+virtual ~MediaPictureResamplerImpl();
+private:
+int32_t mIHeight;
+int32_t mIWidth;
+int32_t mOHeight;
+int32_t mOWidth;
+PixelFormat::Type mIPixelFmt;
+PixelFormat::Type mOPixelFmt;
+
+SwsContext* mContext;
+};
+
+}}}
 
 #endif /*MEDIAPICTURERESAMPLERIMPL_H_*/

@@ -27,86 +27,86 @@
 #include <io/humble/video/MediaPicture.h>
 
 namespace io { namespace humble { namespace video
-  {
+{
 
-    /**
-     * Converts {@link MediaPicture} objects of a given width, height and format to a new
-     * width, height or format.
-     */
-    class VS_API_HUMBLEVIDEO MediaPictureResampler : public io::humble::video::Configurable
-    {
-      public:
+/**
+ * Converts {@link MediaPicture} objects of a given width, height and format to a new
+ * width, height or format.
+ */
+class VS_API_HUMBLEVIDEO MediaPictureResampler : public io::humble::video::Configurable
+{
+public:
 
-        /** Get the width in pixels we expect on the input frame to the resampler.
-         * @return The width we expect on the input frame to the resampler.
-         */
-        virtual int32_t getInputWidth()=0;
+  /** Get the width in pixels we expect on the input frame to the resampler.
+   * @return The width we expect on the input frame to the resampler.
+   */
+  virtual int32_t getInputWidth()=0;
 
-        /** Get the height in pixels we expect on the input frame to the resampler.
-         * @return The height we expect on the input frame to the resampler.
-         */
-        virtual int32_t getInputHeight()=0;
+  /** Get the height in pixels we expect on the input frame to the resampler.
+   * @return The height we expect on the input frame to the resampler.
+   */
+  virtual int32_t getInputHeight()=0;
 
-        /**
-         * Get the input pixel format.
-         * @return The pixel format we expect on the input frame to the resampler.
-         */
-        virtual PixelFormat::Type getInputFormat()=0;
+  /**
+   * Get the input pixel format.
+   * @return The pixel format we expect on the input frame to the resampler.
+   */
+  virtual PixelFormat::Type getInputFormat()=0;
 
-        /**
-         * Get the output width, in pixels.
-         * @return The width we will resample the output frame to
-         */
-        virtual int32_t getOutputWidth()=0;
+  /**
+   * Get the output width, in pixels.
+   * @return The width we will resample the output frame to
+   */
+  virtual int32_t getOutputWidth()=0;
 
-        /**
-         * Get the output height, in pixels.
-         * @return The height we will resample the output frame to
-         */
-        virtual int32_t getOutputHeight()=0;
+  /**
+   * Get the output height, in pixels.
+   * @return The height we will resample the output frame to
+   */
+  virtual int32_t getOutputHeight()=0;
 
-        /**
-         * Get the output pixel format.
-         * @return The pixel format we will resample the output frame to
-         */
-        virtual PixelFormat::Type getOutputFormat()=0;
+  /**
+   * Get the output pixel format.
+   * @return The pixel format we will resample the output frame to
+   */
+  virtual PixelFormat::Type getOutputFormat()=0;
 
-        /**
-         * Resample in to out based on the resampler parameters.
-         *
-         * Resamples the in picture based on the parameters set when
-         * this resampler was constructed.
-         *
-         * @param out The picture we'll resample to.  Check
-         *     {@link MediaPicture#isComplete()} after the call.
-         * @param in The picture we'll resample from.
-         *
-         * @return >= 0 on success; <0 on error.
-         */
-        virtual int32_t resample(MediaPicture *out, MediaPicture *in)=0;
+  /**
+   * Resample in to out based on the resampler parameters.
+   *
+   * Resamples the in picture based on the parameters set when
+   * this resampler was constructed.
+   *
+   * @param out The picture we'll resample to.  Check
+   *     {@link MediaPicture#isComplete()} after the call.
+   * @param in The picture we'll resample from.
+   *
+   * @return >= 0 on success; <0 on error.
+   */
+  virtual int32_t resample(MediaPicture *out, MediaPicture *in)=0;
 
-        /**
-         * Get a new picture resampler.
-         *
-         * @param outputWidth The width in pixels you want to output frame to have.
-         * @param outputHeight The height in pixels you want to output frame to have.
-         * @param outputFmt The pixel format of the output frame.
-         * @param inputWidth The width in pixels the input frame will be in.
-         * @param inputHeight The height in pixels the input frame will be in.
-         * @param inputFmt The pixel format of the input frame.
-         * @return a new object, or null if we cannot allocate one.
-         */
-        static MediaPictureResampler* make(
-            int32_t outputWidth, int32_t outputHeight,
-            PixelFormat::Type outputFmt,
-            int32_t inputWidth, int32_t inputHeight,
-            PixelFormat::Type inputFmt);
+  /**
+   * Get a new picture resampler.
+   *
+   * @param outputWidth The width in pixels you want to output frame to have.
+   * @param outputHeight The height in pixels you want to output frame to have.
+   * @param outputFmt The pixel format of the output frame.
+   * @param inputWidth The width in pixels the input frame will be in.
+   * @param inputHeight The height in pixels the input frame will be in.
+   * @param inputFmt The pixel format of the input frame.
+   * @return a new object, or null if we cannot allocate one.
+   */
+  static MediaPictureResampler* make(
+      int32_t outputWidth, int32_t outputHeight,
+      PixelFormat::Type outputFmt,
+      int32_t inputWidth, int32_t inputHeight,
+      PixelFormat::Type inputFmt);
 
-      protected:
-        MediaPictureResampler();
-        virtual ~MediaPictureResampler();
-    };
+protected:
+  MediaPictureResampler();
+  virtual ~MediaPictureResampler();
+};
 
-  }}}
+}}}
 
 #endif /*MEDIAPICTURERESAMPLER_H_*/
