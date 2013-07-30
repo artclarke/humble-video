@@ -24,12 +24,12 @@ package io.humble.ferry;
  * the underlying buffer.  
  * </p>  
  * <p>  
- *  
+ * To make an Buffer object that is not a Humble internal object,  
  * pass in null for the RefCounted parameter.  
  * </p>  
  */
-public class IBuffer extends RefCounted {
-  // IBuffer.swg: Start generated code
+public class Buffer extends RefCounted {
+  // Buffer.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
 
   private volatile long swigCPtr;
@@ -51,14 +51,14 @@ public class IBuffer extends RefCounted {
    * @param ignore2 ignore.
    *
    */ 
-  public IBuffer(long ignore1, boolean ignore2) {
-    super(FerryJNI.SWIGIBufferUpcast(ignore1), ignore2);
+  public Buffer(long ignore1, boolean ignore2) {
+    super(FerryJNI.SWIGBufferUpcast(ignore1), ignore2);
     swigCPtr = ignore1;
   }
-  protected IBuffer(long cPtr, boolean cMemoryOwn,
+  protected Buffer(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(FerryJNI.SWIGIBufferUpcast(cPtr),
+    super(FerryJNI.SWIGBufferUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -71,7 +71,7 @@ public class IBuffer extends RefCounted {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(IBuffer obj) {
+  protected static long getCPtr(Buffer obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -89,7 +89,7 @@ public class IBuffer extends RefCounted {
   }
   
   /**
-   * Releases ths instance of IBuffer and frees any underlying
+   * Releases ths instance of Buffer and frees any underlying
    * native memory.
    * <p>
    * {@inheritDoc}
@@ -103,17 +103,17 @@ public class IBuffer extends RefCounted {
   }
   
   /**
-   * Create a new IBuffer object that is actually referring to the
+   * Create a new Buffer object that is actually referring to the
    * exact same underlying Native object.
    *
    * @return the new Java object.
    */
   @Override
-  public IBuffer copyReference() {
+  public Buffer copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new IBuffer(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new Buffer(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -126,8 +126,8 @@ public class IBuffer extends RefCounted {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof IBuffer)
-      equal = (((IBuffer)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof Buffer)
+      equal = (((Buffer)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -176,7 +176,7 @@ public class IBuffer extends RefCounted {
    * @param src The array from which bytes are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first byte to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of bytes to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -185,7 +185,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(byte[] src, int srcPos, int destPos, int length)
@@ -216,9 +216,9 @@ public class IBuffer extends RefCounted {
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers bytes from this {@link IBuffer} into the given
+   * This method transfers bytes from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer bytes in the {@link IBuffer} starting
+   * array. If there are fewer bytes in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no bytes are
    * transferred and a BufferUnderflowException is thrown.
@@ -229,7 +229,7 @@ public class IBuffer extends RefCounted {
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which bytes are to be written. Must be non null.
@@ -242,7 +242,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, byte[] dest, int destPos, int length)
@@ -286,7 +286,7 @@ public class IBuffer extends RefCounted {
    * @param src The array from which shorts are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first short to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of shorts to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -295,7 +295,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(short[] src, int srcPos, int destPos, int length)
@@ -327,9 +327,9 @@ public class IBuffer extends RefCounted {
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers shorts from this {@link IBuffer} into the given
+   * This method transfers shorts from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer shorts in the {@link IBuffer} starting
+   * array. If there are fewer shorts in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no shorts are
    * transferred and a BufferUnderflowException is thrown.
@@ -340,7 +340,7 @@ public class IBuffer extends RefCounted {
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which shorts are to be written. Must be non null.
@@ -353,7 +353,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, short[] dest, int destPos, int length)
@@ -398,7 +398,7 @@ public class IBuffer extends RefCounted {
    * @param src The array from which ints are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first int to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of ints to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -407,7 +407,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(int[] src, int srcPos, int destPos, int length)
@@ -439,9 +439,9 @@ public class IBuffer extends RefCounted {
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers ints from this {@link IBuffer} into the given
+   * This method transfers ints from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer ints in the {@link IBuffer} starting
+   * array. If there are fewer ints in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no ints are
    * transferred and a BufferUnderflowException is thrown.
@@ -452,7 +452,7 @@ public class IBuffer extends RefCounted {
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which ints are to be written. Must be non null.
@@ -465,7 +465,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, int[] dest, int destPos, int length)
@@ -510,7 +510,7 @@ public class IBuffer extends RefCounted {
    * @param src The array from which longs are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first long to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of longs to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -519,7 +519,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(long[] src, int srcPos, int destPos, int length)
@@ -551,9 +551,9 @@ public class IBuffer extends RefCounted {
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers longs from this {@link IBuffer} into the given
+   * This method transfers longs from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer longs in the {@link IBuffer} starting
+   * array. If there are fewer longs in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no longs are
    * transferred and a BufferUnderflowException is thrown.
@@ -564,7 +564,7 @@ public class IBuffer extends RefCounted {
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which longs are to be written. Must be non null.
@@ -577,7 +577,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, long[] dest, int destPos, int length)
@@ -621,7 +621,7 @@ public class IBuffer extends RefCounted {
    * @param src The array from which doubles are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first double to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of doubles to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -630,7 +630,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(double[] src, int srcPos, int destPos, int length)
@@ -662,9 +662,9 @@ public class IBuffer extends RefCounted {
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers doubles from this {@link IBuffer} into the given
+   * This method transfers doubles from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer doubles in the {@link IBuffer} starting
+   * array. If there are fewer doubles in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no doubles are
    * transferred and a BufferUnderflowException is thrown.
@@ -675,7 +675,7 @@ public class IBuffer extends RefCounted {
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which doubles are to be written. Must be non null.
@@ -688,7 +688,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, double[] dest, int destPos, int length)
@@ -732,7 +732,7 @@ public class IBuffer extends RefCounted {
    * @param src The array from which floats are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first float to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of floats to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -741,7 +741,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(float[] src, int srcPos, int destPos, int length)
@@ -773,9 +773,9 @@ public class IBuffer extends RefCounted {
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers floats from this {@link IBuffer} into the given
+   * This method transfers floats from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer floats in the {@link IBuffer} starting
+   * array. If there are fewer floats in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no floats are
    * transferred and a BufferUnderflowException is thrown.
@@ -786,7 +786,7 @@ public class IBuffer extends RefCounted {
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which floats are to be written. Must be non null.
@@ -799,7 +799,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, float[] dest, int destPos, int length)
@@ -843,7 +843,7 @@ public class IBuffer extends RefCounted {
    * @param src The array from which chars are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first char to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of chars to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -852,7 +852,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(char[] src, int srcPos, int destPos, int length)
@@ -884,9 +884,9 @@ public class IBuffer extends RefCounted {
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers chars from this {@link IBuffer} into the given
+   * This method transfers chars from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer chars in the {@link IBuffer} starting
+   * array. If there are fewer chars in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no chars are
    * transferred and a BufferUnderflowException is thrown.
@@ -897,7 +897,7 @@ public class IBuffer extends RefCounted {
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which chars are to be written. Must be non null.
@@ -910,7 +910,7 @@ public class IBuffer extends RefCounted {
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, char[] dest, int destPos, int length)
@@ -946,7 +946,7 @@ public class IBuffer extends RefCounted {
    * 
    * The buffer position, mark are initialized to zero and limit
    * is set to the maximum capacity of this buffer.  For some
-   * IBuffer contents, the actual usable data in this buffer will
+   * Buffer contents, the actual usable data in this buffer will
    * be less that the limit.
    * 
    * </p>
@@ -974,7 +974,7 @@ public class IBuffer extends RefCounted {
      * 
      * The buffer position, mark are initialized to zero and limit
      * is set to the maximum capacity of this buffer.  For some
-     * IBuffer contents, the actual usable data in this buffer will
+     * Buffer contents, the actual usable data in this buffer will
      * be less that the limit.
      * 
      * </p>
@@ -1017,7 +1017,7 @@ public class IBuffer extends RefCounted {
      * </p>
      * 
      * @param offset The offset (in bytes) into the buffer managed by
-     *   this IBuffer
+     *   this Buffer
      * @param length The requested length (in bytes) you want to access.
      *   The buffer returned may actually be longer than length.
      * @param referenceReturn If non null, on exit 
@@ -1030,7 +1030,7 @@ public class IBuffer extends RefCounted {
      *   value returned in this parameter, then the returned byte buffer
      *   will be immediately invalid.
      * @return A java.nio.ByteBuffer that directly accesses
-     *   the native memory this IBuffer manages, or null if
+     *   the native memory this Buffer manages, or null if
      *   error.
      */
   public java.nio.ByteBuffer getByteBuffer(int offset, int length,
@@ -1064,9 +1064,9 @@ public class IBuffer extends RefCounted {
   /**
    * Prints the same as {@link Object#toString()} but appends
    * the maximum number of bytes that will fit in this
-   * {@link IBuffer}, the type of the {@link IBuffer}, and the maximum
-   * size in units of {@link IBuffer.Type} that will fit in the
-   * {@link IBuffer}.
+   * {@link Buffer}, the type of the {@link Buffer}, and the maximum
+   * size in units of {@link Buffer.Type} that will fit in the
+   * {@link Buffer}.
    * {@inheritDoc}
    */
   @Override
@@ -1083,7 +1083,7 @@ public class IBuffer extends RefCounted {
   }
   
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-  // IBuffer.swg
+  // Buffer.swg
 
 /**
  * Get the current maximum number of bytes that can  
@@ -1091,12 +1091,12 @@ public class IBuffer extends RefCounted {
  * @return	Maximum number of bytes this buffer can manage.  
  */
   public int getBufferSize() {
-    return FerryJNI.IBuffer_getBufferSize(swigCPtr, this);
+    return FerryJNI.Buffer_getBufferSize(swigCPtr, this);
   }
 
 /**
  * Allocate a new buffer of at least bufferSize.  
- * @param	requestor An optional value telling the IBuffer class what 
+ * @param	requestor An optional value telling the Buffer class what 
  *		 object requested it. This is used for debugging 
  *		 memory leaks; it's a marker for the FERRY object 
  *		 (e.g. IPacket) that actually requested the buffer. 
@@ -1106,9 +1106,9 @@ public class IBuffer extends RefCounted {
  *		 a buffer with a larger size may be returned.  
  * @return	A new buffer, or null on error.  
  */
-  public static IBuffer make(RefCounted requestor, int bufferSize) {
-    long cPtr = FerryJNI.IBuffer_make__SWIG_0(RefCounted.getCPtr(requestor), requestor, bufferSize);
-    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+  public static Buffer make(RefCounted requestor, int bufferSize) {
+    long cPtr = FerryJNI.Buffer_make__SWIG_0(RefCounted.getCPtr(requestor), requestor, bufferSize);
+    return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
 /**
@@ -1116,12 +1116,12 @@ public class IBuffer extends RefCounted {
  * <p>  
  * A type is really just a hint. Like  
  * {@link java.nio.ByteBuffer objects},  
- * {@link IBuffer} objects can be cast to and from any type.  
+ * {@link Buffer} objects can be cast to and from any type.  
  * </p>  
  * @return	the type  
  */
-  public IBuffer.Type getType() {
-    return IBuffer.Type.swigToEnum(FerryJNI.IBuffer_getType(swigCPtr, this));
+  public Buffer.Type getType() {
+    return Buffer.Type.swigToEnum(FerryJNI.Buffer_getType(swigCPtr, this));
   }
 
 /**
@@ -1129,21 +1129,21 @@ public class IBuffer extends RefCounted {
  * <p>  
  * This method does not do any data conversion, it  
  * just changes the reported type (so changing from  
- * {@link Type#IBUFFER_UINT8} to {@link Type#IBUFFER_SINT16}  
+ * {@link Type#BUFFER_UINT8} to {@link Type#BUFFER_SINT16}  
  * is really just a "cast" operation).  
  * </p>  
  * @param	type the type to set to.  
  */
-  public void setType(IBuffer.Type type) {
-    FerryJNI.IBuffer_setType(swigCPtr, this, type.swigValue());
+  public void setType(Buffer.Type type) {
+    FerryJNI.Buffer_setType(swigCPtr, this, type.swigValue());
   }
 
 /**
  * Returns the size, in bytes, of elements of given Type.  
  * @return	the size in bytes.  
  */
-  public static int getTypeSize(IBuffer.Type type) {
-    return FerryJNI.IBuffer_getTypeSize(type.swigValue());
+  public static int getTypeSize(Buffer.Type type) {
+    return FerryJNI.Buffer_getTypeSize(type.swigValue());
   }
 
 /**
@@ -1153,12 +1153,12 @@ public class IBuffer extends RefCounted {
  * will fit in this buffer.  
  */
   public int getSize() {
-    return FerryJNI.IBuffer_getSize(swigCPtr, this);
+    return FerryJNI.Buffer_getSize(swigCPtr, this);
   }
 
 /**
  * Allocate a new buffer of at least bufferSize.  
- * @param	requestor An optional value telling the IBuffer class what 
+ * @param	requestor An optional value telling the Buffer class what 
  *		 object requested it. This is used for debugging 
  *		 memory leaks; it's a marker for the FERRY object 
  *		 (e.g. IPacket) that actually requested the buffer. 
@@ -1174,16 +1174,16 @@ public class IBuffer extends RefCounted {
  * garbage-data in it).  
  * @return	A new buffer, or null on error.  
  */
-  public static IBuffer make(RefCounted requestor, IBuffer.Type type, int numElements, boolean zero) {
-    long cPtr = FerryJNI.IBuffer_make__SWIG_1(RefCounted.getCPtr(requestor), requestor, type.swigValue(), numElements, zero);
-    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+  public static Buffer make(RefCounted requestor, Buffer.Type type, int numElements, boolean zero) {
+    long cPtr = FerryJNI.Buffer_make__SWIG_1(RefCounted.getCPtr(requestor), requestor, type.swigValue(), numElements, zero);
+    return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
 /**
  * Internal only. Do not use.  
  */
   private java.nio.ByteBuffer java_getByteBuffer(int offset, int length) {
-    return FerryJNI.IBuffer_java_getByteBuffer(swigCPtr, this, offset, length);
+    return FerryJNI.Buffer_java_getByteBuffer(swigCPtr, this, offset, length);
   }
 
 /**
@@ -1200,21 +1200,21 @@ public class IBuffer extends RefCounted {
  * around waiting for cleanup then.  
  * </p>  
  * @param	offset The offset (in bytes) into the buffer managed by this 
- *		 IBuffer  
+ *		 Buffer  
  * @param	length The requested length (in bytes) you want to access. 
  *		 The buffer returned may  
  * actually be longer than length.  
- * @return	A copy of the data that is in this IBuffer, or null  
+ * @return	A copy of the data that is in this Buffer, or null  
  * if error.  
  */
   public byte[] getByteArray(int offset, int length) {
-    return FerryJNI.IBuffer_getByteArray(swigCPtr, this, offset, length);
+    return FerryJNI.Buffer_getByteArray(swigCPtr, this, offset, length);
   }
 
 /**
- * Allocate a new IBuffer, and copy the data in buffer into  
- * the new IBuffer object.  
- * @param	requestor An optional value telling the IBuffer class  
+ * Allocate a new Buffer, and copy the data in buffer into  
+ * the new Buffer object.  
+ * @param	requestor An optional value telling the Buffer class  
  * what object requested it. This is used for debugging memory leaks; 
  *  
  *  
@@ -1226,19 +1226,19 @@ public class IBuffer extends RefCounted {
  * to start copying.  
  * @param	length The total number of bytes you want to copy from buffer. 
  *		  
- *  
+ * @return	a new Buffer object with a copy of the data in buffer,  
  * or null on failure.  
  */
-  public static IBuffer make(RefCounted requestor, byte[] buffer, int offset, int length) {
-    long cPtr = FerryJNI.IBuffer_make__SWIG_2(RefCounted.getCPtr(requestor), requestor, buffer, offset, length);
-    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+  public static Buffer make(RefCounted requestor, byte[] buffer, int offset, int length) {
+    long cPtr = FerryJNI.Buffer_make__SWIG_2(RefCounted.getCPtr(requestor), requestor, buffer, offset, length);
+    return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
 /**
- * Create a new IBuffer object that uses the direct byte buffer  
+ * Create a new Buffer object that uses the direct byte buffer  
  * passed in by reference (i.e. it directly uses the bytes in  
  * the direct byte buffer).  
- * @param	requestor An optional value telling the IBuffer class  
+ * @param	requestor An optional value telling the Buffer class  
  * what object requested it. This is used for debugging memory leaks; 
  *  
  *  
@@ -1255,29 +1255,29 @@ public class IBuffer extends RefCounted {
  * to start copying.  
  * @param	length The total number of bytes you want to copy from  
  * directByteBuffer.  
- * @return	a new IBuffer object that is using directByteBuffer  
+ * @return	a new Buffer object that is using directByteBuffer  
  * behind the scenes, or null on failure.  
  */
-  public static IBuffer make(RefCounted requestor, java.nio.ByteBuffer directByteBuffer, int offset, int length) {
-    long cPtr = FerryJNI.IBuffer_make__SWIG_3(RefCounted.getCPtr(requestor), requestor, directByteBuffer, offset, length);
-    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+  public static Buffer make(RefCounted requestor, java.nio.ByteBuffer directByteBuffer, int offset, int length) {
+    long cPtr = FerryJNI.Buffer_make__SWIG_3(RefCounted.getCPtr(requestor), requestor, directByteBuffer, offset, length);
+    return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
   public enum Type {
   /**
    * Types of data that are in this buffer.
    */
-    IBUFFER_UINT8,
-    IBUFFER_SINT8,
-    IBUFFER_UINT16,
-    IBUFFER_SINT16,
-    IBUFFER_UINT32,
-    IBUFFER_SINT32,
-    IBUFFER_UINT64,
-    IBUFFER_SINT64,
-    IBUFFER_FLT32,
-    IBUFFER_DBL64,
-    IBUFFER_NB;
+    BUFFER_UINT8,
+    BUFFER_SINT8,
+    BUFFER_UINT16,
+    BUFFER_SINT16,
+    BUFFER_UINT32,
+    BUFFER_SINT32,
+    BUFFER_UINT64,
+    BUFFER_SINT64,
+    BUFFER_FLT32,
+    BUFFER_DBL64,
+    BUFFER_NB;
 
     public final int swigValue() {
       return swigValue;
