@@ -46,13 +46,14 @@ virtual int32_t getOutputWidth();
 virtual int32_t getOutputHeight();
 virtual PixelFormat::Type getOutputFormat();
 
-virtual int32_t resample(MediaPicture *pOutFrame, MediaPicture *pInFrame);
+virtual void resample(MediaPicture *pOutFrame, MediaPicture *pInFrame);
 
 static MediaPictureResamplerImpl* make(
     int32_t outputWidth, int32_t outputHeight,
     PixelFormat::Type outputFmt,
     int32_t inputWidth, int32_t inputHeight,
-    PixelFormat::Type inputFmt);
+    PixelFormat::Type inputFmt,
+    int32_t flags);
 protected:
 virtual void* getCtx() { return mContext; }
 MediaPictureResamplerImpl();

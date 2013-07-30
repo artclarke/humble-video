@@ -37,11 +37,12 @@ MediaPictureResampler :: make(
     int32_t outputWidth, int32_t outputHeight,
     PixelFormat::Type outputFmt,
     int32_t inputWidth, int32_t inputHeight,
-    PixelFormat::Type inputFmt)
+    PixelFormat::Type inputFmt,
+    int32_t flags)
 {
   Global::init();
   return MediaPictureResamplerImpl::make(outputWidth, outputHeight, outputFmt,
-      inputWidth, inputHeight, inputFmt);
+      inputWidth, inputHeight, inputFmt, flags);
 }
 
 }}}

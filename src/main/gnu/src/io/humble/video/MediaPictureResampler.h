@@ -25,7 +25,9 @@
 #include <io/humble/video/PixelFormat.h>
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/MediaPicture.h>
-
+extern "C" {
+#include <libswscale/swscale.h>
+}
 namespace io { namespace humble { namespace video
 {
 
@@ -36,6 +38,28 @@ namespace io { namespace humble { namespace video
 class VS_API_HUMBLEVIDEO MediaPictureResampler : public io::humble::video::Configurable
 {
 public:
+  typedef enum Flag {
+    FLAG_FAST_BILINEAR = SWS_FAST_BILINEAR,
+    FLAG_BILINEAR = SWS_BILINEAR,
+    FLAG_BICUBIC = SWS_BICUBIC,
+    FLAG_X = SWS_X,
+    FLAG_POINT = SWS_POINT,
+    FLAG_AREA = SWS_AREA,
+    FLAG_BICUBLIN = SWS_BICUBLIN,
+    FLAG_GAUSS = SWS_GAUSS,
+    FLAG_SINC = SWS_SINC,
+    FLAG_LANCZOS = SWS_LANCZOS,
+    FLAG_SPLINE = SWS_SPLINE,
+    FLAG_SRC_V_CHR_DROP_MASK = SWS_SRC_V_CHR_DROP_MASK,
+    FLAG_SRC_V_CHR_DROP_SHIFT = SWS_SRC_V_CHR_DROP_SHIFT,
+    FLAG_PARAM_DEFAULT = SWS_PARAM_DEFAULT,
+    FLAG_FULL_CHR_H_INT = SWS_FULL_CHR_H_INT,
+    FLAG_FULL_CHR_H_INP = SWS_FULL_CHR_H_INP,
+    FLAG_DIRECT_BGR = SWS_DIRECT_BGR,
+    FLAG_ACCURATE_RND = SWS_ACCURATE_RND,
+    FLAG_BITEXACT = SWS_BITEXACT,
+    FLAG_ERROR_DIFFUSION = SWS_ERROR_DIFFUSION,
+  } Flag;
 
   /** Get the width in pixels we expect on the input frame to the resampler.
    * @return The width we expect on the input frame to the resampler.
@@ -81,9 +105,10 @@ public:
    *     {@link MediaPicture#isComplete()} after the call.
    * @param in The picture we'll resample from.
    *
-   * @return >= 0 on success; <0 on error.
+   * @throws InvalidArgument if in our out does not match the parameters this
+   *         resampler was set with.
    */
-  virtual int32_t resample(MediaPicture *out, MediaPicture *in)=0;
+  virtual void resample(MediaPicture *out, MediaPicture *in)=0;
 
   /**
    * Get a new picture resampler.
@@ -100,7 +125,8 @@ public:
       int32_t outputWidth, int32_t outputHeight,
       PixelFormat::Type outputFmt,
       int32_t inputWidth, int32_t inputHeight,
-      PixelFormat::Type inputFmt);
+      PixelFormat::Type inputFmt,
+      int32_t flags);
 
 protected:
   MediaPictureResampler();

@@ -280,6 +280,12 @@ public:
    */
   virtual State getState() { return mState; }
 
+
+#ifndef SWIG
+  virtual void* getCtx() { return getCodecCtx(); }
+  virtual AVCodecContext* getCodecCtx() { return mCtx; }
+#endif
+
 protected:
   virtual void setState(State state) { mState = state; }
   /*

@@ -127,10 +127,6 @@ public:
   virtual int32_t decodeSubtitle(MediaSubtitle * output,
       MediaPacket *packet, int32_t byteOffset);
 
-#ifndef SWIG
-  virtual void* getCtx() { return getCodecCtx(); }
-  virtual AVCodecContext* getCodecCtx() { return mCtx; }
-#endif
 protected:
   Decoder(Codec* codec, const AVCodecContext* src);
   virtual

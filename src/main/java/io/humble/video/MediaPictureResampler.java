@@ -174,10 +174,12 @@ public class MediaPictureResampler extends Configurable {
  * @param	out The picture we'll resample to. Check  
  * {@link MediaPicture#isComplete()} after the call.  
  * @param	in The picture we'll resample from.  
- * @return	>= 0 on success; <0 on error.  
+ * @throws	InvalidArgument if in our out does not match the parameters 
+ *		 this  
+ * resampler was set with.  
  */
-  public int resample(MediaPicture out, MediaPicture in) {
-    return VideoJNI.MediaPictureResampler_resample(swigCPtr, this, MediaPicture.getCPtr(out), out, MediaPicture.getCPtr(in), in);
+  public void resample(MediaPicture out, MediaPicture in) {
+    VideoJNI.MediaPictureResampler_resample(swigCPtr, this, MediaPicture.getCPtr(out), out, MediaPicture.getCPtr(in), in);
   }
 
 /**
@@ -194,9 +196,69 @@ public class MediaPictureResampler extends Configurable {
  * @param	inputFmt The pixel format of the input frame.  
  * @return	a new object, or null if we cannot allocate one.  
  */
-  public static MediaPictureResampler make(int outputWidth, int outputHeight, PixelFormat.Type outputFmt, int inputWidth, int inputHeight, PixelFormat.Type inputFmt) {
-    long cPtr = VideoJNI.MediaPictureResampler_make(outputWidth, outputHeight, outputFmt.swigValue(), inputWidth, inputHeight, inputFmt.swigValue());
+  public static MediaPictureResampler make(int outputWidth, int outputHeight, PixelFormat.Type outputFmt, int inputWidth, int inputHeight, PixelFormat.Type inputFmt, int flags) {
+    long cPtr = VideoJNI.MediaPictureResampler_make(outputWidth, outputHeight, outputFmt.swigValue(), inputWidth, inputHeight, inputFmt.swigValue(), flags);
     return (cPtr == 0) ? null : new MediaPictureResampler(cPtr, false);
+  }
+
+  public enum Flag {
+    FLAG_FAST_BILINEAR(VideoJNI.MediaPictureResampler_FLAG_FAST_BILINEAR_get()),
+    FLAG_BILINEAR(VideoJNI.MediaPictureResampler_FLAG_BILINEAR_get()),
+    FLAG_BICUBIC(VideoJNI.MediaPictureResampler_FLAG_BICUBIC_get()),
+    FLAG_X(VideoJNI.MediaPictureResampler_FLAG_X_get()),
+    FLAG_POINT(VideoJNI.MediaPictureResampler_FLAG_POINT_get()),
+    FLAG_AREA(VideoJNI.MediaPictureResampler_FLAG_AREA_get()),
+    FLAG_BICUBLIN(VideoJNI.MediaPictureResampler_FLAG_BICUBLIN_get()),
+    FLAG_GAUSS(VideoJNI.MediaPictureResampler_FLAG_GAUSS_get()),
+    FLAG_SINC(VideoJNI.MediaPictureResampler_FLAG_SINC_get()),
+    FLAG_LANCZOS(VideoJNI.MediaPictureResampler_FLAG_LANCZOS_get()),
+    FLAG_SPLINE(VideoJNI.MediaPictureResampler_FLAG_SPLINE_get()),
+    FLAG_SRC_V_CHR_DROP_MASK(VideoJNI.MediaPictureResampler_FLAG_SRC_V_CHR_DROP_MASK_get()),
+    FLAG_SRC_V_CHR_DROP_SHIFT(VideoJNI.MediaPictureResampler_FLAG_SRC_V_CHR_DROP_SHIFT_get()),
+    FLAG_PARAM_DEFAULT(VideoJNI.MediaPictureResampler_FLAG_PARAM_DEFAULT_get()),
+    FLAG_FULL_CHR_H_INT(VideoJNI.MediaPictureResampler_FLAG_FULL_CHR_H_INT_get()),
+    FLAG_FULL_CHR_H_INP(VideoJNI.MediaPictureResampler_FLAG_FULL_CHR_H_INP_get()),
+    FLAG_DIRECT_BGR(VideoJNI.MediaPictureResampler_FLAG_DIRECT_BGR_get()),
+    FLAG_ACCURATE_RND(VideoJNI.MediaPictureResampler_FLAG_ACCURATE_RND_get()),
+    FLAG_BITEXACT(VideoJNI.MediaPictureResampler_FLAG_BITEXACT_get()),
+    FLAG_ERROR_DIFFUSION(VideoJNI.MediaPictureResampler_FLAG_ERROR_DIFFUSION_get());
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static Flag swigToEnum(int swigValue) {
+      Flag[] swigValues = Flag.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (Flag swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + Flag.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private Flag() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private Flag(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private Flag(Flag swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
   }
 
 }
