@@ -180,6 +180,7 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
       VS_THROW(HumbleInvalidArgument("output audio sample rate does not match what resampler expected"));
     if (out->getChannelLayout() != getOutputLayout())
       VS_THROW(HumbleInvalidArgument("output audio channel layout does not match what resampler expected"));
+    out->setComplete(false);
   }
   AVFrame* outFrame = out ? out->getCtx() : 0;
   AVFrame* inFrame = in ? in->getCtx() : 0;
@@ -194,6 +195,8 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
     RefPointer<Error> error = Error::make(retval);
     VS_THROW(HumbleRuntimeError::make("Could not convert audio: %s", error ? error->getDescription() : ""));
   }
+  if (out)
+    out->setComplete(true);
   return retval;
 
 }
