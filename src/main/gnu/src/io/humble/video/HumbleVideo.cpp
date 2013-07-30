@@ -14294,17 +14294,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getLineSize(
 }
 
 
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setComplete(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2, jlong jarg3) {
+SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setComplete(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
   io::humble::video::MediaPicture *arg1 = (io::humble::video::MediaPicture *) 0 ;
   bool arg2 ;
-  int64_t arg3 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(io::humble::video::MediaPicture **)&jarg1; 
   arg2 = jarg2 ? true : false; 
-  arg3 = (int64_t)jarg3; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -14317,7 +14315,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setComplete(
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      (arg1)->setComplete(arg2,arg3);
+      (arg1)->setComplete(arg2);
     }
     catch(std::invalid_argument & e)
     {

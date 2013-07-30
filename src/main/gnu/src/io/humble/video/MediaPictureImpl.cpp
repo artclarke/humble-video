@@ -172,12 +172,22 @@ MediaPictureImpl::make(MediaPictureImpl* src, bool copy) {
     retval->mComplete = src->mComplete;
     av_frame_ref(retval->mFrame, src->mFrame);
   }
-  return retval.get();}
+  return retval.get();
+}
+void
+MediaPictureImpl::copy(AVFrame* src, bool complete) {
+  if (!src)
+    VS_THROW(HumbleInvalidArgument("no src"));
+  // release any memory we have
+  av_frame_unref(mFrame);
+  // and copy any data in.
+  av_frame_ref(mFrame, src);
+  mComplete=complete;
+}
 
 void
-MediaPictureImpl::setComplete(bool val, int64_t timestamp) {
+MediaPictureImpl::setComplete(bool val) {
   mComplete = val;
-  mFrame->pts = timestamp;
 }
 
 void

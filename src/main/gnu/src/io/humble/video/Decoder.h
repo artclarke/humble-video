@@ -134,6 +134,7 @@ private:
    * Make sure the audio passed in has parameters that match this decoder.
    */
   void ensureAudioParamsMatch(MediaAudio* audio);
+  void ensurePictureParamsMatch(MediaPicture* audio);
   io::humble::ferry::RefPointer<MediaRaw> mCachedMedia;
 };
 

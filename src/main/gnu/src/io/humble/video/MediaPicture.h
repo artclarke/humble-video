@@ -135,10 +135,10 @@ public:
   getLineSize(int32_t plane)=0;
 
   /**
-   * Set this frame to complete with the given timestamp.
+   * Set this frame to complete.
    */
   virtual void
-  setComplete(bool val, int64_t timestamp)=0;
+  setComplete(bool complete)=0;
 
   /**
    * Returns true if the data in this picture is marked as complete.

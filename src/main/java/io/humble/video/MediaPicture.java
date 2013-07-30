@@ -216,10 +216,10 @@ public class MediaPicture extends MediaRaw {
   }
 
 /**
- * Set this frame to complete with the given timestamp.  
+ * Set this frame to complete.  
  */
-  public void setComplete(boolean val, long timestamp) {
-    VideoJNI.MediaPicture_setComplete(swigCPtr, this, val, timestamp);
+  public void setComplete(boolean complete) {
+    VideoJNI.MediaPicture_setComplete(swigCPtr, this, complete);
   }
 
 /**

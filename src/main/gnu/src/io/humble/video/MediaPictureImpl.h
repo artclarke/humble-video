@@ -48,6 +48,8 @@ public:
   static MediaPictureImpl*
   make(MediaPictureImpl* src, bool copy);
 
+  void copy(AVFrame*, bool complete);
+
   virtual io::humble::ferry::IBuffer*
   getData(int32_t plane);
 
@@ -61,7 +63,7 @@ public:
   getNumDataPlanes();
 
   virtual void
-  setComplete(bool val, int64_t timestamp);
+  setComplete(bool val);
 
   virtual bool
   isComplete() { return mComplete; }

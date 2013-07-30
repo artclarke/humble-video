@@ -80,6 +80,23 @@ Decoder::getFrameSize() {
 }
 
 void
+Decoder::ensurePictureParamsMatch(MediaPicture* pict)
+{
+  if (!pict)
+    VS_THROW(HumbleInvalidArgument("null picture passed to decoder"));
+
+  if (getWidth() != pict->getWidth())
+    VS_THROW(HumbleInvalidArgument("width on picture does not match what decoder expects"));
+
+  if (getHeight() != pict->getHeight())
+    VS_THROW(HumbleInvalidArgument("height on picture does not match what decoder expects"));
+
+  if (getPixelFormat() != pict->getFormat())
+    VS_THROW(HumbleInvalidArgument("Pixel format on picture does not match what decoder expects"));
+
+}
+
+void
 Decoder::ensureAudioParamsMatch(MediaAudio* audio)
 {
   if (!audio)
@@ -218,12 +235,87 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
 }
 
 int32_t
-Decoder::decodeVideo(MediaPicture* output, MediaPacket* packet,
+Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
     int32_t byteOffset) {
-  (void) output;
-  (void) packet;
-  (void) byteOffset;
-  return -1;
+  MediaPictureImpl* output = dynamic_cast<MediaPictureImpl*>(aOutput);
+  MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(aPacket);
+
+
+  if (byteOffset < 0) {
+    VS_THROW(HumbleInvalidArgument("byteOffset must be >= 0"));
+  }
+  if (STATE_OPENED != getState())
+    VS_THROW(HumbleRuntimeError("Attempt to decodeAudio, but Decoder is not opened"));
+
+  // let's check the picture parameters.
+  ensurePictureParamsMatch(output);
+
+  if (packet) {
+    if (!packet->isComplete()) {
+      VS_THROW(HumbleRuntimeError("Passed in a non-null but not complete packet; this is an error"));
+    }
+    if (byteOffset >= packet->getSize()) {
+      VS_THROW(HumbleRuntimeError("Byteoffset is greater than total length of data in packet"));
+    }
+  } else {
+    if (byteOffset > 0) {
+      VS_LOG_WARN("Passing null packet with a non zero byte offset makes no sense");
+    }
+  }
+
+  // arguments now confirmed; let's do a decode
+  int32_t retval = -1;
+  int got_frame = 0;
+
+  // let's get the ffmpeg structures
+  AVPacket* inPkt = packet ? packet->getCtx() : 0;
+
+  // now we're going to copy the inPkt to do the byte-offset stuff. This
+  // will copy by reference.
+  AVPacket tmp;
+  AVPacket* pkt = &tmp;
+  av_init_packet(pkt);
+  if (inPkt) {
+    // copy in the actual packet
+    av_copy_packet(pkt, inPkt);
+    // now, adjust the data and size pointers
+    pkt->data = pkt->data + byteOffset;
+    pkt->size = pkt->size - byteOffset;
+  } else {
+    pkt->data = 0;
+    pkt->size = 0;
+  }
+  // 'empty' out the input samples
+  output->setComplete(false);
+
+  AVFrame *frame = av_frame_alloc();
+  if (!frame)
+    VS_THROW(HumbleBadAlloc());
+  /** DO NOT THROW EXCEPTIONS **/
+  // create a frame to decode into, so that FFmpeg doesn't get knickers
+  // in a twist re: allocation; but we will attempt to re-use our output
+  // frame by setting a call back that Coder::getBuffer2 will use.
+
+  mCachedMedia.reset(output, true);
+  // try out decode
+  retval = avcodec_decode_video2(mCtx, frame, &got_frame, pkt);
+  // always free the packet so that we don't have an exception make us leak it.
+  av_free_packet(pkt);
+  if (got_frame) {
+    // copy the output frame to our frame
+    output->copy(frame, true);
+  }
+  // release the temporary reference
+  mCachedMedia = 0;
+  av_frame_unref(frame);
+  av_freep(&frame);
+  /** END DO NOT THROW EXCEPTIONS **/
+  if (retval < 0) {
+    // let's make an error
+    RefPointer<Error> error = Error::make(retval);
+    VS_THROW(HumbleRuntimeError::make("Error while decoding: %s", error ? error->getDescription() : ""));
+  }
+  return retval;
 }
 
 int32_t
