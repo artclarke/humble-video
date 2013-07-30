@@ -324,6 +324,7 @@ Decoder::decodeSubtitle(MediaSubtitle* output, MediaPacket* packet,
   (void) output;
   (void) packet;
   (void) byteOffset;
+  VS_THROW(HumbleRuntimeError("Not implemented yet."));
   return -1;
 }
 
