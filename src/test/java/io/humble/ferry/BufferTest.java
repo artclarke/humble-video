@@ -24,7 +24,7 @@ import static junit.framework.Assert.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import io.humble.ferry.IBuffer;
+import io.humble.ferry.Buffer;
 
 import org.junit.*;
 
@@ -45,20 +45,20 @@ public class BufferTest
   @Test
   public void testCreation()
   {
-    IBuffer buf = IBuffer.make(null, 1024);
+    Buffer buf = Buffer.make(null, 1024);
     assertNotNull(buf);
     assertTrue(buf.getBufferSize()>=1024);
   }
 
   /**
-   * Test that we can create a IBuffer from a Java byte[] array,
-   * and that we can copy the same data out of an IBuffer (via copy).
+   * Test that we can create a Buffer from a Java byte[] array,
+   * and that we can copy the same data out of an Buffer (via copy).
    */
   @Test
   public void testCreateFromBytes()
   {
     byte buffer[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 ,9 };
-    IBuffer buf = IBuffer.make(null, buffer, 0, buffer.length);
+    Buffer buf = Buffer.make(null, buffer, 0, buffer.length);
     assertNotNull(buf);
     assertEquals(buf.getBufferSize(), buffer.length);
     byte outBuffer[] = buf.getByteArray(0, buffer.length);
@@ -72,14 +72,14 @@ public class BufferTest
   }
   
   /**
-   * Test we can create an IBuffer, then modify the direct
+   * Test we can create an Buffer, then modify the direct
    * bytes in native code.
    */
   @Test
   public void testCanDirectlyModifyNativeBytes()
   {
     byte buffer[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 ,9 };
-    IBuffer buf = IBuffer.make(null, buffer, 0, buffer.length);
+    Buffer buf = Buffer.make(null, buffer, 0, buffer.length);
     assertNotNull(buf);
     assertEquals(buf.getBufferSize(), buffer.length);
     
@@ -94,7 +94,7 @@ public class BufferTest
     // have modified the underlying C++ bytes.
     nativeBytes = null;
     
-    // now, get a copy of the bytes in the IBuffer and make sure
+    // now, get a copy of the bytes in the Buffer and make sure
     // the order of bytes was reversed.
     byte outBuffer[] = buf.getByteArray(0, buffer.length);
     assertNotNull(outBuffer);
@@ -110,11 +110,11 @@ public class BufferTest
   public void testCreationFailsWithoutDirectByteBuffer()
   {
     ByteBuffer directByteBuffer = ByteBuffer.allocate(10);
-    IBuffer.make(null, directByteBuffer, 0, 10);
+    Buffer.make(null, directByteBuffer, 0, 10);
   }
   
   /**
-   * Tests if we can create an IBuffer from a Java direct ByteBuffer.
+   * Tests if we can create an Buffer from a Java direct ByteBuffer.
    */
   @Test
   public void testCreationFromJavaDirectByteBuffer()
@@ -128,7 +128,7 @@ public class BufferTest
     }
     
     // 
-    IBuffer ibuf = IBuffer.make(null, directByteBuffer, 0, numBytes);
+    Buffer ibuf = Buffer.make(null, directByteBuffer, 0, numBytes);
     assertNotNull(ibuf);
     
     ByteBuffer outputDirectByteBuffer = ibuf.getByteBuffer(0, numBytes);
@@ -142,7 +142,7 @@ public class BufferTest
   
   
   /**
-   * Tests if we can create an IBuffer from a Java direct ByteBuffer, and
+   * Tests if we can create an Buffer from a Java direct ByteBuffer, and
    * then modify the data from the original Java byte buffer
    */
   @Test
@@ -157,7 +157,7 @@ public class BufferTest
     }
     
     // 
-    IBuffer ibuf = IBuffer.make(null, directByteBuffer, 0, numBytes);
+    Buffer ibuf = Buffer.make(null, directByteBuffer, 0, numBytes);
     assertNotNull(ibuf);
     
     ByteBuffer outputDirectByteBuffer = ibuf.getByteBuffer(0, numBytes);
@@ -184,7 +184,7 @@ public class BufferTest
   }  
 
   /**
-   * This method allocates one large IBuffer and then repeatedly
+   * This method allocates one large Buffer and then repeatedly
    * creates a java.nio.ByteBuffer to access them
    * 
    * If the system is not leaking, the garbage collector will ensure
@@ -194,7 +194,7 @@ public class BufferTest
   @Test
   public void testNoLeakingMemoryOnDirectAccess()
   {
-    IBuffer buf = IBuffer.make(null, 1024*1024); // 1 MB
+    Buffer buf = Buffer.make(null, 1024*1024); // 1 MB
     assertNotNull(buf);
     for(int i = 0; i < 100000; i++)
     {
@@ -208,13 +208,13 @@ public class BufferTest
 
   /**
    * This is a crazy test to make sure that a direct byte buffer will
-   * still be accessible even if the IBuffer it came from goes out of
+   * still be accessible even if the Buffer it came from goes out of
    * scope and is collected.
    */
   @Test(timeout=5000)
-  public void testDirectByteBufferCanBeAccessedAfterIBufferDisappears()
+  public void testDirectByteBufferCanBeAccessedAfterBufferDisappears()
   {
-    IBuffer buf = IBuffer.make(null, 1024*1024); // 1 MB
+    Buffer buf = Buffer.make(null, 1024*1024); // 1 MB
     assertNotNull(buf);
     
     assertEquals(1, buf.getCurrentRefCount());
@@ -240,7 +240,7 @@ public class BufferTest
   @Test
   public void testByteOrderIsCorrect()
   {
-    IBuffer buf = IBuffer.make(null, 1024*1024); // 1 MB
+    Buffer buf = Buffer.make(null, 1024*1024); // 1 MB
     assertNotNull(buf);
     
     assertEquals(1, buf.getCurrentRefCount());
@@ -288,7 +288,7 @@ public class BufferTest
   @Test
   public void testGetInvalidArgs()
   {
-    IBuffer buf = IBuffer.make(null, 1);
+    Buffer buf = Buffer.make(null, 1);
     
     byte[] in = new byte[]{ 0x38, 0x2C };
     byte[] out = new byte[]{ 0x53, 0x7C};
@@ -347,7 +347,7 @@ public class BufferTest
     JNIMemoryManager.getMgr().flush();
     byte[] in = new byte[]{ 0x38, 0x2C, 0x18, 0x7F };
     byte[] out = new byte[in.length];
-    IBuffer buf = IBuffer.make(null, 1024);
+    Buffer buf = Buffer.make(null, 1024);
     buf.put(in, 0, 0, in.length);
     buf.get(0, out, 0, in.length);
     for(int i = 0; i < in.length; i++)
@@ -365,7 +365,7 @@ public class BufferTest
     JNIMemoryManager.getMgr().flush();
     short[] in = new short[]{ 0x38, 0x2C, 0x18, 0x7F };
     short[] out = new short[in.length];
-    IBuffer buf = IBuffer.make(null, 1024);
+    Buffer buf = Buffer.make(null, 1024);
     buf.put(in, 0, 0, in.length);
     buf.get(0, out, 0, in.length);
     for(int i = 0; i < in.length; i++)
@@ -383,7 +383,7 @@ public class BufferTest
     JNIMemoryManager.getMgr().flush();
     int[] in = new int[]{ 0x38, 0x2C, 0x18, 0x7F };
     int[] out = new int[in.length];
-    IBuffer buf = IBuffer.make(null, 1024);
+    Buffer buf = Buffer.make(null, 1024);
     buf.put(in, 0, 0, in.length);
     buf.get(0, out, 0, in.length);
     for(int i = 0; i < in.length; i++)
@@ -401,7 +401,7 @@ public class BufferTest
     JNIMemoryManager.getMgr().flush();
     char[] in = new char[]{ 0x38, 0x2C, 0x18, 0x7F };
     char[] out = new char[in.length];
-    IBuffer buf = IBuffer.make(null, 1024);
+    Buffer buf = Buffer.make(null, 1024);
     buf.put(in, 0, 0, in.length);
     buf.get(0, out, 0, in.length);
     for(int i = 0; i < in.length; i++)
@@ -419,7 +419,7 @@ public class BufferTest
     JNIMemoryManager.getMgr().flush();
     long[] in = new long[]{ 0x38, 0x2C, 0x18, 0x7F };
     long[] out = new long[in.length];
-    IBuffer buf = IBuffer.make(null, 1024);
+    Buffer buf = Buffer.make(null, 1024);
     buf.put(in, 0, 0, in.length);
     buf.get(0, out, 0, in.length);
     for(int i = 0; i < in.length; i++)
@@ -437,7 +437,7 @@ public class BufferTest
     JNIMemoryManager.getMgr().flush();
     double[] in = new double[]{ 0x38, 0x2C, 0x18, 0x7F };
     double[] out = new double[in.length];
-    IBuffer buf = IBuffer.make(null, 1024);
+    Buffer buf = Buffer.make(null, 1024);
     buf.put(in, 0, 0, in.length);
     buf.get(0, out, 0, in.length);
     for(int i = 0; i < in.length; i++)
@@ -455,7 +455,7 @@ public class BufferTest
     JNIMemoryManager.getMgr().flush();
     float[] in = new float[]{ 0x38, 0x2C, 0x18, 0x7F };
     float[] out = new float[in.length];
-    IBuffer buf = IBuffer.make(null, 1024);
+    Buffer buf = Buffer.make(null, 1024);
     buf.put(in, 0, 0, in.length);
     buf.get(0, out, 0, in.length);
     for(int i = 0; i < in.length; i++)

@@ -64,7 +64,7 @@ MediaAudioImpl::make(int32_t numSamples, int32_t sampleRate, int32_t channels,
 
   int32_t bufSize = av_samples_get_buffer_size(0, channels, numSamples,
       (enum AVSampleFormat) format, 0);
-  RefPointer<IBuffer> buffer = IBuffer::make(0, bufSize);
+  RefPointer<Buffer> buffer = Buffer::make(0, bufSize);
   MediaAudioImpl* retval = make(buffer.value(), numSamples, sampleRate, channels, layout,
       format);
   if (retval) buffer->setJavaAllocator(retval->getJavaAllocator());
@@ -72,7 +72,7 @@ MediaAudioImpl::make(int32_t numSamples, int32_t sampleRate, int32_t channels,
 }
 
 MediaAudioImpl*
-MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer, int32_t numSamples,
+MediaAudioImpl::make(io::humble::ferry::Buffer* buffer, int32_t numSamples,
     int32_t sampleRate,
     int32_t channels, AudioChannel::Layout layout, AudioFormat::Type format) {
   if (numSamples <= 0) {
@@ -110,7 +110,7 @@ MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer, int32_t numSamples,
   }
 
   // By default we are always going to try and manage audio
-  // through IBuffers, but we cannot guarantee that FFmpeg won't
+  // through Buffers, but we cannot guarantee that FFmpeg won't
   // free them and replace them with their own objects, so we
   // must let mFrame->buf[] and mFrame->extended_buf[] win.
   RefPointer<MediaAudioImpl> retval = make();
@@ -159,11 +159,11 @@ MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer, int32_t numSamples,
   // now create references to our one mega buffer in all other pointers
   for (int32_t i = 0; i < FFMIN(planes, AV_NUM_DATA_POINTERS); i++) {
     frame->data[i] = frame->extended_data[i];
-    frame->buf[i] = AVBufferSupport::wrapIBuffer(buffer, frame->extended_data[i], frame->linesize[0]);
+    frame->buf[i] = AVBufferSupport::wrapBuffer(buffer, frame->extended_data[i], frame->linesize[0]);
   }
   // and add refs for the final buffers
   for (int32_t i = 0; i < planes - AV_NUM_DATA_POINTERS; i++) {
-    frame->extended_buf[i] = AVBufferSupport::wrapIBuffer(buffer, frame->extended_data[i+AV_NUM_DATA_POINTERS], frame->linesize[0]);
+    frame->extended_buf[i] = AVBufferSupport::wrapBuffer(buffer, frame->extended_data[i+AV_NUM_DATA_POINTERS], frame->linesize[0]);
   }
   return retval.get();
 }
@@ -219,10 +219,10 @@ MediaAudioImpl::make(MediaAudioImpl* src, bool copy) {
   return retval.get();
 }
 
-io::humble::ferry::IBuffer*
+io::humble::ferry::Buffer*
 MediaAudioImpl::getData(int32_t plane) {
   // we get the buffer for the given plane if it exists, and wrap
-  // it in an IBuffer
+  // it in an Buffer
   if (plane < 0) {
     VS_THROW(HumbleInvalidArgument("plane must be >= 0"));
   }
@@ -232,7 +232,7 @@ MediaAudioImpl::getData(int32_t plane) {
   }
 
   // now we're guaranteed that we should have a plane.
-  RefPointer<IBuffer> buffer;
+  RefPointer<Buffer> buffer;
   if (plane < AV_NUM_DATA_POINTERS) buffer = mFrame->buf[plane] ? AVBufferSupport::wrapAVBuffer(this,
       mFrame->buf[plane], mFrame->extended_data[plane], mFrame->linesize[0]) : 0;
   else buffer = mFrame->extended_buf[plane-AV_NUM_DATA_POINTERS] ? AVBufferSupport::wrapAVBuffer(this,
@@ -329,7 +329,7 @@ MediaAudioImpl::getCtx() {
 
 void
 MediaAudioImpl::setBufferType(AudioFormat::Type format,
-    IBuffer* buffer)
+    Buffer* buffer)
 {
   if (!buffer)
     VS_THROW(HumbleInvalidArgument("no buffer passed in"));
@@ -337,23 +337,23 @@ MediaAudioImpl::setBufferType(AudioFormat::Type format,
   {
     case AudioFormat::SAMPLE_FMT_DBL:
     case AudioFormat::SAMPLE_FMT_DBLP:
-      buffer->setType(IBuffer::IBUFFER_DBL64);
+      buffer->setType(Buffer::BUFFER_DBL64);
       break;
     case AudioFormat::SAMPLE_FMT_FLT:
     case AudioFormat::SAMPLE_FMT_FLTP:
-      buffer->setType(IBuffer::IBUFFER_FLT32);
+      buffer->setType(Buffer::BUFFER_FLT32);
       break;
     case AudioFormat::SAMPLE_FMT_S16:
     case AudioFormat::SAMPLE_FMT_S16P:
-      buffer->setType(IBuffer::IBUFFER_SINT16);
+      buffer->setType(Buffer::BUFFER_SINT16);
       break;
     case AudioFormat::SAMPLE_FMT_S32:
     case AudioFormat::SAMPLE_FMT_S32P:
-      buffer->setType(IBuffer::IBUFFER_SINT32);
+      buffer->setType(Buffer::BUFFER_SINT32);
       break;
     case AudioFormat::SAMPLE_FMT_U8:
     case AudioFormat::SAMPLE_FMT_U8P:
-      buffer->setType(IBuffer::IBUFFER_UINT8);
+      buffer->setType(Buffer::BUFFER_UINT8);
       break;
     default:
       break;

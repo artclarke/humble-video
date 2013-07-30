@@ -12358,7 +12358,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
 
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4, jint jarg5, jint jarg6) {
   jlong jresult = 0 ;
-  io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
+  io::humble::ferry::Buffer *arg1 = (io::humble::ferry::Buffer *) 0 ;
   int32_t arg2 ;
   int32_t arg3 ;
   int32_t arg4 ;
@@ -12369,7 +12369,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
+  arg1 = *(io::humble::ferry::Buffer **)&jarg1; 
   arg2 = (int32_t)jarg2; 
   arg3 = (int32_t)jarg3; 
   arg4 = (int32_t)jarg4; 
@@ -12512,7 +12512,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getData(JNIEn
   jlong jresult = 0 ;
   io::humble::video::MediaAudio *arg1 = (io::humble::video::MediaAudio *) 0 ;
   int32_t arg2 ;
-  io::humble::ferry::IBuffer *result = 0 ;
+  io::humble::ferry::Buffer *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -12531,7 +12531,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getData(JNIEn
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::ferry::IBuffer *)(arg1)->getData(arg2);
+      result = (io::humble::ferry::Buffer *)(arg1)->getData(arg2);
     }
     catch(std::invalid_argument & e)
     {
@@ -12582,7 +12582,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getData(JNIEn
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::ferry::IBuffer **)&jresult = result; 
+  *(io::humble::ferry::Buffer **)&jresult = result; 
   return jresult;
 }
 
@@ -13834,7 +13834,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1make_1_1SWI
 
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1make_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4) {
   jlong jresult = 0 ;
-  io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
+  io::humble::ferry::Buffer *arg1 = (io::humble::ferry::Buffer *) 0 ;
   int32_t arg2 ;
   int32_t arg3 ;
   io::humble::video::PixelFormat::Type arg4 ;
@@ -13843,7 +13843,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1make_1_1SWI
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
+  arg1 = *(io::humble::ferry::Buffer **)&jarg1; 
   arg2 = (int32_t)jarg2; 
   arg3 = (int32_t)jarg3; 
   arg4 = (io::humble::video::PixelFormat::Type)jarg4; 
@@ -13984,7 +13984,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getData(JNI
   jlong jresult = 0 ;
   io::humble::video::MediaPicture *arg1 = (io::humble::video::MediaPicture *) 0 ;
   int32_t arg2 ;
-  io::humble::ferry::IBuffer *result = 0 ;
+  io::humble::ferry::Buffer *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -14003,7 +14003,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getData(JNI
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::ferry::IBuffer *)(arg1)->getData(arg2);
+      result = (io::humble::ferry::Buffer *)(arg1)->getData(arg2);
     }
     catch(std::invalid_argument & e)
     {
@@ -14054,7 +14054,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getData(JNI
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::ferry::IBuffer **)&jresult = result; 
+  *(io::humble::ferry::Buffer **)&jresult = result; 
   return jresult;
 }
 
@@ -17992,7 +17992,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1g
   jlong jresult = 0 ;
   io::humble::video::MediaSubtitleRectangle *arg1 = (io::humble::video::MediaSubtitleRectangle *) 0 ;
   int arg2 ;
-  io::humble::ferry::IBuffer *result = 0 ;
+  io::humble::ferry::Buffer *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -18011,7 +18011,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1g
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::ferry::IBuffer *)(arg1)->getPictureData(arg2);
+      result = (io::humble::ferry::Buffer *)(arg1)->getPictureData(arg2);
     }
     catch(std::invalid_argument & e)
     {
@@ -18062,7 +18062,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1g
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::ferry::IBuffer **)&jresult = result; 
+  *(io::humble::ferry::Buffer **)&jresult = result; 
   return jresult;
 }
 
@@ -18280,13 +18280,13 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG
 
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
+  io::humble::ferry::Buffer *arg1 = (io::humble::ferry::Buffer *) 0 ;
   io::humble::video::MediaPacket *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
+  arg1 = *(io::humble::ferry::Buffer **)&jarg1; 
   {
     // JNIHelper.swg: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -18492,7 +18492,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getData(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   io::humble::video::MediaPacket *arg1 = (io::humble::video::MediaPacket *) 0 ;
-  io::humble::ferry::IBuffer *result = 0 ;
+  io::humble::ferry::Buffer *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -18510,7 +18510,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getData(JNIE
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::ferry::IBuffer *)(arg1)->getData();
+      result = (io::humble::ferry::Buffer *)(arg1)->getData();
     }
     catch(std::invalid_argument & e)
     {
@@ -18561,7 +18561,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getData(JNIE
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::ferry::IBuffer **)&jresult = result; 
+  *(io::humble::ferry::Buffer **)&jresult = result; 
   return jresult;
 }
 
@@ -18647,7 +18647,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getSideData(
   jlong jresult = 0 ;
   io::humble::video::MediaPacket *arg1 = (io::humble::video::MediaPacket *) 0 ;
   int32_t arg2 ;
-  io::humble::ferry::IBuffer *result = 0 ;
+  io::humble::ferry::Buffer *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -18666,7 +18666,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getSideData(
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::ferry::IBuffer *)(arg1)->getSideData(arg2);
+      result = (io::humble::ferry::Buffer *)(arg1)->getSideData(arg2);
     }
     catch(std::invalid_argument & e)
     {
@@ -18717,7 +18717,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getSideData(
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::ferry::IBuffer **)&jresult = result; 
+  *(io::humble::ferry::Buffer **)&jresult = result; 
   return jresult;
 }
 

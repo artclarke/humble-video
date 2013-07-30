@@ -28,7 +28,7 @@
 
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/ferry/RefCounted.h>
-#include <io/humble/ferry/IBuffer.h>
+#include <io/humble/ferry/Buffer.h>
 namespace io {
 namespace humble {
 namespace video {
@@ -37,16 +37,16 @@ class AVBufferSupport
 {
 public:
   /**
-   * Wraps a AVBufferRef in an IBuffer.
+   * Wraps a AVBufferRef in an Buffer.
    */
-  static io::humble::ferry::IBuffer* wrapAVBuffer(io::humble::ferry::RefCounted* requestor, AVBufferRef* ref);
-  static io::humble::ferry::IBuffer* wrapAVBuffer(io::humble::ferry::RefCounted* requestor, AVBufferRef* ref,
+  static io::humble::ferry::Buffer* wrapAVBuffer(io::humble::ferry::RefCounted* requestor, AVBufferRef* ref);
+  static io::humble::ferry::Buffer* wrapAVBuffer(io::humble::ferry::RefCounted* requestor, AVBufferRef* ref,
       void* data, int32_t size);
   /**
-   * Wraps an AVBufferRef in a IBuffer
+   * Wraps an AVBufferRef in a Buffer
    */
-  static AVBufferRef* wrapIBuffer(io::humble::ferry::IBuffer* buf);
-  static AVBufferRef* wrapIBuffer(io::humble::ferry::IBuffer* buf, void *data, int32_t size);
+  static AVBufferRef* wrapBuffer(io::humble::ferry::Buffer* buf);
+  static AVBufferRef* wrapBuffer(io::humble::ferry::Buffer* buf, void *data, int32_t size);
 
 private:
   static void bufferRelease(void * closure, uint8_t * buf);

@@ -16,7 +16,7 @@ class MediaPacketTest : public CxxTest::TestSuite
     void testCreationAndDestruction();
     void testGetDefaults();
     void testCopyPacket();
-    void testWrapIBuffer();
+    void testWrapBuffer();
   private:
     RefPointer<MediaPacket> packet;
 };

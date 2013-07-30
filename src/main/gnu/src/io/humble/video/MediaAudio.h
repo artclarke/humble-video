@@ -26,7 +26,7 @@
 #ifndef AUDIO_H_
 #define AUDIO_H_
 
-#include <io/humble/ferry/IBuffer.h>
+#include <io/humble/ferry/Buffer.h>
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/MediaRaw.h>
 
@@ -435,7 +435,7 @@ public:
   /**
    * Create a MediaAudio using the given buffer.
    *
-   * Note: that the {@link IBuffer.getBufferSize()} constraints the max number
+   * Note: that the {@link Buffer.getBufferSize()} constraints the max number
    * of samples we can place in here, and HumbleVideo needs to reserve some
    * of the buffer for, um, stuff (assume at least 64 bytes). So {@link #getMaxNumSamples()}
    * may not return as many as you think you can fit in here.
@@ -451,7 +451,7 @@ public:
    * @return A {@link MediaAudio} object, or null on failure.
    */
   static MediaAudio*
-  make(io::humble::ferry::IBuffer *buffer, int32_t numSamples,
+  make(io::humble::ferry::Buffer *buffer, int32_t numSamples,
       int32_t sampleRate, int32_t channels,
       AudioChannel::Layout channelLayout, AudioFormat::Type format);
 
@@ -481,7 +481,7 @@ public:
    * @param plane The plane number if {@link getFormat()} is Planar (rather than packed) audio.  Pass zero for packed data.
    * @return The raw data, or null if not accessible.
    */
-  virtual io::humble::ferry::IBuffer*
+  virtual io::humble::ferry::Buffer*
   getData(int32_t plane)=0;
 
   /**

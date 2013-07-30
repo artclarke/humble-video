@@ -125,7 +125,7 @@ public:
   virtual const char* getASS() { return mCtx->ass; }
   virtual int32_t getFlags() { return mCtx->flags; }
   virtual int32_t getPictureLinesize(int line);
-  virtual io::humble::ferry::IBuffer* getPictureData(int line);
+  virtual io::humble::ferry::Buffer* getPictureData(int line);
 #ifndef SWIG
   static MediaSubtitleRectangle* make(AVSubtitleRect* ctx);
 #endif // !SWIG

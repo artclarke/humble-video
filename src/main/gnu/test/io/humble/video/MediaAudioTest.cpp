@@ -97,7 +97,7 @@ MediaAudioTest::testCreation() {
   TS_ASSERT(audio);
 
   // now let's try getting the data
-  RefPointer<IBuffer> buf;
+  RefPointer<Buffer> buf;
 
   TS_ASSERT_EQUALS(numSamples, audio->getMaxNumSamples());
   TS_ASSERT_EQUALS(numSamples, audio->getNumSamples());
@@ -158,7 +158,7 @@ MediaAudioTest::testCreationFromBufferPacked() {
 
   int32_t bufSize = AudioFormat::getBufferSizeNeeded(numSamples, channels,
       format);
-  RefPointer<IBuffer> src = IBuffer::make(0, bufSize);
+  RefPointer<Buffer> src = Buffer::make(0, bufSize);
   double* srcData = (double*) src->getBytes(0, bufSize);
 
   // now, let's go nuts!
@@ -180,7 +180,7 @@ MediaAudioTest::testCreationFromBufferPacked() {
   TS_ASSERT(audio);
 
   TS_ASSERT_EQUALS(1, audio->getNumDataPlanes());
-  RefPointer<IBuffer> dst = audio->getData(0);
+  RefPointer<Buffer> dst = audio->getData(0);
   TS_ASSERT(dst);
   double* dstData = (double*) dst->getBytes(0, dst->getBufferSize());
 
@@ -205,7 +205,7 @@ MediaAudioTest::testCreationFromBufferPlanar() {
       * channels;
   TS_ASSERT_LESS_THAN(minSize, bufSize);
 
-  RefPointer<IBuffer> src = IBuffer::make(0, bufSize);
+  RefPointer<Buffer> src = Buffer::make(0, bufSize);
   double* srcData = (double*) src->getBytes(0, bufSize);
 
   // now, let's go nuts!
@@ -230,7 +230,7 @@ MediaAudioTest::testCreationFromBufferPlanar() {
 
   // sigh; time to test each plane.
   for (int i = 0; i < channels; i++) {
-    RefPointer<IBuffer> dst = audio->getData(i);
+    RefPointer<Buffer> dst = audio->getData(i);
     TS_ASSERT(dst);
     double* dstData = (double*) dst->getBytes(0, dst->getBufferSize());
 
@@ -258,7 +258,7 @@ MediaAudioTest::testCopy() {
       * channels;
   TS_ASSERT_LESS_THAN(minSize, bufSize);
 
-  RefPointer<IBuffer> src = IBuffer::make(0, bufSize);
+  RefPointer<Buffer> src = Buffer::make(0, bufSize);
   double* srcData = (double*) src->getBytes(0, bufSize);
 
   // now, let's go nuts!
@@ -289,8 +289,8 @@ MediaAudioTest::testCopy() {
     TS_ASSERT_EQUALS(copy->getFormat(), audio->getFormat());
 
     for (int32_t j = 0; j < audio->getNumDataPlanes(); j++) {
-      RefPointer<IBuffer> srcBuf = audio->getData(j);
-      RefPointer<IBuffer> dstBuf = copy->getData(j);
+      RefPointer<Buffer> srcBuf = audio->getData(j);
+      RefPointer<Buffer> dstBuf = copy->getData(j);
 
       int32_t planeSize = srcBuf->getBufferSize();
       TS_ASSERT_EQUALS(planeSize, dstBuf->getBufferSize());

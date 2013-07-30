@@ -18,7 +18,7 @@ public class MediaPicture extends MediaRaw {
   @SuppressWarnings("unused")
   private void noop()
   {
-    IBuffer.make(null, 1);
+    Buffer.make(null, 1);
   }
    
   private volatile long swigCPtr;
@@ -157,8 +157,8 @@ public class MediaPicture extends MediaRaw {
  *		 width or height or negative, of format is {@link 
  *		 PixelFormat.Type.PIX_FMT_NONE}  
  */
-  public static MediaPicture make(IBuffer buffer, int width, int height, PixelFormat.Type format) {
-    long cPtr = VideoJNI.MediaPicture_make__SWIG_1(IBuffer.getCPtr(buffer), buffer, width, height, format.swigValue());
+  public static MediaPicture make(Buffer buffer, int width, int height, PixelFormat.Type format) {
+    long cPtr = VideoJNI.MediaPicture_make__SWIG_1(Buffer.getCPtr(buffer), buffer, width, height, format.swigValue());
     return (cPtr == 0) ? null : new MediaPicture(cPtr, false);
   }
 
@@ -184,9 +184,9 @@ public class MediaPicture extends MediaRaw {
  *		  
  * @return	The raw data, or null if not accessible.  
  */
-  public IBuffer getData(int plane) {
+  public Buffer getData(int plane) {
     long cPtr = VideoJNI.MediaPicture_getData(swigCPtr, this, plane);
-    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+    return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
 /**

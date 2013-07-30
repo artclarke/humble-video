@@ -21,7 +21,7 @@
 
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
-#include <io/humble/ferry/IBuffer.h>
+#include <io/humble/ferry/Buffer.h>
 #include <io/humble/video/Global.h>
 
 #include <io/humble/video/PixelFormat.h>

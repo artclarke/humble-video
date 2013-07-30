@@ -50,7 +50,7 @@ MediaPicture::make(int32_t width, int32_t height, PixelFormat::Type format)
 }
 
 MediaPicture*
-MediaPicture::make(io::humble::ferry::IBuffer* buffer, int32_t width, int32_t height,
+MediaPicture::make(io::humble::ferry::Buffer* buffer, int32_t width, int32_t height,
     PixelFormat::Type format)
 {
   Global::init();

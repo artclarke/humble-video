@@ -22,7 +22,7 @@
 
 #include <io/humble/testutils/TestUtils.h>
 #include <io/humble/ferry/RefPointer.h>
-#include <io/humble/ferry/IBuffer.h>
+#include <io/humble/ferry/Buffer.h>
 using namespace VS_CPP_NAMESPACE;
 
 class BufferTest : public CxxTest::TestSuite
@@ -34,7 +34,7 @@ class BufferTest : public CxxTest::TestSuite
     void testReadingAndWriting();
     void testWrapping();
   private:
-    RefPointer<io::humble::ferry::IBuffer> buffer;
+    RefPointer<io::humble::ferry::Buffer> buffer;
     static void freeBuffer(void *buf, void*closure)
     {
       delete [] (unsigned char*)buf;

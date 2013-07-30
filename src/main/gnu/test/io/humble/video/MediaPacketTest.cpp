@@ -61,7 +61,7 @@ MediaPacketTest::testCopyPacket() {
 
   // let's get access to the data
 
-  RefPointer<IBuffer> data = packet->getData();
+  RefPointer<Buffer> data = packet->getData();
   TS_ASSERT_EQUALS(size+16, data->getBufferSize());
   TS_ASSERT_EQUALS(size, packet->getSize());
   uint8_t* raw = (uint8_t*) data->getBytes(0, size);
@@ -87,7 +87,7 @@ MediaPacketTest::testCopyPacket() {
     RefPointer<Rational> newBase = newPacket->getTimeBase();
     TSM_ASSERT("should be equal", newBase->compareTo(timeBase.value()) == 0);
 
-    RefPointer<IBuffer> buf = newPacket->getData();
+    RefPointer<Buffer> buf = newPacket->getData();
     TS_ASSERT_EQUALS(size, newPacket->getSize());
     TS_ASSERT_EQUALS(size+16, buf->getBufferSize());
     uint8_t* d = (uint8_t*) buf->getBytes(0, size);
@@ -105,18 +105,18 @@ MediaPacketTest::testCopyPacket() {
 }
 
 void
-MediaPacketTest::testWrapIBuffer()
+MediaPacketTest::testWrapBuffer()
 {
   const int size = 512;
-  RefPointer<IBuffer> buf = IBuffer::make(0, size);
+  RefPointer<Buffer> buf = Buffer::make(0, size);
   uint8_t* d = (uint8_t*)buf->getBytes(0, size);
   for(int i = 0; i < size; i++)
     d[i] = i % 16;
 
   packet = MediaPacket::make(buf.value());
 
-  RefPointer<IBuffer> data = packet->getData();
-  TSM_ASSERT_DIFFERS("should be different IBuffer objects since once in a packet, AV manages buffer",
+  RefPointer<Buffer> data = packet->getData();
+  TSM_ASSERT_DIFFERS("should be different Buffer objects since once in a packet, AV manages buffer",
       buf.value(), data.value());
   TS_ASSERT_EQUALS(size, data->getBufferSize());
   TS_ASSERT_EQUALS(size, packet->getSize());

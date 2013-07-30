@@ -18,7 +18,7 @@ public class MediaSubtitleRectangle extends RefCounted {
   @SuppressWarnings("unused")
   private void noop()
   {
-    IBuffer.make(null, 1);
+    Buffer.make(null, 1);
   }
    
   private volatile long swigCPtr;
@@ -148,9 +148,9 @@ public class MediaSubtitleRectangle extends RefCounted {
     return VideoJNI.MediaSubtitleRectangle_getPictureLinesize(swigCPtr, this, line);
   }
 
-  public IBuffer getPictureData(int line) {
+  public Buffer getPictureData(int line) {
     long cPtr = VideoJNI.MediaSubtitleRectangle_getPictureData(swigCPtr, this, line);
-    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+    return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
   public enum Flag {

@@ -15,9 +15,9 @@ humble_ferry_main_LDADD= libhumble-ferry.la
 
 libhumble_ferry_la_SOURCES= \
   AtomicInteger.cpp \
-  Buffer.cpp \
+  BufferImpl.cpp \
   HumbleException.cpp \
-  IBuffer.cpp \
+  Buffer.cpp \
   JNIHelper.cpp \
   JNIMemoryManager.cpp \
   Logger.cpp \
@@ -42,11 +42,11 @@ libhumble_ferry_la_HEADERS= \
   RefCounted.h \
   RefCountedTester.h \
   Ferry.i \
-  IBuffer.h \
   Buffer.h \
+  BufferImpl.h \
   HumbleException.h \
   JNIHelper.swg \
-  IBuffer.swg \
+  Buffer.swg \
   RefCounted.swg \
   RefPointer.h
 

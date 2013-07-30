@@ -28,7 +28,7 @@ public class Property extends RefCounted {
   @SuppressWarnings("unused")
   private void noop()
   {
-    IBuffer.make(null, 1);
+    Buffer.make(null, 1);
   }
    
   private volatile long swigCPtr;

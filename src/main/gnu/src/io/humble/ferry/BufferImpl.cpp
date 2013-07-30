@@ -47,7 +47,7 @@ namespace io { namespace humble { namespace ferry
     mFreeFunc = 0;
     mClosure = 0;
     mInternallyAllocated = false;
-    mType = IBUFFER_UINT8; // bytes
+    mType = BUFFER_UINT8; // bytes
   }
 
   BufferImpl :: ~BufferImpl()
@@ -149,7 +149,7 @@ namespace io { namespace humble { namespace ferry
   {
     if (numElements <= 0)
       return 0;
-    if (type < 0 || type >= IBUFFER_NB)
+    if (type < 0 || type >= BUFFER_NB)
       return 0;
     
     int32_t bytesRequested = numElements*mTypeSize[(int32_t)type];
@@ -166,7 +166,7 @@ namespace io { namespace humble { namespace ferry
   int32_t
   BufferImpl :: getTypeSize(Type type)
   {
-    if (type < 0 || type >= IBUFFER_NB)
+    if (type < 0 || type >= BUFFER_NB)
       return 0;
     return mTypeSize[(int32_t)type];
   }
@@ -174,7 +174,7 @@ namespace io { namespace humble { namespace ferry
   int32_t
   BufferImpl :: getSize()
   {
-    if (mType < 0 || mType >= IBUFFER_NB)
+    if (mType < 0 || mType >= BUFFER_NB)
       return 0;
     return getBufferSize()/mTypeSize[(int32_t)mType];
   }

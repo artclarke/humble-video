@@ -43,7 +43,7 @@ public class MediaAudio extends MediaRaw {
   @SuppressWarnings("unused")
   private void noop()
   {
-    IBuffer.make(null, 1);
+    Buffer.make(null, 1);
   }
    
   private volatile long swigCPtr;
@@ -155,7 +155,7 @@ public class MediaAudio extends MediaRaw {
 
 /**
  * Create a MediaAudio using the given buffer.  
- * Note: that the {@link IBuffer.getBufferSize()} constraints the max 
+ * Note: that the {@link Buffer.getBufferSize()} constraints the max 
  * number  
  * of samples we can place in here, and HumbleVideo needs to reserve 
  * some  
@@ -177,8 +177,8 @@ public class MediaAudio extends MediaRaw {
  *		 object.  
  * @return	A {@link MediaAudio} object, or null on failure.  
  */
-  public static MediaAudio make(IBuffer buffer, int numSamples, int sampleRate, int channels, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
-    long cPtr = VideoJNI.MediaAudio_make__SWIG_1(IBuffer.getCPtr(buffer), buffer, numSamples, sampleRate, channels, channelLayout.swigValue(), format.swigValue());
+  public static MediaAudio make(Buffer buffer, int numSamples, int sampleRate, int channels, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
+    long cPtr = VideoJNI.MediaAudio_make__SWIG_1(Buffer.getCPtr(buffer), buffer, numSamples, sampleRate, channels, channelLayout.swigValue(), format.swigValue());
     return (cPtr == 0) ? null : new MediaAudio(cPtr, false);
   }
 
@@ -215,9 +215,9 @@ public class MediaAudio extends MediaRaw {
  *		 
  * @return	The raw data, or null if not accessible.  
  */
-  public IBuffer getData(int plane) {
+  public Buffer getData(int plane) {
     long cPtr = VideoJNI.MediaAudio_getData(swigCPtr, this, plane);
-    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+    return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
 /**

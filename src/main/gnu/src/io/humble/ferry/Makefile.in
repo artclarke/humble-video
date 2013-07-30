@@ -100,8 +100,8 @@ CONFIG_CLEAN_FILES = Ferry.i
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_ferry_la_LIBADD =
-am_libhumble_ferry_la_OBJECTS = AtomicInteger.lo Buffer.lo \
-	HumbleException.lo IBuffer.lo JNIHelper.lo JNIMemoryManager.lo \
+am_libhumble_ferry_la_OBJECTS = AtomicInteger.lo BufferImpl.lo \
+	HumbleException.lo Buffer.lo JNIHelper.lo JNIMemoryManager.lo \
 	Logger.lo LoggerStack.lo Mutex.lo RefCounted.lo \
 	RefCountedTester.lo
 nodist_libhumble_ferry_la_OBJECTS = Ferry.lo
@@ -397,9 +397,9 @@ humble_ferry_main_SOURCES = \
 humble_ferry_main_LDADD = libhumble-ferry.la
 libhumble_ferry_la_SOURCES = \
   AtomicInteger.cpp \
-  Buffer.cpp \
+  BufferImpl.cpp \
   HumbleException.cpp \
-  IBuffer.cpp \
+  Buffer.cpp \
   JNIHelper.cpp \
   JNIMemoryManager.cpp \
   Logger.cpp \
@@ -424,11 +424,11 @@ libhumble_ferry_la_HEADERS = \
   RefCounted.h \
   RefCountedTester.h \
   Ferry.i \
-  IBuffer.h \
   Buffer.h \
+  BufferImpl.h \
   HumbleException.h \
   JNIHelper.swg \
-  IBuffer.swg \
+  Buffer.swg \
   RefCounted.swg \
   RefPointer.h
 
@@ -523,9 +523,9 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AtomicInteger.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Buffer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BufferImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Ferry.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HumbleException.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IBuffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/JNIHelper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/JNIMemoryManager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Plo@am__quote@

@@ -47,7 +47,7 @@ MediaAudio::make(int32_t numSamples, int32_t sampleRate,
 }
 
 MediaAudio*
-MediaAudio::make(io::humble::ferry::IBuffer *buffer, int32_t numSamples,
+MediaAudio::make(io::humble::ferry::Buffer *buffer, int32_t numSamples,
     int32_t sampleRate, int32_t channels,
     AudioChannel::Layout channelLayout, AudioFormat::Type format) {
   Global::init();

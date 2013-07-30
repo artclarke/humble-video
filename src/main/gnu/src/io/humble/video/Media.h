@@ -23,7 +23,7 @@
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/Global.h>
 #include <io/humble/ferry/RefCounted.h>
-#include <io/humble/ferry/IBuffer.h>
+#include <io/humble/ferry/Buffer.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/KeyValueBag.h>
 

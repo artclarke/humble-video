@@ -229,7 +229,7 @@ JNI_OnLoad(JavaVM *, void *)
 #include <io/humble/ferry/AtomicInteger.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/Mutex.h>
-#include <io/humble/ferry/IBuffer.h>
+#include <io/humble/ferry/Buffer.h>
 #include <io/humble/ferry/RefCountedTester.h>
 
 using namespace io::humble::ferry;
@@ -248,11 +248,11 @@ Java_io_humble_ferry_Ferry_init(JNIEnv *env, jclass)
 }
 
 
-static void IBuffer_javaDirectFreeFunc(void *, void * closure);
+static void Buffer_javaDirectFreeFunc(void *, void * closure);
 typedef jobject jNioByteArray;
 
 
-SWIGINTERN jNioByteArray io_humble_ferry_IBuffer_java_getByteBuffer(io::humble::ferry::IBuffer *self,int32_t offset,int32_t length){
+SWIGINTERN jNioByteArray io_humble_ferry_Buffer_java_getByteBuffer(io::humble::ferry::Buffer *self,int32_t offset,int32_t length){
     void * buffer = 0;
     jobject retval = 0;
     
@@ -268,7 +268,7 @@ SWIGINTERN jNioByteArray io_humble_ferry_IBuffer_java_getByteBuffer(io::humble::
     }
     return retval;
   }
-SWIGINTERN jbyteArray io_humble_ferry_IBuffer_getByteArray(io::humble::ferry::IBuffer *self,int32_t offset,int32_t length){
+SWIGINTERN jbyteArray io_humble_ferry_Buffer_getByteArray(io::humble::ferry::Buffer *self,int32_t offset,int32_t length){
     jbyte * buffer = 0;
     jbyteArray retval = 0;
     
@@ -302,8 +302,8 @@ SWIGINTERN jbyteArray io_humble_ferry_IBuffer_getByteArray(io::humble::ferry::IB
     }
     return retval;
   }
-SWIGINTERN io::humble::ferry::IBuffer *io_humble_ferry_IBuffer_make__SWIG_2(io::humble::ferry::RefCounted *requestor,jbyteArray buffer,int32_t offset,int32_t length){
-    IBuffer* retval = 0;
+SWIGINTERN io::humble::ferry::Buffer *io_humble_ferry_Buffer_make__SWIG_2(io::humble::ferry::RefCounted *requestor,jbyteArray buffer,int32_t offset,int32_t length){
+    Buffer* retval = 0;
     try
     {
       JNIEnv* env = JNIHelper::sGetEnv();
@@ -323,9 +323,9 @@ SWIGINTERN io::humble::ferry::IBuffer *io_humble_ferry_IBuffer_make__SWIG_2(io::
       if (bufSize < offset + length)
         throw std::out_of_range("invalid offset and length");
       
-      retval = IBuffer::make(requestor, length);
+      retval = Buffer::make(requestor, length);
       if (!retval)
-        throw std::runtime_error("could not allocate IBuffer");
+        throw std::runtime_error("could not allocate Buffer");
 
       jbyte* bytes = static_cast<jbyte*>(retval->getBytes(0, length));
       if (!bytes)
@@ -334,7 +334,7 @@ SWIGINTERN io::humble::ferry::IBuffer *io_humble_ferry_IBuffer_make__SWIG_2(io::
       // now try the copy
       env->GetByteArrayRegion(buffer, offset, length, bytes);
       if (env->ExceptionCheck())
-        throw std::runtime_error("could not copy data into native IBuffer memory");
+        throw std::runtime_error("could not copy data into native Buffer memory");
     }
     catch(std::exception & c)
     {
@@ -343,8 +343,8 @@ SWIGINTERN io::humble::ferry::IBuffer *io_humble_ferry_IBuffer_make__SWIG_2(io::
     return retval;
 
   }
-SWIGINTERN io::humble::ferry::IBuffer *io_humble_ferry_IBuffer_make__SWIG_3(io::humble::ferry::RefCounted *requestor,jNioByteArray directByteBuffer,int32_t offset,int32_t length){
-    IBuffer * retval = 0;
+SWIGINTERN io::humble::ferry::Buffer *io_humble_ferry_Buffer_make__SWIG_3(io::humble::ferry::RefCounted *requestor,jNioByteArray directByteBuffer,int32_t offset,int32_t length){
+    Buffer * retval = 0;
     jobject globalRef = 0;
     JNIEnv* env = JNIHelper::sGetEnv();
     try
@@ -398,8 +398,8 @@ SWIGINTERN io::humble::ferry::IBuffer *io_humble_ferry_IBuffer_make__SWIG_3(io::
       if (env->ExceptionCheck())
         throw std::runtime_error("could not get global reference to passed in byte array");
             
-      retval = IBuffer::make(requestor, javaBuffer+offset, length,
-          IBuffer_javaDirectFreeFunc, globalRef);
+      retval = Buffer::make(requestor, javaBuffer+offset, length,
+          Buffer_javaDirectFreeFunc, globalRef);
       //fprintf(stderr, "Creating global ref: %p\n", globalRef);
       
       if (!retval)
@@ -420,12 +420,12 @@ SWIGINTERN io::humble::ferry::IBuffer *io_humble_ferry_IBuffer_make__SWIG_3(io::
 
   /**
    * This method is passed as a freefunc to the Buffer object.  Once
-   * the IBuffer has no more references to it, this method will be called,
+   * the Buffer has no more references to it, this method will be called,
    * and will release the backing java.nio.ByteBuffer object that we got
    * data from.
    */
   static void
-  IBuffer_javaDirectFreeFunc(void *, void * closure)
+  Buffer_javaDirectFreeFunc(void *, void * closure)
   {
     jobject globalRef = static_cast<jobject>(closure);
     JNIEnv* env = JNIHelper::sGetEnv();
@@ -3164,15 +3164,15 @@ SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_Mutex_1unlock(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getBufferSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1getBufferSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
+  io::humble::ferry::Buffer *arg1 = (io::humble::ferry::Buffer *) 0 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
+  arg1 = *(io::humble::ferry::Buffer **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -3241,11 +3241,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getBufferSize(JNI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1make_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   io::humble::ferry::RefCounted *arg1 = (io::humble::ferry::RefCounted *) 0 ;
   int32_t arg2 ;
-  io::humble::ferry::IBuffer *result = 0 ;
+  io::humble::ferry::Buffer *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -3257,7 +3257,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_10(
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::ferry::IBuffer *)io::humble::ferry::IBuffer::make(arg1,arg2);
+      result = (io::humble::ferry::Buffer *)io::humble::ferry::Buffer::make(arg1,arg2);
     }
     catch(std::invalid_argument & e)
     {
@@ -3308,20 +3308,20 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_10(
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::ferry::IBuffer **)&jresult = result; 
+  *(io::humble::ferry::Buffer **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1getType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
-  io::humble::ferry::IBuffer::Type result;
+  io::humble::ferry::Buffer *arg1 = (io::humble::ferry::Buffer *) 0 ;
+  io::humble::ferry::Buffer::Type result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
+  arg1 = *(io::humble::ferry::Buffer **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -3334,7 +3334,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getType(JNIEnv *j
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::ferry::IBuffer::Type)(arg1)->getType();
+      result = (io::humble::ferry::Buffer::Type)(arg1)->getType();
     }
     catch(std::invalid_argument & e)
     {
@@ -3390,15 +3390,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getType(JNIEnv *j
 }
 
 
-SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1setType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
-  io::humble::ferry::IBuffer::Type arg2 ;
+SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1setType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  io::humble::ferry::Buffer *arg1 = (io::humble::ferry::Buffer *) 0 ;
+  io::humble::ferry::Buffer::Type arg2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
-  arg2 = (io::humble::ferry::IBuffer::Type)jarg2; 
+  arg1 = *(io::humble::ferry::Buffer **)&jarg1; 
+  arg2 = (io::humble::ferry::Buffer::Type)jarg2; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -3465,20 +3465,20 @@ SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1setType(JNIEnv *j
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getTypeSize(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1getTypeSize(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jint jresult = 0 ;
-  io::humble::ferry::IBuffer::Type arg1 ;
+  io::humble::ferry::Buffer::Type arg1 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (io::humble::ferry::IBuffer::Type)jarg1; 
+  arg1 = (io::humble::ferry::Buffer::Type)jarg1; 
   {
     // JNIHelper.swg: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)io::humble::ferry::IBuffer::getTypeSize(arg1);
+      result = (int32_t)io::humble::ferry::Buffer::getTypeSize(arg1);
     }
     catch(std::invalid_argument & e)
     {
@@ -3534,15 +3534,15 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getTypeSize(JNIEn
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1getSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
-  io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
+  io::humble::ferry::Buffer *arg1 = (io::humble::ferry::Buffer *) 0 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
+  arg1 = *(io::humble::ferry::Buffer **)&jarg1; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -3611,19 +3611,19 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getSize(JNIEnv *j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jboolean jarg4) {
+SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1make_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jboolean jarg4) {
   jlong jresult = 0 ;
   io::humble::ferry::RefCounted *arg1 = (io::humble::ferry::RefCounted *) 0 ;
-  io::humble::ferry::IBuffer::Type arg2 ;
+  io::humble::ferry::Buffer::Type arg2 ;
   int32_t arg3 ;
   bool arg4 ;
-  io::humble::ferry::IBuffer *result = 0 ;
+  io::humble::ferry::Buffer *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(io::humble::ferry::RefCounted **)&jarg1; 
-  arg2 = (io::humble::ferry::IBuffer::Type)jarg2; 
+  arg2 = (io::humble::ferry::Buffer::Type)jarg2; 
   arg3 = (int32_t)jarg3; 
   arg4 = jarg4 ? true : false; 
   {
@@ -3631,7 +3631,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_11(
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::ferry::IBuffer *)io::humble::ferry::IBuffer::make(arg1,arg2,arg3,arg4);
+      result = (io::humble::ferry::Buffer *)io::humble::ferry::Buffer::make(arg1,arg2,arg3,arg4);
     }
     catch(std::invalid_argument & e)
     {
@@ -3682,14 +3682,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_11(
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::ferry::IBuffer **)&jresult = result; 
+  *(io::humble::ferry::Buffer **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jobject JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1java_1getByteBuffer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+SWIGEXPORT jobject JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1java_1getByteBuffer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
   jobject jresult = 0 ;
-  io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
+  io::humble::ferry::Buffer *arg1 = (io::humble::ferry::Buffer *) 0 ;
   int32_t arg2 ;
   int32_t arg3 ;
   jNioByteArray result;
@@ -3697,7 +3697,7 @@ SWIGEXPORT jobject JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1java_1getByteB
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
+  arg1 = *(io::humble::ferry::Buffer **)&jarg1; 
   arg2 = (int32_t)jarg2; 
   arg3 = (int32_t)jarg3; 
   
@@ -3712,7 +3712,7 @@ SWIGEXPORT jobject JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1java_1getByteB
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = io_humble_ferry_IBuffer_java_getByteBuffer(arg1,arg2,arg3);
+      result = io_humble_ferry_Buffer_java_getByteBuffer(arg1,arg2,arg3);
     }
     catch(std::invalid_argument & e)
     {
@@ -3768,9 +3768,9 @@ SWIGEXPORT jobject JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1java_1getByteB
 }
 
 
-SWIGEXPORT jbyteArray JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getByteArray(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+SWIGEXPORT jbyteArray JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1getByteArray(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
   jbyteArray jresult = 0 ;
-  io::humble::ferry::IBuffer *arg1 = (io::humble::ferry::IBuffer *) 0 ;
+  io::humble::ferry::Buffer *arg1 = (io::humble::ferry::Buffer *) 0 ;
   int32_t arg2 ;
   int32_t arg3 ;
   jbyteArray result;
@@ -3778,7 +3778,7 @@ SWIGEXPORT jbyteArray JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getByteArra
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::ferry::IBuffer **)&jarg1; 
+  arg1 = *(io::humble::ferry::Buffer **)&jarg1; 
   arg2 = (int32_t)jarg2; 
   arg3 = (int32_t)jarg3; 
   
@@ -3793,7 +3793,7 @@ SWIGEXPORT jbyteArray JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getByteArra
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = io_humble_ferry_IBuffer_getByteArray(arg1,arg2,arg3);
+      result = io_humble_ferry_Buffer_getByteArray(arg1,arg2,arg3);
     }
     catch(std::invalid_argument & e)
     {
@@ -3849,13 +3849,13 @@ SWIGEXPORT jbyteArray JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1getByteArra
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3, jint jarg4) {
+SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1make_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3, jint jarg4) {
   jlong jresult = 0 ;
   io::humble::ferry::RefCounted *arg1 = (io::humble::ferry::RefCounted *) 0 ;
   jbyteArray arg2 ;
   int32_t arg3 ;
   int32_t arg4 ;
-  io::humble::ferry::IBuffer *result = 0 ;
+  io::humble::ferry::Buffer *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -3869,7 +3869,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_12(
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::ferry::IBuffer *)io_humble_ferry_IBuffer_make__SWIG_2(arg1,arg2,arg3,arg4);
+      result = (io::humble::ferry::Buffer *)io_humble_ferry_Buffer_make__SWIG_2(arg1,arg2,arg3,arg4);
     }
     catch(std::invalid_argument & e)
     {
@@ -3920,18 +3920,18 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_12(
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::ferry::IBuffer **)&jresult = result; 
+  *(io::humble::ferry::Buffer **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2, jint jarg3, jint jarg4) {
+SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1make_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2, jint jarg3, jint jarg4) {
   jlong jresult = 0 ;
   io::humble::ferry::RefCounted *arg1 = (io::humble::ferry::RefCounted *) 0 ;
   jNioByteArray arg2 ;
   int32_t arg3 ;
   int32_t arg4 ;
-  io::humble::ferry::IBuffer *result = 0 ;
+  io::humble::ferry::Buffer *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -3945,7 +3945,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_13(
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::ferry::IBuffer *)io_humble_ferry_IBuffer_make__SWIG_3(arg1,arg2,arg3,arg4);
+      result = (io::humble::ferry::Buffer *)io_humble_ferry_Buffer_make__SWIG_3(arg1,arg2,arg3,arg4);
     }
     catch(std::invalid_argument & e)
     {
@@ -3996,7 +3996,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_IBuffer_1make_1_1SWIG_13(
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
   }
-  *(io::humble::ferry::IBuffer **)&jresult = result; 
+  *(io::humble::ferry::Buffer **)&jresult = result; 
   return jresult;
 }
 
@@ -4146,11 +4146,11 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_SWIGMutexUpcast(JNIEnv *j
     return baseptr;
 }
 
-SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_SWIGIBufferUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_SWIGBufferUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
-    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::ferry::IBuffer **)&jarg1;
+    *(io::humble::ferry::RefCounted **)&baseptr = *(io::humble::ferry::Buffer **)&jarg1;
     return baseptr;
 }
 

@@ -17,8 +17,8 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef BUFFER_H_
-#define BUFFER_H_
+#ifndef BUFFERIMPL_H_
+#define BUFFERIMPL_H_
 
 #include <io/humble/ferry/Buffer.h>
 
@@ -71,4 +71,4 @@ namespace io { namespace humble { namespace ferry
 
 }}}
 
-#endif /*BUFFER_H_*/
+#endif /*BUFFERIMPL_H_*/

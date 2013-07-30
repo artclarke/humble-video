@@ -8,7 +8,7 @@
 
 package io.humble.video;
 
-import io.humble.ferry.IBuffer;
+import io.humble.ferry.Buffer;
 
 class VideoJNI {
 
@@ -395,7 +395,7 @@ class VideoJNI {
   public final static native int AudioFormat_getBufferSizeNeeded(int jarg1, int jarg2, int jarg3);
   public final static native int AudioFormat_getDataPlaneSizeNeeded(int jarg1, int jarg2, int jarg3);
   public final static native long MediaAudio_make__SWIG_0(int jarg1, int jarg2, int jarg3, int jarg4, int jarg5);
-  public final static native long MediaAudio_make__SWIG_1(long jarg1, IBuffer jarg1_, int jarg2, int jarg3, int jarg4, int jarg5, int jarg6);
+  public final static native long MediaAudio_make__SWIG_1(long jarg1, Buffer jarg1_, int jarg2, int jarg3, int jarg4, int jarg5, int jarg6);
   public final static native long MediaAudio_make__SWIG_2(long jarg1, MediaAudio jarg1_, boolean jarg2);
   public final static native long MediaAudio_getData(long jarg1, MediaAudio jarg1_, int jarg2);
   public final static native int MediaAudio_getDataPlaneSize(long jarg1, MediaAudio jarg1_, int jarg2);
@@ -421,7 +421,7 @@ class VideoJNI {
   public final static native int MediaPicture_PICTURE_TYPE_SP_get();
   public final static native int MediaPicture_PICTURE_TYPE_BI_get();
   public final static native long MediaPicture_make__SWIG_0(int jarg1, int jarg2, int jarg3);
-  public final static native long MediaPicture_make__SWIG_1(long jarg1, IBuffer jarg1_, int jarg2, int jarg3, int jarg4);
+  public final static native long MediaPicture_make__SWIG_1(long jarg1, Buffer jarg1_, int jarg2, int jarg3, int jarg4);
   public final static native long MediaPicture_make__SWIG_2(long jarg1, MediaPicture jarg1_, boolean jarg2);
   public final static native long MediaPicture_getData(long jarg1, MediaPicture jarg1_, int jarg2);
   public final static native int MediaPicture_getDataPlaneSize(long jarg1, MediaPicture jarg1_, int jarg2);
@@ -490,7 +490,7 @@ class VideoJNI {
   public final static native int MediaPacket_DATA_WEBVTT_IDENTIFIER_get();
   public final static native int MediaPacket_DATA_WEBVTT_SETTINGS_get();
   public final static native long MediaPacket_make__SWIG_0();
-  public final static native long MediaPacket_make__SWIG_1(long jarg1, IBuffer jarg1_);
+  public final static native long MediaPacket_make__SWIG_1(long jarg1, Buffer jarg1_);
   public final static native long MediaPacket_make__SWIG_2(long jarg1, MediaPacket jarg1_, boolean jarg2);
   public final static native long MediaPacket_make__SWIG_3(int jarg1);
   public final static native long MediaPacket_getData(long jarg1, MediaPacket jarg1_);

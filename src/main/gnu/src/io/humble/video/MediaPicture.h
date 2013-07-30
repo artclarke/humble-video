@@ -26,7 +26,7 @@
 #ifndef MEDIAPICTURE_H_
 #define MEDIAPICTURE_H_
 
-#include <io/humble/ferry/IBuffer.h>
+#include <io/humble/ferry/Buffer.h>
 #include <io/humble/video/MediaRaw.h>
 #include <io/humble/video/PixelFormat.h>
 
@@ -89,7 +89,7 @@ public:
    * @throws InvalidArgument if buffer is null or too small for the image, width or height or negative, of format is {@link PixelFormat.Type.PIX_FMT_NONE}
    */
   static MediaPicture*
-  make(io::humble::ferry::IBuffer* buffer, int32_t width, int32_t height,
+  make(io::humble::ferry::Buffer* buffer, int32_t width, int32_t height,
       PixelFormat::Type format);
 
   /**
@@ -111,7 +111,7 @@ public:
    * @param plane The plane number if {@link getFormat()} is Planar (rather than packed) image data.  Pass zero for packed data.
    * @return The raw data, or null if not accessible.
    */
-  virtual io::humble::ferry::IBuffer*
+  virtual io::humble::ferry::Buffer*
   getData(int32_t plane)=0;
 
   /**

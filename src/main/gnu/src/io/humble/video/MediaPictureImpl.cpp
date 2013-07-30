@@ -65,7 +65,7 @@ MediaPictureImpl::make(int32_t width, int32_t height,
   // let's figure out how big of a buffer we need
   int32_t bufSize = PixelFormat::getBufferSizeNeeded(width, height, format);
 
-  RefPointer<IBuffer> buffer = IBuffer::make(0, bufSize);
+  RefPointer<Buffer> buffer = Buffer::make(0, bufSize);
   MediaPictureImpl* retval = make(buffer.value(), width, height, format);
   if (retval) buffer->setJavaAllocator(retval->getJavaAllocator());
 
@@ -73,7 +73,7 @@ MediaPictureImpl::make(int32_t width, int32_t height,
 }
 
 MediaPictureImpl*
-MediaPictureImpl::make(IBuffer* buffer, int32_t width, int32_t height,
+MediaPictureImpl::make(Buffer* buffer, int32_t width, int32_t height,
     PixelFormat::Type format) {
   if (width <= 0) {
     VS_THROW(HumbleInvalidArgument("width must be > 0"));
@@ -119,7 +119,7 @@ MediaPictureImpl::make(IBuffer* buffer, int32_t width, int32_t height,
   frame->extended_data = frame->data;
   for (int32_t i = 0; i < AV_NUM_DATA_POINTERS; i++) {
     if (frame->data[i])
-      frame->buf[i] = AVBufferSupport::wrapIBuffer(buffer, frame->data[i], frame->linesize[0]);
+      frame->buf[i] = AVBufferSupport::wrapBuffer(buffer, frame->data[i], frame->linesize[0]);
   }
   // now fill in the AVBufferRefs where we pass of to FFmpeg care
   // of our buffer. Be kind FFmpeg.  Be kind.
@@ -131,7 +131,7 @@ MediaPictureImpl::make(IBuffer* buffer, int32_t width, int32_t height,
   if (desc->getFlag(PixelFormatDescriptor::PIX_FMT_FLAG_PAL) ||
       desc->getFlag(PixelFormatDescriptor::PIX_FMT_FLAG_PSEUDOPAL)) {
     av_buffer_unref(&frame->buf[1]);
-    frame->buf[1] = AVBufferSupport::wrapIBuffer(IBuffer::make(retval.value(), 1024));
+    frame->buf[1] = AVBufferSupport::wrapBuffer(Buffer::make(retval.value(), 1024));
     if (!frame->buf[1]) {
       VS_THROW(HumbleRuntimeError("memory failure"));
     }
@@ -202,13 +202,13 @@ MediaPictureImpl::validatePlane(int32_t plane)
   }
 
 }
-IBuffer*
+Buffer*
 MediaPictureImpl::getData(int32_t plane) {
   validatePlane(plane);
   // we get the buffer for the given plane if it exists, and wrap
-  // it in an IBuffer
+  // it in an Buffer
   // now we're guaranteed that we should have a plane.
-  RefPointer<IBuffer> buffer;
+  RefPointer<Buffer> buffer;
   if (mFrame->buf[plane])
     buffer = AVBufferSupport::wrapAVBuffer(this,
         mFrame->buf[plane], mFrame->data[plane], mFrame->linesize[0]);

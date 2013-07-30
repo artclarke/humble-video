@@ -17,165 +17,55 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#include <cstring>
-
 #include <io/humble/ferry/Logger.h>
-#include <io/humble/ferry/JNIMemoryManager.h>
-
 #include <io/humble/ferry/Buffer.h>
+#include <io/humble/ferry/BufferImpl.h>
+
+#include <stdexcept>
+
+using namespace io::humble::ferry;
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 namespace io { namespace humble { namespace ferry
 {
-  uint8_t Buffer :: mTypeSize[] = {
-      // Must be in right order
-      sizeof(uint8_t),
-      sizeof(int8_t),
-      sizeof(uint16_t),
-      sizeof(int16_t),
-      sizeof(uint32_t),
-      sizeof(int32_t),
-      sizeof(uint64_t),
-      sizeof(int64_t),
-      sizeof(float),
-      sizeof(double),
-      0
-  };
-  Buffer :: Buffer() : mBuffer(0), mBufferSize(0)
+
+  Buffer :: Buffer()
   {
-    mFreeFunc = 0;
-    mClosure = 0;
-    mInternallyAllocated = false;
-    mType = IBUFFER_UINT8; // bytes
   }
 
   Buffer :: ~Buffer()
   {
-    if (mBuffer)
-    {
-      VS_ASSERT(mBufferSize, "had buffer but no size");
-      if (mInternallyAllocated)
-        JNIMemoryManager::free(mBuffer);
-      else if (mFreeFunc)
-        mFreeFunc(mBuffer, mClosure);
-      mBuffer = 0;
-      mBufferSize = 0;
-      mFreeFunc = 0;
-      mClosure = 0;
-    }
   }
-
-
-  void*
-  Buffer :: getBytes(int32_t offset, int32_t length)
-  {
-    void* retval = 0;
-
-    if (length == 0)
-      length = mBufferSize - offset;
-
-    if ((length > 0) && (length + offset <= mBufferSize))
-      retval = ((unsigned char*) mBuffer)+offset;
-
-    return retval;
-  }
-
-  int32_t
-  Buffer :: getBufferSize()
-  {
-    return mBufferSize;
-  }
-
+  
   Buffer*
   Buffer :: make(io::humble::ferry::RefCounted* requestor, int32_t bufferSize)
   {
-    Buffer* retval = 0;
-    if (bufferSize <= 0)
-      return 0;
-    
-    void * allocator = requestor ? requestor->getJavaAllocator() : 0;
-    void *buffer = JNIMemoryManager::malloc(allocator, bufferSize);
-    if (!buffer)
-      return 0;
-      
-    retval = Buffer::make();
-    if (!retval) {
-      JNIMemoryManager::free(buffer);
-      return 0;
-    }
-    retval->mBuffer = buffer; 
-    retval->mBufferSize = bufferSize;
-    retval->mInternallyAllocated = true;
-    return retval;
+    return BufferImpl::make(requestor, bufferSize);
   }
-
+  
   Buffer*
-  Buffer :: make(io::humble::ferry::RefCounted* /*unused*/, void *bufToWrap, int32_t bufferSize,
-      FreeFunc freeFunc, void *closure)
+  Buffer :: make(RefCounted* requestor, void * bufToWrap,
+      int32_t bufferSize,
+      FreeFunc freeFunc,
+      void * closure)
   {
-    Buffer * retval = 0;
-    
-    if (bufToWrap && bufferSize>0)
-    {
-      retval = Buffer::make();
-      if (retval)
-      {
-        retval->mFreeFunc = freeFunc;
-        retval->mClosure = closure;
-        retval->mBufferSize = bufferSize;
-        retval->mBuffer = bufToWrap;
-        retval->mInternallyAllocated = false;
-      }
-    }
-    return retval;
+    return BufferImpl::make(requestor, bufToWrap, bufferSize, freeFunc, closure);
   }
   
-  IBuffer::Type
-  Buffer :: getType()
-  {
-    return mType;
-  }
-  
-  void
-  Buffer :: setType(Type type)
-  {
-    mType = type;
-  }
-  
+
   Buffer*
   Buffer :: make(io::humble::ferry::RefCounted* requestor,
       Type type, int32_t numElements, bool zero)
   {
-    if (numElements <= 0)
-      return 0;
-    if (type < 0 || type >= IBUFFER_NB)
-      return 0;
-    
-    int32_t bytesRequested = numElements*mTypeSize[(int32_t)type];
-    Buffer *retval = Buffer::make(requestor, bytesRequested);
-    if (retval)
-    {
-      retval->mType = type;
-      if (zero)
-        memset(retval->getBytes(0, bytesRequested), 0, bytesRequested);
-    }
-    return retval;
+    VS_LOG_TRACE("making a buffer");
+    return BufferImpl::make(requestor, type, numElements, zero);
   }
   
   int32_t
   Buffer :: getTypeSize(Type type)
   {
-    if (type < 0 || type >= IBUFFER_NB)
-      return 0;
-    return mTypeSize[(int32_t)type];
+    return BufferImpl::getTypeSize(type);
   }
-  
-  int32_t
-  Buffer :: getSize()
-  {
-    if (mType < 0 || mType >= IBUFFER_NB)
-      return 0;
-    return getBufferSize()/mTypeSize[(int32_t)mType];
-  }
+
 }}}

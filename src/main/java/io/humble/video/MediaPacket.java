@@ -22,7 +22,7 @@ public class MediaPacket extends MediaEncoded {
   @SuppressWarnings("unused")
   private void noop()
   {
-    IBuffer.make(null, 1);
+    Buffer.make(null, 1);
   }
    
   private volatile long swigCPtr;
@@ -122,16 +122,16 @@ public class MediaPacket extends MediaEncoded {
   }
 
 /**
- * Allocate a new packet that wraps an existing IBuffer.  
+ * Allocate a new packet that wraps an existing Buffer.  
  * NOTE: At least 16 bytes of the passed in buffer will be used  
  * for header information, so the resulting {@link Packet.getSize() 
  * }  
- * will be smaller than {@link IBuffer.getBufferSize() }.  
- * @param	buffer The IBuffer to wrap.  
+ * will be smaller than {@link Buffer.getBufferSize() }.  
+ * @param	buffer The Buffer to wrap.  
  * @return	a new packet or null on error.  
  */
-  public static MediaPacket make(IBuffer buffer) {
-    long cPtr = VideoJNI.MediaPacket_make__SWIG_1(IBuffer.getCPtr(buffer), buffer);
+  public static MediaPacket make(Buffer buffer) {
+    long cPtr = VideoJNI.MediaPacket_make__SWIG_1(Buffer.getCPtr(buffer), buffer);
     return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
   }
 
@@ -173,9 +173,9 @@ public class MediaPacket extends MediaEncoded {
  * Get any underlying raw data available for this packet.  
  * @return	The raw data, or null if not accessible.  
  */
-  public IBuffer getData() {
+  public Buffer getData() {
     long cPtr = VideoJNI.MediaPacket_getData(swigCPtr, this);
-    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+    return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
 /**
@@ -199,9 +199,9 @@ public class MediaPacket extends MediaEncoded {
  * @throws	InvalidArgument if n < 0 || n >= {@link #getNumSideDataElems()} 
  *		  
  */
-  public IBuffer getSideData(int n) {
+  public Buffer getSideData(int n) {
     long cPtr = VideoJNI.MediaPacket_getSideData(swigCPtr, this, n);
-    return (cPtr == 0) ? null : new IBuffer(cPtr, false);
+    return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
 /**
@@ -426,7 +426,7 @@ public class MediaPacket extends MediaEncoded {
  * <p>  
  * Note that if any people have access to the old payload using  
  * getData(), the memory will continue to be available to them  
- * until they release their hold of the IBuffer.  
+ * until they release their hold of the Buffer.  
  * </p>  
  * <p>  
  * When requesting a packet size, the system  

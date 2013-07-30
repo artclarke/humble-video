@@ -116,7 +116,7 @@ DecoderTest::testOpenWithOptions() {
 void
 DecoderTest::writeAudio(FILE* output, MediaAudio* audio)
 {
-  RefPointer<IBuffer> buf;
+  RefPointer<Buffer> buf;
 
   // we'll just write out the first channel.
   buf = audio->getData(0);
@@ -207,7 +207,7 @@ DecoderTest::writePicture(const char* prefix, int32_t* frameNo, MediaPicture* pi
   // write data as PGM file.
   snprintf(filename, sizeof(filename), "%s-%06d.pgm", prefix, *frameNo);
   // only write every n'th frame to save disk space
-  RefPointer<IBuffer> buf = picture->getData(0);
+  RefPointer<Buffer> buf = picture->getData(0);
   uint8_t* data = (uint8_t*)buf->getBytes(0, buf->getBufferSize());
   if (!((*frameNo) % 30)) {
     FILE* output = fopen(filename, "wb");

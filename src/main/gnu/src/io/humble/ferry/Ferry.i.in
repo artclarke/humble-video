@@ -42,7 +42,7 @@ JNI_OnLoad(JavaVM *, void *)
 #include <io/humble/ferry/AtomicInteger.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/Mutex.h>
-#include <io/humble/ferry/IBuffer.h>
+#include <io/humble/ferry/Buffer.h>
 #include <io/humble/ferry/RefCountedTester.h>
 
 using namespace io::humble::ferry;
@@ -70,7 +70,7 @@ Java_io_humble_ferry_Ferry_init(JNIEnv *env, jclass)
     // a race condition exists when JNI_NewDirectByteBuffer is called
     // from multiple threads.  See:
     // http://mail.openjdk.java.net/pipermail/hotspot-runtime-dev/2009-January/000382.html
-    IBuffer buffer = IBuffer.make(null, 2);
+    Buffer buffer = Buffer.make(null, 2);
     java.util.concurrent.atomic.AtomicReference<JNIReference> ref
       = new java.util.concurrent.atomic.AtomicReference<JNIReference>(null);
     buffer.getByteBuffer(0,2, ref);
@@ -166,7 +166,7 @@ Java_io_humble_ferry_Ferry_init(JNIEnv *env, jclass)
 %include <io/humble/ferry/RefCounted.swg>
 %include <io/humble/ferry/Logger.h>
 %include <io/humble/ferry/Mutex.h>
-%include <io/humble/ferry/IBuffer.swg>
+%include <io/humble/ferry/Buffer.swg>
 %include <io/humble/ferry/RefCountedTester.h>
 
 %typemap(javaimports) SWIGTYPE, SWIGTYPE*, SWIGTYPE& "import io.humble.ferry.*;"

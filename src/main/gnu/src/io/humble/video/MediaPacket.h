@@ -150,17 +150,17 @@ public:
   make();
 
   /**
-   * Allocate a new packet that wraps an existing IBuffer.
+   * Allocate a new packet that wraps an existing Buffer.
    *
    * NOTE: At least 16 bytes of the passed in buffer will be used
    * for header information, so the resulting {@link Packet.getSize() }
-   * will be smaller than {@link IBuffer.getBufferSize() }.
+   * will be smaller than {@link Buffer.getBufferSize() }.
    *
-   * @param buffer The IBuffer to wrap.
+   * @param buffer The Buffer to wrap.
    * @return a new packet or null on error.
    */
   static MediaPacket*
-  make(io::humble::ferry::IBuffer* buffer);
+  make(io::humble::ferry::Buffer* buffer);
 
   /**
    * Allocate a new packet wrapping the existing contents of
@@ -201,7 +201,7 @@ public:
    *
    * @return The raw data, or null if not accessible.
    */
-  virtual io::humble::ferry::IBuffer* getData()=0;
+  virtual io::humble::ferry::Buffer* getData()=0;
 
   /**
    * Get the number of side data elements in this packet.
@@ -221,7 +221,7 @@ public:
    * @return the data, or null if none found
    * @throws InvalidArgument if n < 0 || n >= {@link #getNumSideDataElems()}
    */
-  virtual io::humble::ferry::IBuffer* getSideData(int32_t n)=0;
+  virtual io::humble::ferry::Buffer* getSideData(int32_t n)=0;
   /**
    * Get the n'th item of SideData.
    *
@@ -414,7 +414,7 @@ public:
    * <p>
    * Note that if any people have access to the old payload using
    * getData(), the memory will continue to be available to them
-   * until they release their hold of the IBuffer.
+   * until they release their hold of the Buffer.
    * </p>
    * <p>
    * When requesting a packet size, the system

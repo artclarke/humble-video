@@ -17,10 +17,10 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-%typemap(javapackage) io::humble::ferry::IBuffer, io::humble::ferry::IBuffer*, io::humble::ferry::IBuffer& "io.humble.ferry"
+%typemap(javapackage) io::humble::ferry::Buffer, io::humble::ferry::Buffer*, io::humble::ferry::Buffer& "io.humble.ferry"
 
-%typemap(javabody_derived) io::humble::ferry::IBuffer %{
-  // IBuffer.swg: Start generated code
+%typemap(javabody_derived) io::humble::ferry::Buffer %{
+  // Buffer.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
 
   private volatile long swigCPtr;
@@ -167,7 +167,7 @@
    * @param src The array from which bytes are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first byte to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of bytes to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -176,7 +176,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(byte[] src, int srcPos, int destPos, int length)
@@ -207,9 +207,9 @@
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers bytes from this {@link IBuffer} into the given
+   * This method transfers bytes from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer bytes in the {@link IBuffer} starting
+   * array. If there are fewer bytes in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no bytes are
    * transferred and a BufferUnderflowException is thrown.
@@ -220,7 +220,7 @@
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which bytes are to be written. Must be non null.
@@ -233,7 +233,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, byte[] dest, int destPos, int length)
@@ -277,7 +277,7 @@
    * @param src The array from which shorts are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first short to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of shorts to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -286,7 +286,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(short[] src, int srcPos, int destPos, int length)
@@ -318,9 +318,9 @@
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers shorts from this {@link IBuffer} into the given
+   * This method transfers shorts from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer shorts in the {@link IBuffer} starting
+   * array. If there are fewer shorts in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no shorts are
    * transferred and a BufferUnderflowException is thrown.
@@ -331,7 +331,7 @@
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which shorts are to be written. Must be non null.
@@ -344,7 +344,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, short[] dest, int destPos, int length)
@@ -389,7 +389,7 @@
    * @param src The array from which ints are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first int to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of ints to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -398,7 +398,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(int[] src, int srcPos, int destPos, int length)
@@ -430,9 +430,9 @@
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers ints from this {@link IBuffer} into the given
+   * This method transfers ints from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer ints in the {@link IBuffer} starting
+   * array. If there are fewer ints in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no ints are
    * transferred and a BufferUnderflowException is thrown.
@@ -443,7 +443,7 @@
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which ints are to be written. Must be non null.
@@ -456,7 +456,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, int[] dest, int destPos, int length)
@@ -501,7 +501,7 @@
    * @param src The array from which longs are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first long to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of longs to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -510,7 +510,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(long[] src, int srcPos, int destPos, int length)
@@ -542,9 +542,9 @@
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers longs from this {@link IBuffer} into the given
+   * This method transfers longs from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer longs in the {@link IBuffer} starting
+   * array. If there are fewer longs in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no longs are
    * transferred and a BufferUnderflowException is thrown.
@@ -555,7 +555,7 @@
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which longs are to be written. Must be non null.
@@ -568,7 +568,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, long[] dest, int destPos, int length)
@@ -612,7 +612,7 @@
    * @param src The array from which doubles are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first double to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of doubles to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -621,7 +621,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(double[] src, int srcPos, int destPos, int length)
@@ -653,9 +653,9 @@
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers doubles from this {@link IBuffer} into the given
+   * This method transfers doubles from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer doubles in the {@link IBuffer} starting
+   * array. If there are fewer doubles in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no doubles are
    * transferred and a BufferUnderflowException is thrown.
@@ -666,7 +666,7 @@
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which doubles are to be written. Must be non null.
@@ -679,7 +679,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, double[] dest, int destPos, int length)
@@ -723,7 +723,7 @@
    * @param src The array from which floats are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first float to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of floats to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -732,7 +732,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(float[] src, int srcPos, int destPos, int length)
@@ -764,9 +764,9 @@
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers floats from this {@link IBuffer} into the given
+   * This method transfers floats from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer floats in the {@link IBuffer} starting
+   * array. If there are fewer floats in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no floats are
    * transferred and a BufferUnderflowException is thrown.
@@ -777,7 +777,7 @@
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which floats are to be written. Must be non null.
@@ -790,7 +790,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, float[] dest, int destPos, int length)
@@ -834,7 +834,7 @@
    * @param src The array from which chars are to be read.  Must be non null.
    * @param srcPos The offset within <code>src</code> of the first char to be read;
    *   must be non-negative and less than <code>src.length</code>
-   * @param destPos The offset in the IBuffer where you want to copy
+   * @param destPos The offset in the Buffer where you want to copy
    *   data to.  Must be non-negative and less than <code>getBufferSize()</code>
    * @param length The number of chars to be read from <code>src</code>;
    *  must be non-negative and no larger than <code>src.length - srcPos</code>
@@ -843,7 +843,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *   mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient space
-   *   in this {@link IBuffer}.
+   *   in this {@link Buffer}.
    *   
    */
   public void put(char[] src, int srcPos, int destPos, int length)
@@ -875,9 +875,9 @@
   /**
    * Absolute bulk get method.
    * <p>
-   * This method transfers chars from this {@link IBuffer} into the given
+   * This method transfers chars from this {@link Buffer} into the given
    * <code>dest</code>
-   * array. If there are fewer chars in the {@link IBuffer} starting
+   * array. If there are fewer chars in the {@link Buffer} starting
    * at position <code>srcPos</code> than are required
    * to satisfy the request, then no chars are
    * transferred and a BufferUnderflowException is thrown.
@@ -888,7 +888,7 @@
    * {@link JNIMemoryManager.MemoryModel#NATIVE_BUFFERS} memory model.
    * </p>
    * 
-   * @param srcPos The offset in the IBuffer where you want to start
+   * @param srcPos The offset in the Buffer where you want to start
    *        copying data from.
    *        Must be non-negative and less than <code>getBufferSize()</code>
    * @param dest The array to which chars are to be written. Must be non null.
@@ -901,7 +901,7 @@
    * @throws IndexOutOfBoundsException if the preconditions on the arguments
    *         mentioned above are not honored.
    * @throws java.nio.BufferOverflowException if there is insufficient data in this
-   *         {@link IBuffer} to satisfy the request.
+   *         {@link Buffer} to satisfy the request.
    * 
    */
   public void get(int srcPos, char[] dest, int destPos, int length)
@@ -937,7 +937,7 @@
    * 
    * The buffer position, mark are initialized to zero and limit
    * is set to the maximum capacity of this buffer.  For some
-   * IBuffer contents, the actual usable data in this buffer will
+   * Buffer contents, the actual usable data in this buffer will
    * be less that the limit.
    * 
    * </p>
@@ -965,7 +965,7 @@
      * 
      * The buffer position, mark are initialized to zero and limit
      * is set to the maximum capacity of this buffer.  For some
-     * IBuffer contents, the actual usable data in this buffer will
+     * Buffer contents, the actual usable data in this buffer will
      * be less that the limit.
      * 
      * </p>
@@ -1008,7 +1008,7 @@
      * </p>
      * 
      * @param offset The offset (in bytes) into the buffer managed by
-     *   this IBuffer
+     *   this Buffer
      * @param length The requested length (in bytes) you want to access.
      *   The buffer returned may actually be longer than length.
      * @param referenceReturn If non null, on exit 
@@ -1021,7 +1021,7 @@
      *   value returned in this parameter, then the returned byte buffer
      *   will be immediately invalid.
      * @return A java.nio.ByteBuffer that directly accesses
-     *   the native memory this IBuffer manages, or null if
+     *   the native memory this Buffer manages, or null if
      *   error.
      */
   public java.nio.ByteBuffer getByteBuffer(int offset, int length,
@@ -1055,9 +1055,9 @@
   /**
    * Prints the same as {@link Object#toString()} but appends
    * the maximum number of bytes that will fit in this
-   * {@link IBuffer}, the type of the {@link IBuffer}, and the maximum
-   * size in units of {@link IBuffer.Type} that will fit in the
-   * {@link IBuffer}.
+   * {@link Buffer}, the type of the {@link Buffer}, and the maximum
+   * size in units of {@link Buffer.Type} that will fit in the
+   * {@link Buffer}.
    * {@inheritDoc}
    */
   @Override
@@ -1074,29 +1074,29 @@
   }
   
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-  // IBuffer.swg
+  // Buffer.swg
 %}
-%typemap(javadestruct, methodname="doNotSet", methodmodifiers="public synchronized") io::humble::ferry::IBuffer ""
-%typemap(javadestruct_derived, methodname="doNotSet", methodmodifiers="public synchronized") io::humble::ferry::IBuffer ""
+%typemap(javadestruct, methodname="doNotSet", methodmodifiers="public synchronized") io::humble::ferry::Buffer ""
+%typemap(javadestruct_derived, methodname="doNotSet", methodmodifiers="public synchronized") io::humble::ferry::Buffer ""
 
 %{
-static void IBuffer_javaDirectFreeFunc(void *, void * closure);
+static void Buffer_javaDirectFreeFunc(void *, void * closure);
 typedef jobject jNioByteArray;
 
 %}
 
 typedef jobject jNioByteArray;
 
-%include <io/humble/ferry/IBuffer.h>
+%include <io/humble/ferry/Buffer.h>
 %{
   /**
    * This method is passed as a freefunc to the Buffer object.  Once
-   * the IBuffer has no more references to it, this method will be called,
+   * the Buffer has no more references to it, this method will be called,
    * and will release the backing java.nio.ByteBuffer object that we got
    * data from.
    */
   static void
-  IBuffer_javaDirectFreeFunc(void *, void * closure)
+  Buffer_javaDirectFreeFunc(void *, void * closure)
   {
     jobject globalRef = static_cast<jobject>(closure);
     JNIEnv* env = JNIHelper::sGetEnv();
@@ -1109,7 +1109,7 @@ typedef jobject jNioByteArray;
   
 %}
 
-%extend io::humble::ferry::IBuffer {
+%extend io::humble::ferry::Buffer {
 // Used so that extend methods can return a jNioByteArray and it gets mapped
 // to java.nio.ByteBuffer
 
@@ -1151,11 +1151,11 @@ typedef jobject jNioByteArray;
      * around waiting for cleanup then.
      * </p>
      * 
-     * @param offset The offset (in bytes) into the buffer managed by this IBuffer
+     * @param offset The offset (in bytes) into the buffer managed by this Buffer
      * @param length The requested length (in bytes) you want to access.  The buffer returned may
      *   actually be longer than length.
      * 
-     * @return A copy of the data that is in this IBuffer, or null
+     * @return A copy of the data that is in this Buffer, or null
      *   if error.
      */
   jbyteArray getByteArray(int32_t offset, int32_t length)
@@ -1195,10 +1195,10 @@ typedef jobject jNioByteArray;
   }
 
   /**
-   * Allocate a new IBuffer, and copy the data in buffer into
-   * the new IBuffer object.
+   * Allocate a new Buffer, and copy the data in buffer into
+   * the new Buffer object.
    *
-   * @param requestor An optional value telling the IBuffer class
+   * @param requestor An optional value telling the Buffer class
    *   what object requested it. This is used for debugging memory leaks;
    *   it's a marker for the FERRY object (e.g. IPacket) that actually
    *   requested the buffer. If you're not an FERRY object, pass in null here.
@@ -1208,14 +1208,14 @@ typedef jobject jNioByteArray;
    *   to start copying.
    * @param length The total number of bytes you want to copy from buffer.
    *
-   * @return a new IBuffer object with a copy of the data in buffer,
+   * @return a new Buffer object with a copy of the data in buffer,
    *   or null on failure.
    */
    
-  static IBuffer* make(io::humble::ferry::RefCounted* requestor,
+  static Buffer* make(io::humble::ferry::RefCounted* requestor,
      jbyteArray buffer, int32_t offset, int32_t length)
   {
-    IBuffer* retval = 0;
+    Buffer* retval = 0;
     try
     {
       JNIEnv* env = JNIHelper::sGetEnv();
@@ -1235,9 +1235,9 @@ typedef jobject jNioByteArray;
       if (bufSize < offset + length)
         throw std::out_of_range("invalid offset and length");
       
-      retval = IBuffer::make(requestor, length);
+      retval = Buffer::make(requestor, length);
       if (!retval)
-        throw std::runtime_error("could not allocate IBuffer");
+        throw std::runtime_error("could not allocate Buffer");
 
       jbyte* bytes = static_cast<jbyte*>(retval->getBytes(0, length));
       if (!bytes)
@@ -1246,7 +1246,7 @@ typedef jobject jNioByteArray;
       // now try the copy
       env->GetByteArrayRegion(buffer, offset, length, bytes);
       if (env->ExceptionCheck())
-        throw std::runtime_error("could not copy data into native IBuffer memory");
+        throw std::runtime_error("could not copy data into native Buffer memory");
     }
     catch(std::exception & c)
     {
@@ -1257,11 +1257,11 @@ typedef jobject jNioByteArray;
   }
 
   /**
-   * Create a new IBuffer object that uses the direct byte buffer
+   * Create a new Buffer object that uses the direct byte buffer
    * passed in by reference (i.e. it directly uses the bytes in
    * the direct byte buffer).
    *
-   * @param requestor An optional value telling the IBuffer class
+   * @param requestor An optional value telling the Buffer class
    *   what object requested it. This is used for debugging memory leaks;
    *   it's a marker for the FERRY object (e.g. IPacket) that actually
    *   requested the buffer. If you're not an FERRY object, pass in null here.
@@ -1274,14 +1274,14 @@ typedef jobject jNioByteArray;
    * @param length The total number of bytes you want to copy from
    *   directByteBuffer.
    *
-   * @return a new IBuffer object that is using directByteBuffer
+   * @return a new Buffer object that is using directByteBuffer
    *   behind the scenes, or null on failure.
    */
       
-  static IBuffer* make(io::humble::ferry::RefCounted* requestor,
+  static Buffer* make(io::humble::ferry::RefCounted* requestor,
      jNioByteArray directByteBuffer, int32_t offset, int32_t length)
   {
-    IBuffer * retval = 0;
+    Buffer * retval = 0;
     jobject globalRef = 0;
     JNIEnv* env = JNIHelper::sGetEnv();
     try
@@ -1335,8 +1335,8 @@ typedef jobject jNioByteArray;
       if (env->ExceptionCheck())
         throw std::runtime_error("could not get global reference to passed in byte array");
             
-      retval = IBuffer::make(requestor, javaBuffer+offset, length,
-          IBuffer_javaDirectFreeFunc, globalRef);
+      retval = Buffer::make(requestor, javaBuffer+offset, length,
+          Buffer_javaDirectFreeFunc, globalRef);
       //fprintf(stderr, "Creating global ref: %p\n", globalRef);
       
       if (!retval)

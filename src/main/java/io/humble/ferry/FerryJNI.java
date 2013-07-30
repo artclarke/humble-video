@@ -19,7 +19,7 @@ class FerryJNI {
     // a race condition exists when JNI_NewDirectByteBuffer is called
     // from multiple threads.  See:
     // http://mail.openjdk.java.net/pipermail/hotspot-runtime-dev/2009-January/000382.html
-    IBuffer buffer = IBuffer.make(null, 2);
+    Buffer buffer = Buffer.make(null, 2);
     java.util.concurrent.atomic.AtomicReference<JNIReference> ref
       = new java.util.concurrent.atomic.AtomicReference<JNIReference>(null);
     buffer.getByteBuffer(0,2, ref);
@@ -80,20 +80,20 @@ class FerryJNI {
   public final static native long Mutex_make();
   public final static native void Mutex_lock(long jarg1, Mutex jarg1_);
   public final static native void Mutex_unlock(long jarg1, Mutex jarg1_);
-  public final static native int IBuffer_getBufferSize(long jarg1, IBuffer jarg1_);
-  public final static native long IBuffer_make__SWIG_0(long jarg1, RefCounted jarg1_, int jarg2);
-  public final static native int IBuffer_getType(long jarg1, IBuffer jarg1_);
-  public final static native void IBuffer_setType(long jarg1, IBuffer jarg1_, int jarg2);
-  public final static native int IBuffer_getTypeSize(int jarg1);
-  public final static native int IBuffer_getSize(long jarg1, IBuffer jarg1_);
-  public final static native long IBuffer_make__SWIG_1(long jarg1, RefCounted jarg1_, int jarg2, int jarg3, boolean jarg4);
-  public final static native java.nio.ByteBuffer IBuffer_java_getByteBuffer(long jarg1, IBuffer jarg1_, int jarg2, int jarg3);
-  public final static native byte[] IBuffer_getByteArray(long jarg1, IBuffer jarg1_, int jarg2, int jarg3);
-  public final static native long IBuffer_make__SWIG_2(long jarg1, RefCounted jarg1_, byte[] jarg2, int jarg3, int jarg4);
-  public final static native long IBuffer_make__SWIG_3(long jarg1, RefCounted jarg1_, java.nio.ByteBuffer jarg2, int jarg3, int jarg4);
+  public final static native int Buffer_getBufferSize(long jarg1, Buffer jarg1_);
+  public final static native long Buffer_make__SWIG_0(long jarg1, RefCounted jarg1_, int jarg2);
+  public final static native int Buffer_getType(long jarg1, Buffer jarg1_);
+  public final static native void Buffer_setType(long jarg1, Buffer jarg1_, int jarg2);
+  public final static native int Buffer_getTypeSize(int jarg1);
+  public final static native int Buffer_getSize(long jarg1, Buffer jarg1_);
+  public final static native long Buffer_make__SWIG_1(long jarg1, RefCounted jarg1_, int jarg2, int jarg3, boolean jarg4);
+  public final static native java.nio.ByteBuffer Buffer_java_getByteBuffer(long jarg1, Buffer jarg1_, int jarg2, int jarg3);
+  public final static native byte[] Buffer_getByteArray(long jarg1, Buffer jarg1_, int jarg2, int jarg3);
+  public final static native long Buffer_make__SWIG_2(long jarg1, RefCounted jarg1_, byte[] jarg2, int jarg3, int jarg4);
+  public final static native long Buffer_make__SWIG_3(long jarg1, RefCounted jarg1_, java.nio.ByteBuffer jarg2, int jarg3, int jarg4);
   public final static native long RefCountedTester_make__SWIG_0();
   public final static native long RefCountedTester_make__SWIG_1(long jarg1, RefCountedTester jarg1_);
   public final static native long SWIGMutexUpcast(long jarg1);
-  public final static native long SWIGIBufferUpcast(long jarg1);
+  public final static native long SWIGBufferUpcast(long jarg1);
   public final static native long SWIGRefCountedTesterUpcast(long jarg1);
 }

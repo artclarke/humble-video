@@ -41,13 +41,13 @@ public:
         AudioFormat::Type format);
 
   static MediaAudioImpl*
-  make(io::humble::ferry::IBuffer *buffer, int32_t numSamples, int32_t sampleRate, int32_t channels,
+  make(io::humble::ferry::Buffer *buffer, int32_t numSamples, int32_t sampleRate, int32_t channels,
       AudioChannel::Layout channelLayout, AudioFormat::Type format);
 
   static MediaAudioImpl*
   make(MediaAudioImpl* src, bool copy);
 
-  virtual io::humble::ferry::IBuffer*
+  virtual io::humble::ferry::Buffer*
   getData(int32_t plane);
 
   virtual int32_t
@@ -101,7 +101,7 @@ protected:
 private:
   static void
   setBufferType(AudioFormat::Type format,
-      io::humble::ferry::IBuffer* buffer);
+      io::humble::ferry::Buffer* buffer);
 
   AVFrame* mFrame;
   int32_t  mMaxSamples;

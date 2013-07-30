@@ -59,7 +59,7 @@ MediaPictureTest::testCreation() {
   // it touches each valid 'pixel' in the image and sets it to a
   // value. If Valgrind gives any errors about reaching outsides of
   // memory bounds, then there's a bug somewhere downstream in humble.
-  RefPointer<IBuffer> buf;
+  RefPointer<Buffer> buf;
 
   for(int32_t i = 0; i < pixDesc->getNumComponents(); i++) {
     buf = picture->getData(i);
@@ -86,7 +86,7 @@ MediaPictureTest::testCreationInvalidParameters() {
   const int32_t width = 17; // use a prime
   const int32_t height = 191; // use a prime
   int32_t bufSize = PixelFormat::getBufferSizeNeeded(width, height, format);
-  RefPointer<IBuffer> buf = IBuffer::make(0, bufSize);
+  RefPointer<Buffer> buf = Buffer::make(0, bufSize);
 
   // and this method is going to spew lots of log
   // error unlesss we turn them off.
@@ -123,7 +123,7 @@ MediaPictureTest::testCreationFromBuffer() {
   const int32_t width = 17; // use a prime
   const int32_t height = 191; // use a prime
   int32_t bufSize = PixelFormat::getBufferSizeNeeded(width, height, format);
-  RefPointer<IBuffer> buf = IBuffer::make(0, bufSize);
+  RefPointer<Buffer> buf = Buffer::make(0, bufSize);
 
   picture = MediaPicture::make(buf.value(), width, height, format);
   TS_ASSERT(picture);

@@ -42,7 +42,7 @@ public:
   make(int32_t width, int32_t height, PixelFormat::Type format);
 
   static MediaPictureImpl*
-  make(io::humble::ferry::IBuffer* buffer, int32_t width, int32_t height,
+  make(io::humble::ferry::Buffer* buffer, int32_t width, int32_t height,
       PixelFormat::Type format);
 
   static MediaPictureImpl*
@@ -50,7 +50,7 @@ public:
 
   void copy(AVFrame*, bool complete);
 
-  virtual io::humble::ferry::IBuffer*
+  virtual io::humble::ferry::Buffer*
   getData(int32_t plane);
 
   virtual int32_t

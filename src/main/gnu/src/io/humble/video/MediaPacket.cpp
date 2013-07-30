@@ -41,7 +41,7 @@ MediaPacket :: make()
 }
 
 MediaPacket*
-MediaPacket::make(IBuffer* buffer)
+MediaPacket::make(Buffer* buffer)
 {
   Global::init();
   if (!buffer)

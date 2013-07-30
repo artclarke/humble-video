@@ -22,7 +22,7 @@
 
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/ferry/RefPointer.h>
-#include <io/humble/ferry/IBuffer.h>
+#include <io/humble/ferry/Buffer.h>
 #include <io/humble/video/MediaPacket.h>
 
 namespace io {
@@ -37,8 +37,8 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
   public:
     /* This make allocates a default payload of size payloadSize */
     static MediaPacketImpl* make(int32_t payloadSize);
-    /* This make a packet that just wraps a given IBuffer */
-    static MediaPacketImpl* make(io::humble::ferry::IBuffer* buffer);
+    /* This make a packet that just wraps a given Buffer */
+    static MediaPacketImpl* make(io::humble::ferry::Buffer* buffer);
     /* This makes a packet wrapping the buffer in another packet and copying
      * it's settings
      */
@@ -61,7 +61,7 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
     virtual bool isKeyPacket();
     virtual int64_t getDuration();
     virtual int64_t getPosition();
-    virtual io::humble::ferry::IBuffer* getData();
+    virtual io::humble::ferry::Buffer* getData();
     virtual int32_t reset(int32_t payloadSize);
     virtual bool isComplete();
     
@@ -75,10 +75,10 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
     virtual void setPosition(int64_t position);
     virtual int64_t getConvergenceDuration();
     virtual void setConvergenceDuration(int64_t duration);
-    virtual void setData(io::humble::ferry::IBuffer* buffer);
+    virtual void setData(io::humble::ferry::Buffer* buffer);
 
     virtual int32_t getNumSideDataElems();
-    virtual io::humble::ferry::IBuffer* getSideData(int32_t n);
+    virtual io::humble::ferry::Buffer* getSideData(int32_t n);
     virtual SideDataType getSideDataType(int32_t n);
 
 #ifndef SWIG
@@ -90,7 +90,7 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
      * our own buffer state.
      */
     void wrapAVPacket(AVPacket* pkt);
-    void wrapBuffer(io::humble::ferry::IBuffer *buffer);
+    void wrapBuffer(io::humble::ferry::Buffer *buffer);
 #endif // ! SWIG
 
   protected:

@@ -20,8 +20,6 @@
 #include "Media.h"
 #include "KeyValueBagImpl.h"
 
-#include <io/humble/ferry/IBuffer.h>
-
 using namespace io::humble::ferry;
 
 namespace io { namespace humble { namespace video {

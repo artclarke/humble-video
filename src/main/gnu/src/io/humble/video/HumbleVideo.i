@@ -72,7 +72,7 @@ Java_io_humble_video_Video_init(JNIEnv *env, jclass)
 %}
 
 %pragma(java) jniclassimports=%{
-import io.humble.ferry.IBuffer;
+import io.humble.ferry.Buffer;
 %}
 
 %pragma(java) moduleimports=%{

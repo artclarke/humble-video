@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import io.humble.ferry.FerryJNI;
 
 /**
- * Returned by {@link IBuffer#getByteBuffer(int, int, java.util.concurrent.atomic.AtomicReference)}
+ * Returned by {@link Buffer#getByteBuffer(int, int, java.util.concurrent.atomic.AtomicReference)}
  * for users that want to explicitly manage when the returned {@link java.nio.ByteBuffer}
  * is released.
  * <p>

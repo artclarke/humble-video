@@ -156,7 +156,7 @@ namespace io { namespace humble { namespace video {
     mPacket->pos = position;
   }
   
-  IBuffer *
+  Buffer *
   MediaPacketImpl::getData()
   {
     if (!mPacket->data || !mPacket->buf)
@@ -204,7 +204,7 @@ namespace io { namespace humble { namespace video {
   }
   
   MediaPacketImpl*
-  MediaPacketImpl::make (IBuffer* buffer)
+  MediaPacketImpl::make (Buffer* buffer)
   {
     MediaPacketImpl *retval= 0;
     retval = MediaPacketImpl::make();
@@ -240,19 +240,19 @@ namespace io { namespace humble { namespace video {
 
         // we don't just want to reference count the data -- we want
         // to copy it. So we're going to create a new copy.
-        RefPointer<IBuffer> copy = IBuffer::make(retval, numBytes + FF_INPUT_BUFFER_PADDING_SIZE);
+        RefPointer<Buffer> copy = Buffer::make(retval, numBytes + FF_INPUT_BUFFER_PADDING_SIZE);
         if (!copy)
           throw std::bad_alloc();
         uint8_t* data = (uint8_t*)copy->getBytes(0, numBytes);
 
-        // copy the data into our IBuffer backed data
+        // copy the data into our Buffer backed data
         memcpy(data, packet->mPacket->data,
             numBytes);
 
         // now, release the reference currently in the packet
         if (retval->mPacket->buf)
           av_buffer_unref(&retval->mPacket->buf);
-        retval->mPacket->buf = AVBufferSupport::wrapIBuffer(copy.value());
+        retval->mPacket->buf = AVBufferSupport::wrapBuffer(copy.value());
         // and set the data member to the copy
         retval->mPacket->data = retval->mPacket->buf->data;
         retval->mPacket->size = numBytes;
@@ -287,13 +287,13 @@ namespace io { namespace humble { namespace video {
   }
 
   void
-  MediaPacketImpl::setData(IBuffer* buffer)
+  MediaPacketImpl::setData(Buffer* buffer)
   {
     wrapBuffer(buffer);
   }
   
   void
-  MediaPacketImpl::wrapBuffer(IBuffer *buffer)
+  MediaPacketImpl::wrapBuffer(Buffer *buffer)
   {
     if (!buffer)
       return;
@@ -301,7 +301,7 @@ namespace io { namespace humble { namespace video {
     // let's create a av buffer reference
     if (mPacket->buf)
       av_buffer_unref(&mPacket->buf);
-    mPacket->buf = AVBufferSupport::wrapIBuffer(buffer);
+    mPacket->buf = AVBufferSupport::wrapBuffer(buffer);
     if (mPacket->buf) {
       mPacket->size = mPacket->buf->size;
       mPacket->data = mPacket->buf->data;;
@@ -341,7 +341,7 @@ namespace io { namespace humble { namespace video {
     MediaPacketImpl* packet = (MediaPacketImpl*)closure;
     VS_REF_RELEASE(packet);
   }
-  IBuffer*
+  Buffer*
   MediaPacketImpl::getSideData(int32_t n) {
     if(n < 0 || n > getNumSideDataElems()) {
       throw HumbleInvalidArgument("n outside of bounds");
@@ -349,10 +349,10 @@ namespace io { namespace humble { namespace video {
     if (!mPacket->side_data)
       throw HumbleRuntimeError("no data where data expected");
 
-    // now wrap the data in an IBuffer, but also reference the
+    // now wrap the data in an Buffer, but also reference the
     // containing packet so the data doesn't get freed before
     // we're done.
-    return IBuffer::make(this, mPacket->side_data[n].data, mPacket->side_data[n].size,
+    return Buffer::make(this, mPacket->side_data[n].data, mPacket->side_data[n].size,
         MediaPacketImpl_freeSideData, this);
   }
   MediaPacket::SideDataType
