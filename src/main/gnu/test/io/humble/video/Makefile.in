@@ -78,15 +78,15 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = MediaPictureResamplerTester$(EXEEXT) \
-	DecoderTester$(EXEEXT) PixelFormatTester$(EXEEXT) \
-	CodecTester$(EXEEXT) IndexEntryTester$(EXEEXT) \
-	ErrorTester$(EXEEXT) MediaPacketTester$(EXEEXT) \
-	MediaAudioTester$(EXEEXT) MediaPictureTester$(EXEEXT) \
-	KeyValueBagTester$(EXEEXT) SourceTester$(EXEEXT) \
-	SourceFormatTester$(EXEEXT) SourceStreamTester$(EXEEXT) \
-	SinkFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
-	RationalTester$(EXEEXT)
+check_PROGRAMS = MediaAudioResamplerTester$(EXEEXT) \
+	MediaPictureResamplerTester$(EXEEXT) DecoderTester$(EXEEXT) \
+	PixelFormatTester$(EXEEXT) CodecTester$(EXEEXT) \
+	IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
+	MediaPacketTester$(EXEEXT) MediaAudioTester$(EXEEXT) \
+	MediaPictureTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
+	SourceTester$(EXEEXT) SourceFormatTester$(EXEEXT) \
+	SourceStreamTester$(EXEEXT) SinkFormatTester$(EXEEXT) \
+	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mk/depcomp $(noinst_HEADERS) \
@@ -141,6 +141,16 @@ nodist_KeyValueBagTester_OBJECTS =  \
 KeyValueBagTester_OBJECTS = $(am_KeyValueBagTester_OBJECTS) \
 	$(nodist_KeyValueBagTester_OBJECTS)
 KeyValueBagTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_MediaAudioResamplerTester_OBJECTS =  \
+	MediaAudioResamplerTest.$(OBJEXT) TestData.$(OBJEXT) \
+	lodepng.$(OBJEXT) Main.$(OBJEXT)
+nodist_MediaAudioResamplerTester_OBJECTS =  \
+	MediaAudioResamplerTest_CXXRunner.$(OBJEXT)
+MediaAudioResamplerTester_OBJECTS =  \
+	$(am_MediaAudioResamplerTester_OBJECTS) \
+	$(nodist_MediaAudioResamplerTester_OBJECTS)
+MediaAudioResamplerTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_MediaAudioTester_OBJECTS = MediaAudioTest.$(OBJEXT) \
 	TestData.$(OBJEXT) Main.$(OBJEXT)
@@ -264,6 +274,8 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(nodist_IndexEntryTester_SOURCES) \
 	$(KeyValueBagTester_SOURCES) \
 	$(nodist_KeyValueBagTester_SOURCES) \
+	$(MediaAudioResamplerTester_SOURCES) \
+	$(nodist_MediaAudioResamplerTester_SOURCES) \
 	$(MediaAudioTester_SOURCES) $(nodist_MediaAudioTester_SOURCES) \
 	$(MediaPacketTester_SOURCES) \
 	$(nodist_MediaPacketTester_SOURCES) \
@@ -283,8 +295,9 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(nodist_SourceTester_SOURCES)
 DIST_SOURCES = $(CodecTester_SOURCES) $(DecoderTester_SOURCES) \
 	$(ErrorTester_SOURCES) $(IndexEntryTester_SOURCES) \
-	$(KeyValueBagTester_SOURCES) $(MediaAudioTester_SOURCES) \
-	$(MediaPacketTester_SOURCES) \
+	$(KeyValueBagTester_SOURCES) \
+	$(MediaAudioResamplerTester_SOURCES) \
+	$(MediaAudioTester_SOURCES) $(MediaPacketTester_SOURCES) \
 	$(MediaPictureResamplerTester_SOURCES) \
 	$(MediaPictureTester_SOURCES) $(PixelFormatTester_SOURCES) \
 	$(PropertyTester_SOURCES) $(RationalTester_SOURCES) \
@@ -743,6 +756,7 @@ VS_CPP_NAMESPACE = io::humble::video
 VS_TEST = 1
 SUBDIRS = customio
 BUILT_SOURCES = \
+  MediaAudioResamplerTest_CXXRunner.cpp \
   MediaPictureResamplerTest_CXXRunner.cpp \
   DecoderTest_CXXRunner.cpp \
   PixelFormatTest_CXXRunner.cpp \
@@ -761,6 +775,7 @@ BUILT_SOURCES = \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  MediaAudioResamplerTest.h \
   MediaPictureResamplerTest.h \
   DecoderTest.h \
   PixelFormatTest.h \
@@ -784,6 +799,18 @@ inst_checkdir = $(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS = $(check_PROGRAMS)
+MediaAudioResamplerTester_SOURCES = \
+  MediaAudioResamplerTest.cpp \
+  TestData.cpp \
+  lodepng.cpp \
+  Main.cpp
+
+nodist_MediaAudioResamplerTester_SOURCES = \
+  MediaAudioResamplerTest_CXXRunner.cpp
+
+MediaAudioResamplerTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 MediaPictureResamplerTester_SOURCES = \
   MediaPictureResamplerTest.cpp \
   TestData.cpp \
@@ -1019,6 +1046,10 @@ KeyValueBagTester$(EXEEXT): $(KeyValueBagTester_OBJECTS) $(KeyValueBagTester_DEP
 	@rm -f KeyValueBagTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(KeyValueBagTester_OBJECTS) $(KeyValueBagTester_LDADD) $(LIBS)
 
+MediaAudioResamplerTester$(EXEEXT): $(MediaAudioResamplerTester_OBJECTS) $(MediaAudioResamplerTester_DEPENDENCIES) $(EXTRA_MediaAudioResamplerTester_DEPENDENCIES) 
+	@rm -f MediaAudioResamplerTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(MediaAudioResamplerTester_OBJECTS) $(MediaAudioResamplerTester_LDADD) $(LIBS)
+
 MediaAudioTester$(EXEEXT): $(MediaAudioTester_OBJECTS) $(MediaAudioTester_DEPENDENCIES) $(EXTRA_MediaAudioTester_DEPENDENCIES) 
 	@rm -f MediaAudioTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(MediaAudioTester_OBJECTS) $(MediaAudioTester_LDADD) $(LIBS)
@@ -1080,6 +1111,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudioResamplerTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudioResamplerTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudioTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudioTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacketTest.Po@am__quote@
@@ -1372,6 +1405,13 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+MediaAudioResamplerTester.log: MediaAudioResamplerTester$(EXEEXT)
+	@p='MediaAudioResamplerTester$(EXEEXT)'; \
+	b='MediaAudioResamplerTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 MediaPictureResamplerTester.log: MediaPictureResamplerTester$(EXEEXT)
 	@p='MediaPictureResamplerTester$(EXEEXT)'; \
 	b='MediaPictureResamplerTester'; \
