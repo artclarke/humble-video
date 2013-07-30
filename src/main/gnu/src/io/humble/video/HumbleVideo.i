@@ -35,6 +35,7 @@
 #include <io/humble/video/MediaSubtitle.h>
 #include <io/humble/video/MediaPacket.h>
 #include <io/humble/video/Configurable.h>
+#include <io/humble/video/MediaPictureResampler.h>
 #include <io/humble/video/Global.h>
 #include <io/humble/video/Codec.h>
 #include <io/humble/video/ContainerFormat.h>
@@ -136,6 +137,7 @@ import io.humble.ferry.Buffer;
 %include <io/humble/video/MediaSubtitle.swg>
 %include <io/humble/video/MediaPacket.swg>
 %include <io/humble/video/Configurable.swg>
+%include <io/humble/video/MediaPictureResampler.swg>
 %include <io/humble/video/Codec.swg>
 %include <io/humble/video/ContainerFormat.swg>
 %include <io/humble/video/SinkFormat.swg>

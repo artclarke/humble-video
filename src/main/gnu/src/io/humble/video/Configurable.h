@@ -216,7 +216,7 @@ public:
   setProperty(KeyValueBag* valuesToSet, KeyValueBag* valuesNotFound);
 protected:
 #ifndef SWIG
-  virtual void *getCtx() { return 0; }
+  virtual void *getCtx()=0;
 #endif // ! SWIG
   Configurable();
   virtual

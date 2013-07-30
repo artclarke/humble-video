@@ -530,6 +530,14 @@ class VideoJNI {
   public final static native long Configurable_getPropertyAsRational(long jarg1, Configurable jarg1_, String jarg2);
   public final static native boolean Configurable_getPropertyAsBoolean(long jarg1, Configurable jarg1_, String jarg2);
   public final static native int Configurable_setProperty__SWIG_5(long jarg1, Configurable jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_);
+  public final static native int MediaPictureResampler_getInputWidth(long jarg1, MediaPictureResampler jarg1_);
+  public final static native int MediaPictureResampler_getInputHeight(long jarg1, MediaPictureResampler jarg1_);
+  public final static native int MediaPictureResampler_getInputFormat(long jarg1, MediaPictureResampler jarg1_);
+  public final static native int MediaPictureResampler_getOutputWidth(long jarg1, MediaPictureResampler jarg1_);
+  public final static native int MediaPictureResampler_getOutputHeight(long jarg1, MediaPictureResampler jarg1_);
+  public final static native int MediaPictureResampler_getOutputFormat(long jarg1, MediaPictureResampler jarg1_);
+  public final static native int MediaPictureResampler_resample(long jarg1, MediaPictureResampler jarg1_, long jarg2, MediaPicture jarg2_, long jarg3, MediaPicture jarg3_);
+  public final static native long MediaPictureResampler_make(int jarg1, int jarg2, int jarg3, int jarg4, int jarg5, int jarg6);
   public final static native int MediaDescriptor_MEDIA_UNKNOWN_get();
   public final static native int MediaDescriptor_MEDIA_VIDEO_get();
   public final static native int MediaDescriptor_MEDIA_AUDIO_get();
@@ -1267,6 +1275,7 @@ class VideoJNI {
   public final static native long SWIGMediaSubtitleRectangleUpcast(long jarg1);
   public final static native long SWIGMediaPacketUpcast(long jarg1);
   public final static native long SWIGConfigurableUpcast(long jarg1);
+  public final static native long SWIGMediaPictureResamplerUpcast(long jarg1);
   public final static native long SWIGMediaDescriptorUpcast(long jarg1);
   public final static native long SWIGCodecProfileUpcast(long jarg1);
   public final static native long SWIGCodecUpcast(long jarg1);

@@ -101,12 +101,13 @@ am_libhumble_video_la_OBJECTS = AVBufferSupport.lo PixelFormat.lo \
 	KeyValueBag.lo KeyValueBagImpl.lo Property.lo PropertyImpl.lo \
 	Rational.lo RationalImpl.lo Codec.lo Media.lo MediaRaw.lo \
 	MediaAudio.lo MediaAudioImpl.lo MediaPicture.lo \
-	MediaPictureImpl.lo MediaSubtitle.lo MediaSubtitleImpl.lo \
-	IndexEntry.lo IndexEntryImpl.lo Error.lo ErrorImpl.lo \
-	MediaPacket.lo MediaPacketImpl.lo ContainerFormat.lo \
-	Configurable.lo Coder.lo Decoder.lo Encoder.lo \
-	ContainerStream.lo Container.lo SourceFormat.lo Source.lo \
-	SourceImpl.lo SourceStream.lo SourceStreamImpl.lo \
+	MediaPictureImpl.lo MediaPictureResampler.lo \
+	MediaPictureResamplerImpl.lo MediaSubtitle.lo \
+	MediaSubtitleImpl.lo IndexEntry.lo IndexEntryImpl.lo Error.lo \
+	ErrorImpl.lo MediaPacket.lo MediaPacketImpl.lo \
+	ContainerFormat.lo Configurable.lo Coder.lo Decoder.lo \
+	Encoder.lo ContainerStream.lo Container.lo SourceFormat.lo \
+	Source.lo SourceImpl.lo SourceStream.lo SourceStreamImpl.lo \
 	SinkFormat.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
@@ -447,6 +448,8 @@ libhumble_video_la_SOURCES = \
   MediaAudioImpl.cpp \
   MediaPicture.cpp \
   MediaPictureImpl.cpp \
+  MediaPictureResampler.cpp \
+  MediaPictureResamplerImpl.cpp \
   MediaSubtitle.cpp \
   MediaSubtitleImpl.cpp \
   IndexEntry.cpp \
@@ -498,6 +501,9 @@ libhumble_video_la_HEADERS = \
   MediaPicture.h \
   MediaPictureImpl.h \
   MediaPicture.swg \
+  MediaPictureResampler.h \
+  MediaPictureResamplerImpl.h \
+  MediaPictureResampler.swg \
   MediaSubtitle.h \
   MediaSubtitleImpl.h \
   MediaSubtitle.swg \
@@ -622,6 +628,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacketImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPicture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureResampler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureResamplerImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaRaw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaSubtitle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaSubtitleImpl.Plo@am__quote@
