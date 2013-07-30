@@ -132,15 +132,10 @@ Decoder::prepareFrame(AVFrame* frame, int flags) {
   }
   break;
   case MediaDescriptor::MEDIA_VIDEO: {
-    MediaPictureImpl* pict = dynamic_cast<MediaPictureImpl*>(mCachedMedia.value());
-    if (!pict ||
-        pict->getWidth() != frame->width ||
-        pict->getHeight() != frame->height ||
-        pict->getFormat() != frame->format)
-      return Coder::prepareFrame(frame, flags);
-    av_frame_unref(frame);
-    // reuse our audio frame.
-    av_frame_ref(frame, pict->getCtx());
+    // reusing video frames is too tricky given all the alignments; so we
+    // just let FFmpeg allocate it.
+    // adventurous souls can try changing this later.
+    return Coder::prepareFrame(frame, flags);
   }
   break;
   default:

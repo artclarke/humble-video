@@ -91,6 +91,14 @@ public:
    * overwrite any data in the frame object, but
    * you should pass the same MediaPicture into this function
    * repeatedly until Media.isComplete() is true.
+   * <p>
+   * Note on memory for MediaPicture: For a multitude of reasons,
+   * if you created MediaPicture from a buffer, decodeVideo will discard
+   * it and replace it with a buffer that is aligned correctly for different
+   * CPUs and different codecs. If you must have a copy of the image data
+   * in memory managed by you, then pass in a MediaPicture allocated without
+   * a buffer to DecodeVideo, and then copy that into your own media picture.
+   * </p>
    *
    * @param output The MediaPicture we decode. Caller must check if it is complete on return.
    * @param packet  The packet we're attempting to decode from.

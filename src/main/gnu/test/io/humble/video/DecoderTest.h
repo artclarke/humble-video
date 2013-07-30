@@ -44,8 +44,10 @@ public:
   void testOpen();
   void testOpenWithOptions();
   void testDecodeAudio();
+  void testDecodeVideo();
 private:
   void writeAudio(FILE* output, MediaAudio* audio);
+  void writePicture(const char* prefix, int32_t* frameNo, MediaPicture* picture);
   TestData mFixtures;
 };
 

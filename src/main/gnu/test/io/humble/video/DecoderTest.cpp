@@ -124,6 +124,7 @@ DecoderTest::writeAudio(FILE* output, MediaAudio* audio)
   const void* data = buf->getBytes(0, size);
   fwrite(data, 1, size, output);
 }
+
 void
 DecoderTest::testDecodeAudio() {
 
@@ -195,5 +196,93 @@ DecoderTest::testDecodeAudio() {
   }
 
   fclose(output);
+  source->close();
+}
+
+
+void
+DecoderTest::writePicture(const char* prefix, int32_t* frameNo, MediaPicture* picture)
+{
+  char filename[2048];
+  // write data as PGM file.
+  snprintf(filename, sizeof(filename), "%s-%06d.pgm", prefix, *frameNo);
+  // only write every n'th frame to save disk space
+  if (!((*frameNo) % 30)) {
+    FILE* output = fopen(filename, "wb");
+    TS_ASSERT(output);
+    fprintf(output,"P5\n%d %d\n%d\n",picture->getWidth(),picture->getHeight(),255);
+    RefPointer<IBuffer> buf = picture->getData(0);
+    uint8_t* data = (uint8_t*)buf->getBytes(0, buf->getBufferSize());
+    for(int32_t i=0;i<picture->getHeight();i++)
+        fwrite(data + i * picture->getLineSize(0),1,picture->getWidth(),output);
+    fclose(output);
+  }
+
+  (*frameNo)++;
+}
+
+void
+DecoderTest::testDecodeVideo() {
+
+//  TS_SKIP("Not yet implemented");
+
+  TestData::Fixture* fixture=mFixtures.getFixture("testfile.flv");
+  TS_ASSERT(fixture);
+  char filepath[2048];
+  mFixtures.fillPath(fixture, filepath, sizeof(filepath));
+
+  RefPointer<Source> source = Source::make();
+
+  int32_t retval=-1;
+  retval = source->open(filepath, 0, false, true, 0, 0);
+  TS_ASSERT(retval >= 0);
+
+  int32_t numStreams = source->getNumStreams();
+  TS_ASSERT_EQUALS(fixture->num_streams, numStreams);
+
+  int32_t streamToDecode = 0;
+  RefPointer<SourceStream> stream = source->getSourceStream(streamToDecode);
+  TS_ASSERT(stream);
+  RefPointer<Decoder> decoder = stream->getDecoder();
+  TS_ASSERT(decoder);
+  RefPointer<Codec> codec = decoder->getCodec();
+  TS_ASSERT(codec);
+  TS_ASSERT_EQUALS(Codec::CODEC_ID_FLV1, codec->getID());
+
+  decoder->open(0, 0);
+
+  // now, let's start a decoding loop.
+  RefPointer<MediaPacket> packet = MediaPacket::make();
+
+  RefPointer<MediaPicture> picture = MediaPicture::make(
+      decoder->getWidth(),
+      decoder->getHeight(),
+      decoder->getPixelFormat());
+
+  int32_t frameNo = 0;
+  while(source->read(packet.value()) >= 0) {
+    // got a packet; now we try to decode it.
+    if (packet->getStreamIndex() == streamToDecode &&
+        packet->isComplete()) {
+      int32_t bytesRead = 0;
+      int32_t byteOffset=0;
+      do {
+        bytesRead = decoder->decodeVideo(picture.value(), packet.value(), byteOffset);
+        if (picture->isComplete()) {
+          writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
+        }
+        // now, handle the case where bytesRead is 0; we need to flush any
+        // cached packets
+        do {
+          decoder->decodeVideo(picture.value(), 0, 0);
+          if (picture->isComplete()) {
+            writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
+          }
+        } while (picture->isComplete());
+        byteOffset += bytesRead;
+      } while(byteOffset < packet->getSize());
+    }
+
+  }
   source->close();
 }

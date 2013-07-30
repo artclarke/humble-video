@@ -227,6 +227,7 @@ RationalTester_LDADD=\
 clean-local:
 	rm -rf $(BUILT_SOURCES)
 	rm -rf *.au
+	rm -rf *.pgm
 	rm -rf *.flv
 	rm -rf *.mov
 	rm -rf *.mp4
