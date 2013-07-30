@@ -95,6 +95,42 @@ Decoder::ensureAudioParamsMatch(MediaAudio* audio)
     VS_THROW(HumbleInvalidArgument("audio sample format does not match what decoder expects"));
 
 }
+
+int
+Decoder::prepareFrame(AVFrame* frame, int flags) {
+  if (!mCachedMedia)
+    return Coder::prepareFrame(frame, flags);
+
+  switch (getCodecType()) {
+  case MediaDescriptor::MEDIA_AUDIO: {
+    MediaAudioImpl* audio = dynamic_cast<MediaAudioImpl*>(mCachedMedia.value());
+    if (audio->getSampleRate() != frame->sample_rate ||
+        audio->getChannelLayout() != frame->channel_layout ||
+        audio->getFormat() != frame->format)
+      return Coder::prepareFrame(frame, flags);
+    av_frame_unref(frame);
+    // reuse our audio frame.
+    av_frame_ref(frame, audio->getCtx());
+  }
+  break;
+  case MediaDescriptor::MEDIA_VIDEO: {
+    MediaPictureImpl* pict = dynamic_cast<MediaPictureImpl*>(mCachedMedia.value());
+    if (pict->getWidth() != frame->width ||
+        pict->getHeight() != frame->height ||
+        pict->getFormat() != frame->format)
+      return Coder::prepareFrame(frame, flags);
+    av_frame_unref(frame);
+    // reuse our audio frame.
+    av_frame_ref(frame, pict->getCtx());
+  }
+  break;
+  default:
+    VS_LOG_ERROR("Got unknown codec type to allocate for");
+    break;
+  }
+  return -1;
+}
+
 int32_t
 Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
     int32_t byteOffset) {
@@ -130,7 +166,6 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
 
   // let's get the ffmpeg structures
   AVPacket* inPkt = packet ? packet->getCtx() : 0;
-  AVFrame* frame = output->getCtx();
 
   // now we're going to copy the inPkt to do the byte-offset stuff. This
   // will copy by reference.
@@ -143,23 +178,40 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
     // now, adjust the data and size pointers
     pkt->data = pkt->data + byteOffset;
     pkt->size = pkt->size - byteOffset;
+  } else {
+    pkt->data = 0;
+    pkt->size = 0;
   }
   // 'empty' out the input samples
-  output->setComplete(getFrameSize(), false);
+  output->setComplete(false);
 
+  AVFrame *frame = av_frame_alloc();
+  if (!frame)
+    VS_THROW(HumbleBadAlloc());
+  /** DO NOT THROW EXCEPTIONS **/
+  // create a frame to decode into, so that FFmpeg doesn't get knickers
+  // in a twist re: allocation; but we will attempt to re-use our output
+  // frame by setting a call back that Coder::getBuffer2 will use.
+
+  mCachedMedia.reset(output, true);
   // try out decode
   retval = avcodec_decode_audio4(mCtx, frame, &got_frame, pkt);
   // always free the packet so that we don't have an exception make us leak it.
   av_free_packet(pkt);
-  // now, what did all that mean?
+  if (got_frame) {
+    // copy the output frame to our frame
+    output->copy(frame, true);
+  }
+  // release the temporary reference
+  mCachedMedia = 0;
+  av_frame_unref(frame);
+  av_freep(&frame);
+  /** END DO NOT THROW EXCEPTIONS **/
   if (retval < 0) {
     // let's make an error
     RefPointer<Error> error = Error::make(retval);
     VS_THROW(HumbleRuntimeError::make("Error while decoding: %s", error ? error->getDescription() : ""));
   }
-  if (got_frame)
-    output->setComplete(frame->nb_samples, true);
-
   return retval;
 }
 

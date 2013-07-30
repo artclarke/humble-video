@@ -402,8 +402,9 @@ class VideoJNI {
   public final static native int MediaAudio_getNumDataPlanes(long jarg1, MediaAudio jarg1_);
   public final static native int MediaAudio_getMaxNumSamples(long jarg1, MediaAudio jarg1_);
   public final static native int MediaAudio_getNumSamples(long jarg1, MediaAudio jarg1_);
+  public final static native void MediaAudio_setNumSamples(long jarg1, MediaAudio jarg1_, int jarg2);
   public final static native int MediaAudio_getBytesPerSample(long jarg1, MediaAudio jarg1_);
-  public final static native void MediaAudio_setComplete(long jarg1, MediaAudio jarg1_, int jarg2, long jarg3);
+  public final static native void MediaAudio_setComplete(long jarg1, MediaAudio jarg1_, boolean jarg2);
   public final static native int MediaAudio_getSampleRate(long jarg1, MediaAudio jarg1_);
   public final static native int MediaAudio_getChannels(long jarg1, MediaAudio jarg1_);
   public final static native int MediaAudio_getFormat(long jarg1, MediaAudio jarg1_);

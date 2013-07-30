@@ -113,13 +113,15 @@ MediaAudioTest::testCreation() {
     stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
 
     TS_ASSERT_THROWS(
-        audio->setComplete(audio->getMaxNumSamples() + 1, Global::NO_PTS),
+        audio->setNumSamples(audio->getMaxNumSamples()+1),
         HumbleInvalidArgument);
-    TS_ASSERT_THROWS(audio->setComplete(-1, Global::NO_PTS), HumbleInvalidArgument);
-    TS_ASSERT_THROWS(audio->setComplete(0, Global::NO_PTS), HumbleInvalidArgument);
+    TS_ASSERT_THROWS(audio->setNumSamples(-1), HumbleInvalidArgument);
+    TS_ASSERT_THROWS(audio->setNumSamples(0), HumbleInvalidArgument);
   }
 
-  audio->setComplete(audio->getMaxNumSamples() - 1, Global::NO_PTS);
+  audio->setNumSamples(1);
+  TS_ASSERT_EQUALS(1, audio->getNumSamples());
+  audio->setComplete(true);
   TS_ASSERT(audio->isComplete());
 
   for (int i = 0; i < channels; i++) {

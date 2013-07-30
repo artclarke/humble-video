@@ -127,7 +127,7 @@ DecoderTest::writeAudio(FILE* output, MediaAudio* audio)
 void
 DecoderTest::testDecodeAudio() {
 
-  TS_SKIP("Not yet implemented");
+//  TS_SKIP("Not yet implemented");
 
   TestData::Fixture* fixture=mFixtures.getFixture("testfile.mp3");
   TS_ASSERT(fixture);
@@ -187,7 +187,7 @@ DecoderTest::testDecodeAudio() {
           }
         } while (audio->isComplete());
         byteOffset += bytesRead;
-      } while(bytesRead > 0);
+      } while(byteOffset < packet->getSize());
     }
 
   }

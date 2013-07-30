@@ -253,6 +253,15 @@ public class MediaAudio extends MediaRaw {
   }
 
 /**
+ * Set the number of samples in the buffer. Must not be more than  
+ * {@link #getMaxNumSamples()}. Caller is responsible for making  
+ * sure buffer actually matches this.  
+ */
+  public void setNumSamples(int numSamples) {
+    VideoJNI.MediaAudio_setNumSamples(swigCPtr, this, numSamples);
+  }
+
+/**
  * Number of bytes in one sample of one channel of audio in this object. 
  *  
  */
@@ -263,17 +272,10 @@ public class MediaAudio extends MediaRaw {
 /**
  * Call this if you modify the samples and are now done. This  
  * updates the pertinent information in the structure.  
- * @param	numSamples Number of samples in this update (if > 0 then this 
- *		 audio sample is complete). Must be < {@link #getMaxNumSamples()}. 
- *		  
- * @param	pts The presentation time stamp of the starting sample in 
- *		 this buffer.  
- * Caller must ensure pts is in units of 1/1,000,000 of a second  
- * @throws	InvalidArgument if numSamples <= 0 or > {@link #getMaxNumSamples()}. 
- *		  
+ * @param	complete true if complete; false if not.  
  */
-  public void setComplete(int numSamples, long pts) {
-    VideoJNI.MediaAudio_setComplete(swigCPtr, this, numSamples, pts);
+  public void setComplete(boolean complete) {
+    VideoJNI.MediaAudio_setComplete(swigCPtr, this, complete);
   }
 
 /**

@@ -282,11 +282,19 @@ public:
 
 protected:
   virtual void setState(State state) { mState = state; }
+  /*
+   * Override to make a more specific allocator for frames.
+   */
+  virtual int prepareFrame(AVFrame* frame, int flags) {
+    return avcodec_default_get_buffer2(mCtx, frame, flags);
+  }
   Coder(Codec* codec);
   virtual
   ~Coder();
   AVCodecContext *mCtx;
 private:
+  static int getBuffer(struct AVCodecContext *s, AVFrame *frame, int flags);
+
   io::humble::ferry::RefPointer<Codec> mCodec;
   io::humble::ferry::RefPointer<Rational> mTimebase;
 

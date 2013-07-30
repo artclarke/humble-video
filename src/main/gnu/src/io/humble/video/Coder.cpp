@@ -45,6 +45,9 @@ Coder::Coder(Codec* codec) {
   mCtx = avcodec_alloc_context3(codec->getCtx());
   if (!mCtx)
     throw HumbleRuntimeError("could not allocate decoder context");
+  mCtx->refcounted_frames = 1;
+  mCtx->get_buffer2 = Coder::getBuffer;
+  mCtx->opaque = this;
 
   mState = STATE_INITED;
 
@@ -112,6 +115,19 @@ Coder::setTimeBase(Rational* newTimeBase) {
   mCtx->time_base.num = newTimeBase->getNumerator();
   mCtx->time_base.den = newTimeBase->getDenominator();
 }
+
+int
+Coder::getBuffer(struct AVCodecContext *s, AVFrame *frame, int flags) {
+  Coder* coder = static_cast<Coder*>(s->opaque);
+  if (!coder)
+    return avcodec_default_get_buffer2(s, frame, flags);
+
+  if (!(coder->mCodec->getCapabilities() & Codec::CAP_DR1))
+    return avcodec_default_get_buffer2(s, frame, flags);
+
+  return coder->prepareFrame(frame, flags);
+}
+
 
 
 } /* namespace video */

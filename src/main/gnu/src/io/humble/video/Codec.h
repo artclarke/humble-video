@@ -1139,6 +1139,7 @@ private:
   ~CodecDescriptor() {
   }
   const AVCodecDescriptor *mDescriptor;
+
 };
 
 }

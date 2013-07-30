@@ -169,6 +169,18 @@ MediaAudioImpl::make(io::humble::ferry::IBuffer* buffer, int32_t numSamples,
 }
 
 
+void
+MediaAudioImpl::copy(AVFrame* src, bool complete) {
+  if (!src)
+    VS_THROW(HumbleInvalidArgument("no src"));
+  // release any memory we have
+  av_frame_unref(mFrame);
+  // and copy any data in.
+  mMaxSamples = src->nb_samples;
+  av_frame_ref(mFrame, src);
+  mComplete=complete;
+}
+
 MediaAudioImpl*
 MediaAudioImpl::make(MediaAudioImpl* src, bool copy) {
   RefPointer<MediaAudioImpl> retval;
@@ -221,11 +233,12 @@ MediaAudioImpl::getData(int32_t plane) {
 
   // now we're guaranteed that we should have a plane.
   RefPointer<IBuffer> buffer;
-  if (plane < AV_NUM_DATA_POINTERS) buffer = AVBufferSupport::wrapAVBuffer(this,
-      mFrame->buf[plane], mFrame->extended_data[plane], mFrame->linesize[0]);
-  else buffer = AVBufferSupport::wrapAVBuffer(this,
-      mFrame->extended_buf[plane - AV_NUM_DATA_POINTERS], mFrame->extended_data[plane], mFrame->linesize[0]);
-  setBufferType((AudioFormat::Type)mFrame->format, buffer.value());
+  if (plane < AV_NUM_DATA_POINTERS) buffer = mFrame->buf[plane] ? AVBufferSupport::wrapAVBuffer(this,
+      mFrame->buf[plane], mFrame->extended_data[plane], mFrame->linesize[0]) : 0;
+  else buffer = mFrame->extended_buf[plane-AV_NUM_DATA_POINTERS] ? AVBufferSupport::wrapAVBuffer(this,
+      mFrame->extended_buf[plane - AV_NUM_DATA_POINTERS], mFrame->extended_data[plane], mFrame->linesize[0]) : 0;
+  if (buffer)
+    setBufferType((AudioFormat::Type)mFrame->format, buffer.value());
   return buffer.get();
 }
 
@@ -257,13 +270,8 @@ MediaAudioImpl::getBytesPerSample() {
 }
 
 void
-MediaAudioImpl::setComplete(int32_t numSamples, int64_t pts) {
-  if (numSamples <= 0 || numSamples > mMaxSamples) {
-    VS_THROW(HumbleInvalidArgument("invalid number of samples to put in this MediaAudio object"));
-  }
-  mFrame->pts = pts;
-  mFrame->nb_samples = numSamples;
-  mComplete = true;
+MediaAudioImpl::setComplete(bool complete) {
+  mComplete = complete;
 }
 
 int32_t
@@ -285,6 +293,14 @@ int32_t
 MediaAudioImpl::getNumSamples() {
   return mFrame->nb_samples;
 }
+void
+MediaAudioImpl::setNumSamples(int32_t numSamples) {
+  if (numSamples <= 0 || numSamples > mMaxSamples) {
+    VS_THROW(HumbleInvalidArgument("invalid number of samples to put in this MediaAudio object"));
+  }
+  mFrame->nb_samples = numSamples;
+}
+
 
 bool
 MediaAudioImpl::isComplete() {

@@ -44,6 +44,7 @@ TestData::addFixture(TestData::Fixture* f) {
       newArray[i] = mFixtures[i];
     newArray[mNumFixtures] = *f;
     ++mNumFixtures;
+    delete [] mFixtures;
     mFixtures = newArray;
   }
   return mNumFixtures;

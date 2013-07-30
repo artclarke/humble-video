@@ -127,11 +127,14 @@ protected:
   Decoder(Codec* codec);
   virtual
   ~Decoder();
+
+  virtual int prepareFrame(AVFrame* frame, int flags);
 private:
   /**
    * Make sure the audio passed in has parameters that match this decoder.
    */
   void ensureAudioParamsMatch(MediaAudio* audio);
+  io::humble::ferry::RefPointer<MediaRaw> mCachedMedia;
 };
 
 } /* namespace video */

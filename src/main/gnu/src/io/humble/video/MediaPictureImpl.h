@@ -129,14 +129,15 @@ public:
   virtual MediaPicture::Type getType() { return (MediaPicture::Type) getCtx()->pict_type; }
   virtual void setType(MediaPicture::Type type) { getCtx()->pict_type = (enum AVPictureType)type; }
 
+  virtual AVFrame*
+  getCtx() {
+    return mFrame;
+  }
 protected:
   MediaPictureImpl();
   virtual
   ~MediaPictureImpl();
-  AVFrame*
-  getCtx() {
-    return mFrame;
-  }
+
 private:
   void validatePlane(int32_t plane);
   AVFrame* mFrame;

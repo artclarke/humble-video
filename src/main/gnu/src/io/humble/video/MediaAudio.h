@@ -509,6 +509,14 @@ public:
   getNumSamples()=0;
 
   /**
+   * Set the number of samples in the buffer. Must not be more than
+   * {@link #getMaxNumSamples()}. Caller is responsible for making
+   * sure buffer actually matches this.
+   */
+  virtual void
+  setNumSamples(int32_t numSamples)=0;
+
+  /**
    * Number of bytes in one sample of one channel of audio in this object.
    */
   virtual int32_t
@@ -518,13 +526,10 @@ public:
    * Call this if you modify the samples and are now done.  This
    * updates the pertinent information in the structure.
    *
-   * @param numSamples Number of samples in this update (if > 0 then this audio sample is complete).  Must be < {@link #getMaxNumSamples()}.
-   * @param pts The presentation time stamp of the starting sample in this buffer.
-   *   Caller must ensure pts is in units of 1/1,000,000 of a second
-   * @throws InvalidArgument if numSamples <= 0 or > {@link #getMaxNumSamples()}.
+   * @param complete true if complete; false if not.
    */
   virtual void
-  setComplete(int32_t numSamples, int64_t pts)=0;
+  setComplete(bool complete)=0;
 
   /**
    * Sample rate of audio, or 0 if unknown.

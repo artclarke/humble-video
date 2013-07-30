@@ -63,7 +63,7 @@ public:
   getBytesPerSample();
 
   virtual void
-  setComplete(int32_t numSamples, int64_t pts);
+  setComplete(bool);
 
   virtual int32_t
   getSampleRate();
@@ -88,7 +88,12 @@ public:
   virtual int32_t
   getNumSamples();
 
+  virtual void
+  setNumSamples(int32_t numSamples);
+
   virtual AVFrame* getCtx();
+  // Copies data from src into this context, first releasing any memory we have.
+  virtual void copy(AVFrame* src, bool complete);
 protected:
   MediaAudioImpl();
   virtual
