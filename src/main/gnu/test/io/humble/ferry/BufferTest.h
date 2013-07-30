@@ -23,7 +23,7 @@
 #include <io/humble/testutils/TestUtils.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Buffer.h>
-using namespace VS_CPP_NAMESPACE;
+using namespace io::humble::ferry;
 
 class BufferTest : public CxxTest::TestSuite
 {
