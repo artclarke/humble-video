@@ -159,7 +159,7 @@ MediaPacketTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_MediaPictureResamplerTester_OBJECTS =  \
 	MediaPictureResamplerTest.$(OBJEXT) TestData.$(OBJEXT) \
-	Main.$(OBJEXT)
+	lodepng.$(OBJEXT) Main.$(OBJEXT)
 nodist_MediaPictureResamplerTester_OBJECTS =  \
 	MediaPictureResamplerTest_CXXRunner.$(OBJEXT)
 MediaPictureResamplerTester_OBJECTS =  \
@@ -787,6 +787,7 @@ TESTS = $(check_PROGRAMS)
 MediaPictureResamplerTester_SOURCES = \
   MediaPictureResamplerTest.cpp \
   TestData.cpp \
+  lodepng.cpp \
   Main.cpp
 
 nodist_MediaPictureResamplerTester_SOURCES = \
@@ -1102,6 +1103,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestData.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lodepng.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1690,6 +1692,7 @@ clean-local:
 	rm -rf $(BUILT_SOURCES)
 	rm -rf *.au
 	rm -rf *.pgm
+	rm -rf *.png
 	rm -rf *.flv
 	rm -rf *.mov
 	rm -rf *.mp4

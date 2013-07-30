@@ -27,6 +27,9 @@
 #define MEDIAPICTURERESAMPLERTEST_H_
 
 #include <io/humble/testutils/TestUtils.h>
+#include <io/humble/video/MediaPicture.h>
+#include <io/humble/video/MediaPictureResampler.h>
+#include "TestData.h"
 
 class MediaPictureResamplerTest : public CxxTest::TestSuite
 {
@@ -34,7 +37,14 @@ public:
   MediaPictureResamplerTest();
   virtual
   ~MediaPictureResamplerTest();
-  void testCreation();
+  void testRescale();
+private:
+  void writePicture(const char* prefix, int32_t* frameNo,
+      io::humble::video::MediaPicture* picture,
+      io::humble::video::MediaPictureResampler*,
+      io::humble::video::MediaPicture*);
+  TestData mFixtures;
+\
 };
 
 #endif /* MEDIAPICTURERESAMPLERTEST_H_ */

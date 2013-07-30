@@ -71,6 +71,7 @@ TESTS=$(check_PROGRAMS)
 MediaPictureResamplerTester_SOURCES= \
   MediaPictureResamplerTest.cpp \
   TestData.cpp \
+  lodepng.cpp \
   Main.cpp
 
 nodist_MediaPictureResamplerTester_SOURCES= \
@@ -242,6 +243,7 @@ clean-local:
 	rm -rf $(BUILT_SOURCES)
 	rm -rf *.au
 	rm -rf *.pgm
+	rm -rf *.png
 	rm -rf *.flv
 	rm -rf *.mov
 	rm -rf *.mp4
