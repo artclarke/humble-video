@@ -89,29 +89,38 @@ MediaAudioResamplerTest::testCreation()
   TS_ASSERT(resampler);
 }
 
+static void writeAudioHelper(FILE* output, MediaAudio* audio) {
+  RefPointer<Buffer> buf;
+
+  // we'll just write out the first channel.
+  buf = audio->getData(0);
+  // let's figure out # of bytes to make valgrind happy.
+//    size_t size = AudioFormat::getBufferSizeNeeded(audio->getNumSamples(), audio->getChannels(), audio->getFormat());
+  size_t size = AudioFormat::getBytesPerSample(audio->getFormat())*
+      (AudioFormat::isPlanar(audio->getFormat()) ? 1 : audio->getChannels()) *
+          audio->getNumSamples();
+
+  const void* data = buf->getBytes(0, size);
+  fwrite(data, 1, size, output);
+}
 void
 MediaAudioResamplerTest::writeAudio(FILE* output, MediaAudio* audio,
     MediaAudioResampler* resampler,
     MediaAudio* rAudio)
 {
-  // first resample the audio
-  resampler->resample(rAudio, audio);
-  // then use the new audio
-  audio = rAudio;
-
   if (audio->isComplete()) {
-    RefPointer<Buffer> buf;
-
-    // we'll just write out the first channel.
-    buf = audio->getData(0);
-    // let's figure out # of bytes to make valgrind happy.
-//    size_t size = AudioFormat::getBufferSizeNeeded(audio->getNumSamples(), audio->getChannels(), audio->getFormat());
-    size_t size = AudioFormat::getBytesPerSample(audio->getFormat())*
-        (AudioFormat::isPlanar(audio->getFormat()) ? 1 : audio->getChannels()) *
-            audio->getNumSamples();
-
-    const void* data = buf->getBytes(0, size);
-    fwrite(data, 1, size, output);
+    // resampling correctly is tricky; need to make sure that we flush everything.
+    int resampled = 0;
+    do {
+      resampled = resampler->resample(rAudio, audio);
+      if (rAudio->isComplete()) {
+        // we successfully resampled some audio; write it.
+        writeAudioHelper(output, rAudio);
+      }
+      if (resampled > 0)
+        // now let's null out audio so we try to flush the resampler.
+        audio = 0;
+    } while (resampled > 0);
   }
 }
 
@@ -158,7 +167,7 @@ MediaAudioResamplerTest::testResample() {
       decoder->getChannelLayout(),
       decoder->getSampleFormat());
 
-  int32_t rSampleRate = decoder->getSampleRate();
+  int32_t rSampleRate = 22050; // this will result in an uneven conversion, which tests flushing well.
   AudioChannel::Layout rLayout = AudioChannel::CH_LAYOUT_STEREO;
   int32_t rChannels = AudioChannel::getNumChannelsInLayout(rLayout);
   AudioFormat::Type rFormat = AudioFormat::SAMPLE_FMT_S16;
@@ -210,7 +219,8 @@ MediaAudioResamplerTest::testResample() {
         }
       } while (audio->isComplete());
     }
-    if (0 && numSamples > 10240)
+    if (getenv("VS_TEST_MEMCHECK") && numSamples > 10240)
+      // short circuit if running under valgrind.
       break;
   }
   source->close();

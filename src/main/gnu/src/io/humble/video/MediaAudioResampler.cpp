@@ -186,16 +186,19 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
     if (in->getChannelLayout() != getInputLayout())
       VS_THROW(HumbleInvalidArgument("input audio channel layout does not match what resampler expected"));
   }
-  if (out) {
-    if (out->getFormat() != getOutputFormat())
-      VS_THROW(HumbleInvalidArgument("output audio format does not match what resampler expected"));
-    if (out->getSampleRate() != getOutputSampleRate())
-      VS_THROW(HumbleInvalidArgument("output audio sample rate does not match what resampler expected"));
-    if (out->getChannelLayout() != getOutputLayout())
-      VS_THROW(HumbleInvalidArgument("output audio channel layout does not match what resampler expected"));
-    out->setComplete(false);
-  }
-  AVFrame* outFrame = out ? out->getCtx() : 0;
+  if (!out)
+    VS_THROW(HumbleInvalidArgument("output must be specified"));
+
+  if (out->getFormat() != getOutputFormat())
+    VS_THROW(HumbleInvalidArgument("output audio format does not match what resampler expected"));
+  if (out->getSampleRate() != getOutputSampleRate())
+    VS_THROW(HumbleInvalidArgument("output audio sample rate does not match what resampler expected"));
+  if (out->getChannelLayout() != getOutputLayout())
+    VS_THROW(HumbleInvalidArgument("output audio channel layout does not match what resampler expected"));
+
+  out->setComplete(false);
+
+  AVFrame* outFrame = out->getCtx();
   AVFrame* inFrame = in ? in->getCtx() : 0;
 
   // now, we know the audio is hidden in extended_data
@@ -208,8 +211,10 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
     RefPointer<Error> error = Error::make(retval);
     VS_THROW(HumbleRuntimeError::make("Could not convert audio: %s", error ? error->getDescription() : ""));
   }
-  if (out)
-    out->setComplete(true);
+  outFrame->nb_samples = retval;
+  // wrong; need to figure out PTS stuff.
+  outFrame->pts = getNextPts(inFrame ? inFrame->pts : Global::NO_PTS);
+  out->setComplete(retval > 0);
   return retval;
 
 }
