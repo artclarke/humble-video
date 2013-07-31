@@ -151,6 +151,9 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   MediaAudioImpl* output = dynamic_cast<MediaAudioImpl*>(aOutput);
   MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(aPacket);
 
+  if (getCodecType() != MediaDescriptor::MEDIA_AUDIO)
+    VS_THROW(HumbleRuntimeError("Attempting to decode audio on non-audio decoder"));
+
   if (byteOffset < 0) {
     VS_THROW(HumbleInvalidArgument("byteOffset must be >= 0"));
   }
@@ -235,6 +238,9 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
   MediaPictureImpl* output = dynamic_cast<MediaPictureImpl*>(aOutput);
   MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(aPacket);
 
+  RefPointer<Codec> codec = getCodec();
+  if (getCodecType() != MediaDescriptor::MEDIA_VIDEO)
+    VS_THROW(HumbleRuntimeError("Attempting to decode video on non-video decoder"));
 
   if (byteOffset < 0) {
     VS_THROW(HumbleInvalidArgument("byteOffset must be >= 0"));
@@ -316,6 +322,11 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
 int32_t
 Decoder::decodeSubtitle(MediaSubtitle* output, MediaPacket* packet,
     int32_t byteOffset) {
+
+  if (getCodecType() != MediaDescriptor::MEDIA_SUBTITLE)
+    VS_THROW(HumbleRuntimeError("Attempting to decode subtitle on non-subtitle decoder"));
+
+
   (void) output;
   (void) packet;
   (void) byteOffset;
