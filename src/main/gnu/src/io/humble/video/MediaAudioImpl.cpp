@@ -245,7 +245,7 @@ MediaAudioImpl::getDataPlaneSize(int32_t plane) {
   if (plane < 0 || plane >= n)
     VS_THROW(HumbleInvalidArgument("plane is out of range"));
   if (isComplete())
-    return AudioFormat::getDataPlaneSizeNeeded(getNumSamples(), getChannels(), getFormat());
+    return getNumSamples()*AudioFormat::getBytesPerSample(getFormat())*(isPlanar()? 1 : getChannels());
   else
     // oddly for audio, each plane in multiplane audio must
     // be the same as linesize[0] and sometimes ffmpeg

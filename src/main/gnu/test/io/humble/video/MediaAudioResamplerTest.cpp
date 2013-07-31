@@ -95,10 +95,7 @@ static void writeAudioHelper(FILE* output, MediaAudio* audio) {
   // we'll just write out the first channel.
   buf = audio->getData(0);
   // let's figure out # of bytes to make valgrind happy.
-//    size_t size = AudioFormat::getBufferSizeNeeded(audio->getNumSamples(), audio->getChannels(), audio->getFormat());
-  size_t size = AudioFormat::getBytesPerSample(audio->getFormat())*
-      (AudioFormat::isPlanar(audio->getFormat()) ? 1 : audio->getChannels()) *
-          audio->getNumSamples();
+  size_t size = audio->getDataPlaneSize(0);
 
   const void* data = buf->getBytes(0, size);
   fwrite(data, 1, size, output);
