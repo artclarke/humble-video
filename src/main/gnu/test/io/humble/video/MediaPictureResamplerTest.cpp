@@ -116,6 +116,7 @@ MediaPictureResamplerTest::testRescale() {
           picture->getHeight(),
           picture->getFormat(),
           0);
+  resampler->open();
 
   int32_t frameNo = 0;
   while(source->read(packet.value()) >= 0) {

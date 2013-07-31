@@ -550,12 +550,14 @@ class VideoJNI {
   public final static native int MediaPictureResampler_FLAG_ACCURATE_RND_get();
   public final static native int MediaPictureResampler_FLAG_BITEXACT_get();
   public final static native int MediaPictureResampler_FLAG_ERROR_DIFFUSION_get();
+  public final static native int MediaPictureResampler_getState(long jarg1, MediaPictureResampler jarg1_);
   public final static native int MediaPictureResampler_getInputWidth(long jarg1, MediaPictureResampler jarg1_);
   public final static native int MediaPictureResampler_getInputHeight(long jarg1, MediaPictureResampler jarg1_);
   public final static native int MediaPictureResampler_getInputFormat(long jarg1, MediaPictureResampler jarg1_);
   public final static native int MediaPictureResampler_getOutputWidth(long jarg1, MediaPictureResampler jarg1_);
   public final static native int MediaPictureResampler_getOutputHeight(long jarg1, MediaPictureResampler jarg1_);
   public final static native int MediaPictureResampler_getOutputFormat(long jarg1, MediaPictureResampler jarg1_);
+  public final static native void MediaPictureResampler_open(long jarg1, MediaPictureResampler jarg1_);
   public final static native void MediaPictureResampler_resample(long jarg1, MediaPictureResampler jarg1_, long jarg2, MediaPicture jarg2_, long jarg3, MediaPicture jarg3_);
   public final static native long MediaPictureResampler_make(int jarg1, int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7);
   public final static native long MediaAudioResampler_make(int jarg1, int jarg2, int jarg3, int jarg4, int jarg5, int jarg6);

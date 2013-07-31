@@ -27,6 +27,10 @@
 #define MEDIAAUDIORESAMPLERTEST_H_
 
 #include <io/humble/testutils/TestUtils.h>
+#include "TestData.h"
+
+#include <io/humble/video/MediaAudio.h>
+#include <io/humble/video/MediaAudioResampler.h>
 
 class MediaAudioResamplerTest : public CxxTest::TestSuite
 {
@@ -36,6 +40,13 @@ public:
   ~MediaAudioResamplerTest();
   void testCreation();
   void testResampleErrors();
+  void testResample();
+private:
+  void writeAudio(FILE* output, io::humble::video::MediaAudio* audio,
+      io::humble::video::MediaAudioResampler*,
+      io::humble::video::MediaAudio*);
+
+  TestData mFixtures;
 };
 
 #endif /* MEDIAAUDIORESAMPLERTEST_H_ */

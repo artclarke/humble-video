@@ -46,8 +46,10 @@ virtual int32_t getOutputWidth();
 virtual int32_t getOutputHeight();
 virtual PixelFormat::Type getOutputFormat();
 
+virtual void open();
 virtual void resample(MediaPicture *pOutFrame, MediaPicture *pInFrame);
 
+virtual State getState() { return mState; }
 static MediaPictureResamplerImpl* make(
     int32_t outputWidth, int32_t outputHeight,
     PixelFormat::Type outputFmt,
@@ -65,7 +67,7 @@ int32_t mOHeight;
 int32_t mOWidth;
 PixelFormat::Type mIPixelFmt;
 PixelFormat::Type mOPixelFmt;
-
+State mState;
 SwsContext* mContext;
 };
 

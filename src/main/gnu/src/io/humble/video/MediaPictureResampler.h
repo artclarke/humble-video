@@ -61,6 +61,13 @@ public:
     FLAG_ERROR_DIFFUSION = SWS_ERROR_DIFFUSION,
   } Flag;
 
+  typedef enum State {
+    STATE_INITED,
+    STATE_OPENED,
+    STATE_ERROR
+  } State;
+  virtual State getState()=0;
+
   /** Get the width in pixels we expect on the input frame to the resampler.
    * @return The width we expect on the input frame to the resampler.
    */
@@ -94,6 +101,13 @@ public:
    * @return The pixel format we will resample the output frame to
    */
   virtual PixelFormat::Type getOutputFormat()=0;
+
+
+  /**
+   * Opens the resampler so it can be ready for resampling.
+   * You should NOT set options after you open this object.
+   */
+  virtual void open()=0;
 
   /**
    * Resample in to out based on the resampler parameters.

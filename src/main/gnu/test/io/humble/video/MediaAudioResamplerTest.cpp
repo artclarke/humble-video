@@ -25,14 +25,18 @@
 
 #include "MediaAudioResamplerTest.h"
 #include <io/humble/ferry/LoggerStack.h>
+#include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/MediaAudioResampler.h>
 #include <io/humble/video/MediaAudio.h>
-
+#include <io/humble/video/Source.h>
+#include <io/humble/video/Decoder.h>
 
 using namespace io::humble::ferry;
 using namespace io::humble::video;
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 MediaAudioResamplerTest::MediaAudioResamplerTest() {
 }
@@ -83,6 +87,134 @@ MediaAudioResamplerTest::testCreation()
   resampler = MediaAudioResampler::make(outLayout, outSampleRate, outFormat,
       inLayout, inSampleRate, inFormat);
   TS_ASSERT(resampler);
+}
+
+void
+MediaAudioResamplerTest::writeAudio(FILE* output, MediaAudio* audio,
+    MediaAudioResampler* resampler,
+    MediaAudio* rAudio)
+{
+  // first resample the audio
+  resampler->resample(rAudio, audio);
+  // then use the new audio
+  audio = rAudio;
+
+  if (audio->isComplete()) {
+    RefPointer<Buffer> buf;
+
+    // we'll just write out the first channel.
+    buf = audio->getData(0);
+    // let's figure out # of bytes to make valgrind happy.
+//    size_t size = AudioFormat::getBufferSizeNeeded(audio->getNumSamples(), audio->getChannels(), audio->getFormat());
+    size_t size = AudioFormat::getBytesPerSample(audio->getFormat())*
+        (AudioFormat::isPlanar(audio->getFormat()) ? 1 : audio->getChannels()) *
+            audio->getNumSamples();
+
+    const void* data = buf->getBytes(0, size);
+    fwrite(data, 1, size, output);
+  }
+}
+
+void
+MediaAudioResamplerTest::testResample() {
+  TestData::Fixture* fixture=mFixtures.getFixture("bigbuckbunny_h264_aac_5.1.mp4");
+  TS_ASSERT(fixture);
+  char filepath[2048];
+  mFixtures.fillPath(fixture, filepath, sizeof(filepath));
+
+  RefPointer<Source> source = Source::make();
+
+  int32_t retval=-1;
+  retval = source->open(filepath, 0, false, true, 0, 0);
+  TS_ASSERT(retval >= 0);
+
+  int32_t numStreams = source->getNumStreams();
+  TS_ASSERT_EQUALS(fixture->num_streams, numStreams);
+
+  int32_t streamToDecode = 1;
+  RefPointer<SourceStream> stream = source->getSourceStream(streamToDecode);
+  TS_ASSERT(stream);
+  RefPointer<Decoder> decoder = stream->getDecoder();
+  TS_ASSERT(decoder);
+  RefPointer<Codec> codec = decoder->getCodec();
+  TS_ASSERT(codec);
+  TS_ASSERT_EQUALS(Codec::CODEC_ID_AAC, codec->getID());
+
+  decoder->open(0, 0);
+
+  TS_ASSERT_EQUALS(AudioFormat::SAMPLE_FMT_FLTP, decoder->getSampleFormat());
+
+  VS_LOG_TRACE("Channel Layout: %s; Value: %ld", AudioChannel::getLayoutName(decoder->getChannelLayout()),
+      decoder->getChannelLayout());
+  TS_ASSERT_EQUALS((int32_t)AudioChannel::CH_LAYOUT_5POINT1_BACK, (int32_t)decoder->getChannelLayout());
+
+  // now, let's start a decoding loop.
+  RefPointer<MediaPacket> packet = MediaPacket::make();
+
+  RefPointer<MediaAudio> audio = MediaAudio::make(
+      decoder->getFrameSize(),
+      decoder->getSampleRate(),
+      decoder->getChannels(),
+      decoder->getChannelLayout(),
+      decoder->getSampleFormat());
+
+  int32_t rSampleRate = decoder->getSampleRate();
+  AudioChannel::Layout rLayout = AudioChannel::CH_LAYOUT_STEREO;
+  int32_t rChannels = AudioChannel::getNumChannelsInLayout(rLayout);
+  AudioFormat::Type rFormat = AudioFormat::SAMPLE_FMT_S16;
+  RefPointer<MediaAudio> rAudio = MediaAudio::make(
+      decoder->getFrameSize(),
+      rSampleRate,
+      rChannels,
+      rLayout,
+      rFormat
+  );
+
+  // now let's make a resampler
+  RefPointer<MediaAudioResampler> resampler =
+      MediaAudioResampler::make(
+          rAudio->getChannelLayout(),
+          rAudio->getSampleRate(),
+          rAudio->getFormat(),
+          audio->getChannelLayout(),
+          audio->getSampleRate(),
+          audio->getFormat()
+      );
+  resampler->open();
+
+  FILE* output = fopen("MediaAudioResamplerTest_testResample.au", "wb");
+  TS_ASSERT(output);
+
+  int32_t numSamples = 0;
+  while(source->read(packet.value()) >= 0) {
+    // got a packet; now we try to decode it.
+    if (packet->getStreamIndex() == streamToDecode &&
+        packet->isComplete()) {
+      int32_t bytesRead = 0;
+      int32_t byteOffset=0;
+      do {
+        bytesRead = decoder->decodeAudio(audio.value(), packet.value(), byteOffset);
+        if (audio->isComplete()) {
+          writeAudio(output, audio.value(), resampler.value(), rAudio.value());
+          numSamples += audio->getNumSamples();
+        }
+        byteOffset += bytesRead;
+      } while(byteOffset < packet->getSize());
+      // now, handle the case where bytesRead is 0; we need to flush any
+      // cached packets
+      do {
+        decoder->decodeAudio(audio.value(), 0, 0);
+        if (audio->isComplete()) {
+          writeAudio(output, audio.value(), resampler.value(), rAudio.value());
+          numSamples += audio->getNumSamples();
+        }
+      } while (audio->isComplete());
+    }
+    if (0 && numSamples > 10240)
+      break;
+  }
+  source->close();
+  fclose(output);
 }
 
 void
@@ -140,5 +272,4 @@ MediaAudioResamplerTest::testResampleErrors()
     out = MediaAudio::make(1000, outSampleRate, AudioChannel::getNumChannelsInLayout(outLayout), outLayout, AudioFormat::SAMPLE_FMT_S32);
     TS_ASSERT_THROWS(resampler->resample(out.value(), in.value()), HumbleInvalidArgument);
   }
-
 }

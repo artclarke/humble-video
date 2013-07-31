@@ -114,6 +114,10 @@ public class MediaPictureResampler extends Configurable {
   // JNIHelper.swg: End generated code
   
 
+  public MediaPictureResampler.State getState() {
+    return MediaPictureResampler.State.swigToEnum(VideoJNI.MediaPictureResampler_getState(swigCPtr, this));
+  }
+
 /**
  * Get the width in pixels we expect on the input frame to the resampler. 
  *  
@@ -165,6 +169,14 @@ public class MediaPictureResampler extends Configurable {
  */
   public PixelFormat.Type getOutputFormat() {
     return PixelFormat.Type.swigToEnum(VideoJNI.MediaPictureResampler_getOutputFormat(swigCPtr, this));
+  }
+
+/**
+ * Opens the resampler so it can be ready for resampling.  
+ * You should NOT set options after you open this object.  
+ */
+  public void open() {
+    VideoJNI.MediaPictureResampler_open(swigCPtr, this);
   }
 
 /**
@@ -250,6 +262,49 @@ public class MediaPictureResampler extends Configurable {
 
     @SuppressWarnings("unused")
     private Flag(Flag swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
+  public enum State {
+    STATE_INITED,
+    STATE_OPENED,
+    STATE_ERROR;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static State swigToEnum(int swigValue) {
+      State[] swigValues = State.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (State swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + State.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private State() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private State(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private State(State swigEnum) {
       this.swigValue = swigEnum.swigValue;
       SwigNext.next = this.swigValue+1;
     }

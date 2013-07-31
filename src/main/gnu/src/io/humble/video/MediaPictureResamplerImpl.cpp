@@ -42,6 +42,7 @@ MediaPictureResamplerImpl :: MediaPictureResamplerImpl()
   mIPixelFmt = PixelFormat::PIX_FMT_NONE;
   mOPixelFmt = PixelFormat::PIX_FMT_NONE;
   mContext = 0;
+  mState = STATE_INITED;
 }
 
 MediaPictureResamplerImpl :: ~MediaPictureResamplerImpl()
@@ -88,9 +89,16 @@ MediaPictureResamplerImpl :: getOutputFormat()
 }
 
 void
+MediaPictureResamplerImpl::open() {
+  mState = STATE_OPENED;
+}
+void
 MediaPictureResamplerImpl :: resample(MediaPicture* pOutFrame, MediaPicture* pInFrame)
 {
   int32_t retval = -1;
+  if (mState != STATE_OPENED) {
+    VS_THROW(HumbleRuntimeError("open() must be called before resample is attempted"));
+  }
   MediaPictureImpl* outFrame = dynamic_cast<MediaPictureImpl*>(pOutFrame);
   MediaPictureImpl* inFrame  = dynamic_cast<MediaPictureImpl*>(pInFrame);
   if (!outFrame)
