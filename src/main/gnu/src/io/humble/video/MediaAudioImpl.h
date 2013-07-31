@@ -104,7 +104,6 @@ private:
       io::humble::ferry::Buffer* buffer);
 
   AVFrame* mFrame;
-  int32_t  mMaxSamples;
   bool     mComplete;
 };
 

@@ -41,7 +41,6 @@ MediaAudioImpl::MediaAudioImpl() {
   mFrame = av_frame_alloc();
   if (!mFrame) throw std::bad_alloc();
   mFrame->opaque = this;
-  mMaxSamples = 0;
   mComplete = false;
 }
 
@@ -118,7 +117,6 @@ MediaAudioImpl::make(io::humble::ferry::Buffer* buffer, int32_t numSamples,
   av_frame_set_sample_rate(frame, sampleRate);
   av_frame_set_channels(frame, channels);
   av_frame_set_channel_layout(frame, layout);
-  retval->mMaxSamples = numSamples;
   frame->nb_samples = numSamples;
   frame->format = format;
   // we're going to tell the world this buffer now contains the right kind of data
@@ -150,7 +148,7 @@ MediaAudioImpl::make(io::humble::ferry::Buffer* buffer, int32_t numSamples,
   // fill in the extended_data planes
   uint8_t* buf = (uint8_t*) buffer->getBytes(0, bufSize);
   ret = av_samples_fill_arrays(frame->extended_data, &frame->linesize[0], buf,
-      retval->getChannels(), retval->mMaxSamples, (enum AVSampleFormat) frame->format,
+      retval->getChannels(), numSamples, (enum AVSampleFormat) frame->format,
       0);
   if (ret < 0) {
     VS_THROW(HumbleRuntimeError("Could not layout all the audio data; fatal error"));
@@ -176,7 +174,6 @@ MediaAudioImpl::copy(AVFrame* src, bool complete) {
   // release any memory we have
   av_frame_unref(mFrame);
   // and copy any data in.
-  mMaxSamples = src->nb_samples;
   av_frame_ref(mFrame, src);
   mComplete=complete;
 }
@@ -195,7 +192,8 @@ MediaAudioImpl::make(MediaAudioImpl* src, bool copy) {
         src->getChannelLayout(),
         src->getFormat());
 
-    retval->mComplete = src->mComplete;
+    retval->setComplete(src->isComplete());
+    retval->setNumSamples(src->getNumSamples());
 
     // then copy the data into retval
     int32_t n = src->getNumDataPlanes();
@@ -212,9 +210,8 @@ MediaAudioImpl::make(MediaAudioImpl* src, bool copy) {
     retval = make();
 
     // then do the reference
-    retval->mMaxSamples = src->mMaxSamples;
-    retval->mComplete = src->mComplete;
     av_frame_ref(retval->mFrame, src->mFrame);
+    retval->setComplete(src->isComplete());
   }
   return retval.get();
 }
@@ -247,10 +244,13 @@ MediaAudioImpl::getDataPlaneSize(int32_t plane) {
   int32_t n = getNumDataPlanes();
   if (plane < 0 || plane >= n)
     VS_THROW(HumbleInvalidArgument("plane is out of range"));
-  // oddly for audio, each plane in multiplane audio must
-  // be the same as linesize[0] and sometimes ffmpeg
-  // doesn't copy all that data in.
-  return mFrame->linesize[0];
+  if (isComplete())
+    return AudioFormat::getDataPlaneSizeNeeded(getNumSamples(), getChannels(), getFormat());
+  else
+    // oddly for audio, each plane in multiplane audio must
+    // be the same as linesize[0] and sometimes ffmpeg
+    // doesn't copy all that data in.
+    return mFrame->linesize[0];
 }
 
 int32_t
@@ -261,7 +261,9 @@ MediaAudioImpl::getNumDataPlanes() {
 
 int32_t
 MediaAudioImpl::getMaxNumSamples() {
-  return mMaxSamples;
+  int32_t bytesPerSample = AudioFormat::getBytesPerSample(getFormat());
+  int32_t size = bytesPerSample ? mFrame->linesize[0] / bytesPerSample : 0;
+  return size;
 }
 
 int32_t
@@ -295,7 +297,7 @@ MediaAudioImpl::getNumSamples() {
 }
 void
 MediaAudioImpl::setNumSamples(int32_t numSamples) {
-  if (numSamples <= 0 || numSamples > mMaxSamples) {
+  if (numSamples <= 0 || numSamples > getMaxNumSamples()) {
     VS_THROW(HumbleInvalidArgument("invalid number of samples to put in this MediaAudio object"));
   }
   mFrame->nb_samples = numSamples;

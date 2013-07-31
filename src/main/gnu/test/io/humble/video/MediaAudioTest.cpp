@@ -127,7 +127,7 @@ MediaAudioTest::testCreation() {
   for (int i = 0; i < channels; i++) {
     buf = audio->getData(i);
     TS_ASSERT(buf);
-    TS_ASSERT_EQUALS(audio->getDataPlaneSize(i), buf->getBufferSize());
+    TS_ASSERT_EQUALS(audio->getDataPlaneSize(i), AudioFormat::getDataPlaneSizeNeeded(audio->getNumSamples(), audio->getChannels(),audio->getFormat()));
   }
   // now let's try packed audio
   audio = MediaAudio::make(numSamples, sampleRate, channels, layout,

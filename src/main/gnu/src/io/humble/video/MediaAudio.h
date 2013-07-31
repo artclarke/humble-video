@@ -486,6 +486,9 @@ public:
 
   /**
    * The total number of bytes in {@link #getData()} that represent valid audio data.
+   * If {@link #isComplete()} returns true, this returns the total number of bytes
+   * returned by {@link #getData(int)} that are readable from. Otherwise it will
+   * return the total number of bytes that are writable to.
    *
    * @return The size in bytes of that plane of audio data.
    */
