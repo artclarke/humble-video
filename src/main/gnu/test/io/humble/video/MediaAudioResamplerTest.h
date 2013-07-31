@@ -35,6 +35,7 @@ public:
   virtual
   ~MediaAudioResamplerTest();
   void testCreation();
+  void testResampleErrors();
 };
 
 #endif /* MEDIAAUDIORESAMPLERTEST_H_ */

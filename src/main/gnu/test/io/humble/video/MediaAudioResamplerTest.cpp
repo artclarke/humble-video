@@ -84,3 +84,61 @@ MediaAudioResamplerTest::testCreation()
       inLayout, inSampleRate, inFormat);
   TS_ASSERT(resampler);
 }
+
+void
+MediaAudioResamplerTest::testResampleErrors()
+{
+  RefPointer<MediaAudioResampler> resampler;
+  AudioChannel::Layout outLayout = AudioChannel::CH_LAYOUT_STEREO;
+  AudioChannel::Layout inLayout = AudioChannel::CH_LAYOUT_5POINT1;
+  int32_t outSampleRate = 22050;
+  int32_t inSampleRate = 44100;
+  AudioFormat::Type outFormat = AudioFormat::SAMPLE_FMT_S16;
+  AudioFormat::Type inFormat = AudioFormat::SAMPLE_FMT_DBLP;
+
+  resampler = MediaAudioResampler::make(outLayout, outSampleRate, outFormat,
+      inLayout, inSampleRate, inFormat);
+  TS_ASSERT(resampler);
+  resampler->open();
+
+  // now, test that we get the right errors when samples do not match.
+  RefPointer<MediaAudio> in;
+  RefPointer<MediaAudio> out;
+  {
+    LoggerStack stack;
+    stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
+
+    in = MediaAudio::make(1000, inSampleRate*2, AudioChannel::getNumChannelsInLayout(inLayout), inLayout, inFormat);
+    out = MediaAudio::make(1000, outSampleRate, AudioChannel::getNumChannelsInLayout(outLayout), outLayout, outFormat);
+    TS_ASSERT_THROWS(resampler->resample(out.value(), in.value()), HumbleInvalidArgument);
+
+    in = MediaAudio::make(1000, inSampleRate, AudioChannel::getNumChannelsInLayout(inLayout)*2, AudioChannel::CH_LAYOUT_UNKNOWN, inFormat);
+    out = MediaAudio::make(1000, outSampleRate, AudioChannel::getNumChannelsInLayout(outLayout), outLayout, outFormat);
+    TS_ASSERT_THROWS(resampler->resample(out.value(), in.value()), HumbleInvalidArgument);
+
+    in = MediaAudio::make(1000, inSampleRate, AudioChannel::getNumChannelsInLayout(inLayout), AudioChannel::CH_LAYOUT_UNKNOWN, inFormat);
+    out = MediaAudio::make(1000, outSampleRate, AudioChannel::getNumChannelsInLayout(outLayout), outLayout, outFormat);
+    TS_ASSERT_THROWS(resampler->resample(out.value(), in.value()), HumbleInvalidArgument);
+
+    in = MediaAudio::make(1000, inSampleRate, AudioChannel::getNumChannelsInLayout(inLayout), inLayout, AudioFormat::SAMPLE_FMT_S32);
+    out = MediaAudio::make(1000, outSampleRate, AudioChannel::getNumChannelsInLayout(outLayout), outLayout, outFormat);
+    TS_ASSERT_THROWS(resampler->resample(out.value(), in.value()), HumbleInvalidArgument);
+
+    in = MediaAudio::make(1000, inSampleRate, AudioChannel::getNumChannelsInLayout(inLayout), inLayout, inFormat);
+    out = MediaAudio::make(1000, outSampleRate*2, AudioChannel::getNumChannelsInLayout(outLayout), outLayout, outFormat);
+    TS_ASSERT_THROWS(resampler->resample(out.value(), in.value()), HumbleInvalidArgument);
+
+    in = MediaAudio::make(1000, inSampleRate, AudioChannel::getNumChannelsInLayout(inLayout), inLayout, inFormat);
+    out = MediaAudio::make(1000, outSampleRate, AudioChannel::getNumChannelsInLayout(outLayout)*2, AudioChannel::CH_LAYOUT_UNKNOWN, outFormat);
+    TS_ASSERT_THROWS(resampler->resample(out.value(), in.value()), HumbleInvalidArgument);
+
+    in = MediaAudio::make(1000, inSampleRate, AudioChannel::getNumChannelsInLayout(inLayout), inLayout, inFormat);
+    out = MediaAudio::make(1000, outSampleRate, AudioChannel::getNumChannelsInLayout(outLayout), AudioChannel::CH_LAYOUT_UNKNOWN, outFormat);
+    TS_ASSERT_THROWS(resampler->resample(out.value(), in.value()), HumbleInvalidArgument);
+
+    in = MediaAudio::make(1000, inSampleRate, AudioChannel::getNumChannelsInLayout(inLayout), inLayout, inFormat);
+    out = MediaAudio::make(1000, outSampleRate, AudioChannel::getNumChannelsInLayout(outLayout), outLayout, AudioFormat::SAMPLE_FMT_S32);
+    TS_ASSERT_THROWS(resampler->resample(out.value(), in.value()), HumbleInvalidArgument);
+  }
+
+}
