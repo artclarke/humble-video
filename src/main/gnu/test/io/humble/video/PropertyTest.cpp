@@ -11,6 +11,7 @@
 #include <io/humble/ferry/LoggerStack.h>
 #include "PropertyTest.h"
 #include <io/humble/video/Property.h>
+#include <io/humble/video/PropertyNotFoundException.h>
 #include <io/humble/video/KeyValueBag.h>
 #include <io/humble/video/Source.h>
 
@@ -48,8 +49,14 @@ PropertyTest::testValgrindStrlenIssue()
   // option types that have no data in them.
   // This test tries to ensure we have a patched FFmpeg.
   RefPointer<Configurable> c = Source::make();
-  char* value=c->getPropertyAsString("cryptokey");
-  TS_ASSERT(!value);
+
+  {
+    LoggerStack stack;
+    stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
+
+    char* value = c->getPropertyAsString("cryptokey");
+    if (value) free(value);
+  }
 }
 void
 PropertyTest :: testCreation()
@@ -81,6 +88,8 @@ PropertyTest :: testIteration()
     VS_LOG_DEBUG("Name: %s", name);
     VS_LOG_DEBUG("Description: %s", property->getHelp());
     VS_LOG_DEBUG("Default: %lld", property->getDefault());
+    if (strcmp(name, "cryptokey")==0)
+      continue;
     VS_LOG_DEBUG("Current value (boolean) : %d", (int32_t)c->getPropertyAsBoolean(name));
     VS_LOG_DEBUG("Current value (double)  : %f", c->getPropertyAsDouble(name));
     VS_LOG_DEBUG("Current value (long)    : %lld", c->getPropertyAsLong(name));
@@ -111,7 +120,7 @@ PropertyTest :: testSetMetaData()
   TSM_ASSERT("", dict->getNumKeys() == 2);
   TSM_ASSERT("", unset->getNumKeys() == 0);
 
-  TSM_ASSERT("", c->setProperty(dict.value(), unset.value()) == 0);
+  c->setProperty(dict.value(), unset.value());
 
   TSM_ASSERT("", c->getPropertyAsLong(realKey) == 1000);
 

@@ -214,9 +214,9 @@ namespace io { namespace humble { namespace ferry {
   const HumbleStackTrace& __humble_trace = (e); \
   const std::exception* __humble_err = dynamic_cast<const std::exception*>(&__humble_trace); \
   if (__humble_err) \
-    VS_LOG_ERROR(__humble_err->what()); \
+    VS_LOG_ERROR("%s: %s", VS_STRINGIFY(e), __humble_err->what()); \
   else \
-    VS_LOG_ERROR("unknown exception thrown"); \
+    VS_LOG_ERROR("%s: unknown exception thrown", VS_STRINGIFY(e)); \
   int __humble_num_frames = __humble_trace.getNumFrames(); \
   for(int __humble_i = 0; __humble_i < __humble_num_frames; __humble_i++) { \
     const char* __humble_frame = __humble_trace.getFrameDescription(__humble_i); \

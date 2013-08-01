@@ -146,6 +146,8 @@ public class Configurable extends RefCounted {
  * Returns the name of the named property.  
  * @param	name The property name.  
  * @return	a Property value for this properties meta-data  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
   public Property getPropertyMetaData(String name) {
     long cPtr = VideoJNI.Configurable_getPropertyMetaData__SWIG_1(swigCPtr, this, name);
@@ -158,10 +160,11 @@ public class Configurable extends RefCounted {
  *  
  * @param	name The property name. For example "b" for bit-rate.  
  * @param	value The value of the property.  
- * @return	>= 0 if the property was successfully set; <0 on error  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
-  public int setProperty(String name, String value) {
-    return VideoJNI.Configurable_setProperty__SWIG_0(swigCPtr, this, name, value);
+  public void setProperty(String name, String value) {
+    VideoJNI.Configurable_setProperty__SWIG_0(swigCPtr, this, name, value);
   }
 
 /**
@@ -169,10 +172,11 @@ public class Configurable extends RefCounted {
  * value of the property to 'value'.  
  * @param	name name of option  
  * @param	value Value of option  
- * @return	>= 0 on success; <0 on error.  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
-  public int setProperty(String name, double value) {
-    return VideoJNI.Configurable_setProperty__SWIG_1(swigCPtr, this, name, value);
+  public void setProperty(String name, double value) {
+    VideoJNI.Configurable_setProperty__SWIG_1(swigCPtr, this, name, value);
   }
 
 /**
@@ -180,10 +184,11 @@ public class Configurable extends RefCounted {
  * value of the property to 'value'.  
  * @param	name name of option  
  * @param	value Value of option  
- * @return	>= 0 on success; <0 on error.  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
-  public int setProperty(String name, long value) {
-    return VideoJNI.Configurable_setProperty__SWIG_2(swigCPtr, this, name, value);
+  public void setProperty(String name, long value) {
+    VideoJNI.Configurable_setProperty__SWIG_2(swigCPtr, this, name, value);
   }
 
 /**
@@ -191,10 +196,11 @@ public class Configurable extends RefCounted {
  * value of the property to 'value'.  
  * @param	name name of option  
  * @param	value Value of option  
- * @return	>= 0 on success; <0 on error.  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
-  public int setProperty(String name, boolean value) {
-    return VideoJNI.Configurable_setProperty__SWIG_3(swigCPtr, this, name, value);
+  public void setProperty(String name, boolean value) {
+    VideoJNI.Configurable_setProperty__SWIG_3(swigCPtr, this, name, value);
   }
 
 /**
@@ -202,23 +208,19 @@ public class Configurable extends RefCounted {
  * value of the property to 'value'.  
  * @param	name name of option  
  * @param	value Value of option  
- * @return	>= 0 on success; <0 on error.  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
-  public int setProperty(String name, Rational value) {
-    return VideoJNI.Configurable_setProperty__SWIG_4(swigCPtr, this, name, Rational.getCPtr(value), value);
+  public void setProperty(String name, Rational value) {
+    VideoJNI.Configurable_setProperty__SWIG_4(swigCPtr, this, name, Rational.getCPtr(value), value);
   }
 
 /**
  * Gets a property on this Object.  
- * <p>  
- * Note for C++ callers; you must free the returned array with  
- * delete[] in order to avoid a memory leak. If you call  
- * from Java or any other language, you don't need to worry  
- * about this.  
- * </p>  
  * @param	name property name  
- * @return	an string copy of the option value, or null if the option 
- *		 doesn't exist.  
+ * @return	a string copy of the option value.  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
   public String getPropertyAsString(String name) {
     return VideoJNI.Configurable_getPropertyAsString(swigCPtr, this, name);
@@ -227,7 +229,9 @@ public class Configurable extends RefCounted {
 /**
  * Gets the value of this property, and returns as a double;  
  * @param	name name of option  
- * @return	double value of property, or 0 on error.  
+ * @return	double value of property.  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
   public double getPropertyAsDouble(String name) {
     return VideoJNI.Configurable_getPropertyAsDouble(swigCPtr, this, name);
@@ -236,7 +240,9 @@ public class Configurable extends RefCounted {
 /**
  * Gets the value of this property, and returns as an long;  
  * @param	name name of option  
- * @return	long value of property, or 0 on error.  
+ * @return	long value of property.  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
   public long getPropertyAsLong(String name) {
     return VideoJNI.Configurable_getPropertyAsLong(swigCPtr, this, name);
@@ -245,7 +251,9 @@ public class Configurable extends RefCounted {
 /**
  * Gets the value of this property, and returns as an int;  
  * @param	name name of option  
- * @return	int value of property, or 0 on error.  
+ * @return	int value of property.  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
   public int getPropertyAsInt(String name) {
     return VideoJNI.Configurable_getPropertyAsInt(swigCPtr, this, name);
@@ -254,7 +262,9 @@ public class Configurable extends RefCounted {
 /**
  * Gets the value of this property, and returns as an Rational;  
  * @param	name name of option  
- * @return	long value of property, or 0 on error.  
+ * @return	long value of property.  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
   public Rational getPropertyAsRational(String name) {
     long cPtr = VideoJNI.Configurable_getPropertyAsRational(swigCPtr, this, name);
@@ -264,7 +274,9 @@ public class Configurable extends RefCounted {
 /**
  * Gets the value of this property, and returns as a boolean  
  * @param	name name of option  
- * @return	boolean value of property, or false on error.  
+ * @return	boolean value of property.  
+ * @throws	PropertyNotFoundException if this property is not found. 
+ *		  
  */
   public boolean getPropertyAsBoolean(String name) {
     return VideoJNI.Configurable_getPropertyAsBoolean(swigCPtr, this, name);
@@ -277,10 +289,9 @@ public class Configurable extends RefCounted {
  * @param	valuesNotFound If non null will contain all key-values pairs 
  *		 in valuesToSet  
  * that were not found in context.  
- * @return	0 on success; <0 on failure  
  */
-  public int setProperty(KeyValueBag valuesToSet, KeyValueBag valuesNotFound) {
-    return VideoJNI.Configurable_setProperty__SWIG_5(swigCPtr, this, KeyValueBag.getCPtr(valuesToSet), valuesToSet, KeyValueBag.getCPtr(valuesNotFound), valuesNotFound);
+  public void setProperty(KeyValueBag valuesToSet, KeyValueBag valuesNotFound) {
+    VideoJNI.Configurable_setProperty__SWIG_5(swigCPtr, this, KeyValueBag.getCPtr(valuesToSet), valuesToSet, KeyValueBag.getCPtr(valuesNotFound), valuesNotFound);
   }
 
 }

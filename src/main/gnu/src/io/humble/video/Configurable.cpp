@@ -55,40 +55,40 @@ Configurable::getPropertyMetaData(const char *name)
   return PropertyImpl::getPropertyMetaData(getCtx(), name);
 }
 
-int32_t
+void
 Configurable::setProperty(KeyValueBag* valuesToSet, KeyValueBag* valuesNotFound)
 {
-  return PropertyImpl::setProperty(getCtx(), valuesToSet, valuesNotFound);
+  PropertyImpl::setProperty(getCtx(), valuesToSet, valuesNotFound);
 }
 
-int32_t
+void
 Configurable::setProperty(const char* aName, const char *aValue)
 {
-  return PropertyImpl::setProperty(getCtx(), aName, aValue);
+  PropertyImpl::setProperty(getCtx(), aName, aValue);
 }
 
-int32_t
+void
 Configurable::setProperty(const char* aName, double aValue)
 {
-  return PropertyImpl::setProperty(getCtx(), aName, aValue);
+  PropertyImpl::setProperty(getCtx(), aName, aValue);
 }
 
-int32_t
+void
 Configurable::setProperty(const char* aName, int64_t aValue)
 {
-  return PropertyImpl::setProperty(getCtx(), aName, aValue);
+  PropertyImpl::setProperty(getCtx(), aName, aValue);
 }
 
-int32_t
+void
 Configurable::setProperty(const char* aName, bool aValue)
 {
-  return PropertyImpl::setProperty(getCtx(), aName, aValue);
+  PropertyImpl::setProperty(getCtx(), aName, aValue);
 }
 
-int32_t
+void
 Configurable::setProperty(const char* aName, Rational *aValue)
 {
-  return PropertyImpl::setProperty(getCtx(), aName, aValue);
+  PropertyImpl::setProperty(getCtx(), aName, aValue);
 }
 
 char*

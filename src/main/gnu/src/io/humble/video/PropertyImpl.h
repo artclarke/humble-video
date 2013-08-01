@@ -97,9 +97,9 @@ namespace io { namespace humble { namespace video {
      * @param name name of option
      * @param value Value of option
      * 
-     * @return >= 0 on success; <0 on error.
+     * @throws PropertyNotFoundException if property is not found.
      */
-    static int32_t setProperty(void * context, const char* name, const char* value);
+    static void setProperty(void * context, const char* name, const char* value);
     
     /**
      * Looks up the property 'name' in 'context' and sets the
@@ -109,9 +109,9 @@ namespace io { namespace humble { namespace video {
      * @param name name of option
      * @param value Value of option
      * 
-     * @return >= 0 on success; <0 on error.
+     * @throws PropertyNotFoundException if property is not found.
      */
-    static int32_t setProperty(void * context, const char* name, double value);
+    static void setProperty(void * context, const char* name, double value);
     
     /**
      * Looks up the property 'name' in 'context' and sets the
@@ -121,9 +121,10 @@ namespace io { namespace humble { namespace video {
      * @param name name of option
      * @param value Value of option
      * 
-     * @return >= 0 on success; <0 on error.
+     * @throws PropertyNotFoundException if property is not found.
+     *
      */
-    static int32_t setProperty(void * context, const char* name, int64_t value);
+    static void setProperty(void * context, const char* name, int64_t value);
     
     /**
      * Looks up the property 'name' in 'context' and sets the
@@ -133,9 +134,9 @@ namespace io { namespace humble { namespace video {
      * @param name name of option
      * @param value Value of option
      * 
-     * @return >= 0 on success; <0 on error.
+     * @throws PropertyNotFoundException if property is not found.
      */
-    static int32_t setProperty(void * context, const char* name, bool value);
+    static void setProperty(void * context, const char* name, bool value);
     
     /**
      * Looks up the property 'name' in 'context' and sets the
@@ -145,9 +146,9 @@ namespace io { namespace humble { namespace video {
      * @param name name of option
      * @param value Value of option
      * 
-     * @return >= 0 on success; <0 on error.
+     * @throws PropertyNotFoundException if property is not found.
      */
-    static int32_t setProperty(void * context, const char* name, Rational *value);
+    static void setProperty(void * context, const char* name, Rational *value);
 
     /**
      * Gets the value of this property, and returns as a new[]ed string.
@@ -157,8 +158,9 @@ namespace io { namespace humble { namespace video {
      * @param context AVClass context to search for option in.
      * @param name name of option
      * 
-     * @return string version of option value (caller must call delete[]) or
-     *   null on error.
+     * @return string version of option value (caller must call delete[]).
+     *
+     * @throws PropertyNotFoundException if property is not found.
      */
     static char * getPropertyAsString(void * context, const char* name);
 
@@ -168,7 +170,9 @@ namespace io { namespace humble { namespace video {
      * @param context AVClass context to search for option in.
      * @param name name of option
      * 
-     * @return double value of property, or 0 on error.
+     * @return double value of property.
+     *
+     * @throws PropertyNotFoundException if property is not found.
      */
     static double getPropertyAsDouble(void * context, const char* name);
 
@@ -178,7 +182,9 @@ namespace io { namespace humble { namespace video {
      * @param context AVClass context to search for option in.
      * @param name name of option
      * 
-     * @return long value of property, or 0 on error.
+     * @return long value of property.
+     *
+     * @throws PropertyNotFoundException if property is not found.
      */
     static int64_t getPropertyAsLong(void * context, const char* name);
 
@@ -188,7 +194,9 @@ namespace io { namespace humble { namespace video {
      * @param context AVClass context to search for option in.
      * @param name name of option
      *
-     * @return int value of property, or 0 on error.
+     * @return int value of property.
+     *
+     * @throws PropertyNotFoundException if property is not found.
      */
     static int32_t getPropertyAsInt(void * context, const char* name);
 
@@ -198,7 +206,9 @@ namespace io { namespace humble { namespace video {
      * @param context AVClass context to search for option in.
      * @param name name of option
      * 
-     * @return long value of property, or 0 on error.
+     * @return long value of property.
+     *
+     * @throws PropertyNotFoundException if property is not found.
      */
     static Rational *getPropertyAsRational(void * context, const char* name);
 
@@ -208,7 +218,9 @@ namespace io { namespace humble { namespace video {
      * @param context AVClass context to search for option in.
      * @param name name of option
      * 
-     * @return boolean value of property, or false on error.
+     * @return boolean value of property.
+     *
+     * @throws PropertyNotFoundException if property is not found.
      */
     static bool getPropertyAsBoolean(void * context, const char* name);
 
@@ -220,10 +232,8 @@ namespace io { namespace humble { namespace video {
      * @param valuesNotFound If non null will contain all key-values pairs in valuesToSet
      *                       that were not found in context.
      *
-     * @return 0 on success; <0 on failure
-     * @since 5.0
      */
-    static int32_t setProperty(void *context, KeyValueBag* valuesToSet, KeyValueBag* valuesNotFound);
+    static void setProperty(void *context, KeyValueBag* valuesToSet, KeyValueBag* valuesNotFound);
 
   protected:
     PropertyImpl();
@@ -232,6 +242,8 @@ namespace io { namespace humble { namespace video {
   private:
     const AVOption *mOption;
     const AVOption *mOptionStart;
+    static void checkError(int32_t e, const char* name);
+    static void checkArgs(void *context, const char* name);
   };
 
 }}}

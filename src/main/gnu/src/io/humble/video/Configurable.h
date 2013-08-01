@@ -78,6 +78,7 @@ public:
    * @param name  The property name.
    *
    * @return a Property value for this properties meta-data
+   * @throws PropertyNotFoundException if this property is not found.
    */
   virtual Property *
   getPropertyMetaData(const char *name);
@@ -90,9 +91,9 @@ public:
    * @param name The property name.  For example "b" for bit-rate.
    * @param value The value of the property.
    *
-   * @return >= 0 if the property was successfully set; <0 on error
+   * @throws PropertyNotFoundException if this property is not found.
    */
-  virtual int32_t
+  virtual void
   setProperty(const char *name, const char* value);
 
   /**
@@ -102,9 +103,9 @@ public:
    * @param name name of option
    * @param value Value of option
    *
-   * @return >= 0 on success; <0 on error.
+   * @throws PropertyNotFoundException if this property is not found.
    */
-  virtual int32_t
+  virtual void
   setProperty(const char* name, double value);
 
   /**
@@ -114,9 +115,9 @@ public:
    * @param name name of option
    * @param value Value of option
    *
-   * @return >= 0 on success; <0 on error.
+   * @throws PropertyNotFoundException if this property is not found.
    */
-  virtual int32_t
+  virtual void
   setProperty(const char* name, int64_t value);
 
   /**
@@ -126,9 +127,9 @@ public:
    * @param name name of option
    * @param value Value of option
    *
-   * @return >= 0 on success; <0 on error.
+   * @throws PropertyNotFoundException if this property is not found.
    */
-  virtual int32_t
+  virtual void
   setProperty(const char* name, bool value);
 
   /**
@@ -138,9 +139,9 @@ public:
    * @param name name of option
    * @param value Value of option
    *
-   * @return >= 0 on success; <0 on error.
+   * @throws PropertyNotFoundException if this property is not found.
    */
-  virtual int32_t
+  virtual void
   setProperty(const char* name, Rational *value);
 
 #ifdef SWIG
@@ -150,16 +151,11 @@ public:
   /**
    * Gets a property on this Object.
    *
-   * <p>
-   * Note for C++ callers; you must free the returned array with
-   * delete[] in order to avoid a memory leak.  If you call
-   * from Java or any other language, you don't need to worry
-   * about this.
-   * </p>
-   *
    * @param name property name
    *
-   * @return an string copy of the option value, or null if the option doesn't exist.
+   * @return a string copy of the option value.
+   *
+   * @throws PropertyNotFoundException if this property is not found.
    */
   virtual char *
   getPropertyAsString(const char* name);
@@ -169,7 +165,10 @@ public:
    *
    * @param name name of option
    *
-   * @return double value of property, or 0 on error.
+   * @return double value of property.
+   *
+   * @throws PropertyNotFoundException if this property is not found.
+   *
    */
   virtual double
   getPropertyAsDouble(const char* name);
@@ -179,7 +178,9 @@ public:
    *
    * @param name name of option
    *
-   * @return long value of property, or 0 on error.
+   * @return long value of property.
+   *
+   * @throws PropertyNotFoundException if this property is not found.
    */
   virtual int64_t
   getPropertyAsLong(const char* name);
@@ -189,7 +190,9 @@ public:
    *
    * @param name name of option
    *
-   * @return int value of property, or 0 on error.
+   * @return int value of property.
+   *
+   * @throws PropertyNotFoundException if this property is not found.
    */
   virtual int32_t
   getPropertyAsInt(const char* name);
@@ -199,7 +202,9 @@ public:
    *
    * @param name name of option
    *
-   * @return long value of property, or 0 on error.
+   * @return long value of property.
+   *
+   * @throws PropertyNotFoundException if this property is not found.
    */
   virtual Rational *
   getPropertyAsRational(const char* name);
@@ -209,7 +214,9 @@ public:
    *
    * @param name name of option
    *
-   * @return boolean value of property, or false on error.
+   * @return boolean value of property.
+   *
+   * @throws PropertyNotFoundException if this property is not found.
    */
   virtual bool
   getPropertyAsBoolean(const char* name);
@@ -221,9 +228,8 @@ public:
    * @param valuesNotFound If non null will contain all key-values pairs in valuesToSet
    *                       that were not found in context.
    *
-   * @return 0 on success; <0 on failure
    */
-  virtual int32_t
+  virtual void
   setProperty(KeyValueBag* valuesToSet, KeyValueBag* valuesNotFound);
 protected:
 #ifndef SWIG
