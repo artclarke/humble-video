@@ -291,18 +291,16 @@ namespace io { namespace humble { namespace video
       if (!jenv)
         throw e;
 
-      logger->error(__FILE__, __LINE__, "Checking error:%s", e.what());
       if (dynamic_cast<const io::humble::video::PropertyNotFoundException *>(&e))
       {
-        logger->error(__FILE__, __LINE__, "PropNotFound:%s", e.what());
         io::humble::ferry::JNIHelper::throwJavaException(jenv, "io/humble/video/PropertyNotFoundException", e);
       } else {
         JNIHelper::catchException(jenv, e);
       }
     } catch(std::exception & e1) {
-      logger->error(__FILE__, __LINE__, "Got exception when handing exeptions. Yikes: %s", e1.what());
+      logger->error(__FILE__, __LINE__, "Got exception when handing exceptions. Yikes: %s", e1.what());
     } catch (...) {
-      logger->error(__FILE__, __LINE__, "Got exception when handing exeptions. Yikes: %s", "totally unknown whack job error");
+      logger->error(__FILE__, __LINE__, "Got exception when handing exceptions. Yikes: %s", "totally unknown whack job error");
     }
     delete logger;
   }

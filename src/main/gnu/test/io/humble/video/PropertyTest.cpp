@@ -105,7 +105,7 @@ void
 PropertyTest :: testSetMetaData()
 {
   LoggerStack stack;
-  stack.setGlobalLevel(Logger::LEVEL_WARN, false);
+  stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
 
   RefPointer<Configurable> c = Source::make();
   RefPointer<KeyValueBag> dict = KeyValueBag::make();
@@ -125,8 +125,7 @@ PropertyTest :: testSetMetaData()
   TSM_ASSERT("", c->getPropertyAsLong(realKey) == 1000);
 
   // make sure the fake isn't there.
-  RefPointer<Property> fakeProperty = c->getPropertyMetaData(fakeKey);
-  TSM_ASSERT("", !fakeProperty);
+  TS_ASSERT_THROWS(c->getPropertyMetaData(fakeKey), PropertyNotFoundException);
 
   // now make sure the returned dictionary only had the fake in it.
   TSM_ASSERT("", unset->getNumKeys() == 1);

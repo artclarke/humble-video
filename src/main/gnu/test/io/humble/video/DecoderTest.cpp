@@ -92,7 +92,7 @@ DecoderTest::testOpenWithOptions() {
   RefPointer<Decoder> decoder = Decoder::make(codec.value());
 
   TS_ASSERT_EQUALS(0, (int32_t)decoder->getPropertyAsLong("maxrate"));
-  TS_ASSERT_EQUALS(-1, (int32_t)decoder->getPropertyAsLong("dual_mono_mode"));
+//  TS_ASSERT_EQUALS(-1, (int32_t)decoder->getPropertyAsLong("dual_mono_mode"));
 
   // a valid option, all decoders
   inOpts->setValue("maxrate", "500000");
