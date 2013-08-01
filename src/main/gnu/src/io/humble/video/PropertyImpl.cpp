@@ -160,6 +160,8 @@ PropertyImpl::getPropertyMetaData(void *aContext, int32_t aPropertyNo) {
       }
     }
   } while (last);
+  if (!retval)
+    VS_THROW(HumbleInvalidArgument("Property Number must be < getNumProperties()"));
   return retval.get();
 }
 
@@ -174,7 +176,11 @@ PropertyImpl::getPropertyMetaData(void *aContext, const char *aName) {
   if (last) {
     if (last->type != AV_OPT_TYPE_CONST) {
       retval = PropertyImpl::make(av_opt_next(aContext, 0), last);
+    } else {
+      VS_THROW(HumbleRuntimeError::make("Property is a OPT_TYPE_CONST value; no metadata: %s", aName));
     }
+  } else {
+    VS_THROW(PropertyNotFoundException(aName));
   }
   return retval.get();
 }

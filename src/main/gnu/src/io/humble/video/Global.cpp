@@ -280,33 +280,30 @@ namespace io { namespace humble { namespace video
   }
 
   void
-  Global::catchException(const std::exception & e1) {
-    JNIHelper* helper = JNIHelper::getHelper();
-    if (!helper)
-      throw e1;
-
-    JNIEnv* jenv = helper->getEnv();
-    if (!jenv)
-      throw e1;
-
+  Global::catchException(const std::exception & e) {
+    Logger* logger = Logger::getLogger("io.humble.video");
     try {
-      throw e1;
-    }
-    catch(io::humble::video::PropertyNotFoundException & e)
-    {
-      io::humble::ferry::JNIHelper::throwJavaException(jenv, "io/humble/video/PropertyNotFoundException", e);
-    }
-    catch(io::humble::ferry::HumbleInterruptedException & e)
-    {
-      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/InterruptedException", e);
-    }
-    catch (std::exception & e) {
-      JNIHelper::catchException(jenv, e);
-    }
-    catch (...) {
-      std::runtime_error e("Unhandled and unknown native exception");
-      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
-    }
+      JNIHelper* helper = JNIHelper::getHelper();
+      if (!helper)
+        throw e;
 
+      JNIEnv* jenv = helper->getEnv();
+      if (!jenv)
+        throw e;
+
+      logger->error(__FILE__, __LINE__, "Checking error:%s", e.what());
+      if (dynamic_cast<const io::humble::video::PropertyNotFoundException *>(&e))
+      {
+        logger->error(__FILE__, __LINE__, "PropNotFound:%s", e.what());
+        io::humble::ferry::JNIHelper::throwJavaException(jenv, "io/humble/video/PropertyNotFoundException", e);
+      } else {
+        JNIHelper::catchException(jenv, e);
+      }
+    } catch(std::exception & e1) {
+      logger->error(__FILE__, __LINE__, "Got exception when handing exeptions. Yikes: %s", e1.what());
+    } catch (...) {
+      logger->error(__FILE__, __LINE__, "Got exception when handing exeptions. Yikes: %s", "totally unknown whack job error");
+    }
+    delete logger;
   }
 }}}

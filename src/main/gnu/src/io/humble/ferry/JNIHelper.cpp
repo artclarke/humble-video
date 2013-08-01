@@ -552,19 +552,16 @@ namespace io { namespace humble { namespace ferry {
     return JNIHelper::throwJavaException(env, javaClassName, e);
   }
   void
-  JNIHelper::catchException(JNIEnv* jenv, const std::exception & e1) {
-    try {
-      throw e1;
-    }
-    catch(io::humble::ferry::HumbleInterruptedException & e)
+  JNIHelper::catchException(JNIEnv* jenv, const std::exception & e) {
+    if (dynamic_cast<const HumbleInterruptedException*>(&e))
     {
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/InterruptedException", e);
     }
-    catch(std::invalid_argument & e)
+    else if (dynamic_cast<const std::invalid_argument*>(&e))
     {
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/IllegalArgumentException", e);
     }
-    catch(std::bad_alloc & e)
+    else if (dynamic_cast<const std::bad_alloc*>(&e))
     {
       // OK, this is bad and may mean we can't do things like
       // allocate a new class at this time; but we should have
@@ -574,13 +571,8 @@ namespace io { namespace humble { namespace ferry {
       if (helper)
         helper->throwOutOfMemoryError();
     }
-    catch(std::exception & e)
+    else
     {
-      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
-    }
-    catch(...)
-    {
-      std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
     }
   }

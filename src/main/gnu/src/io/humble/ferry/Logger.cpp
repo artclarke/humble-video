@@ -61,6 +61,7 @@ namespace io { namespace humble { namespace ferry {
   }
   Logger :: Logger(const char* loggerName, jobject javaLogger)
   {
+    mPrintStackTrace = false;
     Logger::init();
     for(unsigned int i =0 ; i< sizeof(mIsLogging)/sizeof(bool); i++)
       mIsLogging[i] = true;
@@ -343,6 +344,17 @@ namespace io { namespace humble { namespace ferry {
       didLog = this->doLog(level, msg);
     }
     return didLog;
+  }
+
+  bool
+  Logger :: isPrintStackTrace()
+  {
+    return mPrintStackTrace;
+  }
+  void
+  Logger :: setPrintStackTrace(bool val)
+  {
+    mPrintStackTrace = val;
   }
 
 #define VS_LOGGER_CONVENIENCE_METHOD(__FUNCNAME, __LEVEL) \

@@ -71,6 +71,8 @@ class FerryJNI {
   public final static native boolean Logger_info(long jarg1, Logger jarg1_, String jarg2, int jarg3, String jarg4);
   public final static native boolean Logger_debug(long jarg1, Logger jarg1_, String jarg2, int jarg3, String jarg4);
   public final static native boolean Logger_trace(long jarg1, Logger jarg1_, String jarg2, int jarg3, String jarg4);
+  public final static native boolean Logger_isPrintStackTrace(long jarg1, Logger jarg1_);
+  public final static native void Logger_setPrintStackTrace(long jarg1, Logger jarg1_, boolean jarg2);
   public final static native boolean Logger_isLogging(long jarg1, Logger jarg1_, int jarg2);
   public final static native void Logger_setIsLogging(long jarg1, Logger jarg1_, int jarg2, boolean jarg3);
   public final static native boolean Logger_isGlobalLogging(int jarg1);

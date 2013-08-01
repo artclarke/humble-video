@@ -198,6 +198,14 @@ public class Logger {
     return FerryJNI.Logger_trace(swigCPtr, this, filename, lineNo, format);
   }
 
+  public boolean isPrintStackTrace() {
+    return FerryJNI.Logger_isPrintStackTrace(swigCPtr, this);
+  }
+
+  public void setPrintStackTrace(boolean value) {
+    FerryJNI.Logger_setPrintStackTrace(swigCPtr, this, value);
+  }
+
   public boolean isLogging(Logger.Level level) {
     return FerryJNI.Logger_isLogging(swigCPtr, this, level.swigValue());
   }

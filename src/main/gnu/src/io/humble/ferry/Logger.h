@@ -107,6 +107,9 @@ namespace io { namespace humble { namespace ferry {
     bool trace(const char* filename, int lineNo, const char* format, ...);
 
 
+    bool isPrintStackTrace();
+    void setPrintStackTrace(bool value);
+
     bool isLogging(Level level);
     void setIsLogging(Level level, bool value);
     static bool isGlobalLogging(Level level);
@@ -131,6 +134,7 @@ namespace io { namespace humble { namespace ferry {
     static const int cMaxLoggerNameLength=255;
     char mLoggerName[cMaxLoggerNameLength+1];
     bool mIsLogging[5];
+    bool mPrintStackTrace;
 
     bool doLog(Level level, const char*msg);
     bool doNativeLog(Level level, const char *msg);
@@ -218,10 +222,10 @@ namespace io { namespace humble { namespace ferry {
   else \
     VS_LOG_ERROR("%s: unknown exception thrown", VS_STRINGIFY(e)); \
   int __humble_num_frames = __humble_trace.getNumFrames(); \
-  for(int __humble_i = 0; __humble_i < __humble_num_frames; __humble_i++) { \
+  if (vs_logger_static_context->isPrintStackTrace()) { for(int __humble_i = 0; __humble_i < __humble_num_frames; __humble_i++) { \
     const char* __humble_frame = __humble_trace.getFrameDescription(__humble_i); \
     VS_LOG_ERROR("Stack frame [%d]: %s", __humble_i, __humble_frame); \
-  } \
+  } } \
   __humble_trace.raise(); \
 } while (0)
 

@@ -47,6 +47,12 @@ public:
 
   virtual
   ~PropertyNotFoundException() throw ();
+
+  virtual void
+  raise() const {
+    throw *this;
+  }
+
 };
 
 } /* namespace video */
