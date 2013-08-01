@@ -2013,13 +2013,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getFormat(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2048,13 +2049,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getFormatN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2082,13 +2084,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getDescripto
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2114,13 +2117,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getNumInstall
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2148,13 +2152,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getInstalled
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2182,13 +2187,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getNumPlanes(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2216,13 +2222,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1swapEndiannes
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2254,13 +2261,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getBufferSize
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2296,13 +2304,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2338,13 +2347,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2380,13 +2390,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2422,13 +2433,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2464,13 +2476,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2602,13 +2615,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2644,13 +2658,14 @@ SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1g
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2686,13 +2701,14 @@ SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1g
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2728,13 +2744,14 @@ SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1g
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2770,13 +2787,14 @@ SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1g
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2814,13 +2832,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2856,13 +2875,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1get
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2898,13 +2918,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1get
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2942,13 +2963,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1ge
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -2984,13 +3006,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1get
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3098,13 +3121,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1getNumerator(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3140,13 +3164,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1getDenominator(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3182,13 +3207,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1copy(JNIEnv *je
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3227,13 +3253,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1compareTo(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3265,13 +3292,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1sCompareTo(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3307,13 +3335,14 @@ SWIGEXPORT jdouble JNICALL Java_io_humble_video_VideoJNI_Rational_1getDouble(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3355,13 +3384,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1reduce(JNIEnv *j
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3396,13 +3426,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1sReduce(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3441,13 +3472,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1multiply(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3479,13 +3511,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sMultiply(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3524,13 +3557,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1divide(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3562,13 +3596,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sDivide(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3607,13 +3642,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1subtract(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3645,13 +3681,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sSubtract(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3690,13 +3727,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1add(JNIEnv *jen
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3728,13 +3766,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sAdd(JNIEnv *je
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3775,13 +3814,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1rescale_1_1SWIG
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3815,13 +3855,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sRescale_1_1SWI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3847,13 +3888,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1make_1_1SWIG_10
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3881,13 +3923,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1make_1_1SWIG_11
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3916,13 +3959,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1make_1_1SWIG_12
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -3952,13 +3996,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1make_1_1SWIG_13
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4001,13 +4046,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1rescale_1_1SWIG
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4043,13 +4089,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sRescale_1_1SWI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4087,13 +4134,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1rescale_1_1SWIG
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4129,13 +4177,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Rational_1setNumerator(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4169,13 +4218,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Rational_1setDenominator(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4209,13 +4259,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Rational_1setValue(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4249,13 +4300,14 @@ SWIGEXPORT jdouble JNICALL Java_io_humble_video_VideoJNI_Rational_1getValue(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4291,13 +4343,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Rational_1isFinalized(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4331,13 +4384,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Rational_1init(JNIEnv *jen
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4385,13 +4439,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Global_1getDefaultTimeBas
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4417,13 +4472,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Global_1getVersionMajor(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4449,13 +4505,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Global_1getVersionMinor(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4481,13 +4538,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Global_1getVersionStr(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4513,13 +4571,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Global_1getAVFormatVersion
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4545,13 +4604,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Global_1getAVFormatVers
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4577,13 +4637,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Global_1getAVCodecVersion(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4609,13 +4670,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Global_1getAVCodecVersi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4638,13 +4700,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Global_1init(JNIEnv *jenv,
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4668,13 +4731,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Global_1setFFmpegLoggingLe
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4756,13 +4820,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1getNumKeys(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4800,13 +4865,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1getKey(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4850,13 +4916,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1getValue(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4905,13 +4972,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1setValue_1_1S
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4939,13 +5007,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1make(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -4995,13 +5064,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1setValue_1_1S
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5039,13 +5109,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Error_1getType(JNIEnv *jen
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5081,13 +5152,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Error_1getDescription(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5123,13 +5195,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Error_1getErrorNumber(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5157,13 +5230,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Error_1make_1_1SWIG_10(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5191,13 +5265,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Error_1make_1_1SWIG_11(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5225,13 +5300,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Error_1errorNumberToType(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5259,13 +5335,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Error_1typeToErrorNumber(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5469,13 +5546,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Property_1getName(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5511,13 +5589,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Property_1getHelp(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5553,13 +5632,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Property_1getUnit(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5595,13 +5675,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Property_1getType(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5637,13 +5718,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Property_1getFlags(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5679,13 +5761,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Property_1getDefault(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5721,13 +5804,14 @@ SWIGEXPORT jdouble JNICALL Java_io_humble_video_VideoJNI_Property_1getDefaultAsD
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5763,13 +5847,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Property_1getNumFlagSettin
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5807,13 +5892,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Property_1getFlagConstant
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5855,13 +5941,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Property_1getFlagConstant
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5898,13 +5985,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Media_1getTimeStamp(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5940,13 +6028,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Media_1setTimeStamp(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -5980,13 +6069,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Media_1getTimeBase(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6022,13 +6112,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Media_1isKey(JNIEnv *j
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6064,13 +6155,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Media_1isComplete(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6107,13 +6199,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaEncoded_1setTimeBase(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6147,13 +6240,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getTimeStamp(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6189,13 +6283,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1setTimeStamp(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6229,13 +6324,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getTimeBase(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6271,13 +6367,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1isKey(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6313,13 +6410,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getPts(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6355,13 +6453,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getMetaData(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6397,13 +6496,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getPacketPts(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6439,13 +6539,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getPacketDts(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6481,13 +6582,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getPacketSize(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6523,13 +6625,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getPacketDurati
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -6565,13 +6668,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getBestEffortTi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7263,13 +7367,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getChannelB
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7300,13 +7405,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getChanne
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7334,13 +7440,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getNumChanne
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7368,13 +7475,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getDefaultLa
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7404,13 +7512,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getIndexOfCh
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7440,13 +7549,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getChannelFr
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7474,13 +7584,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getChanne
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7508,13 +7619,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getChanne
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7542,13 +7654,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getLayout
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7708,13 +7821,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getName(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7746,13 +7860,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getFormat(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7783,13 +7898,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getAlternateS
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7817,13 +7933,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getPackedSamp
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7851,13 +7968,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getPlanarSamp
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7885,13 +8003,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getBytesPerSa
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7919,13 +8038,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1isPlanar(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7957,13 +8077,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getBufferSize
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -7995,13 +8116,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getDataPlaneS
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8037,13 +8159,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8082,13 +8205,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8119,13 +8243,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8163,13 +8288,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getData(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8207,13 +8333,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getDataPlaneSi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8249,13 +8376,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getNumDataPlan
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8291,13 +8419,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getMaxNumSampl
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8333,13 +8462,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getNumSamples(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8375,13 +8505,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1setNumSamples(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8415,13 +8546,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getBytesPerSam
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8457,13 +8589,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1setComplete(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8497,13 +8630,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getSampleRate(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8539,13 +8673,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getChannels(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8581,13 +8716,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getFormat(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8623,13 +8759,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1isComplete
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8665,13 +8802,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1isKey(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8707,13 +8845,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1isPlanar(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8749,13 +8888,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getChannelLayo
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8883,13 +9023,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1make_1_1SWI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8924,13 +9065,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1make_1_1SWI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -8961,13 +9103,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1make_1_1SWI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9005,13 +9148,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getData(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9049,13 +9193,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getDataPlane
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9091,13 +9236,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getNumDataPl
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9135,13 +9281,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getLineSize(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9177,13 +9324,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setComplete(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9217,13 +9365,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1isComple
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9259,13 +9408,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getWidth(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9301,13 +9451,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getHeight(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9343,13 +9494,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getFormat(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9385,13 +9537,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getCodedPict
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9427,13 +9580,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setCodedPict
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9467,13 +9621,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getDisplayPi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9509,13 +9664,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setDisplayPi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9549,13 +9705,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getQuality(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9591,13 +9748,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setQuality(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9633,13 +9791,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getError(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9675,13 +9834,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getRepeatPic
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9717,13 +9877,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setRepeatPic
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9757,13 +9918,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1isInterl
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9799,13 +9961,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setInterlace
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9839,13 +10002,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1isTopFie
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9881,13 +10045,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setTopFieldF
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9921,13 +10086,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1isPalett
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -9963,13 +10129,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setPaletteCh
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10003,13 +10170,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getType(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10045,13 +10213,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setType(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10085,13 +10254,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getFormat(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10127,13 +10297,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getStartDi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10169,13 +10340,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getEndDisp
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10211,13 +10383,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getNumRecta
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10253,13 +10426,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getTimeSta
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10297,13 +10471,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getRectang
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10339,13 +10514,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1setTimeStam
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10379,13 +10555,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1isKey(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10421,13 +10598,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getPts(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10463,13 +10641,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getPacketP
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10505,13 +10684,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getPacketD
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10547,13 +10727,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getPacketSi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10589,13 +10770,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getPacketD
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10631,13 +10813,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getBestEff
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10673,13 +10856,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1isCompl
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10717,13 +10901,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1setComplete
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10769,13 +10954,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10811,13 +10997,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10853,13 +11040,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10895,13 +11083,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10937,13 +11126,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -10979,13 +11169,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11021,13 +11212,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11063,13 +11255,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11105,13 +11298,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11149,13 +11343,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11193,13 +11388,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1g
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11369,13 +11565,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11404,13 +11601,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11441,13 +11639,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11475,13 +11674,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11517,13 +11717,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getData(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11559,13 +11760,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getNumSideDat
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11603,13 +11805,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getSideData(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11647,13 +11850,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getSideDataTy
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11689,13 +11893,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getPts(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11731,13 +11936,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setPts(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11771,13 +11977,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getDts(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11813,13 +12020,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setDts(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11853,13 +12061,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getSize(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11895,13 +12104,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getMaxSize(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11937,13 +12147,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getStreamInde
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -11979,13 +12190,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getFlags(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12021,13 +12233,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1isKeyPack
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12063,13 +12276,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getDuration(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12105,13 +12319,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getPosition(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12147,13 +12362,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setKeyPacket(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12187,13 +12403,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setFlags(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12227,13 +12444,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setStreamInde
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12267,13 +12485,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setDuration(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12307,13 +12526,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setPosition(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12347,13 +12567,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getConvergen
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12389,13 +12610,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setConvergenc
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12431,13 +12653,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1reset(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12473,13 +12696,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Configurable_1getNumProper
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12517,13 +12741,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProperty
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12565,13 +12790,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProperty
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12618,13 +12844,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12666,13 +12893,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12713,13 +12941,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12760,13 +12989,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12808,13 +13038,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12855,13 +13086,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProper
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12905,13 +13137,14 @@ SWIGEXPORT jdouble JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProper
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -12954,13 +13187,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProperty
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13003,13 +13237,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Configurable_1getPropertyA
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13052,13 +13287,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProperty
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13101,13 +13337,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Configurable_1getPrope
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13148,13 +13385,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13428,13 +13666,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13470,13 +13709,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13512,13 +13752,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13554,13 +13795,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13596,13 +13838,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13638,13 +13881,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13680,13 +13924,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13720,13 +13965,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1ope
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13764,13 +14010,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1res
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13808,13 +14055,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1ma
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13852,13 +14100,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1make
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13894,13 +14143,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getOu
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13936,13 +14186,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getIn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -13978,13 +14229,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getOu
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14020,13 +14272,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getIn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14062,13 +14315,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getOu
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14104,13 +14358,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getIn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14146,13 +14401,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getIn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14188,13 +14444,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getOu
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14228,13 +14485,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1open(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14274,13 +14532,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1resam
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14318,13 +14577,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14362,13 +14622,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1setCo
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14404,13 +14665,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1dropO
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14448,13 +14710,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1injec
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14492,13 +14755,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getD
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -14534,13 +14798,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getSt
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -15320,13 +15585,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecProfile_1getProfile(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -15362,13 +15628,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_CodecProfile_1getName(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20242,13 +20509,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Codec_1hasCapability(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20284,13 +20552,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getCapabilities(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20326,13 +20595,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Codec_1getName(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20368,13 +20638,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getIDAsInt(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20410,13 +20681,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getID(JNIEnv *jenv,
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20452,13 +20724,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getType(JNIEnv *jen
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20494,13 +20767,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Codec_1canDecode(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20536,13 +20810,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Codec_1canEncode(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20570,13 +20845,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findEncodingCodec(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20604,13 +20880,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findEncodingCodecB
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20642,13 +20919,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findEncodingCodecB
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20677,13 +20955,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findDecodingCodec(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20711,13 +20990,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findDecodingCodecB
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20749,13 +21029,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findDecodingCodecB
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20805,13 +21086,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1guessEncodingCodec
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20850,13 +21132,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Codec_1getLongName(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20882,13 +21165,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumInstalledCode
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20916,13 +21200,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1getInstalledCodec(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -20958,13 +21243,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedVide
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21002,13 +21288,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedVideoF
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21044,13 +21331,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedVide
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21088,13 +21376,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedVideoPi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21130,13 +21419,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedAudi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21174,13 +21464,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedAudioSa
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21216,13 +21507,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedAudi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21260,13 +21552,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedAudioFo
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21302,13 +21595,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedAudi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21346,13 +21640,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedAudioCh
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21388,13 +21683,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedProf
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21432,13 +21728,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedProfil
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21524,13 +21821,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1hasPr
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21566,13 +21864,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getNam
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21608,13 +21907,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getLon
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21650,13 +21950,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getProper
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21692,13 +21993,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getId(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21734,13 +22036,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getType(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -21768,13 +22071,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1make(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22026,13 +22330,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getNam
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22068,13 +22373,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getLon
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22110,13 +22416,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getExt
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22152,13 +22459,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getFlags(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22194,13 +22502,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getNumSup
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22238,13 +22547,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getSuppor
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22282,13 +22592,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getSuppo
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22321,13 +22632,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_delete_1ContainerFormat(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22361,13 +22673,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getName(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22403,13 +22716,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getLongName
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22445,13 +22759,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getExtensio
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22487,13 +22802,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getFlags(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22529,13 +22845,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getDefaultAudi
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22571,13 +22888,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getDefaultVide
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22613,13 +22931,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getDefaultSubt
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22655,13 +22974,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getMimeType
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22705,13 +23025,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1guessFormat(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22770,13 +23091,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1guessCodec(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22815,13 +23137,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getNumSupporte
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22859,13 +23182,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getSupportedCo
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22903,13 +23227,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getSupportedC
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22935,13 +23260,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getNumFormats(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -22969,13 +23295,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SinkFormat_1getFormat(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23011,13 +23338,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getName(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23053,13 +23381,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getLongNa
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23095,13 +23424,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getExtens
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23137,13 +23467,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getFlags(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23179,13 +23510,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getNumSuppor
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23223,13 +23555,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getSupported
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23267,13 +23600,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getSupporte
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23305,13 +23639,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1findFormat(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23338,13 +23673,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getNumFormat
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23372,13 +23708,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SourceFormat_1getFormat(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23426,13 +23763,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1make(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23468,13 +23806,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1getPosition(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23510,13 +23849,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1getTimeStamp(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23552,13 +23892,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1getFlags(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23594,13 +23935,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1getSize(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23636,13 +23978,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1getMinDistance
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -23678,13 +24021,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1isKeyFrame
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24072,13 +24416,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1open(JNIEnv *jenv, 
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24112,13 +24457,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Coder_1getCodec(JNIEnv *j
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24154,13 +24500,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getCodecType(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24196,13 +24543,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getCodecID(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24238,13 +24586,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getHeight(JNIEnv *j
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24280,13 +24629,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setHeight(JNIEnv *j
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24320,13 +24670,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getWidth(JNIEnv *je
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24362,13 +24713,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setWidth(JNIEnv *je
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24402,13 +24754,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getPixelFormat(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24444,13 +24797,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setPixelType(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24484,13 +24838,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getSampleRate(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24526,13 +24881,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setSampleRate(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24566,13 +24922,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getSampleFormat(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24608,13 +24965,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setSampleFormat(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24648,13 +25006,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getChannels(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24690,13 +25049,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setChannels(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24730,13 +25090,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getChannelLayout(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24772,13 +25133,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setChannelLayout(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24812,13 +25174,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Coder_1getTimeBase(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24855,13 +25218,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setTimeBase(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24895,13 +25259,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getState(JNIEnv *je
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24937,13 +25302,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getFrameCount(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -24979,13 +25345,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getFrameSize(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25014,13 +25381,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Decoder_1make_1_1SWIG_10(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25049,13 +25417,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Decoder_1make_1_1SWIG_11(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25089,13 +25458,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Decoder_1flush(JNIEnv *jen
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25137,13 +25507,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1decodeAudio(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25187,13 +25558,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1decodeVideo(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25237,13 +25609,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1decodeSubtitle(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25272,13 +25645,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Encoder_1make_1_1SWIG_10(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25307,13 +25681,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Encoder_1make_1_1SWIG_11(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25357,13 +25732,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeVideo(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25407,13 +25783,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeAudio(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25455,13 +25832,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeSubtitle(JN
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25713,13 +26091,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getIndex(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25755,13 +26134,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getId(JNI
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25797,13 +26177,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getFrame
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25839,13 +26220,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getTimeB
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25881,13 +26263,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getStart
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25923,13 +26306,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getDurat
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -25965,13 +26349,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getCurre
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26007,13 +26392,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getNumInd
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26049,13 +26435,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getNumFr
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26091,13 +26478,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getSampl
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26133,13 +26521,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getConta
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26175,13 +26564,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getParseT
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26217,13 +26607,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1setParseT
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26257,13 +26648,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getMetaD
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26303,13 +26695,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1findTime
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26349,13 +26742,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1findTimeS
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26393,13 +26787,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getIndex
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26435,13 +26830,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getDispos
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26633,13 +27029,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1getState(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26721,13 +27118,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SourceStream_1getAttached
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26763,13 +27161,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SourceStream_1getDecoder(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26795,13 +27194,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1make(JNIEnv *jenv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26837,13 +27237,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getFormat(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26879,13 +27280,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1getState(JNIEnv *j
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26921,13 +27323,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getSourceFormat(J
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -26963,13 +27366,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Source_1setInputBufferLeng
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27003,13 +27407,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1getInputBufferLeng
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27180,13 +27585,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getDuration(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27222,13 +27628,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getStartTime(JNIE
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27264,13 +27671,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getFileSize(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27306,13 +27714,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1getBitRate(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27348,13 +27757,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1getFlags(JNIEnv *j
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27390,13 +27800,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Source_1setFlags(JNIEnv *j
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27432,13 +27843,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Source_1getFlag(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27476,13 +27888,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Source_1setFlag(JNIEnv *je
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27516,13 +27929,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Source_1getURL(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27558,13 +27972,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1getReadRetryCount(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27600,13 +28015,14 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Source_1setReadRetryCount(
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27640,13 +28056,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Source_1canStreamsBeAd
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27682,13 +28099,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Source_1getMetaData(JNIEn
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27726,13 +28144,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1setForcedAudioCode
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27770,13 +28189,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1setForcedVideoCode
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27814,13 +28234,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1setForcedSubtitleC
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code
@@ -27936,13 +28357,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Source_1getMaxDelay(JNIEnv
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // HumbleVideo.i: End generated code

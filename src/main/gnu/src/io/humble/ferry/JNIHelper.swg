@@ -435,13 +435,14 @@
   catch(std::exception & e)
   {
     io::humble::ferry::JNIHelper::catchException(jenv, e);
+    return $null;
   }
   catch(...)
   {
     std::runtime_error e("Unhandled and unknown native exception");
     io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+    return $null;
   }
-  return $null;
   
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code

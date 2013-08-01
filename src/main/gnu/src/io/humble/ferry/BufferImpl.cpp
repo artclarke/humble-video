@@ -20,6 +20,7 @@
 #include <cstring>
 
 #include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/HumbleException.h>
 #include <io/humble/ferry/JNIMemoryManager.h>
 
 #include <io/humble/ferry/BufferImpl.h>
@@ -92,21 +93,23 @@ namespace io { namespace humble { namespace ferry
   {
     BufferImpl* retval = 0;
     if (bufferSize <= 0)
-      return 0;
+      VS_THROW(HumbleInvalidArgument("bufferSize must be > 0"));
     
     void * allocator = requestor ? requestor->getJavaAllocator() : 0;
     void *buffer = JNIMemoryManager::malloc(allocator, bufferSize);
     if (!buffer)
-      return 0;
+      VS_THROW(HumbleBadAlloc());
       
-    retval = BufferImpl::make();
-    if (!retval) {
+    try {
+      retval = BufferImpl::make();
+
+      retval->mBuffer = buffer;
+      retval->mBufferSize = bufferSize;
+      retval->mInternallyAllocated = true;
+    } catch (std::bad_alloc & e) {
       JNIMemoryManager::free(buffer);
-      return 0;
+      throw;
     }
-    retval->mBuffer = buffer; 
-    retval->mBufferSize = bufferSize;
-    retval->mInternallyAllocated = true;
     return retval;
   }
 
@@ -115,18 +118,21 @@ namespace io { namespace humble { namespace ferry
       FreeFunc freeFunc, void *closure)
   {
     BufferImpl * retval = 0;
-    
+
+    if (!bufToWrap)
+      VS_THROW(HumbleInvalidArgument("bufToWrap must be non null"));
+
+    if (bufferSize <= 0)
+      VS_THROW(HumbleInvalidArgument("bufferSize must be > 0"));
+
     if (bufToWrap && bufferSize>0)
     {
       retval = BufferImpl::make();
-      if (retval)
-      {
-        retval->mFreeFunc = freeFunc;
-        retval->mClosure = closure;
-        retval->mBufferSize = bufferSize;
-        retval->mBuffer = bufToWrap;
-        retval->mInternallyAllocated = false;
-      }
+      retval->mFreeFunc = freeFunc;
+      retval->mClosure = closure;
+      retval->mBufferSize = bufferSize;
+      retval->mBuffer = bufToWrap;
+      retval->mInternallyAllocated = false;
     }
     return retval;
   }
@@ -148,18 +154,15 @@ namespace io { namespace humble { namespace ferry
       Type type, int32_t numElements, bool zero)
   {
     if (numElements <= 0)
-      return 0;
+      VS_THROW(HumbleInvalidArgument("numElements must be > 0"));
     if (type < 0 || type >= BUFFER_NB)
-      return 0;
+      VS_THROW(HumbleInvalidArgument("invalid type"));
     
     int32_t bytesRequested = numElements*mTypeSize[(int32_t)type];
     BufferImpl *retval = BufferImpl::make(requestor, bytesRequested);
-    if (retval)
-    {
-      retval->mType = type;
-      if (zero)
-        memset(retval->getBytes(0, bytesRequested), 0, bytesRequested);
-    }
+    retval->mType = type;
+    if (zero)
+      memset(retval->getBytes(0, bytesRequested), 0, bytesRequested);
     return retval;
   }
   

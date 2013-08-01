@@ -131,10 +131,9 @@ public class Configuration
    * </pre>
    * @param properties The properties to use.
    * @param config The item to configure.
-   * @return <0 on error; >= 0 on success.
    */
   @SuppressWarnings("unchecked")
-  public static int configure(final Properties properties, final Configurable config)
+  public static void configure(final Properties properties, final Configurable config)
   {
     for (
         final Enumeration<String> names = (Enumeration<String>) properties.propertyNames();
@@ -144,19 +143,18 @@ public class Configuration
       final String name = names.nextElement();
       final String value = properties.getProperty(name);
       if (value != null) {
-        final int retval = config.setProperty(name, value);
-        if (retval < 0) {
-          log.warn("Invalid property on object {}; name=\"{}\"; value=\"{}\"",
+        try {
+          config.setProperty(name, value);
+        } catch (PropertyNotFoundException e) { 
+          log.warn("Could not find property on object {}; name=\"{}\"; value=\"{}\"",
               new Object[]{
               config,
               name,
               value
           });
-          return retval;
         }
       }
     }
-    return 0;
   }
   /**
    * Configures an {@link Configurable} from a file.
@@ -166,27 +164,15 @@ public class Configuration
    * </p>
    * @param file A filename for the properties file.
    * @param config The item to configure.
-   * @return <0 on error; >= 0 on success.
+   * @throws IOException 
+   * @throws FileNotFoundException 
    */
   @SuppressWarnings("unchecked")
-  public static int configure(final String file, final Configurable config)
+  public static void configure(final String file, final Configurable config) throws FileNotFoundException, IOException
   {
     Properties props = new Properties();
-    try
-    {
-      props.load(new FileInputStream(file));
-    }
-    catch (FileNotFoundException e)
-    {
-      e.printStackTrace();
-      return -1;
-    }
-    catch (IOException e)
-    {
-      e.printStackTrace();
-      return -1;
-    }
-    return Configuration.configure(props, config);
+    props.load(new FileInputStream(file));
+    Configuration.configure(props, config);
   }
 
 }

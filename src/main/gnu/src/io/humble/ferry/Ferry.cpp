@@ -339,6 +339,7 @@ SWIGINTERN io::humble::ferry::Buffer *io_humble_ferry_Buffer_make__SWIG_2(io::hu
     catch(std::exception & c)
     {
          do {      if (retval) {        (retval)->release();      }      (retval) = 0;    } while (0);
+      throw;
     }
     return retval;
 
@@ -413,6 +414,7 @@ SWIGINTERN io::humble::ferry::Buffer *io_humble_ferry_Buffer_make__SWIG_3(io::hu
         env->DeleteGlobalRef(globalRef);
       globalRef = 0;
          do {      if (retval) {        (retval)->release();      }      (retval) = 0;    } while (0);
+      throw;
     }
     
     return retval;
@@ -458,13 +460,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_new_1AtomicInteger_1_1SWI
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -492,13 +495,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_new_1AtomicInteger_1_1SWI
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -531,13 +535,14 @@ SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_delete_1AtomicInteger(JNIE
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -571,13 +576,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_AtomicInteger_1get(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -613,13 +619,14 @@ SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_AtomicInteger_1set(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -655,13 +662,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_AtomicInteger_1getAndSet(J
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -697,13 +705,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_AtomicInteger_1getAndIncre
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -739,13 +748,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_AtomicInteger_1getAndDecre
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -783,13 +793,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_AtomicInteger_1getAndAdd(J
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -825,13 +836,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_AtomicInteger_1incrementAn
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -867,13 +879,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_AtomicInteger_1decrementAn
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -911,13 +924,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_AtomicInteger_1addAndGet(J
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -957,13 +971,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_ferry_FerryJNI_AtomicInteger_1compare
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -999,13 +1014,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_ferry_FerryJNI_AtomicInteger_1isAtomi
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1041,13 +1057,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_RefCounted_1acquire(JNIEnv
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1083,13 +1100,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_RefCounted_1release(JNIEnv
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1125,13 +1143,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_RefCounted_1getCurrentNati
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1223,13 +1242,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_Logger_1getLogger(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1262,13 +1282,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_Logger_1getStaticLogger(J
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1322,13 +1343,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_ferry_FerryJNI_Logger_1log(JNIEnv *je
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1381,13 +1403,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_ferry_FerryJNI_Logger_1error(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1440,13 +1463,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_ferry_FerryJNI_Logger_1warn(JNIEnv *j
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1499,13 +1523,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_ferry_FerryJNI_Logger_1info(JNIEnv *j
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1558,13 +1583,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_ferry_FerryJNI_Logger_1debug(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1617,13 +1643,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_ferry_FerryJNI_Logger_1trace(JNIEnv *
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1663,13 +1690,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_ferry_FerryJNI_Logger_1isLogging(JNIE
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1707,13 +1735,14 @@ SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_Logger_1setIsLogging(JNIEn
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1739,13 +1768,14 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_ferry_FerryJNI_Logger_1isGlobalLoggin
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1773,13 +1803,14 @@ SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_Logger_1setGlobalIsLogging
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1813,13 +1844,14 @@ SWIGEXPORT jstring JNICALL Java_io_humble_ferry_FerryJNI_Logger_1getName(JNIEnv 
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1852,13 +1884,14 @@ SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_delete_1Logger(JNIEnv *jen
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1882,13 +1915,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_Mutex_1make(JNIEnv *jenv,
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1922,13 +1956,14 @@ SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_Mutex_1lock(JNIEnv *jenv, 
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -1960,13 +1995,14 @@ SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_Mutex_1unlock(JNIEnv *jenv
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2000,13 +2036,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1getBufferSize(JNIE
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2037,13 +2074,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1make_1_1SWIG_10(J
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2079,13 +2117,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1getType(JNIEnv *je
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2121,13 +2160,14 @@ SWIGEXPORT void JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1setType(JNIEnv *je
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return ;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
     }
-    return ;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2153,13 +2193,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1getTypeSize(JNIEnv
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2195,13 +2236,14 @@ SWIGEXPORT jint JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1getSize(JNIEnv *je
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2236,13 +2278,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1make_1_1SWIG_11(J
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2282,13 +2325,14 @@ SWIGEXPORT jobject JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1java_1getByteBu
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2328,13 +2372,14 @@ SWIGEXPORT jbyteArray JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1getByteArray
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2369,13 +2414,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1make_1_1SWIG_12(J
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2410,13 +2456,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_Buffer_1make_1_1SWIG_13(J
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2442,13 +2489,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_RefCountedTester_1make_1_
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
@@ -2477,13 +2525,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_ferry_FerryJNI_RefCountedTester_1make_1_
     catch(std::exception & e)
     {
       io::humble::ferry::JNIHelper::catchException(jenv, e);
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
     }
-    return 0;
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
     // JNIHelper.swg: End generated code
