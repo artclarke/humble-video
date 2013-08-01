@@ -126,6 +126,8 @@ namespace io { namespace humble { namespace video
      * Internal Only.  Call to relese globals.
      */
     static void deinit();
+
+    static void catchException(const std::exception & e);
 #endif // ! SWIG
 
 

@@ -142,6 +142,25 @@ Coder::getBuffer(struct AVCodecContext *s, AVFrame *frame, int flags) {
   return coder->prepareFrame(frame, flags);
 }
 
+int32_t
+Coder::getFrameSize() {
+  int32_t retval = (int32_t) getPropertyAsLong("frame_size");
+  if (retval < 0)
+    return retval;
+  RefPointer<Codec> codec = getCodec();
+  if (codec->getType() == MediaDescriptor::MEDIA_AUDIO)
+  {
+    if (retval <= 1)
+    {
+      // Rats; some PCM encoders give a frame size of 1, which is too
+      //small.  We pick a more sensible value.
+      retval = 576;
+    }
+  }
+  return retval;
+}
+
+
 
 
 } /* namespace video */

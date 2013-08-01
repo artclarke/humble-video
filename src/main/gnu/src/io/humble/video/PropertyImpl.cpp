@@ -17,9 +17,12 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
+#include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/PropertyImpl.h>
 #include <io/humble/video/KeyValueBagImpl.h>
+#include <io/humble/video/Error.h>
 extern "C" {
 #include "FfmpegIncludes.h"
 #include <libavutil/log.h>
@@ -29,6 +32,8 @@ extern "C" {
 #include <cstring>
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
+
+using namespace io::humble::ferry;
 
 namespace io { namespace humble { namespace video {
 
@@ -45,26 +50,18 @@ namespace io { namespace humble { namespace video {
   PropertyImpl*
   PropertyImpl :: make(const AVOption *start, const AVOption *option)
   {
-    PropertyImpl *retval = 0;
-    try
-    {
-      if (!start)
-        throw std::bad_alloc();
-      if (!option)
-        throw std::bad_alloc();
-      retval = PropertyImpl::make();
-      if (retval)
-      {
-        retval ->mOptionStart = start;
-        retval->mOption = option;
-      }
-    }
-    catch (std::bad_alloc & e)
-    {
-      VS_REF_RELEASE(retval);
-      throw e;
-    }
-    return retval;
+    RefPointer<PropertyImpl> retval = 0;
+    if (!start)
+      VS_THROW(HumbleInvalidArgument("no start passed in"));
+
+    if (!option)
+      VS_THROW(HumbleInvalidArgument("no option passed in"));
+
+    retval = PropertyImpl::make();
+    retval ->mOptionStart = start;
+    retval->mOption = option;
+
+    return retval.get();
   }
   
   const char *
@@ -131,69 +128,55 @@ namespace io { namespace humble { namespace video {
   Property*
   PropertyImpl :: getPropertyMetaData(void *aContext, int32_t aPropertyNo)
   {
-    Property *retval = 0;
+    RefPointer<Property> retval;
     const AVOption* last = 0;
 
-    try
-    {
-      if (!aContext)
-        throw std::runtime_error("no context passed in");
+    if (!aContext)
+      VS_THROW(HumbleInvalidArgument("No context passed in"));
 
-      int32_t optionNo=-1;
-      do {
-        last = av_opt_next(aContext, last);
-        if (last)
+    if (aPropertyNo < 0)
+      VS_THROW(HumbleInvalidArgument("Property Number must be >= 0"));
+    int32_t optionNo=-1;
+    do {
+      last = av_opt_next(aContext, last);
+      if (last)
+      {
+        if (last->type != AV_OPT_TYPE_CONST)
         {
-          if (last->type != AV_OPT_TYPE_CONST)
+          ++optionNo;
+          // now see if this option position matches the property asked for
+          if (optionNo == aPropertyNo)
           {
-            ++optionNo;
-            // now see if this option position matches the property asked for
-            if (optionNo == aPropertyNo)
-            {
-              retval = PropertyImpl::make(av_opt_next(aContext, 0), last);
-              break;
-            }
+            retval = PropertyImpl::make(av_opt_next(aContext, 0), last);
+            break;
           }
         }
-      } while (last);
-    }
-    catch (std::exception & e)
-    {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      VS_REF_RELEASE(retval);
-    }    
-    return retval;
+      }
+    } while (last);
+    return retval.get();
   }
 
   Property*
   PropertyImpl :: getPropertyMetaData(void *aContext, const char *aName)
   {
-    Property *retval = 0;
+    RefPointer<Property> retval;
     const AVOption* last = 0;
 
-    try
+    if (!aContext)
+      VS_THROW(HumbleInvalidArgument("No context passed in"));
+
+    if (!aName || !*aName)
+      VS_THROW(HumbleInvalidArgument("No name passed in"));
+
+    last = av_opt_find(aContext, aName, 0, 0, 0);
+    if (last)
     {
-      if (!aContext)
-        throw std::runtime_error("no context passed in");
-      
-      if (!aName || !*aName)
-        throw std::runtime_error("no property name passed in");
-      
-      last = av_opt_find(aContext, aName, 0, 0, 0);
-      if (last)
+      if (last->type != AV_OPT_TYPE_CONST)
       {
-        if (last->type != AV_OPT_TYPE_CONST)
-        {
-          retval = PropertyImpl::make(av_opt_next(aContext, 0), last);
-        }
+        retval = PropertyImpl::make(av_opt_next(aContext, 0), last);
       }
     }
-    catch (std::exception & e)
-    {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      VS_REF_RELEASE(retval);
-    }    
-    return retval;
+    return retval.get();
   }
   
   int32_t
@@ -201,34 +184,26 @@ namespace io { namespace humble { namespace video {
   {
     int32_t retval = -1;
 
-    try
-    {
-      if (!aContext)
-        throw std::runtime_error("no context passed in");
-      
-      if (!aName  || !*aName)
-        throw std::runtime_error("empty property name passed to setProperty");
+    if (!aContext)
+      VS_THROW(HumbleInvalidArgument("No context passed in"));
 
-      void * target=0;
-      const AVOption *o = av_opt_find2(aContext, aName, 0, PROPERTY_SEARCH_CHILDREN, 1, &target);
-      if (o) {
-        AVClass *c = *(AVClass**)target;
-        (void) c;
-        VS_LOG_TRACE("Found option \"%s\" with help: %s; in unit: %s; object type: %s; instance name: %s",
+    if (!aName  || !*aName)
+      VS_THROW(HumbleInvalidArgument("No name passed in"));
+
+    void * target=0;
+    const AVOption *o = av_opt_find2(aContext, aName, 0, PROPERTY_SEARCH_CHILDREN, 1, &target);
+    if (o) {
+      AVClass *c = *(AVClass**)target;
+      (void) c;
+      VS_LOG_TRACE("Found option \"%s\" with help: %s; in unit: %s; object type: %s; instance name: %s",
           o->name,
           o->help,
           o->unit,
           c->class_name,
           c->item_name(aContext));
-      }
-      VS_LOG_TRACE("Setting %s to %s", aName, aValue);
-      retval = av_opt_set(aContext, aName, aValue, PROPERTY_SEARCH_CHILDREN);
     }
-    catch (std::exception & e)
-    {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      retval = -1;
-    }
+    VS_LOG_TRACE("Setting %s to %s", aName, aValue);
+    retval = av_opt_set(aContext, aName, aValue, PROPERTY_SEARCH_CHILDREN);
 
     return retval;
   }
@@ -239,42 +214,35 @@ namespace io { namespace humble { namespace video {
     char* retval = 0;
     char *value = 0;
 
-    try
-    {
-      if (!aContext)
-        throw std::runtime_error("no context passed in");
-      
-      if (!aName  || !*aName)
-        throw std::runtime_error("empty property name passed to setProperty");
+    if (!aContext)
+      VS_THROW(HumbleInvalidArgument("No context passed in"));
 
-      int32_t errorcode = av_opt_get(aContext, aName, 0, (uint8_t**)&value);
-      if (errorcode < 0)
-        throw std::runtime_error("could not get property");
-      
-      if (value)
-      {
-        // let's make a copy of the data
-        int32_t valLen = strlen(value);
-        if (valLen > 0)
-        {
-          retval = (char*)malloc((valLen+1)*sizeof(char));
-          if (!retval)
-            throw std::bad_alloc();
-          
-          // copy the data
-          strncpy(retval, value, valLen+1);
-        }
-      }
+    if (!aName  || !*aName)
+      VS_THROW(HumbleInvalidArgument("No name passed in"));
+
+    int32_t errorcode = av_opt_get(aContext, aName, 0, (uint8_t**)&value);
+    if (errorcode < 0) {
+      RefPointer<Error> error = Error::make(errorcode);
+      VS_THROW(HumbleRuntimeError::make("Could not get property %s: %s", aName, error->getDescription()));
     }
-    catch (std::exception & e)
-    {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      if (retval)
-        free(retval);
-      retval = 0;
-    }
+
     if (value)
-      av_free(value);
+    {
+      // let's make a copy of the data
+      int32_t valLen = strlen(value);
+      if (valLen > 0)
+      {
+        retval = (char*)malloc((valLen+1)*sizeof(char));
+        if (!retval) {
+          av_freep(&value);
+          VS_THROW(HumbleBadAlloc());
+        }
+
+        // copy the data
+        strncpy(retval, value, valLen+1);
+      }
+      av_freep(&value);
+    }
 
     // NOTE: Caller must call free() on returned value; we mean it!
     return retval;
@@ -290,153 +258,122 @@ namespace io { namespace humble { namespace video {
   PropertyImpl :: getNumFlagSettings()
   {
     int32_t retval = 0;
-    try {
-      if (getType() != Property::PROPERTY_FLAGS)
-        throw std::runtime_error("flag is not of type PROPERTY_FLAGS");
-      
-      // now, iterate through all options, counting all CONSTS that belong
-      // to the same unit as this option
-      const char* unit = getUnit();
-      if (!unit || !*unit)
-        throw std::runtime_error("flag doesn't have a unit setting, so can't tell what constants");
-      
-      // Create a fake class 
-      AVClass fakeClass;
-      fakeClass.class_name="humbleVideoFakeClass";
-      fakeClass.item_name = fakeContextToName;
-      fakeClass.option = mOptionStart;
-      AVClass *fakeClassPtr = &fakeClass;
-      
-      const AVOption* last = 0;
-      do
-      {
-        last = av_opt_next(&fakeClassPtr, last);
-        if (last &&
-            last->unit &&
-            last->type == AV_OPT_TYPE_CONST &&
-            strcmp(unit, last->unit)==0)
-          ++retval;
-      } while(last);
-    }
-    catch (std::exception & e)
+    if (getType() != Property::PROPERTY_FLAGS)
+      VS_THROW(HumbleRuntimeError("flag is not of type PROPERTY_FLAGS"));
+
+    // now, iterate through all options, counting all CONSTS that belong
+    // to the same unit as this option
+    const char* unit = getUnit();
+    if (!unit || !*unit)
+      VS_THROW(HumbleRuntimeError("flag doesn't have a unit setting, so can't tell what constants"));
+
+    // Create a fake class
+    AVClass fakeClass;
+    fakeClass.class_name="humbleVideoFakeClass";
+    fakeClass.item_name = fakeContextToName;
+    fakeClass.option = mOptionStart;
+    AVClass *fakeClassPtr = &fakeClass;
+
+    const AVOption* last = 0;
+    do
     {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      retval = -1;
-    }
+      last = av_opt_next(&fakeClassPtr, last);
+      if (last &&
+          last->unit &&
+          last->type == AV_OPT_TYPE_CONST &&
+          strcmp(unit, last->unit)==0)
+        ++retval;
+    } while(last);
     return retval;
   }
 
   Property *
   PropertyImpl :: getFlagConstant(int32_t position)
   {
-    Property *retval = 0;
-    try
+    RefPointer<Property> retval;
+
+    if (getType() != Property::PROPERTY_FLAGS)
+      VS_THROW(HumbleRuntimeError("flag is not of type PROPERTY_FLAGS"));
+
+    // now, iterate through all options, counting all CONSTS that belong
+    // to the same unit as this option
+    const char* unit = getUnit();
+    if (!unit || !*unit)
+      VS_THROW(HumbleRuntimeError("flag doesn't have a unit setting, so can't tell what constants"));
+
+    // Create a fake class
+    AVClass fakeClass;
+    fakeClass.class_name="humbleVideoFakeClass";
+    fakeClass.item_name = fakeContextToName;
+    fakeClass.option = mOptionStart;
+    AVClass *fakeClassPtr = &fakeClass;
+
+    const AVOption* last = 0;
+    int32_t constNo = -1;
+    do
     {
-      if (getType() != Property::PROPERTY_FLAGS)
-        throw std::runtime_error("flag is not of type PROPERTY_FLAGS");
-      
-      // now, iterate through all options, counting all CONSTS that belong
-      // to the same unit as this option
-      const char* unit = getUnit();
-      if (!unit || !*unit)
-        throw std::runtime_error("flag doesn't have a unit setting, so can't tell what constants");
-      
-      // Create a fake class 
-      AVClass fakeClass;
-      fakeClass.class_name="humbleVideoFakeClass";
-      fakeClass.item_name = fakeContextToName;
-      fakeClass.option = mOptionStart;
-      AVClass *fakeClassPtr = &fakeClass;
-      
-      const AVOption* last = 0;
-      int32_t constNo = -1;
-      do
+      last = av_opt_next(&fakeClassPtr, last);
+      if (last &&
+          last->unit &&
+          last->type == AV_OPT_TYPE_CONST &&
+          strcmp(unit, last->unit)==0)
       {
-        last = av_opt_next(&fakeClassPtr, last);
-        if (last &&
-            last->unit &&
-            last->type == AV_OPT_TYPE_CONST &&
-            strcmp(unit, last->unit)==0)
+        // count in the same was as getNumFlagSettings,
+        // and then return if the position is equal
+        ++constNo;
+        if (constNo == position)
         {
-          // count in the same was as getNumFlagSettings,
-          // and then return if the position is equal
-          ++constNo;
-          if (constNo == position)
-          {
-            retval = PropertyImpl::make(av_opt_next(&fakeClassPtr, 0), last);
-          }
+          retval = PropertyImpl::make(av_opt_next(&fakeClassPtr, 0), last);
         }
-      } while(last);
-      
-    }
-    catch (std::exception & e)
-    {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      VS_REF_RELEASE(retval);
-    }
-    return retval;
+      }
+    } while(last);
+
+    return retval.get();
   }
 
   Property *
   PropertyImpl :: getFlagConstant(const char* aName)
   {
-    Property *retval = 0;
-    try
-    {
-      if (getType() != Property::PROPERTY_FLAGS)
-        throw std::runtime_error("flag is not of type PROPERTY_FLAGS");
-      
-      // now, iterate through all options, counting all CONSTS that belong
-      // to the same unit as this option
-      const char* unit = getUnit();
-      if (!unit || !*unit)
-        throw std::runtime_error("flag doesn't have a unit setting, so can't tell what constants");
+    RefPointer<Property> retval;
+    if (getType() != Property::PROPERTY_FLAGS)
+      VS_THROW(HumbleRuntimeError("flag is not of type PROPERTY_FLAGS"));
 
-      AVClass fakeClass;
-      fakeClass.class_name="humbleVideoFakeClass";
-      fakeClass.item_name = fakeContextToName;
-      fakeClass.option = mOptionStart;
-      
-      const AVOption* last = 0;
-      last = av_opt_find(&fakeClass, aName, unit, 0, 0);
-      if (last)
+    // now, iterate through all options, counting all CONSTS that belong
+    // to the same unit as this option
+    const char* unit = getUnit();
+    if (!unit || !*unit)
+      VS_THROW(HumbleRuntimeError("flag doesn't have a unit setting, so can't tell what constants"));
+
+    AVClass fakeClass;
+    fakeClass.class_name="humbleVideoFakeClass";
+    fakeClass.item_name = fakeContextToName;
+    fakeClass.option = mOptionStart;
+
+    const AVOption* last = 0;
+    last = av_opt_find(&fakeClass, aName, unit, 0, 0);
+    if (last)
+    {
+      if (last->type == AV_OPT_TYPE_CONST)
       {
-        if (last->type == AV_OPT_TYPE_CONST)
-        {
-          retval = PropertyImpl::make(av_opt_next(&fakeClass, 0), last);
-        }
+        retval = PropertyImpl::make(av_opt_next(&fakeClass, 0), last);
       }
+    }
 
-    }
-    catch (std::exception & e)
-    {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      VS_REF_RELEASE(retval);
-    }
-    return retval;
+    return retval.get();
   }
   
   double
   PropertyImpl :: getPropertyAsDouble(void *aContext, const char* aName)
   {
     double retval = 0;
-    try
-    {
-      if (!aContext)
-        throw std::runtime_error("no context passed in");
-      
-      if (!aName  || !*aName)
-        throw std::runtime_error("empty property name passed to setProperty");
-      
-      if (av_opt_get_double(aContext, aName, 0, &retval) < 0)
-        throw std::runtime_error("error getting property as double");
+    if (!aContext)
+      VS_THROW(HumbleInvalidArgument("no context passed in"));
 
-    }
-    catch (std::exception &e)
-    {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      retval = 0;
-    }
+    if (!aName  || !*aName)
+      VS_THROW(HumbleInvalidArgument("empty property name passed to getProperty"));
+
+    if (av_opt_get_double(aContext, aName, 0, &retval) < 0)
+      VS_THROW(HumbleRuntimeError::make("error getting property \"%s\"", aName));
     return retval;
   }
   
@@ -444,48 +381,43 @@ namespace io { namespace humble { namespace video {
   PropertyImpl :: getPropertyAsLong(void *aContext, const char* aName)
   {
     int64_t retval = 0;
-    try
-    {
-      if (!aContext)
-        throw std::runtime_error("no context passed in");
-      
-      if (!aName  || !*aName)
-        throw std::runtime_error("empty property name passed to setProperty");
-      
-      retval = av_get_int(aContext, aName, 0);
+    if (!aContext)
+      VS_THROW(HumbleInvalidArgument("no context passed in"));
 
-    }
-    catch (std::exception &e)
-    {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      retval = 0;
-    }
+    if (!aName  || !*aName)
+      VS_THROW(HumbleInvalidArgument("empty property name passed to getProperty"));
+
+    if (av_opt_get_int(aContext, aName, 0, &retval) < 0)
+      VS_THROW(HumbleRuntimeError::make("error getting property \"%s\"", aName));
+
     return retval;
   }
   
   Rational*
   PropertyImpl :: getPropertyAsRational(void *aContext, const char* aName)
   {
-    Rational *retval = 0;
-    try
-    {
-      if (!aContext)
-        throw std::runtime_error("no context passed in");
-      
-      if (!aName  || !*aName)
-        throw std::runtime_error("empty property name passed to setProperty");
-      
-      AVRational value = av_get_q(aContext, aName, 0);
-      retval = Rational::make(value.num, value.den);
-    }
-    catch (std::exception &e)
-    {
-      VS_LOG_DEBUG("Error: %s", e.what());
-      VS_REF_RELEASE(retval);
-    }
-    return retval;
+    RefPointer<Rational> retval;
+    if (!aContext)
+      VS_THROW(HumbleInvalidArgument("no context passed in"));
+
+    if (!aName  || !*aName)
+      VS_THROW(HumbleInvalidArgument("empty property name passed to getProperty"));
+
+    AVRational value;
+    if (av_opt_get_q(aContext, aName, 0, &value)<0)
+      VS_THROW(HumbleRuntimeError::make("error getting property \"%s\"", aName));
+
+    retval = Rational::make(value.num, value.den);
+
+    return retval.get();
   }
   
+  int32_t
+  PropertyImpl :: getPropertyAsInt(void *aContext, const char* aName)
+  {
+    return (int32_t) getPropertyAsLong(aContext, aName);
+  }
+
 
   bool
   PropertyImpl :: getPropertyAsBoolean(void *aContext, const char* aName)

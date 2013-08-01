@@ -12,6 +12,7 @@ noinst_LTLIBRARIES = libhumble-video.la
 libhumble_video_la_LIBADD= $(VS_PKG_LIBRARIES)
 
 libhumble_video_la_SOURCES= \
+  PropertyNotFoundException.cpp \
   AVBufferSupport.cpp \
   PixelFormat.cpp \
   KeyValueBag.cpp \
@@ -59,6 +60,7 @@ nodist_libhumble_video_la_SOURCES= \
 libhumble_video_ladir=$(includedir)/$(VS_CPP_PATH)
 libhumble_video_la_HEADERS= \
   HumbleVideo.h \
+  PropertyNotFoundException.h \
   AVBufferSupport.h \
   Codec.h \
   Codec.swg \

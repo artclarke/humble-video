@@ -16,16 +16,42 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
+/*
+ * PropertyNotFoundException.cpp
+ *
+ *  Created on: Jul 31, 2013
+ *      Author: aclarke
+ */
 
-%typemap (javacode) io::humble::video::Configurable,io::humble::video::Configurable*,io::humble::video::Configurable& %{
-%}
-// This makes any method that declares they throw a HumbleInterruptedException
-// also throw the java.lang.InterruptedException
-%typemap(throws) io::humble::video::PropertyNotFoundException,io::humble::video::PropertyNotFoundException*,io::humble::video::PropertyNotFoundException& %{
-  // we don't let a native exception override a java exception
-  io::humble::ferry::JNIHelper::throwJavaException(jenv, "io/humble/video/PropertyNotFoundException", $1);
-  return $null;
-%}
-%catches(io::humble::video::PropertyNotFoundException) io::humble::video::Configurable;
+#include "PropertyNotFoundException.h"
 
-%include <io/humble/video/Configurable.h>
+using namespace io::humble::ferry;
+
+namespace io {
+namespace humble {
+namespace video {
+
+PropertyNotFoundException::PropertyNotFoundException(const std::string & msg)
+: std::runtime_error(msg), HumbleRuntimeError(msg)
+{
+}
+
+PropertyNotFoundException::~PropertyNotFoundException() throw () {
+}
+
+PropertyNotFoundException
+PropertyNotFoundException::make(const char* fmt, ...) {
+  const size_t bufLen=1048;
+  char buf[bufLen];
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(buf, bufLen, fmt, ap);
+  va_end(ap);
+  std::string msg = buf;
+  return PropertyNotFoundException(msg);
+}
+
+
+} /* namespace video */
+} /* namespace humble */
+} /* namespace io */

@@ -73,6 +73,7 @@ namespace io { namespace humble { namespace ferry {
     mThread_currentThread_mid = 0;
     
     mInterruptedException_class = 0;
+    mThread_interrupt_mid = 0;
   }
 
   void
@@ -290,7 +291,7 @@ namespace io { namespace humble { namespace ferry {
         }
       }
     }
-    catch (std::exception e)
+    catch (std::exception & e)
     {
       std::cerr << "Got exception while checking for debugger: "
         << e.what()
@@ -541,6 +542,67 @@ namespace io { namespace humble { namespace ferry {
     if (!mOutOfMemoryErrorSingleton)
       return;
     env->Throw(mOutOfMemoryErrorSingleton);
+  }
+  int
+  JNIHelper::throwJavaException(const std::string javaClassName, const std::exception & e) {
+    JNIEnv *env = this->getEnv();
+    if (!env)
+      return -1;
+    // exception already pending?
+    return JNIHelper::throwJavaException(env, javaClassName, e);
+  }
+  void
+  JNIHelper::catchException(JNIEnv* jenv, const std::exception & e1) {
+    try {
+      throw e1;
+    }
+    catch(io::humble::ferry::HumbleInterruptedException & e)
+    {
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/InterruptedException", e);
+    }
+    catch(std::invalid_argument & e)
+    {
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/IllegalArgumentException", e);
+    }
+    catch(std::bad_alloc & e)
+    {
+      // OK, this is bad and may mean we can't do things like
+      // allocate a new class at this time; but we should have
+      // one lying around
+      io::humble::ferry::JNIHelper *helper =
+        io::humble::ferry::JNIHelper::getHelper();
+      if (helper)
+        helper->throwOutOfMemoryError();
+    }
+    catch(std::exception & e)
+    {
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+    }
+  }
+
+  int
+  JNIHelper::throwJavaException(JNIEnv *env, const std::string javaClassName, const std::exception & e) {
+
+    if (env->ExceptionCheck())
+      return -1;
+    jclass cls=0;
+
+    // let's set up a singleton out of memory error for potential
+    // reuse later
+    cls = env->FindClass(javaClassName.c_str());
+    // couldn't find the class?
+    if (cls) {
+      int retval = env->ThrowNew(cls, e.what());
+      env->DeleteLocalRef(cls);
+      return retval;
+    } else {
+      return -1;
+    }
   }
   
   int32_t

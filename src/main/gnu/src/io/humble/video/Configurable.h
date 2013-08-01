@@ -31,6 +31,7 @@
 #include <io/humble/video/Property.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/KeyValueBag.h>
+#include <io/humble/video/PropertyNotFoundException.h>
 
 namespace io {
 namespace humble {
@@ -182,6 +183,16 @@ public:
    */
   virtual int64_t
   getPropertyAsLong(const char* name);
+
+  /**
+   * Gets the value of this property, and returns as an int;
+   *
+   * @param name name of option
+   *
+   * @return int value of property, or 0 on error.
+   */
+  virtual int32_t
+  getPropertyAsInt(const char* name);
 
   /**
    * Gets the value of this property, and returns as an Rational;

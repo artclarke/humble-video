@@ -19,8 +19,6 @@
 
 %typemap (javacode) io::humble::video::Container,io::humble::video::Container*,io::humble::video::Container& %{
 %}
-%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Container::getNumStreams;
 %javaexception("java.lang.InterruptedException") io::humble::video::Container::getNumStreams;
-%catches(io::humble::ferry::HumbleInterruptedException) io::humble::video::Container::getStream;
 %javaexception("java.lang.InterruptedException") io::humble::video::Container::getStream;
 %include <io/humble/video/Container.h>

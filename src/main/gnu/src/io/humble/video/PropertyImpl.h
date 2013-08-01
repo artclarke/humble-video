@@ -183,6 +183,16 @@ namespace io { namespace humble { namespace video {
     static int64_t getPropertyAsLong(void * context, const char* name);
 
     /**
+     * Gets the value of this property, and returns as an int;
+     *
+     * @param context AVClass context to search for option in.
+     * @param name name of option
+     *
+     * @return int value of property, or 0 on error.
+     */
+    static int32_t getPropertyAsInt(void * context, const char* name);
+
+    /**
      * Gets the value of this property, and returns as an IRational;
      * 
      * @param context AVClass context to search for option in.

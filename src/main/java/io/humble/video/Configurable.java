@@ -243,6 +243,15 @@ public class Configurable extends RefCounted {
   }
 
 /**
+ * Gets the value of this property, and returns as an int;  
+ * @param	name name of option  
+ * @return	int value of property, or 0 on error.  
+ */
+  public int getPropertyAsInt(String name) {
+    return VideoJNI.Configurable_getPropertyAsInt(swigCPtr, this, name);
+  }
+
+/**
  * Gets the value of this property, and returns as an Rational;  
  * @param	name name of option  
  * @return	long value of property, or 0 on error.  

@@ -63,22 +63,6 @@ Decoder::flush() {
   avcodec_flush_buffers(mCtx);
 }
 
-int32_t
-Decoder::getFrameSize() {
-  int32_t retval = mCtx->frame_size;
-  RefPointer<Codec> codec = getCodec();
-  if (codec->getType() == MediaDescriptor::MEDIA_AUDIO)
-  {
-    if (retval <= 1)
-    {
-      // Rats; some PCM encoders give a frame size of 1, which is too
-      //small.  We pick a more sensible value.
-      retval = 576;
-    }
-  }
-  return retval;
-}
-
 void
 Decoder::ensurePictureParamsMatch(MediaPicture* pict)
 {

@@ -109,6 +109,11 @@ Configurable::getPropertyAsLong(const char *aName)
   return PropertyImpl::getPropertyAsLong(getCtx(), aName);
 }
 
+int32_t
+Configurable::getPropertyAsInt(const char *aName)
+{
+  return PropertyImpl::getPropertyAsInt(getCtx(), aName);
+}
 Rational*
 Configurable::getPropertyAsRational(const char *aName)
 {

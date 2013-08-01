@@ -527,6 +527,7 @@ class VideoJNI {
   public final static native String Configurable_getPropertyAsString(long jarg1, Configurable jarg1_, String jarg2);
   public final static native double Configurable_getPropertyAsDouble(long jarg1, Configurable jarg1_, String jarg2);
   public final static native long Configurable_getPropertyAsLong(long jarg1, Configurable jarg1_, String jarg2);
+  public final static native int Configurable_getPropertyAsInt(long jarg1, Configurable jarg1_, String jarg2);
   public final static native long Configurable_getPropertyAsRational(long jarg1, Configurable jarg1_, String jarg2);
   public final static native boolean Configurable_getPropertyAsBoolean(long jarg1, Configurable jarg1_, String jarg2);
   public final static native int Configurable_setProperty__SWIG_5(long jarg1, Configurable jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_);
@@ -1194,9 +1195,10 @@ class VideoJNI {
   public final static native long Coder_getTimeBase(long jarg1, Coder jarg1_);
   public final static native void Coder_setTimeBase(long jarg1, Coder jarg1_, long jarg2, Rational jarg2_);
   public final static native int Coder_getState(long jarg1, Coder jarg1_);
+  public final static native int Coder_getFrameCount(long jarg1, Coder jarg1_);
+  public final static native int Coder_getFrameSize(long jarg1, Coder jarg1_);
   public final static native long Decoder_make__SWIG_0(long jarg1, Codec jarg1_);
   public final static native long Decoder_make__SWIG_1(long jarg1, Decoder jarg1_);
-  public final static native int Decoder_getFrameSize(long jarg1, Decoder jarg1_);
   public final static native void Decoder_flush(long jarg1, Decoder jarg1_);
   public final static native int Decoder_decodeAudio(long jarg1, Decoder jarg1_, long jarg2, MediaAudio jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native int Decoder_decodeVideo(long jarg1, Decoder jarg1_, long jarg2, MediaPicture jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);

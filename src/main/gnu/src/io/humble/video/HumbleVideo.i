@@ -123,6 +123,32 @@ import io.humble.ferry.Buffer;
 %include "enums.swg"
 
 %import <io/humble/ferry/Ferry.i>
+/** Now we override the exception handler to have module specific exceptions */
+%exception
+{
+  // HumbleVideo.i: Start generated code
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+  try
+  {
+    $action
+  }
+  catch(std::exception & e)
+  {
+    io::humble::video::Global::catchException(e);
+  }
+  catch(...)
+  {
+    std::runtime_error e("Unhandled and unknown native exception");
+    io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+  }
+  return $null;
+  
+  // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+  // HumbleVideo.i: End generated code
+}
+
+
+
 
 %include <io/humble/video/HumbleVideo.h>
 %include <io/humble/video/PixelFormat.h>

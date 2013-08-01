@@ -16,16 +16,40 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
+/*
+ * PropertyNotFoundException.h
+ *
+ *  Created on: Jul 31, 2013
+ *      Author: aclarke
+ */
 
-%typemap (javacode) io::humble::video::Configurable,io::humble::video::Configurable*,io::humble::video::Configurable& %{
-%}
-// This makes any method that declares they throw a HumbleInterruptedException
-// also throw the java.lang.InterruptedException
-%typemap(throws) io::humble::video::PropertyNotFoundException,io::humble::video::PropertyNotFoundException*,io::humble::video::PropertyNotFoundException& %{
-  // we don't let a native exception override a java exception
-  io::humble::ferry::JNIHelper::throwJavaException(jenv, "io/humble/video/PropertyNotFoundException", $1);
-  return $null;
-%}
-%catches(io::humble::video::PropertyNotFoundException) io::humble::video::Configurable;
+#ifndef PROPERTYNOTFOUNDEXCEPTION_H_
+#define PROPERTYNOTFOUNDEXCEPTION_H_
 
-%include <io/humble/video/Configurable.h>
+#include <io/humble/ferry/HumbleException.h>
+#include <cstring>
+#include <cstdlib>
+namespace io {
+namespace humble {
+namespace video {
+
+class PropertyNotFoundException : public virtual io::humble::ferry::HumbleRuntimeError
+{
+public:
+  PropertyNotFoundException(const std::string & message);
+  /**
+   * Raises a HumbleRuntimeError with a sprintf style string.
+   * Does not allocate memory per se, but has a limit of 1k on
+   * the message size.
+   */
+  static PropertyNotFoundException make(const char* format, ...);
+
+
+  virtual
+  ~PropertyNotFoundException() throw ();
+};
+
+} /* namespace video */
+} /* namespace humble */
+} /* namespace io */
+#endif /* PROPERTYNOTFOUNDEXCEPTION_H_ */

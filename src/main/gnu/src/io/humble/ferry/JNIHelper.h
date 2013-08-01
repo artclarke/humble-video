@@ -148,10 +148,6 @@ class JNIHelper
      */
     VS_API_FERRY JNIHelper();
 
-    /*
-     * Added for 2.1
-     */
-    
     VS_API_FERRY void throwOutOfMemoryError();
     
     VS_API_FERRY int32_t isInterrupted();
@@ -159,6 +155,14 @@ class JNIHelper
     VS_API_FERRY bool isInterruptedException(jthrowable exception);
     
     VS_API_FERRY void interrupt();
+
+    /**
+     * Throw an exception of the given java class name, using
+     * the message from e.what() for the message.
+     */
+    VS_API_FERRY int throwJavaException(const std::string javaClassName, const std::exception & e);
+    VS_API_FERRY static int throwJavaException(JNIEnv* env, const std::string javaClassName, const std::exception & e);
+    VS_API_FERRY static void catchException(JNIEnv* env, const std::exception &e);
 
   private:
 

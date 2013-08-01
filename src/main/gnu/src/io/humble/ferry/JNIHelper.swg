@@ -432,52 +432,17 @@
   {
     $action
   }
-  catch(std::invalid_argument & e)
-  {
-    // we don't let a native exception override a java exception
-    if (!jenv->ExceptionCheck())
-    {
-      jclass cls=jenv->FindClass("java/lang/IllegalArgumentException");
-      jenv->ThrowNew(cls, e.what());
-    }
-    return $null;
-  }
-  catch(std::bad_alloc & e)
-  {
-    // we don't let a native exception override a java exception
-    if (!jenv->ExceptionCheck())
-    {
-      // OK, this is bad and may mean we can't do things like 
-      // allocate a new class at this time; but we should have
-      // one lying around
-      io::humble::ferry::JNIHelper *helper = 
-        io::humble::ferry::JNIHelper::getHelper();
-      if (helper) {
-        helper->throwOutOfMemoryError();
-      }
-    }
-    return $null;
-  }
   catch(std::exception & e)
   {
-    // we don't let a native exception override a java exception
-    if (!jenv->ExceptionCheck())
-    {
-      jclass cls=jenv->FindClass("java/lang/RuntimeException");
-      jenv->ThrowNew(cls, e.what());
-    }
-    return $null;
+    io::humble::ferry::JNIHelper::catchException(jenv, e);
   }
   catch(...)
   {
-    // we don't let a native exception override a java exception
-    if (!jenv->ExceptionCheck())
-    {
-      jclass cls=jenv->FindClass("java/lang/RuntimeException");
-      jenv->ThrowNew(cls, "Unhandled and unknown native exception");
-    }
-    return $null;
+    std::runtime_error e("Unhandled and unknown native exception");
+    io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
   }
+  return $null;
+  
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
 }
@@ -486,17 +451,4 @@
 // as a java.nio.ByteBuffer type
 %typemap(jtype)  jNioByteArray, const jNioByteArray &  "java.nio.ByteBuffer";
 %typemap(jstype) jNioByteArray, const jNioByteArray &  "java.nio.ByteBuffer";
-
-// This makes any method that declares they throw a HumbleInterruptedException
-// also throw the java.lang.InterruptedException
-%typemap(throws, throws="java.lang.InterruptedException") io::humble::ferry::HumbleInterruptedException %{
-    // we don't let a native exception override a java exception
-  if (!jenv->ExceptionCheck())
-  {
-    jclass excep = jenv->FindClass("java/lang/InterruptedException");
-    if (excep)
-      jenv->ThrowNew(excep, $1.what());
-  }
-  return $null;
-%}
 

@@ -97,11 +97,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libhumble_video_la_DEPENDENCIES =
-am_libhumble_video_la_OBJECTS = AVBufferSupport.lo PixelFormat.lo \
-	KeyValueBag.lo KeyValueBagImpl.lo Property.lo PropertyImpl.lo \
-	Rational.lo RationalImpl.lo Codec.lo Media.lo MediaRaw.lo \
-	MediaAudio.lo MediaAudioImpl.lo MediaAudioResampler.lo \
-	MediaPicture.lo MediaPictureImpl.lo MediaPictureResampler.lo \
+am_libhumble_video_la_OBJECTS = PropertyNotFoundException.lo \
+	AVBufferSupport.lo PixelFormat.lo KeyValueBag.lo \
+	KeyValueBagImpl.lo Property.lo PropertyImpl.lo Rational.lo \
+	RationalImpl.lo Codec.lo Media.lo MediaRaw.lo MediaAudio.lo \
+	MediaAudioImpl.lo MediaAudioResampler.lo MediaPicture.lo \
+	MediaPictureImpl.lo MediaPictureResampler.lo \
 	MediaPictureResamplerImpl.lo MediaSubtitle.lo \
 	MediaSubtitleImpl.lo IndexEntry.lo IndexEntryImpl.lo Error.lo \
 	ErrorImpl.lo MediaPacket.lo MediaPacketImpl.lo \
@@ -433,6 +434,7 @@ SUFFIXES = .i
 noinst_LTLIBRARIES = libhumble-video.la
 libhumble_video_la_LIBADD = $(VS_PKG_LIBRARIES)
 libhumble_video_la_SOURCES = \
+  PropertyNotFoundException.cpp \
   AVBufferSupport.cpp \
   PixelFormat.cpp \
   KeyValueBag.cpp \
@@ -480,6 +482,7 @@ nodist_libhumble_video_la_SOURCES = \
 libhumble_video_ladir = $(includedir)/$(VS_CPP_PATH)
 libhumble_video_la_HEADERS = \
   HumbleVideo.h \
+  PropertyNotFoundException.h \
   AVBufferSupport.h \
   Codec.h \
   Codec.swg \
@@ -639,6 +642,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PixelFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Property.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyNotFoundException.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Rational.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RationalImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SinkFormat.Plo@am__quote@

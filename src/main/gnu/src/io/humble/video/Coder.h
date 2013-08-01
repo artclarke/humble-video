@@ -280,6 +280,14 @@ public:
    */
   virtual State getState() { return mState; }
 
+  /**
+   * Get the number of frames encoded/decoded so far.
+   * If encoding or decoding has an error, this count is <b>not</b> incremented.
+   */
+  virtual int32_t getFrameCount() { return mCtx->frame_number; }
+
+  virtual int32_t getFrameSize();
+
 
 #ifndef SWIG
   virtual void* getCtx() { return getCodecCtx(); }

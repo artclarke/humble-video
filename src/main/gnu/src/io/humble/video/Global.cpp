@@ -27,6 +27,7 @@
 
 #include <io/humble/video/Global.h>
 #include <io/humble/video/FfmpegIncludes.h>
+#include <io/humble/video/PropertyNotFoundException.h>
 
 /**
  * WARNING: Do not use logging in this class, and do
@@ -276,5 +277,36 @@ namespace io { namespace humble { namespace video
     Global* ctx = sGlobal;
 
     return ctx ? ctx->mDefaultTimeBase.get() : 0;
+  }
+
+  void
+  Global::catchException(const std::exception & e1) {
+    JNIHelper* helper = JNIHelper::getHelper();
+    if (!helper)
+      throw e1;
+
+    JNIEnv* jenv = helper->getEnv();
+    if (!jenv)
+      throw e1;
+
+    try {
+      throw e1;
+    }
+    catch(io::humble::video::PropertyNotFoundException & e)
+    {
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "io/humble/video/PropertyNotFoundException", e);
+    }
+    catch(io::humble::ferry::HumbleInterruptedException & e)
+    {
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/InterruptedException", e);
+    }
+    catch (std::exception & e) {
+      JNIHelper::catchException(jenv, e);
+    }
+    catch (...) {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+    }
+
   }
 }}}

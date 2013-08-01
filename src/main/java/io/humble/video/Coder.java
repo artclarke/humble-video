@@ -301,6 +301,19 @@ public class Coder extends Configurable {
     return Coder.State.swigToEnum(VideoJNI.Coder_getState(swigCPtr, this));
   }
 
+/**
+ * Get the number of frames encoded/decoded so far.  
+ * If encoding or decoding has an error, this count is <b>not</b> incremented. 
+ *  
+ */
+  public int getFrameCount() {
+    return VideoJNI.Coder_getFrameCount(swigCPtr, this);
+  }
+
+  public int getFrameSize() {
+    return VideoJNI.Coder_getFrameSize(swigCPtr, this);
+  }
+
   public enum State {
     STATE_INITED,
     STATE_OPENED,
