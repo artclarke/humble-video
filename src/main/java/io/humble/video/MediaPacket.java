@@ -112,6 +112,25 @@ public class MediaPacket extends MediaEncoded {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+  @Override
+  public String toString() {
+    final StringBuilder b = new StringBuilder(super.toString());
+    b.append("[")
+    .append("pts="+getPts()+";")
+    .append("dts="+getDts()+";")
+    .append("complete="+isComplete()+";")
+    .append("size="+getSize()+";")
+    .append("maxSize="+getMaxSize()+";")
+    .append("streamIndex="+getStreamIndex()+";")
+    .append("key="+isKey()+";")
+    .append("flags="+getFlags()+";")
+    .append("duration="+getDuration()+";")
+    .append("position="+getPosition()+";")
+    .append("convergenceDuration="+getConvergenceDuration()+";")
+    .append("]");
+    return b.toString();
+  }
+
 
 /**
  * Create a new {@link Packet}  

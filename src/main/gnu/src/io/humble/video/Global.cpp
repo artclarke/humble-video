@@ -27,7 +27,7 @@
 
 #include <io/humble/video/Global.h>
 #include <io/humble/video/FfmpegIncludes.h>
-#include <io/humble/video/PropertyNotFoundException.h>
+#include <io/humble/video/VideoExceptions.h>
 
 /**
  * WARNING: Do not use logging in this class, and do

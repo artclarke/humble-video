@@ -30,6 +30,7 @@
 #include "MediaPacketImpl.h"
 #include "KeyValueBagImpl.h"
 #include "SourceStreamImpl.h"
+#include "VideoExceptions.h"
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
@@ -85,7 +86,7 @@ SourceImpl::make() {
   return retval;
 }
 
-int32_t
+void
 SourceImpl::open(const char *url, SourceFormat* format,
     bool streamsCanBeAddedDynamically, bool queryMetaData,
     KeyValueBag* options, KeyValueBag* optionsNotSet)
@@ -93,12 +94,10 @@ SourceImpl::open(const char *url, SourceFormat* format,
   AVFormatContext* ctx = this->getFormatCtx();
   int retval = -1;
   if (mState != Container::STATE_INITED) {
-    VS_LOG_DEBUG("Open can only be called when container is in init state. Current state: %d", mState);
-    return retval;
+    VS_THROW(HumbleRuntimeError::make("Open can only be called when container is in init state. Current state: %d", mState));
   }
   if (!url || !*url) {
-    VS_LOG_DEBUG("Open cannot be called with empty URL");
-    return retval;
+    VS_THROW(HumbleInvalidArgument("Open cannot be called with an empty URL"));
   }
 
   AVDictionary* tmp=0;
@@ -123,7 +122,7 @@ SourceImpl::open(const char *url, SourceFormat* format,
     uint8_t* buffer = (uint8_t*)av_malloc(mInputBufferLength);
     if (!buffer) {
       mState = Container::STATE_ERROR;
-      return retval;
+      VS_THROW(HumbleBadAlloc());
     }
 
     // we will allocate ourselves an io context;
@@ -139,7 +138,7 @@ SourceImpl::open(const char *url, SourceFormat* format,
     if (!ctx->pb) {
       av_free(buffer);
       mState = Container::STATE_ERROR;
-      return retval;
+      VS_THROW(HumbleRuntimeError::make("could not open url due to internal error: %s", url));
     }
   }
   // Check for passed in options
@@ -151,7 +150,13 @@ SourceImpl::open(const char *url, SourceFormat* format,
   // in another function to ensure we clean up tmp
   // afterwards.
   retval = doOpen(url, &tmp);
-  VS_CHECK_INTERRUPT(retval, true);
+  KeyValueBagImpl* realUnsetOpts = dynamic_cast<KeyValueBagImpl*>(optionsNotSet);
+  if (realUnsetOpts)
+    realUnsetOpts->copy(tmp);
+  if (tmp)
+    av_dict_free(&tmp);
+
+  VS_CHECK_INTERRUPT(true);
 
   if (retval >= 0) {
     mState = Container::STATE_OPENED;
@@ -161,19 +166,14 @@ SourceImpl::open(const char *url, SourceFormat* format,
 
     if (streamsCanBeAddedDynamically)
       ctx->ctx_flags |= AVFMTCTX_NOHEADER;
-
-    KeyValueBagImpl* realUnsetOpts = dynamic_cast<KeyValueBagImpl*>(optionsNotSet);
-    if (realUnsetOpts)
-      realUnsetOpts->copy(tmp);
-
-    if (queryMetaData)
-      retval = this->queryStreamMetaData();
   }
-  if (tmp)
-    av_dict_free(&tmp);
-  if (retval < 0)
+  if (retval < 0) {
     mState = Container::STATE_ERROR;
-  return retval;
+    FfmpegException::check(retval, "Error opening url: %s; ", url);
+  }
+  if (queryMetaData)
+    queryStreamMetaData();
+  return;
 }
 
 void
@@ -202,11 +202,11 @@ SourceImpl::getNumStreams() {
     doSetupSourceStreams();
   retval = mNumStreams;
 
-  VS_CHECK_INTERRUPT(retval, true);
+  VS_CHECK_INTERRUPT(true);
   return retval;
 }
 
-int32_t
+void
 SourceImpl::close() {
   int32_t retval=-1;
   if (!(mState == Container::STATE_OPENED ||
@@ -239,13 +239,11 @@ SourceImpl::close() {
 
   retval = doCloseFileHandles(pb);
   if (retval < 0) {
-    VS_LOG_ERROR("Error when closing container (%s): %d", getURL(), retval);
     mState = Container::STATE_ERROR;
+    FfmpegException::check(retval, "Error when closing container (%s): %d", getURL(), retval);
   }
 
-  if (mState != Container::STATE_ERROR)
-    mState = Container::STATE_CLOSED;
-  return retval;
+  mState = Container::STATE_CLOSED;
 }
 
 int32_t
@@ -335,11 +333,14 @@ SourceImpl::read(MediaPacket* ipkt) {
       pkt->setComplete(true, pkt->getSize());
     }
   }
-  VS_CHECK_INTERRUPT(retval, true);
+  VS_CHECK_INTERRUPT(true);
+  if (retval < 0 && retval != AVERROR_EOF)
+    // throw exception in this case
+    FfmpegException::check(retval, "exception on read of: %s; ", getURL());
   return retval;
 }
 
-int32_t
+void
 SourceImpl::queryStreamMetaData() {
   int32_t retval = -1;
   if (!(mState == Container::STATE_OPENED ||
@@ -351,6 +352,8 @@ SourceImpl::queryStreamMetaData() {
     retval = avformat_find_stream_info(this->getFormatCtx(), 0);
     if (retval >= 0)
       mStreamInfoGotten = true;
+    else
+      FfmpegException::check(retval, "could not queryStreamMetaData on: %s; ", getURL());
   } else
     retval = 0;
 
@@ -360,9 +363,6 @@ SourceImpl::queryStreamMetaData() {
   } else {
     VS_LOG_WARN("Could not find streams in input container");
   }
-
-  VS_CHECK_INTERRUPT(retval, true);
-  return retval;
 }
 
 int64_t
@@ -488,35 +488,30 @@ SourceImpl::seek(int32_t stream_index, int64_t min_ts, int64_t ts,
       flags);
   // TODO: Make sure all FFmpeg input buffers are cleared after seek
 
-  VS_CHECK_INTERRUPT(retval, true);
+  VS_CHECK_INTERRUPT(true);
   return retval;
 }
 
-int32_t
+void
 SourceImpl::pause() {
   if (mState != Container::STATE_PLAYING)
   {
     VS_THROW(HumbleRuntimeError("Can only pause containers in PLAYING state."));
   }
   int32_t retval = av_read_pause(this->getFormatCtx());
-  VS_CHECK_INTERRUPT(retval, true);
-  if (retval >= 0)
-    mState = Container::STATE_PAUSED;
-  return retval;
+  FfmpegException::check(retval, "Could not pause url: %s; ", getURL());
+  mState = Container::STATE_PAUSED;
 }
 
-int32_t
+void
 SourceImpl::play() {
   if (mState != Container::STATE_PAUSED || mState != Container::STATE_OPENED)
   {
     VS_THROW(HumbleRuntimeError("Can only play containers in OPENED or PAUSED states"));
-    return -1;
   }
   int32_t retval = av_read_play(this->getFormatCtx());
-  VS_CHECK_INTERRUPT(retval, true);
-  if (retval >= 0)
-    mState = Container::STATE_PLAYING;
-  return retval;
+  FfmpegException::check(retval, "Could not play url: %s; ", getURL());
+  mState = Container::STATE_PLAYING;
 }
 
 int32_t

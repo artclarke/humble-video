@@ -8,6 +8,16 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * An object that either converts {@link MediaRaw} objects into {@link 
+ * MediaEncoded}  
+ * objects (called an {@link Encoder}), or converts in the reverse direction 
+ * (called  
+ * a {@link Decoder}).  
+ * Although this object might seem very sparse, use the methods on {@link 
+ * Configurable}  
+ * to see the vast array of options that can be get/set on it.  
+ */
 public class Coder extends Configurable {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -315,6 +325,9 @@ public class Coder extends Configurable {
   }
 
   public enum State {
+  /**
+   * The state that a Coder can be in.
+   */
     STATE_INITED,
     STATE_OPENED,
     STATE_ERROR;

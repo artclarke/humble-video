@@ -75,8 +75,7 @@ void
 KeyValueBagTest :: testSourceGetMetaData()
 {
   RefPointer<Source> source=Source::make();
-  int32_t retval = source->open(mSampleFile, 0, false, true, 0, 0);
-  TS_ASSERT(retval >= 0);
+  source->open(mSampleFile, 0, false, true, 0, 0);
 
   RefPointer<KeyValueBag> meta = source->getMetaData();
   TSM_ASSERT("got meta data", meta);
@@ -92,7 +91,6 @@ KeyValueBagTest :: testSourceGetMetaData()
     TSM_ASSERT("should be found", value);
     TSM_ASSERT("should be found", *value);
   }
-  retval = source->close();
-  TS_ASSERT(retval >= 0);
+  source->close();
 }
 

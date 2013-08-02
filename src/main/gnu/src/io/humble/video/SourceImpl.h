@@ -54,12 +54,12 @@ public:
   virtual int32_t
   getInputBufferLength();
 
-  virtual int32_t
+  virtual void
   open(const char *url, SourceFormat* format, bool streamsCanBeAddedDynamically,
       bool queryStreamMetaData, KeyValueBag* options,
       KeyValueBag* optionsNotSet);
 
-  virtual int32_t
+  virtual void
   close();
 
   virtual int32_t
@@ -72,7 +72,7 @@ public:
   virtual int32_t
   read(MediaPacket *packet);
 
-  virtual int32_t
+  virtual void
   queryStreamMetaData();
 
   virtual int64_t
@@ -130,10 +130,10 @@ public:
   seek(int32_t stream_index, int64_t min_ts, int64_t ts,
       int64_t max_ts, int32_t flags);
 
-  virtual int32_t
+  virtual void
   play();
 
-  virtual int32_t
+  virtual void
   pause();
 
 protected:

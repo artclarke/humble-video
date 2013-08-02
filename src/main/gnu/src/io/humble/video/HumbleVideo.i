@@ -124,8 +124,8 @@ import io.humble.ferry.Buffer;
 
 %import <io/humble/ferry/Ferry.i>
 /** Now we override the exception handler to have module specific exceptions */
-%exception
-{
+
+%define HUMBLE_HANDLE_EXCEPTION( NOTUSED )
   // HumbleVideo.i: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   try
@@ -146,10 +146,19 @@ import io.humble.ferry.Buffer;
   
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // HumbleVideo.i: End generated code
+
+%enddef
+
+%define HUMBLE_JAVA_EXCEPTION( JTYPE, MATCH )
+%javaexception(JTYPE) MATCH {
+  HUMBLE_HANDLE_EXCEPTION(not_used)
 }
+%enddef
 
-
-
+%exception
+{
+  HUMBLE_HANDLE_EXCEPTION($action)
+}
 
 %include <io/humble/video/HumbleVideo.h>
 %include <io/humble/video/PixelFormat.h>

@@ -123,7 +123,7 @@ public:
    *
    * @return >= 0 on success; < 0 on error.
    */
-  virtual int32_t
+  virtual void
   open(const char *url, SourceFormat* format, bool streamsCanBeAddedDynamically,
       bool queryStreamMetaData, KeyValueBag* options,
       KeyValueBag* optionsNotSet)=0;
@@ -143,9 +143,8 @@ public:
    * all resources will be closed anyway.
    * </p>
    *
-   * @return >= 0 on success; < 0 on error.
    */
-  virtual int32_t
+  virtual void
   close()=0;
 
   /**
@@ -192,9 +191,8 @@ public:
    * {@link Error.Type#ERROR_INTERRUPTED}.
    * </p>
    *
-   * @return >= 0 on success; <0 on failure.
    */
-  virtual int32_t
+  virtual void
   queryStreamMetaData()=0;
 
   /**
@@ -427,7 +425,7 @@ public:
   /**
    * Start playing a network source. Call {@link #pause()} to pause.
    */
-  virtual int32_t
+  virtual void
   play()=0;
 
   /**
@@ -435,7 +433,7 @@ public:
    *
    * @return 0 on success; <0 if state is not {@link #State.STATE_PLAYING} or error.
    */
-  virtual int32_t
+  virtual void
   pause()=0;
 
 protected:

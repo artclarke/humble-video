@@ -37,6 +37,7 @@ public:
   static ErrorImpl* make(Type type);
   static Type errorNumberToType(int32_t errorNo);
   static int32_t typeToErrorNumber(Type type);
+
 protected:
   ErrorImpl();
   virtual ~ErrorImpl();

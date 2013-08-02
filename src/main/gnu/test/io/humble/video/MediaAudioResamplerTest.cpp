@@ -130,9 +130,7 @@ MediaAudioResamplerTest::testResample() {
 
   RefPointer<Source> source = Source::make();
 
-  int32_t retval=-1;
-  retval = source->open(filepath, 0, false, true, 0, 0);
-  TS_ASSERT(retval >= 0);
+  source->open(filepath, 0, false, true, 0, 0);
 
   int32_t numStreams = source->getNumStreams();
   TS_ASSERT_EQUALS(fixture->num_streams, numStreams);

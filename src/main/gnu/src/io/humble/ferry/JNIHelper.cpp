@@ -553,6 +553,10 @@ namespace io { namespace humble { namespace ferry {
   }
   void
   JNIHelper::catchException(JNIEnv* jenv, const std::exception & e) {
+    if (dynamic_cast<const HumbleIOException*>(&e))
+    {
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/io/IOException", e);
+    }
     if (dynamic_cast<const HumbleInterruptedException*>(&e))
     {
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/InterruptedException", e);

@@ -93,6 +93,8 @@ public:
   virtual
   ~HumbleInvalidArgument() throw () {
   }
+  static HumbleInvalidArgument make(const char* format, ...);
+
   virtual void
   raise() const {
     throw *this;
@@ -127,13 +129,40 @@ public:
 class VS_API_FERRY HumbleInterruptedException : public virtual HumbleRuntimeError
 {
 public:
+  explicit
   HumbleInterruptedException() :
       std::runtime_error("thread interrupted"), HumbleRuntimeError(
           "thread interrupted") {
   }
+  explicit
+  HumbleInterruptedException(const std::string & arg) :
+      std::runtime_error(arg), HumbleRuntimeError(
+          arg) {
+  }
+
   virtual
   ~HumbleInterruptedException() throw () {
   }
+  static HumbleInterruptedException make(const char* format, ...);
+
+  virtual void
+  raise() const {
+    throw *this;
+  }
+};
+
+class VS_API_FERRY HumbleIOException : public virtual HumbleRuntimeError
+{
+public:
+  explicit
+  HumbleIOException(const std::string& msg) :
+      std::runtime_error(msg), HumbleRuntimeError(msg) {
+  }
+  virtual
+  ~HumbleIOException() throw () {
+  }
+  static HumbleIOException make(const char* format, ...);
+
   virtual void
   raise() const {
     throw *this;
@@ -156,6 +185,20 @@ public:
     throw *this;
   }
 };
+
+
+#define VS_EXCEPTION_MAKE_MAKER(__class) \
+__class \
+__class::make(const char* fmt, ...) { \
+  const size_t bufLen=1048; \
+  char buf[bufLen]; \
+  va_list ap; \
+  va_start(ap, fmt); \
+  vsnprintf(buf, bufLen, fmt, ap); \
+  va_end(ap); \
+  std::string msg = buf; \
+  return __class(msg); \
+}
 
 } /* namespace ferry */
 } /* namespace humble */

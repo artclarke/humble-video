@@ -201,7 +201,7 @@ class JNIHelper
  * checks if the thread is interrupted, and
  * if so sets 'retval' to 'EINTR'.
  */
-#define VS_CHECK_INTERRUPT(retval, __COND__) do { \
+#define VS_CHECK_INTERRUPT(__COND__) do { \
     if (__COND__) { \
       JNIHelper* helper = JNIHelper::getHelper(); \
       if (helper && helper->isInterrupted()) \

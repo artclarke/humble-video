@@ -37,9 +37,7 @@ SourceStreamTest::testCreationAndDestruction()
   char path[2048];
   mFixtures.fillPath(f, path, sizeof(path));
 
-  int32_t retval;
-  retval = s->open(path, 0, false, true, 0, 0);
-  TS_ASSERT(retval >= 0);
+  s->open(path, 0, false, true, 0, 0);
 
   int32_t ns = s->getNumStreams();
   TS_ASSERT_EQUALS(ns, f->num_streams);
@@ -67,8 +65,7 @@ SourceStreamTest::testCreationAndDestruction()
   TS_ASSERT_EQUALS(4, fs->getNumIndexEntries());
 
 
-  retval = s->close();
-  TS_ASSERT(retval >= 0);
+  s->close();
 
   // this test makes sure that accessing a stream
   // after a container is closed does not cause crashes.

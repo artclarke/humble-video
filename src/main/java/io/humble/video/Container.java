@@ -134,7 +134,7 @@ public class Container extends Configurable {
  * </p>  
  * @return	The number of streams in this container.  
  */
-  public int getNumStreams() throws java.lang.InterruptedException {
+  public int getNumStreams() throws java.lang.InterruptedException, java.io.IOException {
     return VideoJNI.Container_getNumStreams(swigCPtr, this);
   }
 
@@ -144,7 +144,7 @@ public class Container extends Configurable {
  * @return	The stream at that position in the container, or null if 
  *		 none there.  
  */
-  public ContainerStream getStream(int streamIndex) throws java.lang.InterruptedException {
+  public ContainerStream getStream(int streamIndex) throws java.lang.InterruptedException, java.io.IOException {
     long cPtr = VideoJNI.Container_getStream(swigCPtr, this, streamIndex);
     return (cPtr == 0) ? null : new ContainerStream(cPtr, false);
   }

@@ -63,17 +63,11 @@ HumbleStackTrace::~HumbleStackTrace() {
   }
 }
 
-HumbleRuntimeError
-HumbleRuntimeError::make(const char* fmt, ...) {
-  const size_t bufLen=1048;
-  char buf[bufLen];
-  va_list ap;
-  va_start(ap, fmt);
-  vsnprintf(buf, bufLen, fmt, ap);
-  va_end(ap);
-  std::string msg = buf;
-  return HumbleRuntimeError(msg);
-}
+VS_EXCEPTION_MAKE_MAKER(HumbleRuntimeError);
+VS_EXCEPTION_MAKE_MAKER(HumbleInterruptedException);
+VS_EXCEPTION_MAKE_MAKER(HumbleIOException);
+VS_EXCEPTION_MAKE_MAKER(HumbleInvalidArgument);
+
 
 } /* namespace ferry */
 } /* namespace humble */

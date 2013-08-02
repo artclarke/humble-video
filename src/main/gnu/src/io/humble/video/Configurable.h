@@ -31,7 +31,7 @@
 #include <io/humble/video/Property.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/KeyValueBag.h>
-#include <io/humble/video/PropertyNotFoundException.h>
+#include <io/humble/video/VideoExceptions.h>
 
 namespace io {
 namespace humble {

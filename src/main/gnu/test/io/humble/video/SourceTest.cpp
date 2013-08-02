@@ -73,18 +73,15 @@ SourceTest::openTestHelper(const char* file)
   RefPointer<Source> source = Source::make();
   TS_ASSERT(source);
 
-  int32_t retval = source->open(file, 0, false, false, 0, 0);
-  TS_ASSERT(retval >= 0);
+  source->open(file, 0, false, false, 0, 0);
   TS_ASSERT(source->getState() == Container::STATE_OPENED);
 
   // now, let's get the meta-data
-  retval = source->queryStreamMetaData();
-  TS_ASSERT(retval >= 0);
+  source->queryStreamMetaData();
 
   // let's call it again; if we accidentally call the FFmpeg method
   // twice it will cause a crash, but the Source object should hide that.
-  retval = source->queryStreamMetaData();
-  TS_ASSERT(retval >= 0);
+  source->queryStreamMetaData();
 
   RefPointer<KeyValueBag> metadata = source->getMetaData();
   TS_ASSERT(metadata);
@@ -113,8 +110,7 @@ SourceTest::openTestHelper(const char* file)
   TSM_ASSERT("format not set", format);
   TSM_ASSERT("Unexpected format", strcmp("flv", format->getName())==0);
 
-  retval = source->close();
-  TS_ASSERT(retval >= 0);
+  source->close();
 
   // and make sure we don't crash after a close.
   {
@@ -147,17 +143,15 @@ SourceTest::testOpenDemuxerPrivatePropertySetting()
   
   const char* file = mSampleFile;
 
-  int32_t r = source->open(file, 0, false, false, inputOptions.value(), 
+  source->open(file, 0, false, false, inputOptions.value(),
       outputOptions.value());
-  TS_ASSERT(r >= 0);
   TS_ASSERT(source->getState() == Container::STATE_OPENED);
 
   TS_ASSERT_EQUALS(1, outputOptions->getNumKeys());
   TSM_ASSERT("Expected option missing", outputOptions->getValue(INVALID_OPTION,
         KeyValueBag::KVB_NONE));
 
-  r = source->close();
-  TS_ASSERT(r >= 0);
+  source->close();
 }
 void
 SourceTest::testOpenResetInputFormat()
@@ -174,9 +168,7 @@ SourceTest::testOpenResetInputFormat()
     LoggerStack stack;
     // quiet ffmpeg error
     stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
-    int32_t retval = source->open(file, format.value(), false, false, 0, 0);
-    // and this should fail since the file is an FLV
-    TS_ASSERT(retval < 0);
+    TS_ASSERT_THROWS(source->open(file, format.value(), false, false, 0, 0), FfmpegException);
   }
 }
 
@@ -198,8 +190,7 @@ SourceTest::testOpenWithoutCloseAutoCloses()
   // quiet Source error when Source is destroyed
   stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
   RefPointer<Source> source = Source::make();
-  int32_t retval = source->open(mSampleFile, 0, false, false, 0, 0);
-  TS_ASSERT(retval >= 0);
+  source->open(mSampleFile, 0, false, false, 0, 0);
 
   // now this test will only fail under a memory leak test, but
   // if a source is destroyed without closing, it should attempt
@@ -209,8 +200,6 @@ SourceTest::testOpenWithoutCloseAutoCloses()
 void
 SourceTest::testOpenInvalidArguments()
 {
-  int32_t retval = 0;
-
   // each sub-test will be wrapped in a block so
   // I can squelch logging once I see the right stuff
   // happen
@@ -219,16 +208,14 @@ SourceTest::testOpenInvalidArguments()
     LoggerStack stack;
     // quiet Source error when Source is destroyed
     stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
-    retval = source->open(0, 0, false, false, 0, 0);
-    TS_ASSERT(retval < 0);
+    TS_ASSERT_THROWS(source->open(0, 0, false, false, 0, 0), HumbleInvalidArgument);
   }
   {
     RefPointer<Source> source = Source::make();
     LoggerStack stack;
     // quiet Source error when Source is destroyed
     stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
-    retval = source->open("/foo/bar/ohsonotalidfile", 0, false, false, 0, 0);
-    TS_ASSERT(retval < 0);
+    TS_ASSERT_THROWS(source->open("/foo/bar/ohsonotalidfile", 0, false, false, 0, 0), HumbleIOException);
   }
 }
 
@@ -238,12 +225,12 @@ SourceTest::testRead()
   RefPointer<Source> source = Source::make();
   TS_ASSERT(source);
 
-  int32_t retval = source->open(mSampleFile, 0, false, true, 0, 0);
-  TS_ASSERT(retval >= 0);
+  source->open(mSampleFile, 0, false, true, 0, 0);
   TS_ASSERT(source->getState() == Container::STATE_OPENED);
 
   int64_t pktsRead = 0;
   RefPointer<MediaPacket> pkt = MediaPacket::make();
+  int32_t retval;
   do {
     retval = source->read(pkt.value());
     if (retval >= 0)
@@ -252,6 +239,5 @@ SourceTest::testRead()
   TS_ASSERT(pktsRead > 0);
   // I happen to know that there are this number of audio and video packets in this file.
   TS_ASSERT_EQUALS(pktsRead, mFixture->packets);
-  retval = source->close();
-  TS_ASSERT(retval >= 0);
+  source->close();
 }

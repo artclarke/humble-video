@@ -21,7 +21,7 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/PropertyImpl.h>
-#include <io/humble/video/PropertyNotFoundException.h>
+#include <io/humble/video/VideoExceptions.h>
 #include <io/humble/video/KeyValueBagImpl.h>
 #include <io/humble/video/Error.h>
 extern "C" {

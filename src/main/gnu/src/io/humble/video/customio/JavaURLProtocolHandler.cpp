@@ -145,7 +145,7 @@ JavaURLProtocolHandler :: url_open(const char *url, int flags)
   if (jUrl)
     env->DeleteLocalRef(jUrl);
 
-  VS_CHECK_INTERRUPT(retval, 1);
+  VS_CHECK_INTERRUPT(true);
   return retval;
 }
 
@@ -173,7 +173,7 @@ JavaURLProtocolHandler :: url_close()
     VS_LOG_DEBUG("Got unknown exception");
     retval = -1;
   }
-  VS_CHECK_INTERRUPT(retval, 1);
+  VS_CHECK_INTERRUPT(true);
 
   return retval;
 }
@@ -205,7 +205,7 @@ JavaURLProtocolHandler :: url_seek(int64_t position,
     VS_LOG_DEBUG("Got unknown exception");
     retval = -1;
   }
-  VS_CHECK_INTERRUPT(retval, 1);
+  VS_CHECK_INTERRUPT(true);
   return retval;
 }
 
@@ -252,7 +252,7 @@ JavaURLProtocolHandler :: url_read(unsigned char* buf, int size)
   // is not returning to Java soon.
   if (byteArray)
     env->DeleteLocalRef(byteArray);
-  VS_CHECK_INTERRUPT(retval, retval < 0 || retval != size);
+  VS_CHECK_INTERRUPT(retval < 0 || retval != size);
   return retval;
 }
 
@@ -299,7 +299,7 @@ JavaURLProtocolHandler :: url_write(const unsigned char* buf, int size)
   // is not returning to Java soon.
   if (byteArray)
     env->DeleteLocalRef(byteArray);
-  VS_CHECK_INTERRUPT(retval, retval < 0 || retval != size);
+  VS_CHECK_INTERRUPT(retval < 0 || retval != size);
 
   return retval;
 }

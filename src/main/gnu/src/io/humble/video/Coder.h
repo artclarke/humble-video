@@ -35,9 +35,20 @@ namespace io {
 namespace humble {
 namespace video {
 
+/**
+ * An object that either converts {@link MediaRaw} objects into {@link MediaEncoded}
+ * objects (called an {@link Encoder}), or converts in the reverse direction (called
+ * a {@link Decoder}).
+ *
+ * Although this object might seem very sparse, use the methods on {@link Configurable}
+ * to see the vast array of options that can be get/set on it.
+ */
 class VS_API_HUMBLEVIDEO Coder : public io::humble::video::Configurable
 {
 public:
+  /**
+   * The state that a Coder can be in.
+   */
   typedef enum State {
     STATE_INITED,
     STATE_OPENED,

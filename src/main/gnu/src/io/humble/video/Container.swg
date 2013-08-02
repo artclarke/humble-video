@@ -18,7 +18,15 @@
  *******************************************************************************/
 
 %typemap (javacode) io::humble::video::Container,io::humble::video::Container*,io::humble::video::Container& %{
+  @Override
+  public String toString() {
+    final StringBuilder b = new StringBuilder(super.toString());
+    b.append("[")
+    .append("]");
+    return b.toString();
+  }
+
 %}
-%javaexception("java.lang.InterruptedException") io::humble::video::Container::getNumStreams;
-%javaexception("java.lang.InterruptedException") io::humble::video::Container::getStream;
+HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Container::getNumStreams);
+HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Container::getStream);
 %include <io/humble/video/Container.h>

@@ -63,6 +63,18 @@ MediaPictureResamplerTest::writePicture(const char* prefix, int32_t* frameNo,
     lodepng_encode32_file(filename, data, resampled->getWidth(), resampled->getHeight());
   }
   (*frameNo)++;
+
+  // check the frame metadata
+  RefPointer<KeyValueBag> md = picture->getMetaData();
+  if (md) {
+    int n =  md->getNumKeys();
+    for(int i = 0; i < n; i++) {
+      const char* key = md->getKey(i);
+      const char* val = md->getValue(key, KeyValueBag::KVB_NONE);
+      fprintf(stderr, "%s : %s", key, val);
+    }
+  }
+
 }
 
 void
@@ -75,9 +87,7 @@ MediaPictureResamplerTest::testRescale() {
 
   RefPointer<Source> source = Source::make();
 
-  int32_t retval=-1;
-  retval = source->open(filepath, 0, false, true, 0, 0);
-  TS_ASSERT(retval >= 0);
+  source->open(filepath, 0, false, true, 0, 0);
 
   int32_t numStreams = source->getNumStreams();
   TS_ASSERT_EQUALS(fixture->num_streams, numStreams);
