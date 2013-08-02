@@ -56,8 +56,6 @@ public:
   /**
    * Get the time base that time stamps of this object are represented in.
    *
-   * Caller must release the returned value.
-   *
    * @return the time base.
    */
   virtual Rational* getTimeBase() { return mTimeBase.get(); }
@@ -117,10 +115,26 @@ public:
    virtual AVFrame *getCtx()=0;
 #endif
 protected:
-    MediaRaw() { mTimeBase = Global::getDefaultTimeBase(); }
+    MediaRaw() { }
     virtual ~MediaRaw() {}
 private:
     io::humble::ferry::RefPointer<Rational> mTimeBase;
+};
+
+/**
+ * Media that represents samples of some continugous stream.
+ * Examples of Sampled data are MediaAudio (digital samples of continuous audio)
+ * or MediaPicture (digital samples of a continuous visual stream).
+ */
+class VS_API_HUMBLEVIDEO MediaSampled : public MediaRaw {
+public:
+  /**
+   * The number of samples in this frame of sampled data.
+   */
+  virtual int32_t getNumSamples()=0;
+protected:
+  MediaSampled() {}
+  virtual ~MediaSampled() {}
 };
 
 } /* namespace video */

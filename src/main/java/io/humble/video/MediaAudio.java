@@ -33,7 +33,7 @@ import io.humble.ferry.*;
  * for the 1 plane.  
  * </p>  
  */
-public class MediaAudio extends MediaRaw {
+public class MediaAudio extends MediaSampled {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**

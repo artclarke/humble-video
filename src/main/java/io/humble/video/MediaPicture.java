@@ -8,7 +8,7 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
-public class MediaPicture extends MediaRaw {
+public class MediaPicture extends MediaSampled {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**

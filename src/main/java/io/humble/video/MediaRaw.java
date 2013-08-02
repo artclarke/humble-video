@@ -131,7 +131,6 @@ public class MediaRaw extends Media {
 /**
  * Get the time base that time stamps of this object are represented 
  * in.  
- * Caller must release the returned value.  
  * @return	the time base.  
  */
   public Rational getTimeBase() {

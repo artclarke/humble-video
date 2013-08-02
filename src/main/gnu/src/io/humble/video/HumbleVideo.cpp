@@ -6685,6 +6685,49 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getBestEffortTi
 }
 
 
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSampled_1getNumSamples(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  io::humble::video::MediaSampled *arg1 = (io::humble::video::MediaSampled *) 0 ;
+  int32_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::MediaSampled **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (int32_t)(arg1)->getNumSamples();
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return 0;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1CH_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::AudioChannel::Type result;
@@ -28506,6 +28549,14 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaRawUpcast(JNIEnv
     return baseptr;
 }
 
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaSampledUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(io::humble::video::MediaRaw **)&baseptr = *(io::humble::video::MediaSampled **)&jarg1;
+    return baseptr;
+}
+
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGAudioChannelUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
@@ -28526,7 +28577,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaAudioUpcast(JNIE
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
-    *(io::humble::video::MediaRaw **)&baseptr = *(io::humble::video::MediaAudio **)&jarg1;
+    *(io::humble::video::MediaSampled **)&baseptr = *(io::humble::video::MediaAudio **)&jarg1;
     return baseptr;
 }
 
@@ -28534,7 +28585,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_SWIGMediaPictureUpcast(JN
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
-    *(io::humble::video::MediaRaw **)&baseptr = *(io::humble::video::MediaPicture **)&jarg1;
+    *(io::humble::video::MediaSampled **)&baseptr = *(io::humble::video::MediaPicture **)&jarg1;
     return baseptr;
 }
 

@@ -310,6 +310,7 @@ class VideoJNI {
   public final static native int MediaRaw_getPacketSize(long jarg1, MediaRaw jarg1_);
   public final static native long MediaRaw_getPacketDuration(long jarg1, MediaRaw jarg1_);
   public final static native long MediaRaw_getBestEffortTimeStamp(long jarg1, MediaRaw jarg1_);
+  public final static native int MediaSampled_getNumSamples(long jarg1, MediaSampled jarg1_);
   public final static native int AudioChannel_CH_UNKNOWN_get();
   public final static native int AudioChannel_CH_FRONT_LEFT_get();
   public final static native int AudioChannel_CH_FRONT_RIGHT_get();
@@ -1308,6 +1309,7 @@ class VideoJNI {
   public final static native long SWIGMediaUpcast(long jarg1);
   public final static native long SWIGMediaEncodedUpcast(long jarg1);
   public final static native long SWIGMediaRawUpcast(long jarg1);
+  public final static native long SWIGMediaSampledUpcast(long jarg1);
   public final static native long SWIGAudioChannelUpcast(long jarg1);
   public final static native long SWIGAudioFormatUpcast(long jarg1);
   public final static native long SWIGMediaAudioUpcast(long jarg1);

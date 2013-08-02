@@ -416,7 +416,7 @@ protected:
  * {@link MediaAudio#getDataLineSize(int)} is the buffer size, in bytes, for the 1 plane.
  * </p>
  */
-class VS_API_HUMBLEVIDEO MediaAudio : public MediaRaw
+class VS_API_HUMBLEVIDEO MediaAudio : public MediaSampled
 {
 
 public:

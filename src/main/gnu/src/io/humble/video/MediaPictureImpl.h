@@ -131,6 +131,7 @@ public:
   virtual MediaPicture::Type getType() { return (MediaPicture::Type) getCtx()->pict_type; }
   virtual void setType(MediaPicture::Type type) { getCtx()->pict_type = (enum AVPictureType)type; }
 
+  virtual int32_t getNumSamples() { return 1; }
   virtual AVFrame*
   getCtx() {
     return mFrame;

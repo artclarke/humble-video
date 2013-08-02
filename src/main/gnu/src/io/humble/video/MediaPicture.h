@@ -34,7 +34,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-class VS_API_HUMBLEVIDEO MediaPicture : public io::humble::video::MediaRaw
+class VS_API_HUMBLEVIDEO MediaPicture : public io::humble::video::MediaSampled
 {
 public:
 
