@@ -118,6 +118,36 @@ public class Coder extends Configurable {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    MediaDescriptor.Type type = getCodecType();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("codec="+getCodec()+";");
+    result.append("time base="+getTimeBase()+";");
+    switch(type)
+    {
+      case MEDIA_VIDEO:
+        result.append("width="+getWidth()+";");
+        result.append("height="+getHeight()+";");
+        result.append("pixel format="+getPixelFormat()+";");
+        break;
+      case MEDIA_AUDIO:
+        result.append("sample rate="+getSampleRate()+";");
+        result.append("channels="+getChannels()+";");
+        result.append("sample format="+getSampleFormat()+";");
+        break;
+      default:
+        break;
+    }
+    result.append("frame size="+getFrameSize()+";");
+    result.append("frame count="+getFrameCount()+";");
+
+    result.append("]");
+    return result.toString();
+  }
 
 /**
  *  

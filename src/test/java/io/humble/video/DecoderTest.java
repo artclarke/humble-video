@@ -22,7 +22,7 @@ public class DecoderTest {
   
   @Before
   public void setUp() throws Exception {
-    final URL s = this.getClass().getResource("/testfile.flv");
+    final URL s = this.getClass().getResource("/ucl_h264_aac.mp4");
     final String f = s.getPath();
     source = Source.make();
     source.open(f, null, false, true, null, null);
@@ -38,7 +38,7 @@ public class DecoderTest {
 
   @Test
   public void testDecodeAudio() throws InterruptedException, IOException {
-    int audioStream = 1;
+    int audioStream = 0;
     SourceStream stream = source.getSourceStream(audioStream);
     Decoder decoder = stream.getDecoder();
     
@@ -82,7 +82,7 @@ public class DecoderTest {
 
   @Test
   public void testDecodeVideo() throws InterruptedException, IOException {
-    int videoStream = 0;
+    int videoStream = 1;
     SourceStream stream = source.getSourceStream(videoStream);
     Decoder decoder = stream.getDecoder();
     
