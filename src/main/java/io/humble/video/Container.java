@@ -112,6 +112,14 @@ public class Container extends Configurable {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+  @Override
+  public String toString() {
+    final StringBuilder b = new StringBuilder(super.toString());
+    b.append("[")
+    .append("]");
+    return b.toString();
+  }
+
 
 /**
  * Get the current state of the container.  

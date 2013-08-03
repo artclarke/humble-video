@@ -12,15 +12,6 @@ import io.humble.ferry.*;
  * A Source of {@link Packet} data.  
  */
 public class Source extends Container {
-  @Override
-  public String toString() {
-    final StringBuilder b = new StringBuilder(super.toString());
-    b.append("[")
-    .append("url="+getURL()+";")
-    .append("format:"+getSourceFormat()+";")
-    .append("]");
-    return b.toString();
-  }
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -120,6 +111,15 @@ public class Source extends Container {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+  @Override
+  public String toString() {
+    final StringBuilder b = new StringBuilder(super.toString());
+    b.append("[")
+    .append("url="+getURL()+";")
+    .append("format:"+getSourceFormat()+";")
+    .append("]");
+    return b.toString();
+  }
 
 /**
  * Create a new {@link Source}  

@@ -19,8 +19,8 @@
 
 %typemap (javacode) io::humble::video::MediaPicture,io::humble::video::MediaPicture*,io::humble::video::MediaPicture& %{
   /**
-   * info about this packet
-   * @return information about this packet
+   * info about this picture
+   * @return information about this picture
    */
   @Override
   public String toString()
@@ -36,6 +36,8 @@
     result.append("key:"+isKey()+";");
     Rational timeBase = Global.getDefaultTimeBase();
     result.append("time base:"+timeBase+";");
+    for(int i = 0; i < getNumDataPlanes(); i++)
+      result.append("plane["+i+"] size: " + getDataPlaneSize(i) +";"); 
     if (timeBase != null) timeBase.delete();
     result.append("]");
     return result.toString();

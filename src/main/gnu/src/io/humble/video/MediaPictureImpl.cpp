@@ -119,7 +119,7 @@ MediaPictureImpl::make(Buffer* buffer, int32_t width, int32_t height,
   frame->extended_data = frame->data;
   for (int32_t i = 0; i < AV_NUM_DATA_POINTERS; i++) {
     if (frame->data[i])
-      frame->buf[i] = AVBufferSupport::wrapBuffer(buffer, frame->data[i], frame->linesize[0]);
+      frame->buf[i] = AVBufferSupport::wrapBuffer(buffer, frame->data[i], frame->linesize[0]*frame->height+16);
   }
   // now fill in the AVBufferRefs where we pass of to FFmpeg care
   // of our buffer. Be kind FFmpeg.  Be kind.
@@ -138,6 +138,17 @@ MediaPictureImpl::make(Buffer* buffer, int32_t width, int32_t height,
 
     frame->data[1] = frame->buf[1]->data;
   }
+
+  int32_t n = retval->getNumDataPlanes();
+  VS_LOG_DEBUG("Created MediaPicture: %d x %d (%d). [%d, %d, %d, %d]",
+      retval->getWidth(),
+      retval->getHeight(),
+      retval->getFormat(),
+      n < 1 ? 0 : retval->getDataPlaneSize(0),
+      n < 2 ? 0 : retval->getDataPlaneSize(1),
+      n < 3 ? 0 : retval->getDataPlaneSize(2),
+      n < 4 ? 0 : retval->getDataPlaneSize(3)
+      );
 
   // and we're done.
   return retval.get();
@@ -211,8 +222,9 @@ MediaPictureImpl::getData(int32_t plane) {
   RefPointer<Buffer> buffer;
   if (mFrame->buf[plane])
     buffer = AVBufferSupport::wrapAVBuffer(this,
-        mFrame->buf[plane], mFrame->data[plane], mFrame->linesize[0]);
-  return buffer.get();}
+        mFrame->buf[plane], mFrame->data[plane], mFrame->buf[plane]->size);
+  return buffer.get();
+}
 
 int32_t
 MediaPictureImpl::getDataPlaneSize(int32_t plane) {
