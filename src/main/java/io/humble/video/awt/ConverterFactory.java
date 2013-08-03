@@ -1,22 +1,21 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Xuggle Inc.  All rights reserved.
+ * Copyright (c) 2013, Art Clarke.  All rights reserved.
  *  
- * This file is part of Xuggle-Xuggler-Main.
+ * This file is part of Humble-Video.
  *
- * Xuggle-Xuggler-Main is free software: you can redistribute it and/or modify
+ * Humble-Video is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Xuggle-Xuggler-Main is distributed in the hope that it will be useful,
+ * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Xuggle-Xuggler-Main.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-
 package io.humble.video.awt;
 
 import io.humble.video.MediaPicture;
@@ -82,14 +81,6 @@ public class ConverterFactory
 
   static
   {
-    // The ARGB converter is not currently registered as a converter
-    // because the underlying FFMPEG support for ARGB is unstable.  If
-    // you really need ARGB type, manually register the converter, but
-    // be aware that the ARGB images produces may be wrong or broken.
-    
-    //registerConverter(new Type(XUGGLER_ARGB_32, ArgbConverter.class, 
-    //PixelFormat.Type.ARGB, BufferedImage.TYPE_INT_ARGB));
-
     registerConverter(new Type(HUMBLE_BGR_24, BgrConverter.class, 
         PixelFormat.Type.PIX_FMT_BGR24, BufferedImage.TYPE_3BYTE_BGR));
   }

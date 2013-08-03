@@ -26,7 +26,7 @@ import io.humble.video.MediaPicture;
  * translation between a given {@link MediaPicture} type and a {@link
  * BufferedImage} type.  Converters are created by {@link
  * ConverterFactory}.  Each converter can translate between any
- * supported {@link com.xuggle.xuggler.IPixelFormat.Type} and a single
+ * supported {@link io.humble.video.IPixelFormat.Type} and a single
  * {@link BufferedImage} type.  Converters can optionally resize images
  * during
  * the conversion process.
@@ -39,7 +39,7 @@ public interface Converter
    * 
    * @return the picture type of this converter.
    *
-   * @see com.xuggle.xuggler.IPixelFormat.Type
+   * @see io.humble.video.IPixelFormat.Type
    */
 
   public PixelFormat.Type getPictureType();
@@ -63,39 +63,22 @@ public interface Converter
    * 
    * @return true if this converter will re-sample during conversion.
    * 
-   * @see com.xuggle.xuggler.IVideoResampler
-   * @see com.xuggle.xuggler.IVideoResampler#isSupported(com.xuggle.xuggler.IVideoResampler.Feature)
    */
 
   public boolean willResample();
 
   /** Converts a {@link BufferedImage} to an {@link MediaPicture}.
-   *
-   * @param image the source buffered image.
-   * @param timestamp the time stamp which should be attached to the the
-   *        video picture (in microseconds).
-   *
-   * @throws IllegalArgumentException if the passed {@link
-   *         BufferedImage} is NULL;
-   * @throws IllegalArgumentException if the passed {@link
-   *         BufferedImage} is not the correct type. See {@link
-   *         #getImageType}.
-   * @throws IllegalArgumentException if the underlying data buffer of
-   *         the {@link BufferedImage} is composed elements other bytes
-   *         or integers.
-   */
-
-  public MediaPicture toPicture(BufferedImage image, long timestamp);
-  
-  /** Converts a {@link BufferedImage} to an {@link MediaPicture}.
   *
-  * @param output the image to write the output to. any data previous in output will be overritten.
-  * @param image the source buffered image.
+  * @param output the image to write the output to. any data previous in output will be overwritten.
+  *   if null, a new output MediaPicture of the correct dimensions will be allocated and returned.
+  * @param input the source buffered image.
   * @param timestamp the time stamp which should be attached to the the
   *        video picture (in microseconds).
   *        
   * @returns output is returned (nice for chaining/reuse).
   *
+  * @throws IllegalArgumentException if the passed {@link
+  *         MediaPicture} is not NULL but is of an unexpected width, height or format;
   * @throws IllegalArgumentException if the passed {@link
   *         BufferedImage} is NULL;
   * @throws IllegalArgumentException if the passed {@link
@@ -105,37 +88,26 @@ public interface Converter
   *         the {@link BufferedImage} is composed elements other bytes
   *         or integers.
   */
-  public MediaPicture toPicture(MediaPicture output, BufferedImage image, long timestamp);
+  public MediaPicture toPicture(MediaPicture output, BufferedImage input, long timestamp);
 
   /** Converts an {@link MediaPicture} to a {@link BufferedImage}.
    *
-   * @param picture the source video picture.
-   *
-   * @throws IllegalArgumentException if the passed {@link
-   *         MediaPicture} is NULL;
-   * @throws IllegalArgumentException if the passed {@link
-   *         MediaPicture} is not the correct type. See {@link
-   *         #getPictureType}.
-   */
-
-  public BufferedImage toImage(MediaPicture picture);
-
-
-
-  /** Converts an {@link MediaPicture} to a {@link BufferedImage}.
-   *
-   * @param picture the source video picture.
+   * @param output the BufferedImage to copy data into, or if null, a new BufferedImage of the 
+   *               correct dimensions will be allocated.
+   * @param input the source video picture.
    *
    * @returns output is returned (nice for chaining/reuse).
    * 
    * @throws IllegalArgumentException if the passed {@link
+   *         BufferedImage} is NOT NULL but has the wrong width, height or type;
+   * @throws IllegalArgumentException if the passed {@link
    *         MediaPicture} is NULL;
    * @throws IllegalArgumentException if the passed {@link
    *         MediaPicture} is not the correct type. See {@link
    *         #getPictureType}.
    */
 
-  public BufferedImage toImage(BufferedImage output, MediaPicture picture);
+  public BufferedImage toImage(BufferedImage output, MediaPicture input);
   
   /** Return a written description of the converter. 
    *

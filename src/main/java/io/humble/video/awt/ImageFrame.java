@@ -23,19 +23,16 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 /**
- * This class just displays a 2d graphic on a Swing window.  It's
- * only here so the video playback demos look simpler.  Please don't
- * reuse this component; why?  Because I know next to nothing
- * about Swing, and this is probably busted.
- * <p>
- * Of note though, is this class has NO XUGGLER dependencies.
- * </p>
+ * Displays a {@link BufferedImage} in a {@link JFrame}. Helpful for
+ * building quick and simple video players.
+ * 
  * @author aclarke
  *
  */

@@ -1,22 +1,21 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Xuggle Inc.  All rights reserved.
+ * Copyright (c) 2013, Art Clarke.  All rights reserved.
  *  
- * This file is part of Xuggle-Xuggler-Main.
+ * This file is part of Humble-Video.
  *
- * Xuggle-Xuggler-Main is free software: you can redistribute it and/or modify
+ * Humble-Video is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Xuggle-Xuggler-Main is distributed in the hope that it will be useful,
+ * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Xuggle-Xuggler-Main.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-
 package io.humble.video.awt;
 
 import io.humble.ferry.Buffer;
@@ -84,11 +83,6 @@ public class BgrConverter extends AConverter {
   }
 
   /** {@inheritDoc} */
-
-  public MediaPicture toPicture(final BufferedImage image, long timestamp) {
-    return toPicture(null, image, timestamp);
-  }
-
   @Override
   public MediaPicture toPicture(MediaPicture output,
       final BufferedImage input, long timestamp) {
@@ -163,11 +157,6 @@ public class BgrConverter extends AConverter {
   }
 
   /** {@inheritDoc} */
-
-  public BufferedImage toImage(final MediaPicture picture) {
-    return toImage(null, picture);
-  }
-
   @Override
   public BufferedImage toImage(BufferedImage output, final MediaPicture input) {
     validatePicture(input);
@@ -235,6 +224,6 @@ public class BgrConverter extends AConverter {
       mResampleMediaPicture.delete();
     mResampleMediaPicture = null;
     
-    super.close();
+    super.delete();
   }
 }

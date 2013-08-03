@@ -129,7 +129,7 @@ public class ConverterFactoryTest
       mConverterType.getDescriptor(), mConverterType.getPictureType(),
       TEST_WIDTH, TEST_HEIGHT);
     
-    c.toImage(null);
+    c.toImage(null, null);
   }
 
   @Test(expected=IllegalArgumentException.class)
@@ -139,7 +139,7 @@ public class ConverterFactoryTest
       mConverterType.getDescriptor(), mConverterType.getPictureType(),
       TEST_WIDTH, TEST_HEIGHT);
     
-    c.toPicture(null, 0);
+    c.toPicture(null, null, 0);
   }
 
   @Test(expected=IllegalArgumentException.class)
@@ -152,7 +152,7 @@ public class ConverterFactoryTest
     MediaPicture picture = MediaPicture.make(
       TEST_WIDTH, TEST_HEIGHT, mConverterType.getPictureType());
 
-    c.toImage(picture);
+    c.toImage(null, picture);
   }
 
   @Test(expected=IllegalArgumentException.class)
@@ -165,7 +165,7 @@ public class ConverterFactoryTest
     MediaPicture picture = MediaPicture.make(
       TEST_WIDTH, TEST_HEIGHT, PixelFormat.Type.PIX_FMT_GRAY16BE);
 
-    c.toImage(picture);
+    c.toImage(null, picture);
   }
 
   @Test(expected=IllegalArgumentException.class)
@@ -179,7 +179,7 @@ public class ConverterFactoryTest
     BufferedImage image = new BufferedImage(
       TEST_WIDTH, TEST_HEIGHT, BufferedImage.TYPE_INT_RGB);
 
-    c.toPicture(image, 0);
+    c.toPicture(null, image, 0);
   }
 
   // this test makes user of mPixelType which, and thus the solid color
@@ -207,8 +207,8 @@ public class ConverterFactoryTest
 
     // convert image1 to a picture and then back to image2
 
-    BufferedImage image2 = converter.toImage(
-      converter.toPicture(image1, 0));
+    BufferedImage image2 = converter.toImage(null,
+      converter.toPicture(null, image1, 0));
 
     // test that all the pixels in image2 are gray, but not black or
     // white
@@ -258,8 +258,8 @@ public class ConverterFactoryTest
 
     // convert image1 to a picture and then back to image2
 
-    MediaPicture picutre = converter1.toPicture(image1, 0);
-    BufferedImage image2 = converter2.toImage(picutre);
+    MediaPicture picture = converter1.toPicture(null, image1, 0);
+    BufferedImage image2 = converter2.toImage(null, picture);
 
     assertEquals("image2 wrong width", w2, image2.getWidth());
     assertEquals("image2 wrong height", h2, image2.getHeight());
@@ -305,8 +305,8 @@ public class ConverterFactoryTest
 
     // convert image1 to a picture and then back to image2
 
-    BufferedImage image2 = converter.toImage(
-      converter.toPicture(image1, 0));
+    BufferedImage image2 = converter.toImage(null, 
+      converter.toPicture(null, image1, 0));
 
     // test that all the pixels in image2 are gray, but not black or
     // white
@@ -352,8 +352,8 @@ public class ConverterFactoryTest
 
     // convert image1 to a picture and then back to image2
 
-    BufferedImage image2 = converter.toImage(
-      converter.toPicture(image1, 0));
+    BufferedImage image2 = converter.toImage(null,
+      converter.toPicture(null, image1, 0));
 
     // test that all the pixels in image2 are the same as image1
 
@@ -400,8 +400,8 @@ public class ConverterFactoryTest
 
     // convert image1 to a picture and then back to image2
 
-    BufferedImage image2 = converter.toImage(
-      converter.toPicture(image1, 0));
+    BufferedImage image2 = converter.toImage(null, 
+      converter.toPicture(null, image1, 0));
 
     // rotae image2 into image3
 
@@ -415,7 +415,7 @@ public class ConverterFactoryTest
 
     // convert image3 to a picture and then back to an image (4)
 
-    BufferedImage image4 = converter.toImage(converter.toPicture(image3, 0));
+    BufferedImage image4 = converter.toImage(null, converter.toPicture(null, image3, 0));
 
     // test that image4 now contains stripped rows (not columns)
 

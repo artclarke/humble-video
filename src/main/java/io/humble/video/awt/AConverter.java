@@ -289,7 +289,7 @@ abstract public class AConverter implements Converter
     return getDescription();
   }
 
-  public void close()
+  public void delete()
   {
     if (mToPictureResampler != null)
       mToPictureResampler.delete();
