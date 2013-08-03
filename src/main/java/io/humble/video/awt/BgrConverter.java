@@ -85,20 +85,21 @@ public class BgrConverter extends AConverter {
 
   /** {@inheritDoc} */
 
-  public MediaPicture toPicture(BufferedImage image, long timestamp) {
-    validateImage(image);
-    
-    final MediaPicture picture = MediaPicture.make(mPictureWidth,
-        mPictureHeight, getPictureType());
-    return toPicture(picture, image, timestamp);
+  public MediaPicture toPicture(final BufferedImage image, long timestamp) {
+    return toPicture(null, image, timestamp);
   }
 
   @Override
-  public MediaPicture toPicture(final MediaPicture output,
-      BufferedImage input, long timestamp) {
+  public MediaPicture toPicture(MediaPicture output,
+      final BufferedImage input, long timestamp) {
     // validate the image
 
     validateImage(input);
+    
+    if (output == null) {
+      output = MediaPicture.make(mPictureWidth,
+          mPictureHeight, getPictureType());
+    }
 
     // get the image byte buffer buffer
 
@@ -163,42 +164,39 @@ public class BgrConverter extends AConverter {
 
   /** {@inheritDoc} */
 
-  public BufferedImage toImage(MediaPicture picture) {
-    validatePicture(picture);
-    // first let's create the number of bytes we need.
-    
-    final byte[] bytes = new byte[willResample() ? mResampleMediaPicture.getDataPlaneSize(0) : picture.getDataPlaneSize(0)];
-    // create the data buffer from the bytes
-    
-    final DataBufferByte db = new DataBufferByte(bytes, bytes.length);
-    
-    // create an a sample model which matches the byte layout of the
-    // image data and raster which contains the data which now can be
-    // properly interpreted
-    int w = mImageWidth;
-    int h = mImageHeight;
-    
-    final SampleModel sm = new PixelInterleavedSampleModel(
-      db.getDataType(), w, h, 3, 3 * w, mBandOffsets);
-    final WritableRaster wr = Raster.createWritableRaster(sm, db, null);
-    
-    // create a color model
-    
-    final ColorModel colorModel = new ComponentColorModel(
-      mColorSpace, false, false, ColorModel.OPAQUE, db.getDataType());
-    
-    // return a new image created from the color model and raster
-    
-    final BufferedImage output = new BufferedImage(colorModel, wr, false, null);
-
-    return toImage(output, picture);
+  public BufferedImage toImage(final MediaPicture picture) {
+    return toImage(null, picture);
   }
 
   @Override
   public BufferedImage toImage(BufferedImage output, final MediaPicture input) {
-    // test that the picture is valid
-
     validatePicture(input);
+    // test that the picture is valid
+    if (output == null) {
+      final byte[] bytes = new byte[willResample() ? mResampleMediaPicture.getDataPlaneSize(0) : input.getDataPlaneSize(0)];
+      // create the data buffer from the bytes
+      
+      final DataBufferByte db = new DataBufferByte(bytes, bytes.length);
+      
+      // create an a sample model which matches the byte layout of the
+      // image data and raster which contains the data which now can be
+      // properly interpreted
+      int w = mImageWidth;
+      int h = mImageHeight;
+      
+      final SampleModel sm = new PixelInterleavedSampleModel(
+        db.getDataType(), w, h, 3, 3 * w, mBandOffsets);
+      final WritableRaster wr = Raster.createWritableRaster(sm, db, null);
+      
+      // create a color model
+      
+      final ColorModel colorModel = new ComponentColorModel(
+        mColorSpace, false, false, ColorModel.OPAQUE, db.getDataType());
+      
+      // return a new image created from the color model and raster
+      
+      output = new BufferedImage(colorModel, wr, false, null);
+    }
 
     MediaPicture picture;
     // resample as needed

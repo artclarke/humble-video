@@ -21,6 +21,7 @@ package io.humble.video.awt;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 
 import javax.swing.JComponent;
@@ -47,13 +48,17 @@ public class ImageFrame extends JFrame
 
   private static final long serialVersionUID = -4752966848100689153L;
   private final ImageComponent mOnscreenPicture;
-
+  
+  private static boolean mIsHeadless = GraphicsEnvironment.isHeadless();
 
   /**
    * Create the frame
    */
 
-  public ImageFrame()
+  public static ImageFrame make() {
+    return mIsHeadless ? null : new ImageFrame();
+  }
+  private ImageFrame()
   {
     super();
     mOnscreenPicture = new ImageComponent();
