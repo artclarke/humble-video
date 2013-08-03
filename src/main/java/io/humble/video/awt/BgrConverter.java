@@ -42,9 +42,11 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * A converter to translate {@link MediaPicture}s to and from
  * {@link BufferedImage}s of type {@link BufferedImage#TYPE_3BYTE_BGR}.
+ * 
+ * Note: Package Private
  */
 
-public class BgrConverter extends AConverter {
+class BgrConverter extends AMediaPictureConverter {
   // band offsets requried by the sample model
 
   private static final int[] mBandOffsets = { 2, 1, 0 };

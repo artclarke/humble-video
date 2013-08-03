@@ -1056,7 +1056,7 @@ public class Buffer extends RefCounted {
       retval.order(java.nio.ByteOrder.nativeOrder());
       retval.position(0);
       retval.mark();
-      retval.limit(this.getSize());
+      retval.limit(this.getBufferSize());
     }
     return retval;
   }

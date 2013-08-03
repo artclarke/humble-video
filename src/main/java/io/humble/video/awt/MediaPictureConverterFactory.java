@@ -32,7 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.awt.image.BufferedImage;
 
 /**
- * This factory class creates {@link Converter} objects for
+ * This factory class creates {@link MediaPictureConverter} objects for
  * translation between a
  * number of {@link MediaPicture} and {@link BufferedImage} types.  Not
  * all image and picture types are supported.  When an unsupported
@@ -59,12 +59,12 @@ import java.awt.image.BufferedImage;
  * </p>
  */
 
-public class ConverterFactory
+public class MediaPictureConverterFactory
 {
   /**
    * Default constructor
    */
-  protected ConverterFactory() {
+  protected MediaPictureConverterFactory() {
     
   }
 
@@ -178,7 +178,7 @@ public class ConverterFactory
    *         MediaPicture} is NULL;
    */
 
-  public static Converter createConverter(
+  public static MediaPictureConverter createConverter(
     String converterDescriptor,
     MediaPicture picture)
   {
@@ -208,7 +208,7 @@ public class ConverterFactory
    *         BufferedImage} is NULL;
    */
 
-  public static Converter createConverter(
+  public static MediaPictureConverter createConverter(
     BufferedImage image,
     PixelFormat.Type pictureType)
   {
@@ -248,7 +248,7 @@ public class ConverterFactory
    *         not be properly initialized
    */
 
-  public static Converter createConverter(
+  public static MediaPictureConverter createConverter(
     String converterDescriptor,
     PixelFormat.Type pictureType, 
     int width, int height)
@@ -279,13 +279,13 @@ public class ConverterFactory
    *         properly created or initialized
    */
 
-  public static Converter createConverter(
+  public static MediaPictureConverter createConverter(
     String converterDescriptor,
     PixelFormat.Type pictureType, 
     int pictureWidth, int pictureHeight,
     int imageWidth, int imageHeight)
   {
-    Converter converter = null;
+    MediaPictureConverter converter = null;
     
     // establish the converter type
 
@@ -300,7 +300,7 @@ public class ConverterFactory
     {
       // establish the constructor 
 
-      Constructor<? extends Converter> converterConstructor = 
+      Constructor<? extends MediaPictureConverter> converterConstructor = 
         converterType.getConverterClass().getConstructor(PixelFormat.Type.class,
           int.class, int.class, int.class, int.class);
 
@@ -367,7 +367,7 @@ public class ConverterFactory
 
   /**
    * This class describes a converter type and is used to register and
-   * unregister types with {@link ConverterFactory}.  The factory
+   * unregister types with {@link MediaPictureConverterFactory}.  The factory
    * oragnizes the converters by descriptor, and thus each should be
    * unique unless you wish to replace an existing converter.
    */
@@ -380,7 +380,7 @@ public class ConverterFactory
 
     /** The class responsible for converting between types. */
 
-    final private Class<? extends Converter> mConverterClass;
+    final private Class<? extends MediaPictureConverter> mConverterClass;
 
     /**
      * The {@link io.humble.video.PixelFormat.Type} which the
@@ -408,7 +408,7 @@ public class ConverterFactory
      *        must be in to convert it to a {@link BufferedImage}
      */
 
-    public Type(String descriptor, Class<? extends Converter> converterClass, 
+    public Type(String descriptor, Class<? extends MediaPictureConverter> converterClass, 
       PixelFormat.Type pictureType, int imageType)
     {
       mDescriptor = descriptor;
@@ -426,7 +426,7 @@ public class ConverterFactory
 
     /** Get the class responsible for converting between types. */
 
-    public Class<? extends Converter> getConverterClass()
+    public Class<? extends MediaPictureConverter> getConverterClass()
     {
       return mConverterClass;
     }

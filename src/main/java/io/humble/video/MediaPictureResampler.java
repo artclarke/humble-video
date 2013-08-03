@@ -14,22 +14,6 @@ import io.humble.ferry.*;
  * width, height or format.  
  */
 public class MediaPictureResampler extends Configurable {
-  @Override
-  public String toString()
-  {
-    StringBuilder result = new StringBuilder();
-    
-    result.append(this.getClass().getName()+"@"+hashCode()+"[");
-    result.append("input width:"+getInputWidth()+";");
-    result.append("input height:"+getInputHeight()+";");
-    result.append("input format:"+getInputFormat()+";");
-    result.append("output width:"+getOutputWidth()+";");
-    result.append("output height:"+getOutputHeight()+";");
-    result.append("output format:"+getOutputFormat()+";");
-    result.append("]");
-    return result.toString();
-  }
-
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -129,6 +113,22 @@ public class MediaPictureResampler extends Configurable {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("input width:"+getInputWidth()+";");
+    result.append("input height:"+getInputHeight()+";");
+    result.append("input format:"+getInputFormat()+";");
+    result.append("output width:"+getOutputWidth()+";");
+    result.append("output height:"+getOutputHeight()+";");
+    result.append("output format:"+getOutputFormat()+";");
+    result.append("]");
+    return result.toString();
+  }
+
 
   public MediaPictureResampler.State getState() {
     return MediaPictureResampler.State.swigToEnum(VideoJNI.MediaPictureResampler_getState(swigCPtr, this));

@@ -42,7 +42,7 @@ import static junit.framework.Assert.*;
 import static java.lang.Math.*;
 
 @RunWith(Parameterized.class)
-public class ConverterFactoryTest
+public class MediaPictureConverterFactoryTest
 {
   // default width and height for test images, note that the width is
   // (and should remain) a perfect multiple of 16 which intentionally
@@ -53,7 +53,7 @@ public class ConverterFactoryTest
   public static final int TEST_WIDTH  = 48;
   public static final int TEST_HEIGHT = 48;
 
-  private final ConverterFactory.Type mConverterType;
+  private final MediaPictureConverterFactory.Type mConverterType;
   private final PixelFormat.Type mPixelType;
 
   // pixel types to included for resampling tests, as we really want
@@ -97,7 +97,7 @@ public class ConverterFactoryTest
     PixelFormat.Type.PIX_FMT_NB,
   };
 
-  public ConverterFactoryTest(ConverterFactory.Type converterType, 
+  public MediaPictureConverterFactoryTest(MediaPictureConverterFactory.Type converterType, 
     PixelFormat.Type pixelType)
   {
     mConverterType = converterType;
@@ -112,8 +112,8 @@ public class ConverterFactoryTest
     Collection<Object[]> parameters = new Vector<Object[]>();
     
     for (PixelFormat.Type pixelType: mIncludedPixelTypes)
-      for (ConverterFactory.Type converterType:
-             ConverterFactory.getRegisteredConverters())
+      for (MediaPictureConverterFactory.Type converterType:
+             MediaPictureConverterFactory.getRegisteredConverters())
         {
           Object[] tuple = {converterType, pixelType};
           parameters.add(tuple);
@@ -125,7 +125,7 @@ public class ConverterFactoryTest
   @Test(expected=IllegalArgumentException.class)
   public void testVideoPictureToImageNullInput()
   {
-    Converter c = ConverterFactory.createConverter(
+    MediaPictureConverter c = MediaPictureConverterFactory.createConverter(
       mConverterType.getDescriptor(), mConverterType.getPictureType(),
       TEST_WIDTH, TEST_HEIGHT);
     
@@ -135,7 +135,7 @@ public class ConverterFactoryTest
   @Test(expected=IllegalArgumentException.class)
   public void testImageToVideoPictureNullInput()
   {
-    Converter c = ConverterFactory.createConverter(
+    MediaPictureConverter c = MediaPictureConverterFactory.createConverter(
       mConverterType.getDescriptor(), mConverterType.getPictureType(),
       TEST_WIDTH, TEST_HEIGHT);
     
@@ -145,7 +145,7 @@ public class ConverterFactoryTest
   @Test(expected=IllegalArgumentException.class)
   public void testVideoPictureToImageIncompletePicture()
   {
-    Converter c = ConverterFactory.createConverter(
+    MediaPictureConverter c = MediaPictureConverterFactory.createConverter(
       mConverterType.getDescriptor(), mConverterType.getPictureType(),
       TEST_WIDTH, TEST_HEIGHT);
 
@@ -158,7 +158,7 @@ public class ConverterFactoryTest
   @Test(expected=IllegalArgumentException.class)
   public void testVideoPictureToImageWrongFormat()
   {
-    Converter c = ConverterFactory.createConverter(
+    MediaPictureConverter c = MediaPictureConverterFactory.createConverter(
       mConverterType.getDescriptor(), PixelFormat.Type.PIX_FMT_YUV420P,
       TEST_WIDTH, TEST_HEIGHT);
 
@@ -172,7 +172,7 @@ public class ConverterFactoryTest
   public void testImageToVideoPictureWrongFormatInput()
   {
 
-    Converter c = ConverterFactory.createConverter(
+    MediaPictureConverter c = MediaPictureConverterFactory.createConverter(
       mConverterType.getDescriptor(), PixelFormat.Type.PIX_FMT_YUV420P,
       TEST_WIDTH, TEST_HEIGHT);
 
@@ -194,7 +194,7 @@ public class ConverterFactoryTest
 
     // create the converter
 
-    Converter converter = ConverterFactory.createConverter(
+    MediaPictureConverter converter = MediaPictureConverterFactory.createConverter(
       mConverterType.getDescriptor(), mPixelType, w, h);
 
     // construct an all gray image
@@ -242,10 +242,10 @@ public class ConverterFactoryTest
 
     // create the converters
 
-    Converter converter1 = ConverterFactory.createConverter(
+    MediaPictureConverter converter1 = MediaPictureConverterFactory.createConverter(
       mConverterType.getDescriptor(), mPixelType, w2, h2, w1, h1);
 
-    Converter converter2 = ConverterFactory.createConverter(
+    MediaPictureConverter converter2 = MediaPictureConverterFactory.createConverter(
       mConverterType.getDescriptor(), mPixelType, w2, h2, w2, h2);
 
     // construct an all gray image
@@ -292,7 +292,7 @@ public class ConverterFactoryTest
 
     // create the converter
 
-    Converter converter = ConverterFactory.createConverter(
+    MediaPictureConverter converter = MediaPictureConverterFactory.createConverter(
       mConverterType.getDescriptor(), mPixelType, w, h);
 
     // construct an all gray image
@@ -334,7 +334,7 @@ public class ConverterFactoryTest
 
     // create the converter
 
-    Converter converter = ConverterFactory.createConverter(
+    MediaPictureConverter converter = MediaPictureConverterFactory.createConverter(
       mConverterType.getDescriptor(), mConverterType.getPictureType(),
       w, h);
 
@@ -383,7 +383,7 @@ public class ConverterFactoryTest
 
     // create the converter
 
-    Converter converter = ConverterFactory.createConverter(
+    MediaPictureConverter converter = MediaPictureConverterFactory.createConverter(
       mConverterType.getDescriptor(), mConverterType.getPictureType(),
       size, size);
 

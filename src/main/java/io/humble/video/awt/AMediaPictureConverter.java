@@ -30,9 +30,11 @@ import java.awt.image.BufferedImage;
  * the {@link MediaPicture} needs to be re-sampled, and
  * if so, creates appropriate {@link MediaPictureResampler} objects to do
  * that.
+ * 
+ *  Note: Package Private
  */
 
-abstract public class AConverter implements Converter
+abstract class AMediaPictureConverter implements MediaPictureConverter
 {
   /** Re-sampler called when converting image to picture, may be null. */
 
@@ -90,7 +92,7 @@ abstract public class AConverter implements Converter
    * @param imageHeight the height of image
    */
 
-  public AConverter(
+  public AMediaPictureConverter(
     PixelFormat.Type pictureType, 
     PixelFormat.Type requiredPictureType, 
     int imageType,

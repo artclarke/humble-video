@@ -1,12 +1,16 @@
 package io.humble.video;
 
-import io.humble.video.awt.Converter;
-import io.humble.video.awt.ConverterFactory;
+import io.humble.video.awt.MediaPictureConverter;
+import io.humble.video.awt.MediaPictureConverterFactory;
 import io.humble.video.awt.ImageFrame;
+import io.humble.video.javaxsound.AudioFrame;
+import io.humble.video.javaxsound.MediaAudioConverter;
+import io.humble.video.javaxsound.MediaAudioConverterFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,6 +26,7 @@ public class DecoderTest {
     final String f = s.getPath();
     source = Source.make();
     source.open(f, null, false, true, null, null);
+    source.queryStreamMetaData();
 
   }
 
@@ -46,9 +51,11 @@ public class DecoderTest {
         decoder.getChannels(),
         decoder.getChannelLayout(),
         decoder.getSampleFormat());
-//    long startTime = Global.NO_PTS;
     
-//    openWindow();
+    final MediaAudioConverter converter = MediaAudioConverterFactory.createConverter(MediaAudioConverterFactory.DEFAULT_JAVA_AUDIO,
+        audio);
+    final AudioFrame audioFrame = AudioFrame.make(converter.getJavaFormat());
+    ByteBuffer rawAudio = null;
     
     while(source.read(packet)>=0) {
      if (packet.isComplete() && packet.getStreamIndex()==audioStream) {
@@ -57,7 +64,9 @@ public class DecoderTest {
        int bytesRead = 0;
        do {
          bytesRead = decoder.decodeAudio(audio, packet, byteOffset);
-//         startTime = displayPicture(startTime, picture);
+         rawAudio = converter.toJavaAudio(rawAudio, audio);
+         if (audioFrame != null) 
+           audioFrame.play(rawAudio);
          byteOffset += bytesRead;
        } while (byteOffset < packet.getSize());
      }
@@ -65,10 +74,10 @@ public class DecoderTest {
      int bytesRead = 0;
      do {
        bytesRead = decoder.decodeAudio(audio, null, 0);
-//       startTime = displayPicture(startTime, picture);
      } while (bytesRead > 0 && audio.isComplete());
     }
-//    closeWindow();
+    if (audioFrame != null) 
+      audioFrame.dispose();
   }
 
   @Test
@@ -85,7 +94,7 @@ public class DecoderTest {
         decoder.getHeight(),
         decoder.getPixelFormat()
         );
-    final Converter converter = ConverterFactory.createConverter(ConverterFactory.HUMBLE_BGR_24, picture);
+    final MediaPictureConverter converter = MediaPictureConverterFactory.createConverter(MediaPictureConverterFactory.HUMBLE_BGR_24, picture);
     BufferedImage image = null;
 
     long startTime = Global.NO_PTS;

@@ -291,6 +291,23 @@ public class MediaAudioResampler extends Configurable {
     return VideoJNI.MediaAudioResampler_getDelay(swigCPtr, this, base);
   }
 
+/**
+ *  
+ * be required when resampling a given number of samples.  
+ * That was a mouthful, yes? So here's the way to think of this. If 
+ * your input  
+ * audio is at 48000 hz, and you pass in 0.5 seconds of audio, that's 
+ * 24,000 input samples.  
+ * But if you're resampling to 22050 hz, then 0.5 seconds of audio is 
+ * 11,025 output samples.  
+ * So <code>getNumResampledSamples(24000)</code> would return <code>11025</code> 
+ * if the input  
+ * sample rate was 48,000 and hte output was 22,050.  
+ */
+  public int getNumResampledSamples(int numSamples) {
+    return VideoJNI.MediaAudioResampler_getNumResampledSamples(swigCPtr, this, numSamples);
+  }
+
   public MediaAudioResampler.State getState() {
     return MediaAudioResampler.State.swigToEnum(VideoJNI.MediaAudioResampler_getState(swigCPtr, this));
   }

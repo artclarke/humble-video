@@ -18,6 +18,28 @@
  *******************************************************************************/
 
 %typemap (javacode) io::humble::video::MediaAudio,io::humble::video::MediaAudio*,io::humble::video::MediaAudio& %{
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("sample rate:"+getSampleRate()+";");
+    result.append("channels:"+getChannels()+";");
+    result.append("format:"+getFormat()+";");
+    result.append("time stamp:"+getTimeStamp()+";");
+    result.append("complete:"+isComplete()+";");
+    result.append("num samples:"+getNumSamples()+";");
+    result.append("key:"+isKey()+";");
+    Rational timeBase = getTimeBase();
+    result.append("time base:"+timeBase+";");
+    if (timeBase != null) timeBase.delete();
+    result.append("planes:"+getNumDataPlanes()+";");
+    for(int i = 0; i < getNumDataPlanes(); i++)
+      result.append("plane size[" + i +"]:"+getDataPlaneSize(i)+";");
+    result.append("]");
+    return result.toString();
+    
+  }
 %}
 
 %include <io/humble/video/MediaAudio.h>

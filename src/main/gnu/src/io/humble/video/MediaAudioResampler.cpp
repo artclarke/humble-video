@@ -245,6 +245,11 @@ MediaAudioResampler::getDelay(int64_t base) {
   return swr_get_delay(mCtx, base);
 }
 
+int32_t
+MediaAudioResampler::getNumResampledSamples(int32_t numSamples) {
+  return av_rescale_rnd(getOutputSampleRate(), numSamples, getInputSampleRate(), AV_ROUND_UP);
+}
+
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

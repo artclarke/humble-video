@@ -25,14 +25,14 @@ import io.humble.video.MediaPicture;
 /** This interface describes a converter which can perform bidirectional
  * translation between a given {@link MediaPicture} type and a {@link
  * BufferedImage} type.  Converters are created by {@link
- * ConverterFactory}.  Each converter can translate between any
+ * MediaPictureConverterFactory}.  Each converter can translate between any
  * supported {@link io.humble.video.IPixelFormat.Type} and a single
  * {@link BufferedImage} type.  Converters can optionally resize images
  * during
  * the conversion process.
  */
 
-public interface Converter
+public interface MediaPictureConverter
 {
   /** Get the picture type, as defined by {@link PixelFormat.Type}, which this converter
    * recognizes.
