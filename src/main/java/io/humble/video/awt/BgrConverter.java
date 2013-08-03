@@ -40,8 +40,6 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.concurrent.atomic.AtomicReference;
 
-import ch.qos.logback.core.joran.conditional.IfAction;
-
 /**
  * A converter to translate {@link MediaPicture}s to and from
  * {@link BufferedImage}s of type {@link BufferedImage#TYPE_3BYTE_BGR}.
