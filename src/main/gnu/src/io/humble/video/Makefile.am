@@ -52,6 +52,9 @@ libhumble_video_la_SOURCES= \
   SourceStream.cpp \
   SourceStreamImpl.cpp \
   SinkFormat.cpp \
+  FilterType.cpp \
+  FilterGraph.cpp \
+  Filter.cpp \
   Global.cpp
   
 nodist_libhumble_video_la_SOURCES= \
@@ -126,6 +129,9 @@ libhumble_video_la_HEADERS= \
   Source.h \
   Source.swg \
   SourceImpl.h \
+  FilterType.h \
+  FilterGraph.h \
+  Filter.h \
   Global.h
 
 BUILT_SOURCES= \

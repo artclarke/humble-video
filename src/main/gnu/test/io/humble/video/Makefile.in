@@ -78,7 +78,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = MediaAudioResamplerTester$(EXEEXT) \
+check_PROGRAMS = FilterTypeTester$(EXEEXT) \
+	MediaAudioResamplerTester$(EXEEXT) \
 	MediaPictureResamplerTester$(EXEEXT) DecoderTester$(EXEEXT) \
 	PixelFormatTester$(EXEEXT) CodecTester$(EXEEXT) \
 	IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
@@ -127,6 +128,13 @@ nodist_ErrorTester_OBJECTS = ErrorTest_CXXRunner.$(OBJEXT)
 ErrorTester_OBJECTS = $(am_ErrorTester_OBJECTS) \
 	$(nodist_ErrorTester_OBJECTS)
 ErrorTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_FilterTypeTester_OBJECTS = FilterTypeTest.$(OBJEXT) \
+	TestData.$(OBJEXT) Main.$(OBJEXT)
+nodist_FilterTypeTester_OBJECTS = FilterTypeTest_CXXRunner.$(OBJEXT)
+FilterTypeTester_OBJECTS = $(am_FilterTypeTester_OBJECTS) \
+	$(nodist_FilterTypeTester_OBJECTS)
+FilterTypeTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_IndexEntryTester_OBJECTS = IndexEntryTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_IndexEntryTester_OBJECTS = IndexEntryTest_CXXRunner.$(OBJEXT)
@@ -271,6 +279,7 @@ am__v_CXXLD_1 =
 SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(DecoderTester_SOURCES) $(nodist_DecoderTester_SOURCES) \
 	$(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
+	$(FilterTypeTester_SOURCES) $(nodist_FilterTypeTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(nodist_IndexEntryTester_SOURCES) \
 	$(KeyValueBagTester_SOURCES) \
 	$(nodist_KeyValueBagTester_SOURCES) \
@@ -294,8 +303,8 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(nodist_SourceStreamTester_SOURCES) $(SourceTester_SOURCES) \
 	$(nodist_SourceTester_SOURCES)
 DIST_SOURCES = $(CodecTester_SOURCES) $(DecoderTester_SOURCES) \
-	$(ErrorTester_SOURCES) $(IndexEntryTester_SOURCES) \
-	$(KeyValueBagTester_SOURCES) \
+	$(ErrorTester_SOURCES) $(FilterTypeTester_SOURCES) \
+	$(IndexEntryTester_SOURCES) $(KeyValueBagTester_SOURCES) \
 	$(MediaAudioResamplerTester_SOURCES) \
 	$(MediaAudioTester_SOURCES) $(MediaPacketTester_SOURCES) \
 	$(MediaPictureResamplerTester_SOURCES) \
@@ -756,6 +765,7 @@ VS_CPP_NAMESPACE = io::humble::video
 VS_TEST = 1
 SUBDIRS = customio
 BUILT_SOURCES = \
+  FilterTypeTest_CXXRunner.cpp \
   MediaAudioResamplerTest_CXXRunner.cpp \
   MediaPictureResamplerTest_CXXRunner.cpp \
   DecoderTest_CXXRunner.cpp \
@@ -775,6 +785,7 @@ BUILT_SOURCES = \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  FilterTypeTest.h \
   MediaAudioResamplerTest.h \
   MediaPictureResamplerTest.h \
   DecoderTest.h \
@@ -799,6 +810,17 @@ inst_checkdir = $(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS = $(check_PROGRAMS)
+FilterTypeTester_SOURCES = \
+  FilterTypeTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_FilterTypeTester_SOURCES = \
+  FilterTypeTest_CXXRunner.cpp
+
+FilterTypeTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 MediaAudioResamplerTester_SOURCES = \
   MediaAudioResamplerTest.cpp \
   TestData.cpp \
@@ -1038,6 +1060,10 @@ ErrorTester$(EXEEXT): $(ErrorTester_OBJECTS) $(ErrorTester_DEPENDENCIES) $(EXTRA
 	@rm -f ErrorTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(ErrorTester_OBJECTS) $(ErrorTester_LDADD) $(LIBS)
 
+FilterTypeTester$(EXEEXT): $(FilterTypeTester_OBJECTS) $(FilterTypeTester_DEPENDENCIES) $(EXTRA_FilterTypeTester_DEPENDENCIES) 
+	@rm -f FilterTypeTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(FilterTypeTester_OBJECTS) $(FilterTypeTester_LDADD) $(LIBS)
+
 IndexEntryTester$(EXEEXT): $(IndexEntryTester_OBJECTS) $(IndexEntryTester_DEPENDENCIES) $(EXTRA_IndexEntryTester_DEPENDENCIES) 
 	@rm -f IndexEntryTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(IndexEntryTester_OBJECTS) $(IndexEntryTester_LDADD) $(LIBS)
@@ -1106,6 +1132,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecoderTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterTypeTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterTypeTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntryTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntryTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagTest.Po@am__quote@
@@ -1405,6 +1433,13 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+FilterTypeTester.log: FilterTypeTester$(EXEEXT)
+	@p='FilterTypeTester$(EXEEXT)'; \
+	b='FilterTypeTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 MediaAudioResamplerTester.log: MediaAudioResamplerTester$(EXEEXT)
 	@p='MediaAudioResamplerTester$(EXEEXT)'; \
 	b='MediaAudioResamplerTester'; \

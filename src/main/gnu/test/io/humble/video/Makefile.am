@@ -7,6 +7,7 @@ include @top_builddir@/mk/Makefile.global
 SUBDIRS=customio
 
 check_PROGRAMS=\
+  FilterTypeTester \
   MediaAudioResamplerTester \
   MediaPictureResamplerTester \
   DecoderTester \
@@ -26,6 +27,7 @@ check_PROGRAMS=\
   RationalTester 
 
 BUILT_SOURCES= \
+  FilterTypeTest_CXXRunner.cpp \
   MediaAudioResamplerTest_CXXRunner.cpp \
   MediaPictureResamplerTest_CXXRunner.cpp \
   DecoderTest_CXXRunner.cpp \
@@ -45,6 +47,7 @@ BUILT_SOURCES= \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  FilterTypeTest.h \
   MediaAudioResamplerTest.h \
   MediaPictureResamplerTest.h \
   DecoderTest.h \
@@ -70,6 +73,17 @@ inst_checkdir=$(bindir)
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
 TESTS=$(check_PROGRAMS)
+
+FilterTypeTester_SOURCES= \
+  FilterTypeTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_FilterTypeTester_SOURCES= \
+  FilterTypeTest_CXXRunner.cpp
+
+FilterTypeTester_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 MediaAudioResamplerTester_SOURCES= \
   MediaAudioResamplerTest.cpp \

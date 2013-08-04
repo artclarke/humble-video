@@ -50,6 +50,9 @@
 #include <io/humble/video/Container.h>
 #include <io/humble/video/SourceStream.h>
 #include <io/humble/video/Source.h>
+#include <io/humble/video/FilterType.h>
+#include <io/humble/video/FilterGraph.h>
+#include <io/humble/video/Filter.h>
 
 using namespace VS_CPP_NAMESPACE;
 
@@ -188,3 +191,6 @@ import io.humble.ferry.Buffer;
 %include <io/humble/video/Container.swg>
 %include <io/humble/video/SourceStream.swg>
 %include <io/humble/video/Source.swg>
+%include <io/humble/video/FilterType.swg>
+%include <io/humble/video/FilterGraph.swg>
+%include <io/humble/video/Filter.swg>

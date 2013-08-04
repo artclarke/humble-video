@@ -17,38 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef FFMPEGINCLUDES_H_
-#define FFMPEGINCLUDES_H_
+%typemap (javacode) io::humble::video::FilterType,io::humble::video::FilterType*,io::humble::video::FilterType& %{
+%}
 
-extern "C"
-{
-// Hack here to get rid of deprecation compilation warnings
-//#define attribute_deprecated
-
-// WARNING: This is GCC specific and is to fix a build issue
-// in FFmpeg where UINT64_C is not always defined.  The
-// __WORDSIZE value is a GCC constant
-#define __STDC_CONSTANT_MACROS 1
-#include <stdint.h>
-#ifndef UINT64_C
-# if __WORDSIZE == 64
-#  define UINT64_C(c)	c ## UL
-# else
-#  define UINT64_C(c)	c ## ULL
-# endif
-#endif
-
-
-#include <libavutil/avutil.h>
-#include <libavutil/common.h>
-#include <libavutil/pixdesc.h>
-#include <libavutil/imgutils.h>
-#include <libavutil/opt.h>
-#include <libavutil/parseutils.h>
-
-
-#include <libavcodec/avcodec.h>
-#include <libavfilter/avfilter.h>
-#include <libavformat/avformat.h>
-}
-#endif /*FFMPEGINCLUDES_H_*/
+%include <io/humble/video/FilterType.h>

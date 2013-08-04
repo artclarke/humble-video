@@ -108,7 +108,8 @@ am_libhumble_video_la_OBJECTS = VideoExceptions.lo AVBufferSupport.lo \
 	MediaPacketImpl.lo ContainerFormat.lo Configurable.lo Coder.lo \
 	Decoder.lo Encoder.lo ContainerStream.lo Container.lo \
 	SourceFormat.lo Source.lo SourceImpl.lo SourceStream.lo \
-	SourceStreamImpl.lo SinkFormat.lo Global.lo
+	SourceStreamImpl.lo SinkFormat.lo FilterType.lo FilterGraph.lo \
+	Filter.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -473,6 +474,9 @@ libhumble_video_la_SOURCES = \
   SourceStream.cpp \
   SourceStreamImpl.cpp \
   SinkFormat.cpp \
+  FilterType.cpp \
+  FilterGraph.cpp \
+  Filter.cpp \
   Global.cpp
 
 nodist_libhumble_video_la_SOURCES = \
@@ -547,6 +551,9 @@ libhumble_video_la_HEADERS = \
   Source.h \
   Source.swg \
   SourceImpl.h \
+  FilterType.h \
+  FilterGraph.h \
+  Filter.h \
   Global.h
 
 BUILT_SOURCES = \
@@ -619,6 +626,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Encoder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Filter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterGraph.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterType.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Global.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HumbleVideo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexEntry.Plo@am__quote@
