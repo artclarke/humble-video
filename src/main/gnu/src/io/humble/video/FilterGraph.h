@@ -94,7 +94,7 @@ public:
       const char *arguments, int flags, double ts);
 
 #ifdef SWIG
-  %newobject sendCommand(const char*, const char*, const char*, int);
+  %newobject getHumanReadableString();
   %typemap(newfree) char * "av_free($1);";
 #endif
   char* getHumanReadableString() {

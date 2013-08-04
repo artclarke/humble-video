@@ -31112,6 +31112,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getHumanRe
     /*@SWIG@*/
   }
   if(result) jresult = jenv->NewStringUTF((const char *)result);
+  av_free(result);
   return jresult;
 }
 
