@@ -53,6 +53,13 @@
 #include <io/humble/video/FilterType.h>
 #include <io/humble/video/FilterGraph.h>
 #include <io/humble/video/Filter.h>
+#include <io/humble/video/FilterEndPoint.h>
+#include <io/humble/video/FilterSource.h>
+#include <io/humble/video/FilterAudioSource.h>
+#include <io/humble/video/FilterPictureSource.h>
+#include <io/humble/video/FilterSink.h>
+#include <io/humble/video/FilterAudioSink.h>
+#include <io/humble/video/FilterPictureSink.h>
 
 using namespace VS_CPP_NAMESPACE;
 
@@ -194,3 +201,10 @@ import io.humble.ferry.Buffer;
 %include <io/humble/video/FilterType.swg>
 %include <io/humble/video/FilterGraph.swg>
 %include <io/humble/video/Filter.swg>
+%include <io/humble/video/FilterEndPoint.swg>
+%include <io/humble/video/FilterSource.swg>
+%include <io/humble/video/FilterAudioSource.swg>
+%include <io/humble/video/FilterPictureSource.swg>
+%include <io/humble/video/FilterSink.swg>
+%include <io/humble/video/FilterAudioSink.swg>
+%include <io/humble/video/FilterPictureSink.swg>

@@ -109,7 +109,9 @@ am_libhumble_video_la_OBJECTS = VideoExceptions.lo AVBufferSupport.lo \
 	Decoder.lo Encoder.lo ContainerStream.lo Container.lo \
 	SourceFormat.lo Source.lo SourceImpl.lo SourceStream.lo \
 	SourceStreamImpl.lo SinkFormat.lo FilterType.lo FilterGraph.lo \
-	Filter.lo Global.lo
+	Filter.lo FilterEndPoint.lo FilterSource.lo \
+	FilterAudioSource.lo FilterPictureSource.lo FilterSink.lo \
+	FilterAudioSink.lo FilterPictureSink.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -477,6 +479,13 @@ libhumble_video_la_SOURCES = \
   FilterType.cpp \
   FilterGraph.cpp \
   Filter.cpp \
+  FilterEndPoint.cpp \
+  FilterSource.cpp \
+  FilterAudioSource.cpp \
+  FilterPictureSource.cpp \
+  FilterSink.cpp \
+  FilterAudioSink.cpp \
+  FilterPictureSink.cpp \
   Global.cpp
 
 nodist_libhumble_video_la_SOURCES = \
@@ -554,6 +563,13 @@ libhumble_video_la_HEADERS = \
   FilterType.h \
   FilterGraph.h \
   Filter.h \
+  FilterEndPoint.h \
+  FilterSource.h \
+  FilterAudioSource.h \
+  FilterPictureSource.h \
+  FilterSink.h \
+  FilterAudioSink.h \
+  FilterPictureSink.h \
   Global.h
 
 BUILT_SOURCES = \
@@ -627,7 +643,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Filter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterAudioSink.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterAudioSource.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterEndPoint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterGraph.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterPictureSink.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterPictureSource.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterSink.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterSource.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterType.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Global.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HumbleVideo.Plo@am__quote@

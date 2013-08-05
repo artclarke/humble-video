@@ -55,6 +55,13 @@ libhumble_video_la_SOURCES= \
   FilterType.cpp \
   FilterGraph.cpp \
   Filter.cpp \
+  FilterEndPoint.cpp \
+  FilterSource.cpp \
+  FilterAudioSource.cpp \
+  FilterPictureSource.cpp \
+  FilterSink.cpp \
+  FilterAudioSink.cpp \
+  FilterPictureSink.cpp \
   Global.cpp
   
 nodist_libhumble_video_la_SOURCES= \
@@ -132,6 +139,13 @@ libhumble_video_la_HEADERS= \
   FilterType.h \
   FilterGraph.h \
   Filter.h \
+  FilterEndPoint.h \
+  FilterSource.h \
+  FilterAudioSource.h \
+  FilterPictureSource.h \
+  FilterSink.h \
+  FilterAudioSink.h \
+  FilterPictureSink.h \
   Global.h
 
 BUILT_SOURCES= \

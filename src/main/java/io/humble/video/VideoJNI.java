@@ -1329,6 +1329,7 @@ class VideoJNI {
   public final static native String FilterGraph_sendCommand(long jarg1, FilterGraph jarg1_, String jarg2, String jarg3, String jarg4, int jarg5);
   public final static native void FilterGraph_queueCommand(long jarg1, FilterGraph jarg1_, String jarg2, String jarg3, String jarg4, int jarg5, double jarg6);
   public final static native String FilterGraph_getHumanReadableString(long jarg1, FilterGraph jarg1_);
+  public final static native int FilterGraph_getState(long jarg1, FilterGraph jarg1_);
   public final static native long SWIGPixelFormatUpcast(long jarg1);
   public final static native long SWIGPixelComponentDescriptorUpcast(long jarg1);
   public final static native long SWIGPixelFormatDescriptorUpcast(long jarg1);
@@ -1369,4 +1370,11 @@ class VideoJNI {
   public final static native long SWIGFilterTypeUpcast(long jarg1);
   public final static native long SWIGFilterGraphUpcast(long jarg1);
   public final static native long SWIGFilterUpcast(long jarg1);
+  public final static native long SWIGFilterEndPointUpcast(long jarg1);
+  public final static native long SWIGFilterSourceUpcast(long jarg1);
+  public final static native long SWIGFilterAudioSourceUpcast(long jarg1);
+  public final static native long SWIGFilterPictureSourceUpcast(long jarg1);
+  public final static native long SWIGFilterSinkUpcast(long jarg1);
+  public final static native long SWIGFilterAudioSinkUpcast(long jarg1);
+  public final static native long SWIGFilterPictureSinkUpcast(long jarg1);
 }

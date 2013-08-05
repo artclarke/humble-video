@@ -40,6 +40,21 @@ class FilterGraph : public io::humble::video::Configurable
 {
   VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(FilterGraph);
 public:
+  /**
+   * States a graph can be in.
+   */
+  typedef enum State {
+    /** Initialized but not yet opened. Properties and graph strings may still be set. */
+    STATE_INITED,
+    /** Opened. Properites and graphs can no longer be set, but {@link MediaRaw} objects
+     * can be processed.
+     */
+    STATE_OPENED,
+    /**
+     * An error occurred and this graph should be discarded.
+     */
+    STATE_ERROR
+  } State;
   typedef enum AutoConvertFlag {
     /** all automatic conversions enabled */
      AUTO_CONVERT_ALL=AVFILTER_AUTO_CONVERT_ALL,
@@ -89,7 +104,7 @@ public:
    * @note As this executes commands after this function returns, no return code
    *       from the filter is provided, also AVFILTER_CMD_FLAG_ONE is not supported.
    */
-  void queueCommand(const char *target,
+  virtual void queueCommand(const char *target,
       const char *command,
       const char *arguments, int flags, double ts);
 
@@ -97,10 +112,11 @@ public:
   %newobject getHumanReadableString();
   %typemap(newfree) char * "av_free($1);";
 #endif
-  char* getHumanReadableString() {
+  virtual char* getHumanReadableString() {
     return avfilter_graph_dump(mCtx, "");
   }
 
+  virtual State getState() { return mState; }
 
 
 protected:
@@ -111,6 +127,7 @@ protected:
 
 private:
   AVFilterGraph* mCtx;
+  State mState;
 };
 
 } /* namespace video */

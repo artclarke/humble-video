@@ -61,8 +61,8 @@
           <additionalparam>-quiet -hide java.* -hide
             org.eclipse.* -collpackages java.util.* -postfixpackage
             -nodefontsize 9 -nodefontpackagesize 7
-            -visibility
-            -views</additionalparam>
+            -enumerations
+          </additionalparam>
           <useStandardDocletOptions>true</useStandardDocletOptions>
         </configuration>
       </plugin>

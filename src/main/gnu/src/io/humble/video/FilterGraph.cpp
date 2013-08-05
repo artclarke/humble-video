@@ -39,6 +39,7 @@ namespace video {
 
 FilterGraph::FilterGraph() {
   mCtx = avfilter_graph_alloc();
+  mState = STATE_INITED;
 }
 
 FilterGraph::~FilterGraph() {
@@ -47,6 +48,8 @@ FilterGraph::~FilterGraph() {
 
 void
 FilterGraph::addFilter(FilterType* type, const char* name) {
+  if (mState != STATE_INITED)
+    VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
   if (!name || !*name)
     VS_THROW(HumbleInvalidArgument("name must not be empty"));
   AVFilterContext* fc = avfilter_graph_alloc_filter(mCtx, type->getCtx(), name);
@@ -69,6 +72,8 @@ FilterGraph::getFilter(const char* name) {
 
 void
 FilterGraph::setAutoConvert(AutoConvertFlag value) {
+  if (mState != STATE_INITED)
+    VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
    mCtx->disable_auto_convert = value;
 }
 
@@ -80,7 +85,11 @@ FilterGraph::getAutoConvert() {
 void
 FilterGraph::open() {
   int e = avfilter_graph_config(mCtx, 0);
-  FfmpegException::check(e, "Could not open filtergraph");
+  if (e < 0) {
+    mState = STATE_ERROR;
+    FfmpegException::check(e, "Could not open filtergraph ");
+  }
+  mState = STATE_OPENED;
 }
 
 char*
@@ -90,8 +99,6 @@ FilterGraph::sendCommand(const char* target, const char* command,
     VS_THROW(HumbleInvalidArgument("target must not be empty"));
   if (!command || !*command)
     VS_THROW(HumbleInvalidArgument("command must not be empty"));
-  if (!arguments || !*arguments)
-    VS_THROW(HumbleInvalidArgument("arguments must not be empty"));
   const int32_t responseLen = 2048;
   char response[responseLen];
   int e = avfilter_graph_send_command(mCtx, target, command, arguments, response,
@@ -108,8 +115,6 @@ FilterGraph::queueCommand(const char* target, const char* command,
     VS_THROW(HumbleInvalidArgument("target must not be empty"));
   if (!command || !*command)
     VS_THROW(HumbleInvalidArgument("command must not be empty"));
-  if (!arguments || !*arguments)
-    VS_THROW(HumbleInvalidArgument("arguments must not be empty"));
   int e = avfilter_graph_queue_command(mCtx, target, command, arguments, flags, ts);
   FfmpegException::check(e, "error queuing command to target. target: %s; command: %s; arguments: %s; ",
       target, command, arguments);
