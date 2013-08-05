@@ -65,7 +65,8 @@ FilterGraph::addAudioSource(const char* name,
     VS_THROW(HumbleInvalidArgument("no sample format specified"));
   }
   // hold in ref pointer to avoid leak
-  RefPointer<Rational> timeBase = aTimeBase;
+  RefPointer<Rational> timeBase;
+  timeBase.reset(aTimeBase, true);
   if (!timeBase)
     timeBase = Rational::make(1, sampleRate);
 
