@@ -50,10 +50,25 @@ FilterGraph::FilterGraph() {
 
 FilterAudioSource*
 FilterGraph::addAudioSource(const char* name,
-    Rational* timeBase, int32_t sampleRate,
+    Rational* aTimeBase, int32_t sampleRate,
     AudioChannel::Layout channelLayout, AudioFormat::Type format) {
+  if (!name || !*name) {
+    VS_THROW(HumbleInvalidArgument("no name specified"));
+  }
+  if (sampleRate <= 0) {
+    VS_THROW(HumbleInvalidArgument("no sample rate specified"));
+  }
+  if (channelLayout == AudioChannel::CH_LAYOUT_UNKNOWN) {
+    VS_THROW(HumbleInvalidArgument("no channel layout specified"));
+  }
+  if (format == AudioFormat::SAMPLE_FMT_NONE) {
+    VS_THROW(HumbleInvalidArgument("no sample format specified"));
+  }
+  // hold in ref pointer to avoid leak
+  RefPointer<Rational> timeBase = aTimeBase;
   if (!timeBase)
     timeBase = Rational::make(1, sampleRate);
+
   // get a buffer source
   AVFilter *abuffersrc  = avfilter_get_by_name("abuffer");
   AVFilterContext* ctx = 0;
