@@ -42,8 +42,57 @@ FilterGraph::FilterGraph() {
   mState = STATE_INITED;
 }
 
+
 FilterGraph::~FilterGraph() {
   avfilter_graph_free(&mCtx);
+}
+
+void
+FilterGraph::addSource(FilterSource*, const char* ) {
+  VS_THROW(HumbleRuntimeError("not implemented"));
+}
+
+int32_t
+FilterGraph::getNumSources() {
+  VS_THROW(HumbleRuntimeError("not implemented"));
+
+  return 0;
+}
+
+FilterSource*
+FilterGraph::getSource(int32_t ) {
+  VS_THROW(HumbleRuntimeError("not implemented"));
+
+  return 0;
+}
+
+FilterSource*
+FilterGraph::getSource(const char* ) {
+  VS_THROW(HumbleRuntimeError("not implemented"));
+  return 0;
+}
+
+void
+FilterGraph::addSink(FilterSink*, const char* ) {
+  VS_THROW(HumbleRuntimeError("not implemented"));
+}
+
+int32_t
+FilterGraph::getNumSinks() {
+  VS_THROW(HumbleRuntimeError("not implemented"));
+  return 0;
+}
+
+FilterSink*
+FilterGraph::getSink(int32_t ) {
+  VS_THROW(HumbleRuntimeError("not implemented"));
+  return 0;
+}
+
+FilterSink*
+FilterGraph::getSink(const char* ) {
+  VS_THROW(HumbleRuntimeError("not implemented"));
+  return 0;
 }
 
 void

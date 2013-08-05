@@ -125,6 +125,86 @@ public class FilterGraph extends Configurable {
   }
 
 /**
+ * Add a {@link FilterSource}.  
+ * @param	source the source  
+ * @param	name the name; must be unique in graph  
+ * @throws	RuntimeException if name is already in graph.  
+ */
+  public void addSource(FilterSource source, String name) {
+    VideoJNI.FilterGraph_addSource(swigCPtr, this, FilterSource.getCPtr(source), source, name);
+  }
+
+/**
+ * @return	number of {@link FilterSource} added so far.  
+ */
+  public int getNumSources() {
+    return VideoJNI.FilterGraph_getNumSources(swigCPtr, this);
+  }
+
+/**
+ * @param	index The n'th of {@link #getNumSoruces()} {@link FilterSource}s 
+ *		 attached to this {@link FilterGraph}.  
+ * @return	the {@link FilterSource}  
+ * @throws	InvalidArgument if index < 0 || index >= {@link #getNumSources()} 
+ *		  
+ */
+  public FilterSource getSource(int index) {
+    long cPtr = VideoJNI.FilterGraph_getSource__SWIG_0(swigCPtr, this, index);
+    return (cPtr == 0) ? null : new FilterSource(cPtr, false);
+  }
+
+/**
+ * @param	name unique name of a {@link FilterSource} in this {@link 
+ *		 FilterGraph}. Should have been added with {@link 
+ *		 #addSource(FilterSource,String)}.  
+ * @throws	PropertyNotFoundException if not in graph.  
+ */
+  public FilterSource getSource(String name) {
+    long cPtr = VideoJNI.FilterGraph_getSource__SWIG_1(swigCPtr, this, name);
+    return (cPtr == 0) ? null : new FilterSource(cPtr, false);
+  }
+
+/**
+ * Add a {@link FilterSink}.  
+ * @param	sink the source  
+ * @param	name the name; must be unique in graph  
+ * @throws	RuntimeException if name is already in graph.  
+ */
+  public void addSink(FilterSink sink, String name) {
+    VideoJNI.FilterGraph_addSink(swigCPtr, this, FilterSink.getCPtr(sink), sink, name);
+  }
+
+/**
+ * @return	number of {@link FilterSink} added so far.  
+ */
+  public int getNumSinks() {
+    return VideoJNI.FilterGraph_getNumSinks(swigCPtr, this);
+  }
+
+/**
+ * @param	index The n'th of {@link #getNumSoruces()} {@link FilterSink}s 
+ *		 attached to this {@link FilterGraph}.  
+ * @return	the {@link FilterSink}  
+ * @throws	InvalidArgument if index < 0 || index >= {@link #getNumSinks()} 
+ *		  
+ */
+  public FilterSink getSink(int index) {
+    long cPtr = VideoJNI.FilterGraph_getSink__SWIG_0(swigCPtr, this, index);
+    return (cPtr == 0) ? null : new FilterSink(cPtr, false);
+  }
+
+/**
+ * @param	name unique name of a {@link FilterSink} in this {@link FilterGraph}. 
+ *		 Should have been added with {@link #addSink(FilterSink,String)}. 
+ *		  
+ * @throws	PropertyNotFoundException if not in graph.  
+ */
+  public FilterSink getSink(String name) {
+    long cPtr = VideoJNI.FilterGraph_getSink__SWIG_1(swigCPtr, this, name);
+    return (cPtr == 0) ? null : new FilterSink(cPtr, false);
+  }
+
+/**
  * Should this graph auto-convert audio or pictures into the formats 
  *  
  * different filters require (rather than require the user to construct 

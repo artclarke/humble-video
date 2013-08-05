@@ -26,6 +26,7 @@
 #ifndef HUMBLEFILTERGRAPH_H_
 #define HUMBLEFILTERGRAPH_H_
 
+#include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/Codec.h>
@@ -36,6 +37,9 @@ namespace humble {
 namespace video {
 
 class Filter;
+class FilterSource;
+class FilterSink;
+
 class FilterGraph : public io::humble::video::Configurable
 {
   VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(FilterGraph);
@@ -55,6 +59,7 @@ public:
      */
     STATE_ERROR
   } State;
+
   typedef enum AutoConvertFlag {
     /** all automatic conversions enabled */
      AUTO_CONVERT_ALL=AVFILTER_AUTO_CONVERT_ALL,
@@ -71,6 +76,60 @@ public:
    * @return the filter with the given name, or null if not found.
    */
   virtual Filter* getFilter(const char* name);
+
+  /**
+   * Add a {@link FilterSource}.
+   * @param source the source
+   * @param name the name; must be unique in graph
+   *
+   * @throws RuntimeException if name is already in graph.
+   */
+  virtual void addSource(FilterSource* source, const char* name);
+
+  /**
+   * @return number of {@link FilterSource} added so far.
+   */
+  virtual int32_t getNumSources();
+
+  /**
+   * @param index The n'th of {@link #getNumSoruces()} {@link FilterSource}s attached to this {@link FilterGraph}.
+   * @return the {@link FilterSource}
+   * @throws InvalidArgument if index < 0 || index >= {@link #getNumSources()}
+   */
+  virtual FilterSource* getSource(int32_t index);
+
+  /**
+   * @param name unique name of a {@link FilterSource} in this {@link FilterGraph}. Should have been added with {@link #addSource(FilterSource,String)}.
+   * @throws PropertyNotFoundException if not in graph.
+   */
+  virtual FilterSource* getSource(const char* name);
+
+  /**
+   * Add a {@link FilterSink}.
+   * @param sink the source
+   * @param name the name; must be unique in graph
+   *
+   * @throws RuntimeException if name is already in graph.
+   */
+  virtual void addSink(FilterSink* sink, const char* name);
+
+  /**
+   * @return number of {@link FilterSink} added so far.
+   */
+  virtual int32_t getNumSinks();
+
+  /**
+   * @param index The n'th of {@link #getNumSoruces()} {@link FilterSink}s attached to this {@link FilterGraph}.
+   * @return the {@link FilterSink}
+   * @throws InvalidArgument if index < 0 || index >= {@link #getNumSinks()}
+   */
+  virtual FilterSink* getSink(int32_t index);
+
+  /**
+   * @param name unique name of a {@link FilterSink} in this {@link FilterGraph}. Should have been added with {@link #addSink(FilterSink,String)}.
+   * @throws PropertyNotFoundException if not in graph.
+   */
+  virtual FilterSink* getSink(const char* name);
 
   /**
    * Should this graph auto-convert audio or pictures into the formats

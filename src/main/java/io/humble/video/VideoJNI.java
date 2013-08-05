@@ -1323,6 +1323,14 @@ class VideoJNI {
   public final static native int FilterGraph_AUTO_CONVERT_NONE_get();
   public final static native void FilterGraph_addFilter(long jarg1, FilterGraph jarg1_, long jarg2, FilterType jarg2_, String jarg3);
   public final static native long FilterGraph_getFilter(long jarg1, FilterGraph jarg1_, String jarg2);
+  public final static native void FilterGraph_addSource(long jarg1, FilterGraph jarg1_, long jarg2, FilterSource jarg2_, String jarg3);
+  public final static native int FilterGraph_getNumSources(long jarg1, FilterGraph jarg1_);
+  public final static native long FilterGraph_getSource__SWIG_0(long jarg1, FilterGraph jarg1_, int jarg2);
+  public final static native long FilterGraph_getSource__SWIG_1(long jarg1, FilterGraph jarg1_, String jarg2);
+  public final static native void FilterGraph_addSink(long jarg1, FilterGraph jarg1_, long jarg2, FilterSink jarg2_, String jarg3);
+  public final static native int FilterGraph_getNumSinks(long jarg1, FilterGraph jarg1_);
+  public final static native long FilterGraph_getSink__SWIG_0(long jarg1, FilterGraph jarg1_, int jarg2);
+  public final static native long FilterGraph_getSink__SWIG_1(long jarg1, FilterGraph jarg1_, String jarg2);
   public final static native void FilterGraph_setAutoConvert(long jarg1, FilterGraph jarg1_, int jarg2);
   public final static native int FilterGraph_getAutoConvert(long jarg1, FilterGraph jarg1_);
   public final static native void FilterGraph_open(long jarg1, FilterGraph jarg1_);
