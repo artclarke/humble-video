@@ -27,6 +27,8 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
+#include <io/humble/video/FilterSource.h>
+#include <io/humble/video/FilterSink.h>
 
 using namespace io::humble::ferry;
 
@@ -38,6 +40,9 @@ namespace video {
 
 FilterGraph::FilterGraph() {
   mCtx = avfilter_graph_alloc();
+  if (!mCtx) {
+    VS_THROW(HumbleBadAlloc());
+  }
   mState = STATE_INITED;
 }
 
@@ -48,7 +53,7 @@ FilterGraph::~FilterGraph() {
 void
 FilterGraph::addSource(FilterSource* aSource, const char* name) {
   RefPointer<Configurable> source;
-  source.reset((Configurable*)aSource, true);
+  source.reset((Configurable*) aSource, true);
 
   if (getState() != STATE_INITED) {
     VS_THROW(HumbleRuntimeError("cannot add sources after opening graph"));
@@ -71,7 +76,7 @@ FilterGraph::getNumSources() {
 
 FilterSource*
 FilterGraph::getSource(int32_t i) {
-  if (i < 0 || (size_t)i >= mSourceNames.size())
+  if (i < 0 || (size_t) i >= mSourceNames.size())
   VS_THROW(HumbleInvalidArgument("index out of range"));
 
   std::string name = mSourceNames[i];
@@ -92,7 +97,7 @@ FilterGraph::getSource(const char* name) {
 void
 FilterGraph::addSink(FilterSink* aSink, const char*name) {
   RefPointer<Configurable> sink;
-  sink.reset((Configurable*)aSink, true);
+  sink.reset((Configurable*) aSink, true);
 
   if (getState() != STATE_INITED) {
     VS_THROW(HumbleRuntimeError("cannot add sinks after opening graph"));
@@ -115,7 +120,7 @@ FilterGraph::getNumSinks() {
 
 FilterSink*
 FilterGraph::getSink(int32_t i) {
-  if (i < 0 || (size_t)i >= mSinkNames.size())
+  if (i < 0 || (size_t) i >= mSinkNames.size())
   VS_THROW(HumbleInvalidArgument("index out of range"));
 
   std::string name = mSinkNames[i];
@@ -134,11 +139,83 @@ FilterGraph::getSink(const char*name) {
 }
 
 void
+FilterGraph::loadGraph(const char* f) {
+  if (mState != STATE_INITED) {
+    VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
+  }
+  if (!f || !*f) {
+    VS_THROW(HumbleInvalidArgument("name must not be empty"));
+  }
+  AVFilterInOut* inputs = 0;
+  AVFilterInOut* outputs = 0;
+  char* filterDebugString = 0;
+
+  try {
+
+    // let's iterate through all our inputs, then outputs
+    std::map<std::string, RefPointer<Configurable> >::iterator iter;
+
+    for(iter = mSources.begin(); iter != mSources.end(); ++iter) {
+      AVFilterInOut* io = avfilter_inout_alloc();
+      if (!io)
+        VS_THROW(HumbleBadAlloc());
+      // do not force a ref count increment since the iter will remain throughout
+      FilterSource* source = (FilterSource*)((*iter).second.value());
+      io->name = av_strdup(source->getName());
+      io->filter_ctx = source->getFilterCtx();
+      io->pad_idx = 0;
+      io->next = inputs;
+      inputs = io;
+    }
+    for(iter = mSinks.begin(); iter != mSinks.end(); ++iter) {
+      AVFilterInOut* io = avfilter_inout_alloc();
+      if (!io)
+        VS_THROW(HumbleBadAlloc());
+      // do not force a ref count increment since the iter will remain throughout
+      FilterSink* sink = (FilterSink*)((*iter).second.value());
+      io->name = av_strdup(sink->getName());
+      io->filter_ctx = sink->getFilterCtx();
+      io->pad_idx = 0;
+      io->next = inputs;
+      inputs = io;
+    }
+    // now, let's try parsing
+    int e = avfilter_graph_parse_ptr(mCtx, f, &inputs, &outputs, 0);
+    FfmpegException::check(e, "failure to parse FilterGraph description ");
+
+    // now, check to make sure that the number of inputs matches the number of outputs
+    // and if not, throw an exception.
+    size_t numUnclosedInputs=0;
+    for(const AVFilterInOut* i = inputs; i; i = i->next)
+      ++numUnclosedInputs;
+    size_t numUnclosedOutputs = 0;
+    for(const AVFilterInOut* i = outputs; i; i = i->next)
+      ++numUnclosedOutputs;
+    if (numUnclosedInputs > mSources.size() || numUnclosedOutputs > mSinks.size()) {
+      filterDebugString = getHumanReadableString();
+      VS_THROW(HumbleRuntimeError::make("filterDescription had unclosed Sinks or Sources. Sinks: [expected=%d,actual=%d]; Sources: [expected=%d, actual=%d]; graphStr=%s;",
+          mSinks.size(),
+          numUnclosedInputs,
+          mSources.size(),
+          numUnclosedOutputs,
+          filterDebugString));
+    }
+  } catch (std::exception & e) {
+    // free any memory before rethrowing
+    avfilter_inout_free(&inputs);
+    avfilter_inout_free(&outputs);
+    av_freep(&filterDebugString);
+  }
+
+}
+void
 FilterGraph::addFilter(FilterType* type, const char* name) {
-  if (mState != STATE_INITED)
-  VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
-  if (!name || !*name)
-  VS_THROW(HumbleInvalidArgument("name must not be empty"));
+  if (mState != STATE_INITED) {
+    VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
+  }
+  if (!name || !*name) {
+    VS_THROW(HumbleInvalidArgument("name must not be empty"));
+  }
   AVFilterContext* fc = avfilter_graph_alloc_filter(mCtx, type->getCtx(), name);
   if (!fc)
   VS_THROW(
@@ -147,8 +224,9 @@ FilterGraph::addFilter(FilterType* type, const char* name) {
 
 Filter*
 FilterGraph::getFilter(const char* name) {
-  if (!name || !*name)
-  VS_THROW(HumbleInvalidArgument("name must not be empty"));
+  if (!name || !*name) {
+    VS_THROW(HumbleInvalidArgument("name must not be empty"));
+  }
 
   AVFilterContext* fc = avfilter_graph_get_filter(mCtx, (char*) name);
   if (!fc)

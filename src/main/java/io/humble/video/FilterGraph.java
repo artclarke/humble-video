@@ -109,6 +109,11 @@ public class FilterGraph extends Configurable {
   // JNIHelper.swg: End generated code
   
 
+  public static FilterGraph make() {
+    long cPtr = VideoJNI.FilterGraph_make();
+    return (cPtr == 0) ? null : new FilterGraph(cPtr, false);
+  }
+
 /**
  * Add a filter with the given name to the graph.  
  */
@@ -219,7 +224,8 @@ public class FilterGraph extends Configurable {
 
 /**
  * @return	does this graph auto convert {@link MediaPicture} and {@link 
- *		 MediaRaw} objects when  
+ *		 MediaRaw} objects to different  
+ * dimensions/sample-rates/channels/etc. when  
  * pulling them through the graph.  
  */
   public FilterGraph.AutoConvertFlag getAutoConvert() {
@@ -227,10 +233,28 @@ public class FilterGraph extends Configurable {
   }
 
 /**
+ * Add a graph described by a string to a graph. For any Sinks or Sources 
+ *  
+ * the caller must have called {@link #addSource} or {@link #addSink} 
+ * before  
+ * this call.  
+ * @param	filterDescription The filter string to be parsed, in FFmpeg 
+ *		 libavfilter format.  
+ */
+  public void loadGraph(String filterDescription) {
+    VideoJNI.FilterGraph_loadGraph(swigCPtr, this, filterDescription);
+  }
+
+/**
  * Call after all filters have been added and you are ready to begin 
  * pushing data through  
  * the graph. Any calls to set properties after this call <i>may</i> 
  * be ignored.  
+ * @throws	RuntimeException if <b>any inputs or outputs</b> are open 
+ *		 (i.e. each filter  
+ * in the graph must either point to another filter on all inputs or 
+ * outputs, or point to  
+ * a {@link FilterSink} or {@link FilterSource} when done).  
  */
   public void open() {
     VideoJNI.FilterGraph_open(swigCPtr, this);
