@@ -109,7 +109,7 @@ am_libhumble_video_la_OBJECTS = VideoExceptions.lo AVBufferSupport.lo \
 	Decoder.lo Encoder.lo ContainerStream.lo Container.lo \
 	SourceFormat.lo Source.lo SourceImpl.lo SourceStream.lo \
 	SourceStreamImpl.lo SinkFormat.lo FilterType.lo FilterGraph.lo \
-	Filter.lo FilterEndPoint.lo FilterSource.lo \
+	Filter.lo FilterLink.lo FilterEndPoint.lo FilterSource.lo \
 	FilterAudioSource.lo FilterPictureSource.lo FilterSink.lo \
 	FilterAudioSink.lo FilterPictureSink.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
@@ -479,6 +479,7 @@ libhumble_video_la_SOURCES = \
   FilterType.cpp \
   FilterGraph.cpp \
   Filter.cpp \
+  FilterLink.cpp \
   FilterEndPoint.cpp \
   FilterSource.cpp \
   FilterAudioSource.cpp \
@@ -563,6 +564,7 @@ libhumble_video_la_HEADERS = \
   FilterType.h \
   FilterGraph.h \
   Filter.h \
+  FilterLink.h \
   FilterEndPoint.h \
   FilterSource.h \
   FilterAudioSource.h \
@@ -647,6 +649,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterAudioSource.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterEndPoint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterGraph.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterLink.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterPictureSink.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterPictureSource.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterSink.Plo@am__quote@

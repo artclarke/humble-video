@@ -109,4 +109,65 @@ public class Filter extends Configurable {
   // JNIHelper.swg: End generated code
   
 
+/**
+ * @return	name of filter.  
+ */
+  public String getName() {
+    return VideoJNI.Filter_getName(swigCPtr, this);
+  }
+
+/**
+ * @return	number of inputs this {@link FilterType} expects.  
+ */
+  public int getNumInputs() {
+    return VideoJNI.Filter_getNumInputs(swigCPtr, this);
+  }
+
+/**
+ * @param	index which input to get name of  
+ * @return	the input name  
+ * @throws	InvalidArgument if index < 0 || index > {@link #getNumInputs()}. 
+ *		  
+ */
+  public String getInputName(int index) {
+    return VideoJNI.Filter_getInputName(swigCPtr, this, index);
+  }
+
+/**
+ * @param	index which input to get type of  
+ * @return	the input media type  
+ * @throws	InvalidArgument if index < 0 || index > {@link #getNumInputs()}. 
+ *		  
+ */
+  public MediaDescriptor.Type getInputType(int index) {
+    return MediaDescriptor.Type.swigToEnum(VideoJNI.Filter_getInputType(swigCPtr, this, index));
+  }
+
+/**
+ * @return	number of outputs this {@link FilterType} expects.  
+ */
+  public int getNumOutputs() {
+    return VideoJNI.Filter_getNumOutputs(swigCPtr, this);
+  }
+
+/**
+ * @param	index which output to get name of  
+ * @return	the output name  
+ * @throws	InvalidArgument if index < 0 || index > {@link #getNumOutputs()}. 
+ *		  
+ */
+  public String getOutputName(int index) {
+    return VideoJNI.Filter_getOutputName(swigCPtr, this, index);
+  }
+
+/**
+ * @param	index which output to get type of  
+ * @return	the output media type  
+ * @throws	InvalidArgument if index < 0 || index > {@link #getNumOutputs()}. 
+ *		  
+ */
+  public MediaDescriptor.Type getOutputType(int index) {
+    return MediaDescriptor.Type.swigToEnum(VideoJNI.Filter_getOutputType(swigCPtr, this, index));
+  }
+
 }

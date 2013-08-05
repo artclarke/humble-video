@@ -16,28 +16,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-/*
- * FilterEndPoint.cpp
- *
- *  Created on: Aug 5, 2013
- *      Author: aclarke
- */
 
-#include "FilterEndPoint.h"
+%typemap (javacode) io::humble::video::FilterLink,io::humble::video::FilterLink*,io::humble::video::FilterLink& %{
+%}
 
-namespace io {
-namespace humble {
-namespace video {
-
-FilterEndPoint::FilterEndPoint() : Filter(0, 0) {
-  // TODO Auto-generated constructor stub
-
-}
-
-FilterEndPoint::~FilterEndPoint() {
-  // TODO Auto-generated destructor stub
-}
-
-} /* namespace video */
-} /* namespace humble */
-} /* namespace io */
+%include <io/humble/video/FilterLink.h>

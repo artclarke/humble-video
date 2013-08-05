@@ -55,6 +55,7 @@ libhumble_video_la_SOURCES= \
   FilterType.cpp \
   FilterGraph.cpp \
   Filter.cpp \
+  FilterLink.cpp \
   FilterEndPoint.cpp \
   FilterSource.cpp \
   FilterAudioSource.cpp \
@@ -139,6 +140,7 @@ libhumble_video_la_HEADERS= \
   FilterType.h \
   FilterGraph.h \
   Filter.h \
+  FilterLink.h \
   FilterEndPoint.h \
   FilterSource.h \
   FilterAudioSource.h \

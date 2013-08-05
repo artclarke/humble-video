@@ -23,17 +23,77 @@
  *      Author: aclarke
  */
 
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/HumbleException.h>
 #include "Filter.h"
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
+
+using namespace io::humble::ferry;
 
 namespace io {
 namespace humble {
 namespace video {
 
-Filter::Filter() : mCtx(0) {
+Filter::Filter(FilterGraph* graph, AVFilterContext* ctx) {
+  if (!graph)
+    VS_THROW(HumbleInvalidArgument("no graph passed in"));
+  if (!ctx)
+    VS_THROW(HumbleInvalidArgument("no ctx passed in"));
 
+  // acquire the graph because it owns the ctx
+  mGraph.reset(graph, true);
+  mCtx = ctx;
+}
+
+Filter*
+Filter::make(FilterGraph* graph, AVFilterContext* mCtx) {
+  RefPointer<Filter> r;
+  r.reset(new Filter(graph, mCtx), true);
+  return r.get();
 }
 
 Filter::~Filter() {
+  // nothing to do since graph owns ctx
+  mCtx = 0;
+}
+
+int32_t
+Filter::getNumInputs() {
+  return mCtx->nb_inputs;
+}
+
+int32_t
+Filter::getNumOutputs() {
+  return mCtx->nb_outputs;
+}
+
+const char*
+Filter::getInputName(int32_t i) {
+  if (i < 0 || i >= getNumInputs())
+    VS_THROW(HumbleInvalidArgument("index out of range"));
+  return avfilter_pad_get_name(mCtx->input_pads, i);
+}
+
+const char*
+Filter::getOutputName(int32_t i) {
+  if (i < 0 || i >= getNumOutputs())
+    VS_THROW(HumbleInvalidArgument("index out of range"));
+  return avfilter_pad_get_name(mCtx->output_pads, i);
+}
+
+MediaDescriptor::Type
+Filter::getInputType(int32_t i) {
+  if (i < 0 || i >= getNumInputs())
+    VS_THROW(HumbleInvalidArgument("index out of range"));
+  return (MediaDescriptor::Type) avfilter_pad_get_type(mCtx->input_pads, i);
+}
+
+MediaDescriptor::Type
+Filter::getOutputType(int32_t i) {
+  if (i < 0 || i >= getNumOutputs())
+    VS_THROW(HumbleInvalidArgument("index out of range"));
+  return (MediaDescriptor::Type) avfilter_pad_get_type(mCtx->output_pads, i);
 }
 
 } /* namespace video */
