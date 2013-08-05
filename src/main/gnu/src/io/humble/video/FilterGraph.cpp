@@ -26,7 +26,6 @@
 #include "FilterGraph.h"
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
-#include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/VideoExceptions.h>
 
 using namespace io::humble::ferry;
@@ -42,78 +41,118 @@ FilterGraph::FilterGraph() {
   mState = STATE_INITED;
 }
 
-
 FilterGraph::~FilterGraph() {
   avfilter_graph_free(&mCtx);
 }
 
 void
-FilterGraph::addSource(FilterSource*, const char* ) {
-  VS_THROW(HumbleRuntimeError("not implemented"));
+FilterGraph::addSource(FilterSource* aSource, const char* name) {
+  RefPointer<Configurable> source;
+  source.reset((Configurable*)aSource, true);
+
+  if (getState() != STATE_INITED) {
+    VS_THROW(HumbleRuntimeError("cannot add sources after opening graph"));
+  }
+  if (!source) {
+    VS_THROW(HumbleInvalidArgument("no source specified"));
+  }
+  if (!name || !*name) {
+    VS_THROW(HumbleInvalidArgument("no name specified"));
+  }
+  if (mSources.find(name) != mSources.end()) mSources.erase(name);
+  else mSourceNames.push_back(name);
+  mSources[name] = source;
 }
 
 int32_t
 FilterGraph::getNumSources() {
-  VS_THROW(HumbleRuntimeError("not implemented"));
-
-  return 0;
+  return mSources.size();
 }
 
 FilterSource*
-FilterGraph::getSource(int32_t ) {
-  VS_THROW(HumbleRuntimeError("not implemented"));
+FilterGraph::getSource(int32_t i) {
+  if (i < 0 || (size_t)i >= mSourceNames.size())
+  VS_THROW(HumbleInvalidArgument("index out of range"));
 
-  return 0;
+  std::string name = mSourceNames[i];
+  return (FilterSource*) (mSources[name].get());
 }
 
 FilterSource*
-FilterGraph::getSource(const char* ) {
-  VS_THROW(HumbleRuntimeError("not implemented"));
-  return 0;
+FilterGraph::getSource(const char* name) {
+  RefPointer<Configurable> r;
+  try {
+    r = mSources[name];
+  } catch (std::out_of_range & e) {
+    VS_THROW(PropertyNotFoundException(name));
+  }
+  return (FilterSource*) (r.get());
 }
 
 void
-FilterGraph::addSink(FilterSink*, const char* ) {
-  VS_THROW(HumbleRuntimeError("not implemented"));
+FilterGraph::addSink(FilterSink* aSink, const char*name) {
+  RefPointer<Configurable> sink;
+  sink.reset((Configurable*)aSink, true);
+
+  if (getState() != STATE_INITED) {
+    VS_THROW(HumbleRuntimeError("cannot add sinks after opening graph"));
+  }
+  if (!sink) {
+    VS_THROW(HumbleInvalidArgument("no sink specified"));
+  }
+  if (!name || !*name) {
+    VS_THROW(HumbleInvalidArgument("no name specified"));
+  }
+  if (mSinks.find(name) != mSources.end()) mSinks.erase(name);
+  else mSinkNames.push_back(name);
+  mSinks[name] = sink;
 }
 
 int32_t
 FilterGraph::getNumSinks() {
-  VS_THROW(HumbleRuntimeError("not implemented"));
-  return 0;
+  return mSinks.size();
 }
 
 FilterSink*
-FilterGraph::getSink(int32_t ) {
-  VS_THROW(HumbleRuntimeError("not implemented"));
-  return 0;
+FilterGraph::getSink(int32_t i) {
+  if (i < 0 || (size_t)i >= mSinkNames.size())
+  VS_THROW(HumbleInvalidArgument("index out of range"));
+
+  std::string name = mSinkNames[i];
+  return (FilterSink*) (mSinks[name].get());
 }
 
 FilterSink*
-FilterGraph::getSink(const char* ) {
-  VS_THROW(HumbleRuntimeError("not implemented"));
-  return 0;
+FilterGraph::getSink(const char*name) {
+  RefPointer<Configurable> r;
+  try {
+    r = mSinks[name];
+  } catch (std::out_of_range & e) {
+    VS_THROW(PropertyNotFoundException(name));
+  }
+  return (FilterSink*) (r.get());
 }
 
 void
 FilterGraph::addFilter(FilterType* type, const char* name) {
   if (mState != STATE_INITED)
-    VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
+  VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
   if (!name || !*name)
-    VS_THROW(HumbleInvalidArgument("name must not be empty"));
+  VS_THROW(HumbleInvalidArgument("name must not be empty"));
   AVFilterContext* fc = avfilter_graph_alloc_filter(mCtx, type->getCtx(), name);
   if (!fc)
-    VS_THROW(HumbleRuntimeError::make("was not able to add filter named: %s", name));
+  VS_THROW(
+      HumbleRuntimeError::make("was not able to add filter named: %s", name));
 }
 
 Filter*
 FilterGraph::getFilter(const char* name) {
   if (!name || !*name)
-    VS_THROW(HumbleInvalidArgument("name must not be empty"));
+  VS_THROW(HumbleInvalidArgument("name must not be empty"));
 
-  AVFilterContext* fc = avfilter_graph_get_filter(mCtx, (char*)name);
+  AVFilterContext* fc = avfilter_graph_get_filter(mCtx, (char*) name);
   if (!fc)
-    VS_THROW(PropertyNotFoundException(name));
+  VS_THROW(PropertyNotFoundException(name));
 
 //  return Filter::make(this, fc);
   return 0;
@@ -122,8 +161,8 @@ FilterGraph::getFilter(const char* name) {
 void
 FilterGraph::setAutoConvert(AutoConvertFlag value) {
   if (mState != STATE_INITED)
-    VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
-   mCtx->disable_auto_convert = value;
+  VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
+  mCtx->disable_auto_convert = value;
 }
 
 FilterGraph::AutoConvertFlag
@@ -145,14 +184,15 @@ char*
 FilterGraph::sendCommand(const char* target, const char* command,
     const char* arguments, int flags) {
   if (!target || !*target)
-    VS_THROW(HumbleInvalidArgument("target must not be empty"));
+  VS_THROW(HumbleInvalidArgument("target must not be empty"));
   if (!command || !*command)
-    VS_THROW(HumbleInvalidArgument("command must not be empty"));
+  VS_THROW(HumbleInvalidArgument("command must not be empty"));
   const int32_t responseLen = 2048;
   char response[responseLen];
-  int e = avfilter_graph_send_command(mCtx, target, command, arguments, response,
-      responseLen, flags);
-  FfmpegException::check(e, "error sending command to target. target: %s; command: %s; arguments: %s; ",
+  int e = avfilter_graph_send_command(mCtx, target, command, arguments,
+      response, responseLen, flags);
+  FfmpegException::check(e,
+      "error sending command to target. target: %s; command: %s; arguments: %s; ",
       target, command, arguments);
   // create a copy
   return av_strdup(response);
@@ -161,11 +201,13 @@ void
 FilterGraph::queueCommand(const char* target, const char* command,
     const char* arguments, int flags, double ts) {
   if (!target || !*target)
-    VS_THROW(HumbleInvalidArgument("target must not be empty"));
+  VS_THROW(HumbleInvalidArgument("target must not be empty"));
   if (!command || !*command)
-    VS_THROW(HumbleInvalidArgument("command must not be empty"));
-  int e = avfilter_graph_queue_command(mCtx, target, command, arguments, flags, ts);
-  FfmpegException::check(e, "error queuing command to target. target: %s; command: %s; arguments: %s; ",
+  VS_THROW(HumbleInvalidArgument("command must not be empty"));
+  int e = avfilter_graph_queue_command(mCtx, target, command, arguments, flags,
+      ts);
+  FfmpegException::check(e,
+      "error queuing command to target. target: %s; command: %s; arguments: %s; ",
       target, command, arguments);
 }
 

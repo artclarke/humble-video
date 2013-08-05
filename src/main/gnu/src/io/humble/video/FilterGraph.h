@@ -26,6 +26,8 @@
 #ifndef HUMBLEFILTERGRAPH_H_
 #define HUMBLEFILTERGRAPH_H_
 
+#include <map>
+#include <vector>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/Configurable.h>
@@ -214,6 +216,10 @@ protected:
 private:
   AVFilterGraph* mCtx;
   State mState;
+  std::map<std::string, io::humble::ferry::RefPointer<Configurable> > mSources;
+  std::vector<std::string> mSourceNames;
+  std::map<std::string, io::humble::ferry::RefPointer<Configurable> > mSinks;
+  std::vector<std::string> mSinkNames;
 };
 
 } /* namespace video */
