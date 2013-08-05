@@ -38,7 +38,7 @@ namespace video {
 class FilterAudioSink : public io::humble::video::FilterSink
 {
 protected:
-  FilterAudioSink();
+  FilterAudioSink(FilterGraph* graph, AVFilterContext* ctx);
   virtual
   ~FilterAudioSink();
 };

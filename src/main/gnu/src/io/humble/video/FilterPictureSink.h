@@ -38,7 +38,7 @@ namespace video {
 class FilterPictureSink : public io::humble::video::FilterSink
 {
 protected:
-  FilterPictureSink();
+  FilterPictureSink(FilterGraph* graph, AVFilterContext* ctx);
   virtual
   ~FilterPictureSink();
 };

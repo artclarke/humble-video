@@ -29,13 +29,10 @@ namespace io {
 namespace humble {
 namespace video {
 
-FilterEndPoint::FilterEndPoint() : Filter(0, 0) {
-  // TODO Auto-generated constructor stub
-
+FilterEndPoint::FilterEndPoint(FilterGraph* graph, AVFilterContext* ctx) : Filter(graph, ctx) {
 }
 
 FilterEndPoint::~FilterEndPoint() {
-  // TODO Auto-generated destructor stub
 }
 
 } /* namespace video */

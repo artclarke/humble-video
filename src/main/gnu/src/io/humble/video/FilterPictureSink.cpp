@@ -29,13 +29,12 @@ namespace io {
 namespace humble {
 namespace video {
 
-FilterPictureSink::FilterPictureSink() {
-  // TODO Auto-generated constructor stub
+FilterPictureSink::FilterPictureSink(FilterGraph* graph, AVFilterContext* ctx) :
+    FilterSink(graph, ctx) {
 
 }
 
 FilterPictureSink::~FilterPictureSink() {
-  // TODO Auto-generated destructor stub
 }
 
 } /* namespace video */

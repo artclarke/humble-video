@@ -71,6 +71,7 @@ FilterLink::~FilterLink() {
 FilterLink*
 FilterLink::make(FilterGraph* graph, AVFilterLink* link)
 {
+  Global::init();
   RefPointer<FilterLink> retval;
   retval.reset(new FilterLink(graph, link), true);
   return retval.get();

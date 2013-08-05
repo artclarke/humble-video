@@ -49,6 +49,7 @@ Filter::Filter(FilterGraph* graph, AVFilterContext* ctx) {
 
 Filter*
 Filter::make(FilterGraph* graph, AVFilterContext* mCtx) {
+  Global::init();
   RefPointer<Filter> r;
   r.reset(new Filter(graph, mCtx), true);
   return r.get();

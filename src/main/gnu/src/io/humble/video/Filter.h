@@ -44,85 +44,102 @@ public:
   /**
    * Flags that can be passed when processing commands.
    */
-  typedef enum CommandFlag {
+  typedef enum CommandFlag
+  {
     /**
      * Stop once a filter understood the command (for target=all for example), fast filters are favored automatically
      */
-    COMMAND_FLAG_ONE=AVFILTER_CMD_FLAG_ONE,
+    COMMAND_FLAG_ONE = AVFILTER_CMD_FLAG_ONE,
     /**
      * Only execute command when its fast (like a video out that supports contrast adjustment in hw)
      */
-    COMMAND_FLAG_FAST=AVFILTER_CMD_FLAG_FAST,
+    COMMAND_FLAG_FAST = AVFILTER_CMD_FLAG_FAST,
 
   } CommandFlag;
   /**
    *  @return name of filter.
    */
-  virtual const char* getName() { return mCtx->name; }
+  virtual const char*
+  getName() {
+    return mCtx->name;
+  }
 
   /**
    * @return number of inputs this {@link FilterType} expects.
    */
-  virtual int32_t getNumInputs();
+  virtual int32_t
+  getNumInputs();
 
   /**
    * @param index which input to get name of
    * @return the input name
    * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
    */
-  virtual const char* getInputName(int32_t index);
+  virtual const char*
+  getInputName(int32_t index);
 
   /**
    * @param index which input to get type of
    * @return the input media type
    * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
    */
-  virtual MediaDescriptor::Type getInputType(int32_t index);
+  virtual MediaDescriptor::Type
+  getInputType(int32_t index);
 
   /**
    * @param index which input to get link of
    * @return the {@link FilterLink} that is inputting into this filter at the given position.
    * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
    */
-  virtual FilterLink* getInputLink(int32_t index);
+  virtual FilterLink*
+  getInputLink(int32_t index);
 
   /**
    * @return number of outputs this {@link FilterType} expects.
    */
-  virtual int32_t getNumOutputs();
+  virtual int32_t
+  getNumOutputs();
 
   /**
    * @param index which output to get name of
    * @return the output name
    * @throws InvalidArgument if index < 0 || index > {@link #getNumOutputs()}.
    */
-  virtual const char* getOutputName(int32_t index);
+  virtual const char*
+  getOutputName(int32_t index);
 
   /**
    * @param index which output to get type of
    * @return the output media type
    * @throws InvalidArgument if index < 0 || index > {@link #getNumOutputs()}.
    */
-  virtual MediaDescriptor::Type getOutputType(int32_t index);
+  virtual MediaDescriptor::Type
+  getOutputType(int32_t index);
 
   /**
-   * @param index which ouput to get link of
+   * @param index which output to get link of
    * @return the {@link FilterLink} that is outputting from this filter at the given position.
    * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
    */
-  virtual FilterLink* getOutputLink(int32_t index);
+  virtual FilterLink*
+  getOutputLink(int32_t index);
 
-  #ifndef SWIG
-  static Filter* make(FilterGraph* graph, AVFilterContext* mCtx);
-  AVFilterContext* getFilterCtx() { return mCtx; }
+#ifndef SWIG
+  static Filter*
+  make(FilterGraph* graph, AVFilterContext* mCtx);
+  AVFilterContext*
+  getFilterCtx() {
+    return mCtx;
+  }
 #endif // ! SWIG
-
 protected:
   Filter(FilterGraph* graph, AVFilterContext* ctx);
   virtual
   ~Filter();
-  void* getCtx() { return mCtx; }
-
+  void*
+  getCtx() {
+    return mCtx;
+  }
 
 private:
   AVFilterContext* mCtx;

@@ -29,13 +29,13 @@ namespace io {
 namespace humble {
 namespace video {
 
-FilterPictureSource::FilterPictureSource() {
-  // TODO Auto-generated constructor stub
+FilterPictureSource::FilterPictureSource(FilterGraph* graph,
+    AVFilterContext* ctx) :
+    FilterSource(graph, ctx) {
 
 }
 
 FilterPictureSource::~FilterPictureSource() {
-  // TODO Auto-generated destructor stub
 }
 
 } /* namespace video */
