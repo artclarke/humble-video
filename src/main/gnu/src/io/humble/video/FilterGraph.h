@@ -44,7 +44,6 @@ class FilterSink;
 
 class FilterGraph : public io::humble::video::Configurable
 {
-  VS_JNIUTILS_REFCOUNTED_OBJECT(FilterGraph);
 public:
   /**
    * States a graph can be in.
@@ -68,6 +67,11 @@ public:
      /** all automatic conversions disabled */
      AUTO_CONVERT_NONE=AVFILTER_AUTO_CONVERT_NONE,
   } AutoConvertFlag;
+
+  /**
+   * Creates a new {@link FilterGraph}.
+   */
+  static FilterGraph* make();
 
   /**
    * Add a filter with the given name to the graph.

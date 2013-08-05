@@ -50,6 +50,15 @@ FilterGraph::~FilterGraph() {
   avfilter_graph_free(&mCtx);
 }
 
+FilterGraph*
+FilterGraph::make()
+{
+  Global::init();
+  RefPointer<FilterGraph> r;
+  r.reset(new FilterGraph(), true);
+  return r.get();
+}
+
 void
 FilterGraph::addSource(FilterSource* aSource, const char* name) {
   RefPointer<Configurable> source;

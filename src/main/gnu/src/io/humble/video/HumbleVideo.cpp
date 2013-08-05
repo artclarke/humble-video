@@ -30680,6 +30680,30 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterType_1getFilterType
 }
 
 
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1AUTO_1CONVERT_1ALL_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::FilterGraph::AutoConvertFlag result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::FilterGraph::AutoConvertFlag)io::humble::video::FilterGraph::AUTO_CONVERT_ALL;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1AUTO_1CONVERT_1NONE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::FilterGraph::AutoConvertFlag result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::FilterGraph::AutoConvertFlag)io::humble::video::FilterGraph::AUTO_CONVERT_NONE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1make(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   io::humble::video::FilterGraph *result = 0 ;
@@ -30712,30 +30736,6 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1make(JNIEnv 
     /*@SWIG@*/
   }
   *(io::humble::video::FilterGraph **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1AUTO_1CONVERT_1ALL_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  io::humble::video::FilterGraph::AutoConvertFlag result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (io::humble::video::FilterGraph::AutoConvertFlag)io::humble::video::FilterGraph::AUTO_CONVERT_ALL;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1AUTO_1CONVERT_1NONE_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  io::humble::video::FilterGraph::AutoConvertFlag result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (io::humble::video::FilterGraph::AutoConvertFlag)io::humble::video::FilterGraph::AUTO_CONVERT_NONE;
-  jresult = (jint)result; 
   return jresult;
 }
 

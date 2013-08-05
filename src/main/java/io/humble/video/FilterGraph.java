@@ -109,6 +109,9 @@ public class FilterGraph extends Configurable {
   // JNIHelper.swg: End generated code
   
 
+/**
+ * Creates a new {@link FilterGraph}.  
+ */
   public static FilterGraph make() {
     long cPtr = VideoJNI.FilterGraph_make();
     return (cPtr == 0) ? null : new FilterGraph(cPtr, false);

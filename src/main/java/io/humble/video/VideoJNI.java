@@ -1319,9 +1319,9 @@ class VideoJNI {
   public final static native long FilterType_findFilterType(String jarg1);
   public final static native int FilterType_getNumFilterTypes();
   public final static native long FilterType_getFilterType(int jarg1);
-  public final static native long FilterGraph_make();
   public final static native int FilterGraph_AUTO_CONVERT_ALL_get();
   public final static native int FilterGraph_AUTO_CONVERT_NONE_get();
+  public final static native long FilterGraph_make();
   public final static native void FilterGraph_addFilter(long jarg1, FilterGraph jarg1_, long jarg2, FilterType jarg2_, String jarg3);
   public final static native long FilterGraph_getFilter(long jarg1, FilterGraph jarg1_, String jarg2);
   public final static native void FilterGraph_addSource(long jarg1, FilterGraph jarg1_, long jarg2, FilterSource jarg2_, String jarg3);
