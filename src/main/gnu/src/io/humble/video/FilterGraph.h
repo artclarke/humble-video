@@ -40,7 +40,11 @@ namespace video {
 
 class Filter;
 class FilterSource;
+class FilterAudioSource;
+class FilterPictureSource;
 class FilterSink;
+class FilterAudioSink;
+class FilterPictureSink;
 
 class FilterGraph : public io::humble::video::Configurable
 {
@@ -84,13 +88,73 @@ public:
   virtual Filter* getFilter(const char* name);
 
   /**
-   * Add a {@link FilterSource}.
-   * @param source the source
+   * Add a {@link FilterAudioSource}.
    * @param name the name; must be unique in graph
+   * @param sampleRate the audio sample rate
+   * @param channelLaout the channel layout
+   * @param format the sample format
    *
+   * @return The FilterSource that was added.
    * @throws RuntimeException if name is already in graph.
+   * @throws InvalidArgument if any argument is invalid.
    */
-  virtual void addSource(FilterSource* source, const char* name);
+  virtual FilterAudioSource* addAudioSource(const char* name,
+      int32_t sampleRate,
+      AudioChannel::Layout channelLayout,
+      AudioFormat::Type format
+  );
+
+  /**
+   * Add a {@link FilterPictureSource}.
+   * @param name the name; must be unique in graph
+   * @param width the width in pixels of {@link MediaPicture} objects that will be added to this source.
+   * @param height the height in pixels  of {@link MediaPicture} objects that will be added to this source.
+   * @param format the pixel format
+   * @return The FilterSource that was added.
+   * @throws RuntimeException if name is already in graph.
+   * @throws InvalidArgument if any argument is invalid.
+   */
+  virtual FilterPictureSource* addPictureSource(const char* name,
+      int32_t width,
+      int32_t height,
+      PixelFormat::Type format);
+
+  /**
+   * Add a {@link FilterAudioSink}.
+   * @param name the name; must be unique in graph
+   * @param sampleRate the audio sample rate
+   * @param channelLaout the channel layout
+   * @param format the sample format
+   *
+   * @return The FilterAudioSink that was added.
+   * @throws RuntimeException if name is already in graph.
+   * @throws InvalidArgument if any argument is invalid.
+   */
+  virtual FilterAudioSink* addAudioSink(const char* name,
+       int32_t sampleRate,
+       AudioChannel::Layout channelLayout,
+       AudioFormat::Type format
+   );
+
+  /**
+   * Add a {@link FilterPictureSink}.
+   * @param name the name; must be unique in graph
+   * @param width the width in pixels of {@link MediaPicture} objects that will be added to this sink.
+   * @param height the height in pixels  of {@link MediaPicture} objects that will be added to this sink.
+   * @param format the pixel format
+   * @return The FilterPictureSink that was added.
+   * @throws RuntimeException if name is already in graph.
+   * @throws InvalidArgument if any argument is invalid.
+   */
+   virtual FilterPictureSink* addPictureSink(const char* name,
+       int32_t width,
+       int32_t height,
+       PixelFormat::Type format);
+
+protected:
+   virtual void addSource(FilterSource* source, const char* name);
+   virtual void addSink(FilterSink* sink, const char* name);
+public:
 
   /**
    * @return number of {@link FilterSource} added so far.
@@ -109,15 +173,6 @@ public:
    * @throws PropertyNotFoundException if not in graph.
    */
   virtual FilterSource* getSource(const char* name);
-
-  /**
-   * Add a {@link FilterSink}.
-   * @param sink the source
-   * @param name the name; must be unique in graph
-   *
-   * @throws RuntimeException if name is already in graph.
-   */
-  virtual void addSink(FilterSink* sink, const char* name);
 
   /**
    * @return number of {@link FilterSink} added so far.

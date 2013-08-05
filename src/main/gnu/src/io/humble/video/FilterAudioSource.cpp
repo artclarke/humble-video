@@ -24,14 +24,47 @@
  */
 
 #include "FilterAudioSource.h"
+#include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/video/VideoExceptions.h>
+#include <io/humble/video/FilterGraph.h>
+
+using namespace io::humble::ferry;
 
 namespace io {
 namespace humble {
 namespace video {
 
-FilterAudioSource::FilterAudioSource(FilterGraph* graph, AVFilterContext* ctx) :
-  FilterSource(graph, ctx) {
+FilterAudioSource::FilterAudioSource(FilterGraph* graph, AVFilterContext* ctx,
+    int32_t sampleRate, AudioChannel::Layout channelLayout,
+    AudioFormat::Type format) :
+    FilterSource(graph, ctx) {
+  (void) sampleRate;
+  (void) channelLayout;
+  (void) format;
 
+}
+
+void
+FilterAudioSource::addAudio(MediaAudio* audio) {
+  (void) audio;
+}
+
+FilterAudioSource*
+FilterAudioSource::make(FilterGraph* graph,
+    int32_t sampleRate, AudioChannel::Layout channelLayout,
+    AudioFormat::Type format) {
+  (void) graph;
+  (void) sampleRate;
+  (void) channelLayout;
+  (void) format;
+  Global::init();
+  RefPointer<FilterAudioSource> r;
+//  new FilterAudioSource(graph, ctx, sampleRate, channelLayout, format);
+//
+//  r.reset(new FilterAudioSource(graph, ctx, sampleRate, channelLayout, format),
+//      true);
+  return r.get();
 }
 
 FilterAudioSource::~FilterAudioSource() {

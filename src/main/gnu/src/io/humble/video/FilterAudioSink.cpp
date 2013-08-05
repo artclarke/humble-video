@@ -24,6 +24,12 @@
  */
 
 #include "FilterAudioSink.h"
+#include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/video/VideoExceptions.h>
+#include <io/humble/video/FilterGraph.h>
+
+using namespace io::humble::ferry;
 
 namespace io {
 namespace humble {
@@ -37,6 +43,22 @@ FilterAudioSink::FilterAudioSink(FilterGraph* graph, AVFilterContext* ctx) :
 FilterAudioSink::~FilterAudioSink() {
 }
 
+FilterAudioSink*
+FilterAudioSink::make(FilterGraph* graph,
+    int32_t sampleRate, AudioChannel::Layout channelLayout,
+    AudioFormat::Type format) {
+  (void) graph;
+  (void) sampleRate;
+  (void) channelLayout;
+  (void) format;
+  Global::init();
+  RefPointer<FilterAudioSink> r;
+//  new FilterAudioSource(graph, ctx, sampleRate, channelLayout, format);
+//
+//  r.reset(new FilterAudioSource(graph, ctx, sampleRate, channelLayout, format),
+//      true);
+  return r.get();
+}
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

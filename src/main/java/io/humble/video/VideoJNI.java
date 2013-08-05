@@ -1324,11 +1324,13 @@ class VideoJNI {
   public final static native long FilterGraph_make();
   public final static native void FilterGraph_addFilter(long jarg1, FilterGraph jarg1_, long jarg2, FilterType jarg2_, String jarg3);
   public final static native long FilterGraph_getFilter(long jarg1, FilterGraph jarg1_, String jarg2);
-  public final static native void FilterGraph_addSource(long jarg1, FilterGraph jarg1_, long jarg2, FilterSource jarg2_, String jarg3);
+  public final static native long FilterGraph_addAudioSource(long jarg1, FilterGraph jarg1_, String jarg2, int jarg3, int jarg4, int jarg5);
+  public final static native long FilterGraph_addPictureSource(long jarg1, FilterGraph jarg1_, String jarg2, int jarg3, int jarg4, int jarg5);
+  public final static native long FilterGraph_addAudioSink(long jarg1, FilterGraph jarg1_, String jarg2, int jarg3, int jarg4, int jarg5);
+  public final static native long FilterGraph_addPictureSink(long jarg1, FilterGraph jarg1_, String jarg2, int jarg3, int jarg4, int jarg5);
   public final static native int FilterGraph_getNumSources(long jarg1, FilterGraph jarg1_);
   public final static native long FilterGraph_getSource__SWIG_0(long jarg1, FilterGraph jarg1_, int jarg2);
   public final static native long FilterGraph_getSource__SWIG_1(long jarg1, FilterGraph jarg1_, String jarg2);
-  public final static native void FilterGraph_addSink(long jarg1, FilterGraph jarg1_, long jarg2, FilterSink jarg2_, String jarg3);
   public final static native int FilterGraph_getNumSinks(long jarg1, FilterGraph jarg1_);
   public final static native long FilterGraph_getSink__SWIG_0(long jarg1, FilterGraph jarg1_, int jarg2);
   public final static native long FilterGraph_getSink__SWIG_1(long jarg1, FilterGraph jarg1_, String jarg2);
@@ -1368,6 +1370,7 @@ class VideoJNI {
   public final static native int FilterLink_getSampleFormat(long jarg1, FilterLink jarg1_);
   public final static native long FilterLink_getTimeBase(long jarg1, FilterLink jarg1_);
   public final static native void FilterLink_insertFilter(long jarg1, FilterLink jarg1_, long jarg2, Filter jarg2_, int jarg3, int jarg4);
+  public final static native void FilterAudioSource_addAudio(long jarg1, FilterAudioSource jarg1_, long jarg2, MediaAudio jarg2_);
   public final static native long SWIGPixelFormatUpcast(long jarg1);
   public final static native long SWIGPixelComponentDescriptorUpcast(long jarg1);
   public final static native long SWIGPixelFormatDescriptorUpcast(long jarg1);

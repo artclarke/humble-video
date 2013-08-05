@@ -37,6 +37,14 @@ namespace video {
  */
 class FilterAudioSink : public io::humble::video::FilterSink
 {
+public:
+
+#ifndef SWIG
+  static FilterAudioSink*
+  make(FilterGraph* graph, int32_t sampleRate,
+      AudioChannel::Layout channelLayout, AudioFormat::Type format);
+#endif // ! SWIG
+
 protected:
   FilterAudioSink(FilterGraph* graph, AVFilterContext* ctx);
   virtual

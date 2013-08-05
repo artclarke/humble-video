@@ -113,4 +113,20 @@ public class FilterAudioSource extends FilterSource {
   // JNIHelper.swg: End generated code
   
 
+/**
+ * Adds audio to this source. NOTE: If you had audio to a {@link FilterSource} 
+ *  
+ * be careful with re-using or rewriting the underlying data. Filters 
+ * will  
+ * try hard to avoid copying data, so if you change the data out from 
+ * under  
+ * them unexpected results can occur.  
+ * @param	audio the audio to add. Must be non-null and complete.  
+ * @throws	InvalidArgument if audio is null or audio is not complete. 
+ *		  
+ */
+  public void addAudio(MediaAudio audio) {
+    VideoJNI.FilterAudioSource_addAudio(swigCPtr, this, MediaAudio.getCPtr(audio), audio);
+  }
+
 }

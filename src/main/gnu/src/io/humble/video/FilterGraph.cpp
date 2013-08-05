@@ -27,8 +27,10 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
-#include <io/humble/video/FilterSource.h>
-#include <io/humble/video/FilterSink.h>
+#include <io/humble/video/FilterAudioSource.h>
+#include <io/humble/video/FilterPictureSource.h>
+#include <io/humble/video/FilterAudioSink.h>
+#include <io/humble/video/FilterPictureSink.h>
 
 using namespace io::humble::ferry;
 
@@ -44,6 +46,46 @@ FilterGraph::FilterGraph() {
     VS_THROW(HumbleBadAlloc());
   }
   mState = STATE_INITED;
+}
+
+FilterAudioSource*
+FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
+    AudioChannel::Layout channelLayout, AudioFormat::Type format) {
+  RefPointer<FilterAudioSource> s = FilterAudioSource::make(this, sampleRate,
+      channelLayout, format);
+  // now, add it to the graph sources
+  this->addSource(s.value(), name);
+  return s.get();
+}
+
+FilterPictureSource*
+FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
+    PixelFormat::Type format) {
+  (void) name;
+  (void) width;
+  (void) height;
+  (void) format;
+  return 0;
+}
+
+FilterAudioSink*
+FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
+    AudioChannel::Layout channelLayout, AudioFormat::Type format) {
+  RefPointer<FilterAudioSink> s = FilterAudioSink::make(this, sampleRate,
+      channelLayout, format);
+  // now, add it to the graph sources
+  this->addSink(s.value(), name);
+  return s.get();
+}
+
+FilterPictureSink*
+FilterGraph::addPictureSink(const char* name, int32_t width, int32_t height,
+    PixelFormat::Type format) {
+  (void) name;
+  (void) width;
+  (void) height;
+  (void) format;
+  return 0;
 }
 
 FilterGraph::~FilterGraph() {

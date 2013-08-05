@@ -183,7 +183,7 @@ public class Filter extends Configurable {
   }
 
 /**
- * @param	index which ouput to get link of  
+ * @param	index which output to get link of  
  * @return	the {@link FilterLink} that is outputting from this filter 
  *		 at the given position.  
  * @throws	InvalidArgument if index < 0 || index > {@link #getNumInputs()}. 
