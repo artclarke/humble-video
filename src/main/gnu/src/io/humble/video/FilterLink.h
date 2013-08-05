@@ -126,6 +126,15 @@ public:
    */
   virtual Rational* getTimeBase();
 
+  /**
+   * Insert a filter into this link between the current input and output.
+   * @param filter filter to insert
+   * @param srcPadIndex the index of the pad on filter to connect the output of the start of the prior link to.
+   * @param dstPadIndex the index of the pad on filter to connect the input of the end of the prior link to.
+   *
+   */
+  virtual void insertFilter(Filter* filter, int32_t srcPadIndex, int32_t dstPadIndex);
+
 #ifndef SWIG
   virtual AVFilterLink* getCtx() { return mCtx; }
   static FilterLink* make(FilterGraph*, AVFilterLink*);

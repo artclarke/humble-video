@@ -144,6 +144,18 @@ public class Filter extends Configurable {
   }
 
 /**
+ * @param	index which input to get link of  
+ * @return	the {@link FilterLink} that is inputting into this filter 
+ *		 at the given position.  
+ * @throws	InvalidArgument if index < 0 || index > {@link #getNumInputs()}. 
+ *		  
+ */
+  public FilterLink getInputLink(int index) {
+    long cPtr = VideoJNI.Filter_getInputLink(swigCPtr, this, index);
+    return (cPtr == 0) ? null : new FilterLink(cPtr, false);
+  }
+
+/**
  * @return	number of outputs this {@link FilterType} expects.  
  */
   public int getNumOutputs() {
@@ -168,6 +180,69 @@ public class Filter extends Configurable {
  */
   public MediaDescriptor.Type getOutputType(int index) {
     return MediaDescriptor.Type.swigToEnum(VideoJNI.Filter_getOutputType(swigCPtr, this, index));
+  }
+
+/**
+ * @param	index which ouput to get link of  
+ * @return	the {@link FilterLink} that is outputting from this filter 
+ *		 at the given position.  
+ * @throws	InvalidArgument if index < 0 || index > {@link #getNumInputs()}. 
+ *		  
+ */
+  public FilterLink getOutputLink(int index) {
+    long cPtr = VideoJNI.Filter_getOutputLink(swigCPtr, this, index);
+    return (cPtr == 0) ? null : new FilterLink(cPtr, false);
+  }
+
+  public enum CommandFlag {
+  /**
+   * Flags that can be passed when processing commands.
+   * Stop once a filter understood the command (for target=all for example), 
+   * fast filters are favored automatically
+   */
+    COMMAND_FLAG_ONE(VideoJNI.Filter_COMMAND_FLAG_ONE_get()),
+  /**
+   * Only execute command when its fast (like a video out that supports 
+   * contrast adjustment in hw)
+   */
+    COMMAND_FLAG_FAST(VideoJNI.Filter_COMMAND_FLAG_FAST_get());
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static CommandFlag swigToEnum(int swigValue) {
+      CommandFlag[] swigValues = CommandFlag.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (CommandFlag swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + CommandFlag.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private CommandFlag() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private CommandFlag(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private CommandFlag(CommandFlag swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
   }
 
 }

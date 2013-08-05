@@ -36,9 +36,25 @@ namespace io {
 namespace humble {
 namespace video {
 
+class FilterLink;
+
 class Filter : public io::humble::video::Configurable
 {
 public:
+  /**
+   * Flags that can be passed when processing commands.
+   */
+  typedef enum CommandFlag {
+    /**
+     * Stop once a filter understood the command (for target=all for example), fast filters are favored automatically
+     */
+    COMMAND_FLAG_ONE=AVFILTER_CMD_FLAG_ONE,
+    /**
+     * Only execute command when its fast (like a video out that supports contrast adjustment in hw)
+     */
+    COMMAND_FLAG_FAST=AVFILTER_CMD_FLAG_FAST,
+
+  } CommandFlag;
   /**
    *  @return name of filter.
    */
@@ -64,6 +80,13 @@ public:
   virtual MediaDescriptor::Type getInputType(int32_t index);
 
   /**
+   * @param index which input to get link of
+   * @return the {@link FilterLink} that is inputting into this filter at the given position.
+   * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
+   */
+  virtual FilterLink* getInputLink(int32_t index);
+
+  /**
    * @return number of outputs this {@link FilterType} expects.
    */
   virtual int32_t getNumOutputs();
@@ -82,8 +105,16 @@ public:
    */
   virtual MediaDescriptor::Type getOutputType(int32_t index);
 
-#ifndef SWIG
+  /**
+   * @param index which ouput to get link of
+   * @return the {@link FilterLink} that is outputting from this filter at the given position.
+   * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
+   */
+  virtual FilterLink* getOutputLink(int32_t index);
+
+  #ifndef SWIG
   static Filter* make(FilterGraph* graph, AVFilterContext* mCtx);
+  AVFilterContext* getFilterCtx() { return mCtx; }
 #endif // ! SWIG
 
 protected:

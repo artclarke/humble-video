@@ -250,4 +250,17 @@ public class FilterLink extends RefCounted {
     return (cPtr == 0) ? null : new Rational(cPtr, false);
   }
 
+/**
+ * Insert a filter into this link between the current input and output. 
+ *  
+ * @param	filter filter to insert  
+ * @param	srcPadIndex the index of the pad on filter to connect the 
+ *		 output of the start of the prior link to.  
+ * @param	dstPadIndex the index of the pad on filter to connect the 
+ *		 input of the end of the prior link to.  
+ */
+  public void insertFilter(Filter filter, int srcPadIndex, int dstPadIndex) {
+    VideoJNI.FilterLink_insertFilter(swigCPtr, this, Filter.getCPtr(filter), filter, srcPadIndex, dstPadIndex);
+  }
+
 }

@@ -23,8 +23,8 @@
  *      Author: aclarke
  */
 
-#ifndef FILTERGRAPH_H_
-#define FILTERGRAPH_H_
+#ifndef HUMBLEFILTERGRAPH_H_
+#define HUMBLEFILTERGRAPH_H_
 
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/Configurable.h>
@@ -61,11 +61,38 @@ public:
      /** all automatic conversions disabled */
      AUTO_CONVERT_NONE=AVFILTER_AUTO_CONVERT_NONE,
   } AutoConvertFlag;
+
+  /**
+   * Add a filter with the given name to the graph.
+   */
   virtual void addFilter(FilterType* type, const char* name);
+
+  /**
+   * @return the filter with the given name, or null if not found.
+   */
   virtual Filter* getFilter(const char* name);
+
+  /**
+   * Should this graph auto-convert audio or pictures into the formats
+   * different filters require (rather than require the user to construct
+   * a graph with all filters sets correctly).
+   *
+   * @param value whether to auto-convert with {@link MediaPictureResampler} or {@link MediaAudioResampler} objects.
+   */
   virtual void setAutoConvert(AutoConvertFlag value);
+
+  /**
+   * @return does this graph auto convert {@link MediaPicture} and {@link MediaRaw} objects when
+   * pulling them through the graph.
+   */
   virtual AutoConvertFlag getAutoConvert();
+
+  /**
+   * Call after all filters have been added and you are ready to begin pushing data through
+   * the graph. Any calls to set properties after this call <i>may</i> be ignored.
+   */
   virtual void open();
+
   /**
    * Send a command to one or more filter instances.
    *
@@ -133,4 +160,4 @@ private:
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
-#endif /* FILTERGRAPH_H_ */
+#endif /* HUMBLEFILTERGRAPH_H_ */

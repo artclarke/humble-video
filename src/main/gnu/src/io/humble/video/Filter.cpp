@@ -26,6 +26,7 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/HumbleException.h>
 #include "Filter.h"
+#include "FilterLink.h"
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
@@ -95,6 +96,20 @@ Filter::getOutputType(int32_t i) {
     VS_THROW(HumbleInvalidArgument("index out of range"));
   return (MediaDescriptor::Type) avfilter_pad_get_type(mCtx->output_pads, i);
 }
+FilterLink*
+Filter::getInputLink(int32_t i) {
+  if (i < 0 || i >= getNumInputs())
+    VS_THROW(HumbleInvalidArgument("index out of range"));
+  return FilterLink::make(mGraph.value(), mCtx->inputs[i]);
+}
+
+FilterLink*
+Filter::getOutputLink(int32_t i) {
+  if (i < 0 || i >= getNumOutputs())
+    VS_THROW(HumbleInvalidArgument("index out of range"));
+  return FilterLink::make(mGraph.value(), mCtx->outputs[i]);
+}
+
 
 } /* namespace video */
 } /* namespace humble */

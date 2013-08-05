@@ -1330,13 +1330,17 @@ class VideoJNI {
   public final static native void FilterGraph_queueCommand(long jarg1, FilterGraph jarg1_, String jarg2, String jarg3, String jarg4, int jarg5, double jarg6);
   public final static native String FilterGraph_getHumanReadableString(long jarg1, FilterGraph jarg1_);
   public final static native int FilterGraph_getState(long jarg1, FilterGraph jarg1_);
+  public final static native int Filter_COMMAND_FLAG_ONE_get();
+  public final static native int Filter_COMMAND_FLAG_FAST_get();
   public final static native String Filter_getName(long jarg1, Filter jarg1_);
   public final static native int Filter_getNumInputs(long jarg1, Filter jarg1_);
   public final static native String Filter_getInputName(long jarg1, Filter jarg1_, int jarg2);
   public final static native int Filter_getInputType(long jarg1, Filter jarg1_, int jarg2);
+  public final static native long Filter_getInputLink(long jarg1, Filter jarg1_, int jarg2);
   public final static native int Filter_getNumOutputs(long jarg1, Filter jarg1_);
   public final static native String Filter_getOutputName(long jarg1, Filter jarg1_, int jarg2);
   public final static native int Filter_getOutputType(long jarg1, Filter jarg1_, int jarg2);
+  public final static native long Filter_getOutputLink(long jarg1, Filter jarg1_, int jarg2);
   public final static native long FilterLink_getFilterGraph(long jarg1, FilterLink jarg1_);
   public final static native long FilterLink_getInputFilter(long jarg1, FilterLink jarg1_);
   public final static native String FilterLink_getInputPadName(long jarg1, FilterLink jarg1_);
@@ -1353,6 +1357,7 @@ class VideoJNI {
   public final static native int FilterLink_getSampleRate(long jarg1, FilterLink jarg1_);
   public final static native int FilterLink_getSampleFormat(long jarg1, FilterLink jarg1_);
   public final static native long FilterLink_getTimeBase(long jarg1, FilterLink jarg1_);
+  public final static native void FilterLink_insertFilter(long jarg1, FilterLink jarg1_, long jarg2, Filter jarg2_, int jarg3, int jarg4);
   public final static native long SWIGPixelFormatUpcast(long jarg1);
   public final static native long SWIGPixelComponentDescriptorUpcast(long jarg1);
   public final static native long SWIGPixelFormatDescriptorUpcast(long jarg1);

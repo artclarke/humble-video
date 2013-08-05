@@ -47,6 +47,22 @@ FilterLink::FilterLink(FilterGraph* graph, AVFilterLink* link) {
   mCtx = link;
 }
 
+void
+FilterLink::insertFilter(Filter* filter, int32_t srcPadIndex,
+    int32_t dstPadIndex) {
+  if (!filter)
+    VS_THROW(HumbleInvalidArgument("no filter passed in"));
+  if (srcPadIndex < 0 || srcPadIndex >= filter->getNumInputs())
+    VS_THROW(HumbleInvalidArgument("invalid src pad index"));
+  if (dstPadIndex >= filter->getNumOutputs())
+    VS_THROW(HumbleInvalidArgument("invalid dst pad index"));
+
+  avfilter_insert_filter(mCtx, filter->getFilterCtx(), srcPadIndex, dstPadIndex);
+  // reset cached pointers
+  mInputFilter = 0;
+  mOutputFilter = 0;
+}
+
 FilterLink::~FilterLink() {
   // graph owns the link
   mCtx = 0;
@@ -65,16 +81,14 @@ FilterLink::getFilterGraph() { return mGraph.get(); }
 
 Filter*
 FilterLink::getInputFilter() {
-  if (!mInputFilter) {
+  if (!mInputFilter || mInputFilter->getFilterCtx() != mCtx->src)
     mInputFilter = Filter::make(mGraph.value(), mCtx->src);
-  }
   return mInputFilter.get();
 }
 
 const char*
 FilterLink::getInputPadName() {
   return avfilter_pad_get_name(mCtx->srcpad, 0);
-
 }
 
 MediaDescriptor::Type
@@ -84,7 +98,7 @@ FilterLink::getInputPadType() {
 
 Filter*
 FilterLink::getOutputFilter() {
-  if (!mOutputFilter)
+  if (!mOutputFilter || mOutputFilter->getFilterCtx() != mCtx->dst)
     mOutputFilter = Filter::make(mGraph.value(), mCtx->dst);
   return mOutputFilter.get();
 }

@@ -109,23 +109,49 @@ public class FilterGraph extends Configurable {
   // JNIHelper.swg: End generated code
   
 
+/**
+ * Add a filter with the given name to the graph.  
+ */
   public void addFilter(FilterType type, String name) {
     VideoJNI.FilterGraph_addFilter(swigCPtr, this, FilterType.getCPtr(type), type, name);
   }
 
+/**
+ * @return	the filter with the given name, or null if not found.  
+ */
   public Filter getFilter(String name) {
     long cPtr = VideoJNI.FilterGraph_getFilter(swigCPtr, this, name);
     return (cPtr == 0) ? null : new Filter(cPtr, false);
   }
 
+/**
+ * Should this graph auto-convert audio or pictures into the formats 
+ *  
+ * different filters require (rather than require the user to construct 
+ *  
+ * a graph with all filters sets correctly).  
+ * @param	value whether to auto-convert with {@link MediaPictureResampler} 
+ *		 or {@link MediaAudioResampler} objects.  
+ */
   public void setAutoConvert(FilterGraph.AutoConvertFlag value) {
     VideoJNI.FilterGraph_setAutoConvert(swigCPtr, this, value.swigValue());
   }
 
+/**
+ * @return	does this graph auto convert {@link MediaPicture} and {@link 
+ *		 MediaRaw} objects when  
+ * pulling them through the graph.  
+ */
   public FilterGraph.AutoConvertFlag getAutoConvert() {
     return FilterGraph.AutoConvertFlag.swigToEnum(VideoJNI.FilterGraph_getAutoConvert(swigCPtr, this));
   }
 
+/**
+ * Call after all filters have been added and you are ready to begin 
+ * pushing data through  
+ * the graph. Any calls to set properties after this call <i>may</i> 
+ * be ignored.  
+ */
   public void open() {
     VideoJNI.FilterGraph_open(swigCPtr, this);
   }
