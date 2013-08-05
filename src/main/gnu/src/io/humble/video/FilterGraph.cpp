@@ -49,10 +49,29 @@ FilterGraph::FilterGraph() {
 }
 
 FilterAudioSource*
-FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
+FilterGraph::addAudioSource(const char* name,
+    Rational* timeBase, int32_t sampleRate,
     AudioChannel::Layout channelLayout, AudioFormat::Type format) {
-  RefPointer<FilterAudioSource> s = FilterAudioSource::make(this, sampleRate,
-      channelLayout, format);
+  if (!timeBase)
+    timeBase = Rational::make(1, sampleRate);
+  // get a buffer source
+  AVFilter *abuffersrc  = avfilter_get_by_name("abuffer");
+  AVFilterContext* ctx = 0;
+  char args[512] = "";
+
+  snprintf(args, sizeof(args),
+          "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=0x%"PRIx64,
+          timeBase->getNumerator(),
+          timeBase->getDenominator(),
+          sampleRate,
+          AudioFormat::getName(format),
+          (int64_t)channelLayout);
+
+  int e = avfilter_graph_create_filter(&ctx, abuffersrc, name,
+                                     args, NULL, mCtx);
+  FfmpegException::check(e, "could not add FilterAudioSource ");
+
+  RefPointer<FilterAudioSource> s = FilterAudioSource::make(this, ctx);
   // now, add it to the graph sources
   this->addSource(s.value(), name);
   return s.get();
@@ -71,8 +90,11 @@ FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
 FilterAudioSink*
 FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
     AudioChannel::Layout channelLayout, AudioFormat::Type format) {
-  RefPointer<FilterAudioSink> s = FilterAudioSink::make(this, sampleRate,
-      channelLayout, format);
+  (void) sampleRate;
+  (void) channelLayout;
+  (void) format;
+  AVFilterContext* ctx = 0;
+  RefPointer<FilterAudioSink> s = FilterAudioSink::make(this, ctx);
   // now, add it to the graph sources
   this->addSink(s.value(), name);
   return s.get();

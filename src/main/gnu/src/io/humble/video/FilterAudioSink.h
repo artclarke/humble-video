@@ -41,8 +41,7 @@ public:
 
 #ifndef SWIG
   static FilterAudioSink*
-  make(FilterGraph* graph, int32_t sampleRate,
-      AudioChannel::Layout channelLayout, AudioFormat::Type format);
+  make(FilterGraph* graph, AVFilterContext* ctx);
 #endif // ! SWIG
 
 protected:

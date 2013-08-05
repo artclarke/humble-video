@@ -135,6 +135,8 @@ public class FilterGraph extends Configurable {
 /**
  * Add a {@link FilterAudioSource}.  
  * @param	name the name; must be unique in graph  
+ * @param	timeBase timebase of frames that will be input. If null 1/sampleRate 
+ *		 is assumed.  
  * @param	sampleRate the audio sample rate  
  * @param	channelLaout the channel layout  
  * @param	format the sample format  
@@ -142,8 +144,8 @@ public class FilterGraph extends Configurable {
  * @throws	RuntimeException if name is already in graph.  
  * @throws	InvalidArgument if any argument is invalid.  
  */
-  public FilterAudioSource addAudioSource(String name, int sampleRate, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
-    long cPtr = VideoJNI.FilterGraph_addAudioSource(swigCPtr, this, name, sampleRate, channelLayout.swigValue(), format.swigValue());
+  public FilterAudioSource addAudioSource(String name, Rational timeBase, int sampleRate, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
+    long cPtr = VideoJNI.FilterGraph_addAudioSource(swigCPtr, this, name, Rational.getCPtr(timeBase), timeBase, sampleRate, channelLayout.swigValue(), format.swigValue());
     return (cPtr == 0) ? null : new FilterAudioSource(cPtr, false);
   }
 

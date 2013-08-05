@@ -90,6 +90,7 @@ public:
   /**
    * Add a {@link FilterAudioSource}.
    * @param name the name; must be unique in graph
+   * @param timeBase timebase of frames that will be input. If null 1/sampleRate is assumed.
    * @param sampleRate the audio sample rate
    * @param channelLaout the channel layout
    * @param format the sample format
@@ -99,6 +100,7 @@ public:
    * @throws InvalidArgument if any argument is invalid.
    */
   virtual FilterAudioSource* addAudioSource(const char* name,
+      Rational* timeBase,
       int32_t sampleRate,
       AudioChannel::Layout channelLayout,
       AudioFormat::Type format

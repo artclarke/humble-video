@@ -53,14 +53,11 @@ public:
 
 #ifndef SWIG
   static FilterAudioSource*
-  make(FilterGraph* graph, int32_t sampleRate,
-      AudioChannel::Layout channelLayout, AudioFormat::Type format);
+  make(FilterGraph* graph, AVFilterContext* ctx);
 #endif // ! SWIG
 protected:
 //  virtual void* getCtx() { return Filter::getCtx(); }
-  FilterAudioSource(FilterGraph* graph, AVFilterContext* ctx,
-      int32_t sampleRate, AudioChannel::Layout channelLayout,
-      AudioFormat::Type format);
+  FilterAudioSource(FilterGraph* graph, AVFilterContext* ctx);
   virtual
   ~FilterAudioSource();
 };

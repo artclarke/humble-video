@@ -44,19 +44,10 @@ FilterAudioSink::~FilterAudioSink() {
 }
 
 FilterAudioSink*
-FilterAudioSink::make(FilterGraph* graph,
-    int32_t sampleRate, AudioChannel::Layout channelLayout,
-    AudioFormat::Type format) {
-  (void) graph;
-  (void) sampleRate;
-  (void) channelLayout;
-  (void) format;
+FilterAudioSink::make(FilterGraph* graph, AVFilterContext* ctx) {
   Global::init();
   RefPointer<FilterAudioSink> r;
-//  new FilterAudioSource(graph, ctx, sampleRate, channelLayout, format);
-//
-//  r.reset(new FilterAudioSource(graph, ctx, sampleRate, channelLayout, format),
-//      true);
+  r.reset(new FilterAudioSink(graph, ctx), true);
   return r.get();
 }
 } /* namespace video */

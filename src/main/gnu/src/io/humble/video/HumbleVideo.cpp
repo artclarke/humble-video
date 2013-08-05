@@ -30845,27 +30845,30 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getFilter(JN
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addAudioSource(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3, jint jarg4, jint jarg5) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addAudioSource(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3, jobject jarg3_, jint jarg4, jint jarg5, jint jarg6) {
   jlong jresult = 0 ;
   io::humble::video::FilterGraph *arg1 = (io::humble::video::FilterGraph *) 0 ;
   char *arg2 = (char *) 0 ;
-  int32_t arg3 ;
-  io::humble::video::AudioChannel::Layout arg4 ;
-  io::humble::video::AudioFormat::Type arg5 ;
+  io::humble::video::Rational *arg3 = (io::humble::video::Rational *) 0 ;
+  int32_t arg4 ;
+  io::humble::video::AudioChannel::Layout arg5 ;
+  io::humble::video::AudioFormat::Type arg6 ;
   io::humble::video::FilterAudioSource *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
+  (void)jarg3_;
   arg1 = *(io::humble::video::FilterGraph **)&jarg1; 
   arg2 = 0;
   if (jarg2) {
     arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
     if (!arg2) return 0;
   }
-  arg3 = (int32_t)jarg3; 
-  arg4 = (io::humble::video::AudioChannel::Layout)jarg4; 
-  arg5 = (io::humble::video::AudioFormat::Type)jarg5; 
+  arg3 = *(io::humble::video::Rational **)&jarg3; 
+  arg4 = (int32_t)jarg4; 
+  arg5 = (io::humble::video::AudioChannel::Layout)jarg5; 
+  arg6 = (io::humble::video::AudioFormat::Type)jarg6; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -30879,7 +30882,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addAudioSour
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::FilterAudioSource *)(arg1)->addAudioSource((char const *)arg2,arg3,arg4,arg5);
+      result = (io::humble::video::FilterAudioSource *)(arg1)->addAudioSource((char const *)arg2,arg3,arg4,arg5,arg6);
     }
     catch(std::exception & e)
     {

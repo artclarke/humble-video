@@ -35,14 +35,8 @@ namespace io {
 namespace humble {
 namespace video {
 
-FilterAudioSource::FilterAudioSource(FilterGraph* graph, AVFilterContext* ctx,
-    int32_t sampleRate, AudioChannel::Layout channelLayout,
-    AudioFormat::Type format) :
+FilterAudioSource::FilterAudioSource(FilterGraph* graph, AVFilterContext* ctx) :
     FilterSource(graph, ctx) {
-  (void) sampleRate;
-  (void) channelLayout;
-  (void) format;
-
 }
 
 void
@@ -52,18 +46,10 @@ FilterAudioSource::addAudio(MediaAudio* audio) {
 
 FilterAudioSource*
 FilterAudioSource::make(FilterGraph* graph,
-    int32_t sampleRate, AudioChannel::Layout channelLayout,
-    AudioFormat::Type format) {
-  (void) graph;
-  (void) sampleRate;
-  (void) channelLayout;
-  (void) format;
+    AVFilterContext* ctx) {
   Global::init();
   RefPointer<FilterAudioSource> r;
-//  new FilterAudioSource(graph, ctx, sampleRate, channelLayout, format);
-//
-//  r.reset(new FilterAudioSource(graph, ctx, sampleRate, channelLayout, format),
-//      true);
+  r.reset(new FilterAudioSource(graph, ctx), true);
   return r.get();
 }
 
