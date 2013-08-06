@@ -100,10 +100,11 @@ public:
    * @throws InvalidArgument if any argument is invalid.
    */
   virtual FilterAudioSource* addAudioSource(const char* name,
-      Rational* timeBase,
       int32_t sampleRate,
       AudioChannel::Layout channelLayout,
-      AudioFormat::Type format
+      AudioFormat::Type format,
+      Rational* timeBase
+
   );
 
   /**
@@ -112,6 +113,9 @@ public:
    * @param width the width in pixels of {@link MediaPicture} objects that will be added to this source.
    * @param height the height in pixels  of {@link MediaPicture} objects that will be added to this source.
    * @param format the pixel format
+   * @param timeBase timebase of frames that will be input. If null, 1/{@link Global.DEFAULT_PTS_PER_SECOND} is assumed.
+   * @param pixelAspectRatio pixel aspect ratio. If null, 1/1 is assumed.
+   *
    * @return The FilterSource that was added.
    * @throws RuntimeException if name is already in graph.
    * @throws InvalidArgument if any argument is invalid.
@@ -119,7 +123,9 @@ public:
   virtual FilterPictureSource* addPictureSource(const char* name,
       int32_t width,
       int32_t height,
-      PixelFormat::Type format);
+      PixelFormat::Type format,
+      Rational* timeBase,
+      Rational* pixelAspectRatio);
 
   /**
    * Add a {@link FilterAudioSink}.

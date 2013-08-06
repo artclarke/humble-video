@@ -50,8 +50,9 @@ FilterGraph::FilterGraph() {
 
 FilterAudioSource*
 FilterGraph::addAudioSource(const char* name,
-    Rational* aTimeBase, int32_t sampleRate,
-    AudioChannel::Layout channelLayout, AudioFormat::Type format) {
+    int32_t sampleRate,
+    AudioChannel::Layout channelLayout, AudioFormat::Type format,
+    Rational* aTimeBase) {
   if (!name || !*name) {
     VS_THROW(HumbleInvalidArgument("no name specified"));
   }
@@ -72,6 +73,8 @@ FilterGraph::addAudioSource(const char* name,
 
   // get a buffer source
   AVFilter *abuffersrc  = avfilter_get_by_name("abuffer");
+  if (!abuffersrc)
+    VS_THROW(HumbleRuntimeError::make("could not find audio buffer source; bad FFmpeg build?"));
   AVFilterContext* ctx = 0;
   char args[512] = "";
 
@@ -95,12 +98,50 @@ FilterGraph::addAudioSource(const char* name,
 
 FilterPictureSource*
 FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
-    PixelFormat::Type format) {
-  (void) name;
-  (void) width;
-  (void) height;
-  (void) format;
-  return 0;
+    PixelFormat::Type format, Rational* aTimeBase, Rational* aPixelAspectRatio) {
+  if (!name || !*name) {
+    VS_THROW(HumbleInvalidArgument("no name specified"));
+  }
+  if (width <= 0) {
+    VS_THROW(HumbleInvalidArgument("no width specified"));
+  }
+  if (height <= 0) {
+    VS_THROW(HumbleInvalidArgument("no height specified"));
+  }
+  if (format == PixelFormat::PIX_FMT_NONE) {
+    VS_THROW(HumbleInvalidArgument("no sample format specified"));
+  }
+  // hold in ref pointer to avoid leak
+  RefPointer<Rational> timeBase;
+  timeBase.reset(aTimeBase, true);
+  if (!timeBase)
+    timeBase = Rational::make(1, Global::DEFAULT_PTS_PER_SECOND);
+
+  RefPointer<Rational> aspectRatio;
+  aspectRatio.reset(aPixelAspectRatio, true);
+  if (!aspectRatio)
+    aspectRatio = Rational::make(1, 1);
+
+  AVFilter *buffersrc  = avfilter_get_by_name("buffer");
+  if (!buffersrc)
+      VS_THROW(HumbleRuntimeError::make("could not find audio buffer source; bad FFmpeg build?"));
+  AVFilterContext* ctx = 0;
+
+  char args[512];
+  snprintf(args, sizeof(args),
+          "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
+          width, height, format,
+          timeBase->getNumerator(), timeBase->getDenominator(),
+          aspectRatio->getNumerator(), aspectRatio->getDenominator());
+
+  int e = avfilter_graph_create_filter(&ctx, buffersrc, "in",
+                                     args, 0, mCtx);
+  FfmpegException::check(e, "could not add FilterPictureSource ");
+
+  RefPointer<FilterPictureSource> s = FilterPictureSource::make(this, ctx);
+  // now, add it to the graph sources
+  this->addSource(s.value(), name);
+  return s.get();
 }
 
 FilterAudioSink*

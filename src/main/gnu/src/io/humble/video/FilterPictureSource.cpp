@@ -24,6 +24,9 @@
  */
 
 #include "FilterPictureSource.h"
+#include <io/humble/ferry/RefPointer.h>
+
+using namespace io::humble::ferry;
 
 namespace io {
 namespace humble {
@@ -37,6 +40,15 @@ FilterPictureSource::FilterPictureSource(FilterGraph* graph,
 
 FilterPictureSource::~FilterPictureSource() {
 }
+
+FilterPictureSource*
+FilterPictureSource::make(FilterGraph* graph, AVFilterContext* ctx) {
+  Global::init();
+  RefPointer<FilterPictureSource> r;
+  r.reset(new FilterPictureSource(graph, ctx), true);
+  return r.get();
+}
+
 
 } /* namespace video */
 } /* namespace humble */

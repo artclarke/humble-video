@@ -1324,8 +1324,8 @@ class VideoJNI {
   public final static native long FilterGraph_make();
   public final static native void FilterGraph_addFilter(long jarg1, FilterGraph jarg1_, long jarg2, FilterType jarg2_, String jarg3);
   public final static native long FilterGraph_getFilter(long jarg1, FilterGraph jarg1_, String jarg2);
-  public final static native long FilterGraph_addAudioSource(long jarg1, FilterGraph jarg1_, String jarg2, long jarg3, Rational jarg3_, int jarg4, int jarg5, int jarg6);
-  public final static native long FilterGraph_addPictureSource(long jarg1, FilterGraph jarg1_, String jarg2, int jarg3, int jarg4, int jarg5);
+  public final static native long FilterGraph_addAudioSource(long jarg1, FilterGraph jarg1_, String jarg2, int jarg3, int jarg4, int jarg5, long jarg6, Rational jarg6_);
+  public final static native long FilterGraph_addPictureSource(long jarg1, FilterGraph jarg1_, String jarg2, int jarg3, int jarg4, int jarg5, long jarg6, Rational jarg6_, long jarg7, Rational jarg7_);
   public final static native long FilterGraph_addAudioSink(long jarg1, FilterGraph jarg1_, String jarg2, int jarg3, int jarg4, int jarg5);
   public final static native long FilterGraph_addPictureSink(long jarg1, FilterGraph jarg1_, String jarg2, int jarg3, int jarg4, int jarg5);
   public final static native int FilterGraph_getNumSources(long jarg1, FilterGraph jarg1_);
