@@ -47,11 +47,17 @@ FilterGraph::FilterGraph() {
   }
   mState = STATE_INITED;
 }
+FilterGraph::~FilterGraph() {
+  avfilter_graph_free(&mCtx);
+}
 
 FilterAudioSource*
 FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
     AudioChannel::Layout channelLayout, AudioFormat::Type format,
     Rational* aTimeBase) {
+  if (getState() != STATE_INITED) {
+    VS_THROW(HumbleRuntimeError("cannot add sources after opening graph"));
+  }
   if (!name || !*name) {
     VS_THROW(HumbleInvalidArgument("no name specified"));
   }
@@ -96,6 +102,10 @@ FilterPictureSource*
 FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
     PixelFormat::Type format, Rational* aTimeBase,
     Rational* aPixelAspectRatio) {
+  if (getState() != STATE_INITED) {
+    VS_THROW(HumbleRuntimeError("cannot add sources after opening graph"));
+  }
+
   if (!name || !*name) {
     VS_THROW(HumbleInvalidArgument("no name specified"));
   }
@@ -142,6 +152,10 @@ FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
 FilterAudioSink*
 FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
     AudioChannel::Layout channelLayout, AudioFormat::Type format) {
+  if (getState() != STATE_INITED) {
+    VS_THROW(HumbleRuntimeError("cannot add sinks after opening graph"));
+  }
+
   if (!name || !*name) {
     VS_THROW(HumbleInvalidArgument("no name specified"));
   }
@@ -199,6 +213,9 @@ FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
 FilterPictureSink*
 FilterGraph::addPictureSink(const char* name, int32_t width, int32_t height,
     PixelFormat::Type format) {
+  if (getState() != STATE_INITED) {
+    VS_THROW(HumbleRuntimeError("cannot add sinks after opening graph"));
+  }
   if (!name || !*name) {
     VS_THROW(HumbleInvalidArgument("no name specified"));
   }
@@ -237,10 +254,6 @@ FilterGraph::addPictureSink(const char* name, int32_t width, int32_t height,
   return s.get();
 }
 
-FilterGraph::~FilterGraph() {
-  avfilter_graph_free(&mCtx);
-}
-
 FilterGraph*
 FilterGraph::make() {
   Global::init();
@@ -254,9 +267,6 @@ FilterGraph::addSource(FilterSource* aSource, const char* name) {
   RefPointer<Configurable> source;
   source.reset((Configurable*) aSource, true);
 
-  if (getState() != STATE_INITED) {
-    VS_THROW(HumbleRuntimeError("cannot add sources after opening graph"));
-  }
   if (!source) {
     VS_THROW(HumbleInvalidArgument("no source specified"));
   }
@@ -298,9 +308,6 @@ FilterGraph::addSink(FilterSink* aSink, const char*name) {
   RefPointer<Configurable> sink;
   sink.reset((Configurable*) aSink, true);
 
-  if (getState() != STATE_INITED) {
-    VS_THROW(HumbleRuntimeError("cannot add sinks after opening graph"));
-  }
   if (!sink) {
     VS_THROW(HumbleInvalidArgument("no sink specified"));
   }
