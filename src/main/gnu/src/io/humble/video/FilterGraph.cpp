@@ -344,7 +344,7 @@ FilterGraph::getSink(const char*name) {
 }
 
 void
-FilterGraph::loadGraph(const char* f) {
+FilterGraph::open(const char* f) {
   if (mState != STATE_INITED) {
     VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
   }
@@ -353,7 +353,6 @@ FilterGraph::loadGraph(const char* f) {
   }
   AVFilterInOut* inputs = 0;
   AVFilterInOut* outputs = 0;
-  char* filterDebugString = 0;
 
   try {
 
@@ -365,28 +364,19 @@ FilterGraph::loadGraph(const char* f) {
     int e = avfilter_graph_parse_ptr(mCtx, f, &inputs, &outputs, 0);
     FfmpegException::check(e, "failure to parse FilterGraph description ");
 
-    // now, check to make sure that the number of inputs matches the number of outputs
-    // and if not, throw an exception.
-    size_t numUnclosedInputs = 0;
-    for (const AVFilterInOut* i = inputs; i; i = i->next)
-      ++numUnclosedInputs;
-    size_t numUnclosedOutputs = 0;
-    for (const AVFilterInOut* i = outputs; i; i = i->next)
-      ++numUnclosedOutputs;
-    if (numUnclosedInputs > mSources.size()
-        || numUnclosedOutputs > mSinks.size()) {
-      filterDebugString = getHumanReadableString();
-      VS_THROW(
-          HumbleRuntimeError::make(
-              "filterDescription had unclosed Sinks or Sources. Sinks: [expected=%d,actual=%d]; Sources: [expected=%d, actual=%d]; graphStr=%s;",
-              mSinks.size(), numUnclosedInputs, mSources.size(),
-              numUnclosedOutputs, filterDebugString));
-    }
+    e = avfilter_graph_config(mCtx, 0);
+    FfmpegException::check(e, "failure to configure FilterGraph ");
+
+    avfilter_inout_free(&inputs);
+    avfilter_inout_free(&outputs);
+
+    mState = STATE_OPENED;
   } catch (std::exception & e) {
     // free any memory before rethrowing
     avfilter_inout_free(&inputs);
     avfilter_inout_free(&outputs);
-    av_freep(&filterDebugString);
+    mState = STATE_ERROR;
+    throw e;
   }
 
 }
@@ -469,16 +459,13 @@ FilterGraph::getAutoConvert() {
   return (FilterGraph::AutoConvertFlag) mCtx->disable_auto_convert;
 }
 
-void
-FilterGraph::open() {
-  int e = avfilter_graph_config(mCtx, 0);
-  if (e < 0) {
-    mState = STATE_ERROR;
-    FfmpegException::check(e, "Could not open filtergraph ");
+char*
+FilterGraph::getDisplayString() {
+  if (getState() != STATE_OPENED) {
+    VS_THROW(HumbleRuntimeError("can only get displayString on opened graphs"));
   }
-  mState = STATE_OPENED;
+  return avfilter_graph_dump(mCtx, "");
 }
-
 char*
 FilterGraph::sendCommand(const char* target, const char* command,
     const char* arguments, int flags) {

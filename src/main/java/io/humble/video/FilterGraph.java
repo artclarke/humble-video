@@ -295,24 +295,14 @@ public class FilterGraph extends Configurable {
  * this call.  
  * @param	filterDescription The filter string to be parsed, in FFmpeg 
  *		 libavfilter format.  
- */
-  public void loadGraph(String filterDescription) {
-    VideoJNI.FilterGraph_loadGraph(swigCPtr, this, filterDescription);
-  }
-
-/**
- * Call after all filters have been added and you are ready to begin 
- * pushing data through  
- * the graph. Any calls to set properties after this call <i>may</i> 
- * be ignored.  
  * @throws	RuntimeException if <b>any inputs or outputs</b> are open 
  *		 (i.e. each filter  
  * in the graph must either point to another filter on all inputs or 
  * outputs, or point to  
  * a {@link FilterSink} or {@link FilterSource} when done).  
  */
-  public void open() {
-    VideoJNI.FilterGraph_open(swigCPtr, this);
+  public void open(String filterDescription) {
+    VideoJNI.FilterGraph_open(swigCPtr, this, filterDescription);
   }
 
   public String sendCommand(String target, String command, String arguments, int flags) {
@@ -338,8 +328,8 @@ public class FilterGraph extends Configurable {
     VideoJNI.FilterGraph_queueCommand(swigCPtr, this, target, command, arguments, flags, ts);
   }
 
-  public String getHumanReadableString() {
-    return VideoJNI.FilterGraph_getHumanReadableString(swigCPtr, this);
+  public String getDisplayString() {
+    return VideoJNI.FilterGraph_getDisplayString(swigCPtr, this);
   }
 
   public FilterGraph.State getState() {

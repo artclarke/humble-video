@@ -222,18 +222,11 @@ public:
    * this call.
    *
    * @param filterDescription The filter string to be parsed, in FFmpeg libavfilter format.
-   */
-  virtual void loadGraph(const char* filterDescription);
-
-  /**
-   * Call after all filters have been added and you are ready to begin pushing data through
-   * the graph. Any calls to set properties after this call <i>may</i> be ignored.
-   *
    * @throws RuntimeException if <b>any inputs or outputs</b> are open (i.e. each filter
    *   in the graph must either point to another filter on all inputs or outputs, or point to
    *   a {@link FilterSink} or {@link FilterSource} when done).
    */
-  virtual void open();
+  virtual void open(const char* filterDescription);
 
   /**
    * Send a command to one or more filter instances.
@@ -278,12 +271,10 @@ public:
       const char *arguments, int flags, double ts);
 
 #ifdef SWIG
-  %newobject getHumanReadableString();
+  %newobject getDisplayString();
   %typemap(newfree) char * "av_free($1);";
 #endif
-  virtual char* getHumanReadableString() {
-    return avfilter_graph_dump(mCtx, "");
-  }
+  virtual char* getDisplayString();
 
   virtual State getState() { return mState; }
 

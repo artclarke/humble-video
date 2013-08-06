@@ -1336,11 +1336,10 @@ class VideoJNI {
   public final static native long FilterGraph_getSink__SWIG_1(long jarg1, FilterGraph jarg1_, String jarg2);
   public final static native void FilterGraph_setAutoConvert(long jarg1, FilterGraph jarg1_, int jarg2);
   public final static native int FilterGraph_getAutoConvert(long jarg1, FilterGraph jarg1_);
-  public final static native void FilterGraph_loadGraph(long jarg1, FilterGraph jarg1_, String jarg2);
-  public final static native void FilterGraph_open(long jarg1, FilterGraph jarg1_);
+  public final static native void FilterGraph_open(long jarg1, FilterGraph jarg1_, String jarg2);
   public final static native String FilterGraph_sendCommand(long jarg1, FilterGraph jarg1_, String jarg2, String jarg3, String jarg4, int jarg5);
   public final static native void FilterGraph_queueCommand(long jarg1, FilterGraph jarg1_, String jarg2, String jarg3, String jarg4, int jarg5, double jarg6);
-  public final static native String FilterGraph_getHumanReadableString(long jarg1, FilterGraph jarg1_);
+  public final static native String FilterGraph_getDisplayString(long jarg1, FilterGraph jarg1_);
   public final static native int FilterGraph_getState(long jarg1, FilterGraph jarg1_);
   public final static native int Filter_COMMAND_FLAG_ONE_get();
   public final static native int Filter_COMMAND_FLAG_FAST_get();

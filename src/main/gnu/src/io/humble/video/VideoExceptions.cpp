@@ -97,6 +97,10 @@ FfmpegException::check(int32_t error, const char* fmt, ...) {
     VS_THROW(HumbleInterruptedException(finalStr));
     break;
   }
+  case AVERROR(EINVAL): {
+    VS_THROW(HumbleInvalidArgument(finalStr));
+    break;
+  }
   case AVERROR_EXIT :
   case AVERROR_BUG :
   case AVERROR_BUFFER_TOO_SMALL :
@@ -107,7 +111,6 @@ FfmpegException::check(int32_t error, const char* fmt, ...) {
   case AVERROR_UNKNOWN :
   case AVERROR_EXPERIMENTAL:
   case AVERROR(EDOM):
-  case AVERROR(EINVAL):
   case AVERROR(EILSEQ):
   case AVERROR(ENOSYS):
   case AVERROR(ERANGE):

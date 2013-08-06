@@ -31478,7 +31478,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getAutoConver
 }
 
 
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1loadGraph(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   io::humble::video::FilterGraph *arg1 = (io::humble::video::FilterGraph *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -31504,7 +31504,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1loadGraph(JNI
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      (arg1)->loadGraph((char const *)arg2);
+      (arg1)->open((char const *)arg2);
     }
     catch(std::exception & e)
     {
@@ -31524,48 +31524,6 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1loadGraph(JNI
     /*@SWIG@*/
   }
   if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
-}
-
-
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  io::humble::video::FilterGraph *arg1 = (io::humble::video::FilterGraph *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(io::humble::video::FilterGraph **)&jarg1; 
-  
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
-      "invalid native object; delete() likely already called");
-    return ;
-  }
-  
-  {
-    /*@SWIG:/Users/aclarke/Work/humble/humble-video-main/src/main/gnu/src/io/humble/video/HumbleVideo.i,139,HUMBLE_HANDLE_EXCEPTION@*/
-    // HumbleVideo.i: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      (arg1)->open();
-    }
-    catch(std::exception & e)
-    {
-      io::humble::video::Global::catchException(e);
-      return ;
-    }
-    catch(...)
-    {
-      std::runtime_error e("Unhandled and unknown native exception");
-      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
-      return ;
-    }
-    
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // HumbleVideo.i: End generated code
-    
-    /*@SWIG@*/
-  }
 }
 
 
@@ -31706,7 +31664,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1queueCommand(
 }
 
 
-SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getHumanReadableString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getDisplayString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   io::humble::video::FilterGraph *arg1 = (io::humble::video::FilterGraph *) 0 ;
   char *result = 0 ;
@@ -31728,7 +31686,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getHumanRe
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (char *)(arg1)->getHumanReadableString();
+      result = (char *)(arg1)->getDisplayString();
     }
     catch(std::exception & e)
     {
