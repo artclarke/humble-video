@@ -24,6 +24,15 @@
  */
 
 #include "FilterSource.h"
+#include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/video/VideoExceptions.h>
+#include <io/humble/video/FilterGraph.h>
+#include <io/humble/video/MediaAudioImpl.h>
+
+using namespace io::humble::ferry;
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 namespace io {
 namespace humble {
@@ -35,6 +44,23 @@ FilterSource::FilterSource(FilterGraph* graph, AVFilterContext* ctx) :
 
 FilterSource::~FilterSource() {
 }
+
+void
+FilterSource::add(MediaRaw* media) {
+  if (!media) {
+    VS_THROW(HumbleInvalidArgument("no media passed in"));
+  }
+  if (!media->isComplete()) {
+    VS_THROW(HumbleInvalidArgument("incomplete media passed in"));
+  }
+  // ok, let's get to work
+  AVFilterContext* ctx = getFilterCtx();
+  AVFrame* frame = media->getCtx();
+
+  int e = av_buffersrc_write_frame(ctx, frame);
+  FfmpegException::check(e, "could not add frame to audio source:");
+}
+
 
 } /* namespace video */
 } /* namespace humble */

@@ -113,4 +113,21 @@ public class FilterPictureSource extends FilterSource {
   // JNIHelper.swg: End generated code
   
 
+/**
+ * Adds a picture to this source. NOTE: If you add a picture to a {@link 
+ * FilterSource}  
+ * be careful with re-using or rewriting the underlying data. Filters 
+ * will  
+ * try hard to avoid copying data, so if you change the data out from 
+ * under  
+ * them unexpected results can occur.  
+ * @param	picture the picture to add. Must be non-null and complete. 
+ *		  
+ * @throws	InvalidArgument if picture is null or audio is not complete. 
+ *		  
+ */
+  public void addPicture(MediaPicture picture) {
+    VideoJNI.FilterPictureSource_addPicture(swigCPtr, this, MediaPicture.getCPtr(picture), picture);
+  }
+
 }

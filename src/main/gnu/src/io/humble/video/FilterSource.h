@@ -39,6 +39,7 @@ namespace video {
 class FilterSource : public io::humble::video::FilterEndPoint
 {
 protected:
+  void add(MediaRaw* media);
   FilterSource(FilterGraph* graph, AVFilterContext* ctx);
   virtual
   ~FilterSource();

@@ -49,6 +49,11 @@ FilterPictureSource::make(FilterGraph* graph, AVFilterContext* ctx) {
   return r.get();
 }
 
+void
+FilterPictureSource::addPicture(MediaPicture* picture) {
+  FilterSource::add(picture);
+}
+
 
 } /* namespace video */
 } /* namespace humble */

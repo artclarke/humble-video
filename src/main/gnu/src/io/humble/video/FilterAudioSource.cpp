@@ -28,6 +28,7 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
 #include <io/humble/video/FilterGraph.h>
+#include <io/humble/video/MediaAudioImpl.h>
 
 using namespace io::humble::ferry;
 
@@ -41,7 +42,7 @@ FilterAudioSource::FilterAudioSource(FilterGraph* graph, AVFilterContext* ctx) :
 
 void
 FilterAudioSource::addAudio(MediaAudio* audio) {
-  (void) audio;
+  FilterSource::add(audio);
 }
 
 FilterAudioSource*

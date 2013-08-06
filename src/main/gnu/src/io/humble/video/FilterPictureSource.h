@@ -27,6 +27,8 @@
 #define FILTERPICTURESOURCE_H_
 
 #include <io/humble/video/FilterSource.h>
+#include <io/humble/video/MediaPicture.h>
+
 
 namespace io {
 namespace humble {
@@ -38,6 +40,16 @@ namespace video {
 class FilterPictureSource : public io::humble::video::FilterSource
 {
 public:
+  /**
+   * Adds a picture to this source. NOTE: If you add a picture to a {@link FilterSource}
+   * be careful with re-using or rewriting the underlying data. Filters will
+   * try hard to avoid copying data, so if you change the data out from under
+   * them unexpected results can occur.
+   * @param picture the picture to add. Must be non-null and complete.
+   * @throws InvalidArgument if picture is null or audio is not complete.
+   */
+  void
+  addPicture(MediaPicture* picture);
 #ifndef SWIG
   static FilterPictureSource* make(FilterGraph*, AVFilterContext*);
 #endif // ! SWIG.

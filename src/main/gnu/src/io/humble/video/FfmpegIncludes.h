@@ -17,8 +17,8 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef FFMPEGINCLUDES_H_
-#define FFMPEGINCLUDES_H_
+#ifndef HUMBLEFFMPEGINCLUDES_H_
+#define HUMBLEFFMPEGINCLUDES_H_
 
 extern "C"
 {
@@ -49,6 +49,8 @@ extern "C"
 
 #include <libavcodec/avcodec.h>
 #include <libavfilter/avfilter.h>
+#include <libavfilter/buffersink.h>
+#include <libavfilter/buffersrc.h>
 #include <libavformat/avformat.h>
 }
-#endif /*FFMPEGINCLUDES_H_*/
+#endif /*HUMBLEFFMPEGINCLUDES_H_*/

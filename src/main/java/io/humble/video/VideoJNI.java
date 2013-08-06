@@ -1371,6 +1371,7 @@ class VideoJNI {
   public final static native long FilterLink_getTimeBase(long jarg1, FilterLink jarg1_);
   public final static native void FilterLink_insertFilter(long jarg1, FilterLink jarg1_, long jarg2, Filter jarg2_, int jarg3, int jarg4);
   public final static native void FilterAudioSource_addAudio(long jarg1, FilterAudioSource jarg1_, long jarg2, MediaAudio jarg2_);
+  public final static native void FilterPictureSource_addPicture(long jarg1, FilterPictureSource jarg1_, long jarg2, MediaPicture jarg2_);
   public final static native long SWIGPixelFormatUpcast(long jarg1);
   public final static native long SWIGPixelComponentDescriptorUpcast(long jarg1);
   public final static native long SWIGPixelFormatDescriptorUpcast(long jarg1);
