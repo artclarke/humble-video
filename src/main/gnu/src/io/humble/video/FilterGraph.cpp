@@ -96,8 +96,6 @@ FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
 
   int e = avfilter_graph_create_filter(&ctx, abuffersrc, name, args, 0, mCtx);
   FfmpegException::check(e, "could not add FilterAudioSource ");
-
-  // now, add it to the graph sources
   this->addSource(ctx);
 
   // and return a made object (note: we must not ref-count this ourselves)
@@ -148,7 +146,6 @@ FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
 
   int e = avfilter_graph_create_filter(&ctx, buffersrc, name, args, 0, mCtx);
   FfmpegException::check(e, "could not add FilterPictureSource ");
-
   // now, add it to the graph sources
   this->addSource(ctx);
 
@@ -191,25 +188,14 @@ FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
   int e = avfilter_graph_create_filter(&ctx, abuffersink, name, 0, 0, mCtx);
   FfmpegException::check(e, "could not add FilterAudioSink ");
 
-  try {
-    e =
-        av_opt_set_int_list(ctx, "sample_fmts", sampleFormats, -1, AV_OPT_SEARCH_CHILDREN);
-    FfmpegException::check(e, "could not set audio formats ");
+  e = av_opt_set_int_list(ctx, "sample_fmts", sampleFormats, -1, AV_OPT_SEARCH_CHILDREN);
+  FfmpegException::check(e, "could not set audio formats ");
 
-    e =
-        av_opt_set_int_list(ctx, "channel_layouts", channels, -1, AV_OPT_SEARCH_CHILDREN);
-    FfmpegException::check(e, "could not set audio channel layouts ");
+  e = av_opt_set_int_list(ctx, "channel_layouts", channels, -1, AV_OPT_SEARCH_CHILDREN);
+  FfmpegException::check(e, "could not set audio channel layouts ");
 
-    e =
-        av_opt_set_int_list(ctx, "sample_rates", sampleRates, -1, AV_OPT_SEARCH_CHILDREN);
-    FfmpegException::check(e, "could not set audio sample rates ");
-  } catch (std::exception & e0) {
-    // if we throw an exception, free the context so we don't leak.
-    avfilter_free(ctx);
-    ctx = 0;
-    throw e0;
-  }
-
+  e = av_opt_set_int_list(ctx, "sample_rates", sampleRates, -1, AV_OPT_SEARCH_CHILDREN);
+  FfmpegException::check(e, "could not set audio sample rates ");
   // now, add it to the graph sources
   this->addSink(ctx);
 
@@ -245,16 +231,8 @@ FilterGraph::addPictureSink(const char* name, int32_t width, int32_t height,
 
   int e = avfilter_graph_create_filter(&ctx, buffersink, name, 0, 0, mCtx);
   FfmpegException::check(e, "could not add FilterPictureSink ");
-  try {
-    e =
-        av_opt_set_int_list(ctx, "pix_fmts", formats, -1, AV_OPT_SEARCH_CHILDREN);
-    FfmpegException::check(e, "could not set pixel formats ");
-  } catch (std::exception & e0) {
-    // if we throw an exception, free the context so we don't leak.
-    avfilter_free(ctx);
-    ctx = 0;
-    throw e0;
-  }
+  e = av_opt_set_int_list(ctx, "pix_fmts", formats, -1, AV_OPT_SEARCH_CHILDREN);
+  FfmpegException::check(e, "could not set pixel formats ");
   this->addSink(ctx);
   return dynamic_cast<FilterPictureSink*>(getFilter(ctx));
 }
@@ -297,7 +275,10 @@ FilterGraph::getSource(const char* name) {
   int n = contexts.size();
   for(int i = 0; i < n; i++) {
     AVFilterContext* sourceCtx = contexts[i];
-    if (sourceCtx && sourceCtx->name && *sourceCtx->name && strcmp(sourceCtx->name, name)==0)
+    if (sourceCtx &&
+        sourceCtx->name &&
+        *sourceCtx->name &&
+        strcmp(sourceCtx->name, name)==0)
       return getSource(i);
   }
   // if we get here we did not find the filter.
@@ -357,8 +338,8 @@ FilterGraph::open(const char* f) {
   try {
 
     // let's iterate through all our inputs, then outputs
-    fillAVFilterInOut(mSources, &inputs);
-    fillAVFilterInOut(mSinks, &outputs);
+    fillAVFilterInOut(mSinks, &inputs);
+    fillAVFilterInOut(mSources, &outputs);
 
     // now, let's try parsing
     int e = avfilter_graph_parse_ptr(mCtx, f, &inputs, &outputs, 0);
@@ -371,14 +352,13 @@ FilterGraph::open(const char* f) {
     avfilter_inout_free(&outputs);
 
     mState = STATE_OPENED;
-  } catch (std::exception & e) {
+  } catch (std::exception & e0) {
     // free any memory before rethrowing
     avfilter_inout_free(&inputs);
     avfilter_inout_free(&outputs);
     mState = STATE_ERROR;
-    throw e;
+    throw e0;
   }
-
 }
 
 void
@@ -389,9 +369,9 @@ FilterGraph::fillAVFilterInOut(std::vector<AVFilterContext*>& list, AVFilterInOu
     if (!io) {
       VS_THROW(HumbleBadAlloc());
     }
-    AVFilterContext* source = list[i];
-    io->name = av_strdup(source->name);
-    io->filter_ctx = source;
+    AVFilterContext* fc = list[i];
+    io->name = av_strdup(fc->name);
+    io->filter_ctx = fc;
     io->pad_idx = 0;
     io->next = *inOut;
     *inOut = io;
