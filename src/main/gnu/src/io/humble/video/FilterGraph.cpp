@@ -165,7 +165,7 @@ FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
   const int64_t channels[] =
     { channelLayout, -1 };
   const enum AVSampleFormat sampleFormats[] =
-    { (enum AVSampleFormat) format, (enum AVSampleFormat)-1 };
+    { (enum AVSampleFormat) format, (enum AVSampleFormat) -1 };
 
   AVFilterContext* ctx = 0;
   int e = avfilter_graph_create_filter(&ctx, abuffersink, name, 0, 0, mCtx);
@@ -199,11 +199,42 @@ FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
 FilterPictureSink*
 FilterGraph::addPictureSink(const char* name, int32_t width, int32_t height,
     PixelFormat::Type format) {
-  (void) name;
-  (void) width;
-  (void) height;
-  (void) format;
-  return 0;
+  if (!name || !*name) {
+    VS_THROW(HumbleInvalidArgument("no name specified"));
+  }
+  if (width <= 0) {
+    VS_THROW(HumbleInvalidArgument("no width specified"));
+  }
+  if (height <= 0) {
+    VS_THROW(HumbleInvalidArgument("no height specified"));
+  }
+  if (format == PixelFormat::PIX_FMT_NONE) {
+    VS_THROW(HumbleInvalidArgument("no sample format specified"));
+  }
+  AVFilter *buffersink = avfilter_get_by_name("buffersink");
+  if (!buffersink) {
+    VS_THROW(
+        HumbleRuntimeError::make(
+            "could not find video buffer sink; bad FFmpeg build?"));
+  }
+  enum AVPixelFormat formats[] = { (enum AVPixelFormat)format, AV_PIX_FMT_NONE };
+  AVFilterContext* ctx = 0;
+
+  int e = avfilter_graph_create_filter(&ctx, buffersink, name, 0, 0, mCtx);
+  FfmpegException::check(e, "could not add FilterPictureSink ");
+  try {
+    e =
+        av_opt_set_int_list(ctx, "pix_fmts", formats, -1, AV_OPT_SEARCH_CHILDREN);
+    FfmpegException::check(e, "could not set pixel formats ");
+  } catch (std::exception & e0) {
+    // if we throw an exception, free the context so we don't leak.
+    avfilter_free(ctx);
+    ctx = 0;
+    throw e0;
+  }
+  RefPointer<FilterPictureSink> s = FilterPictureSink::make(this, ctx);
+  this->addSink(s.value(), name);
+  return s.get();
 }
 
 FilterGraph::~FilterGraph() {

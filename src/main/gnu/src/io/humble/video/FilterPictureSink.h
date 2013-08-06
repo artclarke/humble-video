@@ -37,6 +37,10 @@ namespace video {
  */
 class FilterPictureSink : public io::humble::video::FilterSink
 {
+public:
+#ifndef SWIG
+  static FilterPictureSink* make(FilterGraph*, AVFilterContext*);
+#endif // ! SWIG
 protected:
   FilterPictureSink(FilterGraph* graph, AVFilterContext* ctx);
   virtual

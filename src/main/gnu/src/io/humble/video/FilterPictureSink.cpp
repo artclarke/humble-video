@@ -24,6 +24,9 @@
  */
 
 #include "FilterPictureSink.h"
+#include <io/humble/ferry/RefPointer.h>
+
+using namespace io::humble::ferry;
 
 namespace io {
 namespace humble {
@@ -37,6 +40,13 @@ FilterPictureSink::FilterPictureSink(FilterGraph* graph, AVFilterContext* ctx) :
 FilterPictureSink::~FilterPictureSink() {
 }
 
+FilterPictureSink*
+FilterPictureSink::make(FilterGraph* graph, AVFilterContext* ctx) {
+  Global::init();
+  RefPointer<FilterPictureSink> r;
+  r.reset(new FilterPictureSink(graph, ctx), true);
+  return r.get();
+}
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
