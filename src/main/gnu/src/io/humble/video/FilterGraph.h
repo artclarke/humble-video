@@ -26,7 +26,6 @@
 #ifndef HUMBLEFILTERGRAPH_H_
 #define HUMBLEFILTERGRAPH_H_
 
-#include <map>
 #include <vector>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/HumbleVideo.h>
@@ -160,8 +159,8 @@ public:
        PixelFormat::Type format);
 
 protected:
-   virtual void addSource(AVFilterContext* source, const char* name);
-   virtual void addSink(AVFilterContext* sink, const char* name);
+   virtual void addSource(AVFilterContext* source);
+   virtual void addSink(AVFilterContext* sink);
 public:
 
   /**
@@ -295,12 +294,11 @@ protected:
   ~FilterGraph();
 
 private:
+  static void fillAVFilterInOut(std::vector<AVFilterContext*>& list, AVFilterInOut** inOut);
   AVFilterGraph* mCtx;
   State mState;
-  std::map<std::string, AVFilterContext* > mSources;
-  std::vector<std::string> mSourceNames;
-  std::map<std::string, AVFilterContext* > mSinks;
-  std::vector<std::string> mSinkNames;
+  std::vector<AVFilterContext*> mSources;
+  std::vector<AVFilterContext*> mSinks;
 };
 
 } /* namespace video */

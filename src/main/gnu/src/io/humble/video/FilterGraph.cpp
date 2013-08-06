@@ -93,7 +93,7 @@ FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
   FfmpegException::check(e, "could not add FilterAudioSource ");
 
   // now, add it to the graph sources
-  this->addSource(ctx, name);
+  this->addSource(ctx);
 
   // and return a made object (note: we must not ref-count this ourselves)
   return FilterAudioSource::make(this, ctx);
@@ -145,7 +145,7 @@ FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
   FfmpegException::check(e, "could not add FilterPictureSource ");
 
   // now, add it to the graph sources
-  this->addSource(ctx, name);
+  this->addSource(ctx);
 
   return FilterPictureSource::make(this, ctx);
 }
@@ -206,7 +206,7 @@ FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
   }
 
   // now, add it to the graph sources
-  this->addSink(ctx, name);
+  this->addSink(ctx);
 
   return FilterAudioSink::make(this, ctx);
 }
@@ -250,7 +250,7 @@ FilterGraph::addPictureSink(const char* name, int32_t width, int32_t height,
     ctx = 0;
     throw e0;
   }
-  this->addSink(ctx, name);
+  this->addSink(ctx);
   return FilterPictureSink::make(this, ctx);
 }
 
@@ -263,16 +263,11 @@ FilterGraph::make() {
 }
 
 void
-FilterGraph::addSource(AVFilterContext* source, const char* name) {
+FilterGraph::addSource(AVFilterContext* source) {
   if (!source) {
     VS_THROW(HumbleInvalidArgument("no source specified"));
   }
-  if (!name || !*name) {
-    VS_THROW(HumbleInvalidArgument("no name specified"));
-  }
-  if (mSources.find(name) != mSources.end()) mSources.erase(name);
-  else mSourceNames.push_back(name);
-  mSources[name] = source;
+  mSources.push_back(source);
 }
 
 int32_t
@@ -282,20 +277,10 @@ FilterGraph::getNumSources() {
 
 FilterSource*
 FilterGraph::getSource(int32_t i) {
-  if (i < 0 || (size_t) i >= mSourceNames.size())
+  if (i < 0 || (size_t) i >= mSources.size())
   VS_THROW(HumbleInvalidArgument("index out of range"));
 
-  return getSource(mSourceNames[i].c_str());
-}
-
-FilterSource*
-FilterGraph::getSource(const char* name) {
-  AVFilterContext* sourceCtx = 0;
-  try {
-    sourceCtx = mSources[name];
-  } catch (std::out_of_range & e) {
-    VS_THROW(PropertyNotFoundException(name));
-  }
+  AVFilterContext* sourceCtx = mSources[i];
   AVMediaType type = avfilter_pad_get_type(sourceCtx->output_pads, 0);
   RefPointer<FilterSource> source;
   switch(type) {
@@ -312,17 +297,29 @@ FilterGraph::getSource(const char* name) {
   return source.get();
 }
 
+FilterSource*
+FilterGraph::getSource(const char* name) {
+  if (!name || !*name) {
+    VS_THROW(HumbleInvalidArgument("missing name"));
+  }
+  std::vector<AVFilterContext*> contexts = mSources;
+  int n = contexts.size();
+  for(int i = 0; i < n; i++) {
+    AVFilterContext* sourceCtx = contexts[i];
+    if (sourceCtx && sourceCtx->name && *sourceCtx->name && strcmp(sourceCtx->name, name)==0)
+      return getSource(i);
+  }
+  // if we get here we did not find the filter.
+  VS_THROW(PropertyNotFoundException(name));
+  return 0;
+}
+
 void
-FilterGraph::addSink(AVFilterContext* sink, const char*name) {
+FilterGraph::addSink(AVFilterContext* sink) {
   if (!sink) {
     VS_THROW(HumbleInvalidArgument("no sink specified"));
   }
-  if (!name || !*name) {
-    VS_THROW(HumbleInvalidArgument("no name specified"));
-  }
-  if (mSinks.find(name) != mSources.end()) mSinks.erase(name);
-  else mSinkNames.push_back(name);
-  mSinks[name] = sink;
+  mSinks.push_back(sink);
 }
 
 int32_t
@@ -332,21 +329,11 @@ FilterGraph::getNumSinks() {
 
 FilterSink*
 FilterGraph::getSink(int32_t i) {
-  if (i < 0 || (size_t) i >= mSinkNames.size())
-  VS_THROW(HumbleInvalidArgument("index out of range"));
-
-  std::string name = mSinkNames[i];
-  return getSink(name.c_str());
-}
-
-FilterSink*
-FilterGraph::getSink(const char*name) {
-  AVFilterContext* sinkCtx;
-  try {
-    sinkCtx = mSinks[name];
-  } catch (std::out_of_range & e) {
-    VS_THROW(PropertyNotFoundException(name));
+  if (i < 0 || (size_t) i >= mSinks.size()) {
+    VS_THROW(HumbleInvalidArgument("index out of range"));
   }
+  AVFilterContext *sinkCtx = mSinks[i];
+
   AVMediaType type = avfilter_pad_get_type(sinkCtx->input_pads, 0);
   RefPointer<FilterSink> sink;
   switch(type) {
@@ -361,6 +348,23 @@ FilterGraph::getSink(const char*name) {
     break;
   }
   return sink.get();
+}
+
+FilterSink*
+FilterGraph::getSink(const char*name) {
+  if (!name || !*name) {
+    VS_THROW(HumbleInvalidArgument("no name specified"));
+  }
+  std::vector<AVFilterContext*> contexts = mSinks;
+  int n = contexts.size();
+  for(int i = 0; i < n; i++) {
+    AVFilterContext* sourceCtx = contexts[i];
+    if (sourceCtx && sourceCtx->name && *sourceCtx->name && strcmp(sourceCtx->name, name)==0)
+      return getSink(i);
+  }
+  // if we get here we did not find the filter.
+  VS_THROW(PropertyNotFoundException(name));
+  return 0;
 }
 
 void
@@ -378,32 +382,9 @@ FilterGraph::loadGraph(const char* f) {
   try {
 
     // let's iterate through all our inputs, then outputs
-    std::map<std::string, AVFilterContext* >::iterator iter;
+    fillAVFilterInOut(mSources, &inputs);
+    fillAVFilterInOut(mSinks, &outputs);
 
-    for (iter = mSources.begin(); iter != mSources.end(); ++iter) {
-      AVFilterInOut* io = avfilter_inout_alloc();
-      if (!io)
-      VS_THROW(HumbleBadAlloc());
-      // do not force a ref count increment since the iter will remain throughout
-      AVFilterContext* source = iter->second;
-      io->name = av_strdup(source->name);
-      io->filter_ctx = source;
-      io->pad_idx = 0;
-      io->next = inputs;
-      inputs = io;
-    }
-    for (iter = mSinks.begin(); iter != mSinks.end(); ++iter) {
-      AVFilterInOut* io = avfilter_inout_alloc();
-      if (!io)
-      VS_THROW(HumbleBadAlloc());
-      // do not force a ref count increment since the iter will remain throughout
-      AVFilterContext* sink = iter->second;
-      io->name = av_strdup(sink->name);
-      io->filter_ctx = sink;
-      io->pad_idx = 0;
-      io->next = inputs;
-      inputs = io;
-    }
     // now, let's try parsing
     int e = avfilter_graph_parse_ptr(mCtx, f, &inputs, &outputs, 0);
     FfmpegException::check(e, "failure to parse FilterGraph description ");
@@ -432,6 +413,23 @@ FilterGraph::loadGraph(const char* f) {
     av_freep(&filterDebugString);
   }
 
+}
+
+void
+FilterGraph::fillAVFilterInOut(std::vector<AVFilterContext*>& list, AVFilterInOut** inOut) {
+  int32_t n = list.size();
+  for(int i = 0; i < n; i++) {
+    AVFilterInOut* io = avfilter_inout_alloc();
+    if (!io) {
+      VS_THROW(HumbleBadAlloc());
+    }
+    AVFilterContext* source = list[i];
+    io->name = av_strdup(source->name);
+    io->filter_ctx = source;
+    io->pad_idx = 0;
+    io->next = *inOut;
+    *inOut = io;
+  }
 }
 void
 FilterGraph::addFilter(FilterType* type, const char* name) {
