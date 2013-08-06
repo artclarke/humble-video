@@ -34,5 +34,6 @@ public:
   FilterGraphTest();
   virtual ~FilterGraphTest();
   void testCreation();
+  void testAddIO();
 };
 #endif /* FILTERGRAPHTEST_H_ */

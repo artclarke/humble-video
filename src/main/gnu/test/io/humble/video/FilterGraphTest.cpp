@@ -25,6 +25,10 @@
 
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/FilterGraph.h>
+#include <io/humble/video/FilterAudioSource.h>
+#include <io/humble/video/FilterAudioSink.h>
+#include <io/humble/video/FilterPictureSource.h>
+#include <io/humble/video/FilterPictureSink.h>
 #include "FilterGraphTest.h"
 
 using namespace io::humble::ferry;
@@ -40,4 +44,30 @@ void
 FilterGraphTest::testCreation() {
   RefPointer<FilterGraph> graph = FilterGraph::make();
   TS_ASSERT(graph);
+}
+
+void
+FilterGraphTest::testAddIO() {
+  RefPointer<FilterGraph> graph = FilterGraph::make();
+  TS_ASSERT(graph);
+  int32_t sampleRate = 22050;
+  AudioChannel::Layout layout = AudioChannel::CH_LAYOUT_STEREO;
+  AudioFormat::Type sampleFormat = AudioFormat::SAMPLE_FMT_S32P;
+  int32_t width = 1024;
+  int32_t height = 768;
+  PixelFormat::Type pixelFormat = PixelFormat::PIX_FMT_YUV420P;
+
+  RefPointer<FilterAudioSource> asource = graph->addAudioSource("ain",
+      sampleRate, layout, sampleFormat, 0);
+  TS_ASSERT(asource);
+  RefPointer<FilterPictureSource> psource = graph->addPictureSource("pin",
+      width, height, pixelFormat, 0, 0);
+  TS_ASSERT(psource);
+  RefPointer<FilterAudioSink> asink = graph->addAudioSink("aout",
+      sampleRate, layout, sampleFormat);
+  TS_ASSERT(asink);
+  RefPointer<FilterPictureSink> psink = graph->addPictureSink("pout",
+      width, height, pixelFormat);
+  TS_ASSERT(psink);
+
 }
