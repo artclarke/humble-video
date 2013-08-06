@@ -49,8 +49,7 @@ FilterGraph::FilterGraph() {
 }
 
 FilterAudioSource*
-FilterGraph::addAudioSource(const char* name,
-    int32_t sampleRate,
+FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
     AudioChannel::Layout channelLayout, AudioFormat::Type format,
     Rational* aTimeBase) {
   if (!name || !*name) {
@@ -68,26 +67,23 @@ FilterGraph::addAudioSource(const char* name,
   // hold in ref pointer to avoid leak
   RefPointer<Rational> timeBase;
   timeBase.reset(aTimeBase, true);
-  if (!timeBase)
-    timeBase = Rational::make(1, sampleRate);
+  if (!timeBase) timeBase = Rational::make(1, sampleRate);
 
   // get a buffer source
-  AVFilter *abuffersrc  = avfilter_get_by_name("abuffer");
+  AVFilter *abuffersrc = avfilter_get_by_name("abuffer");
   if (!abuffersrc)
-    VS_THROW(HumbleRuntimeError::make("could not find audio buffer source; bad FFmpeg build?"));
+  VS_THROW(
+      HumbleRuntimeError::make(
+          "could not find audio buffer source; bad FFmpeg build?"));
   AVFilterContext* ctx = 0;
   char args[512] = "";
 
   snprintf(args, sizeof(args),
-          "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=0x%"PRIx64,
-          timeBase->getNumerator(),
-          timeBase->getDenominator(),
-          sampleRate,
-          AudioFormat::getName(format),
-          (int64_t)channelLayout);
+      "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=0x%"PRIx64,
+      timeBase->getNumerator(), timeBase->getDenominator(), sampleRate,
+      AudioFormat::getName(format), (int64_t) channelLayout);
 
-  int e = avfilter_graph_create_filter(&ctx, abuffersrc, name,
-                                     args, NULL, mCtx);
+  int e = avfilter_graph_create_filter(&ctx, abuffersrc, name, args, 0, mCtx);
   FfmpegException::check(e, "could not add FilterAudioSource ");
 
   RefPointer<FilterAudioSource> s = FilterAudioSource::make(this, ctx);
@@ -98,7 +94,8 @@ FilterGraph::addAudioSource(const char* name,
 
 FilterPictureSource*
 FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
-    PixelFormat::Type format, Rational* aTimeBase, Rational* aPixelAspectRatio) {
+    PixelFormat::Type format, Rational* aTimeBase,
+    Rational* aPixelAspectRatio) {
   if (!name || !*name) {
     VS_THROW(HumbleInvalidArgument("no name specified"));
   }
@@ -114,28 +111,26 @@ FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
   // hold in ref pointer to avoid leak
   RefPointer<Rational> timeBase;
   timeBase.reset(aTimeBase, true);
-  if (!timeBase)
-    timeBase = Rational::make(1, Global::DEFAULT_PTS_PER_SECOND);
+  if (!timeBase) timeBase = Rational::make(1, Global::DEFAULT_PTS_PER_SECOND);
 
   RefPointer<Rational> aspectRatio;
   aspectRatio.reset(aPixelAspectRatio, true);
-  if (!aspectRatio)
-    aspectRatio = Rational::make(1, 1);
+  if (!aspectRatio) aspectRatio = Rational::make(1, 1);
 
-  AVFilter *buffersrc  = avfilter_get_by_name("buffer");
+  AVFilter *buffersrc = avfilter_get_by_name("buffer");
   if (!buffersrc)
-      VS_THROW(HumbleRuntimeError::make("could not find audio buffer source; bad FFmpeg build?"));
+  VS_THROW(
+      HumbleRuntimeError::make(
+          "could not find video buffer source; bad FFmpeg build?"));
   AVFilterContext* ctx = 0;
 
   char args[512];
   snprintf(args, sizeof(args),
-          "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
-          width, height, format,
-          timeBase->getNumerator(), timeBase->getDenominator(),
-          aspectRatio->getNumerator(), aspectRatio->getDenominator());
+      "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d", width,
+      height, format, timeBase->getNumerator(), timeBase->getDenominator(),
+      aspectRatio->getNumerator(), aspectRatio->getDenominator());
 
-  int e = avfilter_graph_create_filter(&ctx, buffersrc, "in",
-                                     args, 0, mCtx);
+  int e = avfilter_graph_create_filter(&ctx, buffersrc, name, args, 0, mCtx);
   FfmpegException::check(e, "could not add FilterPictureSource ");
 
   RefPointer<FilterPictureSource> s = FilterPictureSource::make(this, ctx);
@@ -147,10 +142,54 @@ FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
 FilterAudioSink*
 FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
     AudioChannel::Layout channelLayout, AudioFormat::Type format) {
-  (void) sampleRate;
-  (void) channelLayout;
-  (void) format;
+  if (!name || !*name) {
+    VS_THROW(HumbleInvalidArgument("no name specified"));
+  }
+  if (sampleRate <= 0) {
+    VS_THROW(HumbleInvalidArgument("no sample rate specified"));
+  }
+  if (channelLayout == AudioChannel::CH_LAYOUT_UNKNOWN) {
+    VS_THROW(HumbleInvalidArgument("no channel layout specified"));
+  }
+  if (format == AudioFormat::SAMPLE_FMT_NONE) {
+    VS_THROW(HumbleInvalidArgument("no sample format specified"));
+  }
+
+  AVFilter *abuffersink = avfilter_get_by_name("abuffersink");
+  if (!abuffersink)
+  VS_THROW(
+      HumbleRuntimeError::make(
+          "could not find audio buffer sink; bad FFmpeg build?"));
+  const int sampleRates[] =
+    { sampleRate, -1 };
+  const int64_t channels[] =
+    { channelLayout, -1 };
+  const enum AVSampleFormat sampleFormats[] =
+    { (enum AVSampleFormat) format, (enum AVSampleFormat)-1 };
+
   AVFilterContext* ctx = 0;
+  int e = avfilter_graph_create_filter(&ctx, abuffersink, name, 0, 0, mCtx);
+  FfmpegException::check(e, "could not add FilterAudioSink ");
+
+  try {
+    e =
+        av_opt_set_int_list(ctx, "sample_fmts", sampleFormats, -1, AV_OPT_SEARCH_CHILDREN);
+    FfmpegException::check(e, "could not set audio formats ");
+
+    e =
+        av_opt_set_int_list(ctx, "channel_layouts", channels, -1, AV_OPT_SEARCH_CHILDREN);
+    FfmpegException::check(e, "could not set audio channel layouts ");
+
+    e =
+        av_opt_set_int_list(ctx, "sample_rates", sampleRates, -1, AV_OPT_SEARCH_CHILDREN);
+    FfmpegException::check(e, "could not set audio sample rates ");
+  } catch (std::exception & e0) {
+    // if we throw an exception, free the context so we don't leak.
+    avfilter_free(ctx);
+    ctx = 0;
+    throw e0;
+  }
+
   RefPointer<FilterAudioSink> s = FilterAudioSink::make(this, ctx);
   // now, add it to the graph sources
   this->addSink(s.value(), name);
@@ -172,8 +211,7 @@ FilterGraph::~FilterGraph() {
 }
 
 FilterGraph*
-FilterGraph::make()
-{
+FilterGraph::make() {
   Global::init();
   RefPointer<FilterGraph> r;
   r.reset(new FilterGraph(), true);
@@ -285,24 +323,24 @@ FilterGraph::loadGraph(const char* f) {
     // let's iterate through all our inputs, then outputs
     std::map<std::string, RefPointer<Configurable> >::iterator iter;
 
-    for(iter = mSources.begin(); iter != mSources.end(); ++iter) {
+    for (iter = mSources.begin(); iter != mSources.end(); ++iter) {
       AVFilterInOut* io = avfilter_inout_alloc();
       if (!io)
-        VS_THROW(HumbleBadAlloc());
+      VS_THROW(HumbleBadAlloc());
       // do not force a ref count increment since the iter will remain throughout
-      FilterSource* source = (FilterSource*)((*iter).second.value());
+      FilterSource* source = (FilterSource*) ((*iter).second.value());
       io->name = av_strdup(source->getName());
       io->filter_ctx = source->getFilterCtx();
       io->pad_idx = 0;
       io->next = inputs;
       inputs = io;
     }
-    for(iter = mSinks.begin(); iter != mSinks.end(); ++iter) {
+    for (iter = mSinks.begin(); iter != mSinks.end(); ++iter) {
       AVFilterInOut* io = avfilter_inout_alloc();
       if (!io)
-        VS_THROW(HumbleBadAlloc());
+      VS_THROW(HumbleBadAlloc());
       // do not force a ref count increment since the iter will remain throughout
-      FilterSink* sink = (FilterSink*)((*iter).second.value());
+      FilterSink* sink = (FilterSink*) ((*iter).second.value());
       io->name = av_strdup(sink->getName());
       io->filter_ctx = sink->getFilterCtx();
       io->pad_idx = 0;
@@ -315,20 +353,20 @@ FilterGraph::loadGraph(const char* f) {
 
     // now, check to make sure that the number of inputs matches the number of outputs
     // and if not, throw an exception.
-    size_t numUnclosedInputs=0;
-    for(const AVFilterInOut* i = inputs; i; i = i->next)
+    size_t numUnclosedInputs = 0;
+    for (const AVFilterInOut* i = inputs; i; i = i->next)
       ++numUnclosedInputs;
     size_t numUnclosedOutputs = 0;
-    for(const AVFilterInOut* i = outputs; i; i = i->next)
+    for (const AVFilterInOut* i = outputs; i; i = i->next)
       ++numUnclosedOutputs;
-    if (numUnclosedInputs > mSources.size() || numUnclosedOutputs > mSinks.size()) {
+    if (numUnclosedInputs > mSources.size()
+        || numUnclosedOutputs > mSinks.size()) {
       filterDebugString = getHumanReadableString();
-      VS_THROW(HumbleRuntimeError::make("filterDescription had unclosed Sinks or Sources. Sinks: [expected=%d,actual=%d]; Sources: [expected=%d, actual=%d]; graphStr=%s;",
-          mSinks.size(),
-          numUnclosedInputs,
-          mSources.size(),
-          numUnclosedOutputs,
-          filterDebugString));
+      VS_THROW(
+          HumbleRuntimeError::make(
+              "filterDescription had unclosed Sinks or Sources. Sinks: [expected=%d,actual=%d]; Sources: [expected=%d, actual=%d]; graphStr=%s;",
+              mSinks.size(), numUnclosedInputs, mSources.size(),
+              numUnclosedOutputs, filterDebugString));
     }
   } catch (std::exception & e) {
     // free any memory before rethrowing
