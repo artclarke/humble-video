@@ -92,10 +92,11 @@ FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
   int e = avfilter_graph_create_filter(&ctx, abuffersrc, name, args, 0, mCtx);
   FfmpegException::check(e, "could not add FilterAudioSource ");
 
-  RefPointer<FilterAudioSource> s = FilterAudioSource::make(this, ctx);
   // now, add it to the graph sources
-  this->addSource(s.value(), name);
-  return s.get();
+  this->addSource(ctx, name);
+
+  // and return a made object (note: we must not ref-count this ourselves)
+  return FilterAudioSource::make(this, ctx);
 }
 
 FilterPictureSource*
@@ -143,10 +144,10 @@ FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
   int e = avfilter_graph_create_filter(&ctx, buffersrc, name, args, 0, mCtx);
   FfmpegException::check(e, "could not add FilterPictureSource ");
 
-  RefPointer<FilterPictureSource> s = FilterPictureSource::make(this, ctx);
   // now, add it to the graph sources
-  this->addSource(s.value(), name);
-  return s.get();
+  this->addSource(ctx, name);
+
+  return FilterPictureSource::make(this, ctx);
 }
 
 FilterAudioSink*
@@ -204,10 +205,10 @@ FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
     throw e0;
   }
 
-  RefPointer<FilterAudioSink> s = FilterAudioSink::make(this, ctx);
   // now, add it to the graph sources
-  this->addSink(s.value(), name);
-  return s.get();
+  this->addSink(ctx, name);
+
+  return FilterAudioSink::make(this, ctx);
 }
 
 FilterPictureSink*
@@ -249,9 +250,8 @@ FilterGraph::addPictureSink(const char* name, int32_t width, int32_t height,
     ctx = 0;
     throw e0;
   }
-  RefPointer<FilterPictureSink> s = FilterPictureSink::make(this, ctx);
-  this->addSink(s.value(), name);
-  return s.get();
+  this->addSink(ctx, name);
+  return FilterPictureSink::make(this, ctx);
 }
 
 FilterGraph*
@@ -263,10 +263,7 @@ FilterGraph::make() {
 }
 
 void
-FilterGraph::addSource(FilterSource* aSource, const char* name) {
-  RefPointer<Configurable> source;
-  source.reset((Configurable*) aSource, true);
-
+FilterGraph::addSource(AVFilterContext* source, const char* name) {
   if (!source) {
     VS_THROW(HumbleInvalidArgument("no source specified"));
   }
@@ -288,26 +285,35 @@ FilterGraph::getSource(int32_t i) {
   if (i < 0 || (size_t) i >= mSourceNames.size())
   VS_THROW(HumbleInvalidArgument("index out of range"));
 
-  std::string name = mSourceNames[i];
-  return (FilterSource*) (mSources[name].get());
+  return getSource(mSourceNames[i].c_str());
 }
 
 FilterSource*
 FilterGraph::getSource(const char* name) {
-  RefPointer<Configurable> r;
+  AVFilterContext* sourceCtx = 0;
   try {
-    r = mSources[name];
+    sourceCtx = mSources[name];
   } catch (std::out_of_range & e) {
     VS_THROW(PropertyNotFoundException(name));
   }
-  return (FilterSource*) (r.get());
+  AVMediaType type = avfilter_pad_get_type(sourceCtx->output_pads, 0);
+  RefPointer<FilterSource> source;
+  switch(type) {
+  case AVMEDIA_TYPE_AUDIO:
+    source = FilterAudioSource::make(this, sourceCtx);
+    break;
+  case AVMEDIA_TYPE_VIDEO:
+    source = FilterPictureSource::make(this, sourceCtx);
+    break;
+  default:
+    VS_THROW(HumbleRuntimeError::make("Unknown media type of FilterSource: %s", sourceCtx->name));
+    break;
+  }
+  return source.get();
 }
 
 void
-FilterGraph::addSink(FilterSink* aSink, const char*name) {
-  RefPointer<Configurable> sink;
-  sink.reset((Configurable*) aSink, true);
-
+FilterGraph::addSink(AVFilterContext* sink, const char*name) {
   if (!sink) {
     VS_THROW(HumbleInvalidArgument("no sink specified"));
   }
@@ -330,18 +336,31 @@ FilterGraph::getSink(int32_t i) {
   VS_THROW(HumbleInvalidArgument("index out of range"));
 
   std::string name = mSinkNames[i];
-  return (FilterSink*) (mSinks[name].get());
+  return getSink(name.c_str());
 }
 
 FilterSink*
 FilterGraph::getSink(const char*name) {
-  RefPointer<Configurable> r;
+  AVFilterContext* sinkCtx;
   try {
-    r = mSinks[name];
+    sinkCtx = mSinks[name];
   } catch (std::out_of_range & e) {
     VS_THROW(PropertyNotFoundException(name));
   }
-  return (FilterSink*) (r.get());
+  AVMediaType type = avfilter_pad_get_type(sinkCtx->input_pads, 0);
+  RefPointer<FilterSink> sink;
+  switch(type) {
+  case AVMEDIA_TYPE_AUDIO:
+    sink = FilterAudioSink::make(this, sinkCtx);
+    break;
+  case AVMEDIA_TYPE_VIDEO:
+    sink = FilterPictureSink::make(this, sinkCtx);
+    break;
+  default:
+    VS_THROW(HumbleRuntimeError::make("Unknown media type of FilterSink: %s", sinkCtx->name));
+    break;
+  }
+  return sink.get();
 }
 
 void
@@ -359,16 +378,16 @@ FilterGraph::loadGraph(const char* f) {
   try {
 
     // let's iterate through all our inputs, then outputs
-    std::map<std::string, RefPointer<Configurable> >::iterator iter;
+    std::map<std::string, AVFilterContext* >::iterator iter;
 
     for (iter = mSources.begin(); iter != mSources.end(); ++iter) {
       AVFilterInOut* io = avfilter_inout_alloc();
       if (!io)
       VS_THROW(HumbleBadAlloc());
       // do not force a ref count increment since the iter will remain throughout
-      FilterSource* source = (FilterSource*) ((*iter).second.value());
-      io->name = av_strdup(source->getName());
-      io->filter_ctx = source->getFilterCtx();
+      AVFilterContext* source = iter->second;
+      io->name = av_strdup(source->name);
+      io->filter_ctx = source;
       io->pad_idx = 0;
       io->next = inputs;
       inputs = io;
@@ -378,9 +397,9 @@ FilterGraph::loadGraph(const char* f) {
       if (!io)
       VS_THROW(HumbleBadAlloc());
       // do not force a ref count increment since the iter will remain throughout
-      FilterSink* sink = (FilterSink*) ((*iter).second.value());
-      io->name = av_strdup(sink->getName());
-      io->filter_ctx = sink->getFilterCtx();
+      AVFilterContext* sink = iter->second;
+      io->name = av_strdup(sink->name);
+      io->filter_ctx = sink;
       io->pad_idx = 0;
       io->next = inputs;
       inputs = io;

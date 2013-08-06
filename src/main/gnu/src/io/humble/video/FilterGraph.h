@@ -160,8 +160,8 @@ public:
        PixelFormat::Type format);
 
 protected:
-   virtual void addSource(FilterSource* source, const char* name);
-   virtual void addSink(FilterSink* sink, const char* name);
+   virtual void addSource(AVFilterContext* source, const char* name);
+   virtual void addSink(AVFilterContext* sink, const char* name);
 public:
 
   /**
@@ -297,9 +297,9 @@ protected:
 private:
   AVFilterGraph* mCtx;
   State mState;
-  std::map<std::string, io::humble::ferry::RefPointer<Configurable> > mSources;
+  std::map<std::string, AVFilterContext* > mSources;
   std::vector<std::string> mSourceNames;
-  std::map<std::string, io::humble::ferry::RefPointer<Configurable> > mSinks;
+  std::map<std::string, AVFilterContext* > mSinks;
   std::vector<std::string> mSinkNames;
 };
 
