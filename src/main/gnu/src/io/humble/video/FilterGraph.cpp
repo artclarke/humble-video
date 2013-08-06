@@ -36,6 +36,11 @@ using namespace io::humble::ferry;
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
+#define VS_FILTER_AUDIO_SINK "abuffersink"
+#define VS_FILTER_AUDIO_SOURCE "abuffer"
+#define VS_FILTER_VIDEO_SINK "buffersink"
+#define VS_FILTER_VIDEO_SOURCE "buffer"
+
 namespace io {
 namespace humble {
 namespace video {
@@ -76,11 +81,11 @@ FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
   if (!timeBase) timeBase = Rational::make(1, sampleRate);
 
   // get a buffer source
-  AVFilter *abuffersrc = avfilter_get_by_name("abuffer");
+  AVFilter *abuffersrc = avfilter_get_by_name(VS_FILTER_AUDIO_SOURCE);
   if (!abuffersrc)
-  VS_THROW(
-      HumbleRuntimeError::make(
-          "could not find audio buffer source; bad FFmpeg build?"));
+    VS_THROW(
+        HumbleRuntimeError::make(
+            "could not find audio buffer source; bad FFmpeg build?"));
   AVFilterContext* ctx = 0;
   char args[512] = "";
 
@@ -96,7 +101,7 @@ FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
   this->addSource(ctx);
 
   // and return a made object (note: we must not ref-count this ourselves)
-  return FilterAudioSource::make(this, ctx);
+  return dynamic_cast<FilterAudioSource*>(getFilter(ctx));
 }
 
 FilterPictureSource*
@@ -128,11 +133,11 @@ FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
   aspectRatio.reset(aPixelAspectRatio, true);
   if (!aspectRatio) aspectRatio = Rational::make(1, 1);
 
-  AVFilter *buffersrc = avfilter_get_by_name("buffer");
+  AVFilter *buffersrc = avfilter_get_by_name(VS_FILTER_VIDEO_SOURCE);
   if (!buffersrc)
-  VS_THROW(
-      HumbleRuntimeError::make(
-          "could not find video buffer source; bad FFmpeg build?"));
+    VS_THROW(
+        HumbleRuntimeError::make(
+            "could not find video buffer source; bad FFmpeg build?"));
   AVFilterContext* ctx = 0;
 
   char args[512];
@@ -147,7 +152,7 @@ FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
   // now, add it to the graph sources
   this->addSource(ctx);
 
-  return FilterPictureSource::make(this, ctx);
+  return dynamic_cast<FilterPictureSource*>(getFilter(ctx));
 }
 
 FilterAudioSink*
@@ -170,17 +175,17 @@ FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
     VS_THROW(HumbleInvalidArgument("no sample format specified"));
   }
 
-  AVFilter *abuffersink = avfilter_get_by_name("abuffersink");
+  AVFilter *abuffersink = avfilter_get_by_name(VS_FILTER_AUDIO_SINK);
   if (!abuffersink)
-  VS_THROW(
-      HumbleRuntimeError::make(
-          "could not find audio buffer sink; bad FFmpeg build?"));
+    VS_THROW(
+        HumbleRuntimeError::make(
+            "could not find audio buffer sink; bad FFmpeg build?"));
   const int sampleRates[] =
-    { sampleRate, -1 };
+      { sampleRate, -1 };
   const int64_t channels[] =
-    { channelLayout, -1 };
+      { channelLayout, -1 };
   const enum AVSampleFormat sampleFormats[] =
-    { (enum AVSampleFormat) format, (enum AVSampleFormat) -1 };
+      { (enum AVSampleFormat) format, (enum AVSampleFormat) -1 };
 
   AVFilterContext* ctx = 0;
   int e = avfilter_graph_create_filter(&ctx, abuffersink, name, 0, 0, mCtx);
@@ -208,7 +213,7 @@ FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
   // now, add it to the graph sources
   this->addSink(ctx);
 
-  return FilterAudioSink::make(this, ctx);
+  return dynamic_cast<FilterAudioSink*>(getFilter(ctx));
 }
 
 FilterPictureSink*
@@ -229,7 +234,7 @@ FilterGraph::addPictureSink(const char* name, int32_t width, int32_t height,
   if (format == PixelFormat::PIX_FMT_NONE) {
     VS_THROW(HumbleInvalidArgument("no sample format specified"));
   }
-  AVFilter *buffersink = avfilter_get_by_name("buffersink");
+  AVFilter *buffersink = avfilter_get_by_name(VS_FILTER_VIDEO_SINK);
   if (!buffersink) {
     VS_THROW(
         HumbleRuntimeError::make(
@@ -251,7 +256,7 @@ FilterGraph::addPictureSink(const char* name, int32_t width, int32_t height,
     throw e0;
   }
   this->addSink(ctx);
-  return FilterPictureSink::make(this, ctx);
+  return dynamic_cast<FilterPictureSink*>(getFilter(ctx));
 }
 
 FilterGraph*
@@ -278,23 +283,9 @@ FilterGraph::getNumSources() {
 FilterSource*
 FilterGraph::getSource(int32_t i) {
   if (i < 0 || (size_t) i >= mSources.size())
-  VS_THROW(HumbleInvalidArgument("index out of range"));
+    VS_THROW(HumbleInvalidArgument("index out of range"));
 
-  AVFilterContext* sourceCtx = mSources[i];
-  AVMediaType type = avfilter_pad_get_type(sourceCtx->output_pads, 0);
-  RefPointer<FilterSource> source;
-  switch(type) {
-  case AVMEDIA_TYPE_AUDIO:
-    source = FilterAudioSource::make(this, sourceCtx);
-    break;
-  case AVMEDIA_TYPE_VIDEO:
-    source = FilterPictureSource::make(this, sourceCtx);
-    break;
-  default:
-    VS_THROW(HumbleRuntimeError::make("Unknown media type of FilterSource: %s", sourceCtx->name));
-    break;
-  }
-  return source.get();
+  return dynamic_cast<FilterSource*>(getFilter(mSources[i]));
 }
 
 FilterSource*
@@ -332,22 +323,7 @@ FilterGraph::getSink(int32_t i) {
   if (i < 0 || (size_t) i >= mSinks.size()) {
     VS_THROW(HumbleInvalidArgument("index out of range"));
   }
-  AVFilterContext *sinkCtx = mSinks[i];
-
-  AVMediaType type = avfilter_pad_get_type(sinkCtx->input_pads, 0);
-  RefPointer<FilterSink> sink;
-  switch(type) {
-  case AVMEDIA_TYPE_AUDIO:
-    sink = FilterAudioSink::make(this, sinkCtx);
-    break;
-  case AVMEDIA_TYPE_VIDEO:
-    sink = FilterPictureSink::make(this, sinkCtx);
-    break;
-  default:
-    VS_THROW(HumbleRuntimeError::make("Unknown media type of FilterSink: %s", sinkCtx->name));
-    break;
-  }
-  return sink.get();
+  return dynamic_cast<FilterSink*>(getFilter(mSinks[i]));
 }
 
 FilterSink*
@@ -431,7 +407,7 @@ FilterGraph::fillAVFilterInOut(std::vector<AVFilterContext*>& list, AVFilterInOu
     *inOut = io;
   }
 }
-void
+Filter*
 FilterGraph::addFilter(FilterType* type, const char* name) {
   if (mState != STATE_INITED) {
     VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
@@ -441,8 +417,9 @@ FilterGraph::addFilter(FilterType* type, const char* name) {
   }
   AVFilterContext* fc = avfilter_graph_alloc_filter(mCtx, type->getCtx(), name);
   if (!fc)
-  VS_THROW(
-      HumbleRuntimeError::make("was not able to add filter named: %s", name));
+    VS_THROW(
+        HumbleRuntimeError::make("was not able to add filter named: %s", name));
+  return getFilter(name);
 }
 
 Filter*
@@ -452,17 +429,38 @@ FilterGraph::getFilter(const char* name) {
   }
 
   AVFilterContext* fc = avfilter_graph_get_filter(mCtx, (char*) name);
-  if (!fc)
-  VS_THROW(PropertyNotFoundException(name));
+  if (!fc) {
+    VS_THROW(PropertyNotFoundException(name));
+  }
 
-//  return Filter::make(this, fc);
-  return 0;
+  return getFilter(fc);
+}
+Filter*
+FilterGraph::getFilter(AVFilterContext* ctx)
+{
+  // get the type
+  const AVFilter* filter = ctx->filter;
+  const char* filter_name = filter->name;
+  if (strcmp(filter_name, VS_FILTER_AUDIO_SINK)==0) {
+    return FilterAudioSink::make(this, ctx);
+  }
+  else if (strcmp(filter_name, VS_FILTER_AUDIO_SOURCE)==0) {
+    return FilterAudioSource::make(this, ctx);
+  }
+  else if (strcmp(filter_name, VS_FILTER_VIDEO_SINK)==0) {
+    return FilterPictureSink::make(this, ctx);
+  }
+  else if (strcmp(filter_name, VS_FILTER_VIDEO_SOURCE)==0) {
+    return FilterPictureSource::make(this, ctx);
+  }
+  else
+    return Filter::make(this, ctx);
 }
 
 void
 FilterGraph::setAutoConvert(AutoConvertFlag value) {
   if (mState != STATE_INITED)
-  VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
+    VS_THROW(HumbleRuntimeError("Attempt to set property on opened graph"));
   mCtx->disable_auto_convert = value;
 }
 
@@ -485,9 +483,9 @@ char*
 FilterGraph::sendCommand(const char* target, const char* command,
     const char* arguments, int flags) {
   if (!target || !*target)
-  VS_THROW(HumbleInvalidArgument("target must not be empty"));
+    VS_THROW(HumbleInvalidArgument("target must not be empty"));
   if (!command || !*command)
-  VS_THROW(HumbleInvalidArgument("command must not be empty"));
+    VS_THROW(HumbleInvalidArgument("command must not be empty"));
   const int32_t responseLen = 2048;
   char response[responseLen];
   int e = avfilter_graph_send_command(mCtx, target, command, arguments,
@@ -502,9 +500,9 @@ void
 FilterGraph::queueCommand(const char* target, const char* command,
     const char* arguments, int flags, double ts) {
   if (!target || !*target)
-  VS_THROW(HumbleInvalidArgument("target must not be empty"));
+    VS_THROW(HumbleInvalidArgument("target must not be empty"));
   if (!command || !*command)
-  VS_THROW(HumbleInvalidArgument("command must not be empty"));
+    VS_THROW(HumbleInvalidArgument("command must not be empty"));
   int e = avfilter_graph_queue_command(mCtx, target, command, arguments, flags,
       ts);
   FfmpegException::check(e,

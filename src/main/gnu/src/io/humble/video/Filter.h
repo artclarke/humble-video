@@ -124,6 +124,12 @@ public:
   virtual FilterLink*
   getOutputLink(int32_t index);
 
+  /**
+   * @return the graph this filter is part of.
+   */
+  virtual FilterGraph*
+  getGraph() { return mGraph.get(); }
+
 #ifndef SWIG
   static Filter*
   make(FilterGraph* graph, AVFilterContext* mCtx);

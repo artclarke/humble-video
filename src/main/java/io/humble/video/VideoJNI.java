@@ -1322,7 +1322,7 @@ class VideoJNI {
   public final static native int FilterGraph_AUTO_CONVERT_ALL_get();
   public final static native int FilterGraph_AUTO_CONVERT_NONE_get();
   public final static native long FilterGraph_make();
-  public final static native void FilterGraph_addFilter(long jarg1, FilterGraph jarg1_, long jarg2, FilterType jarg2_, String jarg3);
+  public final static native long FilterGraph_addFilter(long jarg1, FilterGraph jarg1_, long jarg2, FilterType jarg2_, String jarg3);
   public final static native long FilterGraph_getFilter(long jarg1, FilterGraph jarg1_, String jarg2);
   public final static native long FilterGraph_addAudioSource(long jarg1, FilterGraph jarg1_, String jarg2, int jarg3, int jarg4, int jarg5, long jarg6, Rational jarg6_);
   public final static native long FilterGraph_addPictureSource(long jarg1, FilterGraph jarg1_, String jarg2, int jarg3, int jarg4, int jarg5, long jarg6, Rational jarg6_, long jarg7, Rational jarg7_);
@@ -1353,6 +1353,7 @@ class VideoJNI {
   public final static native String Filter_getOutputName(long jarg1, Filter jarg1_, int jarg2);
   public final static native int Filter_getOutputType(long jarg1, Filter jarg1_, int jarg2);
   public final static native long Filter_getOutputLink(long jarg1, Filter jarg1_, int jarg2);
+  public final static native long Filter_getGraph(long jarg1, Filter jarg1_);
   public final static native long FilterLink_getFilterGraph(long jarg1, FilterLink jarg1_);
   public final static native long FilterLink_getInputFilter(long jarg1, FilterLink jarg1_);
   public final static native String FilterLink_getInputPadName(long jarg1, FilterLink jarg1_);

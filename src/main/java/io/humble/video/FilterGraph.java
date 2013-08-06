@@ -119,9 +119,11 @@ public class FilterGraph extends Configurable {
 
 /**
  * Add a filter with the given name to the graph.  
+ * @return	An object that refers to the new filter.  
  */
-  public void addFilter(FilterType type, String name) {
-    VideoJNI.FilterGraph_addFilter(swigCPtr, this, FilterType.getCPtr(type), type, name);
+  public Filter addFilter(FilterType type, String name) {
+    long cPtr = VideoJNI.FilterGraph_addFilter(swigCPtr, this, FilterType.getCPtr(type), type, name);
+    return (cPtr == 0) ? null : new Filter(cPtr, false);
   }
 
 /**

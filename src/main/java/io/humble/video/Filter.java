@@ -194,6 +194,14 @@ public class Filter extends Configurable {
     return (cPtr == 0) ? null : new FilterLink(cPtr, false);
   }
 
+/**
+ * @return	the graph this filter is part of.  
+ */
+  public FilterGraph getGraph() {
+    long cPtr = VideoJNI.Filter_getGraph(swigCPtr, this);
+    return (cPtr == 0) ? null : new FilterGraph(cPtr, false);
+  }
+
   public enum CommandFlag {
   /**
    * Flags that can be passed when processing commands.

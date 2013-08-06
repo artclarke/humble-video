@@ -78,8 +78,9 @@ public:
 
   /**
    * Add a filter with the given name to the graph.
+   * @return An object that refers to the new filter.
    */
-  virtual void addFilter(FilterType* type, const char* name);
+  virtual Filter* addFilter(FilterType* type, const char* name);
 
   /**
    * @return the filter with the given name, or null if not found.
@@ -295,6 +296,7 @@ protected:
 
 private:
   static void fillAVFilterInOut(std::vector<AVFilterContext*>& list, AVFilterInOut** inOut);
+  virtual Filter* getFilter(AVFilterContext*);
   AVFilterGraph* mCtx;
   State mState;
   std::vector<AVFilterContext*> mSources;
