@@ -50,26 +50,26 @@ void
 FilterGraphTest::testAddIO() {
   RefPointer<FilterGraph> graph = FilterGraph::make();
   TS_ASSERT(graph);
-//  int32_t sampleRate = 22050;
-//  AudioChannel::Layout layout = AudioChannel::CH_LAYOUT_STEREO;
-//  AudioFormat::Type sampleFormat = AudioFormat::SAMPLE_FMT_S32P;
+  int32_t sampleRate = 22050;
+  AudioChannel::Layout layout = AudioChannel::CH_LAYOUT_STEREO;
+  AudioFormat::Type sampleFormat = AudioFormat::SAMPLE_FMT_S32P;
   int32_t width = 1024;
   int32_t height = 768;
   PixelFormat::Type pixelFormat = PixelFormat::PIX_FMT_YUV420P;
 
-//  RefPointer<FilterAudioSource> asource = graph->addAudioSource("ain",
-//      sampleRate, layout, sampleFormat, 0);
-//  TS_ASSERT(asource);
-  RefPointer<FilterPictureSource> psource = graph->addPictureSource("in",
+  RefPointer<FilterAudioSource> asource = graph->addAudioSource("ain",
+      sampleRate, layout, sampleFormat, 0);
+  TS_ASSERT(asource);
+  RefPointer<FilterPictureSource> psource = graph->addPictureSource("pin",
       width, height, pixelFormat, 0, 0);
   TS_ASSERT(psource);
-//  RefPointer<FilterAudioSink> asink = graph->addAudioSink("aout",
-//      sampleRate, layout, sampleFormat);
-//  TS_ASSERT(asink);
-  RefPointer<FilterPictureSink> psink = graph->addPictureSink("out",
+  RefPointer<FilterAudioSink> asink = graph->addAudioSink("aout",
+      sampleRate, layout, sampleFormat);
+  TS_ASSERT(asink);
+  RefPointer<FilterPictureSink> psink = graph->addPictureSink("pout",
       width, height, PixelFormat::PIX_FMT_GRAY8);
   TS_ASSERT(psink);
 
-  graph->open("scale=78:24");
+  graph->open("[pin]scale=78:24[pout];[ain]atempo=1.2[aout]");
 
 }
