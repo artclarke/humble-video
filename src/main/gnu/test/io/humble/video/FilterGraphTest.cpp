@@ -24,6 +24,8 @@
  */
 
 #include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/LoggerStack.h>
 #include <io/humble/video/FilterGraph.h>
 #include <io/humble/video/FilterAudioSource.h>
 #include <io/humble/video/FilterAudioSink.h>
@@ -33,6 +35,8 @@
 
 using namespace io::humble::ferry;
 using namespace io::humble::video;
+
+VS_LOG_SETUP(io.humble.video);
 
 FilterGraphTest::FilterGraphTest() {
 }
@@ -71,5 +75,12 @@ FilterGraphTest::testAddIO() {
   TS_ASSERT(psink);
 
   graph->open("[pin]scale=78:24[pout];[ain]atempo=1.2[aout]");
-
+  {
+    // get the string
+    char* s = graph->getDisplayString();
+    av_free(s);
+    LoggerStack stack;
+    stack.setGlobalLevel(Logger::LEVEL_DEBUG, false);
+    VS_LOG_DEBUG("\nGraph: %s\n", s);
+  }
 }
