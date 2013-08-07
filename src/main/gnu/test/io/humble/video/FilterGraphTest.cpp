@@ -114,7 +114,7 @@ FilterGraphTest::testFilterVideo() {
 
 //  TestData::Fixture* fixture = mFixtures.getFixture(
 //      "bigbuckbunny_h264_aac_5.1.mp4");
-  TestData::Fixture* fixture=mFixtures.getFixture("ucl_h264_aac.mp4");
+  TestData::Fixture* fixture = mFixtures.getFixture("ucl_h264_aac.mp4");
   TS_ASSERT(fixture);
   char filepath[2048];
   mFixtures.fillPath(fixture, filepath, sizeof(filepath));
@@ -168,9 +168,19 @@ FilterGraphTest::testFilterVideo() {
   RefPointer<FilterPictureSink> filterSink = graph->addPictureSink("out",
   // make the filter do the conversion for us.
       filterPicture->getFormat());
-  // and open our graph
-  graph->open(
-      "[in]scale=w=480:h=360[scaled];[scaled]split=4[0][1][2][3];[0]pad=iw*2:ih*2[a];[1]negate[b];[2]hflip[c];[3]edgedetect[d];[a][b]overlay=w[x];[x][c]overlay=0:h[y];[y][d]overlay=w:h");
+  // and open our graph. I have spit it into a nice chain so readers
+  // can see how [in] eventually becomes [out] by splitting into four
+  // streams, negating one, flipping another horizontally, edge-detecting a
+  // third, and then overlaying all the resulting streams back on each other.
+  graph->open("[in]scale=w=480:h=360[scaled];"
+      "[scaled]split=4[0][1][2][3];"
+      "[0]pad=iw*2:ih*2[a];"
+      "[1]negate[b];"
+      "[2]hflip[c];"
+      "[3]edgedetect[d];"
+      "[a][b]overlay=w[x];"
+      "[x][c]overlay=0:h[y];"
+      "[y][d]overlay=w:h[out]");
 
   {
     LoggerStack stack;
@@ -201,20 +211,139 @@ FilterGraphTest::testFilterVideo() {
         }
         byteOffset += bytesRead;
       } while (byteOffset < packet->getSize());
-      // now, handle the case where bytesRead is 0; we need to flush any
-      // cached packets
-      do {
-        decoder->decodeVideo(picture.value(), 0, 0);
-        if (picture->isComplete()) {
-          filterSource->addPicture(picture.value());
-          // now pull pictures
-          while (filterSink->getPicture(filterPicture.value()) >= 0)
-            writePicture("FilterGraphTest_testFilterVideo", &frameNo,
-                filterPicture.value());
-        }
-      } while (picture->isComplete());
-    }
 
+      if (getenv("VS_TEST_MEMCHECK") && frameNo > 10) {
+        VS_LOG_DEBUG("Cutting short when running under valgrind");
+        // short circuit if running under valgrind.
+        break;
+      }
+    }
+    // now, handle the case where bytesRead is 0; we need to flush any
+    // cached packets
+    do {
+      decoder->decodeVideo(picture.value(), 0, 0);
+      if (picture->isComplete()) {
+        filterSource->addPicture(picture.value());
+        // now pull pictures
+        while (filterSink->getPicture(filterPicture.value()) >= 0)
+          writePicture("FilterGraphTest_testFilterVideo", &frameNo,
+              filterPicture.value());
+      }
+    } while (picture->isComplete());
   }
   source->close();
+}
+
+void
+FilterGraphTest::writeAudio(FILE* output, MediaAudio* audio)
+{
+  RefPointer<Buffer> buf;
+
+  // we'll just write out the first channel.
+  buf = audio->getData(0);
+  size_t size = buf->getBufferSize();
+  const void* data = buf->getBytes(0, size);
+  fwrite(data, 1, size, output);
+}
+
+void
+FilterGraphTest::testFilterAudio() {
+  //  TS_SKIP("Not yet implemented");
+
+    TestData::Fixture* fixture=mFixtures.getFixture("testfile.mp3");
+    TS_ASSERT(fixture);
+    char filepath[2048];
+    mFixtures.fillPath(fixture, filepath, sizeof(filepath));
+
+    RefPointer<Source> source = Source::make();
+
+    source->open(filepath, 0, false, true, 0, 0);
+
+    int32_t numStreams = source->getNumStreams();
+    TS_ASSERT_EQUALS(fixture->num_streams, numStreams);
+
+    int32_t streamToDecode = -1;
+    RefPointer<Decoder> decoder;
+    // find first video stream
+    for (int i = 0; i < numStreams; i++) {
+      RefPointer<SourceStream> stream = source->getSourceStream(i);
+      TS_ASSERT(stream);
+      decoder = stream->getDecoder();
+      TS_ASSERT(decoder);
+      if (decoder->getCodecType() == MediaDescriptor::MEDIA_AUDIO) {
+        streamToDecode = i;
+        break;
+      }
+    }
+    TS_ASSERT(streamToDecode >= 0);
+
+    FILE* output = fopen("GraphTestTest_testFilterAudio.au", "wb");
+    TS_ASSERT(output);
+
+    decoder->open(0, 0);
+
+    // now, let's start a decoding loop.
+    RefPointer<MediaPacket> packet = MediaPacket::make();
+
+    // make audio to read into
+    RefPointer<MediaAudio> audio = MediaAudio::make(
+        decoder->getFrameSize(),
+        decoder->getSampleRate(),
+        decoder->getChannels(),
+        decoder->getChannelLayout(),
+        decoder->getSampleFormat()
+    );
+
+    RefPointer<MediaAudio> filteredAudio = MediaAudio::make(audio.value(), true);
+
+    RefPointer<FilterGraph> graph = FilterGraph::make();
+    RefPointer<FilterAudioSource> fsource = graph->addAudioSource("in",
+        audio->getSampleRate(),
+        audio->getChannelLayout(),
+        audio->getFormat(),
+        0);
+    RefPointer<FilterAudioSink> fsink = graph->addAudioSink("out",
+        filteredAudio->getSampleRate(),
+        filteredAudio->getChannelLayout(),
+        filteredAudio->getFormat());
+    graph->open("[in]aphaser=decay=.99:delay=5[out]");
+
+    int32_t numSamples = 0;
+    while(source->read(packet.value()) >= 0) {
+      // got a packet; now we try to decode it.
+      if (packet->getStreamIndex() == streamToDecode &&
+          packet->isComplete()) {
+        int32_t bytesRead = 0;
+        int32_t byteOffset=0;
+        do {
+          bytesRead = decoder->decodeAudio(audio.value(), packet.value(), byteOffset);
+          if (audio->isComplete()) {
+            numSamples += audio->getNumSamples();
+            fsource->addAudio(audio.value());
+            while(fsink->getAudio(filteredAudio.value()) >= 0)
+              writeAudio(output, filteredAudio.value());
+          }
+          byteOffset += bytesRead;
+        } while(byteOffset < packet->getSize());
+      }
+      if (getenv("VS_TEST_MEMCHECK") && numSamples > 22050) {
+        VS_LOG_DEBUG("Cutting short when running under valgrind");
+        // short circuit if running under valgrind.
+        break;
+      }
+
+    }
+    // now, handle the case where bytesRead is 0; we need to flush any
+    // cached packets
+    do {
+      decoder->decodeAudio(audio.value(), 0, 0);
+      if (audio->isComplete()) {
+        fsource->addAudio(audio.value());
+        while(fsink->getAudio(filteredAudio.value()) >= 0)
+          writeAudio(output, filteredAudio.value());
+      }
+    } while (audio->isComplete());
+
+    fclose(output);
+    source->close();
 }

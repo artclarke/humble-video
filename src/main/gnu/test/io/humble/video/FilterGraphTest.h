@@ -29,6 +29,7 @@
 #include <io/humble/testutils/TestUtils.h>
 #include "TestData.h"
 #include <io/humble/video/MediaPicture.h>
+#include <io/humble/video/MediaAudio.h>
 
 class FilterGraphTest : public CxxTest::TestSuite
 {
@@ -38,9 +39,11 @@ public:
   void testCreation();
   void testAddIO();
   void testFilterVideo();
+  void testFilterAudio();
 private:
 
   void writePicture(const char* prefix, int32_t* frameNo, io::humble::video::MediaPicture* picture);
+  void writeAudio(FILE* output, io::humble::video::MediaAudio* audio);
 
   TestData mFixtures;
 
