@@ -27,6 +27,7 @@
 #define FILTERSINK_H_
 
 #include <io/humble/video/FilterEndPoint.h>
+#include <io/humble/video/MediaRaw.h>
 
 namespace io {
 namespace humble {
@@ -38,6 +39,7 @@ namespace video {
 class FilterSink : public io::humble::video::FilterEndPoint
 {
 protected:
+  int32_t get(MediaRaw*);
   FilterSink(FilterGraph* graph, AVFilterContext* ctx);
   virtual
   ~FilterSink();

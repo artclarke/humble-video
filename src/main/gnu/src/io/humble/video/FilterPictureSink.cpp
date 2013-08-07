@@ -47,6 +47,11 @@ FilterPictureSink::make(FilterGraph* graph, AVFilterContext* ctx) {
   r.reset(new FilterPictureSink(graph, ctx), true);
   return r.get();
 }
+
+int32_t
+FilterPictureSink::getPicture(MediaPicture* picture) {
+  return FilterSink::get(picture);
+}
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

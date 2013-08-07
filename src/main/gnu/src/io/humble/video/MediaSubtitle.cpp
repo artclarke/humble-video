@@ -24,6 +24,7 @@
  */
 
 #include "MediaSubtitle.h"
+#include "MediaSubtitleImpl.h"
 #include <io/humble/ferry/RefPointer.h>
 
 using namespace io::humble::ferry;

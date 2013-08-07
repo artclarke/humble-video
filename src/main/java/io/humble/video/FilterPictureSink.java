@@ -113,4 +113,12 @@ public class FilterPictureSink extends FilterSink {
   // JNIHelper.swg: End generated code
   
 
+/**
+ * @param	picture The picture to fill if possible.  
+ * @return	>=0 if a successful picture is fetched, or -1 for EOF.  
+ */
+  public int getPicture(MediaPicture picture) {
+    return VideoJNI.FilterPictureSink_getPicture(swigCPtr, this, MediaPicture.getCPtr(picture), picture);
+  }
+
 }

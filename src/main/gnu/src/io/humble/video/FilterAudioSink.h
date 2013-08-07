@@ -27,6 +27,7 @@
 #define FILTERAUDIOSINK_H_
 
 #include <io/humble/video/FilterSink.h>
+#include <io/humble/video/MediaAudio.h>
 
 namespace io {
 namespace humble {
@@ -38,6 +39,11 @@ namespace video {
 class FilterAudioSink : public io::humble::video::FilterSink
 {
 public:
+  /**
+   * @param audio The audio to fill if possible.
+   * @return >=0 if a successful audio is fetched, or -1 for EOF.
+   */
+  virtual int32_t getAudio(MediaAudio* audio);
 
 #ifndef SWIG
   static FilterAudioSink*

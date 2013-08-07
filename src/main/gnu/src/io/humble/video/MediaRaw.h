@@ -111,6 +111,12 @@ public:
     */
    virtual int64_t getBestEffortTimeStamp() { return av_frame_get_best_effort_timestamp(getCtx()); }
 
+   /**
+    * @param value is the object complete or not.
+    * @see #isComplete()
+    */
+   virtual void setComplete(bool value)=0;
+
 #ifndef SWIG
    virtual AVFrame *getCtx()=0;
 #endif

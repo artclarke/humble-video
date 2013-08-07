@@ -27,6 +27,7 @@
 #define FILTERPICTURESINK_H_
 
 #include <io/humble/video/FilterSink.h>
+#include <io/humble/video/MediaPicture.h>
 
 namespace io {
 namespace humble {
@@ -38,6 +39,11 @@ namespace video {
 class FilterPictureSink : public io::humble::video::FilterSink
 {
 public:
+  /**
+   * @param picture The picture to fill if possible.
+   * @return >=0 if a successful picture is fetched, or -1 for EOF.
+   */
+  virtual int32_t getPicture(MediaPicture* picture);
 #ifndef SWIG
   static FilterPictureSink* make(FilterGraph*, AVFilterContext*);
 #endif // ! SWIG

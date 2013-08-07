@@ -96,6 +96,8 @@ public:
     mCtx->pts = timestamp;
     mComplete = complete;
   }
+  virtual void setComplete(bool complete) { setComplete(complete, Global::NO_PTS); }
+
 #ifndef SWIG
    virtual AVFrame *getCtx() { return 0; }
 #endif

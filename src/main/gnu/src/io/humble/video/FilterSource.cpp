@@ -28,7 +28,6 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
 #include <io/humble/video/FilterGraph.h>
-#include <io/humble/video/MediaAudioImpl.h>
 
 using namespace io::humble::ferry;
 

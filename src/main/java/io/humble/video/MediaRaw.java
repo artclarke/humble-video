@@ -212,4 +212,12 @@ public class MediaRaw extends Media {
     return VideoJNI.MediaRaw_getBestEffortTimeStamp(swigCPtr, this);
   }
 
+/**
+ * @param	value is the object complete or not.  
+ * @see		#isComplete()  
+ */
+  public void setComplete(boolean value) {
+    VideoJNI.MediaRaw_setComplete(swigCPtr, this, value);
+  }
+
 }

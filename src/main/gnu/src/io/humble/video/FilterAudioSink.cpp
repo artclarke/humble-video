@@ -50,6 +50,11 @@ FilterAudioSink::make(FilterGraph* graph, AVFilterContext* ctx) {
   r.reset(new FilterAudioSink(graph, ctx), true);
   return r.get();
 }
+
+int32_t
+FilterAudioSink::getAudio(MediaAudio* audio) {
+  return FilterSink::get(audio);
+}
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

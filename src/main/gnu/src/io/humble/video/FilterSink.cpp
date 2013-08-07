@@ -24,6 +24,14 @@
  */
 
 #include "FilterSink.h"
+#include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/video/VideoExceptions.h>
+#include <io/humble/video/FilterGraph.h>
+
+using namespace io::humble::ferry;
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 namespace io {
 namespace humble {
@@ -36,6 +44,27 @@ FilterSink::FilterSink(FilterGraph* graph, AVFilterContext* ctx) :
 FilterSink::~FilterSink() {
 }
 
+int32_t
+FilterSink::get(MediaRaw* media)
+{
+  if (!media) {
+    VS_THROW(HumbleInvalidArgument("no media passed in"));
+  }
+  // 'empty' media before filling.
+  media->setComplete(false);
+  // ok, let's get to work
+  AVFilterContext* ctx = getFilterCtx();
+  AVFrame* frame = media->getCtx();
+
+  int e = av_buffersink_get_frame(ctx, frame);
+  if (e != AVERROR_EOF) {
+    FfmpegException::check(e, "could not add frame to audio source:");
+
+    // if we get here, we're complete
+    media->setComplete(true);
+  }
+  return e;
+}
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

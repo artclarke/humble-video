@@ -310,6 +310,7 @@ class VideoJNI {
   public final static native int MediaRaw_getPacketSize(long jarg1, MediaRaw jarg1_);
   public final static native long MediaRaw_getPacketDuration(long jarg1, MediaRaw jarg1_);
   public final static native long MediaRaw_getBestEffortTimeStamp(long jarg1, MediaRaw jarg1_);
+  public final static native void MediaRaw_setComplete(long jarg1, MediaRaw jarg1_, boolean jarg2);
   public final static native int MediaSampled_getNumSamples(long jarg1, MediaSampled jarg1_);
   public final static native int AudioChannel_CH_UNKNOWN_get();
   public final static native int AudioChannel_CH_FRONT_LEFT_get();
@@ -465,7 +466,8 @@ class VideoJNI {
   public final static native long MediaSubtitle_getPacketDuration(long jarg1, MediaSubtitle jarg1_);
   public final static native long MediaSubtitle_getBestEffortTimeStamp(long jarg1, MediaSubtitle jarg1_);
   public final static native boolean MediaSubtitle_isComplete(long jarg1, MediaSubtitle jarg1_);
-  public final static native void MediaSubtitle_setComplete(long jarg1, MediaSubtitle jarg1_, boolean jarg2, long jarg3);
+  public final static native void MediaSubtitle_setComplete__SWIG_0(long jarg1, MediaSubtitle jarg1_, boolean jarg2, long jarg3);
+  public final static native void MediaSubtitle_setComplete__SWIG_1(long jarg1, MediaSubtitle jarg1_, boolean jarg2);
   public final static native int MediaSubtitleRectangle_SUBTITLE_FLAG_FORCED_get();
   public final static native int MediaSubtitleRectangle_getX(long jarg1, MediaSubtitleRectangle jarg1_);
   public final static native int MediaSubtitleRectangle_getY(long jarg1, MediaSubtitleRectangle jarg1_);
@@ -1372,6 +1374,8 @@ class VideoJNI {
   public final static native void FilterLink_insertFilter(long jarg1, FilterLink jarg1_, long jarg2, Filter jarg2_, int jarg3, int jarg4);
   public final static native void FilterAudioSource_addAudio(long jarg1, FilterAudioSource jarg1_, long jarg2, MediaAudio jarg2_);
   public final static native void FilterPictureSource_addPicture(long jarg1, FilterPictureSource jarg1_, long jarg2, MediaPicture jarg2_);
+  public final static native int FilterAudioSink_getAudio(long jarg1, FilterAudioSink jarg1_, long jarg2, MediaAudio jarg2_);
+  public final static native int FilterPictureSink_getPicture(long jarg1, FilterPictureSink jarg1_, long jarg2, MediaPicture jarg2_);
   public final static native long SWIGPixelFormatUpcast(long jarg1);
   public final static native long SWIGPixelComponentDescriptorUpcast(long jarg1);
   public final static native long SWIGPixelFormatDescriptorUpcast(long jarg1);

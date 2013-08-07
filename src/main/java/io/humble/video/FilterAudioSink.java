@@ -113,4 +113,12 @@ public class FilterAudioSink extends FilterSink {
   // JNIHelper.swg: End generated code
   
 
+/**
+ * @param	audio The audio to fill if possible.  
+ * @return	>=0 if a successful audio is fetched, or -1 for EOF.  
+ */
+  public int getAudio(MediaAudio audio) {
+    return VideoJNI.FilterAudioSink_getAudio(swigCPtr, this, MediaAudio.getCPtr(audio), audio);
+  }
+
 }

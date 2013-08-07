@@ -41,6 +41,7 @@ protected:
   ~MediaSubtitleImpl();
   virtual bool isComplete() { return mComplete; }
   virtual AVFrame* getCtx() { return 0; }
+  virtual void setComplete(bool val) { mComplete = val; }
 private:
   bool mComplete;
   AVSubtitle* mCtx;

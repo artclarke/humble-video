@@ -188,7 +188,11 @@ public class MediaSubtitle extends MediaRaw {
  * Sets the subtitle to be complete.  
  */
   public void setComplete(boolean complete, long timestamp) {
-    VideoJNI.MediaSubtitle_setComplete(swigCPtr, this, complete, timestamp);
+    VideoJNI.MediaSubtitle_setComplete__SWIG_0(swigCPtr, this, complete, timestamp);
+  }
+
+  public void setComplete(boolean complete) {
+    VideoJNI.MediaSubtitle_setComplete__SWIG_1(swigCPtr, this, complete);
   }
 
   public enum Type {
