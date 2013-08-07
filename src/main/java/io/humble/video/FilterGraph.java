@@ -190,17 +190,14 @@ public class FilterGraph extends Configurable {
 /**
  * Add a {@link FilterPictureSink}.  
  * @param	name the name; must be unique in graph  
- * @param	width the width in pixels of {@link MediaPicture} objects 
- *		 that will be added to this sink.  
- * @param	height the height in pixels of {@link MediaPicture} objects 
- *		 that will be added to this sink.  
- * @param	format the pixel format  
+ * @param	format the pixel format desired of pictures taken from this 
+ *		 sink.  
  * @return	The FilterPictureSink that was added.  
  * @throws	RuntimeException if name is already in graph.  
  * @throws	InvalidArgument if any argument is invalid.  
  */
-  public FilterPictureSink addPictureSink(String name, int width, int height, PixelFormat.Type format) {
-    long cPtr = VideoJNI.FilterGraph_addPictureSink(swigCPtr, this, name, width, height, format.swigValue());
+  public FilterPictureSink addPictureSink(String name, PixelFormat.Type format) {
+    long cPtr = VideoJNI.FilterGraph_addPictureSink(swigCPtr, this, name, format.swigValue());
     return (cPtr == 0) ? null : new FilterPictureSink(cPtr, false);
   }
 

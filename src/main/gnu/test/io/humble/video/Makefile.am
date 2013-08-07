@@ -80,6 +80,7 @@ TESTS=$(check_PROGRAMS)
 FilterGraphTester_SOURCES= \
   FilterGraphTest.cpp \
   TestData.cpp \
+  lodepng.cpp \
   Main.cpp
 
 nodist_FilterGraphTester_SOURCES= \

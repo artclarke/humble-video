@@ -184,5 +184,29 @@ TestData::setupFixtures() {
 //  fixture.codec_ids = {Codec::CODEC_ID_H264, Codec::CODEC_ID_AAC, Codec::CODEC_ID_NONE};
   addFixture(&fixture);
 
+  fixture.url = "ucl_h264_aac.mp4";
+  fixture.num_streams = 2;
+  fixture.duration = Global::NO_PTS;
+  fixture.filesize = 762612;
+  fixture.bitrate = -1;
+  fixture.audio_packets = 0;
+  fixture.video_packets = 0;
+  // 1 frame per packet
+  fixture.video_frames = 0;
+  fixture.video_key_frames = 0;
+  fixture.audio_samples = -1;
+  fixture.packets = fixture.audio_packets + fixture.video_packets;
+  fixture.frame_rate = 0;
+  fixture.time_base = .0010; // This is the default BEFORE we read any packets
+  fixture.width = 480;
+  fixture.height = 360;
+  fixture.gops = 0;
+  fixture.pixel_format = PixelFormat::PIX_FMT_YUV420P;
+  fixture.audio_format = AudioFormat::SAMPLE_FMT_FLTP;
+  fixture.bit_rate = -1;
+  fixture.sample_rate = 44100;
+  fixture.channels = 2;
+  addFixture(&fixture);
+
 }
 

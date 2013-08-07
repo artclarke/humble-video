@@ -31123,13 +31123,11 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addAudioSink
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addPictureSink(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3, jint jarg4, jint jarg5) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addPictureSink(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
   jlong jresult = 0 ;
   io::humble::video::FilterGraph *arg1 = (io::humble::video::FilterGraph *) 0 ;
   char *arg2 = (char *) 0 ;
-  int32_t arg3 ;
-  int32_t arg4 ;
-  io::humble::video::PixelFormat::Type arg5 ;
+  io::humble::video::PixelFormat::Type arg3 ;
   io::humble::video::FilterPictureSink *result = 0 ;
   
   (void)jenv;
@@ -31141,9 +31139,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addPictureSi
     arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
     if (!arg2) return 0;
   }
-  arg3 = (int32_t)jarg3; 
-  arg4 = (int32_t)jarg4; 
-  arg5 = (io::humble::video::PixelFormat::Type)jarg5; 
+  arg3 = (io::humble::video::PixelFormat::Type)jarg3; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -31157,7 +31153,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addPictureSi
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::FilterPictureSink *)(arg1)->addPictureSink((char const *)arg2,arg3,arg4,arg5);
+      result = (io::humble::video::FilterPictureSink *)(arg1)->addPictureSink((char const *)arg2,arg3);
     }
     catch(std::exception & e)
     {

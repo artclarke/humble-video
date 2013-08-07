@@ -147,16 +147,12 @@ public:
   /**
    * Add a {@link FilterPictureSink}.
    * @param name the name; must be unique in graph
-   * @param width the width in pixels of {@link MediaPicture} objects that will be added to this sink.
-   * @param height the height in pixels  of {@link MediaPicture} objects that will be added to this sink.
-   * @param format the pixel format
+   * @param format the pixel format desired of pictures taken from this sink.
    * @return The FilterPictureSink that was added.
    * @throws RuntimeException if name is already in graph.
    * @throws InvalidArgument if any argument is invalid.
    */
    virtual FilterPictureSink* addPictureSink(const char* name,
-       int32_t width,
-       int32_t height,
        PixelFormat::Type format);
 
 protected:

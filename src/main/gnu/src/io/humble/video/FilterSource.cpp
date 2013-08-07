@@ -57,7 +57,7 @@ FilterSource::add(MediaRaw* media) {
   AVFrame* frame = media->getCtx();
 
   int e = av_buffersrc_write_frame(ctx, frame);
-  FfmpegException::check(e, "could not add frame to audio source:");
+  FfmpegException::check(e, "could not add frame to filter source: ");
 }
 
 

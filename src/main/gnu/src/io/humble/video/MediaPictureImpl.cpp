@@ -140,7 +140,7 @@ MediaPictureImpl::make(Buffer* buffer, int32_t width, int32_t height,
   }
 
   int32_t n = retval->getNumDataPlanes();
-  VS_LOG_DEBUG("Created MediaPicture: %d x %d (%d). [%d, %d, %d, %d]",
+  VS_LOG_TRACE("Created MediaPicture: %d x %d (%d). [%d, %d, %d, %d]",
       retval->getWidth(),
       retval->getHeight(),
       retval->getFormat(),

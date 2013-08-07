@@ -130,7 +130,7 @@ ErrorTester_OBJECTS = $(am_ErrorTester_OBJECTS) \
 ErrorTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_FilterGraphTester_OBJECTS = FilterGraphTest.$(OBJEXT) \
-	TestData.$(OBJEXT) Main.$(OBJEXT)
+	TestData.$(OBJEXT) lodepng.$(OBJEXT) Main.$(OBJEXT)
 nodist_FilterGraphTester_OBJECTS =  \
 	FilterGraphTest_CXXRunner.$(OBJEXT)
 FilterGraphTester_OBJECTS = $(am_FilterGraphTester_OBJECTS) \
@@ -826,6 +826,7 @@ TESTS = $(check_PROGRAMS)
 FilterGraphTester_SOURCES = \
   FilterGraphTest.cpp \
   TestData.cpp \
+  lodepng.cpp \
   Main.cpp
 
 nodist_FilterGraphTester_SOURCES = \

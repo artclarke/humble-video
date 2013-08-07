@@ -25,6 +25,13 @@
 
 #include "FilterPictureSink.h"
 #include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/video/VideoExceptions.h>
+#include <io/humble/video/FilterGraph.h>
+
+using namespace io::humble::ferry;
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 using namespace io::humble::ferry;
 
@@ -50,6 +57,29 @@ FilterPictureSink::make(FilterGraph* graph, AVFilterContext* ctx) {
 
 int32_t
 FilterPictureSink::getPicture(MediaPicture* picture) {
+  if (!picture) {
+    VS_THROW(HumbleInvalidArgument("no picture passed in"));
+  }
+  AVFilterContext* ctx = getFilterCtx();
+
+  // sadly, FFmpeg will not auto scale width and height at this
+  // time, and so we need to check before we get a frame so we
+  // don't destroy something we shouldn't.
+  if (!ctx->inputs) {
+    VS_THROW(HumbleRuntimeError("unexpect ffmpeg internal error"));
+  }
+
+  AVFilterLink* link = ctx->inputs[0];
+  if (link) {
+    if (link->w != picture->getWidth() || link->h != picture->getHeight()) {
+      VS_THROW(HumbleInvalidArgument::make("picture dimensions do not match expected.  Got (%d x %d); Expected (%d x %d)",
+          picture->getWidth(),
+          picture->getHeight(),
+          link->w,
+          link->h
+          ));
+    }
+  }
   return FilterSink::get(picture);
 }
 } /* namespace video */

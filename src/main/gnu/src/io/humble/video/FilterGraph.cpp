@@ -203,19 +203,13 @@ FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
 }
 
 FilterPictureSink*
-FilterGraph::addPictureSink(const char* name, int32_t width, int32_t height,
+FilterGraph::addPictureSink(const char* name,
     PixelFormat::Type format) {
   if (getState() != STATE_INITED) {
     VS_THROW(HumbleRuntimeError("cannot add sinks after opening graph"));
   }
   if (!name || !*name) {
     VS_THROW(HumbleInvalidArgument("no name specified"));
-  }
-  if (width <= 0) {
-    VS_THROW(HumbleInvalidArgument("no width specified"));
-  }
-  if (height <= 0) {
-    VS_THROW(HumbleInvalidArgument("no height specified"));
   }
   if (format == PixelFormat::PIX_FMT_NONE) {
     VS_THROW(HumbleInvalidArgument("no sample format specified"));

@@ -27,6 +27,8 @@
 #define FILTERGRAPHTEST_H_
 
 #include <io/humble/testutils/TestUtils.h>
+#include "TestData.h"
+#include <io/humble/video/MediaPicture.h>
 
 class FilterGraphTest : public CxxTest::TestSuite
 {
@@ -35,5 +37,12 @@ public:
   virtual ~FilterGraphTest();
   void testCreation();
   void testAddIO();
+  void testFilterVideo();
+private:
+
+  void writePicture(const char* prefix, int32_t* frameNo, io::humble::video::MediaPicture* picture);
+
+  TestData mFixtures;
+
 };
 #endif /* FILTERGRAPHTEST_H_ */
