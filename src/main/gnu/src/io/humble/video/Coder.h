@@ -296,7 +296,17 @@ public:
    * If encoding or decoding has an error, this count is <b>not</b> incremented.
    */
   virtual int32_t getFrameCount() { return mCtx->frame_number; }
-
+  /**
+   * Number of samples per channel in an audio frame.
+   *
+   * - encoding: Each submitted frame
+   *   except the last must contain exactly frame_size samples per channel.
+   *   May be 0 when the codec has CODEC_CAP_VARIABLE_FRAME_SIZE set, then the
+   *   frame size is not restricted.
+   * - decoding: may be set by some decoders to indicate constant frame size
+   *
+   * @return number of samples per channel.
+   */
   virtual int32_t getFrameSize();
 
 

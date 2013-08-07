@@ -350,6 +350,18 @@ public class Coder extends Configurable {
     return VideoJNI.Coder_getFrameCount(swigCPtr, this);
   }
 
+/**
+ * Number of samples per channel in an audio frame.  
+ * - encoding: Each submitted frame  
+ * except the last must contain exactly frame_size samples per channel. 
+ *  
+ * May be 0 when the codec has CODEC_CAP_VARIABLE_FRAME_SIZE set, then 
+ * the  
+ * frame size is not restricted.  
+ * - decoding: may be set by some decoders to indicate constant frame 
+ * size  
+ * @return	number of samples per channel.  
+ */
   public int getFrameSize() {
     return VideoJNI.Coder_getFrameSize(swigCPtr, this);
   }
