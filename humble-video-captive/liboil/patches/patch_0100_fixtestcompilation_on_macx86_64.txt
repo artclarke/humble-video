@@ -1,0 +1,13 @@
+Index: testsuite/stack_align.c
+===================================================================
+--- testsuite/stack_align.c	(revision 2147)
++++ testsuite/stack_align.c	(working copy)
+@@ -235,7 +235,7 @@
+ 
+ void realign(int align)
+ {
+-#ifdef HAVE_GCC_ASM
++#if defined(HAVE_GCC_ASM) && !defined(__APPLE__)
+ #ifdef HAVE_I386
+   __asm__ __volatile__ (
+       "  sub %%edi, %%esp\n"

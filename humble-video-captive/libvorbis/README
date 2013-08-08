@@ -1,0 +1,6 @@
+Libvorbis Version 1.3.2
+Software Homepage: http://www.xiph.org/
+Source Download URL: http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.2.tar.gz
+Patches:
+  - modified configure.ac and configure to pass "-O3" instead of "-O4" to
+    compiler on darwin to avoid bug in the GCC that ships with lion

@@ -1,0 +1,5 @@
+#!/bin/sh
+prefix="@prefix@"
+includedir="@includedir@"
+echo "Removing our copy of liboil-0.3 include files"
+rm -rf ${DESTDIR}${includedir}/liboil

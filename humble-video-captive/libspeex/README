@@ -1,0 +1,7 @@
+Libspeex Version 1.2 RC1
+Software Homepage: http://speex.org/
+Source Download URL: http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz
+
+Patches:
+ - configure.ac has been modified to support the current LT_INIT macro, and autoreconf was run
+  

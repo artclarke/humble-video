@@ -1,0 +1,6 @@
+Humble Video incorporates the mp3lame library (the Library) into our project.
+
+If you are using Humble Video under the AGPL license, then we
+explicitly choose to redistribute all LGPL and GPL components of the 
+Library under the GPL Version 3 or Later, as allowed
+by the copyright holders of the Library.
