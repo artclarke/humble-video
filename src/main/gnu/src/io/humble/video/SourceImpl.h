@@ -37,16 +37,16 @@ namespace io {
 namespace humble {
 namespace video {
 
-class SourceImpl : public io::humble::video::Source
+class DemuxerImpl : public io::humble::video::Demuxer
 {
 public:
-  static SourceImpl* make();
+  static DemuxerImpl* make();
 
   virtual State
   getState() { return mState; }
 
-  virtual SourceFormat *
-  getSourceFormat() { return mFormat.get(); }
+  virtual DemuxerFormat *
+  getFormat() { return mFormat.get(); }
 
   virtual void
   setInputBufferLength(int32_t size);
@@ -55,7 +55,7 @@ public:
   getInputBufferLength();
 
   virtual void
-  open(const char *url, SourceFormat* format, bool streamsCanBeAddedDynamically,
+  open(const char *url, DemuxerFormat* format, bool streamsCanBeAddedDynamically,
       bool queryStreamMetaData, KeyValueBag* options,
       KeyValueBag* optionsNotSet);
 
@@ -65,9 +65,8 @@ public:
   virtual int32_t
   getNumStreams();
 
-  virtual ContainerStream* getStream(int32_t i) { return getSourceStream(i); }
-  virtual SourceStream*
-  getSourceStream(int32_t streamIndex);
+  virtual DemuxerStream*
+  getStream(int32_t streamIndex);
 
   virtual int32_t
   read(MediaPacket *packet);
@@ -137,9 +136,9 @@ public:
   pause();
 
 protected:
-  SourceImpl();
+  DemuxerImpl();
   virtual
-  ~SourceImpl();
+  ~DemuxerImpl();
   virtual AVFormatContext* getFormatCtx();
 
 private:
@@ -152,12 +151,12 @@ private:
   int32_t mReadRetryMax;
   int32_t mInputBufferLength;
   io::humble::video::customio::URLProtocolHandler* mIOHandler;
-  io::humble::ferry::RefPointer<SourceFormat> mFormat;
+  io::humble::ferry::RefPointer<DemuxerFormat> mFormat;
   // We do pointer to RefPointers to avoid too many
   // acquire() / release() cycles as the vector manages
   // itself.
   std::vector<
-    io::humble::ferry::RefPointer<SourceStreamImpl>*
+    io::humble::ferry::RefPointer<DemuxerStreamImpl>*
     > mStreams;
   int32_t mNumStreams;
   io::humble::ferry::RefPointer<KeyValueBag> mMetaData;

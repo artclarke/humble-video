@@ -12,7 +12,7 @@ import io.humble.ferry.*;
  * A {@link ContainerStream} class that was read from a {@link Source}. 
  *  
  */
-public class SourceStream extends ContainerStream {
+public class DemuxerStream extends ContainerStream {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -30,18 +30,18 @@ public class SourceStream extends ContainerStream {
   /**
    * Internal Only.
    */
-  protected SourceStream(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGSourceStreamUpcast(cPtr), cMemoryOwn);
+  protected DemuxerStream(long cPtr, boolean cMemoryOwn) {
+    super(VideoJNI.SWIGDemuxerStreamUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
   /**
    * Internal Only.
    */
-  protected SourceStream(long cPtr, boolean cMemoryOwn,
+  protected DemuxerStream(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGSourceStreamUpcast(cPtr),
+    super(VideoJNI.SWIGDemuxerStreamUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -54,7 +54,7 @@ public class SourceStream extends ContainerStream {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(SourceStream obj) {
+  protected static long getCPtr(DemuxerStream obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -72,17 +72,17 @@ public class SourceStream extends ContainerStream {
   }
   
   /**
-   * Create a new SourceStream object that is actually referring to the
+   * Create a new DemuxerStream object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
    */
   @Override
-  public SourceStream copyReference() {
+  public DemuxerStream copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new SourceStream(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new DemuxerStream(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -95,8 +95,8 @@ public class SourceStream extends ContainerStream {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof SourceStream)
-      equal = (((SourceStream)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof DemuxerStream)
+      equal = (((DemuxerStream)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -112,28 +112,6 @@ public class SourceStream extends ContainerStream {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
-
-  /**
-   * info about this stream
-   * @return information about this stream
-   */
-   
-  @Override
-  public String toString()
-  {
-    StringBuilder result = new StringBuilder();
-    
-    result.append(this.getClass().getName()+"@"+hashCode()+"[");
-    result.append("index:"+getIndex()+";");
-    result.append("id:"+getId()+";");
-    //result.append("streamcoder:"+getStreamCoder()+";");
-    result.append("framerate:"+getFrameRate()+";");
-    result.append("timebase:"+getTimeBase()+";");
-    result.append("]");
-    return result.toString();
-  }
-
-
 /**
  * For containers with Stream.Disposition.DISPOSITION_ATTACHED_PIC, 
  *  
@@ -141,7 +119,7 @@ public class SourceStream extends ContainerStream {
  * picture (needs to be decoded separately).  
  */
   public MediaPacket getAttachedPic() {
-    long cPtr = VideoJNI.SourceStream_getAttachedPic(swigCPtr, this);
+    long cPtr = VideoJNI.DemuxerStream_getAttachedPic(swigCPtr, this);
     return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
   }
 
@@ -150,7 +128,7 @@ public class SourceStream extends ContainerStream {
  *  
  */
   public Decoder getDecoder() {
-    long cPtr = VideoJNI.SourceStream_getDecoder(swigCPtr, this);
+    long cPtr = VideoJNI.DemuxerStream_getDecoder(swigCPtr, this);
     return (cPtr == 0) ? null : new Decoder(cPtr, false);
   }
 

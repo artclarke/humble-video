@@ -11,7 +11,7 @@ import io.humble.ferry.*;
 /**
  * A Source of {@link Packet} data.  
  */
-public class Source extends Container {
+public class Demuxer extends Container {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -29,18 +29,18 @@ public class Source extends Container {
   /**
    * Internal Only.
    */
-  protected Source(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGSourceUpcast(cPtr), cMemoryOwn);
+  protected Demuxer(long cPtr, boolean cMemoryOwn) {
+    super(VideoJNI.SWIGDemuxerUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
   /**
    * Internal Only.
    */
-  protected Source(long cPtr, boolean cMemoryOwn,
+  protected Demuxer(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGSourceUpcast(cPtr),
+    super(VideoJNI.SWIGDemuxerUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -53,7 +53,7 @@ public class Source extends Container {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(Source obj) {
+  protected static long getCPtr(Demuxer obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -71,17 +71,17 @@ public class Source extends Container {
   }
   
   /**
-   * Create a new Source object that is actually referring to the
+   * Create a new Demuxer object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
    */
   @Override
-  public Source copyReference() {
+  public Demuxer copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new Source(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new Demuxer(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -94,8 +94,8 @@ public class Source extends Container {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof Source)
-      equal = (((Source)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof Demuxer)
+      equal = (((Demuxer)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -116,7 +116,7 @@ public class Source extends Container {
     final StringBuilder b = new StringBuilder(super.toString());
     b.append("[")
     .append("url="+getURL()+";")
-    .append("format:"+getSourceFormat()+";")
+    .append("format:"+getDemuxerFormat()+";")
     .append("]");
     return b.toString();
   }
@@ -124,33 +124,25 @@ public class Source extends Container {
 /**
  * Create a new {@link Source}  
  */
-  public static Source make() {
-    long cPtr = VideoJNI.Source_make();
-    return (cPtr == 0) ? null : new Source(cPtr, false);
-  }
-
-/**
- * {@inheritDoc}  
- */
-  protected ContainerFormat getFormat() {
-    long cPtr = VideoJNI.Source_getFormat(swigCPtr, this);
-    return (cPtr == 0) ? null : new ContainerFormat(cPtr, false);
+  public static Demuxer make() {
+    long cPtr = VideoJNI.Demuxer_make();
+    return (cPtr == 0) ? null : new Demuxer(cPtr, false);
   }
 
 /**
  * {@inheritDoc}  
  */
   public Container.State getState() {
-    return Container.State.swigToEnum(VideoJNI.Source_getState(swigCPtr, this));
+    return Container.State.swigToEnum(VideoJNI.Demuxer_getState(swigCPtr, this));
   }
 
 /**
  *  
  * or null if unknown.  
  */
-  public SourceFormat getSourceFormat() {
-    long cPtr = VideoJNI.Source_getSourceFormat(swigCPtr, this);
-    return (cPtr == 0) ? null : new SourceFormat(cPtr, false);
+  protected DemuxerFormat getFormat() {
+    long cPtr = VideoJNI.Demuxer_getFormat(swigCPtr, this);
+    return (cPtr == 0) ? null : new DemuxerFormat(cPtr, false);
   }
 
 /**
@@ -162,7 +154,7 @@ public class Source extends Container {
  * @throws	InvalidArgument if size <= 0  
  */
   public void setInputBufferLength(int size) {
-    VideoJNI.Source_setInputBufferLength(swigCPtr, this, size);
+    VideoJNI.Demuxer_setInputBufferLength(swigCPtr, this, size);
   }
 
 /**
@@ -173,7 +165,7 @@ public class Source extends Container {
  * size (and it'll probably be 32768).  
  */
   public int getInputBufferLength() {
-    return VideoJNI.Source_getInputBufferLength(swigCPtr, this);
+    return VideoJNI.Demuxer_getInputBufferLength(swigCPtr, this);
   }
 
 /**
@@ -225,8 +217,8 @@ public class Source extends Container {
  * {@link Source}.  
  * @return	>= 0 on success; < 0 on error.  
  */
-  public void open(String url, SourceFormat format, boolean streamsCanBeAddedDynamically, boolean queryStreamMetaData, KeyValueBag options, KeyValueBag optionsNotSet) throws java.lang.InterruptedException, java.io.IOException {
-    VideoJNI.Source_open(swigCPtr, this, url, SourceFormat.getCPtr(format), format, streamsCanBeAddedDynamically, queryStreamMetaData, KeyValueBag.getCPtr(options), options, KeyValueBag.getCPtr(optionsNotSet), optionsNotSet);
+  public void open(String url, DemuxerFormat format, boolean streamsCanBeAddedDynamically, boolean queryStreamMetaData, KeyValueBag options, KeyValueBag optionsNotSet) throws java.lang.InterruptedException, java.io.IOException {
+    VideoJNI.Demuxer_open(swigCPtr, this, url, DemuxerFormat.getCPtr(format), format, streamsCanBeAddedDynamically, queryStreamMetaData, KeyValueBag.getCPtr(options), options, KeyValueBag.getCPtr(optionsNotSet), optionsNotSet);
   }
 
 /**
@@ -246,7 +238,7 @@ public class Source extends Container {
  * </p>  
  */
   public void close() throws java.lang.InterruptedException, java.io.IOException {
-    VideoJNI.Source_close(swigCPtr, this);
+    VideoJNI.Demuxer_close(swigCPtr, this);
   }
 
 /**
@@ -255,9 +247,9 @@ public class Source extends Container {
  * @return	The stream at that position in the container, or null if 
  *		 none there.  
  */
-  public SourceStream getSourceStream(int streamIndex) throws java.lang.InterruptedException, java.io.IOException {
-    long cPtr = VideoJNI.Source_getSourceStream(swigCPtr, this, streamIndex);
-    return (cPtr == 0) ? null : new SourceStream(cPtr, false);
+  public DemuxerStream getStream(int streamIndex) throws java.lang.InterruptedException, java.io.IOException {
+    long cPtr = VideoJNI.Demuxer_getStream(swigCPtr, this, streamIndex);
+    return (cPtr == 0) ? null : new DemuxerStream(cPtr, false);
   }
 
 /**
@@ -277,7 +269,7 @@ public class Source extends Container {
  * @return	0 if successful, or <0 if not.  
  */
   public int read(MediaPacket packet) throws java.lang.InterruptedException, java.io.IOException {
-    return VideoJNI.Source_read(swigCPtr, this, MediaPacket.getCPtr(packet), packet);
+    return VideoJNI.Demuxer_read(swigCPtr, this, MediaPacket.getCPtr(packet), packet);
   }
 
 /**
@@ -302,7 +294,7 @@ public class Source extends Container {
  * </p>  
  */
   public void queryStreamMetaData() throws java.lang.InterruptedException, java.io.IOException {
-    VideoJNI.Source_queryStreamMetaData(swigCPtr, this);
+    VideoJNI.Demuxer_queryStreamMetaData(swigCPtr, this);
   }
 
 /**
@@ -312,7 +304,7 @@ public class Source extends Container {
  * @return	The duration, or {@link Global#NO_PTS} if not known.  
  */
   public long getDuration() {
-    return VideoJNI.Source_getDuration(swigCPtr, this);
+    return VideoJNI.Demuxer_getDuration(swigCPtr, this);
   }
 
 /**
@@ -329,7 +321,7 @@ public class Source extends Container {
  *		 if not known.  
  */
   public long getStartTime() {
-    return VideoJNI.Source_getStartTime(swigCPtr, this);
+    return VideoJNI.Demuxer_getStartTime(swigCPtr, this);
   }
 
 /**
@@ -339,7 +331,7 @@ public class Source extends Container {
  * @return	The file size in bytes, or <0 on error.  
  */
   public long getFileSize() {
-    return VideoJNI.Source_getFileSize(swigCPtr, this);
+    return VideoJNI.Demuxer_getFileSize(swigCPtr, this);
   }
 
 /**
@@ -352,7 +344,7 @@ public class Source extends Container {
  *		  
  */
   public int getBitRate() {
-    return VideoJNI.Source_getBitRate(swigCPtr, this);
+    return VideoJNI.Demuxer_getBitRate(swigCPtr, this);
   }
 
 /**
@@ -360,7 +352,7 @@ public class Source extends Container {
  * @return	The (compacted) value of all flags set.  
  */
   public int getFlags() {
-    return VideoJNI.Source_getFlags(swigCPtr, this);
+    return VideoJNI.Demuxer_getFlags(swigCPtr, this);
   }
 
 /**
@@ -370,7 +362,7 @@ public class Source extends Container {
  * @param	newFlags The new set flags for this codec.  
  */
   public void setFlags(int newFlags) {
-    VideoJNI.Source_setFlags(swigCPtr, this, newFlags);
+    VideoJNI.Demuxer_setFlags(swigCPtr, this, newFlags);
   }
 
 /**
@@ -379,7 +371,7 @@ public class Source extends Container {
  * @return	0 for false; non-zero for true  
  */
   public boolean getFlag(Container.Flag flag) {
-    return VideoJNI.Source_getFlag(swigCPtr, this, flag.swigValue());
+    return VideoJNI.Demuxer_getFlag(swigCPtr, this, flag.swigValue());
   }
 
 /**
@@ -388,7 +380,7 @@ public class Source extends Container {
  * @param	value The value to set it to (true or false)  
  */
   public void setFlag(Container.Flag flag, boolean value) {
-    VideoJNI.Source_setFlag(swigCPtr, this, flag.swigValue(), value);
+    VideoJNI.Demuxer_setFlag(swigCPtr, this, flag.swigValue(), value);
   }
 
 /**
@@ -397,7 +389,7 @@ public class Source extends Container {
  * @return	the URL opened, or null.  
  */
   public String getURL() {
-    return VideoJNI.Source_getURL(swigCPtr, this);
+    return VideoJNI.Demuxer_getURL(swigCPtr, this);
   }
 
 /**
@@ -409,7 +401,7 @@ public class Source extends Container {
  * @return	the read retry count  
  */
   public int getReadRetryCount() {
-    return VideoJNI.Source_getReadRetryCount(swigCPtr, this);
+    return VideoJNI.Demuxer_getReadRetryCount(swigCPtr, this);
   }
 
 /**
@@ -418,7 +410,7 @@ public class Source extends Container {
  * @param	count The read retry count. <0 means keep trying.  
  */
   public void setReadRetryCount(int count) {
-    VideoJNI.Source_setReadRetryCount(swigCPtr, this, count);
+    VideoJNI.Demuxer_setReadRetryCount(swigCPtr, this, count);
   }
 
 /**
@@ -426,7 +418,7 @@ public class Source extends Container {
  * @return	true if streams can be added dynamically  
  */
   public boolean canStreamsBeAddedDynamically() {
-    return VideoJNI.Source_canStreamsBeAddedDynamically(swigCPtr, this);
+    return VideoJNI.Demuxer_canStreamsBeAddedDynamically(swigCPtr, this);
   }
 
 /**
@@ -450,7 +442,7 @@ public class Source extends Container {
  * @return	the {@link KeyValueBag}.  
  */
   public KeyValueBag getMetaData() {
-    long cPtr = VideoJNI.Source_getMetaData(swigCPtr, this);
+    long cPtr = VideoJNI.Demuxer_getMetaData(swigCPtr, this);
     return (cPtr == 0) ? null : new KeyValueBag(cPtr, false);
   }
 
@@ -462,7 +454,7 @@ public class Source extends Container {
  *		  
  */
   public int setForcedAudioCodec(Codec.ID id) {
-    return VideoJNI.Source_setForcedAudioCodec(swigCPtr, this, id.swigValue());
+    return VideoJNI.Demuxer_setForcedAudioCodec(swigCPtr, this, id.swigValue());
   }
 
 /**
@@ -473,7 +465,7 @@ public class Source extends Container {
  *		  
  */
   public int setForcedVideoCodec(Codec.ID id) {
-    return VideoJNI.Source_setForcedVideoCodec(swigCPtr, this, id.swigValue());
+    return VideoJNI.Demuxer_setForcedVideoCodec(swigCPtr, this, id.swigValue());
   }
 
 /**
@@ -484,7 +476,7 @@ public class Source extends Container {
  *		  
  */
   public int setForcedSubtitleCodec(Codec.ID id) {
-    return VideoJNI.Source_setForcedSubtitleCodec(swigCPtr, this, id.swigValue());
+    return VideoJNI.Demuxer_setForcedSubtitleCodec(swigCPtr, this, id.swigValue());
   }
 
 /**
@@ -524,7 +516,7 @@ public class Source extends Container {
  * ABI compatibility yet!  
  */
   public int seek(int stream_index, long min_ts, long ts, long max_ts, int flags) throws java.lang.InterruptedException, java.io.IOException {
-    return VideoJNI.Source_seek(swigCPtr, this, stream_index, min_ts, ts, max_ts, flags);
+    return VideoJNI.Demuxer_seek(swigCPtr, this, stream_index, min_ts, ts, max_ts, flags);
   }
 
 /**
@@ -532,14 +524,14 @@ public class Source extends Container {
  * @return	The max delay, error code otherwise.  
  */
   public int getMaxDelay() {
-    return VideoJNI.Source_getMaxDelay(swigCPtr, this);
+    return VideoJNI.Demuxer_getMaxDelay(swigCPtr, this);
   }
 
 /**
  *  
  */
   public void play() throws java.lang.InterruptedException, java.io.IOException {
-    VideoJNI.Source_play(swigCPtr, this);
+    VideoJNI.Demuxer_play(swigCPtr, this);
   }
 
 /**
@@ -549,7 +541,7 @@ public class Source extends Container {
  *		 or error.  
  */
   public void pause() throws java.lang.InterruptedException, java.io.IOException {
-    VideoJNI.Source_pause(swigCPtr, this);
+    VideoJNI.Demuxer_pause(swigCPtr, this);
   }
 
   public enum SeekFlag {
@@ -558,19 +550,19 @@ public class Source extends Container {
    * flag, then key-frame-only/forward seeking is assumed.
    * Seek backwards.
    */
-    SEEK_BACKWARD(VideoJNI.Source_SEEK_BACKWARD_get()),
+    SEEK_BACKWARD(VideoJNI.Demuxer_SEEK_BACKWARD_get()),
   /**
    * Seek based on position in bytes.
    */
-    SEEK_BYTE(VideoJNI.Source_SEEK_BYTE_get()),
+    SEEK_BYTE(VideoJNI.Demuxer_SEEK_BYTE_get()),
   /**
    * Seek to any frame, even non-keyframes
    */
-    SEEK_ANY(VideoJNI.Source_SEEK_ANY_get()),
+    SEEK_ANY(VideoJNI.Demuxer_SEEK_ANY_get()),
   /**
    * Seek based on frame number
    */
-    SEEK_FRAME(VideoJNI.Source_SEEK_FRAME_get());
+    SEEK_FRAME(VideoJNI.Demuxer_SEEK_FRAME_get());
 
     public final int swigValue() {
       return swigValue;

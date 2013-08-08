@@ -27,11 +27,11 @@
 
 #include <io/humble/testutils/TestUtils.h>
 
-class SourceFormatTest : public CxxTest::TestSuite
+class DemuxerFormatTest : public CxxTest::TestSuite
 {
 public:
-  SourceFormatTest();
-  virtual ~SourceFormatTest();
+  DemuxerFormatTest();
+  virtual ~DemuxerFormatTest();
   void setUp();
   void tearDown();
   void testCreateSourceFormat();

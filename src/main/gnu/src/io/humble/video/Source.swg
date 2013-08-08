@@ -17,13 +17,13 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-%typemap (javacode) io::humble::video::Source,io::humble::video::Source*,io::humble::video::Source& %{
+%typemap (javacode) io::humble::video::Demuxer,io::humble::video::Demuxer*,io::humble::video::Demuxer& %{
   @Override
   public String toString() {
     final StringBuilder b = new StringBuilder(super.toString());
     b.append("[")
     .append("url="+getURL()+";")
-    .append("format:"+getSourceFormat()+";")
+    .append("format:"+getDemuxerFormat()+";")
     .append("]");
     return b.toString();
   }
@@ -32,15 +32,14 @@
 /**
  * Tell users which methods can block (and hence, can be interrupted).
  */
-HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Source::open);
-HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Source::read);
-HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Source::seek);
-HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Source::play);
-HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Source::pause);
-HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Source::close);
-HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Source::getNumStreams);
-HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Source::getStream);
-HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Source::getSourceStream);
-HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Source::queryStreamMetaData);
+HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Demuxer::open);
+HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Demuxer::read);
+HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Demuxer::seek);
+HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Demuxer::play);
+HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Demuxer::pause);
+HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Demuxer::close);
+HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Demuxer::getNumStreams);
+HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Demuxer::getStream);
+HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Demuxer::queryStreamMetaData);
 
 %include <io/humble/video/Source.h>

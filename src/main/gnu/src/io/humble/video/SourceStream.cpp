@@ -29,12 +29,12 @@ namespace io {
 namespace humble {
 namespace video {
 
-SourceStream::SourceStream() {
+DemuxerStream::DemuxerStream() {
   // TODO Auto-generated constructor stub
 
 }
 
-SourceStream::~SourceStream() {
+DemuxerStream::~DemuxerStream() {
   // TODO Auto-generated destructor stub
 }
 

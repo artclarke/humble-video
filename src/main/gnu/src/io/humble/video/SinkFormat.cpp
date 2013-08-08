@@ -29,19 +29,19 @@ namespace io {
 namespace humble {
 namespace video {
 
-SinkFormat::SinkFormat()
+MuxerFormat::MuxerFormat()
 {
   mFormat = 0;
 }
 
-SinkFormat::~SinkFormat()
+MuxerFormat::~MuxerFormat()
 {
   mFormat = 0;
 }
-SinkFormat*
-SinkFormat::make(AVOutputFormat* format)
+MuxerFormat*
+MuxerFormat::make(AVOutputFormat* format)
 {
-  SinkFormat* retval = 0;
+  MuxerFormat* retval = 0;
   if (format)
   {
     retval = make();
@@ -50,22 +50,22 @@ SinkFormat::make(AVOutputFormat* format)
   return retval;
 }
 
-SinkFormat*
-SinkFormat::guessFormat(const char * shortName, const char *filename,
+MuxerFormat*
+MuxerFormat::guessFormat(const char * shortName, const char *filename,
     const char *mimeType)
 {
   // This is an entry static into this class, so we
   // ensure we initialize FFmpeg, if not already inited.
   Global::init();
-  SinkFormat *retval = 0;
+  MuxerFormat *retval = 0;
   AVOutputFormat* format = av_guess_format(shortName, filename, mimeType);
   if (format)
-    retval = SinkFormat::make(format);
+    retval = MuxerFormat::make(format);
   return retval;
 }
 
 int32_t
-SinkFormat::getNumFormats()
+MuxerFormat::getNumFormats()
 {
   Global::init();
   int i = 0;
@@ -76,8 +76,8 @@ SinkFormat::getNumFormats()
   return i;
 }
 
-SinkFormat*
-SinkFormat::getFormat(int32_t index)
+MuxerFormat*
+MuxerFormat::getFormat(int32_t index)
 {
   Global::init();
   int i = 0;
@@ -85,14 +85,14 @@ SinkFormat::getFormat(int32_t index)
   (f = av_oformat_next(f))!=0;
   ++i)
     if (i == index) {
-      SinkFormat * retval = SinkFormat::make(f);
+      MuxerFormat * retval = MuxerFormat::make(f);
       return retval;
     }
   return 0;
 }
 
 AVOutputFormat*
-SinkFormat::getCtx()
+MuxerFormat::getCtx()
 {
   return mFormat;
 }

@@ -38,7 +38,7 @@ using namespace io::humble::ferry;
 using namespace io::humble::video;
 using namespace io::humble::video::customio;
 
-SourceTest::SourceTest() {
+DemuxerTest::DemuxerTest() {
   mFixture = 0;
   mSampleFile[0] = 0;
   mFixture = mFixtures.getFixture(0);
@@ -47,15 +47,15 @@ SourceTest::SourceTest() {
   VS_LOG_TRACE("Sample File: %s", mSampleFile);
 }
 
-SourceTest::~SourceTest() {
+DemuxerTest::~DemuxerTest() {
   URLProtocolManager::unregisterAllProtocols();
 }
 
 void
-SourceTest::testMake() {
-  RefPointer<Source> source = Source::make();
+DemuxerTest::testMake() {
+  RefPointer<Demuxer> source = Demuxer::make();
   // for debugging, we'll keep another value around to look at
-  SourceImpl* obj = (SourceImpl*) source.value();
+  DemuxerImpl* obj = (DemuxerImpl*) source.value();
   (void) obj;
 
   TS_ASSERT(source);
@@ -63,14 +63,14 @@ SourceTest::testMake() {
 }
 
 void
-SourceTest::testOpen() {
+DemuxerTest::testOpen() {
   openTestHelper(mSampleFile);
 }
 
 void
-SourceTest::openTestHelper(const char* file)
+DemuxerTest::openTestHelper(const char* file)
 {
-  RefPointer<Source> source = Source::make();
+  RefPointer<Demuxer> source = Demuxer::make();
   TS_ASSERT(source);
 
   source->open(file, 0, false, false, 0, 0);
@@ -106,7 +106,7 @@ SourceTest::openTestHelper(const char* file)
 
   TS_ASSERT(!source->canStreamsBeAddedDynamically());
 
-  RefPointer<SourceFormat> format = source->getSourceFormat();
+  RefPointer<DemuxerFormat> format = source->getFormat();
   TSM_ASSERT("format not set", format);
   TSM_ASSERT("Unexpected format", strcmp("flv", format->getName())==0);
 
@@ -129,9 +129,9 @@ SourceTest::openTestHelper(const char* file)
 }
 
 void
-SourceTest::testOpenDemuxerPrivatePropertySetting()
+DemuxerTest::testOpenDemuxerPrivatePropertySetting()
 {
-  RefPointer<Source> source = Source::make();
+  RefPointer<Demuxer> source = Demuxer::make();
   // create a bag of options to pass in for an FLV input format.
   RefPointer<KeyValueBag> inputOptions = KeyValueBag::make();
   RefPointer<KeyValueBag> outputOptions = KeyValueBag::make();
@@ -154,16 +154,16 @@ SourceTest::testOpenDemuxerPrivatePropertySetting()
   source->close();
 }
 void
-SourceTest::testOpenResetInputFormat()
+DemuxerTest::testOpenResetInputFormat()
 {
-  RefPointer<SourceFormat> format = 0;
-  RefPointer<Source> source = Source::make();
+  RefPointer<DemuxerFormat> format = 0;
+  RefPointer<Demuxer> source = Demuxer::make();
   TS_ASSERT(source);
   const char*file = mSampleFile;
 
-  format = source->getSourceFormat();
+  format = source->getFormat();
   TS_ASSERT(!format);
-  format = SourceFormat::findFormat("mp4");
+  format = DemuxerFormat::findFormat("mp4");
   {
     LoggerStack stack;
     // quiet ffmpeg error
@@ -173,7 +173,7 @@ SourceTest::testOpenResetInputFormat()
 }
 
 void
-SourceTest::testOpenCustomIO()
+DemuxerTest::testOpenCustomIO()
 {
   StdioURLProtocolManager::registerProtocol("test");
   char url[2048];
@@ -184,12 +184,12 @@ SourceTest::testOpenCustomIO()
 }
 
 void
-SourceTest::testOpenWithoutCloseAutoCloses()
+DemuxerTest::testOpenWithoutCloseAutoCloses()
 {
   LoggerStack stack;
   // quiet Source error when Source is destroyed
   stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
-  RefPointer<Source> source = Source::make();
+  RefPointer<Demuxer> source = Demuxer::make();
   source->open(mSampleFile, 0, false, false, 0, 0);
 
   // now this test will only fail under a memory leak test, but
@@ -198,20 +198,20 @@ SourceTest::testOpenWithoutCloseAutoCloses()
 }
 
 void
-SourceTest::testOpenInvalidArguments()
+DemuxerTest::testOpenInvalidArguments()
 {
   // each sub-test will be wrapped in a block so
   // I can squelch logging once I see the right stuff
   // happen
   {
-    RefPointer<Source> source = Source::make();
+    RefPointer<Demuxer> source = Demuxer::make();
     LoggerStack stack;
     // quiet Source error when Source is destroyed
     stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
     TS_ASSERT_THROWS(source->open(0, 0, false, false, 0, 0), HumbleInvalidArgument);
   }
   {
-    RefPointer<Source> source = Source::make();
+    RefPointer<Demuxer> source = Demuxer::make();
     LoggerStack stack;
     // quiet Source error when Source is destroyed
     stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
@@ -220,9 +220,9 @@ SourceTest::testOpenInvalidArguments()
 }
 
 void
-SourceTest::testRead()
+DemuxerTest::testRead()
 {
-  RefPointer<Source> source = Source::make();
+  RefPointer<Demuxer> source = Demuxer::make();
   TS_ASSERT(source);
 
   source->open(mSampleFile, 0, false, true, 0, 0);

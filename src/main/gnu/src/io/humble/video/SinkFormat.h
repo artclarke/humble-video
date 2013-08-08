@@ -32,9 +32,9 @@ namespace io {
 namespace humble {
 namespace video {
 
-class VS_API_HUMBLEVIDEO SinkFormat : public ContainerFormat
+class VS_API_HUMBLEVIDEO MuxerFormat : public ContainerFormat
 {
-VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(SinkFormat)
+VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MuxerFormat)
 public:
   /**
    * Name for format.
@@ -118,7 +118,7 @@ public:
    * @param mimeType if non-NULL checks if mime_type matches with the
    * MIME type of the registered formats
    */
-  static SinkFormat*
+  static MuxerFormat*
   guessFormat(const char * shortName, const char *filename,
       const char *mimeType);
   virtual Codec::ID
@@ -178,20 +178,20 @@ public:
    * @return a format object for that input or null if
    *   unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()}
    */
-  static SinkFormat* getFormat(int32_t index);
+  static MuxerFormat* getFormat(int32_t index);
 
 #ifndef SWIG
   virtual AVOutputFormat* getCtx();
 #endif // ! SWIG
 
 protected:
-  static SinkFormat*
+  static MuxerFormat*
   make(AVOutputFormat* format);
 
 private:
-  SinkFormat();
+  MuxerFormat();
   virtual
-  ~SinkFormat();
+  ~MuxerFormat();
 
 private:
   AVOutputFormat *mFormat;

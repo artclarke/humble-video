@@ -18,14 +18,14 @@ import org.junit.Test;
 
 public class FilterGraphTest {
 
-  private Source source;
+  private Demuxer source;
 
   @Before
   public void setUp() throws Exception {
     final URL s = this.getClass().getResource("/ucl_h264_aac.mp4");
 //    final URL s = this.getClass().getResource("/testfile.mp3");
     final String f = s.getPath();
-    source = Source.make();
+    source = Demuxer.make();
     source.open(f, null, false, true, null, null);
     source.queryStreamMetaData();
 
@@ -119,7 +119,7 @@ public class FilterGraphTest {
     Decoder decoder=null;
     int n = source.getNumStreams();
     for(int i = 0; i < n; i++) {
-      SourceStream stream = source.getSourceStream(i);
+      DemuxerStream stream = source.getSourceStream(i);
       decoder = stream.getDecoder();
       if (decoder.getCodecType() == MediaDescriptor.Type.MEDIA_AUDIO) {
         audioStream = i;

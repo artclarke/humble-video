@@ -27,11 +27,11 @@
 
 #include <io/humble/testutils/TestUtils.h>
 
-class SinkFormatTest : public CxxTest::TestSuite
+class MuxerFormatTest : public CxxTest::TestSuite
 {
 public:
-  SinkFormatTest();
-  virtual ~SinkFormatTest();
+  MuxerFormatTest();
+  virtual ~MuxerFormatTest();
   void setUp();
   void tearDown();
   void testCreateSinkFormat();

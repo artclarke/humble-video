@@ -12,7 +12,7 @@ public class ConfigurableTest {
 
   @Test
   public void testGetNumProperties() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
 
     assertTrue(source.getNumProperties() > 10);
   }
@@ -20,7 +20,7 @@ public class ConfigurableTest {
   @Test
   public void testGetPropertyMetaDataInt() {
 
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
     int n = source.getNumProperties();
 
     Property d;
@@ -46,13 +46,13 @@ public class ConfigurableTest {
 
   @Test(expected = PropertyNotFoundException.class)
   public void testGetPropertyMetaDataStringNotFound() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
     source.getPropertyMetaData("not-an-option");
   }
 
   @Test
   public void testSetPropertyStringString() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
 
     // set it.
     source.setProperty(GOOD_OPTION, "66.459");
@@ -63,14 +63,14 @@ public class ConfigurableTest {
 
   @Test(expected = PropertyNotFoundException.class)
   public void testSetPropertyStringStringNotFound() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
 
     source.setProperty("not-an-option", "66.459");
   }
 
   @Test
   public void testSetPropertyStringDouble() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
 
     // set it.
     source.setProperty(GOOD_OPTION, 66.459);
@@ -81,14 +81,14 @@ public class ConfigurableTest {
 
   @Test(expected = PropertyNotFoundException.class)
   public void testSetPropertyStringDoubleNotFound() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
 
     source.setProperty("not-an-option", 66.459);
   }
 
   @Test
   public void testSetPropertyStringLong() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
 
     // set it.
     source.setProperty(GOOD_OPTION, 66L);
@@ -99,14 +99,14 @@ public class ConfigurableTest {
 
   @Test(expected = PropertyNotFoundException.class)
   public void testSetPropertyStringLongNotFound() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
 
     source.setProperty("not-an-option", 66L);
   }
 
   @Test
   public void testSetPropertyStringBoolean() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
 
     // set it.
     source.setProperty(GOOD_OPTION, true);
@@ -117,14 +117,14 @@ public class ConfigurableTest {
 
   @Test(expected = PropertyNotFoundException.class)
   public void testSetPropertyStringBooleanNotFound() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
 
     source.setProperty("not-an-option", true);
   }
   
   @Test
   public void testSetPropertyStringRational() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
     Rational r = Rational.make(2, 1);
 
     // set it.
@@ -143,7 +143,7 @@ public class ConfigurableTest {
 
   @Test(expected = PropertyNotFoundException.class)
   public void testSetPropertyStringRationalNotFound() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
     Rational r = Rational.make(2, 1);
 
     source.setProperty("not-an-option", r);
@@ -151,37 +151,37 @@ public class ConfigurableTest {
   
   @Test
   public void testGetPropertyAsString() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
     assertEquals("0", source.getPropertyAsString(GOOD_OPTION));
   }
 
   @Test
   public void testGetPropertyAsDouble() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
     assertEquals(0.0, source.getPropertyAsDouble(GOOD_OPTION), 0.01);
   }
 
   @Test
   public void testGetPropertyAsLong() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
     assertEquals(0L, source.getPropertyAsLong(GOOD_OPTION));
   }
 
   @Test
   public void testGetPropertyAsInt() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
     assertEquals(0, source.getPropertyAsInt(GOOD_OPTION));
   }
 
   @Test
   public void testGetPropertyAsRational() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
     assertEquals(0.0, source.getPropertyAsRational(GOOD_OPTION).getValue(), 0.0001);
   }
 
   @Test
   public void testGetPropertyAsBoolean() {
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
     assertEquals(false, source.getPropertyAsBoolean(GOOD_OPTION));
   }
 
@@ -193,7 +193,7 @@ public class ConfigurableTest {
     in.setValue(GOOD_OPTION, "2");
     in.setValue("not-an-option", "62");
     
-    Source source = Source.make();
+    Demuxer source = Demuxer.make();
     source.setProperty(in, out);
     assertEquals(1,  out.getNumKeys());
     assertEquals(2,  source.getPropertyAsInt(GOOD_OPTION));

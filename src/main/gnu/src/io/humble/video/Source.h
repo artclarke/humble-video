@@ -35,7 +35,7 @@ namespace video {
 /**
  * A Source of {@link Packet} data.
  */
-class VS_API_HUMBLEVIDEO Source : public io::humble::video::Container
+class VS_API_HUMBLEVIDEO Demuxer : public io::humble::video::Container
 {
   /**
    * Note: This class is a pure-virtual interface. Actual
@@ -46,14 +46,8 @@ public:
   /**
    * Create a new {@link Source}
    */
-  static Source*
+  static Demuxer*
   make();
-
-  /** {@inheritDoc} */
-  virtual ContainerFormat *
-  getFormat() {
-    return getSourceFormat();
-  }
 
   /** {@inheritDoc} */
   virtual State
@@ -63,8 +57,8 @@ public:
    * Get the {@link InputFormat} associated with this {@link Source}
    * or null if unknown.
    */
-  virtual SourceFormat *
-  getSourceFormat() = 0;
+  virtual DemuxerFormat *
+  getFormat() = 0;
 
   /**
    * Set the buffer length Humble Video will suggest to FFMPEG for reading inputs.
@@ -124,7 +118,7 @@ public:
    * @return >= 0 on success; < 0 on error.
    */
   virtual void
-  open(const char *url, SourceFormat* format, bool streamsCanBeAddedDynamically,
+  open(const char *url, DemuxerFormat* format, bool streamsCanBeAddedDynamically,
       bool queryStreamMetaData, KeyValueBag* options,
       KeyValueBag* optionsNotSet)=0;
 
@@ -153,8 +147,8 @@ public:
    * @param streamIndex the index of this stream in the container
    * @return The stream at that position in the container, or null if none there.
    */
-  virtual SourceStream*
-  getSourceStream(int32_t streamIndex)=0;
+  virtual DemuxerStream*
+  getStream(int32_t streamIndex)=0;
 
   /**
    * Reads the next packet in the Source into the Packet.  This method will
@@ -437,9 +431,9 @@ public:
   pause()=0;
 
 protected:
-  Source();
+  Demuxer();
   virtual
-  ~Source();
+  ~Demuxer();
 };
 
 } /* namespace video */

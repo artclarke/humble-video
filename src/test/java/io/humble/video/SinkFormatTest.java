@@ -17,10 +17,10 @@ public class SinkFormatTest extends TestCase {
 
   @Test
   public void testSinkFormat() {
-    SinkFormat f = SinkFormat.guessFormat("flv", null, null);
+    MuxerFormat f = MuxerFormat.guessFormat("flv", null, null);
     assertNotNull(f);
     
-    f = SinkFormat.guessFormat("mp4", null, null);
+    f = MuxerFormat.guessFormat("mp4", null, null);
     assertNotNull(f);
     
     assertEquals(Codec.ID.CODEC_ID_AAC, f.getDefaultAudioCodecId());
@@ -34,7 +34,7 @@ public class SinkFormatTest extends TestCase {
   
   @Test
   public void testGetCodecs() {
-    final SinkFormat f = SinkFormat.guessFormat("mp4", null, null);
+    final MuxerFormat f = MuxerFormat.guessFormat("mp4", null, null);
     assertNotNull(f);
     
     final List<Codec.ID> l = f.getSupportedCodecs();
@@ -43,10 +43,10 @@ public class SinkFormatTest extends TestCase {
 
   @Test
   public void testInstallation() {
-    Collection<SinkFormat> formats = SinkFormat.getFormats();
+    Collection<MuxerFormat> formats = MuxerFormat.getFormats();
     // A well configured FFmpeg will have over 120 output formats
     assertTrue(formats.size() > 100);
-    for (SinkFormat  f : formats)
+    for (MuxerFormat  f : formats)
     {
       assertNotNull(f);
 //      System.out.println(f);

@@ -35,28 +35,28 @@ using namespace io::humble::video;
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
-SourceFormatTest::SourceFormatTest()
+DemuxerFormatTest::DemuxerFormatTest()
 {
 }
 
-SourceFormatTest::~SourceFormatTest()
+DemuxerFormatTest::~DemuxerFormatTest()
 {
 }
 
 void
-SourceFormatTest::setUp()
+DemuxerFormatTest::setUp()
 {
 
 }
 
 void
-SourceFormatTest::tearDown() {
+DemuxerFormatTest::tearDown() {
 
 }
 void
-SourceFormatTest::testCreateSourceFormat() {
-  RefPointer<SourceFormat> format;
-  format = SourceFormat::findFormat("mp4");
+DemuxerFormatTest::testCreateSourceFormat() {
+  RefPointer<DemuxerFormat> format;
+  format = DemuxerFormat::findFormat("mp4");
   VS_LOG_DEBUG("Pointer: %p", format.value());
   VS_LOG_DEBUG("Name: %s", format->getName());
   VS_LOG_DEBUG("Long Name: %s", format->getLongName());
@@ -78,12 +78,12 @@ SourceFormatTest::testCreateSourceFormat() {
 }
 
 void
-SourceFormatTest::testInstallation() {
-  int32_t n = SourceFormat::getNumFormats();
+DemuxerFormatTest::testInstallation() {
+  int32_t n = DemuxerFormat::getNumFormats();
   TSM_ASSERT("", n > 0);
 
   for(int32_t i = 0; i < n; i++) {
-    RefPointer<SourceFormat> f = SourceFormat::getFormat(i);
+    RefPointer<DemuxerFormat> f = DemuxerFormat::getFormat(i);
     VS_LOG_DEBUG("Name: %s; Description: %s", f->getName(), f->getLongName());
   }
 }

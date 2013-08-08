@@ -42,18 +42,18 @@ namespace io {
 namespace humble {
 namespace video {
 
-SourceStreamImpl::SourceStreamImpl() {
+DemuxerStreamImpl::DemuxerStreamImpl() {
   mStream = 0;
   mContainer = 0;
   mLastDts = Global::NO_PTS;
 }
 
-SourceStreamImpl::~SourceStreamImpl() {
+DemuxerStreamImpl::~DemuxerStreamImpl() {
   reset();
 }
 
 MediaPacket*
-SourceStreamImpl::getAttachedPic() {
+DemuxerStreamImpl::getAttachedPic() {
   MediaPacketImpl* retval = 0;
 
   if (mStream && mStream->attached_pic.size > 0) {
@@ -67,7 +67,7 @@ SourceStreamImpl::getAttachedPic() {
 }
 
 ContainerStream::Disposition
-SourceStreamImpl::getDisposition() {
+DemuxerStreamImpl::getDisposition() {
   return
       mStream ?
           (ContainerStream::Disposition) mStream->disposition :
@@ -75,7 +75,7 @@ SourceStreamImpl::getDisposition() {
 }
 
 void
-SourceStreamImpl::reset() {
+DemuxerStreamImpl::reset() {
   VS_ASSERT("should be a valid object", getCurrentRefCount() >= 1);
   mMetaData.reset();
   // As of recent (March 2011) builds of FFmpeg, Stream objects
@@ -89,11 +89,11 @@ SourceStreamImpl::reset() {
   mContainer = 0;
 }
 
-SourceStreamImpl*
-SourceStreamImpl::make(Container *container, AVStream * aStream,
+DemuxerStreamImpl*
+DemuxerStreamImpl::make(Container *container, AVStream * aStream,
     AVCodec* /* avCodec */) {
   // note: make will acquire this for us.
-  SourceStreamImpl *newStream = 0;
+  DemuxerStreamImpl *newStream = 0;
   if (aStream) {
     try {
       newStream = make();
@@ -115,18 +115,18 @@ SourceStreamImpl::make(Container *container, AVStream * aStream,
 }
 
 int
-SourceStreamImpl::getIndex() {
+DemuxerStreamImpl::getIndex() {
   return (mStream ? mStream->index : -1);
 }
 
 int
-SourceStreamImpl::getId() {
+DemuxerStreamImpl::getId() {
   return (mStream ? mStream->id : -1);
 }
 
 #if 0
 StreamCoder *
-SourceStreamImpl::getStreamCoder()
+DemuxerStreamImpl::getStreamCoder()
 {
   StreamCoder *retval = 0;
 
@@ -139,7 +139,7 @@ SourceStreamImpl::getStreamCoder()
 #endif
 
 Rational *
-SourceStreamImpl::getFrameRate() {
+DemuxerStreamImpl::getFrameRate() {
   Rational * result = 0;
   if (mStream && mStream->avg_frame_rate.den != 0) {
     result = Rational::make(mStream->avg_frame_rate.num,
@@ -149,7 +149,7 @@ SourceStreamImpl::getFrameRate() {
 }
 
 Rational *
-SourceStreamImpl::getTimeBase() {
+DemuxerStreamImpl::getTimeBase() {
   Rational * result = 0;
   if (mStream) {
     result = Rational::make(mStream->time_base.num, mStream->time_base.den);
@@ -157,14 +157,14 @@ SourceStreamImpl::getTimeBase() {
   return result;
 }
 void
-SourceStreamImpl::setTimeBase(Rational* src) {
+DemuxerStreamImpl::setTimeBase(Rational* src) {
   if (mStream && src) {
     mStream->time_base.den = src->getDenominator();
     mStream->time_base.num = src->getNumerator();
   }
 }
 void
-SourceStreamImpl::setFrameRate(Rational* src) {
+DemuxerStreamImpl::setFrameRate(Rational* src) {
   if (mStream && src) {
     mStream->r_frame_rate.den = src->getDenominator();
     mStream->r_frame_rate.num = src->getNumerator();
@@ -172,30 +172,30 @@ SourceStreamImpl::setFrameRate(Rational* src) {
 }
 
 int64_t
-SourceStreamImpl::getStartTime() {
+DemuxerStreamImpl::getStartTime() {
   return (mStream ? mStream->start_time : Global::NO_PTS);
 }
 
 int64_t
-SourceStreamImpl::getDuration() {
+DemuxerStreamImpl::getDuration() {
   return (mStream ? mStream->duration : Global::NO_PTS);
 }
 
 int64_t
-SourceStreamImpl::getCurrentDts() {
+DemuxerStreamImpl::getCurrentDts() {
   return (mStream ? mStream->cur_dts : Global::NO_PTS);
 }
 
 int64_t
-SourceStreamImpl::getNumFrames() {
+DemuxerStreamImpl::getNumFrames() {
   return (mStream ? mStream->nb_frames : 0);
 }
 int
-SourceStreamImpl::getNumIndexEntries() {
+DemuxerStreamImpl::getNumIndexEntries() {
   return (mStream ? mStream->nb_index_entries : 0);
 }
 int
-SourceStreamImpl::containerClosed(Container *) {
+DemuxerStreamImpl::containerClosed(Container *) {
   // let the coder know we're closed.
 //    if (mCoder)
 //      mCoder->streamClosed(this);
@@ -204,7 +204,7 @@ SourceStreamImpl::containerClosed(Container *) {
 }
 
 int32_t
-SourceStreamImpl::acquire() {
+DemuxerStreamImpl::acquire() {
   int retval = 0;
   retval = RefCounted::acquire();
   VS_LOG_TRACE("Acquired %p: %d", this, retval);
@@ -212,7 +212,7 @@ SourceStreamImpl::acquire() {
 }
 
 int32_t
-SourceStreamImpl::release() {
+DemuxerStreamImpl::release() {
   int retval = 0;
   retval = RefCounted::release();
   VS_LOG_TRACE("Released %p: %d", this, retval);
@@ -220,7 +220,7 @@ SourceStreamImpl::release() {
 }
 
 Rational*
-SourceStreamImpl::getSampleAspectRatio() {
+DemuxerStreamImpl::getSampleAspectRatio() {
   Rational* retval = 0;
   if (mStream) {
     retval = Rational::make(mStream->sample_aspect_ratio.num,
@@ -230,7 +230,7 @@ SourceStreamImpl::getSampleAspectRatio() {
 }
 
 void
-SourceStreamImpl::setSampleAspectRatio(Rational* aNewValue) {
+DemuxerStreamImpl::setSampleAspectRatio(Rational* aNewValue) {
   if (aNewValue && mStream) {
     mStream->sample_aspect_ratio.num = aNewValue->getNumerator();
     mStream->sample_aspect_ratio.den = aNewValue->getDenominator();
@@ -239,7 +239,7 @@ SourceStreamImpl::setSampleAspectRatio(Rational* aNewValue) {
 }
 
 Container*
-SourceStreamImpl::getContainer() {
+DemuxerStreamImpl::getContainer() {
   // add ref for caller
   VS_REF_ACQUIRE(mContainer);
   return mContainer;
@@ -247,12 +247,12 @@ SourceStreamImpl::getContainer() {
 
 #if 0
 int32_t
-SourceStreamImpl::setStreamCoder(StreamCoder *coder)
+DemuxerStreamImpl::setStreamCoder(StreamCoder *coder)
 {
   return setStreamCoder(coder, true);
 }
 int32_t
-SourceStreamImpl::setStreamCoder(StreamCoder *aCoder, bool assumeOnlyStream)
+DemuxerStreamImpl::setStreamCoder(StreamCoder *aCoder, bool assumeOnlyStream)
 {
   int32_t retval = -1;
   try
@@ -291,7 +291,7 @@ SourceStreamImpl::setStreamCoder(StreamCoder *aCoder, bool assumeOnlyStream)
 #endif
 
 ContainerStream::ParseType
-SourceStreamImpl::getParseType() {
+DemuxerStreamImpl::getParseType() {
   if (mStream) {
     return (ContainerStream::ParseType) mStream->need_parsing;
   } else {
@@ -300,17 +300,17 @@ SourceStreamImpl::getParseType() {
 }
 
 void
-SourceStreamImpl::setParseType(ContainerStream::ParseType type) {
+DemuxerStreamImpl::setParseType(ContainerStream::ParseType type) {
   if (mStream) {
     mStream->need_parsing = (enum AVStreamParseType) type;
   }
 }
 
 KeyValueBag*
-SourceStreamImpl::getMetaData() {
+DemuxerStreamImpl::getMetaData() {
   if (!mMetaData && mStream) {
 #if 0
-    if (mDirection == SourceStreamImpl::OUTBOUND)
+    if (mDirection == DemuxerStreamImpl::OUTBOUND)
     mMetaData = MetaData::make(&mStream->metadata);
     else
 #endif
@@ -322,7 +322,7 @@ SourceStreamImpl::getMetaData() {
 }
 
 void
-SourceStreamImpl::setMetaData(KeyValueBag * copy) {
+DemuxerStreamImpl::setMetaData(KeyValueBag * copy) {
   KeyValueBagImpl* data = dynamic_cast<KeyValueBagImpl*>(getMetaData());
   if (data) {
     data->copy(copy);
@@ -333,7 +333,7 @@ SourceStreamImpl::setMetaData(KeyValueBag * copy) {
 }
 
 int32_t
-SourceStreamImpl::stampOutputPacket(MediaPacket* packet) {
+DemuxerStreamImpl::stampOutputPacket(MediaPacket* packet) {
   if (!packet) return -1;
 
 //    VS_LOG_DEBUG("input:  duration: %lld; dts: %lld; pts: %lld;",
@@ -394,14 +394,14 @@ SourceStreamImpl::stampOutputPacket(MediaPacket* packet) {
 }
 
 IndexEntry*
-SourceStreamImpl::findTimeStampEntryInIndex(int64_t wantedTimeStamp,
+DemuxerStreamImpl::findTimeStampEntryInIndex(int64_t wantedTimeStamp,
     int32_t flags) {
   int32_t index = findTimeStampPositionInIndex(wantedTimeStamp, flags);
   // getIndexEntry will check for a negative index and return null if so
   return getIndexEntry(index);
 }
 int32_t
-SourceStreamImpl::findTimeStampPositionInIndex(int64_t wantedTimeStamp,
+DemuxerStreamImpl::findTimeStampPositionInIndex(int64_t wantedTimeStamp,
     int32_t flags) {
   int retval = -1;
   if (mStream) {
@@ -411,7 +411,7 @@ SourceStreamImpl::findTimeStampPositionInIndex(int64_t wantedTimeStamp,
 }
 
 IndexEntry*
-SourceStreamImpl::getIndexEntry(int32_t index) {
+DemuxerStreamImpl::getIndexEntry(int32_t index) {
   IndexEntry* retval = 0;
   if (mStream->index_entries && index >= 0
       && index < mStream->nb_index_entries) {
@@ -424,7 +424,7 @@ SourceStreamImpl::getIndexEntry(int32_t index) {
   return retval;
 }
 int32_t
-SourceStreamImpl::addIndexEntry(IndexEntry* entry) {
+DemuxerStreamImpl::addIndexEntry(IndexEntry* entry) {
   if (!entry) return -1;
   if (!mStream) return -1;
   return av_add_index_entry(mStream, entry->getPosition(),
@@ -433,13 +433,13 @@ SourceStreamImpl::addIndexEntry(IndexEntry* entry) {
 }
 
 void
-SourceStreamImpl::setId(int32_t aId) {
+DemuxerStreamImpl::setId(int32_t aId) {
   if (!mStream) return;
   mStream->id = aId;
 }
 
 Decoder*
-SourceStreamImpl::getDecoder() {
+DemuxerStreamImpl::getDecoder() {
   if (!mDecoder) {
     if (mStream->codec) {
       // make a copy of the decoder so we decouple it from the container

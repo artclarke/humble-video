@@ -8,7 +8,7 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
-public class SinkFormat extends ContainerFormat {
+public class MuxerFormat extends ContainerFormat {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -26,7 +26,7 @@ public class SinkFormat extends ContainerFormat {
   /**
    * Internal Only.
    */
-  protected SinkFormat(long cPtr, boolean cMemoryOwn) {
+  protected MuxerFormat(long cPtr, boolean cMemoryOwn) {
     super(VideoJNI.SWIGSinkFormatUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
@@ -34,7 +34,7 @@ public class SinkFormat extends ContainerFormat {
   /**
    * Internal Only.
    */
-  protected SinkFormat(long cPtr, boolean cMemoryOwn,
+  protected MuxerFormat(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
     super(VideoJNI.SWIGSinkFormatUpcast(cPtr),
@@ -50,7 +50,7 @@ public class SinkFormat extends ContainerFormat {
    * @param obj The java proxy object for a native object.
    * @return The raw pointer obj is proxying for.
    */
-  protected static long getCPtr(SinkFormat obj) {
+  protected static long getCPtr(MuxerFormat obj) {
     if (obj == null) return 0;
     return obj.getMyCPtr();
   }
@@ -74,11 +74,11 @@ public class SinkFormat extends ContainerFormat {
    * @return the new Java object.
    */
   @Override
-  public SinkFormat copyReference() {
+  public MuxerFormat copyReference() {
     if (swigCPtr == 0)
       return null;
     else
-      return new SinkFormat(swigCPtr, swigCMemOwn, getJavaRefCount());
+      return new MuxerFormat(swigCPtr, swigCMemOwn, getJavaRefCount());
   }
 
   /**
@@ -91,8 +91,8 @@ public class SinkFormat extends ContainerFormat {
    */
   public boolean equals(Object obj) {
     boolean equal = false;
-    if (obj instanceof SinkFormat)
-      equal = (((SinkFormat)obj).swigCPtr == this.swigCPtr);
+    if (obj instanceof MuxerFormat)
+      equal = (((MuxerFormat)obj).swigCPtr == this.swigCPtr);
     return equal;
   }
   
@@ -127,15 +127,15 @@ public class SinkFormat extends ContainerFormat {
    * Return a collection of all output formats installed on this system.
    * @return the list.
    */
-  public static java.util.Collection<SinkFormat>
+  public static java.util.Collection<MuxerFormat>
   getFormats()
   {
-    java.util.Collection<SinkFormat> retval =
-      new java.util.HashSet<SinkFormat>();
+    java.util.Collection<MuxerFormat> retval =
+      new java.util.HashSet<MuxerFormat>();
     int count = getNumFormats();
     for(int i = 0; i< count;++i)
     {
-      SinkFormat fmt = getFormat(i);
+      MuxerFormat fmt = getFormat(i);
       if (fmt != null)
         retval.add(fmt);
     }
@@ -217,9 +217,9 @@ public class SinkFormat extends ContainerFormat {
  *		  
  * MIME type of the registered formats  
  */
-  public static SinkFormat guessFormat(String shortName, String filename, String mimeType) {
+  public static MuxerFormat guessFormat(String shortName, String filename, String mimeType) {
     long cPtr = VideoJNI.SinkFormat_guessFormat(shortName, filename, mimeType);
-    return (cPtr == 0) ? null : new SinkFormat(cPtr, false);
+    return (cPtr == 0) ? null : new MuxerFormat(cPtr, false);
   }
 
   public Codec.ID guessCodec(String shortName, String filename, String mimeType, MediaDescriptor.Type type) {
@@ -275,9 +275,9 @@ public class SinkFormat extends ContainerFormat {
  * unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()} 
  *  
  */
-  public static SinkFormat getFormat(int index) {
+  public static MuxerFormat getFormat(int index) {
     long cPtr = VideoJNI.SinkFormat_getFormat(index);
-    return (cPtr == 0) ? null : new SinkFormat(cPtr, false);
+    return (cPtr == 0) ? null : new MuxerFormat(cPtr, false);
   }
 
 }

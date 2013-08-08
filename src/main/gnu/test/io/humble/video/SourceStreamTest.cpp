@@ -10,29 +10,29 @@ using namespace io::humble::video;
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
-SourceStreamTest::SourceStreamTest()
+DemuxerStreamTest::DemuxerStreamTest()
 {
   VS_LOG_TRACE("Creation!");
 }
 
-SourceStreamTest::~SourceStreamTest()
+DemuxerStreamTest::~DemuxerStreamTest()
 {
 }
 
 void
-SourceStreamTest::setUp()
+DemuxerStreamTest::setUp()
 {
 }
 
 void
-SourceStreamTest::tearDown()
+DemuxerStreamTest::tearDown()
 {
 }
 
 void
-SourceStreamTest::testCreationAndDestruction()
+DemuxerStreamTest::testCreationAndDestruction()
 {
-  RefPointer<Source> s = Source::make();
+  RefPointer<Demuxer> s = Demuxer::make();
   TestData::Fixture* f = mFixtures.getFixture(0);
   char path[2048];
   mFixtures.fillPath(f, path, sizeof(path));
@@ -43,14 +43,14 @@ SourceStreamTest::testCreationAndDestruction()
   TS_ASSERT_EQUALS(ns, f->num_streams);
 
   for(int i = 0; i < ns; i++) {
-    RefPointer<SourceStream> ss = s->getSourceStream(i);
+    RefPointer<DemuxerStream> ss = s->getStream(i);
     TS_ASSERT(ss);
 
     // now, let's go a testing.
     TS_ASSERT_EQUALS(i, ss->getIndex());
   }
   // Remember this for after the close -- we best not crash
-  RefPointer<SourceStream> fs = s->getSourceStream(0);
+  RefPointer<DemuxerStream> fs = s->getStream(0);
 
   TS_ASSERT_EQUALS(Global::NO_PTS, fs->getDuration());
   TS_ASSERT_EQUALS(2667, fs->getCurrentDts());

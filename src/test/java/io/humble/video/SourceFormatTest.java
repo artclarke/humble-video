@@ -11,7 +11,7 @@ public class SourceFormatTest {
 
   @Test
   public void testSourceFormat() {
-    final SourceFormat f = SourceFormat.findFormat("aiff");
+    final DemuxerFormat f = DemuxerFormat.findFormat("aiff");
     assertNotNull(f);
     
     assertEquals("aiff", f.getName());
@@ -22,10 +22,10 @@ public class SourceFormatTest {
   
   @Test
   public void testInstallation() {
-    Collection<SourceFormat> formats = SourceFormat.getFormats();
+    Collection<DemuxerFormat> formats = DemuxerFormat.getFormats();
     // A well configured FFmpeg will have over 180 formats
     assertTrue(formats.size() > 100);
-    for (SourceFormat  f : formats)
+    for (DemuxerFormat  f : formats)
     {
       assertNotNull(f);
 //      System.out.println(f);

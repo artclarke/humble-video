@@ -17,8 +17,8 @@
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef STREAMIMPL_H_
-#define STREAMIMPL_H_
+#ifndef HUMBLESTREAMIMPL_H_
+#define HUMBLESTREAMIMPL_H_
 
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/SourceStream.h>
@@ -32,9 +32,9 @@ namespace io { namespace humble { namespace video
   class Container;
   class MediaPacket;
 
-  class SourceStreamImpl : public SourceStream
+  class DemuxerStreamImpl : public DemuxerStream
   {
-    VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(SourceStreamImpl)
+    VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(DemuxerStreamImpl)
   public:
 
     // IStream
@@ -49,7 +49,7 @@ namespace io { namespace humble { namespace video
     virtual int64_t getNumFrames();
 
     // Not for calling from Java
-    static SourceStreamImpl * make(Container* container, AVStream *, AVCodec*);
+    static DemuxerStreamImpl * make(Container* container, AVStream *, AVCodec*);
 
     // The StreamCoder will call this if it needs to
     virtual void setTimeBase(Rational *);
@@ -67,7 +67,7 @@ namespace io { namespace humble { namespace video
 
     virtual Container* getContainer();
     virtual ContainerStream::ParseType getParseType();
-    virtual void setParseType(ParseType type);
+    virtual void setParseType(ContainerStream::ParseType type);
 
     virtual AVStream* getAVStream() { return mStream; }
     
@@ -87,8 +87,8 @@ namespace io { namespace humble { namespace video
     virtual Decoder* getDecoder();
 
   protected:
-    SourceStreamImpl();
-    virtual ~SourceStreamImpl();
+    DemuxerStreamImpl();
+    virtual ~DemuxerStreamImpl();
 
   private:
     void reset();
@@ -101,4 +101,4 @@ namespace io { namespace humble { namespace video
 
 }}}
 
-#endif /*STREAMIMPL_H_*/
+#endif /*HUMBLESTREAMIMPL_H_*/

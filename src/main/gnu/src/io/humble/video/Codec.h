@@ -36,7 +36,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-class SinkFormat;
+class MuxerFormat;
 
 /**
  * A descriptor for different types of media that can be handled
@@ -865,7 +865,7 @@ public:
    * @return the codec, or null if we can't find it.
    */
   static Codec*
-  guessEncodingCodec(SinkFormat* fmt, const char *shortName, const char*url,
+  guessEncodingCodec(MuxerFormat* fmt, const char *shortName, const char*url,
       const char*mimeType, MediaDescriptor::Type type);
 
   /**

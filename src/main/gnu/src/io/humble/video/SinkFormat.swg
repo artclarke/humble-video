@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  *
- * SinkFormat.h
+ * MuxerFormat.swg
  *
  *  Created on: Jun 28, 2013
  *      Author: aclarke
@@ -25,7 +25,7 @@
 %javamethodmodifiers getSupportedCodecId "protected";
 %javamethodmodifiers getSupportedCodecTag "protected";
 
-%typemap (javacode) io::humble::video::SinkFormat,io::humble::video::SinkFormat*,io::humble::video::SinkFormat& %{
+%typemap (javacode) io::humble::video::MuxerFormat,io::humble::video::MuxerFormat*,io::humble::video::MuxerFormat& %{
   
   @Override
   public String toString()
@@ -45,15 +45,15 @@
    * Return a collection of all output formats installed on this system.
    * @return the list.
    */
-  public static java.util.Collection<SinkFormat>
+  public static java.util.Collection<MuxerFormat>
   getFormats()
   {
-    java.util.Collection<SinkFormat> retval =
-      new java.util.HashSet<SinkFormat>();
+    java.util.Collection<MuxerFormat> retval =
+      new java.util.HashSet<MuxerFormat>();
     int count = getNumFormats();
     for(int i = 0; i< count;++i)
     {
-      SinkFormat fmt = getFormat(i);
+      MuxerFormat fmt = getFormat(i);
       if (fmt != null)
         retval.add(fmt);
     }
@@ -62,4 +62,4 @@
 
 %}
 
-%include <io/humble/video/SinkFormat.h>
+%include <io/humble/video/SourceFormat.h>

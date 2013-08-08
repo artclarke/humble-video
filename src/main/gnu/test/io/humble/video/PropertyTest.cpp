@@ -48,7 +48,7 @@ PropertyTest::testValgrindStrlenIssue()
   // captive build. The error crops up for BINARY
   // option types that have no data in them.
   // This test tries to ensure we have a patched FFmpeg.
-  RefPointer<Configurable> c = Source::make();
+  RefPointer<Configurable> c = Demuxer::make();
 
   {
     LoggerStack stack;
@@ -63,7 +63,7 @@ PropertyTest :: testCreation()
 {
   LoggerStack stack;
   stack.setGlobalLevel(Logger::LEVEL_WARN, false);
-  RefPointer<Configurable> c = Source::make();
+  RefPointer<Configurable> c = Demuxer::make();
   RefPointer<Property> property =  c->getPropertyMetaData("packetsize");
   VS_LOG_DEBUG("Name: %s", property->getName());
   VS_LOG_DEBUG("Description: %s", property->getHelp());
@@ -76,7 +76,7 @@ PropertyTest :: testIteration()
   LoggerStack stack;
   stack.setGlobalLevel(Logger::LEVEL_WARN, false);
 
-  RefPointer<Configurable> c = Source::make();
+  RefPointer<Configurable> c = Demuxer::make();
 
   int32_t numProperties = c->getNumProperties();
   TSM_ASSERT("", numProperties > 0);
@@ -107,7 +107,7 @@ PropertyTest :: testSetMetaData()
   LoggerStack stack;
   stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
 
-  RefPointer<Configurable> c = Source::make();
+  RefPointer<Configurable> c = Demuxer::make();
   RefPointer<KeyValueBag> dict = KeyValueBag::make();
   RefPointer<KeyValueBag> unset = KeyValueBag::make();
   const char* realKey = "packetsize";

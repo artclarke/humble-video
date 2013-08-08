@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  *
- * SourceFormat.swg
+ * DemuxerFormat.swg
  *
  *  Created on: Jun 29, 2013
  *      Author: aclarke
@@ -28,7 +28,7 @@
 %javamethodmodifiers getNumFormats "protected";
 %javamethodmodifiers getFormat "protected"
 
-%typemap (javacode) io::humble::video::SourceFormat,io::humble::video::SourceFormat*,io::humble::video::SourceFormat& %{
+%typemap (javacode) io::humble::video::DemuxerFormat,io::humble::video::DemuxerFormat*,io::humble::video::DemuxerFormat& %{
   @Override
   public String toString()
   {
@@ -45,15 +45,15 @@
    * Return a collection of all input formats installed on this system.
    * @return the list.
    */
-  public static java.util.Collection<SourceFormat>
+  public static java.util.Collection<DemuxerFormat>
   getFormats()
   {
-    java.util.Collection<SourceFormat> retval =
-      new java.util.HashSet<SourceFormat>();
+    java.util.Collection<DemuxerFormat> retval =
+      new java.util.HashSet<DemuxerFormat>();
     int count = getNumFormats();
     for(int i = 0; i< count;++i)
     {
-      SourceFormat fmt = getFormat(i);
+      DemuxerFormat fmt = getFormat(i);
       if (fmt != null)
         retval.add(fmt);
     }

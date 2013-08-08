@@ -119,7 +119,7 @@ FilterGraphTest::testFilterVideo() {
   char filepath[2048];
   mFixtures.fillPath(fixture, filepath, sizeof(filepath));
 
-  RefPointer<Source> source = Source::make();
+  RefPointer<Demuxer> source = Demuxer::make();
 
   source->open(filepath, 0, false, true, 0, 0);
 
@@ -130,7 +130,7 @@ FilterGraphTest::testFilterVideo() {
   int32_t streamToDecode = -1;
   // find first video stream
   for (int i = 0; i < numStreams; i++) {
-    RefPointer<SourceStream> stream = source->getSourceStream(i);
+    RefPointer<DemuxerStream> stream = source->getStream(i);
     TS_ASSERT(stream);
     decoder = stream->getDecoder();
     TS_ASSERT(decoder);
@@ -258,7 +258,7 @@ FilterGraphTest::testFilterAudio() {
     char filepath[2048];
     mFixtures.fillPath(fixture, filepath, sizeof(filepath));
 
-    RefPointer<Source> source = Source::make();
+    RefPointer<Demuxer> source = Demuxer::make();
 
     source->open(filepath, 0, false, true, 0, 0);
 
@@ -269,7 +269,7 @@ FilterGraphTest::testFilterAudio() {
     RefPointer<Decoder> decoder;
     // find first video stream
     for (int i = 0; i < numStreams; i++) {
-      RefPointer<SourceStream> stream = source->getSourceStream(i);
+      RefPointer<DemuxerStream> stream = source->getStream(i);
       TS_ASSERT(stream);
       decoder = stream->getDecoder();
       TS_ASSERT(decoder);

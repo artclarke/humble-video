@@ -146,17 +146,6 @@ public class Container extends Configurable {
     return VideoJNI.Container_getNumStreams(swigCPtr, this);
   }
 
-/**
- * Get the stream at the given position.  
- * @param	streamIndex the index of this stream in the container  
- * @return	The stream at that position in the container, or null if 
- *		 none there.  
- */
-  public ContainerStream getStream(int streamIndex) throws java.lang.InterruptedException, java.io.IOException {
-    long cPtr = VideoJNI.Container_getStream(swigCPtr, this, streamIndex);
-    return (cPtr == 0) ? null : new ContainerStream(cPtr, false);
-  }
-
   public enum Flag {
   /**
    * Do not set these flags -- several are used by the internals of Humble 

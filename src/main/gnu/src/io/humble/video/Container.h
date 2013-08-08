@@ -137,14 +137,6 @@ public:
   virtual int32_t
   getNumStreams()=0;
 
-  /**
-   * Get the stream at the given position.
-   *
-   * @param streamIndex the index of this stream in the container
-   * @return The stream at that position in the container, or null if none there.
-   */
-  virtual ContainerStream*
-  getStream(int32_t streamIndex)=0;
 protected:
   Container();
   virtual

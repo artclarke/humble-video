@@ -41,7 +41,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-SourceImpl::SourceImpl() {
+DemuxerImpl::DemuxerImpl() {
   mNumStreams = 0;
   mStreamInfoGotten = 0;
   mReadRetryMax = 1;
@@ -55,7 +55,7 @@ SourceImpl::SourceImpl() {
   mState = Container::STATE_INITED;
 }
 
-SourceImpl::~SourceImpl() {
+DemuxerImpl::~DemuxerImpl() {
   if (mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
       mState == Container::STATE_PAUSED) {
@@ -67,7 +67,7 @@ SourceImpl::~SourceImpl() {
     avformat_free_context(mCtx);
 }
 AVFormatContext*
-SourceImpl::getFormatCtx() {
+DemuxerImpl::getFormatCtx() {
   // throw an exception if in wrong state.
   if (mState == Container::STATE_CLOSED || mState == Container::STATE_ERROR) {
     const char * MESSAGE="Method called on Source in CLOSED or ERROR state.";
@@ -78,16 +78,16 @@ SourceImpl::getFormatCtx() {
   return mCtx;
 }
 
-SourceImpl*
-SourceImpl::make() {
+DemuxerImpl*
+DemuxerImpl::make() {
   Global::init();
-  SourceImpl *retval = new SourceImpl();
+  DemuxerImpl *retval = new DemuxerImpl();
   VS_REF_ACQUIRE(retval);
   return retval;
 }
 
 void
-SourceImpl::open(const char *url, SourceFormat* format,
+DemuxerImpl::open(const char *url, DemuxerFormat* format,
     bool streamsCanBeAddedDynamically, bool queryMetaData,
     KeyValueBag* options, KeyValueBag* optionsNotSet)
 {
@@ -162,7 +162,7 @@ SourceImpl::open(const char *url, SourceFormat* format,
     mState = Container::STATE_OPENED;
 
     if (oldFormat != ctx->iformat)
-      mFormat = SourceFormat::make(ctx->iformat);
+      mFormat = DemuxerFormat::make(ctx->iformat);
 
     if (streamsCanBeAddedDynamically)
       ctx->ctx_flags |= AVFMTCTX_NOHEADER;
@@ -177,7 +177,7 @@ SourceImpl::open(const char *url, SourceFormat* format,
 }
 
 void
-SourceImpl::setInputBufferLength(int32_t size) {
+DemuxerImpl::setInputBufferLength(int32_t size) {
   if (size <= 0)
     VS_THROW(HumbleInvalidArgument("size <= 0"));
   if (mState != Container::STATE_INITED)
@@ -186,12 +186,12 @@ SourceImpl::setInputBufferLength(int32_t size) {
 }
 
 int32_t
-SourceImpl::getInputBufferLength() {
+DemuxerImpl::getInputBufferLength() {
   return mInputBufferLength;
 }
 
 int32_t
-SourceImpl::getNumStreams() {
+DemuxerImpl::getNumStreams() {
   int32_t retval = 0;
   if (!(mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
@@ -207,7 +207,7 @@ SourceImpl::getNumStreams() {
 }
 
 void
-SourceImpl::close() {
+DemuxerImpl::close() {
   int32_t retval=-1;
   if (!(mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
@@ -218,7 +218,7 @@ SourceImpl::close() {
   // tell the streams we're closing.
   while(mStreams.size() > 0)
   {
-    RefPointer<SourceStreamImpl> * stream=mStreams.back();
+    RefPointer<DemuxerStreamImpl> * stream=mStreams.back();
 
     VS_ASSERT(stream && *stream, "no stream?");
     if (stream && *stream) {
@@ -247,7 +247,7 @@ SourceImpl::close() {
 }
 
 int32_t
-SourceImpl::doCloseFileHandles(AVIOContext* pb)
+DemuxerImpl::doCloseFileHandles(AVIOContext* pb)
 {
   int32_t retval = -1;
   if (mIOHandler) {
@@ -264,14 +264,14 @@ SourceImpl::doCloseFileHandles(AVIOContext* pb)
   return retval;
 }
 
-SourceStream*
-SourceImpl::getSourceStream(int32_t position) {
+DemuxerStream*
+DemuxerImpl::getStream(int32_t position) {
   if (!(mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
       mState == Container::STATE_PAUSED)) {
     VS_THROW(HumbleRuntimeError("Attempt to get source stream from source when not opened, playing or paused is ignored"));
   }
-  SourceStream *retval = 0;
+  DemuxerStream *retval = 0;
   if ((int32_t)mCtx->nb_streams != mNumStreams)
     doSetupSourceStreams();
 
@@ -281,7 +281,7 @@ SourceImpl::getSourceStream(int32_t position) {
   if (position < mNumStreams)
   {
     // will acquire for caller.
-    RefPointer<SourceStreamImpl> * p = mStreams.at(position);
+    RefPointer<DemuxerStreamImpl> * p = mStreams.at(position);
     retval = p ? p->get() : 0;
   }
   return retval;
@@ -289,7 +289,7 @@ SourceImpl::getSourceStream(int32_t position) {
 }
 
 int32_t
-SourceImpl::read(MediaPacket* ipkt) {
+DemuxerImpl::read(MediaPacket* ipkt) {
   int32_t retval = -1;
   MediaPacketImpl* pkt = dynamic_cast<MediaPacketImpl*>(ipkt);
   if (pkt)
@@ -323,7 +323,7 @@ SourceImpl::read(MediaPacket* ipkt) {
     if (retval >= 0) {
       if (pkt->getStreamIndex() >= 0)
       {
-        RefPointer<SourceStream> stream = this->getSourceStream(pkt->getStreamIndex());
+        RefPointer<DemuxerStream> stream = this->getStream(pkt->getStreamIndex());
         if (stream)
         {
           RefPointer<Rational> streamBase = stream->getTimeBase();
@@ -344,7 +344,7 @@ SourceImpl::read(MediaPacket* ipkt) {
 }
 
 void
-SourceImpl::queryStreamMetaData() {
+DemuxerImpl::queryStreamMetaData() {
   int32_t retval = -1;
   if (!(mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
@@ -369,17 +369,17 @@ SourceImpl::queryStreamMetaData() {
 }
 
 int64_t
-SourceImpl::getDuration() {
+DemuxerImpl::getDuration() {
   return this->getFormatCtx()->duration;
 }
 
 int64_t
-SourceImpl::getStartTime() {
+DemuxerImpl::getStartTime() {
   return this->getFormatCtx()->start_time;
 }
 
 int64_t
-SourceImpl::getFileSize() {
+DemuxerImpl::getFileSize() {
   int64_t retval = -1;
   AVFormatContext* ctx = this->getFormatCtx();
   if (ctx->iformat && (ctx->iformat->flags & AVFMT_NOFILE))
@@ -392,18 +392,18 @@ SourceImpl::getFileSize() {
 }
 
 int32_t
-SourceImpl::getBitRate() {
+DemuxerImpl::getBitRate() {
   return this->getFormatCtx()->bit_rate;
 }
 
 int32_t
-SourceImpl::getFlags() {
+DemuxerImpl::getFlags() {
   int32_t flags = this->getFormatCtx()->flags;
   return flags;
 }
 
 void
-SourceImpl::setFlags(int32_t newFlags) {
+DemuxerImpl::setFlags(int32_t newFlags) {
   AVFormatContext* ctx=this->getFormatCtx();
   ctx->flags = newFlags;
   if (mIOHandler)
@@ -411,12 +411,12 @@ SourceImpl::setFlags(int32_t newFlags) {
 }
 
 bool
-SourceImpl::getFlag(Flag flag) {
+DemuxerImpl::getFlag(Flag flag) {
   return this->getFormatCtx()->flags & flag;
 }
 
 void
-SourceImpl::setFlag(Flag flag, bool value) {
+DemuxerImpl::setFlag(Flag flag, bool value) {
   AVFormatContext* ctx=this->getFormatCtx();
 
   if (value)
@@ -426,58 +426,58 @@ SourceImpl::setFlag(Flag flag, bool value) {
 }
 
 const char*
-SourceImpl::getURL() {
+DemuxerImpl::getURL() {
   return this->getFormatCtx()->filename;
 }
 
 int32_t
-SourceImpl::getReadRetryCount() {
+DemuxerImpl::getReadRetryCount() {
   return mReadRetryMax;
 }
 
 void
-SourceImpl::setReadRetryCount(int32_t count) {
+DemuxerImpl::setReadRetryCount(int32_t count) {
   if (count >= 0)
     mReadRetryMax = count;
 }
 
 bool
-SourceImpl::canStreamsBeAddedDynamically() {
+DemuxerImpl::canStreamsBeAddedDynamically() {
   return this->getFormatCtx()->ctx_flags & AVFMTCTX_NOHEADER;
 }
 
 KeyValueBag*
-SourceImpl::getMetaData() {
+DemuxerImpl::getMetaData() {
   if (!mMetaData)
     mMetaData = KeyValueBagImpl::make(this->getFormatCtx()->metadata);
   return mMetaData.get();
 }
 
 int32_t
-SourceImpl::setForcedAudioCodec(Codec::ID id) {
+DemuxerImpl::setForcedAudioCodec(Codec::ID id) {
   this->getFormatCtx()->audio_codec_id = (enum AVCodecID) id;
   return 0;
 }
 
 int32_t
-SourceImpl::setForcedVideoCodec(Codec::ID id) {
+DemuxerImpl::setForcedVideoCodec(Codec::ID id) {
   this->getFormatCtx()->video_codec_id = (enum AVCodecID) id;
   return 0;
 }
 
 int32_t
-SourceImpl::setForcedSubtitleCodec(Codec::ID id) {
+DemuxerImpl::setForcedSubtitleCodec(Codec::ID id) {
   this->getFormatCtx()->subtitle_codec_id = (enum AVCodecID)id;
   return 0;
 }
 
 int32_t
-SourceImpl::getMaxDelay() {
+DemuxerImpl::getMaxDelay() {
   return this->getFormatCtx()->max_delay;
 }
 
 int32_t
-SourceImpl::seek(int32_t stream_index, int64_t min_ts, int64_t ts,
+DemuxerImpl::seek(int32_t stream_index, int64_t min_ts, int64_t ts,
     int64_t max_ts, int32_t flags) {
   if (mState != Container::STATE_OPENED)
   {
@@ -496,7 +496,7 @@ SourceImpl::seek(int32_t stream_index, int64_t min_ts, int64_t ts,
 }
 
 void
-SourceImpl::pause() {
+DemuxerImpl::pause() {
   if (mState != Container::STATE_PLAYING)
   {
     VS_THROW(HumbleRuntimeError("Can only pause containers in PLAYING state."));
@@ -507,7 +507,7 @@ SourceImpl::pause() {
 }
 
 void
-SourceImpl::play() {
+DemuxerImpl::play() {
   if (mState != Container::STATE_PAUSED || mState != Container::STATE_OPENED)
   {
     VS_THROW(HumbleRuntimeError("Can only play containers in OPENED or PAUSED states"));
@@ -518,7 +518,7 @@ SourceImpl::play() {
 }
 
 int32_t
-SourceImpl::doOpen(const char* url, AVDictionary** options)
+DemuxerImpl::doOpen(const char* url, AVDictionary** options)
 {
   int32_t retval=0;
   AVFormatContext* ctx = this->getFormatCtx();
@@ -541,7 +541,7 @@ SourceImpl::doOpen(const char* url, AVDictionary** options)
 }
 
 int32_t
-SourceImpl::doSetupSourceStreams()
+DemuxerImpl::doSetupSourceStreams()
 {
   // do nothing if we're already all set up.
   if (mNumStreams == (int32_t) mCtx->nb_streams)
@@ -569,8 +569,8 @@ SourceImpl::doSetupSourceStreams()
         avStream->time_base = *goodTimebase;
       }
 
-      RefPointer<SourceStreamImpl>* stream = new RefPointer<SourceStreamImpl>(
-          SourceStreamImpl::make(this, avStream, 0)
+      RefPointer<DemuxerStreamImpl>* stream = new RefPointer<DemuxerStreamImpl>(
+          DemuxerStreamImpl::make(this, avStream, 0)
       );
 
       if (stream)

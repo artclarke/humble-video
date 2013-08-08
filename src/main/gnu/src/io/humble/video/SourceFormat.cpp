@@ -29,18 +29,18 @@ namespace io {
 namespace humble {
 namespace video {
 
-SourceFormat::SourceFormat() : mFormat(0)
+DemuxerFormat::DemuxerFormat() : mFormat(0)
 {
 
 }
 
-SourceFormat::~SourceFormat()
+DemuxerFormat::~DemuxerFormat()
 {
 }
 
-SourceFormat*
-SourceFormat::make(AVInputFormat* f) {
-  SourceFormat* retval = 0;
+DemuxerFormat*
+DemuxerFormat::make(AVInputFormat* f) {
+  DemuxerFormat* retval = 0;
   if (f) {
     retval = make();
     retval->mFormat = f;
@@ -49,8 +49,8 @@ SourceFormat::make(AVInputFormat* f) {
 }
 
 
-SourceFormat *
-SourceFormat::findFormat(const char *shortName)
+DemuxerFormat *
+DemuxerFormat::findFormat(const char *shortName)
 {
   Global::init();
   AVInputFormat *f = av_find_input_format(shortName);
@@ -58,7 +58,7 @@ SourceFormat::findFormat(const char *shortName)
 }
 
 int32_t
-SourceFormat::getNumFormats()
+DemuxerFormat::getNumFormats()
 {
   Global::init();
   int i = 0;
@@ -69,8 +69,8 @@ SourceFormat::getNumFormats()
   return i;
 }
 
-SourceFormat*
-SourceFormat::getFormat(int32_t index)
+DemuxerFormat*
+DemuxerFormat::getFormat(int32_t index)
 {
   Global::init();
   int i = 0;
@@ -78,7 +78,7 @@ SourceFormat::getFormat(int32_t index)
   (f = av_iformat_next(f))!=0;
   ++i)
     if (i == index) {
-      SourceFormat * retval = SourceFormat::make(f);
+      DemuxerFormat * retval = DemuxerFormat::make(f);
       return retval;
     }
   return 0;

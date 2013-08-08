@@ -24,15 +24,15 @@ namespace io {
 namespace humble {
 namespace video {
 
-Source::Source() {
+Demuxer::Demuxer() {
 }
 
-Source::~Source() {
+Demuxer::~Demuxer() {
 }
 
-Source*
-Source::make() {
-  return SourceImpl::make();
+Demuxer*
+Demuxer::make() {
+  return DemuxerImpl::make();
 }
 
 } /* namespace video */

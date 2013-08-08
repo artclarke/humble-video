@@ -135,7 +135,7 @@ DecoderTest::testDecodeAudio() {
   char filepath[2048];
   mFixtures.fillPath(fixture, filepath, sizeof(filepath));
 
-  RefPointer<Source> source = Source::make();
+  RefPointer<Demuxer> source = Demuxer::make();
 
   source->open(filepath, 0, false, true, 0, 0);
 
@@ -143,7 +143,7 @@ DecoderTest::testDecodeAudio() {
   TS_ASSERT_EQUALS(fixture->num_streams, numStreams);
 
   int32_t streamToDecode = 0;
-  RefPointer<SourceStream> stream = source->getSourceStream(streamToDecode);
+  RefPointer<DemuxerStream> stream = source->getStream(streamToDecode);
   TS_ASSERT(stream);
   RefPointer<Decoder> decoder = stream->getDecoder();
   TS_ASSERT(decoder);
@@ -241,7 +241,7 @@ DecoderTest::testDecodeVideo() {
   char filepath[2048];
   mFixtures.fillPath(fixture, filepath, sizeof(filepath));
 
-  RefPointer<Source> source = Source::make();
+  RefPointer<Demuxer> source = Demuxer::make();
 
   source->open(filepath, 0, false, true, 0, 0);
 
@@ -251,7 +251,7 @@ DecoderTest::testDecodeVideo() {
   int32_t streamToDecode = -1;
   RefPointer<Decoder> decoder;
   for(int i =0 ; i < numStreams; i++) {
-    RefPointer<SourceStream> stream = source->getSourceStream(i);
+    RefPointer<DemuxerStream> stream = source->getStream(i);
     TS_ASSERT(stream);
     decoder = stream->getDecoder();
     TS_ASSERT(decoder);
@@ -310,12 +310,12 @@ DecoderTest::testOpenCloseMP4() {
   char filepath[2048];
   mFixtures.fillPath(fixture, filepath, sizeof(filepath));
 
-  RefPointer<Source> source = Source::make();
+  RefPointer<Demuxer> source = Demuxer::make();
 
   source->open(filepath, 0, false, true, 0, 0);
   int32_t n = source->getNumStreams();
   for(int i = 0; i < n; i++) {
-    RefPointer<SourceStream> s = source->getSourceStream(i);
+    RefPointer<DemuxerStream> s = source->getStream(i);
     RefPointer<Decoder> d = s->getDecoder();
     if (d->getCodecType() == MediaDescriptor::MEDIA_AUDIO ||
         d->getCodecType() == MediaDescriptor::MEDIA_VIDEO) {

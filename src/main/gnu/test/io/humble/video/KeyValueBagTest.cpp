@@ -74,7 +74,7 @@ KeyValueBagTest :: testCreation()
 void
 KeyValueBagTest :: testSourceGetMetaData()
 {
-  RefPointer<Source> source=Source::make();
+  RefPointer<Demuxer> source=Demuxer::make();
   source->open(mSampleFile, 0, false, true, 0, 0);
 
   RefPointer<KeyValueBag> meta = source->getMetaData();

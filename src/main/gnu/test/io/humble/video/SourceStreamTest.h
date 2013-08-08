@@ -4,12 +4,12 @@
 #include <io/humble/testutils/TestUtils.h>
 #include "TestData.h"
 
-class SourceStreamTest : public CxxTest::TestSuite
+class DemuxerStreamTest : public CxxTest::TestSuite
 {
 public:
-  SourceStreamTest();
+  DemuxerStreamTest();
   virtual
-  ~SourceStreamTest();
+  ~DemuxerStreamTest();
   void
   setUp();
   void

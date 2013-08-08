@@ -17,7 +17,7 @@
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-%typemap (javacode) io::humble::video::SourceStream,io::humble::video::SourceStream*,io::humble::video::SourceStream& %{
+%typemap (javacode) io::humble::video::DemuxerStream,io::humble::video::DemuxerStream*,io::humble::video::DemuxerStream& %{
 
   /**
    * info about this stream
@@ -41,4 +41,4 @@
 
 %}
 
-%include <io/humble/video/SourceStream.h>
+%include <io/humble/video/DemuxerStream.h>

@@ -31,12 +31,12 @@
 
 #include "TestData.h"
 
-class SourceTest : public CxxTest::TestSuite
+class DemuxerTest : public CxxTest::TestSuite
 {
 public:
-  SourceTest();
+  DemuxerTest();
   virtual
-  ~SourceTest();
+  ~DemuxerTest();
   void testMake();
   void testOpen();
   void testOpenDemuxerPrivatePropertySetting();

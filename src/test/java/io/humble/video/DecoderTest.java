@@ -18,13 +18,13 @@ import org.junit.Test;
 
 public class DecoderTest {
 
-  private Source source;
+  private Demuxer source;
   
   @Before
   public void setUp() throws Exception {
     final URL s = this.getClass().getResource("/ucl_h264_aac.mp4");
     final String f = s.getPath();
-    source = Source.make();
+    source = Demuxer.make();
     source.open(f, null, false, true, null, null);
     source.queryStreamMetaData();
 
@@ -39,7 +39,7 @@ public class DecoderTest {
   @Test
   public void testDecodeAudio() throws InterruptedException, IOException {
     int audioStream = 0;
-    SourceStream stream = source.getSourceStream(audioStream);
+    DemuxerStream stream = source.getSourceStream(audioStream);
     Decoder decoder = stream.getDecoder();
     
     decoder.open(null, null);
@@ -83,7 +83,7 @@ public class DecoderTest {
   @Test
   public void testDecodeVideo() throws InterruptedException, IOException {
     int videoStream = 1;
-    SourceStream stream = source.getSourceStream(videoStream);
+    DemuxerStream stream = source.getSourceStream(videoStream);
     Decoder decoder = stream.getDecoder();
     
     decoder.open(null, null);

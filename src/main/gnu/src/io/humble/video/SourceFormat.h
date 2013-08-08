@@ -32,9 +32,9 @@ namespace io {
 namespace humble {
 namespace video {
 
-class VS_API_HUMBLEVIDEO SourceFormat : public io::humble::video::ContainerFormat
+class VS_API_HUMBLEVIDEO DemuxerFormat : public io::humble::video::ContainerFormat
 {
-VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(SourceFormat)
+VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(DemuxerFormat)
 public:
   /**
    * Name for format.
@@ -109,7 +109,7 @@ public:
    * @return An {@link InputFormat} or null if none found.
    */
   static
-  SourceFormat *findFormat(const char *shortName);
+  DemuxerFormat *findFormat(const char *shortName);
 
   /**
    * Get the number of input formats this install can demultiplex (read)
@@ -127,19 +127,19 @@ public:
    * @return a format object for that input or null if
    *   unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()}
    */
-  static SourceFormat* getFormat(int32_t index);
+  static DemuxerFormat* getFormat(int32_t index);
 
 #ifndef SWIG
   virtual AVInputFormat* getCtx() { return mFormat; }
-  static SourceFormat*
+  static DemuxerFormat*
   make(AVInputFormat* format);
 #endif // ! SWIG
 
 protected:
 private:
-  SourceFormat();
+  DemuxerFormat();
   virtual
-  ~SourceFormat();
+  ~DemuxerFormat();
 
 private:
   AVInputFormat *mFormat;

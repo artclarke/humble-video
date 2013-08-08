@@ -35,28 +35,28 @@ using namespace io::humble::video;
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
-SinkFormatTest::SinkFormatTest()
+MuxerFormatTest::MuxerFormatTest()
 {
 }
 
-SinkFormatTest::~SinkFormatTest()
+MuxerFormatTest::~MuxerFormatTest()
 {
 }
 
 void
-SinkFormatTest::setUp()
+MuxerFormatTest::setUp()
 {
 
 }
 
 void
-SinkFormatTest::tearDown() {
+MuxerFormatTest::tearDown() {
 
 }
 void
-SinkFormatTest::testCreateSinkFormat() {
-  RefPointer<SinkFormat> format;
-  format = SinkFormat::guessFormat("flv", 0, 0);
+MuxerFormatTest::testCreateSinkFormat() {
+  RefPointer<MuxerFormat> format;
+  format = MuxerFormat::guessFormat("flv", 0, 0);
   VS_LOG_DEBUG("Pointer: %p", format.value());
   VS_LOG_DEBUG("Name: %s", format->getName());
   VS_LOG_DEBUG("Long Name: %s", format->getLongName());
@@ -76,13 +76,13 @@ SinkFormatTest::testCreateSinkFormat() {
     VS_LOG_DEBUG("    Properties: %d", d->getProperties());
   }
   TSM_ASSERT("", strcmp("flv", format->getName()) == 0);
-  format = SinkFormat::guessFormat(0, "foo.flv", 0);
+  format = MuxerFormat::guessFormat(0, "foo.flv", 0);
   TSM_ASSERT("", strcmp("flv", format->getName()) == 0);
-  format = SinkFormat::guessFormat(0, 0, "video/x-flv");
+  format = MuxerFormat::guessFormat(0, 0, "video/x-flv");
   TSM_ASSERT("", strcmp("flv", format->getName()) == 0);
 
   /** make sure default codec stuff works */
-  format = SinkFormat::guessFormat("mp4", 0, 0);
+  format = MuxerFormat::guessFormat("mp4", 0, 0);
   TSM_ASSERT("", format);
 
   Codec::ID id = Codec::CODEC_ID_NONE;
@@ -108,12 +108,12 @@ SinkFormatTest::testCreateSinkFormat() {
 }
 
 void
-SinkFormatTest::testInstallation() {
-  int32_t n = SinkFormat::getNumFormats();
+MuxerFormatTest::testInstallation() {
+  int32_t n = MuxerFormat::getNumFormats();
   TSM_ASSERT("", n > 0);
 
   for(int32_t i = 0; i < n; i++) {
-    RefPointer<SinkFormat> f = SinkFormat::getFormat(i);
+    RefPointer<MuxerFormat> f = MuxerFormat::getFormat(i);
     VS_LOG_DEBUG("Name: %s; Description: %s", f->getName(), f->getLongName());
   }
 }

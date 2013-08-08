@@ -173,7 +173,7 @@ namespace io { namespace humble { namespace video
   }
 
   Codec*
-  Codec::guessEncodingCodec(SinkFormat* pFmt,
+  Codec::guessEncodingCodec(MuxerFormat* pFmt,
       const char* shortName,
       const char* url,
       const char* mimeType,
@@ -181,16 +181,16 @@ namespace io { namespace humble { namespace video
   {
     Global::init();
     Codec* retval = 0;
-    RefPointer<SinkFormat> fmt = 0;
+    RefPointer<MuxerFormat> fmt = 0;
     AVOutputFormat * oFmt = 0;
 
     // We acquire here because the RefPointer always
     // releases.
-    fmt.reset(dynamic_cast<SinkFormat*>(pFmt), true);
+    fmt.reset(dynamic_cast<MuxerFormat*>(pFmt), true);
 
     if (!fmt)
     {
-      fmt = SinkFormat::guessFormat(shortName, url, mimeType);
+      fmt = MuxerFormat::guessFormat(shortName, url, mimeType);
     }
     if (fmt)
       oFmt = fmt->getCtx();
