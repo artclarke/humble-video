@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# This hacky script allows a developer to run Valgrind against a test
+# without hand-passing in all the params.
+
+@VALGRIND@ --tool=memcheck --error-exitcode=255 --time-stamp=yes --num-callers=50 --read-var-info=yes --dsymutil=yes --demangle=yes --track-origins=yes --leak-check=full --show-reachable=yes --smc-check=all --suppressions=@abs_top_srcdir@/mk/Valgrind.suppressions --gen-suppressions=all -- $*

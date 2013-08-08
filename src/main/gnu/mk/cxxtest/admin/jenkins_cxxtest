@@ -1,0 +1,69 @@
+#!/bin/bash
+
+if test -z "$WORKSPACE"; then
+    echo "ERROR: \$WORKSPACE not defined"
+    exit 1
+fi
+
+export PATH="$WORKSPACE/vpython/bin:$PATH"
+
+echo
+echo "Building on `hostname`:"
+echo
+echo "  Workspace: ${WORKSPACE}"
+echo
+echo "  Package: ${PACKAGE}"
+echo
+echo "  Environment:"
+/usr/bin/env 2>&1 | sort | sed 's/^/    /'
+echo
+echo "  Python:"
+python -c 'import sys; sys.stdout.write(sys.version+"\n")' 2>&1 \
+    | sed 's/^/    /'
+PYTHON_VER=`python -c 'import sys; sys.stdout.write(str(sys.version_info[0]))'`
+echo
+# The following executables are required (missing app yields build failure)
+for app in gcc; do
+echo "  $app:"
+$app --version 2>&1 | grep -v '^$' | sed 's/^/    /' || exit 1
+echo
+done
+
+
+# Setup virtual Python environment
+\rm -Rf vpython
+python cxxtest/admin/virtualenv.py vpython
+vpython/bin/easy_install nose
+if test "$PYTHON_VER" -gt 2; then
+    vpython/bin/easy_install unittest2py3k
+else
+    vpython/bin/easy_install unittest2
+fi
+vpython/bin/easy_install ply
+vpython/bin/easy_install ordereddict
+vpython/bin/easy_install gcovr
+vpython/bin/easy_install pyutilib.th
+cd "$WORKSPACE"/cxxtest/python
+"$WORKSPACE"/vpython/bin/python setup.py install
+
+# Cleanup test directories
+cd "$WORKSPACE"/cxxtest/test
+make clean
+cd "$WORKSPACE"/cxxtest/doc
+make clean
+cd "$WORKSPACE"
+
+# Run tests
+export CXXTEST_GCOV_FLAGS='-fprofile-arcs -ftest-coverage'
+vpython/bin/nosetests -v -v -w "$WORKSPACE"/cxxtest \
+    --with-xunit --xunit-file="$WORKSPACE"/TEST-cxxtest.xml \
+    || echo "(INFO) nosetests returned non-zero return code"
+
+# Generate code coverage
+cd "$WORKSPACE"/cxxtest
+"$WORKSPACE"/vpython/bin/gcovr -v -d -r "$WORKSPACE"/cxxtest \
+    -x -o "$WORKSPACE"/cxxtest/test/coverage.xml \
+    --gcov-filter '.*#test#(\.\.|\^)#cxxtest#.*gcov'
+
+echo "DONE"
+

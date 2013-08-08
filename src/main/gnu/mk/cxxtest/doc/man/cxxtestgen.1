@@ -1,0 +1,178 @@
+'\" t
+.\"     Title: cxxtestgen
+.\"    Author: [see the "AUTHOR" section]
+.\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
+.\"      Date: 01/21/2012
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "CXXTESTGEN" "1" "01/21/2012" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+cxxtestgen \- performs test discovery to create a CxxTest test runner
+.SH "SYNOPSIS"
+.sp
+cxxtestgen [options] [<filename> \&...]
+.SH "DESCRIPTION"
+.sp
+The cxxtestgen command processes C++ header files to perform test discovery, and then it creates files for the CxxTest test runner\&.
+.SH "OPTIONS"
+.PP
+\fB\-h, \-\-help\fR
+.RS 4
+show this help message and exit
+.RE
+.PP
+\fB\-\-version\fR
+.RS 4
+Write the CxxTest version\&.
+.RE
+.PP
+\fB\-o, \-\-output\fR=\fINAME\fR
+.RS 4
+Write output to file NAME\&.
+.RE
+.PP
+\fB\-w, \-\-world\fR
+.RS 4
+The label of the tests, used to name the XML results\&.
+.RE
+.PP
+\fB\-\-include\fR=\fIHEADER\fR
+.RS 4
+Include file HEADER in the test runner before other headers\&.
+.RE
+.PP
+\fB\-\-abort\-on\-fail\fR
+.RS 4
+Abort tests on failed asserts (like xUnit)\&.
+.RE
+.PP
+\fB\-\-main\fR
+.RS 4
+Specify an alternative name for the main() function\&.
+.RE
+.PP
+\fB\-\-headers\fR
+.RS 4
+Specify a filename that contains a list of header files that are processed to generate a test runner\&.
+.RE
+.PP
+\fB\-\-runner\fR=\fICLASS\fR
+.RS 4
+Create a test runner that processes test events using the class CxxTest::CLASS\&.
+.RE
+.PP
+\fB\-\-gui\fR=\fICLASS\fR
+.RS 4
+Create a GUI test runner that processes test events using the class CxxTest::CLASS\&. (deprecated)
+.RE
+.PP
+\fB\-\-error\-printer\fR
+.RS 4
+Create a test runner using the ErrorPrinter class, and allow the use of the standard library\&.
+.RE
+.PP
+\fB\-\-xunit\-printer\fR
+.RS 4
+Create a test runner using the XUnitPrinter class\&.
+.RE
+.PP
+\fB\-\-xunit\-file\fR
+.RS 4
+The file to which the XML summary is written for test runners using the XUnitPrinter class\&. The default XML filename is TEST\-<world>\&.xml, where <world> is the value of the \-\-world option\&. (default: cxxtest)
+.RE
+.PP
+\fB\-\-have\-std\fR
+.RS 4
+Use the standard library (even if not found in tests)\&.
+.RE
+.PP
+\fB\-\-no\-std\fR
+.RS 4
+Do not use standard library (even if found in tests)\&.
+.RE
+.PP
+\fB\-\-have\-eh\fR
+.RS 4
+Use exception handling (even if not found in tests)\&.
+.RE
+.PP
+\fB\-\-no\-eh\fR
+.RS 4
+Do not use exception handling (even if found in tests)\&.
+.RE
+.PP
+\fB\-\-longlong\fR=\fITYPE\fR
+.RS 4
+Use TYPE as for long long integers\&. (default: not supported)
+.RE
+.PP
+\fB\-\-no\-static\-init\fR
+.RS 4
+Do not rely on static initialization in the test runner\&.
+.RE
+.PP
+\fB\-\-template\fR=\fITEMPLATE\fR
+.RS 4
+Generate the test runner using file TEMPLATE to define a template\&.
+.RE
+.PP
+\fB\-\-root\fR
+.RS 4
+Write the main() function and global data for a test runner\&.
+.RE
+.PP
+\fB\-\-part\fR
+.RS 4
+Write the tester classes for a test runner\&.
+.RE
+.PP
+\fB\-f, \-\-fog\-parser\fR
+.RS 4
+Use new FOG C++ parser (disabled)
+.RE
+.SH "EXIT STATUS"
+.PP
+\fB0\fR
+.RS 4
+Success
+.RE
+.PP
+\fB1\fR
+.RS 4
+Failure (syntax or usage error; configuration error; document processing failure; unexpected error)\&.
+.RE
+.SH "BUGS"
+.sp
+See the CxxTest Home Page for the link to the CxxTest ticket repository\&.
+.SH "AUTHOR"
+.sp
+CxxTest was originally written by Erez Volk\&. Many people have contributed to it\&.
+.SH "RESOURCES"
+.sp
+Home page: http://cxxtest\&.com/
+.sp
+CxxTest User Guide: http://cxxtest\&.com/cxxtest/doc/guide\&.html
+.SH "COPYING"
+.sp
+Copyright (c) 2008 Sandia Corporation\&. This software is distributed under the Lesser GNU General Public License (LGPL) v3

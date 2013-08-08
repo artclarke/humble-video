@@ -1,0 +1,148 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- This POM makes the humble-video-noarch artifact, but is actually part of
+       the humble-video-main project because it also has the source code
+       for all our native code -->
+  <groupId>io.humble</groupId>
+  <artifactId>humble-video-noarch</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>humble-video-main</name>
+  <url>http://www.humble.io</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <organization>
+    <name>Humble Software</name>
+    <url>http://www.humble.io</url>
+  </organization>
+  <description>This POM file generates all the Java source code needed for the humble-video project. However, it is useless without the correct native code for the platform it is running (usually available as something like humble-video-arch-x86_64-apple-darwin-11.jar or humble-video.jar which will download ALL common native platforms).</description>
+  <licenses>
+    <license>
+      <name>AGPL</name>
+      <url>http://www.gnu.org/licenses/agpl-3.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>GNU Affero General Public License</comments>
+    </license>
+  </licenses>
+  <scm>
+    <developerConnection></developerConnection>
+    <tag>xuggle</tag>
+    <url>https://github.com/artclarke/humble-video-main</url>
+  </scm>
+  <developers>
+    <developer>
+      <id>art.clarke@gmail.com</id>
+      <name>Art Clarke</name>
+      <email>art.clarke@gmail.com</email>
+      <url>http://www.linkedin.com/in/artclarke</url>
+    </developer>
+  </developers>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <show>public</show>
+          <public>true</public>
+          <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+          <docletArtifact>
+            <groupId>org.umlgraph</groupId>
+            <artifactId>umlgraph</artifactId>
+            <version>5.6</version>
+          </docletArtifact>
+          <additionalparam>-quiet -hide java.* -hide
+            org.eclipse.* -collpackages java.util.* -postfixpackage
+            -nodefontsize 9 -nodefontpackagesize 7
+            -enumerations
+          </additionalparam>
+          <useStandardDocletOptions>true</useStandardDocletOptions>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.15</version>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.3.2</version>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.15</version>
+          <configuration>
+            <forkMode>always</forkMode>
+            <workingDirectory>${basedir}/target/test-workingdir</workingDirectory>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>2.7</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jxr-plugin</artifactId>
+          <version>2.1</version>
+          <configuration>
+            <aggregate>true</aggregate>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.5</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.0.13</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- For the tests, we depend upon the Humble Maven Jar with *all* the 
+      common native libraries included, but not 'humble-video.jar' which is a downstream 
+      dependency of this project. -->
+    <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-arch-all</artifactId>
+      <version>0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

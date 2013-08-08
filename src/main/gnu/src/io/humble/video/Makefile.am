@@ -1,0 +1,162 @@
+VS_PRODUCT=humble-video
+VS_CPP_PATH=io/humble/video
+VS_CPP_PACKAGE=io.humble.video
+VS_CPP_NAMESPACE=io::humble::video
+include @top_builddir@/mk/Makefile.global
+
+SUBDIRS=customio
+SUFFIXES=.i
+
+noinst_LTLIBRARIES = libhumble-video.la
+
+libhumble_video_la_LIBADD= $(VS_PKG_LIBRARIES)
+
+libhumble_video_la_SOURCES= \
+  VideoExceptions.cpp \
+  AVBufferSupport.cpp \
+  PixelFormat.cpp \
+  KeyValueBag.cpp \
+  KeyValueBagImpl.cpp \
+  Property.cpp \
+  PropertyImpl.cpp \
+  Rational.cpp \
+  RationalImpl.cpp \
+  Codec.cpp \
+  Media.cpp \
+  MediaRaw.cpp \
+  MediaAudio.cpp \
+  MediaAudioImpl.cpp \
+  MediaAudioResampler.cpp \
+  MediaPicture.cpp \
+  MediaPictureImpl.cpp \
+  MediaPictureResampler.cpp \
+  MediaPictureResamplerImpl.cpp \
+  MediaSubtitle.cpp \
+  MediaSubtitleImpl.cpp \
+  IndexEntry.cpp \
+  IndexEntryImpl.cpp \
+  Error.cpp \
+  ErrorImpl.cpp \
+  MediaPacket.cpp \
+  MediaPacketImpl.cpp \
+  ContainerFormat.cpp \
+  Configurable.cpp \
+  Coder.cpp \
+  Decoder.cpp \
+  Encoder.cpp \
+  ContainerStream.cpp \
+  Container.cpp \
+  DemuxerFormat.cpp \
+  Demuxer.cpp \
+  DemuxerImpl.cpp \
+  DemuxerStream.cpp \
+  DemuxerStreamImpl.cpp \
+  MuxerFormat.cpp \
+  FilterType.cpp \
+  FilterGraph.cpp \
+  Filter.cpp \
+  FilterLink.cpp \
+  FilterEndPoint.cpp \
+  FilterSource.cpp \
+  FilterAudioSource.cpp \
+  FilterPictureSource.cpp \
+  FilterSink.cpp \
+  FilterAudioSink.cpp \
+  FilterPictureSink.cpp \
+  Global.cpp
+  
+nodist_libhumble_video_la_SOURCES= \
+  HumbleVideo.cpp
+
+libhumble_video_ladir=$(includedir)/$(VS_CPP_PATH)
+libhumble_video_la_HEADERS= \
+  HumbleVideo.h \
+  VideoExceptions.h \
+  AVBufferSupport.h \
+  Codec.h \
+  Codec.swg \
+  FfmpegIncludes.h \
+  Global.swg \
+  PixelFormat.h \
+  KeyValueBag.h \
+  KeyValueBagImpl.h \
+  KeyValueBag.swg \
+  Rational.h \
+  RationalImpl.h \
+  Rational.swg \
+  Media.h \
+  Media.swg \
+  MediaRaw.h \
+  MediaRaw.swg \
+  MediaAudio.h \
+  MediaAudioImpl.h \
+  MediaAudio.swg \
+  MediaAudioResampler.h \
+  MediaPicture.h \
+  MediaPictureImpl.h \
+  MediaPicture.swg \
+  MediaPictureResampler.h \
+  MediaPictureResamplerImpl.h \
+  MediaPictureResampler.swg \
+  MediaSubtitle.h \
+  MediaSubtitleImpl.h \
+  MediaSubtitle.swg \
+  IndexEntry.h \
+  IndexEntryImpl.h \
+  IndexEntry.swg \
+  Error.h \
+  ErrorImpl.h \
+  Error.swg \
+  MediaPacket.h \
+  MediaPacketImpl.h \
+  MediaPacket.swg \
+  Property.h \
+  PropertyImpl.h \
+  Property.swg \
+  ContainerFormat.h \
+  ContainerFormat.swg \
+  MuxerFormat.h \
+  MuxerFormat.swg \
+  DemuxerFormat.h \
+  DemuxerFormat.swg \
+  Configurable.h \
+  Configurable.swg \
+  Coder.h \
+  Coder.swg \
+  Decoder.h \
+  Decoder.swg \
+  Encoder.h \
+  Encoder.swg \
+  ContainerStream.h \
+  ContainerStream.swg \
+  Container.h \
+  Container.swg \
+  DemuxerStream.h \
+  DemuxerStream.swg \
+  DemuxerStreamImpl.h \
+  Demuxer.h \
+  Demuxer.swg \
+  DemuxerImpl.h \
+  FilterType.h \
+  FilterGraph.h \
+  Filter.h \
+  FilterLink.h \
+  FilterEndPoint.h \
+  FilterSource.h \
+  FilterAudioSource.h \
+  FilterPictureSource.h \
+  FilterSink.h \
+  FilterAudioSink.h \
+  FilterPictureSink.h \
+  Global.h
+
+BUILT_SOURCES= \
+  HumbleVideo.cpp
+
+HumbleVideo.cpp : $(libhumble_video_la_HEADERS)
+
+HumbleVideo.i : $(libhumble_video_la_HEADERS)
+
+clean-local:
+	rm -f $(BUILT_SOURCES)
+	if test -w "$(SWIGOUTTMPDIR)"; then rm -rf $(SWIGOUTTMPDIR); fi

@@ -1,0 +1,32 @@
+#! /usr/bin/env python
+
+import subprocess
+import sys
+import os
+
+if len(sys.argv) == 1:
+    print "Must specify release version"
+    sys.exit(1)
+
+rev = sys.argv[1]
+
+if os.path.exists('cxxtest'):
+    subprocess.call('rm -Rf cxxtest', shell=True)
+if os.path.exists(rev):
+    subprocess.call('rm -Rf '+rev, shell=True)
+
+subprocess.call('svn export https://cxxtest.svn.sourceforge.net/svnroot/cxxtest/tags/%s cxxtest' % rev, shell=True)
+
+if not os.path.exists('cxxtest'):
+    print "Error exporting release "+rev
+    sys.exit(1)
+
+os.mkdir(rev)
+
+subprocess.call('tar cvf - cxxtest > %s/cxxtest-%s.tar' % (rev,rev), shell=True)
+subprocess.call('gzip %s/cxxtest-%s.tar' % (rev,rev), shell=True)
+subprocess.call('cp cxxtest/doc/guide.pdf %s/cxxtest-guide-%s.pdf' % (rev,rev), shell=True)
+subprocess.call('cp cxxtest/doc/guide.html %s/cxxtest-guide-%s.html' % (rev,rev), shell=True)
+subprocess.call('cp cxxtest/doc/guide.epub %s/cxxtest-guide-%s.epub' % (rev,rev), shell=True)
+subprocess.call('zip -r %s/cxxtest-%s.zip cxxtest' % (rev,rev), shell=True)
+
