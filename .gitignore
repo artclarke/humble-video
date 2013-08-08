@@ -7,7 +7,7 @@ config.h.in~
 .project
 .settings
 .DS_Store
-/target
+target
 Makefile
 config.log
 config.status

@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
@@ -9,12 +8,17 @@
     <relativePath>../humble-video-parent/pom.xml</relativePath>
   </parent>
 
-  <!-- This POM makes the humble-video-noarch artifact, but is actually part of
-       the humble-video-main project because it also has the source code
-       for all our native code -->
+  <properties>
+    <humbleVideoVersion>0.1-SNAPSHOT</humbleVideoVersion>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <groupId>io.humble</groupId>
-  <artifactId>humble-video-noarch</artifactId>
-  <version>0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <artifactId>humble-video-captive</artifactId>
+  <version>${humbleVideoVersion}</version>
+  <packaging>pom</packaging>
+
+  <name>humble-video-arch-all</name>
+  <url>http://maven.apache.org</url>
 
 </project>
