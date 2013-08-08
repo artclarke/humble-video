@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import junit.framework.TestCase;
 
-public class SinkFormatTest extends TestCase {
+public class MuxerFormatTest extends TestCase {
   private final Logger log = LoggerFactory.getLogger(this.getClass());
-  public SinkFormatTest() {
+  public MuxerFormatTest() {
     log.trace("Remove a warning; ignore");
   }
 

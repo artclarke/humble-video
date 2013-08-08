@@ -23,7 +23,7 @@
     final StringBuilder b = new StringBuilder(super.toString());
     b.append("[")
     .append("url="+getURL()+";")
-    .append("format:"+getDemuxerFormat()+";")
+    .append("format:"+getFormat()+";")
     .append("]");
     return b.toString();
   }

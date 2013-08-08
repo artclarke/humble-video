@@ -39,7 +39,7 @@ public class DecoderTest {
   @Test
   public void testDecodeAudio() throws InterruptedException, IOException {
     int audioStream = 0;
-    DemuxerStream stream = source.getSourceStream(audioStream);
+    DemuxerStream stream = source.getStream(audioStream);
     Decoder decoder = stream.getDecoder();
     
     decoder.open(null, null);
@@ -83,7 +83,7 @@ public class DecoderTest {
   @Test
   public void testDecodeVideo() throws InterruptedException, IOException {
     int videoStream = 1;
-    DemuxerStream stream = source.getSourceStream(videoStream);
+    DemuxerStream stream = source.getStream(videoStream);
     Decoder decoder = stream.getDecoder();
     
     decoder.open(null, null);

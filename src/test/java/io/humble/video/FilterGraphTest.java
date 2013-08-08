@@ -119,7 +119,7 @@ public class FilterGraphTest {
     Decoder decoder=null;
     int n = source.getNumStreams();
     for(int i = 0; i < n; i++) {
-      DemuxerStream stream = source.getSourceStream(i);
+      DemuxerStream stream = source.getStream(i);
       decoder = stream.getDecoder();
       if (decoder.getCodecType() == MediaDescriptor.Type.MEDIA_AUDIO) {
         audioStream = i;

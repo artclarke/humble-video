@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class SourceFormatTest {
+public class DemuxerFormatTest {
 
   @Test
   public void testSourceFormat() {
