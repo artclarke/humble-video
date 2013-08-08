@@ -166,6 +166,9 @@ EXTRA_DIST= \
   mk/memcheck \
   mk/lib
 
+install-exec-hook:
+	@mvn -f pom-@build@.xml install
+
 doc: doxygen-doc
 
 dist-hook:
