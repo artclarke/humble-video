@@ -172,17 +172,17 @@ FilterGraphTest::testFilterVideo() {
   // can see how [in] eventually becomes [out] by splitting into four
   // streams, negating one, flipping another horizontally, edge-detecting a
   // third, and then overlaying all the resulting streams back on each other.
-//  graph->open("[in]scale=w=480:h=360[scaled];"
-//      "[scaled]split=4[0][1][2][3];"
-//      "[0]pad=iw*2:ih*2[a];"
-//      "[1]negate[b];"
-//      "[2]hflip[c];"
-//      "[3]edgedetect[d];"
-//      "[a][b]overlay=w[x];"
-//      "[x][c]overlay=0:h[y];"
-//      "[y][d]overlay=w:h[out]");
-//
-  graph->open("scale=w=960:h=720");
+  graph->open("[in]scale=w=480:h=360[scaled];"
+      "[scaled]split=4[0][1][2][3];"
+      "[0]pad=iw*2:ih*2[a];"
+      "[1]negate[b];"
+      "[2]hflip[c];"
+      "[3]edgedetect[d];"
+      "[a][b]overlay=w[x];"
+      "[x][c]overlay=0:h[y];"
+      "[y][d]overlay=w:h[out]");
+
+//  graph->open("scale=w=960:h=720");
 
   {
     LoggerStack stack;

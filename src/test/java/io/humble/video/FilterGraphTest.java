@@ -37,6 +37,12 @@ public class FilterGraphTest {
     source.delete();
   }
   
+  @Test(expected=IllegalArgumentException.class)
+  public void testGraphThrowsErrorOnBadOpen() {
+    FilterGraph graph = FilterGraph.make();
+    graph.open("[monkeybutt]polishTurd[goldturkey]");
+  }
+  
   @Test
   public void testFilterGenerateVideo() {
     MediaPicture picture = MediaPicture.make(

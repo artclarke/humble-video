@@ -351,7 +351,8 @@ FilterGraph::open(const char* f) {
     avfilter_inout_free(&inputs);
     avfilter_inout_free(&outputs);
     mState = STATE_ERROR;
-    throw e0;
+    // oddly enough, do not rethrow or you'll lose type info. re-raise.
+    throw;
   }
 }
 
