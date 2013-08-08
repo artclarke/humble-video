@@ -172,15 +172,17 @@ FilterGraphTest::testFilterVideo() {
   // can see how [in] eventually becomes [out] by splitting into four
   // streams, negating one, flipping another horizontally, edge-detecting a
   // third, and then overlaying all the resulting streams back on each other.
-  graph->open("[in]scale=w=480:h=360[scaled];"
-      "[scaled]split=4[0][1][2][3];"
-      "[0]pad=iw*2:ih*2[a];"
-      "[1]negate[b];"
-      "[2]hflip[c];"
-      "[3]edgedetect[d];"
-      "[a][b]overlay=w[x];"
-      "[x][c]overlay=0:h[y];"
-      "[y][d]overlay=w:h[out]");
+//  graph->open("[in]scale=w=480:h=360[scaled];"
+//      "[scaled]split=4[0][1][2][3];"
+//      "[0]pad=iw*2:ih*2[a];"
+//      "[1]negate[b];"
+//      "[2]hflip[c];"
+//      "[3]edgedetect[d];"
+//      "[a][b]overlay=w[x];"
+//      "[x][c]overlay=0:h[y];"
+//      "[y][d]overlay=w:h[out]");
+//
+  graph->open("scale=w=960:h=720");
 
   {
     LoggerStack stack;
@@ -218,20 +220,21 @@ FilterGraphTest::testFilterVideo() {
         break;
       }
     }
-    // now, handle the case where bytesRead is 0; we need to flush any
-    // cached packets
-    do {
-      decoder->decodeVideo(picture.value(), 0, 0);
-      if (picture->isComplete()) {
-        filterSource->addPicture(picture.value());
-        // now pull pictures
-        while (filterSink->getPicture(filterPicture.value()) >= 0)
-          writePicture("FilterGraphTest_testFilterVideo", &frameNo,
-              filterPicture.value());
-      }
-    } while (picture->isComplete());
   }
   source->close();
+  // now, handle the case where bytesRead is 0; we need to flush any
+  // cached packets
+  do {
+    decoder->decodeVideo(picture.value(), 0, 0);
+    if (picture->isComplete()) {
+      filterSource->addPicture(picture.value());
+      // now pull pictures
+      while (filterSink->getPicture(filterPicture.value()) >= 0)
+        writePicture("FilterGraphTest_testFilterVideo", &frameNo,
+            filterPicture.value());
+    }
+  } while (picture->isComplete());
+
 }
 
 void
@@ -277,7 +280,7 @@ FilterGraphTest::testFilterAudio() {
     }
     TS_ASSERT(streamToDecode >= 0);
 
-    FILE* output = fopen("GraphTestTest_testFilterAudio.au", "wb");
+    FILE* output = fopen("FilterGraphTest_testFilterAudio.au", "wb");
     TS_ASSERT(output);
 
     decoder->open(0, 0);

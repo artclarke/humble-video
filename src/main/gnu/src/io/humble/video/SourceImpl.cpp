@@ -275,6 +275,9 @@ SourceImpl::getSourceStream(int32_t position) {
   if ((int32_t)mCtx->nb_streams != mNumStreams)
     doSetupSourceStreams();
 
+  if (position < 0 || position >= mNumStreams) {
+    VS_THROW(HumbleInvalidArgument("position out of range of number of streams"));
+  }
   if (position < mNumStreams)
   {
     // will acquire for caller.

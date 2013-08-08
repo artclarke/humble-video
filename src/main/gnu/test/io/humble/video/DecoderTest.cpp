@@ -235,9 +235,8 @@ DecoderTest::writePicture(const char* prefix, int32_t* frameNo, MediaPicture* pi
 void
 DecoderTest::testDecodeVideo() {
 
-//  TS_SKIP("Not yet implemented");
-
-  TestData::Fixture* fixture=mFixtures.getFixture("testfile_h264_mp4a_tmcd.mov");
+//  TestData::Fixture* fixture=mFixtures.getFixture("testfile_h264_mp4a_tmcd.mov");
+  TestData::Fixture* fixture=mFixtures.getFixture("ucl_h264_aac.mp4");
   TS_ASSERT(fixture);
   char filepath[2048];
   mFixtures.fillPath(fixture, filepath, sizeof(filepath));
@@ -249,14 +248,18 @@ DecoderTest::testDecodeVideo() {
   int32_t numStreams = source->getNumStreams();
   TS_ASSERT_EQUALS(fixture->num_streams, numStreams);
 
-  int32_t streamToDecode = 0;
-  RefPointer<SourceStream> stream = source->getSourceStream(streamToDecode);
-  TS_ASSERT(stream);
-  RefPointer<Decoder> decoder = stream->getDecoder();
-  TS_ASSERT(decoder);
-  RefPointer<Codec> codec = decoder->getCodec();
-  TS_ASSERT(codec);
-  TS_ASSERT_EQUALS(Codec::CODEC_ID_H264, codec->getID());
+  int32_t streamToDecode = -1;
+  RefPointer<Decoder> decoder;
+  for(int i =0 ; i < numStreams; i++) {
+    RefPointer<SourceStream> stream = source->getSourceStream(i);
+    TS_ASSERT(stream);
+    decoder = stream->getDecoder();
+    TS_ASSERT(decoder);
+    if (decoder->getCodecType() == MediaDescriptor::MEDIA_VIDEO) {
+      streamToDecode = 1;
+    }
+  }
+  TS_ASSERT(streamToDecode >= 0);
 
   decoder->open(0, 0);
 
@@ -282,16 +285,43 @@ DecoderTest::testDecodeVideo() {
         }
         byteOffset += bytesRead;
       } while(byteOffset < packet->getSize());
-      // now, handle the case where bytesRead is 0; we need to flush any
-      // cached packets
-      do {
-        decoder->decodeVideo(picture.value(), 0, 0);
-        if (picture->isComplete()) {
-          writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
-        }
-      } while (picture->isComplete());
     }
+  }
+  source->close();
+  source = 0;
 
+  // this would have been impossible in xuggle, but in humble video
+  // we should be able to flush a decoder after the source is closed.
+
+  // now, handle the case where bytesRead is 0; we need to flush any
+  // cached packets
+  do {
+    decoder->decodeVideo(picture.value(), 0, 0);
+    if (picture->isComplete()) {
+      writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
+    }
+  } while (picture->isComplete());
+}
+
+void
+DecoderTest::testOpenCloseMP4() {
+  TestData::Fixture* fixture=mFixtures.getFixture("ucl_h264_aac.mp4");
+  TS_ASSERT(fixture);
+  char filepath[2048];
+  mFixtures.fillPath(fixture, filepath, sizeof(filepath));
+
+  RefPointer<Source> source = Source::make();
+
+  source->open(filepath, 0, false, true, 0, 0);
+  int32_t n = source->getNumStreams();
+  for(int i = 0; i < n; i++) {
+    RefPointer<SourceStream> s = source->getSourceStream(i);
+    RefPointer<Decoder> d = s->getDecoder();
+    if (d->getCodecType() == MediaDescriptor::MEDIA_AUDIO ||
+        d->getCodecType() == MediaDescriptor::MEDIA_VIDEO) {
+      // open the decoders
+      d->open(0, 0);
+    }
   }
   source->close();
 }
