@@ -17,13 +17,13 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * SourceStream.cpp
+ * DemuxerStream.cpp
  *
  *  Created on: Jul 7, 2013
  *      Author: aclarke
  */
 
-#include "SourceStream.h"
+#include "DemuxerStream.h"
 
 namespace io {
 namespace humble {

@@ -16,14 +16,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  *
- * InputFormat.h
+ * SinkFormat.h
  *
- *  Created on: Jun 29, 2013
+ *  Created on: Jun 28, 2013
  *      Author: aclarke
  */
 
-#ifndef INPUTFORMAT_H_
-#define INPUTFORMAT_H_
+#ifndef SINKFORMAT_H_
+#define SINKFORMAT_H_
 
 #include <io/humble/video/ContainerFormat.h>
 #include <io/humble/video/Codec.h>
@@ -32,9 +32,9 @@ namespace io {
 namespace humble {
 namespace video {
 
-class VS_API_HUMBLEVIDEO DemuxerFormat : public io::humble::video::ContainerFormat
+class VS_API_HUMBLEVIDEO MuxerFormat : public ContainerFormat
 {
-VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(DemuxerFormat)
+VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MuxerFormat)
 public:
   /**
    * Name for format.
@@ -72,6 +72,63 @@ public:
   {
     return mFormat->flags;
   }
+
+  /**
+   * Get the default audio codec for this format.
+   */
+  virtual Codec::ID
+  getDefaultAudioCodecId()
+  {
+    return (Codec::ID) mFormat->audio_codec;
+  }
+  /**
+   * Get the default video codec for this format.
+   */
+  virtual Codec::ID
+  getDefaultVideoCodecId()
+  {
+    return (Codec::ID) mFormat->video_codec;
+  }
+  /**
+   * Get the default subtitle coded for this format.
+   */
+  virtual Codec::ID
+  getDefaultSubtitleCodecId()
+  {
+    return (Codec::ID) mFormat->subtitle_codec;
+  }
+  /**
+   * Get the mime type for this format.
+   */
+  virtual const char *
+  getMimeType()
+  {
+    return mFormat->mime_type;
+  }
+
+  /**
+   * Return the sink format in the list of registered sink formats
+   * which best matches the provided parameters, or return NULL if
+   * there is no match.
+   *
+   * @param shortName if non-NULL checks if short_name matches with the
+   * names of the registered formats
+   * @param filename if non-NULL checks if filename terminates with the
+   * extensions of the registered formats
+   * @param mimeType if non-NULL checks if mime_type matches with the
+   * MIME type of the registered formats
+   */
+  static MuxerFormat*
+  guessFormat(const char * shortName, const char *filename,
+      const char *mimeType);
+  virtual Codec::ID
+  guessCodec(const char * shortName, const char * filename,
+      const char* mimeType, MediaDescriptor::Type type)
+  {
+    return (Codec::ID) av_guess_codec(mFormat, shortName, filename, mimeType,
+        (enum AVMediaType) type);
+  }
+
   /**
    * Get total number of different codecs this container can output.
    */
@@ -81,11 +138,11 @@ public:
     return ContainerFormat::getNumSupportedCodecs(mFormat->codec_tag);
   }
   /**
-   * Get the CodecId for the n'th codec supported by this container.
+   * Get the Codec.ID for the n'th codec supported by this container.
    *
    * @param n The n'th codec supported by this codec. Lower n are higher priority.
    *   n must be < {@link #getNumSupportedCodecs()}
-   * @return the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} if none.
+   * @return the {@link Codec.ID} at the n'th slot, or {@link Codec.ID.CODEC_ID_NONE} if none.
    */
   virtual Codec::ID
   getSupportedCodecId(int32_t n)
@@ -104,12 +161,6 @@ public:
   {
     return ContainerFormat::getSupportedCodecTag(mFormat->codec_tag, n);
   }
-  /**
-   * Find {@link InputFormat} based on the short name of the input format.
-   * @return An {@link InputFormat} or null if none found.
-   */
-  static
-  DemuxerFormat *findFormat(const char *shortName);
 
   /**
    * Get the number of input formats this install can demultiplex (read)
@@ -127,25 +178,26 @@ public:
    * @return a format object for that input or null if
    *   unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()}
    */
-  static DemuxerFormat* getFormat(int32_t index);
+  static MuxerFormat* getFormat(int32_t index);
 
 #ifndef SWIG
-  virtual AVInputFormat* getCtx() { return mFormat; }
-  static DemuxerFormat*
-  make(AVInputFormat* format);
+  virtual AVOutputFormat* getCtx();
 #endif // ! SWIG
 
 protected:
-private:
-  DemuxerFormat();
-  virtual
-  ~DemuxerFormat();
+  static MuxerFormat*
+  make(AVOutputFormat* format);
 
 private:
-  AVInputFormat *mFormat;
+  MuxerFormat();
+  virtual
+  ~MuxerFormat();
+
+private:
+  AVOutputFormat *mFormat;
 };
 
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
-#endif /* INPUTFORMAT_H_ */
+#endif /* SINKFORMAT_H_ */

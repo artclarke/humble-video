@@ -21,7 +21,7 @@
 #define HUMBLESTREAMIMPL_H_
 
 #include <io/humble/ferry/RefPointer.h>
-#include <io/humble/video/SourceStream.h>
+#include <io/humble/video/DemuxerStream.h>
 #include <io/humble/video/FfmpegIncludes.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/KeyValueBag.h>

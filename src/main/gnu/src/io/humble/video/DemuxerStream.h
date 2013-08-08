@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *
+ *  
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
@@ -16,25 +16,48 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
+/*
+ * DemuxerStream.h
+ *
+ *  Created on: Jul 7, 2013
+ *      Author: aclarke
+ */
 
-#include "Source.h"
-#include "SourceImpl.h"
+#ifndef DEMUXERSTREAM_H_
+#define DEMUXERSTREAM_H_
+
+#include <io/humble/video/HumbleVideo.h>
+#include <io/humble/video/ContainerStream.h>
 
 namespace io {
 namespace humble {
 namespace video {
 
-Demuxer::Demuxer() {
-}
+class Decoder;
+/**
+ * A {@link ContainerStream} class that was read from a {@link Demuxer}.
+ */
+class VS_API_HUMBLEVIDEO DemuxerStream : public io::humble::video::ContainerStream
+{
+public:
+  /**
+   * For containers with Stream.Disposition.DISPOSITION_ATTACHED_PIC,
+   * this returns a read-only copy of the packet containing the
+   * picture (needs to be decoded separately).
+   */
+  virtual MediaPacket* getAttachedPic()=0;
+  /**
+   * Get the decoder that can decode the information in this Demuxer stream.
+   */
+  virtual Decoder* getDecoder()=0;
 
-Demuxer::~Demuxer() {
-}
-
-Demuxer*
-Demuxer::make() {
-  return DemuxerImpl::make();
-}
+protected:
+  DemuxerStream();
+  virtual
+  ~DemuxerStream();
+};
 
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
+#endif /* DEMUXERSTREAM_H_ */

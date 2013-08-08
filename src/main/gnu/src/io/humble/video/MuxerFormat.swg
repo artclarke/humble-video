@@ -16,44 +16,44 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  *
- * DemuxerFormat.swg
+ * MuxerFormat.swg
  *
- *  Created on: Jun 29, 2013
+ *  Created on: Jun 28, 2013
  *      Author: aclarke
  */
-
 %javamethodmodifiers getNumSupportedCodecs "protected";
 %javamethodmodifiers getSupportedCodecId "protected";
 %javamethodmodifiers getSupportedCodecTag "protected";
-%javamethodmodifiers getNumFormats "protected";
-%javamethodmodifiers getFormat "protected"
 
-%typemap (javacode) io::humble::video::DemuxerFormat,io::humble::video::DemuxerFormat*,io::humble::video::DemuxerFormat& %{
+%typemap (javacode) io::humble::video::MuxerFormat,io::humble::video::MuxerFormat*,io::humble::video::MuxerFormat& %{
+  
   @Override
   public String toString()
   {
     StringBuilder result = new StringBuilder();
     
     result.append(this.getClass().getName()+"@"+hashCode()+"[");
-    result.append("name:" + getName() + ";");
-    result.append("description:"+getLongName() + ";");
+    result.append("name:"+getName()+";");
+    result.append("description:"+getLongName()+";");
+    result.append("mimetype:"+getMimeType()+";");
+    result.append("extensions:"+getExtensions()+";");
     result.append("]");
     return result.toString();
   }
-
+  
   /**
-   * Return a collection of all input formats installed on this system.
+   * Return a collection of all output formats installed on this system.
    * @return the list.
    */
-  public static java.util.Collection<DemuxerFormat>
+  public static java.util.Collection<MuxerFormat>
   getFormats()
   {
-    java.util.Collection<DemuxerFormat> retval =
-      new java.util.HashSet<DemuxerFormat>();
+    java.util.Collection<MuxerFormat> retval =
+      new java.util.HashSet<MuxerFormat>();
     int count = getNumFormats();
     for(int i = 0; i< count;++i)
     {
-      DemuxerFormat fmt = getFormat(i);
+      MuxerFormat fmt = getFormat(i);
       if (fmt != null)
         retval.add(fmt);
     }
@@ -62,4 +62,4 @@
 
 %}
 
-%include <io/humble/video/SourceFormat.h>
+%include <io/humble/video/MuxerFormat.h>

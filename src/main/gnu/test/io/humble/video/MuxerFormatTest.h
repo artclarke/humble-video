@@ -16,26 +16,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  *
- * SourceFormatTest.h
+ * MuxerFormatTest.h
  *
  *  Created on: Jun 28, 2013
  *      Author: aclarke
  */
 
-#ifndef SOURCEFORMATTEST_H_
-#define SOURCEFORMATTEST_H_
+#ifndef SINKFORMATTEST_H_
+#define SINKFORMATTEST_H_
 
 #include <io/humble/testutils/TestUtils.h>
 
-class DemuxerFormatTest : public CxxTest::TestSuite
+class MuxerFormatTest : public CxxTest::TestSuite
 {
 public:
-  DemuxerFormatTest();
-  virtual ~DemuxerFormatTest();
+  MuxerFormatTest();
+  virtual ~MuxerFormatTest();
   void setUp();
   void tearDown();
-  void testCreateSourceFormat();
+  void testCreateMuxerFormat();
   void testInstallation();
 };
 
-#endif /* SOURCEFORMATTEST_H_ */
+#endif /* SINKFORMATTEST_H_ */

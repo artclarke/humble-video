@@ -17,7 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * SourceImpl.cpp
+ * DemuxerImpl.cpp
  *
  *  Created on: Jul 2, 2013
  *      Author: aclarke
@@ -26,10 +26,10 @@
 #include <io/humble/ferry/JNIHelper.h>
 #include <io/humble/video/customio/URLProtocolManager.h>
 #include "Global.h"
-#include "SourceImpl.h"
+#include "DemuxerImpl.h"
 #include "MediaPacketImpl.h"
 #include "KeyValueBagImpl.h"
-#include "SourceStreamImpl.h"
+#include "DemuxerStreamImpl.h"
 #include "VideoExceptions.h"
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
@@ -59,7 +59,7 @@ DemuxerImpl::~DemuxerImpl() {
   if (mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
       mState == Container::STATE_PAUSED) {
-    VS_LOG_ERROR("Open Source destroyed without Source.close() being called. Closing anyway: %s",
+    VS_LOG_ERROR("Open Demuxer destroyed without Demuxer.close() being called. Closing anyway: %s",
         this->getURL());
     (void) this->close();
   }
@@ -70,7 +70,7 @@ AVFormatContext*
 DemuxerImpl::getFormatCtx() {
   // throw an exception if in wrong state.
   if (mState == Container::STATE_CLOSED || mState == Container::STATE_ERROR) {
-    const char * MESSAGE="Method called on Source in CLOSED or ERROR state.";
+    const char * MESSAGE="Method called on Demuxer in CLOSED or ERROR state.";
     VS_LOG_ERROR(MESSAGE);
     std::exception e = std::runtime_error(MESSAGE);
     throw e;
@@ -181,7 +181,7 @@ DemuxerImpl::setInputBufferLength(int32_t size) {
   if (size <= 0)
     VS_THROW(HumbleInvalidArgument("size <= 0"));
   if (mState != Container::STATE_INITED)
-    VS_THROW(HumbleRuntimeError("Source object has already been opened"));
+    VS_THROW(HumbleRuntimeError("Demuxer object has already been opened"));
   mInputBufferLength = size;
 }
 
@@ -196,7 +196,7 @@ DemuxerImpl::getNumStreams() {
   if (!(mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
       mState == Container::STATE_PAUSED)) {
-    VS_THROW(HumbleRuntimeError("Attempt to query number of streams in source when not opened, playing or paused is ignored"));
+    VS_THROW(HumbleRuntimeError("Attempt to query number of streams in Demuxer when not opened, playing or paused is ignored"));
   }
   if ((int32_t) mCtx->nb_streams != mNumStreams)
     doSetupSourceStreams();
@@ -269,7 +269,7 @@ DemuxerImpl::getStream(int32_t position) {
   if (!(mState == Container::STATE_OPENED ||
       mState == Container::STATE_PLAYING ||
       mState == Container::STATE_PAUSED)) {
-    VS_THROW(HumbleRuntimeError("Attempt to get source stream from source when not opened, playing or paused is ignored"));
+    VS_THROW(HumbleRuntimeError("Attempt to get Demuxer stream from Demuxer when not opened, playing or paused is ignored"));
   }
   DemuxerStream *retval = 0;
   if ((int32_t)mCtx->nb_streams != mNumStreams)
@@ -481,7 +481,7 @@ DemuxerImpl::seek(int32_t stream_index, int64_t min_ts, int64_t ts,
     int64_t max_ts, int32_t flags) {
   if (mState != Container::STATE_OPENED)
   {
-    VS_THROW(HumbleRuntimeError("Can only seek on OPEN (not paused or playing) sources"));
+    VS_THROW(HumbleRuntimeError("Can only seek on OPEN (not paused or playing) Demuxers"));
   }
   int32_t retval = avformat_seek_file(this->getFormatCtx(),
       stream_index,

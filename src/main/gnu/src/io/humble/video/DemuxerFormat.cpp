@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  *
- * InputFormat.cpp
+ * DemuxerFormat.cpp
  *
  *  Created on: Jun 29, 2013
  *      Author: aclarke
  */
 
-#include "SourceFormat.h"
+#include "DemuxerFormat.h"
 #include "Global.h"
 
 namespace io {

@@ -17,7 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * SourceTest.cpp
+ * DemuxerTest.cpp
  *
  *  Created on: Jul 3, 2013
  *      Author: aclarke
@@ -28,8 +28,8 @@
 
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/LoggerStack.h>
-#include "SourceTest.h"
-#include <io/humble/video/SourceImpl.h>
+#include "DemuxerTest.h"
+#include <io/humble/video/DemuxerImpl.h>
 #include <io/humble/video/customio/StdioURLProtocolManager.h>
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
@@ -80,7 +80,7 @@ DemuxerTest::openTestHelper(const char* file)
   source->queryStreamMetaData();
 
   // let's call it again; if we accidentally call the FFmpeg method
-  // twice it will cause a crash, but the Source object should hide that.
+  // twice it will cause a crash, but the Demuxer object should hide that.
   source->queryStreamMetaData();
 
   RefPointer<KeyValueBag> metadata = source->getMetaData();
@@ -187,7 +187,7 @@ void
 DemuxerTest::testOpenWithoutCloseAutoCloses()
 {
   LoggerStack stack;
-  // quiet Source error when Source is destroyed
+  // quiet Demuxer error when Demuxer is destroyed
   stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
   RefPointer<Demuxer> source = Demuxer::make();
   source->open(mSampleFile, 0, false, false, 0, 0);
@@ -206,14 +206,14 @@ DemuxerTest::testOpenInvalidArguments()
   {
     RefPointer<Demuxer> source = Demuxer::make();
     LoggerStack stack;
-    // quiet Source error when Source is destroyed
+    // quiet Demuxer error when Demuxer is destroyed
     stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
     TS_ASSERT_THROWS(source->open(0, 0, false, false, 0, 0), HumbleInvalidArgument);
   }
   {
     RefPointer<Demuxer> source = Demuxer::make();
     LoggerStack stack;
-    // quiet Source error when Source is destroyed
+    // quiet Demuxer error when Demuxer is destroyed
     stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
     TS_ASSERT_THROWS(source->open("/foo/bar/ohsonotalidfile", 0, false, false, 0, 0), HumbleIOException);
   }

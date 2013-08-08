@@ -42,4 +42,4 @@ HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io:
 HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Demuxer::getStream);
 HUMBLE_JAVA_EXCEPTION("java.lang.InterruptedException, java.io.IOException", io::humble::video::Demuxer::queryStreamMetaData);
 
-%include <io/humble/video/Source.h>
+%include <io/humble/video/Demuxer.h>

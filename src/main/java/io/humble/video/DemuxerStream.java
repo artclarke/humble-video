@@ -9,7 +9,7 @@
 package io.humble.video;
 import io.humble.ferry.*;
 /**
- * A {@link ContainerStream} class that was read from a {@link Source}. 
+ * A {@link ContainerStream} class that was read from a {@link Demuxer}. 
  *  
  */
 public class DemuxerStream extends ContainerStream {
@@ -112,6 +112,28 @@ public class DemuxerStream extends ContainerStream {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+
+  /**
+   * info about this stream
+   * @return information about this stream
+   */
+   
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("index:"+getIndex()+";");
+    result.append("id:"+getId()+";");
+    //result.append("streamcoder:"+getStreamCoder()+";");
+    result.append("framerate:"+getFrameRate()+";");
+    result.append("timebase:"+getTimeBase()+";");
+    result.append("]");
+    return result.toString();
+  }
+
+
 /**
  * For containers with Stream.Disposition.DISPOSITION_ATTACHED_PIC, 
  *  
@@ -124,7 +146,7 @@ public class DemuxerStream extends ContainerStream {
   }
 
 /**
- * Get the decoder that can decode the information in this source stream. 
+ * Get the decoder that can decode the information in this Demuxer stream. 
  *  
  */
   public Decoder getDecoder() {

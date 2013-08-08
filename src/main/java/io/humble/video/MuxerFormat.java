@@ -27,7 +27,7 @@ public class MuxerFormat extends ContainerFormat {
    * Internal Only.
    */
   protected MuxerFormat(long cPtr, boolean cMemoryOwn) {
-    super(VideoJNI.SWIGSinkFormatUpcast(cPtr), cMemoryOwn);
+    super(VideoJNI.SWIGMuxerFormatUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
@@ -37,7 +37,7 @@ public class MuxerFormat extends ContainerFormat {
   protected MuxerFormat(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super(VideoJNI.SWIGSinkFormatUpcast(cPtr),
+    super(VideoJNI.SWIGMuxerFormatUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -68,7 +68,7 @@ public class MuxerFormat extends ContainerFormat {
   }
   
   /**
-   * Create a new SinkFormat object that is actually referring to the
+   * Create a new MuxerFormat object that is actually referring to the
    * exact same underlying native object.
    *
    * @return the new Java object.
@@ -147,7 +147,7 @@ public class MuxerFormat extends ContainerFormat {
  * Name for format.  
  */
   public String getName() {
-    return VideoJNI.SinkFormat_getName(swigCPtr, this);
+    return VideoJNI.MuxerFormat_getName(swigCPtr, this);
   }
 
 /**
@@ -156,14 +156,14 @@ public class MuxerFormat extends ContainerFormat {
  * than name.  
  */
   public String getLongName() {
-    return VideoJNI.SinkFormat_getLongName(swigCPtr, this);
+    return VideoJNI.MuxerFormat_getLongName(swigCPtr, this);
   }
 
 /**
  * A comma-separated list of supported filename extensions  
  */
   public String getExtensions() {
-    return VideoJNI.SinkFormat_getExtensions(swigCPtr, this);
+    return VideoJNI.MuxerFormat_getExtensions(swigCPtr, this);
   }
 
 /**
@@ -171,40 +171,39 @@ public class MuxerFormat extends ContainerFormat {
  * @return	a bitmask of {@link Flags}  
  */
   public int getFlags() {
-    return VideoJNI.SinkFormat_getFlags(swigCPtr, this);
+    return VideoJNI.MuxerFormat_getFlags(swigCPtr, this);
   }
 
 /**
  * Get the default audio codec for this format.  
  */
   public Codec.ID getDefaultAudioCodecId() {
-    return Codec.ID.swigToEnum(VideoJNI.SinkFormat_getDefaultAudioCodecId(swigCPtr, this));
+    return Codec.ID.swigToEnum(VideoJNI.MuxerFormat_getDefaultAudioCodecId(swigCPtr, this));
   }
 
 /**
  * Get the default video codec for this format.  
  */
   public Codec.ID getDefaultVideoCodecId() {
-    return Codec.ID.swigToEnum(VideoJNI.SinkFormat_getDefaultVideoCodecId(swigCPtr, this));
+    return Codec.ID.swigToEnum(VideoJNI.MuxerFormat_getDefaultVideoCodecId(swigCPtr, this));
   }
 
 /**
  * Get the default subtitle coded for this format.  
  */
   public Codec.ID getDefaultSubtitleCodecId() {
-    return Codec.ID.swigToEnum(VideoJNI.SinkFormat_getDefaultSubtitleCodecId(swigCPtr, this));
+    return Codec.ID.swigToEnum(VideoJNI.MuxerFormat_getDefaultSubtitleCodecId(swigCPtr, this));
   }
 
 /**
  * Get the mime type for this format.  
  */
   public String getMimeType() {
-    return VideoJNI.SinkFormat_getMimeType(swigCPtr, this);
+    return VideoJNI.MuxerFormat_getMimeType(swigCPtr, this);
   }
 
 /**
- * Return the output format in the list of registered output formats 
- *  
+ * Return the sink format in the list of registered sink formats  
  * which best matches the provided parameters, or return NULL if  
  * there is no match.  
  * @param	shortName if non-NULL checks if short_name matches with the 
@@ -218,19 +217,19 @@ public class MuxerFormat extends ContainerFormat {
  * MIME type of the registered formats  
  */
   public static MuxerFormat guessFormat(String shortName, String filename, String mimeType) {
-    long cPtr = VideoJNI.SinkFormat_guessFormat(shortName, filename, mimeType);
+    long cPtr = VideoJNI.MuxerFormat_guessFormat(shortName, filename, mimeType);
     return (cPtr == 0) ? null : new MuxerFormat(cPtr, false);
   }
 
   public Codec.ID guessCodec(String shortName, String filename, String mimeType, MediaDescriptor.Type type) {
-    return Codec.ID.swigToEnum(VideoJNI.SinkFormat_guessCodec(swigCPtr, this, shortName, filename, mimeType, type.swigValue()));
+    return Codec.ID.swigToEnum(VideoJNI.MuxerFormat_guessCodec(swigCPtr, this, shortName, filename, mimeType, type.swigValue()));
   }
 
 /**
  *  
  */
   protected int getNumSupportedCodecs() {
-    return VideoJNI.SinkFormat_getNumSupportedCodecs(swigCPtr, this);
+    return VideoJNI.MuxerFormat_getNumSupportedCodecs(swigCPtr, this);
   }
 
 /**
@@ -243,7 +242,7 @@ public class MuxerFormat extends ContainerFormat {
  *		 if none.  
  */
   protected Codec.ID getSupportedCodecId(int n) {
-    return Codec.ID.swigToEnum(VideoJNI.SinkFormat_getSupportedCodecId(swigCPtr, this, n));
+    return Codec.ID.swigToEnum(VideoJNI.MuxerFormat_getSupportedCodecId(swigCPtr, this, n));
   }
 
 /**
@@ -255,7 +254,7 @@ public class MuxerFormat extends ContainerFormat {
  * @return	the codec tag at the n'th slot, or 0 if none.  
  */
   protected long getSupportedCodecTag(int n) {
-    return VideoJNI.SinkFormat_getSupportedCodecTag(swigCPtr, this, n);
+    return VideoJNI.MuxerFormat_getSupportedCodecTag(swigCPtr, this, n);
   }
 
 /**
@@ -265,7 +264,7 @@ public class MuxerFormat extends ContainerFormat {
  * @return	the number of formats  
  */
   public static int getNumFormats() {
-    return VideoJNI.SinkFormat_getNumFormats();
+    return VideoJNI.MuxerFormat_getNumFormats();
   }
 
 /**
@@ -276,7 +275,7 @@ public class MuxerFormat extends ContainerFormat {
  *  
  */
   public static MuxerFormat getFormat(int index) {
-    long cPtr = VideoJNI.SinkFormat_getFormat(index);
+    long cPtr = VideoJNI.MuxerFormat_getFormat(index);
     return (cPtr == 0) ? null : new MuxerFormat(cPtr, false);
   }
 

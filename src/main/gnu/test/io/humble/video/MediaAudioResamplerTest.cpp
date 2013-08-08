@@ -30,7 +30,7 @@
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/MediaAudioResampler.h>
 #include <io/humble/video/MediaAudio.h>
-#include <io/humble/video/Source.h>
+#include <io/humble/video/Demuxer.h>
 #include <io/humble/video/Decoder.h>
 
 using namespace io::humble::ferry;

@@ -85,8 +85,8 @@ check_PROGRAMS = FilterTypeTester$(EXEEXT) FilterGraphTester$(EXEEXT) \
 	IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
 	MediaPacketTester$(EXEEXT) MediaAudioTester$(EXEEXT) \
 	MediaPictureTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
-	SourceTester$(EXEEXT) SourceFormatTester$(EXEEXT) \
-	SourceStreamTester$(EXEEXT) SinkFormatTester$(EXEEXT) \
+	DemuxerTester$(EXEEXT) DemuxerFormatTester$(EXEEXT) \
+	DemuxerStreamTester$(EXEEXT) MuxerFormatTester$(EXEEXT) \
 	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -122,6 +122,29 @@ nodist_DecoderTester_OBJECTS = DecoderTest_CXXRunner.$(OBJEXT)
 DecoderTester_OBJECTS = $(am_DecoderTester_OBJECTS) \
 	$(nodist_DecoderTester_OBJECTS)
 DecoderTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_DemuxerFormatTester_OBJECTS = DemuxerFormatTest.$(OBJEXT) \
+	Main.$(OBJEXT)
+nodist_DemuxerFormatTester_OBJECTS =  \
+	DemuxerFormatTest_CXXRunner.$(OBJEXT)
+DemuxerFormatTester_OBJECTS = $(am_DemuxerFormatTester_OBJECTS) \
+	$(nodist_DemuxerFormatTester_OBJECTS)
+DemuxerFormatTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_DemuxerStreamTester_OBJECTS = DemuxerStreamTest.$(OBJEXT) \
+	TestData.$(OBJEXT) Main.$(OBJEXT)
+nodist_DemuxerStreamTester_OBJECTS =  \
+	DemuxerStreamTest_CXXRunner.$(OBJEXT)
+DemuxerStreamTester_OBJECTS = $(am_DemuxerStreamTester_OBJECTS) \
+	$(nodist_DemuxerStreamTester_OBJECTS)
+DemuxerStreamTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_DemuxerTester_OBJECTS = DemuxerTest.$(OBJEXT) TestData.$(OBJEXT) \
+	Main.$(OBJEXT)
+nodist_DemuxerTester_OBJECTS = DemuxerTest_CXXRunner.$(OBJEXT)
+DemuxerTester_OBJECTS = $(am_DemuxerTester_OBJECTS) \
+	$(nodist_DemuxerTester_OBJECTS)
+DemuxerTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_ErrorTester_OBJECTS = ErrorTest.$(OBJEXT) Main.$(OBJEXT)
 nodist_ErrorTester_OBJECTS = ErrorTest_CXXRunner.$(OBJEXT)
@@ -201,6 +224,14 @@ MediaPictureTester_OBJECTS = $(am_MediaPictureTester_OBJECTS) \
 	$(nodist_MediaPictureTester_OBJECTS)
 MediaPictureTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_MuxerFormatTester_OBJECTS = MuxerFormatTest.$(OBJEXT) \
+	Main.$(OBJEXT)
+nodist_MuxerFormatTester_OBJECTS =  \
+	MuxerFormatTest_CXXRunner.$(OBJEXT)
+MuxerFormatTester_OBJECTS = $(am_MuxerFormatTester_OBJECTS) \
+	$(nodist_MuxerFormatTester_OBJECTS)
+MuxerFormatTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_PixelFormatTester_OBJECTS = PixelFormatTest.$(OBJEXT) \
 	TestData.$(OBJEXT) Main.$(OBJEXT)
 nodist_PixelFormatTester_OBJECTS =  \
@@ -220,35 +251,6 @@ nodist_RationalTester_OBJECTS = RationalTest_CXXRunner.$(OBJEXT)
 RationalTester_OBJECTS = $(am_RationalTester_OBJECTS) \
 	$(nodist_RationalTester_OBJECTS)
 RationalTester_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_SinkFormatTester_OBJECTS = SinkFormatTest.$(OBJEXT) Main.$(OBJEXT)
-nodist_SinkFormatTester_OBJECTS = SinkFormatTest_CXXRunner.$(OBJEXT)
-SinkFormatTester_OBJECTS = $(am_SinkFormatTester_OBJECTS) \
-	$(nodist_SinkFormatTester_OBJECTS)
-SinkFormatTester_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_SourceFormatTester_OBJECTS = SourceFormatTest.$(OBJEXT) \
-	Main.$(OBJEXT)
-nodist_SourceFormatTester_OBJECTS =  \
-	SourceFormatTest_CXXRunner.$(OBJEXT)
-SourceFormatTester_OBJECTS = $(am_SourceFormatTester_OBJECTS) \
-	$(nodist_SourceFormatTester_OBJECTS)
-SourceFormatTester_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_SourceStreamTester_OBJECTS = SourceStreamTest.$(OBJEXT) \
-	TestData.$(OBJEXT) Main.$(OBJEXT)
-nodist_SourceStreamTester_OBJECTS =  \
-	SourceStreamTest_CXXRunner.$(OBJEXT)
-SourceStreamTester_OBJECTS = $(am_SourceStreamTester_OBJECTS) \
-	$(nodist_SourceStreamTester_OBJECTS)
-SourceStreamTester_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_SourceTester_OBJECTS = SourceTest.$(OBJEXT) TestData.$(OBJEXT) \
-	Main.$(OBJEXT)
-nodist_SourceTester_OBJECTS = SourceTest_CXXRunner.$(OBJEXT)
-SourceTester_OBJECTS = $(am_SourceTester_OBJECTS) \
-	$(nodist_SourceTester_OBJECTS)
-SourceTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -286,8 +288,12 @@ am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(DecoderTester_SOURCES) $(nodist_DecoderTester_SOURCES) \
-	$(ErrorTester_SOURCES) $(nodist_ErrorTester_SOURCES) \
-	$(FilterGraphTester_SOURCES) \
+	$(DemuxerFormatTester_SOURCES) \
+	$(nodist_DemuxerFormatTester_SOURCES) \
+	$(DemuxerStreamTester_SOURCES) \
+	$(nodist_DemuxerStreamTester_SOURCES) $(DemuxerTester_SOURCES) \
+	$(nodist_DemuxerTester_SOURCES) $(ErrorTester_SOURCES) \
+	$(nodist_ErrorTester_SOURCES) $(FilterGraphTester_SOURCES) \
 	$(nodist_FilterGraphTester_SOURCES) \
 	$(FilterTypeTester_SOURCES) $(nodist_FilterTypeTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(nodist_IndexEntryTester_SOURCES) \
@@ -302,27 +308,23 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(nodist_MediaPictureResamplerTester_SOURCES) \
 	$(MediaPictureTester_SOURCES) \
 	$(nodist_MediaPictureTester_SOURCES) \
+	$(MuxerFormatTester_SOURCES) \
+	$(nodist_MuxerFormatTester_SOURCES) \
 	$(PixelFormatTester_SOURCES) \
 	$(nodist_PixelFormatTester_SOURCES) $(PropertyTester_SOURCES) \
 	$(nodist_PropertyTester_SOURCES) $(RationalTester_SOURCES) \
-	$(nodist_RationalTester_SOURCES) $(SinkFormatTester_SOURCES) \
-	$(nodist_SinkFormatTester_SOURCES) \
-	$(SourceFormatTester_SOURCES) \
-	$(nodist_SourceFormatTester_SOURCES) \
-	$(SourceStreamTester_SOURCES) \
-	$(nodist_SourceStreamTester_SOURCES) $(SourceTester_SOURCES) \
-	$(nodist_SourceTester_SOURCES)
+	$(nodist_RationalTester_SOURCES)
 DIST_SOURCES = $(CodecTester_SOURCES) $(DecoderTester_SOURCES) \
-	$(ErrorTester_SOURCES) $(FilterGraphTester_SOURCES) \
-	$(FilterTypeTester_SOURCES) $(IndexEntryTester_SOURCES) \
-	$(KeyValueBagTester_SOURCES) \
+	$(DemuxerFormatTester_SOURCES) $(DemuxerStreamTester_SOURCES) \
+	$(DemuxerTester_SOURCES) $(ErrorTester_SOURCES) \
+	$(FilterGraphTester_SOURCES) $(FilterTypeTester_SOURCES) \
+	$(IndexEntryTester_SOURCES) $(KeyValueBagTester_SOURCES) \
 	$(MediaAudioResamplerTester_SOURCES) \
 	$(MediaAudioTester_SOURCES) $(MediaPacketTester_SOURCES) \
 	$(MediaPictureResamplerTester_SOURCES) \
-	$(MediaPictureTester_SOURCES) $(PixelFormatTester_SOURCES) \
-	$(PropertyTester_SOURCES) $(RationalTester_SOURCES) \
-	$(SinkFormatTester_SOURCES) $(SourceFormatTester_SOURCES) \
-	$(SourceStreamTester_SOURCES) $(SourceTester_SOURCES)
+	$(MediaPictureTester_SOURCES) $(MuxerFormatTester_SOURCES) \
+	$(PixelFormatTester_SOURCES) $(PropertyTester_SOURCES) \
+	$(RationalTester_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -789,10 +791,10 @@ BUILT_SOURCES = \
   MediaAudioTest_CXXRunner.cpp \
   MediaPictureTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
-  SourceTest_CXXRunner.cpp \
-  SourceFormatTest_CXXRunner.cpp \
-  SourceStreamTest_CXXRunner.cpp \
-  SinkFormatTest_CXXRunner.cpp \
+  DemuxerTest_CXXRunner.cpp \
+  DemuxerFormatTest_CXXRunner.cpp \
+  DemuxerStreamTest_CXXRunner.cpp \
+  MuxerFormatTest_CXXRunner.cpp \
   PropertyTest_CXXRunner.cpp \
   RationalTest_CXXRunner.cpp
 
@@ -810,10 +812,10 @@ noinst_HEADERS = \
   MediaAudioTest.h \
   MediaPictureTest.h \
   KeyValueBagTest.h \
-  SourceTest.h \
-  SourceFormatTest.h \
-  SourceStreamTest.h \
-  SinkFormatTest.h \
+  DemuxerTest.h \
+  DemuxerFormatTest.h \
+  DemuxerStreamTest.h \
+  MuxerFormatTest.h \
   PropertyTest.h \
   RationalTest.h
 
@@ -966,46 +968,46 @@ nodist_KeyValueBagTester_SOURCES = \
 KeyValueBagTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-SourceStreamTester_SOURCES = \
-  SourceStreamTest.cpp \
+DemuxerStreamTester_SOURCES = \
+  DemuxerStreamTest.cpp \
   TestData.cpp \
   Main.cpp
 
-nodist_SourceStreamTester_SOURCES = \
-  SourceStreamTest_CXXRunner.cpp
+nodist_DemuxerStreamTester_SOURCES = \
+  DemuxerStreamTest_CXXRunner.cpp
 
-SourceStreamTester_LDADD = \
+DemuxerStreamTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-SourceTester_SOURCES = \
-  SourceTest.cpp \
+DemuxerTester_SOURCES = \
+  DemuxerTest.cpp \
   TestData.cpp \
   Main.cpp
 
-nodist_SourceTester_SOURCES = \
-  SourceTest_CXXRunner.cpp
+nodist_DemuxerTester_SOURCES = \
+  DemuxerTest_CXXRunner.cpp
 
-SourceTester_LDADD = \
+DemuxerTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-SourceFormatTester_SOURCES = \
-  SourceFormatTest.cpp \
+DemuxerFormatTester_SOURCES = \
+  DemuxerFormatTest.cpp \
   Main.cpp
 
-nodist_SourceFormatTester_SOURCES = \
-  SourceFormatTest_CXXRunner.cpp
+nodist_DemuxerFormatTester_SOURCES = \
+  DemuxerFormatTest_CXXRunner.cpp
 
-SourceFormatTester_LDADD = \
+DemuxerFormatTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-SinkFormatTester_SOURCES = \
-  SinkFormatTest.cpp \
+MuxerFormatTester_SOURCES = \
+  MuxerFormatTest.cpp \
   Main.cpp
 
-nodist_SinkFormatTester_SOURCES = \
-  SinkFormatTest_CXXRunner.cpp
+nodist_MuxerFormatTester_SOURCES = \
+  MuxerFormatTest_CXXRunner.cpp
 
-SinkFormatTester_LDADD = \
+MuxerFormatTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 PropertyTester_SOURCES = \
@@ -1081,6 +1083,18 @@ DecoderTester$(EXEEXT): $(DecoderTester_OBJECTS) $(DecoderTester_DEPENDENCIES) $
 	@rm -f DecoderTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(DecoderTester_OBJECTS) $(DecoderTester_LDADD) $(LIBS)
 
+DemuxerFormatTester$(EXEEXT): $(DemuxerFormatTester_OBJECTS) $(DemuxerFormatTester_DEPENDENCIES) $(EXTRA_DemuxerFormatTester_DEPENDENCIES) 
+	@rm -f DemuxerFormatTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DemuxerFormatTester_OBJECTS) $(DemuxerFormatTester_LDADD) $(LIBS)
+
+DemuxerStreamTester$(EXEEXT): $(DemuxerStreamTester_OBJECTS) $(DemuxerStreamTester_DEPENDENCIES) $(EXTRA_DemuxerStreamTester_DEPENDENCIES) 
+	@rm -f DemuxerStreamTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DemuxerStreamTester_OBJECTS) $(DemuxerStreamTester_LDADD) $(LIBS)
+
+DemuxerTester$(EXEEXT): $(DemuxerTester_OBJECTS) $(DemuxerTester_DEPENDENCIES) $(EXTRA_DemuxerTester_DEPENDENCIES) 
+	@rm -f DemuxerTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DemuxerTester_OBJECTS) $(DemuxerTester_LDADD) $(LIBS)
+
 ErrorTester$(EXEEXT): $(ErrorTester_OBJECTS) $(ErrorTester_DEPENDENCIES) $(EXTRA_ErrorTester_DEPENDENCIES) 
 	@rm -f ErrorTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(ErrorTester_OBJECTS) $(ErrorTester_LDADD) $(LIBS)
@@ -1121,6 +1135,10 @@ MediaPictureTester$(EXEEXT): $(MediaPictureTester_OBJECTS) $(MediaPictureTester_
 	@rm -f MediaPictureTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(MediaPictureTester_OBJECTS) $(MediaPictureTester_LDADD) $(LIBS)
 
+MuxerFormatTester$(EXEEXT): $(MuxerFormatTester_OBJECTS) $(MuxerFormatTester_DEPENDENCIES) $(EXTRA_MuxerFormatTester_DEPENDENCIES) 
+	@rm -f MuxerFormatTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(MuxerFormatTester_OBJECTS) $(MuxerFormatTester_LDADD) $(LIBS)
+
 PixelFormatTester$(EXEEXT): $(PixelFormatTester_OBJECTS) $(PixelFormatTester_DEPENDENCIES) $(EXTRA_PixelFormatTester_DEPENDENCIES) 
 	@rm -f PixelFormatTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(PixelFormatTester_OBJECTS) $(PixelFormatTester_LDADD) $(LIBS)
@@ -1133,22 +1151,6 @@ RationalTester$(EXEEXT): $(RationalTester_OBJECTS) $(RationalTester_DEPENDENCIES
 	@rm -f RationalTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(RationalTester_OBJECTS) $(RationalTester_LDADD) $(LIBS)
 
-SinkFormatTester$(EXEEXT): $(SinkFormatTester_OBJECTS) $(SinkFormatTester_DEPENDENCIES) $(EXTRA_SinkFormatTester_DEPENDENCIES) 
-	@rm -f SinkFormatTester$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(SinkFormatTester_OBJECTS) $(SinkFormatTester_LDADD) $(LIBS)
-
-SourceFormatTester$(EXEEXT): $(SourceFormatTester_OBJECTS) $(SourceFormatTester_DEPENDENCIES) $(EXTRA_SourceFormatTester_DEPENDENCIES) 
-	@rm -f SourceFormatTester$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(SourceFormatTester_OBJECTS) $(SourceFormatTester_LDADD) $(LIBS)
-
-SourceStreamTester$(EXEEXT): $(SourceStreamTester_OBJECTS) $(SourceStreamTester_DEPENDENCIES) $(EXTRA_SourceStreamTester_DEPENDENCIES) 
-	@rm -f SourceStreamTester$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(SourceStreamTester_OBJECTS) $(SourceStreamTester_LDADD) $(LIBS)
-
-SourceTester$(EXEEXT): $(SourceTester_OBJECTS) $(SourceTester_DEPENDENCIES) $(EXTRA_SourceTester_DEPENDENCIES) 
-	@rm -f SourceTester$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(SourceTester_OBJECTS) $(SourceTester_LDADD) $(LIBS)
-
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -1159,6 +1161,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CodecTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecoderTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecoderTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerFormatTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerFormatTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerStreamTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerStreamTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterGraphTest.Po@am__quote@
@@ -1180,20 +1188,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureResamplerTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MuxerFormatTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MuxerFormatTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PixelFormatTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PixelFormatTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RationalTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RationalTest_CXXRunner.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SinkFormatTest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SinkFormatTest_CXXRunner.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceFormatTest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceFormatTest_CXXRunner.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceStreamTest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceStreamTest_CXXRunner.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestData.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lodepng.Po@am__quote@
 
@@ -1555,30 +1557,30 @@ KeyValueBagTester.log: KeyValueBagTester$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-SourceTester.log: SourceTester$(EXEEXT)
-	@p='SourceTester$(EXEEXT)'; \
-	b='SourceTester'; \
+DemuxerTester.log: DemuxerTester$(EXEEXT)
+	@p='DemuxerTester$(EXEEXT)'; \
+	b='DemuxerTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-SourceFormatTester.log: SourceFormatTester$(EXEEXT)
-	@p='SourceFormatTester$(EXEEXT)'; \
-	b='SourceFormatTester'; \
+DemuxerFormatTester.log: DemuxerFormatTester$(EXEEXT)
+	@p='DemuxerFormatTester$(EXEEXT)'; \
+	b='DemuxerFormatTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-SourceStreamTester.log: SourceStreamTester$(EXEEXT)
-	@p='SourceStreamTester$(EXEEXT)'; \
-	b='SourceStreamTester'; \
+DemuxerStreamTester.log: DemuxerStreamTester$(EXEEXT)
+	@p='DemuxerStreamTester$(EXEEXT)'; \
+	b='DemuxerStreamTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-SinkFormatTester.log: SinkFormatTester$(EXEEXT)
-	@p='SinkFormatTester$(EXEEXT)'; \
-	b='SinkFormatTester'; \
+MuxerFormatTester.log: MuxerFormatTester$(EXEEXT)
+	@p='MuxerFormatTester$(EXEEXT)'; \
+	b='MuxerFormatTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

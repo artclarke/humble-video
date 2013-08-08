@@ -439,8 +439,8 @@ public class Codec extends RefCounted {
  * @param	type The codec type.  
  * @return	the codec, or null if we can't find it.  
  */
-  public static Codec guessEncodingCodec(SWIGTYPE_p_io__humble__video__MuxerFormat fmt, String shortName, String url, String mimeType, MediaDescriptor.Type type) {
-    long cPtr = VideoJNI.Codec_guessEncodingCodec(SWIGTYPE_p_io__humble__video__MuxerFormat.getCPtr(fmt), shortName, url, mimeType, type.swigValue());
+  public static Codec guessEncodingCodec(MuxerFormat fmt, String shortName, String url, String mimeType, MediaDescriptor.Type type) {
+    long cPtr = VideoJNI.Codec_guessEncodingCodec(MuxerFormat.getCPtr(fmt), fmt, shortName, url, mimeType, type.swigValue());
     return (cPtr == 0) ? null : new Codec(cPtr, false);
   }
 

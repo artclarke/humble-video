@@ -23,7 +23,7 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/KeyValueBag.h>
-#include <io/humble/video/Source.h>
+#include <io/humble/video/Demuxer.h>
 
 using namespace io::humble::ferry;
 using namespace io::humble::video;
@@ -72,7 +72,7 @@ KeyValueBagTest :: testCreation()
 }
 
 void
-KeyValueBagTest :: testSourceGetMetaData()
+KeyValueBagTest :: testDemuxerGetMetaData()
 {
   RefPointer<Demuxer> source=Demuxer::make();
   source->open(mSampleFile, 0, false, true, 0, 0);

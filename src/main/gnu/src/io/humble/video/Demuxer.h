@@ -17,13 +17,13 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-#ifndef SOURCE_H_
-#define SOURCE_H_
+#ifndef DEMUXER_H_
+#define DEMUXER_H_
 
 #include <io/humble/video/MediaPacket.h>
 #include <io/humble/video/Container.h>
-#include <io/humble/video/SourceStream.h>
-#include <io/humble/video/SourceFormat.h>
+#include <io/humble/video/DemuxerStream.h>
+#include <io/humble/video/DemuxerFormat.h>
 
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/HumbleException.h>
@@ -39,12 +39,12 @@ class VS_API_HUMBLEVIDEO Demuxer : public io::humble::video::Container
 {
   /**
    * Note: This class is a pure-virtual interface. Actual
-   * implementation should be in SourceImpl.
+   * implementation should be in DemuxerImpl.
    */
 public:
 
   /**
-   * Create a new {@link Source}
+   * Create a new {@link Demuxer}
    */
   static Demuxer*
   make();
@@ -54,7 +54,7 @@ public:
   getState() = 0;
 
   /**
-   * Get the {@link InputFormat} associated with this {@link Source}
+   * Get the {@link InputFormat} associated with this {@link Demuxer}
    * or null if unknown.
    */
   virtual DemuxerFormat *
@@ -85,7 +85,7 @@ public:
    * Open this container and make it ready for reading, optionally
    * reading as far into the container as necessary to find all streams.
    * <p>The caller must call {@link #close()} when done, but if not, the
-   * {@link Source} will eventually close
+   * {@link Demuxer} will eventually close
    * them later but warn to the logging system.
    * </p><p>If the current thread is interrupted while this blocking method
    * is running the method will return with a negative value.
@@ -113,7 +113,7 @@ public:
    *   is the only way to set InputFormat-specific options.
    * @param optionsNotSet If not null, on return this {@link KeyValueBag} object will be cleared out, and
    *   replace with any key/value pairs that were in <code>options</code> but could not be set on this
-   *   {@link Source}.
+   *   {@link Demuxer}.
    *
    * @return >= 0 on success; < 0 on error.
    */
@@ -151,7 +151,7 @@ public:
   getStream(int32_t streamIndex)=0;
 
   /**
-   * Reads the next packet in the Source into the Packet.  This method will
+   * Reads the next packet in the Demuxer into the Packet.  This method will
    * release any buffers currently held by this packet and allocate
    * new ones.
    * <p>If the current thread is interrupted while this blocking method
@@ -162,7 +162,7 @@ public:
    * {@link Error.Type#ERROR_INTERRUPTED}.
    * </p>
    *
-   * @param  packet [In/Out] The packet the Source will read into.
+   * @param  packet [In/Out] The packet the Demuxer will read into.
    *
    * @return 0 if successful, or <0 if not.
    */
@@ -192,7 +192,7 @@ public:
   /**
    * Gets the duration, if known, of this container.
    *
-   * This will only work for non-streamable containers where Source
+   * This will only work for non-streamable containers where Demuxer
    * can calculate the container size.
    *
    * @return The duration, or {@link Global#NO_PTS} if not known.
@@ -204,9 +204,9 @@ public:
    * Get the starting timestamp in microseconds of the first packet of the earliest stream in this container.
    * <p>
    * This will only return value values either either (a) for non-streamable
-   * containers where Source can calculate the container size or
-   * (b) after Source has actually read the
-   * first packet from a streamable source.
+   * containers where Demuxer can calculate the container size or
+   * (b) after Demuxer has actually read the
+   * first packet from a streamable Demuxer.
    * </p>
    *
    * @return The starting timestamp in microseconds, or {@link Global#NO_PTS} if not known.
@@ -274,7 +274,7 @@ public:
   setFlag(Flag flag, bool value) = 0;
 
   /**
-   * Get the URL the Source was opened with.
+   * Get the URL the Demuxer was opened with.
    * May return null if unknown.
    * @return the URL opened, or null.
    */
@@ -282,7 +282,7 @@ public:
   getURL()=0;
 
   /**
-   * Get the number of times {@link Source#readNextPacket(Packet)}
+   * Get the number of times {@link Demuxer#readNextPacket(Packet)}
    * will retry a read if it gets a {@link Error.Type#ERROR_AGAIN}
    * value back.
    *
@@ -315,16 +315,16 @@ public:
    * Get the {@link KeyValueBag} of media MetaData for this object,
    * or null if none.
    * <p>
-   * If the {@link Source} or {@link IStream} object
+   * If the {@link Demuxer} or {@link IStream} object
    * that this {@link KeyValueBag} came from was opened
    * for reading, then changes via {@link KeyValueBag#setValue(String, String)}
    * will have no effect on the underlying media.
    * </p>
    * <p>
-   * If the {@link Source} or {@link IStream} object
+   * If the {@link Demuxer} or {@link IStream} object
    * that this {@link KeyValueBag} came from was opened
    * for writing, then changes via {@link KeyValueBag#setValue(String, String)}
-   * will have no effect after {@link Source#writeHeader()}
+   * will have no effect after {@link Demuxer#writeHeader()}
    * is called.
    * </p>
    * @return the {@link KeyValueBag}.
@@ -333,7 +333,7 @@ public:
   getMetaData()=0;
 
   /**
-   * Forces the {@link Source} to assume all audio streams are
+   * Forces the {@link Demuxer} to assume all audio streams are
    * encoded with the given audio codec when demuxing.
    * @param id The codec id
    * @return < 0 on error (e.g. not an audio codec); >= 0 on success.
@@ -342,7 +342,7 @@ public:
   setForcedAudioCodec(Codec::ID id)=0;
 
   /**
-   * Forces the {@link Source} to assume all video streams are
+   * Forces the {@link Demuxer} to assume all video streams are
    * encoded with the given video codec when demuxing.
    * @param id The codec id
    * @return < 0 on error (e.g. not an video codec); >= 0 on success.
@@ -351,7 +351,7 @@ public:
   setForcedVideoCodec(Codec::ID id)=0;
 
   /**
-   * Forces the {@link Source} to assume all subtitle streams are
+   * Forces the {@link Demuxer} to assume all subtitle streams are
    * encoded with the given subtitle codec when demuxing.
    * @param id The codec id
    * @return < 0 on error (e.g. not an subtitle codec); >= 0 on success.
@@ -439,4 +439,4 @@ protected:
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
-#endif /* SOURCE_H_ */
+#endif /* DEMUXER_H_ */

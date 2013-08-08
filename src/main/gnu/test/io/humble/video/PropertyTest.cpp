@@ -13,7 +13,7 @@
 #include <io/humble/video/Property.h>
 #include <io/humble/video/VideoExceptions.h>
 #include <io/humble/video/KeyValueBag.h>
-#include <io/humble/video/Source.h>
+#include <io/humble/video/Demuxer.h>
 
 using namespace io::humble::ferry;
 using namespace io::humble::video;

@@ -46,12 +46,12 @@ libhumble_video_la_SOURCES= \
   Encoder.cpp \
   ContainerStream.cpp \
   Container.cpp \
-  SourceFormat.cpp \
-  Source.cpp \
-  SourceImpl.cpp \
-  SourceStream.cpp \
-  SourceStreamImpl.cpp \
-  SinkFormat.cpp \
+  DemuxerFormat.cpp \
+  Demuxer.cpp \
+  DemuxerImpl.cpp \
+  DemuxerStream.cpp \
+  DemuxerStreamImpl.cpp \
+  MuxerFormat.cpp \
   FilterType.cpp \
   FilterGraph.cpp \
   Filter.cpp \
@@ -115,10 +115,10 @@ libhumble_video_la_HEADERS= \
   Property.swg \
   ContainerFormat.h \
   ContainerFormat.swg \
-  SinkFormat.h \
-  SinkFormat.swg \
-  SourceFormat.h \
-  SourceFormat.swg \
+  MuxerFormat.h \
+  MuxerFormat.swg \
+  DemuxerFormat.h \
+  DemuxerFormat.swg \
   Configurable.h \
   Configurable.swg \
   Coder.h \
@@ -131,12 +131,12 @@ libhumble_video_la_HEADERS= \
   ContainerStream.swg \
   Container.h \
   Container.swg \
-  SourceStream.h \
-  SourceStream.swg \
-  SourceStreamImpl.h \
-  Source.h \
-  Source.swg \
-  SourceImpl.h \
+  DemuxerStream.h \
+  DemuxerStream.swg \
+  DemuxerStreamImpl.h \
+  Demuxer.h \
+  Demuxer.swg \
+  DemuxerImpl.h \
   FilterType.h \
   FilterGraph.h \
   Filter.h \

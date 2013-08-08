@@ -17,47 +17,38 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * SourceStream.h
+ * DemuxerTest.h
  *
- *  Created on: Jul 7, 2013
+ *  Created on: Jul 3, 2013
  *      Author: aclarke
  */
 
-#ifndef SOURCESTREAM_H_
-#define SOURCESTREAM_H_
+#ifndef SOURCETEST_H_
+#define SOURCETEST_H_
 
-#include <io/humble/video/HumbleVideo.h>
-#include <io/humble/video/ContainerStream.h>
+#include <io/humble/testutils/TestUtils.h>
+#include <io/humble/video/Demuxer.h>
 
-namespace io {
-namespace humble {
-namespace video {
+#include "TestData.h"
 
-class Decoder;
-/**
- * A {@link ContainerStream} class that was read from a {@link Source}.
- */
-class VS_API_HUMBLEVIDEO DemuxerStream : public io::humble::video::ContainerStream
+class DemuxerTest : public CxxTest::TestSuite
 {
 public:
-  /**
-   * For containers with Stream.Disposition.DISPOSITION_ATTACHED_PIC,
-   * this returns a read-only copy of the packet containing the
-   * picture (needs to be decoded separately).
-   */
-  virtual MediaPacket* getAttachedPic()=0;
-  /**
-   * Get the decoder that can decode the information in this source stream.
-   */
-  virtual Decoder* getDecoder()=0;
-
-protected:
-  DemuxerStream();
+  DemuxerTest();
   virtual
-  ~DemuxerStream();
+  ~DemuxerTest();
+  void testMake();
+  void testOpen();
+  void testOpenDemuxerPrivatePropertySetting();
+  void testOpenResetInputFormat();
+  void testOpenCustomIO();
+  void testOpenWithoutCloseAutoCloses();
+  void testOpenInvalidArguments();
+  void testRead();
+private:
+  void openTestHelper(const char* url);
+  char mSampleFile[2048];
+  TestData mFixtures;
+  TestData::Fixture* mFixture;
 };
-
-} /* namespace video */
-} /* namespace humble */
-} /* namespace io */
-#endif /* SOURCESTREAM_H_ */
+#endif /* SOURCETEST_H_ */

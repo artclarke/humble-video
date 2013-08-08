@@ -29,7 +29,7 @@
 
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaPictureResampler.h>
-#include <io/humble/video/Source.h>
+#include <io/humble/video/Demuxer.h>
 #include <io/humble/video/Decoder.h>
 #include "lodepng.h"
 

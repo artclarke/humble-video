@@ -20,10 +20,10 @@ check_PROGRAMS=\
   MediaAudioTester \
   MediaPictureTester \
   KeyValueBagTester \
-  SourceTester \
-  SourceFormatTester \
-  SourceStreamTester \
-  SinkFormatTester \
+  DemuxerTester \
+  DemuxerFormatTester \
+  DemuxerStreamTester \
+  MuxerFormatTester \
   PropertyTester \
   RationalTester 
 
@@ -41,10 +41,10 @@ BUILT_SOURCES= \
   MediaAudioTest_CXXRunner.cpp \
   MediaPictureTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
-  SourceTest_CXXRunner.cpp \
-  SourceFormatTest_CXXRunner.cpp \
-  SourceStreamTest_CXXRunner.cpp \
-  SinkFormatTest_CXXRunner.cpp \
+  DemuxerTest_CXXRunner.cpp \
+  DemuxerFormatTest_CXXRunner.cpp \
+  DemuxerStreamTest_CXXRunner.cpp \
+  MuxerFormatTest_CXXRunner.cpp \
   PropertyTest_CXXRunner.cpp \
   RationalTest_CXXRunner.cpp
 
@@ -62,10 +62,10 @@ noinst_HEADERS = \
   MediaAudioTest.h \
   MediaPictureTest.h \
   KeyValueBagTest.h \
-  SourceTest.h \
-  SourceFormatTest.h \
-  SourceStreamTest.h \
-  SinkFormatTest.h \
+  DemuxerTest.h \
+  DemuxerFormatTest.h \
+  DemuxerStreamTest.h \
+  MuxerFormatTest.h \
   PropertyTest.h \
   RationalTest.h
 
@@ -220,46 +220,46 @@ nodist_KeyValueBagTester_SOURCES= \
 KeyValueBagTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-SourceStreamTester_SOURCES= \
-  SourceStreamTest.cpp \
+DemuxerStreamTester_SOURCES= \
+  DemuxerStreamTest.cpp \
   TestData.cpp \
   Main.cpp
 
-nodist_SourceStreamTester_SOURCES= \
-  SourceStreamTest_CXXRunner.cpp
+nodist_DemuxerStreamTester_SOURCES= \
+  DemuxerStreamTest_CXXRunner.cpp
 
-SourceStreamTester_LDADD= \
+DemuxerStreamTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
   
-SourceTester_SOURCES= \
-  SourceTest.cpp \
+DemuxerTester_SOURCES= \
+  DemuxerTest.cpp \
   TestData.cpp \
   Main.cpp
 
-nodist_SourceTester_SOURCES= \
-  SourceTest_CXXRunner.cpp
+nodist_DemuxerTester_SOURCES= \
+  DemuxerTest_CXXRunner.cpp
 
-SourceTester_LDADD= \
+DemuxerTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
-SourceFormatTester_SOURCES= \
-  SourceFormatTest.cpp \
+DemuxerFormatTester_SOURCES= \
+  DemuxerFormatTest.cpp \
   Main.cpp
 
-nodist_SourceFormatTester_SOURCES= \
-  SourceFormatTest_CXXRunner.cpp
+nodist_DemuxerFormatTester_SOURCES= \
+  DemuxerFormatTest_CXXRunner.cpp
 
-SourceFormatTester_LDADD= \
+DemuxerFormatTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
   
-SinkFormatTester_SOURCES= \
-  SinkFormatTest.cpp \
+MuxerFormatTester_SOURCES= \
+  MuxerFormatTest.cpp \
   Main.cpp
 
-nodist_SinkFormatTester_SOURCES= \
-  SinkFormatTest_CXXRunner.cpp
+nodist_MuxerFormatTester_SOURCES= \
+  MuxerFormatTest_CXXRunner.cpp
 
-SinkFormatTester_LDADD= \
+MuxerFormatTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 

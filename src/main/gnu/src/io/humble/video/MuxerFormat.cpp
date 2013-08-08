@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
  *
- * OutputFormat.cpp
+ * SinkFormat.cpp
  *
  *  Created on: Jun 28, 2013
  *      Author: aclarke
  */
 
-#include "SinkFormat.h"
+#include "MuxerFormat.h"
 #include <io/humble/video/Global.h>
 
 namespace io {

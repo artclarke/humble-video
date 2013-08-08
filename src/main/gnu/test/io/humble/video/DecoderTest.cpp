@@ -27,8 +27,8 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/KeyValueBag.h>
-#include <io/humble/video/Source.h>
-#include <io/humble/video/SourceStream.h>
+#include <io/humble/video/Demuxer.h>
+#include <io/humble/video/DemuxerStream.h>
 #include <io/humble/video/MediaAudio.h>
 
 DecoderTest::DecoderTest() {

@@ -1,9 +1,9 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
-#include <io/humble/video/Source.h>
-#include <io/humble/video/SourceStream.h>
+#include <io/humble/video/Demuxer.h>
+#include <io/humble/video/DemuxerStream.h>
 #include <io/humble/video/Global.h>
-#include "SourceStreamTest.h"
+#include "DemuxerStreamTest.h"
 
 using namespace io::humble::ferry;
 using namespace io::humble::video;

@@ -1063,7 +1063,7 @@ class VideoJNI {
   public final static native long Codec_findDecodingCodec(int jarg1);
   public final static native long Codec_findDecodingCodecByIntID(int jarg1);
   public final static native long Codec_findDecodingCodecByName(String jarg1);
-  public final static native long Codec_guessEncodingCodec(long jarg1, String jarg2, String jarg3, String jarg4, int jarg5);
+  public final static native long Codec_guessEncodingCodec(long jarg1, MuxerFormat jarg1_, String jarg2, String jarg3, String jarg4, int jarg5);
   public final static native String Codec_getLongName(long jarg1, Codec jarg1_);
   public final static native int Codec_getNumInstalledCodecs();
   public final static native long Codec_getInstalledCodec(int jarg1);
@@ -1116,6 +1116,21 @@ class VideoJNI {
   public final static native int ContainerFormat_getSupportedCodecId(long jarg1, ContainerFormat jarg1_, int jarg2);
   public final static native long ContainerFormat_getSupportedCodecTag(long jarg1, ContainerFormat jarg1_, int jarg2);
   public final static native void delete_ContainerFormat(long jarg1);
+  public final static native String MuxerFormat_getName(long jarg1, MuxerFormat jarg1_);
+  public final static native String MuxerFormat_getLongName(long jarg1, MuxerFormat jarg1_);
+  public final static native String MuxerFormat_getExtensions(long jarg1, MuxerFormat jarg1_);
+  public final static native int MuxerFormat_getFlags(long jarg1, MuxerFormat jarg1_);
+  public final static native int MuxerFormat_getDefaultAudioCodecId(long jarg1, MuxerFormat jarg1_);
+  public final static native int MuxerFormat_getDefaultVideoCodecId(long jarg1, MuxerFormat jarg1_);
+  public final static native int MuxerFormat_getDefaultSubtitleCodecId(long jarg1, MuxerFormat jarg1_);
+  public final static native String MuxerFormat_getMimeType(long jarg1, MuxerFormat jarg1_);
+  public final static native long MuxerFormat_guessFormat(String jarg1, String jarg2, String jarg3);
+  public final static native int MuxerFormat_guessCodec(long jarg1, MuxerFormat jarg1_, String jarg2, String jarg3, String jarg4, int jarg5);
+  public final static native int MuxerFormat_getNumSupportedCodecs(long jarg1, MuxerFormat jarg1_);
+  public final static native int MuxerFormat_getSupportedCodecId(long jarg1, MuxerFormat jarg1_, int jarg2);
+  public final static native long MuxerFormat_getSupportedCodecTag(long jarg1, MuxerFormat jarg1_, int jarg2);
+  public final static native int MuxerFormat_getNumFormats();
+  public final static native long MuxerFormat_getFormat(int jarg1);
   public final static native String DemuxerFormat_getName(long jarg1, DemuxerFormat jarg1_);
   public final static native String DemuxerFormat_getLongName(long jarg1, DemuxerFormat jarg1_);
   public final static native String DemuxerFormat_getExtensions(long jarg1, DemuxerFormat jarg1_);
@@ -1386,6 +1401,7 @@ class VideoJNI {
   public final static native long SWIGCodecUpcast(long jarg1);
   public final static native long SWIGCodecDescriptorUpcast(long jarg1);
   public final static native long SWIGContainerFormatUpcast(long jarg1);
+  public final static native long SWIGMuxerFormatUpcast(long jarg1);
   public final static native long SWIGDemuxerFormatUpcast(long jarg1);
   public final static native long SWIGIndexEntryUpcast(long jarg1);
   public final static native long SWIGCoderUpcast(long jarg1);

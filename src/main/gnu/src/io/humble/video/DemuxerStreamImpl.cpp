@@ -24,7 +24,7 @@
 #include <io/humble/ferry/RefPointer.h>
 
 #include <io/humble/video/Global.h>
-#include <io/humble/video/SourceStreamImpl.h>
+#include <io/humble/video/DemuxerStreamImpl.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/Container.h>
 #include <io/humble/video/KeyValueBagImpl.h>

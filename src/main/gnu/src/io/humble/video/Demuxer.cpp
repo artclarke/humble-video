@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ *
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
@@ -16,39 +16,25 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-/*
- * SourceTest.h
- *
- *  Created on: Jul 3, 2013
- *      Author: aclarke
- */
 
-#ifndef SOURCETEST_H_
-#define SOURCETEST_H_
+#include "Demuxer.h"
+#include "DemuxerImpl.h"
 
-#include <io/humble/testutils/TestUtils.h>
-#include <io/humble/video/Source.h>
+namespace io {
+namespace humble {
+namespace video {
 
-#include "TestData.h"
+Demuxer::Demuxer() {
+}
 
-class DemuxerTest : public CxxTest::TestSuite
-{
-public:
-  DemuxerTest();
-  virtual
-  ~DemuxerTest();
-  void testMake();
-  void testOpen();
-  void testOpenDemuxerPrivatePropertySetting();
-  void testOpenResetInputFormat();
-  void testOpenCustomIO();
-  void testOpenWithoutCloseAutoCloses();
-  void testOpenInvalidArguments();
-  void testRead();
-private:
-  void openTestHelper(const char* url);
-  char mSampleFile[2048];
-  TestData mFixtures;
-  TestData::Fixture* mFixture;
-};
-#endif /* SOURCETEST_H_ */
+Demuxer::~Demuxer() {
+}
+
+Demuxer*
+Demuxer::make() {
+  return DemuxerImpl::make();
+}
+
+} /* namespace video */
+} /* namespace humble */
+} /* namespace io */

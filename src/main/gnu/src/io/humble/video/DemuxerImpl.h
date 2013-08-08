@@ -17,18 +17,18 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * SourceImpl.h
+ * DemuxerImpl.h
  *
  *  Created on: Jul 2, 2013
  *      Author: aclarke
  */
 
-#ifndef SOURCEIMPL_H_
-#define SOURCEIMPL_H_
+#ifndef DEMUXERIMPL_H_
+#define DEMUXERIMPL_H_
 
 #include <io/humble/ferry/RefPointer.h>
-#include <io/humble/video/Source.h>
-#include <io/humble/video/SourceStreamImpl.h>
+#include <io/humble/video/Demuxer.h>
+#include <io/humble/video/DemuxerStreamImpl.h>
 #include <io/humble/video/customio/URLProtocolHandler.h>
 
 #include <vector>
@@ -165,4 +165,4 @@ private:
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
-#endif /* SOURCEIMPL_H_ */
+#endif /* DEMUXERIMPL_H_ */

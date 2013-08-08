@@ -31,7 +31,7 @@ public:
   void setUp();
   void tearDown();
   void testCreation();
-  void testSourceGetMetaData();
+  void testDemuxerGetMetaData();
 
 private:
   char mSampleFile[2048];

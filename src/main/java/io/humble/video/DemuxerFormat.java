@@ -108,6 +108,38 @@ public class DemuxerFormat extends ContainerFormat {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("name:" + getName() + ";");
+    result.append("description:"+getLongName() + ";");
+    result.append("]");
+    return result.toString();
+  }
+
+  /**
+   * Return a collection of all input formats installed on this system.
+   * @return the list.
+   */
+  public static java.util.Collection<DemuxerFormat>
+  getFormats()
+  {
+    java.util.Collection<DemuxerFormat> retval =
+      new java.util.HashSet<DemuxerFormat>();
+    int count = getNumFormats();
+    for(int i = 0; i< count;++i)
+    {
+      DemuxerFormat fmt = getFormat(i);
+      if (fmt != null)
+        retval.add(fmt);
+    }
+    return retval;
+  }
+
+
 /**
  * Name for format.  
  */
@@ -171,9 +203,9 @@ public class DemuxerFormat extends ContainerFormat {
   }
 
 /**
- * Find {@link InputFormat} based on the short name of the input format. 
+ * Find {@link DemuxerFormat} based on the short name of the input format. 
  *  
- * @return	An {@link InputFormat} or null if none found.  
+ * @return	An {@link DemuxerFormat} or null if none found.  
  */
   public static DemuxerFormat findFormat(String shortName) {
     long cPtr = VideoJNI.DemuxerFormat_findFormat(shortName);
@@ -181,23 +213,24 @@ public class DemuxerFormat extends ContainerFormat {
   }
 
 /**
- * Get the number of input formats this install can demultiplex (read) 
- *  
+ * Get the number of {@link DemuxerFormat}s this install can demultiplex 
+ * (read)  
  * from.  
  * @return	the number of formats  
  */
-  public static int getNumFormats() {
+  protected static int getNumFormats() {
     return VideoJNI.DemuxerFormat_getNumFormats();
   }
 
 /**
- * Return an object for the input format at the given index.  
- * @param	index an index for the input format list we maintain  
+ * Return an object for the {@link DemuxerFormats} at the given index. 
+ *  
+ * @param	index an index for the format list we maintain  
  * @return	a format object for that input or null if  
  * unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()} 
  *  
  */
-  public static DemuxerFormat getFormat(int index) {
+  protected static DemuxerFormat getFormat(int index) {
     long cPtr = VideoJNI.DemuxerFormat_getFormat(index);
     return (cPtr == 0) ? null : new DemuxerFormat(cPtr, false);
   }

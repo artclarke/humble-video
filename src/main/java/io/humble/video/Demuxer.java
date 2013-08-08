@@ -122,7 +122,7 @@ public class Demuxer extends Container {
   }
 
 /**
- * Create a new {@link Source}  
+ * Create a new {@link Demuxer}  
  */
   public static Demuxer make() {
     long cPtr = VideoJNI.Demuxer_make();
@@ -137,6 +137,7 @@ public class Demuxer extends Container {
   }
 
 /**
+ * Get the {@link InputFormat} associated with this {@link Demuxer} 
  *  
  * or null if unknown.  
  */
@@ -174,7 +175,7 @@ public class Demuxer extends Container {
  *  
  * <p>The caller must call {@link #close()} when done, but if not, the 
  *  
- * {@link Source} will eventually close  
+ * {@link Demuxer} will eventually close  
  * them later but warn to the logging system.  
  * </p><p>If the current thread is interrupted while this blocking method 
  *  
@@ -214,7 +215,7 @@ public class Demuxer extends Container {
  *		 object will be cleared out, and  
  * replace with any key/value pairs that were in <code>options</code> 
  * but could not be set on this  
- * {@link Source}.  
+ * {@link Demuxer}.  
  * @return	>= 0 on success; < 0 on error.  
  */
   public void open(String url, DemuxerFormat format, boolean streamsCanBeAddedDynamically, boolean queryStreamMetaData, KeyValueBag options, KeyValueBag optionsNotSet) throws java.lang.InterruptedException, java.io.IOException {
@@ -253,7 +254,7 @@ public class Demuxer extends Container {
   }
 
 /**
- * Reads the next packet in the Source into the Packet. This method 
+ * Reads the next packet in the Demuxer into the Packet. This method 
  * will  
  * release any buffers currently held by this packet and allocate  
  * new ones.  
@@ -265,7 +266,7 @@ public class Demuxer extends Container {
  * check {@link Error#getType()} to see if it is  
  * {@link Error.Type#ERROR_INTERRUPTED}.  
  * </p>  
- * @param	packet [In/Out] The packet the Source will read into.  
+ * @param	packet [In/Out] The packet the Demuxer will read into.  
  * @return	0 if successful, or <0 if not.  
  */
   public int read(MediaPacket packet) throws java.lang.InterruptedException, java.io.IOException {
@@ -299,7 +300,7 @@ public class Demuxer extends Container {
 
 /**
  * Gets the duration, if known, of this container.  
- * This will only work for non-streamable containers where Source  
+ *  
  * can calculate the container size.  
  * @return	The duration, or {@link Global#NO_PTS} if not known.  
  */
@@ -313,9 +314,9 @@ public class Demuxer extends Container {
  * <p>  
  * This will only return value values either either (a) for non-streamable 
  *  
- * containers where Source can calculate the container size or  
- * (b) after Source has actually read the  
- * first packet from a streamable source.  
+ * containers where Demuxer can calculate the container size or  
+ * (b) after Demuxer has actually read the  
+ * first packet from a streamable Demuxer.  
  * </p>  
  * @return	The starting timestamp in microseconds, or {@link Global#NO_PTS} 
  *		 if not known.  
@@ -384,7 +385,7 @@ public class Demuxer extends Container {
   }
 
 /**
- * Get the URL the Source was opened with.  
+ * Get the URL the Demuxer was opened with.  
  * May return null if unknown.  
  * @return	the URL opened, or null.  
  */
@@ -393,7 +394,7 @@ public class Demuxer extends Container {
   }
 
 /**
- * Get the number of times {@link Source#readNextPacket(Packet)}  
+ * Get the number of times {@link Demuxer#readNextPacket(Packet)}  
  * will retry a read if it gets a {@link Error.Type#ERROR_AGAIN}  
  * value back.  
  * Defaults to 1 times. <0 means it will keep retrying indefinitely. 
@@ -425,18 +426,18 @@ public class Demuxer extends Container {
  * Get the {@link KeyValueBag} of media MetaData for this object,  
  * or null if none.  
  * <p>  
- * If the {@link Source} or {@link IStream} object  
+ * If the {@link Demuxer} or {@link IStream} object  
  * that this {@link KeyValueBag} came from was opened  
  * for reading, then changes via {@link KeyValueBag#setValue(String, 
  * String)}  
  * will have no effect on the underlying media.  
  * </p>  
  * <p>  
- * If the {@link Source} or {@link IStream} object  
+ * If the {@link Demuxer} or {@link IStream} object  
  * that this {@link KeyValueBag} came from was opened  
  * for writing, then changes via {@link KeyValueBag#setValue(String, 
  * String)}  
- * will have no effect after {@link Source#writeHeader()}  
+ * will have no effect after {@link Demuxer#writeHeader()}  
  * is called.  
  * </p>  
  * @return	the {@link KeyValueBag}.  
@@ -447,7 +448,7 @@ public class Demuxer extends Container {
   }
 
 /**
- * Forces the {@link Source} to assume all audio streams are  
+ * Forces the {@link Demuxer} to assume all audio streams are  
  * encoded with the given audio codec when demuxing.  
  * @param	id The codec id  
  * @return	< 0 on error (e.g. not an audio codec); >= 0 on success. 
@@ -458,7 +459,7 @@ public class Demuxer extends Container {
   }
 
 /**
- * Forces the {@link Source} to assume all video streams are  
+ * Forces the {@link Demuxer} to assume all video streams are  
  * encoded with the given video codec when demuxing.  
  * @param	id The codec id  
  * @return	< 0 on error (e.g. not an video codec); >= 0 on success. 
@@ -469,7 +470,7 @@ public class Demuxer extends Container {
   }
 
 /**
- * Forces the {@link Source} to assume all subtitle streams are  
+ * Forces the {@link Demuxer} to assume all subtitle streams are  
  * encoded with the given subtitle codec when demuxing.  
  * @param	id The codec id  
  * @return	< 0 on error (e.g. not an subtitle codec); >= 0 on success. 

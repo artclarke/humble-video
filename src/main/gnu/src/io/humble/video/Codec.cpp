@@ -22,7 +22,7 @@
 #include <io/humble/video/Global.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/Codec.h>
-#include <io/humble/video/SinkFormat.h>
+#include <io/humble/video/MuxerFormat.h>
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 

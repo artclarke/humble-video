@@ -26,8 +26,8 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/LoggerStack.h>
-#include <io/humble/video/Source.h>
-#include <io/humble/video/SourceStream.h>
+#include <io/humble/video/Demuxer.h>
+#include <io/humble/video/DemuxerStream.h>
 #include <io/humble/video/Decoder.h>
 #include <io/humble/video/FilterGraph.h>
 #include <io/humble/video/FilterAudioSource.h>

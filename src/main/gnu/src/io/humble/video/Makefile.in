@@ -107,11 +107,12 @@ am_libhumble_video_la_OBJECTS = VideoExceptions.lo AVBufferSupport.lo \
 	IndexEntryImpl.lo Error.lo ErrorImpl.lo MediaPacket.lo \
 	MediaPacketImpl.lo ContainerFormat.lo Configurable.lo Coder.lo \
 	Decoder.lo Encoder.lo ContainerStream.lo Container.lo \
-	SourceFormat.lo Source.lo SourceImpl.lo SourceStream.lo \
-	SourceStreamImpl.lo SinkFormat.lo FilterType.lo FilterGraph.lo \
-	Filter.lo FilterLink.lo FilterEndPoint.lo FilterSource.lo \
-	FilterAudioSource.lo FilterPictureSource.lo FilterSink.lo \
-	FilterAudioSink.lo FilterPictureSink.lo Global.lo
+	DemuxerFormat.lo Demuxer.lo DemuxerImpl.lo DemuxerStream.lo \
+	DemuxerStreamImpl.lo MuxerFormat.lo FilterType.lo \
+	FilterGraph.lo Filter.lo FilterLink.lo FilterEndPoint.lo \
+	FilterSource.lo FilterAudioSource.lo FilterPictureSource.lo \
+	FilterSink.lo FilterAudioSink.lo FilterPictureSink.lo \
+	Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -470,12 +471,12 @@ libhumble_video_la_SOURCES = \
   Encoder.cpp \
   ContainerStream.cpp \
   Container.cpp \
-  SourceFormat.cpp \
-  Source.cpp \
-  SourceImpl.cpp \
-  SourceStream.cpp \
-  SourceStreamImpl.cpp \
-  SinkFormat.cpp \
+  DemuxerFormat.cpp \
+  Demuxer.cpp \
+  DemuxerImpl.cpp \
+  DemuxerStream.cpp \
+  DemuxerStreamImpl.cpp \
+  MuxerFormat.cpp \
   FilterType.cpp \
   FilterGraph.cpp \
   Filter.cpp \
@@ -539,10 +540,10 @@ libhumble_video_la_HEADERS = \
   Property.swg \
   ContainerFormat.h \
   ContainerFormat.swg \
-  SinkFormat.h \
-  SinkFormat.swg \
-  SourceFormat.h \
-  SourceFormat.swg \
+  MuxerFormat.h \
+  MuxerFormat.swg \
+  DemuxerFormat.h \
+  DemuxerFormat.swg \
   Configurable.h \
   Configurable.swg \
   Coder.h \
@@ -555,12 +556,12 @@ libhumble_video_la_HEADERS = \
   ContainerStream.swg \
   Container.h \
   Container.swg \
-  SourceStream.h \
-  SourceStream.swg \
-  SourceStreamImpl.h \
-  Source.h \
-  Source.swg \
-  SourceImpl.h \
+  DemuxerStream.h \
+  DemuxerStream.swg \
+  DemuxerStreamImpl.h \
+  Demuxer.h \
+  Demuxer.swg \
+  DemuxerImpl.h \
   FilterType.h \
   FilterGraph.h \
   Filter.h \
@@ -641,6 +642,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ContainerFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ContainerStream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Decoder.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Demuxer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerFormat.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerStream.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerStreamImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Encoder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorImpl.Plo@am__quote@
@@ -674,17 +680,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaRaw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaSubtitle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaSubtitleImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MuxerFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PixelFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Property.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Rational.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RationalImpl.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SinkFormat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Source.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceFormat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceImpl.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceStream.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SourceStreamImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VideoExceptions.Plo@am__quote@
 
 .cpp.o:
