@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <groupId>io.humble</groupId>
+  <artifactId>humble-video-superproject</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>humble-video-superproject</name>
+  <url>http://humble.io</url>
+
+  <modules>
+    <module>
+      humble-video-captive
+    </module>
+    <module>
+      humble-video-native
+    </module>
+    <module>
+      humble-video-arch-all
+    </module>
+    <module>
+      humble-video-noarch
+    </module>
+    <module>
+      humble-video-all
+    </module>
+    <module>
+      humble-video-test
+    </module>
+  </modules>
+
+</project>
