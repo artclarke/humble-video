@@ -74,6 +74,40 @@
               <goal>exec</goal>
             </goals>
           </execution>
+          <execution>
+            <id>exec-four</id>
+            <phase>test</phase>
+            <configuration>
+              <executable>bash</executable>
+              <arguments>
+                <argument>${project.basedir}/src/main/gnu/cross-make.sh</argument>
+                <argument>check</argument>
+              </arguments>
+              <workingDirectory>
+                ${project.basedir}/target/native
+              </workingDirectory>
+            </configuration>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>exec-five</id>
+            <phase>package</phase>
+            <configuration>
+              <executable>bash</executable>
+              <arguments>
+                <argument>${project.basedir}/src/main/gnu/cross-make.sh</argument>
+                <argument>install</argument>
+              </arguments>
+              <workingDirectory>
+                ${project.basedir}/target/native
+              </workingDirectory>
+            </configuration>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
     </plugins>

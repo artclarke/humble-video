@@ -18,8 +18,8 @@
  *******************************************************************************/
 
 #include <io/humble/ferry/Logger.h>
-#include <io/humble/ferry/IBuffer.h>
 #include <io/humble/ferry/Buffer.h>
+#include <io/humble/ferry/BufferImpl.h>
 #include "BufferTest.h"
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
