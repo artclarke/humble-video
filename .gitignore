@@ -12,6 +12,9 @@ Makefile
 config.log
 config.status
 libtool
+/mvn.out
+/*/mvn.out
+/*/test.log
 src/main/gnu/mk/Makefile.dependencies
 src/main/gnu/mk/Makefile.global
 src/main/gnu/pom*.xml
@@ -32,5 +35,4 @@ src/test/gnu/io/humble/testutils/Makefile
 *.o
 *.la
 *_CXXRunner.cpp
-/io.humble.*
-/test.log
+io.humble.*
