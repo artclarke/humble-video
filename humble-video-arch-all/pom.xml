@@ -2,14 +2,17 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <properties>
-    <humbleVideoVersion>0.1-SNAPSHOT</humbleVideoVersion>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+  <parent>
+    <groupId>io.humble</groupId>
+    <artifactId>humble-video-parent</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <relativePath>../humble-video-parent/pom.xml</relativePath>
+  </parent>
+
   <groupId>io.humble</groupId>
   <artifactId>humble-video-arch-all</artifactId>
-  <version>${humbleVideoVersion}</version>
-  <packaging>jar</packaging>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
   <name>humble-video-arch-all</name>
   <url>http://maven.apache.org</url>
@@ -18,12 +21,10 @@
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch-i686-apple-darwin12</artifactId>
-      <version>${humbleVideoVersion}</version>
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch-x86_64-apple-darwin12</artifactId>
-      <version>${humbleVideoVersion}</version>
     </dependency>
   </dependencies>
 </project>

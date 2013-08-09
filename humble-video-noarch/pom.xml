@@ -16,5 +16,11 @@
   <artifactId>humble-video-noarch</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+  </dependencies>
 
 </project>

@@ -2,14 +2,16 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <properties>
-    <humbleVideoVersion>0.1-SNAPSHOT</humbleVideoVersion>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+  <parent>
+    <groupId>io.humble</groupId>
+    <artifactId>humble-video-parent</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <relativePath>../humble-video-parent/pom.xml</relativePath>
+  </parent>
 
   <groupId>io.humble</groupId>
   <artifactId>humble-video-all</artifactId>
-  <version>${humbleVideoVersion}</version>
+  <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>humble-video-all</name>
@@ -17,14 +19,26 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch-all</artifactId>
-      <version>${humbleVideoVersion}</version>
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-noarch</artifactId>
-      <version>${humbleVideoVersion}</version>
     </dependency>
   </dependencies>
 </project>
