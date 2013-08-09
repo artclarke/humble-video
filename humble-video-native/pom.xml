@@ -65,6 +65,7 @@
               <executable>bash</executable>
               <arguments>
                 <argument>${project.basedir}/src/main/gnu/cross-make.sh</argument>
+                <argument>-j4</argument>
               </arguments>
               <workingDirectory>
                 ${project.basedir}/target/native
@@ -81,6 +82,7 @@
               <executable>bash</executable>
               <arguments>
                 <argument>${project.basedir}/src/main/gnu/cross-make.sh</argument>
+                <argument>-j4</argument>
                 <argument>check</argument>
               </arguments>
               <workingDirectory>

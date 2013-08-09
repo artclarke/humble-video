@@ -96,7 +96,7 @@ memcheck:
 	@echo
 endif
 
-SWIGOUTDIR=$(abs_top_srcdir)/../../../src/main/java
+SWIGOUTDIR=$(abs_top_srcdir)/../../../../humble-video-noarch/src/main/java
 SWIGOUTCPPDIR=$(abs_top_srcdir)/src
 SWIGOUTTMPDIR=$(abs_top_builddir)/java
 SWIGEXT=.i
