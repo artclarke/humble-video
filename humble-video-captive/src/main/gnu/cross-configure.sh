@@ -8,11 +8,14 @@ humble_configure()
 {
   PREFIX="$1/$2/"
   BUILD=$2
-  echo "Building ${DIR}/configure in ${PREFIX}"
-  mkdir -p ./$cross_os
-  mkdir -p "${PREFIX}"
-  (cd ./${cross_os} && (${DIR}/configure --prefix="${PREFIX}" --build="${BUILD}" ${HUMBLE_CONFIGURE} | tee configure.log))
-  echo "Run 'make && make install' to complete"
+  if [ ! -e ./${cross_os}/Makefile ]; then
+    echo "Building ${DIR}/configure in ${PREFIX}"
+    mkdir -p ./$cross_os
+    mkdir -p "${PREFIX}"
+    (cd ./${cross_os} && (${DIR}/configure --prefix="${PREFIX}" --build="${BUILD}" ${HUMBLE_CONFIGURE} | tee configure.log))
+  else
+    echo "Makefile appears to be up-to-date in ${cross_os}"
+  fi
 }
 
 STAGE_DIR="${HUMBLE_HOME:-/tmp}"

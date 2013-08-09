@@ -8,17 +8,12 @@
     <relativePath>../humble-video-parent/pom.xml</relativePath>
   </parent>
 
-  <properties>
-    <humbleVideoVersion>0.1-SNAPSHOT</humbleVideoVersion>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
   <groupId>io.humble</groupId>
-  <artifactId>humble-video-captive</artifactId>
+  <artifactId>humble-video-native</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>humble-video-captive</name>
+  <name>humble-video-native</name>
   <url>http://maven.apache.org</url>
 
   <build>
