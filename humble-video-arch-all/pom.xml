@@ -9,10 +9,8 @@
     <relativePath>../humble-video-parent/pom.xml</relativePath>
   </parent>
 
-  <groupId>io.humble</groupId>
   <artifactId>humble-video-arch-all</artifactId>
-  <version>0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
   <name>humble-video-arch-all</name>
   <url>http://maven.apache.org</url>

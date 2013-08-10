@@ -12,9 +12,7 @@
   <!-- This POM makes the humble-video-noarch artifact, but is actually part of
        the humble-video-main project because it also has the source code
        for all our native code -->
-  <groupId>io.humble</groupId>
   <artifactId>humble-video-noarch</artifactId>
-  <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <dependencies>
     <dependency>

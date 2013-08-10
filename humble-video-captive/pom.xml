@@ -8,9 +8,7 @@
     <relativePath>../humble-video-parent/pom.xml</relativePath>
   </parent>
 
-  <groupId>io.humble</groupId>
   <artifactId>humble-video-captive</artifactId>
-  <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>humble-video-captive</name>
