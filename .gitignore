@@ -25,3 +25,10 @@ io.humble.*
 
 # Python generate byte code should not be checked in
 *.pyc
+.rake_test_cache
+
+###
+# Ignore Chef key files and secrets
+###
+.chef/*.pem
+.chef/encrypted_data_bag_secret
