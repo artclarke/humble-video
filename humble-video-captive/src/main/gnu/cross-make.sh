@@ -21,7 +21,7 @@ case $HOST in
         exit -1;
       fi
     done
-    for dir in *-mingw-*; do
+    for dir in *mingw*; do
       (cd $dir && make $*)
       if [ $? -ne 0 ]; then
         exit -1;
