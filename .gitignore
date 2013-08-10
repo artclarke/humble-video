@@ -22,3 +22,6 @@ libtool
 *_CXXRunner.cpp
 io.humble.*
 /.vagrant
+
+# Python generate byte code should not be checked in
+*.pyc
