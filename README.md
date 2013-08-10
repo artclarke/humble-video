@@ -13,6 +13,7 @@ It requires accesss to a Mac OS X development environment (Mountain Lion or late
 It consists of several sub-projects which are detailed below:
 
 * `humble-video-parent/`: The parent pom to all projects, where global defaults (like version numbers) are set.
+* `humble-video-chef/`: A collection of chef-solo recipes for configuring a Vagrant Ubuntu-64-bit box to build Linux and Windows versions.
 * `humble-video-captive/`: All open-source libraries incorporated into humble-video. These are built with a custom build system.
 * `humble-video-native/`: All native (C/C++/Assembly) code for Humble-Video. These are built with a custom build system that generates
      many Maven artifacts containing native code. and generate Java files. The maven artifacts generated are of the form:
