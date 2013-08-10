@@ -158,7 +158,12 @@ DX_CLEANFILES = \
 
 endif DX_COND_doc
 
-SUBDIRS= src test
+SUBDIRS= src
+if VS_OS_WINDOWS
+# do not build test on windows.
+else
+SUBDIRS+= test
+endif
 
 EXTRA_DIST= \
   mk/Doxyfile \
