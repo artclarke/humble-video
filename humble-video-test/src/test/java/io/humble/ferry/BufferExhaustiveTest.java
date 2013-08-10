@@ -67,11 +67,11 @@ public class BufferExhaustiveTest
   }
   
   /**
-   * This tests tries to make sure the IBuffer correctly releases any
+   * This tests tries to make sure the Buffer correctly releases any
    * references it might hold to the underlying java.nio.ByteBuffer
    * it wraps.
    * 
-   * It does this by creating a lot of large IBuffer objects.
+   * It does this by creating a lot of large Buffer objects.
    */
   @Test
   public void testNoLeaksWhenBufferMadeFromDirectJavaByteBuffer()
@@ -82,7 +82,7 @@ public class BufferExhaustiveTest
     {
       assertEquals(0, JNIReference.getMgr().getNumPinnedObjects());
       ByteBuffer nativeBytes = ByteBuffer.allocateDirect(10*1024*1024);
-      IBuffer buf = IBuffer.make(null, nativeBytes, 0, nativeBytes.capacity());
+      Buffer buf = Buffer.make(null, nativeBytes, 0, nativeBytes.capacity());
       assertNotNull(buf);
       assertEquals(1, JNIReference.getMgr().getNumPinnedObjects());
       buf.delete();
@@ -118,7 +118,7 @@ public class BufferExhaustiveTest
     assertEquals(0, JNIReference.getMgr().getNumPinnedObjects());
 
     // now start the test
-    IBuffer buf = IBuffer.make(null, 1024*1024);
+    Buffer buf = Buffer.make(null, 1024*1024);
     assertNotNull(buf);
 
     assertEquals(1, JNIReference.getMgr().getNumPinnedObjects());
@@ -128,7 +128,7 @@ public class BufferExhaustiveTest
 
     assertEquals(2, JNIReference.getMgr().getNumPinnedObjects());
 
-    // kill the xuggler refcount in the IBuffer
+    // kill the  refcount in the Buffer
     buf.delete();
 
     assertEquals(1, JNIReference.getMgr().getNumPinnedObjects());
@@ -168,14 +168,14 @@ public class BufferExhaustiveTest
   public void testJNIMemoryManagerCollectionThread()
   {
     JNIMemoryManager.getMgr().startCollectionThread();
-    IBuffer buf = IBuffer.make(null, 1024*1024);
+    Buffer buf = Buffer.make(null, 1024*1024);
     assertNotNull(buf);
 
     // This will create a reference
     java.nio.ByteBuffer jbuf = buf.getByteBuffer(0, buf.getBufferSize());
 
     assertEquals(2, JNIMemoryManager.getMgr().getNumPinnedObjects());
-    // kill the xuggler refcount in the IBuffer
+    // kill the refcount in the Buffer
     buf.delete();
     assertEquals(1, JNIMemoryManager.getMgr().getNumPinnedObjects());
     jbuf.put((byte) 0);
@@ -192,7 +192,7 @@ public class BufferExhaustiveTest
   }
   
   /**
-   * This method allocates one large IBuffer and then repeatedly
+   * This method allocates one large Buffer and then repeatedly
    * copies out the bytes into a Java byte[] array.
    * 
    * If the system is not leaking, the garbage collector will ensure
@@ -202,7 +202,7 @@ public class BufferExhaustiveTest
   @Test
   public void testNoLeakingMemoryOnCopy()
   {
-    IBuffer buf = IBuffer.make(null, 1024*1024); // 1 MB
+    Buffer buf = Buffer.make(null, 1024*1024); // 1 MB
     assertNotNull(buf);
     for(int i = 0; i < 1000; i++)
     {
@@ -221,7 +221,7 @@ public class BufferExhaustiveTest
   @Test(timeout=5*60*1000)
   public void testDirectByteBufferIncrementsAndDecrementsRefCounts()
   {
-    IBuffer buf = IBuffer.make(null, 1024*1024); // 1 MB
+    Buffer buf = Buffer.make(null, 1024*1024); // 1 MB
     assertNotNull(buf);
     
     assertEquals(1, buf.getCurrentRefCount());

@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 
 /**
  * A collection of test methods that can be used to test
- * the performance of the IBuffer Memory Model. 
+ * the performance of the Buffer Memory Model. 
  * 
  * This test is in JUnit3 format so it can be run from JMeter.
  * I know it's a canonical example of a JUnit4 parameterized
@@ -182,7 +182,7 @@ public class MemoryModelExhaustiveTest extends TestCase
 
     for(i = 0; i < numAllocsPerTest; i++)
     {
-      IBuffer buffer = getTestBuffer(allocator, bufferSize, forceCommit);
+      Buffer buffer = getTestBuffer(allocator, bufferSize, forceCommit);
       if (cleanUpAfterOurselves)
         buffer.delete();
     }
@@ -212,17 +212,17 @@ public class MemoryModelExhaustiveTest extends TestCase
   {
     JNIMemoryManager.setMemoryModel(model);
     System.out.println("Medium Term Test; Memory model = " + JNIMemoryManager.getMemoryModel());
-    LinkedHashMap<IBuffer, IBuffer> map = new LinkedHashMap<IBuffer, IBuffer>()
+    LinkedHashMap<Buffer, Buffer> map = new LinkedHashMap<Buffer, Buffer>()
     {
       private static final long serialVersionUID = 1L;
 
       @Override
       protected boolean removeEldestEntry(
-          java.util.Map.Entry<IBuffer,IBuffer> eldest) 
+          java.util.Map.Entry<Buffer,Buffer> eldest) 
       {
         if(size() > cacheSize)
         {
-          IBuffer key = eldest.getKey();
+          Buffer key = eldest.getKey();
           this.remove(key);
           if(cleanUpAfterOurselves)
             key.delete();
@@ -234,7 +234,7 @@ public class MemoryModelExhaustiveTest extends TestCase
     RefCounted allocator = RefCountedTester.make();
     for(i = 0; i < numAllocsPerTest; i++)
     {
-      IBuffer buffer = getTestBuffer(allocator, bufferSize, forceCommit);
+      Buffer buffer = getTestBuffer(allocator, bufferSize, forceCommit);
       map.put(buffer, buffer);
       assertTrue("unexpected map size: " + map.size(), 
           map.size() <= cacheSize);
@@ -242,12 +242,12 @@ public class MemoryModelExhaustiveTest extends TestCase
     System.out.println("Finished allocating objects: " + i);
   }
 
-  public static IBuffer getTestBuffer(RefCounted allocator, int size,
+  public static Buffer getTestBuffer(RefCounted allocator, int size,
       boolean forceCommit) throws OutOfMemoryError
   {
-    IBuffer buffer = null;
+    Buffer buffer = null;
     try {
-      buffer = IBuffer.make(allocator, size);
+      buffer = Buffer.make(allocator, size);
       if (forceCommit) {
         AtomicReference<JNIReference> ref = new AtomicReference<JNIReference>(null);
         ByteBuffer jbuffer = buffer.getByteBuffer(0, size, ref);
@@ -267,7 +267,7 @@ public class MemoryModelExhaustiveTest extends TestCase
       try {
         MemoryTestHelper.forceJavaHeapWeakReferenceClear();
         JNIMemoryManager.collect();
-        buffer = IBuffer.make(null, size);
+        buffer = Buffer.make(null, size);
       }
       catch (OutOfMemoryError e2)
       {
