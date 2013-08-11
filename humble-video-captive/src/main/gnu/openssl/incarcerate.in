@@ -64,14 +64,13 @@ fi
 
 # We use the cross-compile setting for openssl but still pass through our
 # flags
-CC="@CC@ @CFLAGS@" \
 CFLAGS="-I@includedir@ @CFLAGS@" \
 LDFLAGS="-L@libdir@ @LDFLAGS@" \
 CPPFLAGS="@CPPFLAGS@" \
 CXXFLAGS="@CXXFLAGS@" \
 ASFLAGS="@ASFLAGS@" \
 PATH="$PATH:@abs_top_builddir@@bindir@@" sh "@abs_builddir@/csrc/Configure" \
-  ${OPENSSL_CONFIG} no-shared zlib -fPIC \
+  ${OPENSSL_CONFIG} no-shared zlib -fPIC ${CFLAGS} \
   --cross-compile-prefix="${CROSS_COMPILE}" \
   --openssldir=${prefix} \
   --with-zlib-include="@includedir@" \
