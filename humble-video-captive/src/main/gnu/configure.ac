@@ -25,6 +25,15 @@ CXXFLAGS="${CXXFLAGS}"
 LDFLAGS="${LDFLAGS}"
 ASFLAGS="${ASFLAGS}"
 case $host_os in
+  *linux*)
+  case $host_cpu in
+     *i?86*)
+     CFLAGS="-m32 ${CFLAGS}"
+     CXXFLAGS="-m32 ${CXXFLAGS}"
+     LDFLAGS="-m32 ${LDFLAGS}"
+     ;;
+  esac
+  ;;
   *darwin*)
   case $host_cpu in
      *x86_64*|*amd64*)
@@ -57,6 +66,9 @@ AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_AS
 
+AC_ARG_VAR(RC,
+          [Location of the 'windres' program; if found, we will build with some cool assembly on x86/x86_64 systems.])
+
 # check for cross compiling
 AC_MSG_CHECKING([for cross-compiling])
 if test "x$host_alias" != "x"; then
@@ -70,9 +82,12 @@ if test "x$host_alias" != "x"; then
     VS_CROSS_PREFIX=""
     AC_MSG_RESULT([no])
   fi
+  RC="${RC-$VS_CROSS_PREFIX}windres}"
 else
+  RC=${RC-windres}
   AC_MSG_RESULT([no])
 fi 
+AC_SUBST([RC])
 AC_SUBST([VS_CROSS_PREFIX])
 AC_SUBST([VS_CROSS_COMPILE])
 AM_CONDITIONAL([VS_CROSS_COMPILE], [ test "x$host_alias" != "x" ])
@@ -121,7 +136,7 @@ esac
 HOST_CPU=$host_cpu
 HOST_VENDOR=$host_vendor
 # strip gnu from the OS_C variable if there
-HOST_OS_C=$( echo $host_os | sed -e "s/-gnu//" )
+HOST_OS_C=$( echo $host_os | sed -e "s/-gnu.\?$//" )
 
 AC_SUBST([HOST_TYPE])
 AC_SUBST([HOST_OS])

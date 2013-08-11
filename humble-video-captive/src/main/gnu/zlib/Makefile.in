@@ -186,6 +186,7 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+RC = @RC@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -478,6 +479,7 @@ export CFLAGS=@CFLAGS@
 export LDFLAGS=@LDFLAGS@
 export SHELL=@SHELL@
 export CPP=@CPP@
+export RC=@RC@
 
 all-local: incarcerate-package
 	@echo "Incarcerating package $(srcdir) to fake DESTDIR=$(DESTDIR)"

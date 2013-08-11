@@ -19,7 +19,16 @@ end
 package "pkg-config" do
   action :upgrade
 end
-package "gcc-mingw32" do
+package "gcc-multilib" do
+  action :upgrade
+end
+package "g++-multilib" do
+  action :upgrade
+end
+package "mingw-w64" do
+  action :upgrade
+end
+package "binutils-mingw-w64" do
   action :upgrade
 end
 package "doxygen" do

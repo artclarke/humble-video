@@ -272,6 +272,7 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+RC = @RC@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -826,7 +827,7 @@ include $(abs_top_builddir)/Makefile.global
 
 # We delete the libtool generated .la files because they cause link errors for our code
 all-local:
-	@-find "$(vs_captive_prefix)" -name '*.la' | xargs rm 
+	@-find "$(prefix)" -name '*.la' | xargs rm 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

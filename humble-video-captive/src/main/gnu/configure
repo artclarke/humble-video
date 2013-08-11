@@ -660,6 +660,7 @@ VS_CROSS_COMPILE_FALSE
 VS_CROSS_COMPILE_TRUE
 VS_CROSS_COMPILE
 VS_CROSS_PREFIX
+RC
 CCASFLAGS
 CCAS
 CXXCPP
@@ -803,6 +804,7 @@ CCC
 CXXCPP
 CCAS
 CCASFLAGS
+RC
 YASM'
 
 
@@ -1460,6 +1462,8 @@ Some influential environment variables:
   CXXCPP      C++ preprocessor
   CCAS        assembler compiler command (defaults to CC)
   CCASFLAGS   assembler compiler flags (defaults to CFLAGS)
+  RC          Location of the 'windres' program; if found, we will build with
+              some cool assembly on x86/x86_64 systems.
   YASM        Location of the 'yasm' program; if found, we will build with
               some cool assembly on x86/x86_64 systems.
 
@@ -11662,6 +11666,15 @@ CXXFLAGS="${CXXFLAGS}"
 LDFLAGS="${LDFLAGS}"
 ASFLAGS="${ASFLAGS}"
 case $host_os in
+  *linux*)
+  case $host_cpu in
+     *i?86*)
+     CFLAGS="-m32 ${CFLAGS}"
+     CXXFLAGS="-m32 ${CXXFLAGS}"
+     LDFLAGS="-m32 ${LDFLAGS}"
+     ;;
+  esac
+  ;;
   *darwin*)
   case $host_cpu in
      *x86_64*|*amd64*)
@@ -15698,6 +15711,8 @@ test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
 
 
 
+
+
 # check for cross compiling
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for cross-compiling" >&5
 $as_echo_n "checking for cross-compiling... " >&6; }
@@ -15716,10 +15731,13 @@ $as_echo "yes: \"${VS_CROSS_PREFIX}\" " >&6; } #"
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
   fi
+  RC="${RC-$VS_CROSS_PREFIX}windres}"
 else
+  RC=${RC-windres}
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
+
 
 
  if  test "x$host_alias" != "x" ; then
@@ -15790,7 +15808,7 @@ esac
 HOST_CPU=$host_cpu
 HOST_VENDOR=$host_vendor
 # strip gnu from the OS_C variable if there
-HOST_OS_C=$( echo $host_os | sed -e "s/-gnu//" )
+HOST_OS_C=$( echo $host_os | sed -e "s/-gnu.\?$//" )
 
 
 

@@ -41,4 +41,4 @@ SUBDIRS+=ffmpeg
 
 # We delete the libtool generated .la files because they cause link errors for our code
 all-local:
-	@-find "$(vs_captive_prefix)" -name '*.la' | xargs rm 
+	@-find "$(prefix)" -name '*.la' | xargs rm 

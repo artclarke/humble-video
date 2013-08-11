@@ -64,6 +64,7 @@ fi
 
 # We use the cross-compile setting for openssl but still pass through our
 # flags
+CC="@CC@ @CFLAGS@" \
 CFLAGS="-I@includedir@ @CFLAGS@" \
 LDFLAGS="-L@libdir@ @LDFLAGS@" \
 CPPFLAGS="@CPPFLAGS@" \

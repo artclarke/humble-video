@@ -27,6 +27,15 @@ CXXFLAGS="${CXXFLAGS}"
 LDFLAGS="${LDFLAGS}"
 ASFLAGS="${ASFLAGS}"
 case $host_os in
+  *linux*)
+  case $host_cpu in
+     *i?86*)
+     CFLAGS="-m32 ${CFLAGS}"
+     CXXFLAGS="-m32 ${CXXFLAGS}"
+     LDFLAGS="-m32 ${LDFLAGS}"
+     ;;
+  esac
+  ;;
   *darwin*)
   case $host_cpu in
      *x86_64*|*amd64*)

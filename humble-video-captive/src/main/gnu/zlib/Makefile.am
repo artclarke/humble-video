@@ -27,6 +27,7 @@ export CFLAGS=@CFLAGS@
 export LDFLAGS=@LDFLAGS@
 export SHELL=@SHELL@
 export CPP=@CPP@
+export RC=@RC@
 
 all-local: incarcerate-package
 	@echo "Incarcerating package $(srcdir) to fake DESTDIR=$(DESTDIR)"

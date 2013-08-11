@@ -52,6 +52,7 @@ case $HOST_OS in
   RANLIB="@RANLIB@" \
   AR="@AR@" \
   DLLTOOL="@DLLTOOL@" \
+  RC="@RC@" \
   prefix="${prefix}" \
   exec_prefix="${exec_prefix}" \
   libdir="${libdir}" \
