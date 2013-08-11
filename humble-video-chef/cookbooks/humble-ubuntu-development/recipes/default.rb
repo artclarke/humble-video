@@ -16,10 +16,10 @@ end
 package "libtool" do
   action :upgrade
 end
-package "gcc-mingw32" do
+package "pkg-config" do
   action :upgrade
 end
-package "yasm" do
+package "gcc-mingw32" do
   action :upgrade
 end
 package "doxygen" do
