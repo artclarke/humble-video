@@ -28,6 +28,12 @@ end
 package "mingw-w64" do
   action :upgrade
 end
+package "g++-mingw-w64" do
+  action :upgrade
+end
+package "gcc-mingw-w64" do
+  action :upgrade
+end
 package "binutils-mingw-w64" do
   action :upgrade
 end
