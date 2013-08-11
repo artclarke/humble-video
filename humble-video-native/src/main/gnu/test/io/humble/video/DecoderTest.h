@@ -27,12 +27,12 @@
 #define DECODERTEST_H_
 #include <io/humble/testutils/TestUtils.h>
 #include <io/humble/video/Decoder.h>
+#include <io/humble/video/MediaAudio.h>
 #include "TestData.h"
 
 using namespace io::humble::video;
 using namespace io::humble::ferry;
 
-class io::humble::video::MediaAudio;
 class DecoderTest : public CxxTest::TestSuite
 {
 public:

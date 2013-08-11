@@ -79,7 +79,7 @@ namespace io { namespace humble { namespace video
        * It can also be accessed at any time in {@link #getAttachedPic()}.
        */
       DISPOSITION_ATTACHED_PIC =  AV_DISPOSITION_ATTACHED_PIC,
-    };
+    } Disposition;
     /**
      * What types of parsing can we do on a call to
      * {@link Source#read(Packet)}

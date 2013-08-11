@@ -124,8 +124,7 @@ vpath %$(SWIGEXT) .:$(srcdir)
 	@$(MKDIR_P) $(SWIGOUTDIR)/$(VS_CPP_PATH)
 	@$(MKDIR_P) $(SWIGOUTCPPDIR)/$(VS_CPP_PATH)
 	@$(MKDIR_P) $(SWIGOUTTMPDIR)/$(VS_CPP_PATH)
-	@echo "  SWIG     "$(notdir $<)
-	@$(SWIGCOMPILE) -outdir $(SWIGOUTTMPDIR)/$(VS_CPP_PATH) -c++ -java -o $@ $< 
+	$(AM_V_GEN)$(SWIGCOMPILE) -outdir $(SWIGOUTTMPDIR)/$(VS_CPP_PATH) -c++ -java -o $@ $< 
 	@-if test -w $(SWIGOUTCPPDIR)/$(VS_CPP_PATH) ; then \
 	  cp -f $@ $(SWIGOUTCPPDIR)/$(VS_CPP_PATH) ; \
 	fi

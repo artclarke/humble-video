@@ -90,7 +90,7 @@ public:
      * (internally or generically).
      */
     FILTER_FLAG_SUPPORT_TIMELINE = AVFILTER_FLAG_SUPPORT_TIMELINE,
-  };
+  } Flag;
 
   /**
    * @return name of this filter type.
