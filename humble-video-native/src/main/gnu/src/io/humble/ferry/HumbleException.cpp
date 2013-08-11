@@ -25,8 +25,11 @@
 
 #ifdef __GNUC__
 /** We are compiling in GCC */
+#if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) || defined(VS_OS_WINDOWS)
+# else
 #include <execinfo.h>
-#endif // __GNUG__
+#endif
+#endif // __GNUC__
 #include "HumbleException.h"
 #include <cstring>
 #include <cstdlib>
@@ -40,9 +43,12 @@ HumbleStackTrace::HumbleStackTrace() {
   mNumFrames = 0;
   // time to generate a stack trace
 #ifdef __GNUC__
+#if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) || defined(VS_OS_WINDOWS)
+#else
   mNumFrames = backtrace(mFrames, sizeof(mFrames)/sizeof(*mFrames));
   if (mNumFrames > 0)
     mSymbols = backtrace_symbols(mFrames, mNumFrames);
+#endif
 #endif
 }
 

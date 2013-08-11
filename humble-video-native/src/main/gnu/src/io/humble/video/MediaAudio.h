@@ -137,14 +137,14 @@ public:
   static char*
   getChannelLayoutString(int32_t numChannels, int64_t layout) {
     const int bufSize = 512;
-    char* retval = (char*) malloc(bufSize);
+    char* retval = (char*) av_malloc(bufSize);
     if (retval) av_get_channel_layout_string(retval, bufSize, numChannels,
         (uint64_t) layout);
     return retval;
   }
 #ifdef SWIG
   %newobject getChannelLayoutString(int32_t, int64_t);
-  %typemap(newfree) char * "free($1);";
+  %typemap(newfree) char * "av_free($1);";
 #endif
 
   /**

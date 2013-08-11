@@ -27,8 +27,6 @@
 #define VIDEOEXCEPTIONS_H_
 
 #include <io/humble/ferry/HumbleException.h>
-#include <cstring>
-#include <cstdlib>
 namespace io {
 namespace humble {
 namespace video {
