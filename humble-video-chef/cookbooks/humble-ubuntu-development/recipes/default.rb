@@ -55,7 +55,7 @@ template '/usr/bin/x86_64-w64-mingw32-strip' do
   group "root"
   mode 00755
   variables({
-     :strip => '/usr/bin/x86_64-w64-ming32-strip'
+     :strip => '/usr/bin/x86_64-w64-mingw32-strip'
   })
   not_if {File.exists?("/usr/bin/x86_64-w64-mingw32-strip")}
 end
@@ -65,7 +65,7 @@ template '/usr/bin/i686-w64-mingw32-strip' do
   group "root"
   mode 00755
   variables({
-     :strip => '/usr/bin/i686-w64-ming32-strip'
+     :strip => '/usr/bin/i686-w64-mingw32-strip'
   })
   not_if {File.exists?("/usr/bin/i686-w64-mingw32-strip")}
 end
