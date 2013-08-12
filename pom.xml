@@ -27,9 +27,10 @@
     <module>
       humble-video-test
     </module>
-    <module>
-      humble-video-all
-    </module>
+    <!-- Note: humble-video-all is NOT included because it will
+         only build on machines that have staged artifacts for
+         all required native code. See the humble-video-stage/pom.xml
+         file. -->
   </modules>
 
 </project>
