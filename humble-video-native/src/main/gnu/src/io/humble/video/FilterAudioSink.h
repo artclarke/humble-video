@@ -34,7 +34,7 @@ namespace humble {
 namespace video {
 
 /**
- * A source of {@link MediaAudio} objects for a {@link FilterGraph}.
+ * A source of MediaAudio objects for a FilterGraph.
  */
 class FilterAudioSink : public io::humble::video::FilterSink
 {

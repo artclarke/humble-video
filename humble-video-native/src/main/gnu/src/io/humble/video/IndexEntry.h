@@ -26,7 +26,7 @@ namespace io { namespace humble { namespace video
 {
 
 /**
- * An index entry for a {@link Stream}.
+ * An index entry for a Stream.
  * <p>
  * Some ContainerFormats can maintain index of where key-frames
  * (and other interesting frames) can be found in a byte-stream.
@@ -36,7 +36,7 @@ namespace io { namespace humble { namespace video
  * </p>
  * <p>
  * We don't maintain a complete list of all ContainerFormats that support
- * index, but if they do, you can query the {@link Stream#getNumIndexEntries()}
+ * index, but if they do, you can query the Stream#getNumIndexEntries()
  * method to find how many entires are in the index.  Some ContainerFormats can
  * parse the relevant Container message if an index is embedded in the
  * container (for example, the MOV and MP4 demuxer can do this).  Other
@@ -56,32 +56,32 @@ class VS_API_HUMBLEVIDEO IndexEntry: public io::humble::ferry::RefCounted
 {
 public:
   /**
-   * A bit mask value that may be set in {@link #getFlags}.
+   * A bit mask value that may be set in #getFlags.
    */
   static const int32_t INDEX_FLAG_KEYFRAME = 0x0001;
 
   /**
-   * Create a new {@link IndexEntry} with the specified
+   * Create a new IndexEntry with the specified
    * values.
    *
-   * @param position The value to be returned from {@link #getPosition()}.
-   * @param timeStamp The value to be returned from {@link #getTimeStamp()}.
-   * @param flags The value to be returned from {@link #getFlags()}.
-   * @param size The value to be returned from {@link #getSize()}.
-   * @param minDistance The value to be returned from {@link #getMinDistance()}.
+   * @param position The value to be returned from #getPosition().
+   * @param timeStamp The value to be returned from #getTimeStamp().
+   * @param flags The value to be returned from #getFlags().
+   * @param size The value to be returned from #getSize().
+   * @param minDistance The value to be returned from #getMinDistance().
    */
   static IndexEntry* make(int64_t position, int64_t timeStamp,
       int32_t flags, int32_t size, int32_t minDistance);
 
   /**
    * The position in bytes of the frame corresponding to this index entry
-   * in the {@link Container}.
+   * in the Container.
    * @return The byte-offset from start of the Container where the
-   *   frame for this {@link IndexEntry} can be found.
+   *   frame for this IndexEntry can be found.
    */
   virtual int64_t getPosition()=0;
   /**
-   * The actual time stamp, in units of {@link Stream#getTimeBase()}, of the frame this entry points to.
+   * The actual time stamp, in units of Stream#getTimeBase(), of the frame this entry points to.
    * @return The time stamp for this entry.
    */
   virtual int64_t getTimeStamp()=0;
@@ -105,7 +105,7 @@ public:
   virtual int32_t getMinDistance()=0;
   /**
    * Is this index entry pointing to a key frame.
-   * Really shorthand for <code>{@link #getFlags()} &amp; {@link #INDEX_FLAG_KEYFRAME}</code>.
+   * Really shorthand for <code>#getFlags() &amp; #INDEX_FLAG_KEYFRAME</code>.
    * @return True if this index entry is for a key frame.
    */
   virtual bool    isKeyFrame()=0;

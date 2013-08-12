@@ -138,8 +138,8 @@ public:
    * Get the type this buffer was created as.
    * <p>
    * A type is really just a hint.  Like
-   * {@link java.nio.ByteBuffer objects},
-   * {@link Buffer} objects can be cast to and from any type.
+   * java.nio.ByteBuffer objects,
+   * Buffer objects can be cast to and from any type.
    * </p>
    * @return the type  
    */
@@ -150,7 +150,7 @@ public:
    * <p>
    * This method does not do any data conversion, it
    * just changes the reported type (so changing from
-   * {@link Type#BUFFER_UINT8} to {@link Type#BUFFER_SINT16}
+   * Type#BUFFER_UINT8 to Type#BUFFER_SINT16
    * is really just a "cast" operation).
    * </p>
    * @param type the type to set to. 
@@ -165,10 +165,10 @@ public:
   static int32_t getTypeSize(Type type);
   
   /**
-   * Returns the size, in units of {@link #getType()} of
+   * Returns the size, in units of #getType() of
    * this buffer.
    * 
-   * @return number of items of type {@link #getType()} that
+   * @return number of items of type #getType() that
    *   will fit in this buffer.
    */
   virtual int32_t getSize()=0;

@@ -65,7 +65,7 @@ public:
   /**
    * Flags that tell you what capabilities this format supports.
    *
-   * @return a bitmask of {@link Flags}
+   * @return a bitmask of Flags
    */
   virtual int32_t
   getFlags()
@@ -141,8 +141,8 @@ public:
    * Get the Codec.ID for the n'th codec supported by this container.
    *
    * @param n The n'th codec supported by this codec. Lower n are higher priority.
-   *   n must be < {@link #getNumSupportedCodecs()}
-   * @return the {@link Codec.ID} at the n'th slot, or {@link Codec.ID.CODEC_ID_NONE} if none.
+   *   n must be < #getNumSupportedCodecs()
+   * @return the Codec.ID at the n'th slot, or Codec.ID.CODEC_ID_NONE if none.
    */
   virtual Codec::ID
   getSupportedCodecId(int32_t n)
@@ -153,7 +153,7 @@ public:
    * Get the 32-bit Codec Tag for the n'th codec supported by this container.
    *
    * @param n The n'th codec supported by this codec. Lower n are higher priority.
-   *   n must be < {@link #getNumSupportedCodecs()}
+   *   n must be < #getNumSupportedCodecs()
    * @return the codec tag at the n'th slot, or 0 if none.
    */
   virtual uint32_t
@@ -176,7 +176,7 @@ public:
    * @param index an index for the input format list we maintain
    *
    * @return a format object for that input or null if
-   *   unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()}
+   *   unknown, index < 0 or index >= #getNumInstalledInputFormats()
    */
   static MuxerFormat* getFormat(int32_t index);
 

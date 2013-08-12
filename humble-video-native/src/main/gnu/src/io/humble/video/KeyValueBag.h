@@ -28,8 +28,8 @@ namespace io { namespace humble { namespace video
 
 /**
  * KeyValueBag is a bag of key/value pairs that can be embedded
- * in some {@link Container} or some {@link Stream}
- * in an {@link Container}, and are then written to
+ * in some Container or some Stream
+ * in an Container, and are then written to
  * or read from a media file.  Keys must be unique, and
  * any attempt to set a key value replaces any previous values.
  * </p>
@@ -37,8 +37,8 @@ namespace io { namespace humble { namespace video
  * An example is the "title" meta-data item in an MP3 file.
  * </p>
  * <p>
- * Support for KeyValueBag differs depending upon the {@link
- * Container} format you're using and the implementation
+ * Support for KeyValueBag differs depending upon the 
+ * Container format you're using and the implementation
  * in <a href="http://www.ffmpeg.org/">FFmpeg</a>.  For example,
  * MP3 meta-data reading and writing is supported, but
  * (as of the writing of this comment) FLV meta-data writing
@@ -49,30 +49,30 @@ class VS_API_HUMBLEVIDEO KeyValueBag : public io::humble::ferry::RefCounted
 {
 public:
   /**
-   * Different types of flags that can be passed to {@link KeyValueBag#getValue}
+   * Different types of flags that can be passed to KeyValueBag#getValue
    */
   typedef enum {
     /**
-     * For {@link #getValue(String)} case-insensitive match of key.
+     * For #getValue(String) case-insensitive match of key.
      */
     KVB_NONE=0,
     /**
-     * For {@link #getValue(String)} case-sensitive match of key.
+     * For #getValue(String) case-sensitive match of key.
      */
     KVB_MATCH_CASE=1,
     /**
-     * For {@link #setValue(String,String,Flags)} do not overwrite existing value -- append another key/value pair.
+     * For #setValue(String,String,Flags) do not overwrite existing value -- append another key/value pair.
      */
     KVB_DONT_OVERWRITE=16,
     /**
-     * For {@link #setValue(String,String,Flags)} append to the existing value in a key (string append).
+     * For #setValue(String,String,Flags) append to the existing value in a key (string append).
      */
     KVB_APPEND=32,
   } Flags;
 
   /**
    * Get the total number of keys currently in this
-   * {@link KeyValueBag} object.
+   * KeyValueBag object.
    * 
    * @return the number of keys.
    */
@@ -84,12 +84,12 @@ public:
    * 
    * <p>
    * Note: positions of keys may change between
-   * calls to {@link #setValue(String, String)} and 
+   * calls to #setValue(String, String) and 
    * should be requiried.
    * </p>
    * 
    * @param position The position.  Must be >=0 and < 
-   * {@link #getNumKeys()}.
+   * #getNumKeys().
    * 
    * @return the key, or null if not found.
    */
@@ -116,7 +116,7 @@ public:
   virtual int32_t setValue(const char* key, const char* value)=0;
   
   /**
-   * Create a new {@link KeyValueBag} bag of properties with
+   * Create a new KeyValueBag bag of properties with
    * no values set.
    */
   static KeyValueBag* make();

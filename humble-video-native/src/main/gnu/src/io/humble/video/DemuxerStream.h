@@ -35,7 +35,7 @@ namespace video {
 
 class Decoder;
 /**
- * A {@link ContainerStream} class that was read from a {@link Demuxer}.
+ * A ContainerStream class that was read from a Demuxer.
  */
 class VS_API_HUMBLEVIDEO DemuxerStream : public io::humble::video::ContainerStream
 {

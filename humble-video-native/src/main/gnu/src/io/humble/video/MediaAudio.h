@@ -382,7 +382,7 @@ public:
    * Get the size of a plane of audio bytes that would be required to hold the
    * number of samples of audio in the given format and with the given number of channels.
    * <p>
-   * If format is packed, then this method returns the same number as {@link #getBufferSizeNeeded(int, int, Type)}.
+   * If format is packed, then this method returns the same number as #getBufferSizeNeeded(int, int, Type).
    * </p>
    */
   static int32_t
@@ -410,10 +410,10 @@ protected:
  * The data layout is as follows:
  * </p><p>
  * For planar sample formats, each audio channel is in a separate data plane,
- * and {@link MediaAudio#getDataLineSize(int)} is the buffer size, in bytes, for a single plane. All data
+ * and MediaAudio#getDataLineSize(int) is the buffer size, in bytes, for a single plane. All data
  * planes must be the same size. For packed sample formats, only the first data
  * plane is used, and samples for each channel are interleaved. In this case,
- * {@link MediaAudio#getDataLineSize(int)} is the buffer size, in bytes, for the 1 plane.
+ * MediaAudio#getDataLineSize(int) is the buffer size, in bytes, for the 1 plane.
  * </p>
  */
 class VS_API_HUMBLEVIDEO MediaAudio : public MediaSampled
@@ -422,12 +422,12 @@ class VS_API_HUMBLEVIDEO MediaAudio : public MediaSampled
 public:
   /**
    * Create a MediaAudio and the underlying data. Will allocate a buffer to back this data.
-   * @param numSamples The number of samples of audio that will be placed in this {@link MediaAudio} object.
+   * @param numSamples The number of samples of audio that will be placed in this MediaAudio object.
    * @param sampleRate The sample rate (per second) of this audio.
-   * @param channels The number of channels of audio that will be placed in this {@link MediaAudio} object.
-   * @paray channelLayout The channel layout of audio that will be placed in this {@link MediaAudio} object.
-   * @param format The format of the audio placed in this {@link MediaAudio} object.
-   * @return A {@link MediaAudio} object, or null on failure.
+   * @param channels The number of channels of audio that will be placed in this MediaAudio object.
+   * @paray channelLayout The channel layout of audio that will be placed in this MediaAudio object.
+   * @param format The format of the audio placed in this MediaAudio object.
+   * @return A MediaAudio object, or null on failure.
    */
   static MediaAudio*
   make(int32_t numSamples, int32_t sampleRate, int32_t channels, AudioChannel::Layout channelLayout,
@@ -435,20 +435,20 @@ public:
   /**
    * Create a MediaAudio using the given buffer.
    *
-   * Note: that the {@link Buffer.getBufferSize()} constraints the max number
+   * Note: that the Buffer.getBufferSize() constraints the max number
    * of samples we can place in here, and HumbleVideo needs to reserve some
-   * of the buffer for, um, stuff (assume at least 64 bytes). So {@link #getMaxNumSamples()}
+   * of the buffer for, um, stuff (assume at least 64 bytes). So #getMaxNumSamples()
    * may not return as many as you think you can fit in here.
    *
    * @param buffer A buffer to back the audio with. If not large enough to hold all the samples (with alignment on 32-bit boundaries if planar),
    *    then an error results.
-   * @param numSamples The number of samples of audio that will be placed in this {@link MediaAudio} object.
+   * @param numSamples The number of samples of audio that will be placed in this MediaAudio object.
    * @param sampleRate The sample rate (per second) of this audio.
-   * @param channels The number of channels of audio that will be placed in this {@link MediaAudio} object.
-   * @paray channelLayout The channel layout of audio that will be placed in this {@link MediaAudio} object.
-   * @param format The format of the audio placed in this {@link MediaAudio} object.
+   * @param channels The number of channels of audio that will be placed in this MediaAudio object.
+   * @paray channelLayout The channel layout of audio that will be placed in this MediaAudio object.
+   * @param format The format of the audio placed in this MediaAudio object.
    *
-   * @return A {@link MediaAudio} object, or null on failure.
+   * @return A MediaAudio object, or null on failure.
    */
   static MediaAudio*
   make(io::humble::ferry::Buffer *buffer, int32_t numSamples,
@@ -470,7 +470,7 @@ public:
    * @param src MediaAudio to reference
    * @param copy true if we should copy all data. false if we should just gain a reference to the same underlying data in src.
    *
-   * @return a {@link MediaAudio} object, or null on failure.
+   * @return a MediaAudio object, or null on failure.
    */
   static MediaAudio*
   make(MediaAudio* src, bool copy);
@@ -478,16 +478,16 @@ public:
   /**
    * Get any underlying raw data available for this object.
    *
-   * @param plane The plane number if {@link getFormat()} is Planar (rather than packed) audio.  Pass zero for packed data.
+   * @param plane The plane number if getFormat() is Planar (rather than packed) audio.  Pass zero for packed data.
    * @return The raw data, or null if not accessible.
    */
   virtual io::humble::ferry::Buffer*
   getData(int32_t plane)=0;
 
   /**
-   * The total number of bytes in {@link #getData()} that represent valid audio data.
-   * If {@link #isComplete()} returns true, this returns the total number of bytes
-   * returned by {@link #getData(int)} that are readable from. Otherwise it will
+   * The total number of bytes in #getData() that represent valid audio data.
+   * If #isComplete() returns true, this returns the total number of bytes
+   * returned by #getData(int) that are readable from. Otherwise it will
    * return the total number of bytes that are writable to.
    *
    * @return The size in bytes of that plane of audio data.
@@ -500,7 +500,7 @@ public:
   getNumDataPlanes()=0;
 
   /**
-   * @return maximum of samples of {@link #getChannels()} {@link #getFormat()} audio that can be put in this {@link MediaAudio} object.
+   * @return maximum of samples of #getChannels() #getFormat() audio that can be put in this MediaAudio object.
    */
   virtual int32_t
   getMaxNumSamples()=0;
@@ -513,7 +513,7 @@ public:
 
   /**
    * Set the number of samples in the buffer. Must not be more than
-   * {@link #getMaxNumSamples()}. Caller is responsible for making
+   * #getMaxNumSamples(). Caller is responsible for making
    * sure buffer actually matches this.
    */
   virtual void

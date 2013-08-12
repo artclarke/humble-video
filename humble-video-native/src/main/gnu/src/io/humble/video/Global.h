@@ -39,13 +39,13 @@ namespace io { namespace humble { namespace video
   public:
     /**
      * A value that means no time stamp is set for a given object.
-     * if the {@link Media#getTimeStamp()} method of an
+     * if the Media#getTimeStamp() method of an
      * object returns this value it means the time stamp wasn't set.
      */
     static const int64_t NO_PTS=0x8000000000000000LL;
     /**
      * The default time units per second that we use for decoded
-     * {@link MediaRaw} objects.
+     * MediaRaw objects.
      *
      * This means that 1 tick of a time stamp is 1 Microsecond.
      */

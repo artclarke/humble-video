@@ -34,7 +34,7 @@ namespace humble {
 namespace video {
 
 /**
- * A Sink of {@link MediaPicture} objects for a {@link FilterGraph}.
+ * A Sink of MediaPicture objects for a FilterGraph.
  */
 class FilterPictureSink : public io::humble::video::FilterSink
 {

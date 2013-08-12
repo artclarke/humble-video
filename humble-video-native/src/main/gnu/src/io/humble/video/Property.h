@@ -28,7 +28,7 @@ namespace io { namespace humble { namespace video {
    * operate.
    * <p>
    * For example, setting the &quot;b&quot; property on an
-   * {@link IStreamCoder} sets the bit-rate the coder will attempt
+   * IStreamCoder sets the bit-rate the coder will attempt
    * to encode at.
    * </p> 
    */
@@ -126,7 +126,7 @@ namespace io { namespace humble { namespace video {
     virtual double getDefaultAsDouble()=0;
     
     /**
-     * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this method will
+     * If this IProperty is of the type Type#PROPERTY_FLAGS, this method will
      * tell you how many different flag settings it takes.
      * 
      * @return Number of flag settings, or <0 if not a FLAGS value
@@ -134,7 +134,7 @@ namespace io { namespace humble { namespace video {
     virtual int32_t getNumFlagSettings()=0;
     
     /**
-     * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this method will
+     * If this IProperty is of the type Type#PROPERTY_FLAGS, this method will
      * give you another IProperty representing a constant setting for that flag.
      * 
      * @param position The position number for the flag;  Must be in range 0 <= position <= #getNumFlagSettings().
@@ -144,7 +144,7 @@ namespace io { namespace humble { namespace video {
     virtual Property *getFlagConstant(int32_t position)=0;
 
     /**
-     * If this IProperty is of the type {@link Type#PROPERTY_FLAGS}, this method will
+     * If this IProperty is of the type Type#PROPERTY_FLAGS, this method will
      * give you another IProperty representing a constant setting for that flag.
      * 
      * @param name The name of the constant.

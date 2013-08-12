@@ -41,16 +41,16 @@ class VS_API_HUMBLEVIDEO Decoder : public io::humble::video::Coder
 {
 public:
   /**
-   * Create a {@link Decoder} that will use the given {@link Codec}.
+   * Create a Decoder that will use the given Codec.
    *
-   * @return a {@link Decoder}
+   * @return a Decoder
    * @throws InvalidArgument if codec is null or codec cannot decode.
    */
   static Decoder* make(Codec* codec);
 
   /**
-   * Creates a {@link Decoder} from a given {@link Decoder}
-   * @return a {@link Decoder}
+   * Creates a Decoder from a given Decoder
+   * @return a Decoder
    * @throws InvalidArgument if src is null
    */
   static Decoder* make(Decoder* src);
@@ -59,7 +59,7 @@ public:
 #endif // ! SWIG
 
   /**
-   * Flush this {@link Decoder}, getting rid of any cached packets (call after seek).
+   * Flush this Decoder, getting rid of any cached packets (call after seek).
    * Next packet given to decode should be a key packet.
    */
   virtual void flush();

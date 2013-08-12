@@ -619,7 +619,7 @@ public:
   }
 
   /**
-   * Get the flags for this Pixel Format. This is a bitmask of the {@link PixelFormatDescriptor.Flag} enum values.
+   * Get the flags for this Pixel Format. This is a bitmask of the PixelFormatDescriptor.Flag enum values.
    */
   uint8_t
   getFlags() {

@@ -30,17 +30,17 @@ namespace io { namespace humble { namespace video
   class IndexEntry;
   
   /**
-   * Represents a stream of similar data (eg video) in a {@link Container}.
+   * Represents a stream of similar data (eg video) in a Container.
    * <p>
-   * Streams are really virtual concepts; {@link Container}s really just contain
-   * a bunch of {@link Packet}s.  But each {@link Packet} usually has a stream
-   * id associated with it, and all {@link Packet}s with that stream id represent
+   * Streams are really virtual concepts; Container objects really just contain
+   * a bunch of Packets.  But each Packet usually has a stream
+   * id associated with it, and all Packets with that stream id represent
    * the same type of (usually time-based) data.  For example in many FLV
    * video files, there is a stream with id "0" that contains all video data, and
    * a stream with id "1" that contains all audio data.
    * </p><p>
-   * You use an {@link Stream} object to get properly configured {@link Decoder}s
-   * for decoding, and to tell {@link Encoder}s how to encode {@link Packet}s when
+   * You use an Stream object to get properly configured Decoders
+   * for decoding, and to tell Encoders how to encode Packets when
    * decoding.
    * </p>
    */
@@ -76,13 +76,13 @@ namespace io { namespace humble { namespace video
        * The stream is stored in the file as an attached picture/"cover art" (e.g.
        * APIC frame in ID3v2). The single packet associated with it will be returned
        * among the first few packets read from the file unless seeking takes place.
-       * It can also be accessed at any time in {@link #getAttachedPic()}.
+       * It can also be accessed at any time in #getAttachedPic().
        */
       DISPOSITION_ATTACHED_PIC =  AV_DISPOSITION_ATTACHED_PIC,
     } Disposition;
     /**
      * What types of parsing can we do on a call to
-     * {@link Source#read(Packet)}
+     * Source#read(Packet)
      */
     typedef enum ParseType {
       /** No special instructions */
@@ -103,7 +103,7 @@ namespace io { namespace humble { namespace video
 
     /**
      * Get the relative position this stream has in the hosting
-     * {@link Container} object.
+     * Container object.
      * @return The Index within the Container of this stream.
      */
     virtual int32_t getIndex()=0;
@@ -137,22 +137,22 @@ namespace io { namespace humble { namespace video
     virtual Rational * getTimeBase()=0;
 
     /**
-     * Return the start time, in {@link #getTimeBase()} units, when this stream
+     * Return the start time, in #getTimeBase() units, when this stream
      * started.
      * @return The start time.
      */
     virtual int64_t getStartTime()=0;
 
     /**
-     * Return the duration, in {@link #getTimeBase()} units, of this stream,
-     * or {@link Global#NO_PTS} if unknown.
+     * Return the duration, in #getTimeBase() units, of this stream,
+     * or Global#NO_PTS if unknown.
      * @return The duration (in getTimeBase units) of this stream, if known.
      */
     virtual int64_t getDuration()=0;
 
     /**
      * The current Decompression Time Stamp that will be used on this stream,
-     * in {@link #getTimeBase()} units.
+     * in #getTimeBase() units.
      * @return The current Decompression Time Stamp that will be used on this stream.
      */
     virtual int64_t getCurrentDts()=0;
@@ -196,7 +196,7 @@ namespace io { namespace humble { namespace video
     
     /**
      * Set the parse type the decoding codec should use.  Set to
-     * {@link ParseType#PARSE_NONE} if you don't want any parsing
+     * ParseType#PARSE_NONE if you don't want any parsing
      * to be done.
      * <p>
      * Warning: do not set this flag unless you know what you're doing,
@@ -208,68 +208,68 @@ namespace io { namespace humble { namespace video
     virtual void setParseType(ParseType type)=0;
 
     /**
-     * Get the {@link KeyValueBag} for this object,
+     * Get the KeyValueBag for this object,
      * or null if none.
      * <p>
-     * If the {@link Container} or {@link Stream} object
-     * that this {@link KeyValueBag} came from was opened
-     * for reading, then changes via {@link KeyValueBag#setValue(String, String)}
+     * If the Container or Stream object
+     * that this KeyValueBag came from was opened
+     * for reading, then changes via KeyValueBag#setValue(String, String)
      * will have no effect on the underlying media.
      * </p>
      * <p>
-     * If the {@link Container} or {@link Stream} object
-     * that this {@link KeyValueBag} came from was opened
-     * for writing, then changes via {@link KeyValueBag#setValue(String, String)}
-     * will have no effect after {@link Container#writeHeader()}
+     * If the Container or Stream object
+     * that this KeyValueBag came from was opened
+     * for writing, then changes via KeyValueBag#setValue(String, String)
+     * will have no effect after Container#writeHeader()
      * is called.
      * </p>
-     * @return the {@link KeyValueBag}.
+     * @return the KeyValueBag.
      */
    virtual KeyValueBag* getMetaData()=0;
 
    /**
-    * Search for the given time stamp in the key-frame index for this {@link Stream}.
+    * Search for the given time stamp in the key-frame index for this Stream.
     * <p>
-    * Not all {@link ContainerFormat} implementations
+    * Not all ContainerFormat implementations
     * maintain key frame indexes, but if they have one,
-    * then this method searches in the {@link Stream} index
+    * then this method searches in the Stream index
     * to quickly find the byte-offset of the nearest key-frame to
     * the given time stamp.
     * </p>
     * @param wantedTimeStamp the time stamp wanted, in the stream's
     *                        time base units.
     * @param flags A bitmask of the <code>SEEK_FLAG_*</code> flags, or 0 to turn
-    *              all flags off.  If {@link Container#SEEK_FLAG_BACKWARDS} then the returned
+    *              all flags off.  If Container#SEEK_FLAG_BACKWARDS then the returned
     *              index will correspond to the time stamp which is <=
     *              the requested one (not supported by all demuxers).
-    *              If {@link Container#SEEK_FLAG_BACKWARDS} is not set then it will be >=.
-    *              if {@link Container#SEEK_FLAG_ANY} seek to any frame, only
+    *              If Container#SEEK_FLAG_BACKWARDS is not set then it will be >=.
+    *              if Container#SEEK_FLAG_ANY seek to any frame, only
     *              keyframes otherwise (not supported by all demuxers).
-    * @return The {@link IndexEntry} for the nearest appropriate timestamp
+    * @return The IndexEntry for the nearest appropriate timestamp
     *   in the index, or null if it can't be found.
     */
    virtual IndexEntry* findTimeStampEntryInIndex(
        int64_t wantedTimeStamp, int32_t flags)=0;
 
    /**
-    * Search for the given time stamp in the key-frame index for this {@link Stream}.
+    * Search for the given time stamp in the key-frame index for this Stream.
     * <p>
-    * Not all {@link ContainerFormat} implementations
+    * Not all ContainerFormat implementations
     * maintain key frame indexes, but if they have one,
-    * then this method searches in the {@link Stream} index
+    * then this method searches in the Stream index
     * to quickly find the index entry position of the nearest key-frame to
     * the given time stamp.
     * </p>
     * @param wantedTimeStamp the time stamp wanted, in the stream's
     *                        time base units.
     * @param flags A bitmask of the <code>SEEK_FLAG_*</code> flags, or 0 to turn
-    *              all flags off.  If {@link Container#SEEK_FLAG_BACKWARDS} then the returned
+    *              all flags off.  If Container#SEEK_FLAG_BACKWARDS then the returned
     *              index will correspond to the time stamp which is <=
     *              the requested one (not supported by all demuxers).
-    *              If {@link Container#SEEK_FLAG_BACKWARDS} is not set then it will be >=.
-    *              if {@link Container#SEEK_FLAG_ANY} seek to any frame, only
+    *              If Container#SEEK_FLAG_BACKWARDS is not set then it will be >=.
+    *              if Container#SEEK_FLAG_ANY seek to any frame, only
     *              keyframes otherwise (not supported by all demuxers).
-    * @return The position in this {@link Stream} index, or -1 if it cannot
+    * @return The position in this Stream index, or -1 if it cannot
     *   be found or an index is not maintained.
     * @see #getIndexEntry(int)
     */
@@ -277,17 +277,17 @@ namespace io { namespace humble { namespace video
        int64_t wantedTimeStamp, int32_t flags)=0;
 
    /**
-    * Get the {@link IndexEntry} at the given position in this
-    * {@link Stream} object's index.
+    * Get the IndexEntry at the given position in this
+    * Stream object's index.
     * <p>
-    * Not all {@link ContainerFormat} types maintain
-    * {@link Stream} indexes, but if they do,
+    * Not all ContainerFormat types maintain
+    * Stream indexes, but if they do,
     * this method can return those entries.
     * </p>
     * <p>
-    * Do not modify the {@link Container} this stream
+    * Do not modify the Container this stream
     * is from between calls to this method and
-    * {@link #getNumIndexEntries()} as indexes may
+    * #getNumIndexEntries() as indexes may
     * be compacted while processing.
     * </p>
     * @param position The position in the index table.
@@ -295,13 +295,12 @@ namespace io { namespace humble { namespace video
    virtual IndexEntry* getIndexEntry(int32_t position)=0;
 
    /**
-    * Get the {@link Stream.Disposition} of this stream.
+    * Get the Stream.Disposition of this stream.
     */
    virtual ContainerStream::Disposition getDisposition()=0;
   protected:
     virtual ~ContainerStream()=0;
     ContainerStream();
-  /** Added in 1.17 */
   };
 }}}
 

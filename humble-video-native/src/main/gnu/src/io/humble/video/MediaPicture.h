@@ -67,11 +67,11 @@ public:
    *
    * @param width Number of pixels wide.
    * @param height Number of pixels high.
-   * @param format PixelFormat.Type of the {@link MediaPicture}
+   * @param format PixelFormat.Type of the MediaPicture
    *
    * @return A MediaPicture with memory allocated for it.
    *
-   * @throws InvalidArgument if width or height or negative, of format is {@link PixelFormat.Type.PIX_FMT_NONE}
+   * @throws InvalidArgument if width or height or negative, of format is PixelFormat.Type.PIX_FMT_NONE
    */
   static MediaPicture*
   make(int32_t width, int32_t height, PixelFormat::Type format);
@@ -82,11 +82,11 @@ public:
    * @param buffer A buffer of data to use for the image.
    * @param width Number of pixels wide.
    * @param height Number of pixels high.
-   * @param format PixelFormat.Type of the {@link MediaPicture}
+   * @param format PixelFormat.Type of the MediaPicture
    *
    * @return A MediaPicture with memory allocated for it.
    *
-   * @throws InvalidArgument if buffer is null or too small for the image, width or height or negative, of format is {@link PixelFormat.Type.PIX_FMT_NONE}
+   * @throws InvalidArgument if buffer is null or too small for the image, width or height or negative, of format is PixelFormat.Type.PIX_FMT_NONE
    */
   static MediaPicture*
   make(io::humble::ferry::Buffer* buffer, int32_t width, int32_t height,
@@ -95,10 +95,10 @@ public:
   /**
    * Create a media picture from src.
    *
-   * @param src A source {@link MediaPicture}.
+   * @param src A source MediaPicture.
    * @param copy If true then all data is copied from src into the new object. If false, then the new object just copies meta-data but references the same underlying buffers.
    *
-   * @return A {@link MediaPicture}
+   * @return A MediaPicture
    *
    * @throws InvalidArgument if src is null.
    */
@@ -108,14 +108,14 @@ public:
   /**
    * Get any underlying raw data available for this object.
    *
-   * @param plane The plane number if {@link getFormat()} is Planar (rather than packed) image data.  Pass zero for packed data.
+   * @param plane The plane number if getFormat() is Planar (rather than packed) image data.  Pass zero for packed data.
    * @return The raw data, or null if not accessible.
    */
   virtual io::humble::ferry::Buffer*
   getData(int32_t plane)=0;
 
   /**
-   * The total number of bytes in {@link #getData()} that represent valid image data.
+   * The total number of bytes in #getData() that represent valid image data.
    *
    * @return The size in bytes of that plane of image data.
    */

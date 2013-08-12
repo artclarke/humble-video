@@ -33,7 +33,7 @@ namespace humble {
 namespace video {
 
 /**
- * A Source of {@link Packet} data.
+ * A Source of Packet data.
  */
 class VS_API_HUMBLEVIDEO Demuxer : public io::humble::video::Container
 {
@@ -44,17 +44,16 @@ class VS_API_HUMBLEVIDEO Demuxer : public io::humble::video::Container
 public:
 
   /**
-   * Create a new {@link Demuxer}
+   * Create a new Demuxer
    */
   static Demuxer*
   make();
 
-  /** {@inheritDoc} */
   virtual State
   getState() = 0;
 
   /**
-   * Get the {@link InputFormat} associated with this {@link Demuxer}
+   * Get the InputFormat associated with this Demuxer
    * or null if unknown.
    */
   virtual DemuxerFormat *
@@ -84,15 +83,15 @@ public:
   /**
    * Open this container and make it ready for reading, optionally
    * reading as far into the container as necessary to find all streams.
-   * <p>The caller must call {@link #close()} when done, but if not, the
-   * {@link Demuxer} will eventually close
+   * <p>The caller must call #close() when done, but if not, the
+   * Demuxer will eventually close
    * them later but warn to the logging system.
    * </p><p>If the current thread is interrupted while this blocking method
    * is running the method will return with a negative value.
    * To check if the method exited because of an interruption
-   * pass the return value to {@link Error#make(int)} and then
-   * check {@link Error#getType()} to see if it is
-   * {@link Error.Type#ERROR_INTERRUPTED}.
+   * pass the return value to Error#make(int) and then
+   * check Error#getType() to see if it is
+   * Error.Type#ERROR_INTERRUPTED.
    * </p>
    *
    * @param url The resource to open; The format of this string is any
@@ -103,7 +102,7 @@ public:
    *   the format of this container, or null if you want us to guess.
    * @param streamsCanBeAddedDynamically If true, open() will expect that new
    *   streams can be added at any time, even after the format header has been read.
-   * @param queryStreamMetaData If true, open() will call {@link #queryStreamMetaData()}
+   * @param queryStreamMetaData If true, open() will call #queryStreamMetaData()
    *   on this container, which will potentially block until it has ready
    *   enough data to find all streams in a container.  If false, it will only
    *   block to read a minimal header for this container format.
@@ -111,9 +110,9 @@ public:
    *   the format is determined.  Some options cannot be set on input formats until
    *   the system has had a chance to determine what the format is, so this
    *   is the only way to set InputFormat-specific options.
-   * @param optionsNotSet If not null, on return this {@link KeyValueBag} object will be cleared out, and
+   * @param optionsNotSet If not null, on return this KeyValueBag object will be cleared out, and
    *   replace with any key/value pairs that were in <code>options</code> but could not be set on this
-   *   {@link Demuxer}.
+   *   Demuxer.
    *
    * @return >= 0 on success; < 0 on error.
    */
@@ -128,9 +127,9 @@ public:
    * <p>If the current thread is interrupted while this blocking method
    * is running the method will return with a negative value.
    * To check if the method exited because of an interruption
-   * pass the return value to {@link Error#make(int)} and then
-   * check {@link Error#getType()} to see if it is
-   * {@link Error.Type#ERROR_INTERRUPTED}.
+   * pass the return value to Error#make(int) and then
+   * check Error#getType() to see if it is
+   * Error.Type#ERROR_INTERRUPTED.
    * </p>
    * <p>
    * If this method exits because of an interruption,
@@ -157,9 +156,9 @@ public:
    * <p>If the current thread is interrupted while this blocking method
    * is running the method will return with a negative value.
    * To check if the method exited because of an interruption
-   * pass the return value to {@link Error#make(int)} and then
-   * check {@link Error#getType()} to see if it is
-   * {@link Error.Type#ERROR_INTERRUPTED}.
+   * pass the return value to Error#make(int) and then
+   * check Error#getType() to see if it is
+   * Error.Type#ERROR_INTERRUPTED.
    * </p>
    *
    * @param  packet [In/Out] The packet the Demuxer will read into.
@@ -176,13 +175,13 @@ public:
    * Any packets this method reads ahead will be cached and correctly returned when you
    * read packets, but this method can be non-blocking potentially until end of container
    * to get all meta data.  Take care when you call it.
-   * </p><p>After this method is called, other meta data methods like {@link #getDuration()} should
+   * </p><p>After this method is called, other meta data methods like #getDuration() should
    * work.</p> <p>If the current thread is interrupted while this blocking method
    * is running the method will return with a negative value.
    * To check if the method exited because of an interruption
-   * pass the return value to {@link Error#make(int)} and then
-   * check {@link Error#getType()} to see if it is
-   * {@link Error.Type#ERROR_INTERRUPTED}.
+   * pass the return value to Error#make(int) and then
+   * check Error#getType() to see if it is
+   * Error.Type#ERROR_INTERRUPTED.
    * </p>
    *
    */
@@ -195,7 +194,7 @@ public:
    * This will only work for non-streamable containers where Demuxer
    * can calculate the container size.
    *
-   * @return The duration, or {@link Global#NO_PTS} if not known.
+   * @return The duration, or Global#NO_PTS if not known.
    */
   virtual int64_t
   getDuration()=0;
@@ -209,7 +208,7 @@ public:
    * first packet from a streamable Demuxer.
    * </p>
    *
-   * @return The starting timestamp in microseconds, or {@link Global#NO_PTS} if not known.
+   * @return The starting timestamp in microseconds, or Global#NO_PTS if not known.
    */
   virtual int64_t
   getStartTime()=0;
@@ -282,8 +281,8 @@ public:
   getURL()=0;
 
   /**
-   * Get the number of times {@link Demuxer#readNextPacket(Packet)}
-   * will retry a read if it gets a {@link Error.Type#ERROR_AGAIN}
+   * Get the number of times Demuxer#readNextPacket(Packet)
+   * will retry a read if it gets a Error.Type#ERROR_AGAIN
    * value back.
    *
    * Defaults to 1 times.  <0 means it will keep retrying indefinitely.
@@ -312,28 +311,28 @@ public:
   canStreamsBeAddedDynamically()=0;
 
   /**
-   * Get the {@link KeyValueBag} of media MetaData for this object,
+   * Get the KeyValueBag of media MetaData for this object,
    * or null if none.
    * <p>
-   * If the {@link Demuxer} or {@link IStream} object
-   * that this {@link KeyValueBag} came from was opened
-   * for reading, then changes via {@link KeyValueBag#setValue(String, String)}
+   * If the Demuxer or IStream object
+   * that this KeyValueBag came from was opened
+   * for reading, then changes via KeyValueBag#setValue(String, String)
    * will have no effect on the underlying media.
    * </p>
    * <p>
-   * If the {@link Demuxer} or {@link IStream} object
-   * that this {@link KeyValueBag} came from was opened
-   * for writing, then changes via {@link KeyValueBag#setValue(String, String)}
-   * will have no effect after {@link Demuxer#writeHeader()}
+   * If the Demuxer or IStream object
+   * that this KeyValueBag came from was opened
+   * for writing, then changes via KeyValueBag#setValue(String, String)
+   * will have no effect after Demuxer#writeHeader()
    * is called.
    * </p>
-   * @return the {@link KeyValueBag}.
+   * @return the KeyValueBag.
    */
   virtual KeyValueBag*
   getMetaData()=0;
 
   /**
-   * Forces the {@link Demuxer} to assume all audio streams are
+   * Forces the Demuxer to assume all audio streams are
    * encoded with the given audio codec when demuxing.
    * @param id The codec id
    * @return < 0 on error (e.g. not an audio codec); >= 0 on success.
@@ -342,7 +341,7 @@ public:
   setForcedAudioCodec(Codec::ID id)=0;
 
   /**
-   * Forces the {@link Demuxer} to assume all video streams are
+   * Forces the Demuxer to assume all video streams are
    * encoded with the given video codec when demuxing.
    * @param id The codec id
    * @return < 0 on error (e.g. not an video codec); >= 0 on success.
@@ -351,7 +350,7 @@ public:
   setForcedVideoCodec(Codec::ID id)=0;
 
   /**
-   * Forces the {@link Demuxer} to assume all subtitle streams are
+   * Forces the Demuxer to assume all subtitle streams are
    * encoded with the given subtitle codec when demuxing.
    * @param id The codec id
    * @return < 0 on error (e.g. not an subtitle codec); >= 0 on success.
@@ -360,7 +359,7 @@ public:
   setForcedSubtitleCodec(Codec::ID id)=0;
 
   /**
-   * Flags that can be bitmasked in the {@link #seek} method. If no
+   * Flags that can be bitmasked in the #seek method. If no
    * flag, then key-frame-only/forward seeking is assumed.
    */
   typedef enum SeekFlag
@@ -382,16 +381,16 @@ public:
    *
    * Seeking will be done so that the point from which all active streams
    * can be presented successfully will be closest to ts and within min/max_ts.
-   * Active streams are all streams that have {@link Stream.getDiscardSetting} <
-   * {@link Codec.DISCARD_ALL}.
+   * Active streams are all streams that have Stream.getDiscardSetting <
+   * Codec.DISCARD_ALL.
    *
-   * If flags contain {@link SeekFlags.SEEK_BYTE}, then all timestamps are in bytes and
+   * If flags contain SeekFlags.SEEK_BYTE, then all timestamps are in bytes and
    * are the file position (this may not be supported by all demuxers).
-   * If flags contain {@link SeekFlags.SEEK_FRAME}, then all timestamps are in frames
+   * If flags contain SeekFlags.SEEK_FRAME, then all timestamps are in frames
    * in the stream with stream_index (this may not be supported by all demuxers).
    * Otherwise all timestamps are in units of the stream selected by stream_index
    * or if stream_index is -1, in (1/Global.DEFAULT_PTS_MICROSECONDS} units.
-   * If flags contain {@link SeekFlags.SEEK_ANY}, then non-keyframes are treated as
+   * If flags contain SeekFlags.SEEK_ANY, then non-keyframes are treated as
    * keyframes (this may not be supported by all demuxers).
    *
    * @param stream_index index of the stream which is used as time base reference
@@ -417,15 +416,15 @@ public:
   getMaxDelay()=0;
 
   /**
-   * Start playing a network source. Call {@link #pause()} to pause.
+   * Start playing a network source. Call #pause() to pause.
    */
   virtual void
   play()=0;
 
   /**
-   * Pause a playing network source. Call {@link #play()} to unpause.
+   * Pause a playing network source. Call #play() to unpause.
    *
-   * @return 0 on success; <0 if state is not {@link #State.STATE_PLAYING} or error.
+   * @return 0 on success; <0 if state is not #State.STATE_PLAYING or error.
    */
   virtual void
   pause()=0;

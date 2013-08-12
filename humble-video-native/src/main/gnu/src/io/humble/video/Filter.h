@@ -65,7 +65,7 @@ public:
   }
 
   /**
-   * @return number of inputs this {@link FilterType} expects.
+   * @return number of inputs this FilterType expects.
    */
   virtual int32_t
   getNumInputs();
@@ -73,7 +73,7 @@ public:
   /**
    * @param index which input to get name of
    * @return the input name
-   * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
+   * @throws InvalidArgument if index < 0 || index > #getNumInputs().
    */
   virtual const char*
   getInputName(int32_t index);
@@ -81,21 +81,21 @@ public:
   /**
    * @param index which input to get type of
    * @return the input media type
-   * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
+   * @throws InvalidArgument if index < 0 || index > #getNumInputs().
    */
   virtual MediaDescriptor::Type
   getInputType(int32_t index);
 
   /**
    * @param index which input to get link of
-   * @return the {@link FilterLink} that is inputting into this filter at the given position.
-   * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
+   * @return the FilterLink that is inputting into this filter at the given position.
+   * @throws InvalidArgument if index < 0 || index > #getNumInputs().
    */
   virtual FilterLink*
   getInputLink(int32_t index);
 
   /**
-   * @return number of outputs this {@link FilterType} expects.
+   * @return number of outputs this FilterType expects.
    */
   virtual int32_t
   getNumOutputs();
@@ -103,7 +103,7 @@ public:
   /**
    * @param index which output to get name of
    * @return the output name
-   * @throws InvalidArgument if index < 0 || index > {@link #getNumOutputs()}.
+   * @throws InvalidArgument if index < 0 || index > #getNumOutputs().
    */
   virtual const char*
   getOutputName(int32_t index);
@@ -111,15 +111,15 @@ public:
   /**
    * @param index which output to get type of
    * @return the output media type
-   * @throws InvalidArgument if index < 0 || index > {@link #getNumOutputs()}.
+   * @throws InvalidArgument if index < 0 || index > #getNumOutputs().
    */
   virtual MediaDescriptor::Type
   getOutputType(int32_t index);
 
   /**
    * @param index which output to get link of
-   * @return the {@link FilterLink} that is outputting from this filter at the given position.
-   * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
+   * @return the FilterLink that is outputting from this filter at the given position.
+   * @throws InvalidArgument if index < 0 || index > #getNumInputs().
    */
   virtual FilterLink*
   getOutputLink(int32_t index);

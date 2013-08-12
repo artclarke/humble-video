@@ -43,13 +43,13 @@
    *
    */ 
   public $javaclassname(long ignore1, boolean ignore2) {
-    super($imclassname.SWIG$javaclassnameUpcast(ignore1), ignore2);
+    super($imclassname.$javaclassname_SWIGUpcast(ignore1), ignore2);
     swigCPtr = ignore1;
   }
   protected $javaclassname(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super($imclassname.SWIG$javaclassnameUpcast(cPtr),
+    super($imclassname.$javaclassname_SWIGUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }
@@ -1266,7 +1266,7 @@ typedef jobject jNioByteArray;
    *   what object requested it. This is used for debugging memory leaks;
    *   it's a marker for the FERRY object (e.g. IPacket) that actually
    *   requested the buffer. If you're not an FERRY object, pass in null here.
-   * @param directByteBuffer A direct {@link java.nio.ByteBuffer} object
+   * @param directByteBuffer A direct java.nio.ByteBuffer object
    *   you want to use for your memory.  This must be a direct object --
    *   non direct objects will result in an JVM-dependent exception
    *   being thrown. 

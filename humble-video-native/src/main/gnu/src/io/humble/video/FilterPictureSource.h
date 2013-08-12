@@ -35,13 +35,13 @@ namespace humble {
 namespace video {
 
 /**
- * A source of {@link MediaPicture} objects for a {@link FilterGraph}.
+ * A source of MediaPicture objects for a FilterGraph.
  */
 class FilterPictureSource : public io::humble::video::FilterSource
 {
 public:
   /**
-   * Adds a picture to this source. NOTE: If you add a picture to a {@link FilterSource}
+   * Adds a picture to this source. NOTE: If you add a picture to a FilterSource
    * be careful with re-using or rewriting the underlying data. Filters will
    * try hard to avoid copying data, so if you change the data out from under
    * them unexpected results can occur.

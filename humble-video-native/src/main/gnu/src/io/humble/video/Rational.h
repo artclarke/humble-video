@@ -210,9 +210,9 @@ namespace io { namespace humble { namespace video
     
     /**
      * Get a new rational that will be set to 0/1.
-     * The rational will not have {@link #init()} called
-     * and hence will be modifiable by {@link #setValue(double)}
-     * until {@link #init()} is called.
+     * The rational will not have #init() called
+     * and hence will be modifiable by #setValue(double)
+     * until #init() is called.
      * @return a rational number object
      */
     static Rational *make();
@@ -309,7 +309,7 @@ namespace io { namespace humble { namespace video
    /**
     * Sets the numerator on this object.
     * <p>
-    * If {@link #isFinalized} is true, then this method is ignored.
+    * If #isFinalized is true, then this method is ignored.
     * </p>
     * 
     * 
@@ -320,7 +320,7 @@ namespace io { namespace humble { namespace video
    /**
     * Sets the denominator on this object.
     * <p>
-    * If {@link #isFinalized} is true, then this method is ignored.
+    * If #isFinalized is true, then this method is ignored.
     * </p>
     * 
     * 
@@ -332,7 +332,7 @@ namespace io { namespace humble { namespace video
     * reducing the double to the closest integer numerator
     * and denominator.
     * <p>
-    * If {@link #isFinalized} is true, then this method is ignored.
+    * If #isFinalized is true, then this method is ignored.
     * </p>
     * 
     * 
@@ -340,14 +340,14 @@ namespace io { namespace humble { namespace video
    virtual void setValue(double value)=0;
 
    /**
-    * An alias for {@link #getDouble()} but matching JavaBean
+    * An alias for #getDouble() but matching JavaBean
     * conventions.
     * 
     */
    virtual double getValue()=0;
 
    /**
-    * Returns true if {@link #init()} has been called and
+    * Returns true if #init() has been called and
     * this object is now considered finalized and immutable.
     * 
     * 
@@ -356,12 +356,12 @@ namespace io { namespace humble { namespace video
    
    /**
     * Marks this object as finalized and immutable.  Any
-    * setters called after the first {@link #init()} call
+    * setters called after the first #init() call
     * will be ignored.
     * <p>
     * Most <code>make</code> methods will call this method
     * automatically, with the exception of the blank factory
-    * method {@link #make()}.
+    * method #make().
     * </p> 
     * 
     */

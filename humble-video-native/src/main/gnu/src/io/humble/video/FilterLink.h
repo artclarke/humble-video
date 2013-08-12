@@ -41,13 +41,13 @@ namespace humble {
 namespace video {
 
 /**
- * A link between two {@link Filter}s in a {@link FilterGraph}.
+ * A link between two Filters in a FilterGraph.
  */
 class FilterLink : public io::humble::ferry::RefCounted
 {
 public:
   /**
-   * Get the {@link FilterGraph} this {@link FilterLink} belongs to.
+   * Get the FilterGraph this FilterLink belongs to.
    */
   virtual FilterGraph* getFilterGraph();
   /**
@@ -61,7 +61,7 @@ public:
   virtual const char* getInputPadName();
 
   /**
-   * @return the input pad type for this link. Should be the same as {@link #getMediaType()}.
+   * @return the input pad type for this link. Should be the same as #getMediaType().
    */
   virtual MediaDescriptor::Type getInputPadType();
 
@@ -74,44 +74,44 @@ public:
    */
   virtual const char* getOutputPadName();
   /**
-   * @return the output pad type for this link. Should be the same as {@link #getMediaType()}.
+   * @return the output pad type for this link. Should be the same as #getMediaType().
    */
   virtual MediaDescriptor::Type getOutputPadType();
 
   /**
-   * @return the {@link MediaDescriptor.Type} for this link.
+   * @return the MediaDescriptor.Type for this link.
    */
   virtual MediaDescriptor::Type getMediaType();
 
   /**
-   * @return width of video agreed between the input filter and output filter if {@link MediaDescriptor.Type} = {@link MediaDescriptor.Type.MEDIA_VIDEO}.
+   * @return width of video agreed between the input filter and output filter if MediaDescriptor.Type = MediaDescriptor.Type.MEDIA_VIDEO.
    */
   virtual int32_t getWidth() { return mCtx->w; };
   /**
-   * @return height of video agreed between the input filter and output filter if {@link MediaDescriptor.Type} = {@link MediaDescriptor.Type.MEDIA_VIDEO}.
+   * @return height of video agreed between the input filter and output filter if MediaDescriptor.Type = MediaDescriptor.Type.MEDIA_VIDEO.
    */
   virtual int32_t getHeight() { return mCtx->h; }
 
   /**
-   * @return pixel format of video agreed between the input filter and output filter if {@link MediaDescriptor.Type} = {@link MediaDescriptor.Type.MEDIA_VIDEO}.
+   * @return pixel format of video agreed between the input filter and output filter if MediaDescriptor.Type = MediaDescriptor.Type.MEDIA_VIDEO.
    */
   virtual PixelFormat::Type getPixelFormat() { return (PixelFormat::Type) mCtx->format; }
   /**
-   * @return pixel aspect ratio of video agreed between the input filter and output filter if {@link MediaDescriptor.Type} = {@link MediaDescriptor.Type.MEDIA_VIDEO}.
+   * @return pixel aspect ratio of video agreed between the input filter and output filter if MediaDescriptor.Type = MediaDescriptor.Type.MEDIA_VIDEO.
    */
   virtual Rational* getPixelAspectRatio();
 
   /**
-   * @return channel layout agreed between the input filter and output filter if {@link MediaDescriptor.Type} = {@link MediaDescriptor.Type.MEDIA_AUDIO}.
+   * @return channel layout agreed between the input filter and output filter if MediaDescriptor.Type = MediaDescriptor.Type.MEDIA_AUDIO.
    */
   virtual AudioChannel::Layout getChannelLayout() { return (AudioChannel::Layout) mCtx->channel_layout; }
   /**
-   * @return sample rate agreed between the input filter and output filter if {@link MediaDescriptor.Type} = {@link MediaDescriptor.Type.MEDIA_AUDIO}.
+   * @return sample rate agreed between the input filter and output filter if MediaDescriptor.Type = MediaDescriptor.Type.MEDIA_AUDIO.
    */
   virtual int32_t getSampleRate() { return mCtx->sample_rate; }
 
   /**
-   * @return sample format agreed between the input filter and output filter if {@link MediaDescriptor.Type} = {@link MediaDescriptor.Type.MEDIA_AUDIO}.
+   * @return sample format agreed between the input filter and output filter if MediaDescriptor.Type = MediaDescriptor.Type.MEDIA_AUDIO.
    */
   virtual AudioFormat::Type getSampleFormat() { return (AudioFormat::Type) mCtx->format; }
 

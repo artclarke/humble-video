@@ -40,16 +40,16 @@ class Encoder : public io::humble::video::Coder
 {
 public:
   /**
-   * Create a {@link Encoder} that will use the given {@link Codec}.
+   * Create a Encoder that will use the given Codec.
    *
-   * @return a {@link Encoder}
+   * @return a Encoder
    * @throws InvalidArgument if codec is null or codec cannot decode.
    */
   static Encoder* make(Codec* codec);
 
   /**
-   * Creates a {@link Encoder} from a given {@link Encoder}
-   * @return a {@link Encoder}
+   * Creates a Encoder from a given Encoder
+   * @return a Encoder
    * @throws InvalidArgument if src is null
    */
   static Encoder* make(Encoder* src);

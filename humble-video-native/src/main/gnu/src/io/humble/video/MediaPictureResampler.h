@@ -32,7 +32,7 @@ namespace io { namespace humble { namespace video
 {
 
 /**
- * Converts {@link MediaPicture} objects of a given width, height and format to a new
+ * Converts MediaPicture objects of a given width, height and format to a new
  * width, height or format.
  */
 class VS_API_HUMBLEVIDEO MediaPictureResampler : public io::humble::video::Configurable
@@ -116,7 +116,7 @@ public:
    * this resampler was constructed.
    *
    * @param out The picture we'll resample to.  Check
-   *     {@link MediaPicture#isComplete()} after the call.
+   *     MediaPicture#isComplete() after the call.
    * @param in The picture we'll resample from.
    *
    * @throws InvalidArgument if in our out does not match the parameters this

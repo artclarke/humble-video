@@ -29,7 +29,7 @@ namespace io { namespace humble { namespace video
  * Maps from int return codes to defined Error values.
  * <p>
  * This class is used to map from Humble Video return codes
- * (for example on {@link IContainer#readNextPacket(IPacket)}
+ * (for example on IContainer#readNextPacket(IPacket)
  * into an enum type if the error is known and a text description.
  * </p><p>
  * WARNING: Do not write code that depends on the integer values
@@ -106,7 +106,7 @@ public:
    * was used to create this Error.
    * 
    * Note that this value can have different meanings on
-   * different operating systems.  Use {@link #getType()}
+   * different operating systems.  Use #getType()
    * instead for programmatic decisions.
    * 
    * @return the native error number.

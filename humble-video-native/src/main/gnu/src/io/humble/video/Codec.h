@@ -77,7 +77,7 @@ private:
 };
 
 /**
- * A profile supported by a {@link Codec}.
+ * A profile supported by a Codec.
  */
 class VS_API_HUMBLEVIDEO CodecProfile : public io::humble::ferry::RefCounted
 {
@@ -757,7 +757,7 @@ public:
   hasCapability(CodecCapability c);
 
   /**
-   * Get a bitmask of the supported {@link CodecCapability} flags.
+   * Get a bitmask of the supported CodecCapability flags.
    */
   virtual int32_t
   getCapabilities();
@@ -888,12 +888,12 @@ public:
   getNumInstalledCodecs();
 
   /**
-   * Get the {@link ICodec} at the given index.
+   * Get the ICodec at the given index.
    *
    * @param index the index in our list
    *
    * @return the codec, or null if index < 0 or index >=
-   *   {@link #getNumInstalledCodecs()}
+   *   #getNumInstalledCodecs()
    */
   static Codec*
   getInstalledCodec(int32_t index);
@@ -912,7 +912,7 @@ public:
    * @param index the index in our list.
    *
    * @return the frame rate, or null if unknown, if index <0 or
-   *   if index >= {@link #getNumSupportedVideoFrameRates()}
+   *   if index >= #getNumSupportedVideoFrameRates()
    */
   virtual Rational*
   getSupportedVideoFrameRate(int32_t index);
@@ -931,9 +931,9 @@ public:
    *
    * @param index the index in our list.
    *
-   * @return the pixel format, or {@link IPixelFormat.Type#NONE} if unknown,
+   * @return the pixel format, or IPixelFormat.Type#NONE if unknown,
    *   if index <0 or
-   *   if index >= {@link #getNumSupportedVideoPixelFormats()}
+   *   if index >= #getNumSupportedVideoPixelFormats()
    */
   virtual PixelFormat::Type
   getSupportedVideoPixelFormat(int32_t index);
@@ -953,7 +953,7 @@ public:
    * @param index the index in our list.
    *
    * @return the sample rate, or 0 if unknown, index < 0 or
-   *   index >= {@link #getNumSupportedAudioSampleRates()}
+   *   index >= #getNumSupportedAudioSampleRates()
    */
   virtual int32_t
   getSupportedAudioSampleRate(int32_t index);
@@ -972,9 +972,9 @@ public:
    *
    * @param index the index in our list.
    *
-   * @return the format, or {@link AudioFormat.Type.SAMPLE_FMT_NONE} if
+   * @return the format, or AudioFormat.Type.SAMPLE_FMT_NONE if
    *   unknown, index < 0 or index >=
-   *   {@link #getNumSupportedAudioSampleFormats()}.
+   *   #getNumSupportedAudioSampleFormats().
    */
   virtual AudioFormat::Type
   getSupportedAudioFormat(int32_t index);
@@ -994,30 +994,30 @@ public:
    *
    * The value returned is a bit flag representing the different
    * types of audio layout this codec can support.  Test the values
-   * by bit-comparing them to the {@link AudioChannel.Layout}
+   * by bit-comparing them to the AudioChannel.Layout
    * enum types.
    *
    * @param index the index
    *
    * @return the channel layout, or 0 if unknown, index < 0 or
-   *   index >= {@link #getNumSupportedAudioChannelLayouts}.
+   *   index >= #getNumSupportedAudioChannelLayouts.
    */
   virtual AudioChannel::Layout
   getSupportedAudioChannelLayout(int32_t index);
 
   /**
-   * Get the number of supported {@link CodecProfile}s this codec
+   * Get the number of supported CodecProfiles this codec
    * supports.
    */
   virtual int32_t
   getNumSupportedProfiles();
 
   /**
-   * Get the supported {@link CodecProfile} at this index.
+   * Get the supported CodecProfile at this index.
    *
    * @param index the index
    * @return A CodecProfile, or null if unknown, index < 0
-   *   or lindex >= {@link #getNumSupportedProfiles}.
+   *   or lindex >= #getNumSupportedProfiles.
    */
   virtual CodecProfile*
   getSupportedProfile(int32_t index);
@@ -1037,7 +1037,7 @@ private:
 };
 
 /**
- * Meta-data that describes a {@link Codec} object.
+ * Meta-data that describes a Codec object.
  */
 class VS_API_HUMBLEVIDEO CodecDescriptor : public io::humble::ferry::RefCounted
 {
@@ -1094,7 +1094,7 @@ public:
     return mDescriptor->long_name;
   }
   /**
-   * A bit mask of {@link Codec.Properties} this codec has.
+   * A bit mask of Codec.Properties this codec has.
    */
   virtual int32_t
   getProperties() {

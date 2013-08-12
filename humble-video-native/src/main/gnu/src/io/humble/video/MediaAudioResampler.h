@@ -37,14 +37,14 @@ namespace humble {
 namespace video {
 
 /**
- * A MediaAudioResampler object resamples {@link MediaAudio} objects from
+ * A MediaAudioResampler object resamples MediaAudio objects from
  * one format/sample-rate/channel-layout to another.
  */
 class MediaAudioResampler : public io::humble::video::Configurable
 {
 public:
   /**
-   * Create a new {@link MediaAudioResampler}.
+   * Create a new MediaAudioResampler.
    */
   static MediaAudioResampler*
   make(
@@ -81,11 +81,11 @@ public:
    */
   virtual AudioFormat::Type getInputFormat();
   /**
-   * Get number of input channels (derived from {@link #getInputLayout()}).
+   * Get number of input channels (derived from #getInputLayout()).
    */
   virtual int32_t getInputChannels();
   /**
-   * Get number of output channels (derived from {@link #getOutputLayout()}).
+   * Get number of output channels (derived from #getOutputLayout()).
    */
   virtual int32_t getOutputChannels();
 

@@ -44,7 +44,7 @@ class FilterType : public io::humble::ferry::RefCounted
   VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(FilterType);
 public:
   /**
-   * Flags that show features different {@link FilterType} object support.
+   * Flags that show features different FilterType object support.
    */
   typedef enum Flag {
     /**
@@ -103,51 +103,51 @@ public:
   virtual const char* getDescription() { return mCtx->description; }
 
   /**
-   * @return bitmask of {@link Flag}s set on this {@link FilterType}.
+   * @return bitmask of Flags set on this FilterType.
    */
   virtual int getFlags() { return mCtx->flags; }
 
   /**
    * @param flag flag to check setting of.
-   * @return is this flag set on the given {@link FilterType}
+   * @return is this flag set on the given FilterType
    */
   virtual bool getFlag(Flag flag) { return mCtx->flags & flag; }
 
   /**
-   * @return number of inputs this {@link FilterType} expects.
+   * @return number of inputs this FilterType expects.
    */
   virtual int32_t getNumInputs();
 
   /**
    * @param index which input to get name of
    * @return the input name
-   * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
+   * @throws InvalidArgument if index < 0 || index > #getNumInputs().
    */
   virtual const char* getInputName(int32_t index);
 
   /**
    * @param index which input to get type of
    * @return the input media type
-   * @throws InvalidArgument if index < 0 || index > {@link #getNumInputs()}.
+   * @throws InvalidArgument if index < 0 || index > #getNumInputs().
    */
   virtual MediaDescriptor::Type getInputType(int32_t index);
 
   /**
-   * @return number of outputs this {@link FilterType} expects.
+   * @return number of outputs this FilterType expects.
    */
   virtual int32_t getNumOutputs();
 
   /**
    * @param index which output to get name of
    * @return the output name
-   * @throws InvalidArgument if index < 0 || index > {@link #getNumOutputs()}.
+   * @throws InvalidArgument if index < 0 || index > #getNumOutputs().
    */
   virtual const char* getOutputName(int32_t index);
 
   /**
    * @param index which output to get type of
    * @return the output media type
-   * @throws InvalidArgument if index < 0 || index > {@link #getNumOutputs()}.
+   * @throws InvalidArgument if index < 0 || index > #getNumOutputs().
    */
   virtual MediaDescriptor::Type getOutputType(int32_t index);
 
@@ -165,10 +165,10 @@ public:
 
   /**
    * @param index the position in the list of installed filters to get. Use
-   *   with {@link #getNumFilters()} to iterate over all the filters installed
+   *   with #getNumFilters() to iterate over all the filters installed
    *   in the system.
    * @return get the filter at the <code>index</code> position in the installed filters.
-   * @throws InvalidArgument if index < 0 || index >= {@link #getNumFilterTypes()}.
+   * @throws InvalidArgument if index < 0 || index >= #getNumFilterTypes().
    */
   static FilterType* getFilterType(int32_t index);
 #ifndef SWIG

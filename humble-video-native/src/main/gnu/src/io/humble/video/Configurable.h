@@ -40,9 +40,9 @@ namespace video {
 /**
  * Methods that implement this class can be configured
  * using setProperty and getProperty methods, and expose
- * {@link IProperty} meta data about their properties.
+ * IProperty meta data about their properties.
  * <p>
- * You can use {@link Configuration#configure(java.util.Properties, Configurable)}
+ * You can use Configuration#configure(java.util.Properties, Configurable)
  * to easily configure these objects from Java properties or
  * from a FFmpeg preset file.
  * </p>
@@ -222,7 +222,7 @@ public:
   getPropertyAsBoolean(const char* name);
 
   /**
-   * Sets all properties in valuesToSet on this {@link Configurable} object.
+   * Sets all properties in valuesToSet on this Configurable object.
    *
    * @param valuesToSet The set of key-value pairs to try to set
    * @param valuesNotFound If non null will contain all key-values pairs in valuesToSet

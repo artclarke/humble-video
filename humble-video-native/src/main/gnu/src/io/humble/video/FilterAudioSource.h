@@ -34,14 +34,14 @@ namespace humble {
 namespace video {
 
 /**
- * A source of {@link MediaAudio} objects for a {@link FilterGraph}.
+ * A source of MediaAudio objects for a FilterGraph.
  */
 class FilterAudioSource : public io::humble::video::FilterSource
 {
 public:
 
   /**
-   * Adds audio to this source. NOTE: If you had audio to a {@link FilterSource}
+   * Adds audio to this source. NOTE: If you had audio to a FilterSource
    * be careful with re-using or rewriting the underlying data. Filters will
    * try hard to avoid copying data, so if you change the data out from under
    * them unexpected results can occur.

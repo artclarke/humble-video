@@ -328,7 +328,7 @@
    * Internal Only.
    */
   protected $javaclassname(long cPtr, boolean cMemoryOwn) {
-    super($imclassname.SWIG$javaclassnameUpcast(cPtr), cMemoryOwn);
+    super($imclassname.$javaclassname_SWIGUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
   
@@ -338,7 +338,7 @@
   protected $javaclassname(long cPtr, boolean cMemoryOwn,
       java.util.concurrent.atomic.AtomicLong ref)
   {
-    super($imclassname.SWIG$javaclassnameUpcast(cPtr),
+    super($imclassname.$javaclassname_SWIGUpcast(cPtr),
      cMemoryOwn, ref);
     swigCPtr = cPtr;
   }

@@ -40,7 +40,7 @@ namespace io
       {
       public:
         /**
-         * A series of flags that different {@link ContainerFormat}s and their subclasses
+         * A series of flags that different ContainerFormats and their subclasses
          * can support.
          */
         typedef enum Flags
@@ -120,7 +120,7 @@ namespace io
         /**
          * Flags that tell you what capabilities this format supports.
          *
-         * @return a bitmask of {@link Flags}
+         * @return a bitmask of Flags
          */
         virtual int32_t
         getFlags()=0;
@@ -134,15 +134,15 @@ namespace io
          * Get the Codec.ID for the n'th codec supported by this container.
          *
          * @param n The n'th codec supported by this codec. Lower n are higher priority.
-         *   n must be < {@link #getNumSupportedCodecs()}
-         * @return the {@link Codec.ID} at the n'th slot, or {@link Codec.ID.CODEC_ID_NONE} if none.
+         *   n must be < #getNumSupportedCodecs()
+         * @return the Codec.ID at the n'th slot, or Codec.ID.CODEC_ID_NONE if none.
          */
         virtual Codec::ID getSupportedCodecId(int32_t n) = 0;
         /**
          * Get the 32-bit Codec Tag for the n'th codec supported by this container.
          *
          * @param n The n'th codec supported by this codec. Lower n are higher priority.
-         *   n must be < {@link #getNumSupportedCodecs()}
+         *   n must be < #getNumSupportedCodecs()
          * @return the codec tag at the n'th slot, or 0 if none.
          */
         virtual uint32_t getSupportedCodecTag(int32_t n) = 0;
@@ -157,8 +157,8 @@ namespace io
          * Get the Codec.ID for the n'th codec supported by this container.
          *
          * @param n The n'th codec supported by this codec. Lower n are higher priority.
-         *   n must be < {@link #getNumSupportedCodecs()}
-         * @return the {@link Codec.ID} at the n'th slot, or {@link Codec.ID.CODEC_ID_NONE} if none.
+         *   n must be < #getNumSupportedCodecs()
+         * @return the Codec.ID at the n'th slot, or Codec.ID.CODEC_ID_NONE if none.
          */
         static Codec::ID getSupportedCodecId(const struct AVCodecTag * const * tags, int32_t n);
 
@@ -166,7 +166,7 @@ namespace io
          * Get the 32-bit Codec Tag for the n'th codec supported by this container.
          *
          * @param n The n'th codec supported by this codec. Lower n are higher priority.
-         *   n must be < {@link #getNumSupportedCodecs()}
+         *   n must be < #getNumSupportedCodecs()
          * @return the codec tag at the n'th slot, or 0 if none.
          */
         static uint32_t getSupportedCodecTag(const struct AVCodecTag * const * tags, int32_t n);

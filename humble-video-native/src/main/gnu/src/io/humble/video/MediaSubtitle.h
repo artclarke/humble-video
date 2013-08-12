@@ -61,12 +61,12 @@ public:
   virtual uint16_t getFormat() { return mCtx->format; }
 
   /**
-   * Get the start display time in ms, relative to the {@link #getTimeStamp()}.
+   * Get the start display time in ms, relative to the #getTimeStamp().
    */
   virtual int64_t getStartDisplayTime() { return mCtx->start_display_time; }
 
   /**
-   * Get the end display time in ms, relative to {@link #getTimeStamp()}.
+   * Get the end display time in ms, relative to #getTimeStamp().
    */
   virtual int64_t getEndDisplayTime() { return mCtx->end_display_time; }
   /** Get the number of rectangles this subtitle draws */

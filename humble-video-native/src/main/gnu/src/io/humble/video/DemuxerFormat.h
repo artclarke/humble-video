@@ -65,7 +65,7 @@ public:
   /**
    * Flags that tell you what capabilities this format supports.
    *
-   * @return a bitmask of {@link Flags}
+   * @return a bitmask of Flags
    */
   virtual int32_t
   getFlags()
@@ -84,8 +84,8 @@ public:
    * Get the CodecId for the n'th codec supported by this container.
    *
    * @param n The n'th codec supported by this codec. Lower n are higher priority.
-   *   n must be < {@link #getNumSupportedCodecs()}
-   * @return the {@link CodecId} at the n'th slot, or {@link CodecId.ID_NONE} if none.
+   *   n must be < #getNumSupportedCodecs()
+   * @return the CodecId at the n'th slot, or CodecId.ID_NONE if none.
    */
   virtual Codec::ID
   getSupportedCodecId(int32_t n)
@@ -96,7 +96,7 @@ public:
    * Get the 32-bit Codec Tag for the n'th codec supported by this container.
    *
    * @param n The n'th codec supported by this codec. Lower n are higher priority.
-   *   n must be < {@link #getNumSupportedCodecs()}
+   *   n must be < #getNumSupportedCodecs()
    * @return the codec tag at the n'th slot, or 0 if none.
    */
   virtual uint32_t
@@ -105,14 +105,14 @@ public:
     return ContainerFormat::getSupportedCodecTag(mFormat->codec_tag, n);
   }
   /**
-   * Find {@link DemuxerFormat} based on the short name of the input format.
-   * @return An {@link DemuxerFormat} or null if none found.
+   * Find DemuxerFormat based on the short name of the input format.
+   * @return An DemuxerFormat or null if none found.
    */
   static
   DemuxerFormat *findFormat(const char *shortName);
 
   /**
-   * Get the number of {@link DemuxerFormat}s this install can demultiplex (read)
+   * Get the number of DemuxerFormats this install can demultiplex (read)
    * from.
    *
    * @return the number of formats
@@ -120,12 +120,12 @@ public:
   static int32_t getNumFormats();
 
   /**
-   * Return an object for the {@link DemuxerFormats} at the given index.
+   * Return an object for the DemuxerFormats at the given index.
    *
    * @param index an index for the format list we maintain
    *
    * @return a format object for that input or null if
-   *   unknown, index < 0 or index >= {@link #getNumInstalledInputFormats()}
+   *   unknown, index < 0 or index >= #getNumInstalledInputFormats()
    */
   static DemuxerFormat* getFormat(int32_t index);
 

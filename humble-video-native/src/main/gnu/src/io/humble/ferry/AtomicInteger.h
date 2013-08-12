@@ -39,7 +39,7 @@ namespace io { namespace humble { namespace ferry {
  * is no current guarantee of Atomicity.
  * </p><p>
  * The object just forwards to the Java object:
- * {@link java.util.concurrent.atomic.AtomicInteger}
+ * java.util.concurrent.atomic.AtomicInteger
  * </p>
  */
 class VS_API_FERRY AtomicInteger

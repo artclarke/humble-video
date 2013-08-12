@@ -36,11 +36,11 @@ namespace humble {
 namespace video {
 
 /**
- * An object that either converts {@link MediaRaw} objects into {@link MediaEncoded}
- * objects (called an {@link Encoder}), or converts in the reverse direction (called
- * a {@link Decoder}).
+ * An object that either converts MediaRaw objects into MediaEncoded
+ * objects (called an Encoder), or converts in the reverse direction (called
+ * a Decoder).
  *
- * Although this object might seem very sparse, use the methods on {@link Configurable}
+ * Although this object might seem very sparse, use the methods on Configurable
  * to see the vast array of options that can be get/set on it.
  */
 class VS_API_HUMBLEVIDEO Coder : public io::humble::video::Configurable

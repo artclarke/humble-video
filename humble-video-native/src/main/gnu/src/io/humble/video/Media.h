@@ -30,7 +30,7 @@
 namespace io { namespace humble { namespace video {
 
 /**
- * The parent class of all media objects than can be gotten from or added to a {@link Stream}.
+ * The parent class of all media objects than can be gotten from or added to a Stream.
  */
 class VS_API_HUMBLEVIDEO Media: public io::humble::ferry::RefCounted
 {

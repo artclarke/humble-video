@@ -29,8 +29,8 @@ namespace humble {
 namespace video {
 
 /**
- * A packet of data that was read from a {@link Source} or
- * will be written to a {@link Sink}.
+ * A packet of data that was read from a Source or
+ * will be written to a Sink.
  */
 class VS_API_HUMBLEVIDEO MediaPacket : public io::humble::video::MediaEncoded
 {
@@ -144,7 +144,7 @@ public:
   } SideDataType;
 
   /**
-   * Create a new {@link Packet}
+   * Create a new Packet
    */
   static MediaPacket*
   make();
@@ -153,8 +153,8 @@ public:
    * Allocate a new packet that wraps an existing Buffer.
    *
    * NOTE: At least 16 bytes of the passed in buffer will be used
-   * for header information, so the resulting {@link Packet.getSize() }
-   * will be smaller than {@link Buffer.getBufferSize() }.
+   * for header information, so the resulting Packet.getSize() 
+   * will be smaller than Buffer.getBufferSize() .
    *
    * @param buffer The Buffer to wrap.
    * @return a new packet or null on error.
@@ -165,8 +165,8 @@ public:
   /**
    * Allocate a new packet wrapping the existing contents of
    * a passed in packet.  Callers can then modify
-   * {@link #getPts()},
-   * {@link #getDts()} and other get/set methods without
+   * #getPts(),
+   * #getDts() and other get/set methods without
    * modifying the original packet.
    *
    * @param packet Packet to reuse buffer from and to
@@ -219,15 +219,15 @@ public:
    *
    * @param n The n'th item to get.
    * @return the data, or null if none found
-   * @throws InvalidArgument if n < 0 || n >= {@link #getNumSideDataElems()}
+   * @throws InvalidArgument if n < 0 || n >= #getNumSideDataElems()
    */
   virtual io::humble::ferry::Buffer* getSideData(int32_t n)=0;
   /**
    * Get the n'th item of SideData.
    *
    * @param n The n'th item to get.
-   * @return the data, or {@link SideDataType.DATA_UNKNOWN} if none found
-   * @throws InvalidArgument if n < 0 || n >= {@link #getNumSideDataElems()}
+   * @return the data, or SideDataType.DATA_UNKNOWN if none found
+   * @throws InvalidArgument if n < 0 || n >= #getNumSideDataElems()
    */
   virtual SideDataType getSideDataType(int32_t n) = 0;
 
@@ -236,7 +236,7 @@ public:
    *
    * This is the time at which the payload for this packet should
    * be <strong>presented</strong> to the user, in units of
-   * {@link #getTimeBase()}, relative to the start of stream.
+   * #getTimeBase(), relative to the start of stream.
    *
    * @return Get the Presentation Timestamp for this packet.
    */
@@ -258,7 +258,7 @@ public:
    * <p>
    * This is the time at which the payload for this packet should
    * be <strong>decompressed</strong>, in units of
-   * {@link #getTimeBase()}, relative to the start of stream.
+   * #getTimeBase(), relative to the start of stream.
    * </p>
    * <p>
    * Some media codecs can require packets from the &quot;future&quot; to
@@ -322,7 +322,7 @@ public:
   isKeyPacket()=0;
 
   /**
-   * Return the duration of this packet, in units of {@link #getTimeBase()}
+   * Return the duration of this packet, in units of #getTimeBase()
    * @return Duration of this packet, in same time-base as the PTS.
    */
   virtual int64_t
@@ -355,7 +355,7 @@ public:
   /**
    * Set the stream index for this packet.
    *
-   * @param streamIndex The stream index, as determined from the {@link IContainer} this packet will be written to.
+   * @param streamIndex The stream index, as determined from the IContainer this packet will be written to.
    */
   virtual void
   setStreamIndex(int32_t streamIndex)=0;
@@ -377,13 +377,13 @@ public:
   setPosition(int64_t position)=0;
 
   /**
-   * Time difference in {@link IStream#getTimeBase()} units
+   * Time difference in IStream#getTimeBase() units
    * from the presentation time stamp of this
    * packet to the point at which the output from the decoder has converged
    * independent from the availability of previous frames. That is, the
    * frames are virtually identical no matter if decoding started from
    * the very first frame or from this keyframe.
-   * Is {@link Global#NO_PTS} if unknown.
+   * Is Global#NO_PTS if unknown.
    * This field is not the display duration of the current packet.
    * <p>
    * The purpose of this field is to allow seeking in streams that have no

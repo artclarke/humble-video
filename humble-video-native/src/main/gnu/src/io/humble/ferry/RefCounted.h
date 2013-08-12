@@ -55,7 +55,7 @@ namespace io { namespace humble { namespace ferry {
      * <p>
      * This method is called internally by Ferry in Java, and you should
      * not call it without knowing what you are doing.  But if you do
-     * call it, make sure you call {@link #release()} once for each call
+     * call it, make sure you call #release() once for each call
      * you make to this method.
      * </p>
      * @return The refcount after the acquire.  Note due to multi-threaded issues, you should not rely on this value,
@@ -71,8 +71,8 @@ namespace io { namespace humble { namespace ferry {
      * <p>
      * This method is called internally by Ferry in Java, and you should
      * not call it without knowing what you are doing.  But if you do
-     * call it, make sure you had previously called {@link #acquire()} once for each call
-     * to {@link #release()} you make.
+     * call it, make sure you had previously called #acquire() once for each call
+     * to #release() you make.
      * </p>
      * @return The ref count after the release.  Note due to multi-threaded issues, you should not rely on this value,
      * as it may change before the method returns to you.

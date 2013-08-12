@@ -33,7 +33,7 @@ namespace humble {
 namespace video {
 
 /**
- * A source of {@link MediaRaw} objects for a {@link FilterGraph}.
+ * A source of MediaRaw objects for a FilterGraph.
  */
 
 class FilterSource : public io::humble::video::FilterEndPoint

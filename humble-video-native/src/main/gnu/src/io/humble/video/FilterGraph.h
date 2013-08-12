@@ -54,7 +54,7 @@ public:
   typedef enum State {
     /** Initialized but not yet opened. Properties and graph strings may still be set. */
     STATE_INITED,
-    /** Opened. Properites and graphs can no longer be set, but {@link MediaRaw} objects
+    /** Opened. Properites and graphs can no longer be set, but MediaRaw objects
      * can be processed.
      */
     STATE_OPENED,
@@ -72,7 +72,7 @@ public:
   } AutoConvertFlag;
 
   /**
-   * Creates a new {@link FilterGraph}.
+   * Creates a new FilterGraph.
    */
   static FilterGraph* make();
 
@@ -88,7 +88,7 @@ public:
   virtual Filter* getFilter(const char* name);
 
   /**
-   * Add a {@link FilterAudioSource}.
+   * Add a FilterAudioSource.
    * @param name the name; must be unique in graph
    * @param timeBase timebase of frames that will be input. If null 1/sampleRate is assumed.
    * @param sampleRate the audio sample rate
@@ -108,12 +108,12 @@ public:
   );
 
   /**
-   * Add a {@link FilterPictureSource}.
+   * Add a FilterPictureSource.
    * @param name the name; must be unique in graph
-   * @param width the width in pixels of {@link MediaPicture} objects that will be added to this source.
-   * @param height the height in pixels  of {@link MediaPicture} objects that will be added to this source.
+   * @param width the width in pixels of MediaPicture objects that will be added to this source.
+   * @param height the height in pixels  of MediaPicture objects that will be added to this source.
    * @param format the pixel format
-   * @param timeBase timebase of frames that will be input. If null, 1/{@link Global.DEFAULT_PTS_PER_SECOND} is assumed.
+   * @param timeBase timebase of frames that will be input. If null, 1/Global.DEFAULT_PTS_PER_SECOND is assumed.
    * @param pixelAspectRatio pixel aspect ratio. If null, 1/1 is assumed.
    *
    * @return The FilterSource that was added.
@@ -128,7 +128,7 @@ public:
       Rational* pixelAspectRatio);
 
   /**
-   * Add a {@link FilterAudioSink}.
+   * Add a FilterAudioSink.
    * @param name the name; must be unique in graph
    * @param sampleRate the audio sample rate
    * @param channelLaout the channel layout
@@ -145,7 +145,7 @@ public:
    );
 
   /**
-   * Add a {@link FilterPictureSink}.
+   * Add a FilterPictureSink.
    * @param name the name; must be unique in graph
    * @param format the pixel format desired of pictures taken from this sink.
    * @return The FilterPictureSink that was added.
@@ -161,37 +161,37 @@ protected:
 public:
 
   /**
-   * @return number of {@link FilterSource} added so far.
+   * @return number of FilterSource added so far.
    */
   virtual int32_t getNumSources();
 
   /**
-   * @param index The n'th of {@link #getNumSoruces()} {@link FilterSource}s attached to this {@link FilterGraph}.
-   * @return the {@link FilterSource}
-   * @throws InvalidArgument if index < 0 || index >= {@link #getNumSources()}
+   * @param index The n'th of #getNumSoruces() FilterSources attached to this FilterGraph.
+   * @return the FilterSource
+   * @throws InvalidArgument if index < 0 || index >= #getNumSources()
    */
   virtual FilterSource* getSource(int32_t index);
 
   /**
-   * @param name unique name of a {@link FilterSource} in this {@link FilterGraph}. Should have been added with {@link #addSource(FilterSource,String)}.
+   * @param name unique name of a FilterSource in this FilterGraph. Should have been added with #addSource(FilterSource,String).
    * @throws PropertyNotFoundException if not in graph.
    */
   virtual FilterSource* getSource(const char* name);
 
   /**
-   * @return number of {@link FilterSink} added so far.
+   * @return number of FilterSink added so far.
    */
   virtual int32_t getNumSinks();
 
   /**
-   * @param index The n'th of {@link #getNumSoruces()} {@link FilterSink}s attached to this {@link FilterGraph}.
-   * @return the {@link FilterSink}
-   * @throws InvalidArgument if index < 0 || index >= {@link #getNumSinks()}
+   * @param index The n'th of #getNumSoruces() FilterSinks attached to this FilterGraph.
+   * @return the FilterSink
+   * @throws InvalidArgument if index < 0 || index >= #getNumSinks()
    */
   virtual FilterSink* getSink(int32_t index);
 
   /**
-   * @param name unique name of a {@link FilterSink} in this {@link FilterGraph}. Should have been added with {@link #addSink(FilterSink,String)}.
+   * @param name unique name of a FilterSink in this FilterGraph. Should have been added with #addSink(FilterSink,String).
    * @throws PropertyNotFoundException if not in graph.
    */
   virtual FilterSink* getSink(const char* name);
@@ -201,12 +201,12 @@ public:
    * different filters require (rather than require the user to construct
    * a graph with all filters sets correctly).
    *
-   * @param value whether to auto-convert with {@link MediaPictureResampler} or {@link MediaAudioResampler} objects.
+   * @param value whether to auto-convert with MediaPictureResampler or MediaAudioResampler objects.
    */
   virtual void setAutoConvert(AutoConvertFlag value);
 
   /**
-   * @return does this graph auto convert {@link MediaPicture} and {@link MediaRaw} objects to different
+   * @return does this graph auto convert MediaPicture and MediaRaw objects to different
    * dimensions/sample-rates/channels/etc. when
    * pulling them through the graph.
    */
@@ -214,13 +214,13 @@ public:
 
   /**
    * Add a graph described by a string to a graph. For any Sinks or Sources
-   * the caller must have called {@link #addSource} or {@link #addSink} before
+   * the caller must have called #addSource or #addSink before
    * this call.
    *
    * @param filterDescription The filter string to be parsed, in FFmpeg libavfilter format.
    * @throws RuntimeException if <b>any inputs or outputs</b> are open (i.e. each filter
    *   in the graph must either point to another filter on all inputs or outputs, or point to
-   *   a {@link FilterSink} or {@link FilterSource} when done).
+   *   a FilterSink or FilterSource when done).
    */
   virtual void open(const char* filterDescription);
 
@@ -234,7 +234,7 @@ public:
    * @param command the command to send, for handling simplicity all commands must be alphanumeric only
    * @param arguments the argument for the command
    * @returns a response form the command.
-   * @throws RuntimeException on error or {@link PropertyNotFoundException} for unsupported
+   * @throws RuntimeException on error or PropertyNotFoundException for unsupported
    *   commands.
    */
 #ifdef SWIG

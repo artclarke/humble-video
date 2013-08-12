@@ -33,7 +33,7 @@ namespace humble {
 namespace video {
 
 /**
- * An source or a sink that terminates the end points of a {@link FilterGraph}.
+ * An source or a sink that terminates the end points of a FilterGraph.
  */
 class FilterEndPoint : public io::humble::video::Filter
 {
