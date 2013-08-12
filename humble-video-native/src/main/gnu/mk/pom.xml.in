@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.humble</groupId>
-  <artifactId>@VS_PROJECT_NAME@-arch-@build@</artifactId>
+  <artifactId>@VS_PROJECT_NAME@-arch-@host@</artifactId>
   <version>@LIB_MAJOR_VERSION@.@LIB_MINOR_VERSION@-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>@VS_PROJECT_NAME@-arch-@build@</name>
+  <name>@VS_PROJECT_NAME@-arch-@host@</name>
   <url>http://www.humble.io</url>
 
   <properties>
@@ -34,7 +34,7 @@
               <Humble-Native-App>@VS_PROJECT_NAME@</Humble-Native-App>
               <Humble-Native-Root>.</Humble-Native-Root>
               <Humble-Native-Paths>.</Humble-Native-Paths>
-              <Humble-Native-Bundles>@build@</Humble-Native-Bundles>
+              <Humble-Native-Bundles>@host@</Humble-Native-Bundles>
             </manifestEntries>
           </archive>
         </configuration>
