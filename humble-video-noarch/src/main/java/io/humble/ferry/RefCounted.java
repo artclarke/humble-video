@@ -7,6 +7,15 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+/**
+ * Parent of all Ferry objects -- it mains reference counts<br>
+ * in native code.<br>
+ * <p><br>
+ * RefCounted objects cannot be made with new.  They must be<br>
+ * constructed with special factory methods, usually called<br>
+ * make(...).<br>
+ * </p>
+ */
 
 public class RefCounted {
   // JNIHelper.swg: Start generated code
@@ -178,14 +187,58 @@ public class RefCounted {
   
  
  
+/**
+ * Internal Only.  <strong>DO NOT USE FROM JAVA</strong>.<br>
+ * <p><br>
+ * Acquire a reference to this object.<br>
+ * This increments the native internal ref count in native code by +1.  <br>
+ *  </p><br>
+ * <p><br>
+ * This method is called internally by Ferry in Java, and you should<br>
+ * not call it without knowing what you are doing.  But if you do<br>
+ * call it, make sure you call #release() once for each call<br>
+ * you make to this method.<br>
+ * </p><br>
+ * @return The refcount after the acquire.  Note due to multi-threaded issues, you should not rely on this value,<br>
+ * as it may change before the method returns to you.
+ */
   protected int acquire() {
     return FerryJNI.RefCounted_acquire(swigCPtr, this);
   }
 
+/**
+ * Internal Only.  <strong>DO NOT USE FROM JAVA</strong>.<br>
+ * <p><br>
+ * This decrements the native internal ref count by -1; the object is destroyed if its ref count reaches zero.<br>
+ * </p><br>
+ * <p><br>
+ * This method is called internally by Ferry in Java, and you should<br>
+ * not call it without knowing what you are doing.  But if you do<br>
+ * call it, make sure you had previously called #acquire() once for each call<br>
+ * to #release() you make.<br>
+ * </p><br>
+ * @return The ref count after the release.  Note due to multi-threaded issues, you should not rely on this value,<br>
+ * as it may change before the method returns to you.
+ */
   protected int release() {
     return FerryJNI.RefCounted_release(swigCPtr, this);
   }
 
+/**
+ * Return the current reference count on this object.<br>
+ * <br>
+ * The number returned represents the value at the instant<br>
+ * the message was called, and the value can change even<br>
+ * before this method returns.  Callers are advised not to<br>
+ * depend on the value of this except to check that<br>
+ * the value == 1.<br>
+ * <p><br>
+ * If the value returned is one, and you know you have a valid<br>
+ * reference to that object, then congratulations; you are the<br>
+ * only person referencing that object.<br>
+ * </p><br>
+ * @return The current ref count.
+ */
   private int getCurrentNativeRefCount() {
     return FerryJNI.RefCounted_getCurrentNativeRefCount(swigCPtr, this);
   }

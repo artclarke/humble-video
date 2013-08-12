@@ -7,6 +7,26 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+/**
+ * Allows Java code to get data from a native buffers, and optionally modify native memory directly.<br>
+ * <p> <br>
+ * When accessing from Java, you can copy in and<br>
+ * out ranges of buffers.  You can do this by-copy<br>
+ * (which is safer but a little slower) or by-reference<br>
+ * where you <b>directly access underlying C++/native<br>
+ * memory from Java</b>.  Take special care if you decide<br>
+ * that native access is required.<br>
+ * </p><br>
+ * <p><br>
+ * When accessing from C++, you get direct access to<br>
+ * the underlying buffer.<br>
+ * </p><br>
+ * <p><br>
+ * To make an Buffer object that is not a Humble internal object,<br>
+ * pass in null for the RefCounted parameter.<br>
+ * <br>
+ * </p>
+ */
 
 public class Buffer extends RefCounted {
   // Buffer.swg: Start generated code
@@ -1065,31 +1085,90 @@ public class Buffer extends RefCounted {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // Buffer.swg
 
+/**
+ * Get the current maximum number of bytes that can<br>
+ * be safely placed in this buffer.<br>
+ * <br>
+ * @return Maximum number of bytes this buffer can manage.
+ */
   public int getBufferSize() {
     return FerryJNI.Buffer_getBufferSize(swigCPtr, this);
   }
 
+/**
+ * Allocate a new buffer of at least bufferSize.<br>
+ * <br>
+ * @param requestor An optional value telling the Buffer class what object requested it.  This is used for debugging memory leaks; it's a marker for the FERRY object (e.g. IPacket) that actually requested the buffer.  If you're not an FERRY object, pass in null here.<br>
+ * @param bufferSize The minimum buffer size you're requesting in bytes; a buffer with a larger size may be returned.<br>
+ * <br>
+ * @return A new buffer, or null on error.
+ */
   public static Buffer make(RefCounted requestor, int bufferSize) {
     long cPtr = FerryJNI.Buffer_make__SWIG_0(RefCounted.getCPtr(requestor), requestor, bufferSize);
     return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
+/**
+ * Get the type this buffer was created as.<br>
+ * <p><br>
+ * A type is really just a hint.  Like<br>
+ * java.nio.ByteBuffer objects,<br>
+ * Buffer objects can be cast to and from any type.<br>
+ * </p><br>
+ * @return the type  
+ */
   public Buffer.Type getType() {
     return Buffer.Type.swigToEnum(FerryJNI.Buffer_getType(swigCPtr, this));
   }
 
+/**
+ * Reset the buffer type to a new type.<br>
+ * <p><br>
+ * This method does not do any data conversion, it<br>
+ * just changes the reported type (so changing from<br>
+ * Type#BUFFER_UINT8 to Type#BUFFER_SINT16<br>
+ * is really just a "cast" operation).<br>
+ * </p><br>
+ * @param type the type to set to. 
+ */
   public void setType(Buffer.Type type) {
     FerryJNI.Buffer_setType(swigCPtr, this, type.swigValue());
   }
 
+/**
+ * Returns the size, in bytes, of elements of given Type.<br>
+ * <br>
+ * @return the size in bytes.
+ */
   public static int getTypeSize(Buffer.Type type) {
     return FerryJNI.Buffer_getTypeSize(type.swigValue());
   }
 
+/**
+ * Returns the size, in units of #getType() of<br>
+ * this buffer.<br>
+ * <br>
+ * @return number of items of type #getType() that<br>
+ *   will fit in this buffer.
+ */
   public int getSize() {
     return FerryJNI.Buffer_getSize(swigCPtr, this);
   }
 
+/**
+ * Allocate a new buffer of at least bufferSize.<br>
+ * <br>
+ * @param requestor An optional value telling the Buffer class what object requested it.  This is used for debugging memory leaks; it's a marker for the FERRY object (e.g. IPacket) that actually requested the buffer.  If you're not an FERRY object, pass in null here.<br>
+ * @param type The type of buffer.<br>
+ * @param numElements The minimum number of elements of the specified<br>
+ *                    type you will put in this buffer.<br>
+ * @param zero If true, we will guarantee the buffer contains<br>
+ *             only zeros.  If false, we will not (it is <br>
+ *             faster to not, but then the buffer will have<br>
+ *             garbage-data in it).<br>
+ * <br>
+ * @return A new buffer, or null on error.
+ */
   public static Buffer make(RefCounted requestor, Buffer.Type type, int numElements, boolean zero) {
     long cPtr = FerryJNI.Buffer_make__SWIG_1(RefCounted.getCPtr(requestor), requestor, type.swigValue(), numElements, zero);
     return (cPtr == 0) ? null : new Buffer(cPtr, false);
@@ -1099,20 +1178,82 @@ public class Buffer extends RefCounted {
     return FerryJNI.Buffer_java_getByteBuffer(swigCPtr, this, offset, length);
   }
 
+/**
+ * Returns up to length bytes, starting at offset in the<br>
+ * underlying buffer we're managing.<br>
+ * <p> <br>
+ * This method COPIES the data into the byte array being<br>
+ * returned..<br>
+ * </p><p><br>
+ * If you don't NEED the direct access that getByteBuffer<br>
+ * offers (and most programs can in fact take the performance<br>
+ * hit of the copy), we recommend you use this method.<br>
+ * It's much harder to accidentally leave native memory lying<br>
+ * around waiting for cleanup then.<br>
+ * </p><br>
+ * <br>
+ * @param offset The offset (in bytes) into the buffer managed by this Buffer<br>
+ * @param length The requested length (in bytes) you want to access.  The buffer returned may<br>
+ *   actually be longer than length.<br>
+ * <br>
+ * @return A copy of the data that is in this Buffer, or null<br>
+ *   if error.
+ */
   public byte[] getByteArray(int offset, int length) {
     return FerryJNI.Buffer_getByteArray(swigCPtr, this, offset, length);
   }
 
+/**
+ * Allocate a new Buffer, and copy the data in buffer into<br>
+ * the new Buffer object.<br>
+ * <br>
+ * @param requestor An optional value telling the Buffer class<br>
+ *   what object requested it. This is used for debugging memory leaks;<br>
+ *   it's a marker for the FERRY object (e.g. IPacket) that actually<br>
+ *   requested the buffer. If you're not an FERRY object, pass in null here.<br>
+ * @param buffer A java byte buffer for the data containing the<br>
+ *   data you want to copy.<br>
+ * @param offset The starting offset in buffer where you want<br>
+ *   to start copying.<br>
+ * @param length The total number of bytes you want to copy from buffer.<br>
+ * <br>
+ * @return a new Buffer object with a copy of the data in buffer,<br>
+ *   or null on failure.
+ */
   public static Buffer make(RefCounted requestor, byte[] buffer, int offset, int length) {
     long cPtr = FerryJNI.Buffer_make__SWIG_2(RefCounted.getCPtr(requestor), requestor, buffer, offset, length);
     return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
+/**
+ * Create a new Buffer object that uses the direct byte buffer<br>
+ * passed in by reference (i.e. it directly uses the bytes in<br>
+ * the direct byte buffer).<br>
+ * <br>
+ * @param requestor An optional value telling the Buffer class<br>
+ *   what object requested it. This is used for debugging memory leaks;<br>
+ *   it's a marker for the FERRY object (e.g. IPacket) that actually<br>
+ *   requested the buffer. If you're not an FERRY object, pass in null here.<br>
+ * @param directByteBuffer A direct java.nio.ByteBuffer object<br>
+ *   you want to use for your memory.  This must be a direct object --<br>
+ *   non direct objects will result in an JVM-dependent exception<br>
+ *   being thrown. <br>
+ * @param offset The starting offset in directByteBuffer where you want<br>
+ *   to start copying.<br>
+ * @param length The total number of bytes you want to copy from<br>
+ *   directByteBuffer.<br>
+ * <br>
+ * @return a new Buffer object that is using directByteBuffer<br>
+ *   behind the scenes, or null on failure.
+ */
   public static Buffer make(RefCounted requestor, java.nio.ByteBuffer directByteBuffer, int offset, int length) {
     long cPtr = FerryJNI.Buffer_make__SWIG_3(RefCounted.getCPtr(requestor), requestor, directByteBuffer, offset, length);
     return (cPtr == 0) ? null : new Buffer(cPtr, false);
   }
 
+  /**
+   * Types of data that are in this buffer.
+   */
   public enum Type {
     BUFFER_UINT8,
     BUFFER_SINT8,

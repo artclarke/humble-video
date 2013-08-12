@@ -7,6 +7,19 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+/**
+ * Internal Only.<br>
+ * <p><br>
+ * This object exists so that Native code can get access to <br>
+ * thread safe locking objects if they need it.<br>
+ * </p><p><br>
+ * Implements a blocking Mutually-Exclusive lock<br>
+ * by wrapping a Java lock.<br>
+ * </p><p><br>
+ * If not running inside Java, lock() and unlock()<br>
+ * are NO-OPs.<br>
+ * </p>
+ */
 
 public class Mutex extends RefCounted {
   // JNIHelper.swg: Start generated code

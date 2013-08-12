@@ -7,6 +7,25 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+/**
+ * Internal only.  Atomic Integer represents Integers than can be updated<br>
+ * atomically from native code.<br>
+ * <p><br>
+ * This object is NOT meant to be called from Java (in fact, that'd be stupid<br>
+ * since you'd just be calling from native code back into Java).  It's<br>
+ * here so that native code inside a JVM can have access to portable<br>
+ * thread-safe objects.<br>
+ * </p>  <br>
+ * <p><br>
+ * And that said, this method is really only Atomic if running inside a<br>
+ * Java JVM (or other virtual machine that can provide the functionality).<br>
+ * If running in a standalone C++ program there<br>
+ * is no current guarantee of Atomicity.<br>
+ * </p><p><br>
+ * The object just forwards to the Java object:<br>
+ * java.util.concurrent.atomic.AtomicInteger<br>
+ * </p>
+ */
 
 public class AtomicInteger {
   // JNIHelper.swg: Start generated code
@@ -171,10 +190,21 @@ public class AtomicInteger {
     return FerryJNI.AtomicInteger_addAndGet(swigCPtr, this, arg0);
   }
 
+/**
+ * Compare the current value to expected, and if<br>
+ * they are equal, set the current value to update.<br>
+ * @param expected the value expected<br>
+ * @param update the value to update to<br>
+ * @return true if equal
+ */
   public boolean compareAndSet(int expected, int update) {
     return FerryJNI.AtomicInteger_compareAndSet(swigCPtr, this, expected, update);
   }
 
+/**
+ * @return true if we're actually able to guarantee<br>
+ * atomicity; false if we can't.
+ */
   public boolean isAtomic() {
     return FerryJNI.AtomicInteger_isAtomic(swigCPtr, this);
   }

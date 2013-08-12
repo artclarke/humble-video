@@ -7,6 +7,20 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+/**
+ * Internal Only<br>
+ * <p><br>
+ * C++ wrapper to SLF4J Java Logging frame work.<br>
+ * </p><br>
+ * <p><br>
+ * If not running inside a JVM, then this class<br>
+ * just does a rudimentary printout of log messages<br>
+ * to stderr.<br>
+ * </p><br>
+ * <p><br>
+ * Otherwise, it forwards to Java's SLF4J logging framework.<br>
+ * </p>
+ */
 
 public class Logger {
   // JNIHelper.swg: Start generated code
@@ -127,16 +141,44 @@ public class Logger {
     }
   }
 
+/**
+ * Returns a new Logger object for this loggerName.<br>
+ * <br>
+ * @param aLoggerName A name (no spaces allowed) for this logger.<br>
+ * <br>
+ * @return a New logger for logging; caller must delete when done.
+ */
   public static Logger getLogger(String aLoggerName) {
     long cPtr = FerryJNI.Logger_getLogger(aLoggerName);
     return (cPtr == 0) ? null : new Logger(cPtr, false);
   }
 
+/**
+ * Get a Logger object, but ask the Logger code to<br>
+ * free it up once the JavaVM shuts down.  Use at your<br>
+ * own risk.<br>
+ * <br>
+ * @param aLoggerName A name (no spaces allowed) for this logger.<br>
+ * <br>
+ * @return A new logger for logging; caller must not call delete<br>
+ *  and must not use the logger once the JavaVM (or main) has exited.
+ */
   public static Logger getStaticLogger(String aLoggerName) {
     long cPtr = FerryJNI.Logger_getStaticLogger(aLoggerName);
     return (cPtr == 0) ? null : new Logger(cPtr, false);
   }
 
+/**
+ * Log the message to the logger, using sprintf() format<br>
+ * strings.<br>
+ * <br>
+ * @param filename The filename that is logging, or NULL.<br>
+ * @param lineNo The line number where this log statement is executed from.<br>
+ *  or 0.<br>
+ * @param level Level to log at.<br>
+ * @param format    A format specification string, in sprintf format.<br>
+ * @return if the message was actually logged.
+ */
   public boolean log(String filename, int lineNo, Logger.Level level, String format) {
     return FerryJNI.Logger_log(swigCPtr, this, filename, lineNo, level.swigValue(), format);
   }
@@ -189,6 +231,9 @@ public class Logger {
     return FerryJNI.Logger_getName(swigCPtr, this);
   }
 
+  /**
+   * Different logging levels (noiseness) supported by us.
+   */
   public enum Level {
     LEVEL_ERROR(FerryJNI.Logger_LEVEL_ERROR_get()),
     LEVEL_WARN(FerryJNI.Logger_LEVEL_WARN_get()),

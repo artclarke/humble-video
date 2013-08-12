@@ -7,6 +7,13 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+/**
+ * Internal Only.  This object exists in order for the ferry test<br>
+ * libraries to test the memory management functionality<br>
+ * of the RefCounted class from Java.<br>
+ * <br>
+ * It is NOT part of the public API.
+ */
 
 public class RefCountedTester extends RefCounted {
   // JNIHelper.swg: Start generated code
@@ -113,6 +120,11 @@ public class RefCountedTester extends RefCounted {
     return (cPtr == 0) ? null : new RefCountedTester(cPtr, false);
   }
 
+/**
+ * Acquires a reference to a passed in object,<br>
+ * and returns the new object.  This, when wrapped<br>
+ * by Swig, will be wrapped in a new Java object.
+ */
   public static RefCountedTester make(RefCountedTester objToAcquire) {
     long cPtr = FerryJNI.RefCountedTester_make__SWIG_1(RefCountedTester.getCPtr(objToAcquire), objToAcquire);
     return (cPtr == 0) ? null : new RefCountedTester(cPtr, false);
