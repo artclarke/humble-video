@@ -84,3 +84,6 @@ end
 package "maven" do
   action :upgrade
 end
+package "libpcre3-dev" do
+  action :upgrade
+end
