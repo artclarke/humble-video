@@ -43,7 +43,7 @@
     <resources>
       <!-- Add all the shared objects per OS -->
       <resource>
-        <directory>@prefix@/bin</directory>
+        <directory>target/native/bin</directory>
         <includes>
           <include>**/*.dll</include>
         </includes>
@@ -52,7 +52,7 @@
         </excludes>
       </resource>
       <resource>
-        <directory>@prefix@/lib</directory>
+        <directory>target/native/lib</directory>
         <includes>
           <include>**/*.so</include>
           <include>**/*.dylib</include>
