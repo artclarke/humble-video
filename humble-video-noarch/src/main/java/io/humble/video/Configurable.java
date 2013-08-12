@@ -16,7 +16,6 @@ package io.humble.video;
  * to easily configure these objects from Java properties or<br>
  * from a FFmpeg preset file.<br>
  * </p><br>
- * @see Configuration#configure(SWIGTYPE_p_java_util_Properties,SWIGTYPE_p_Configurable)<br>
  * <br>
  * @author aclarke
  */
