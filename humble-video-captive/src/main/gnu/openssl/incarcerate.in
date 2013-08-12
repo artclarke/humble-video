@@ -14,6 +14,7 @@ OPENSSL_CONFIG=
 # and we only support windows, linux and mac today
 # on the i386 or x86_64 architectures, so it's pretty
 # safe
+OPENSSL_FLAGS=
 case $HOST_OS in
   *cygwin*|*mingw*)
     case $HOST_OS in
@@ -45,6 +46,7 @@ case $HOST_OS in
       ;;
       *)
       OPENSSL_CONFIG=linux-generic32
+      OPENSSL_FLAGS=-m32
       ;;
     esac
   ;;
@@ -64,13 +66,26 @@ fi
 
 # We use the cross-compile setting for openssl but still pass through our
 # flags
+echo CFLAGS="-I@includedir@ @CFLAGS@" \
+LDFLAGS="-L@libdir@ @LDFLAGS@" \
+CPPFLAGS="@CPPFLAGS@" \
+CXXFLAGS="@CXXFLAGS@" \
+ASFLAGS="@ASFLAGS@" \
+PATH="$PATH:@abs_top_builddir@@bindir@@" sh "@abs_builddir@/csrc/Configure" \
+  ${OPENSSL_CONFIG} no-shared zlib -fPIC ${OPENSSL_FLAGS} \
+  --cross-compile-prefix="${CROSS_COMPILE}" \
+  --openssldir=${prefix} \
+  --with-zlib-include="@includedir@" \
+  --with-zlib-lib="@libdir@" \
+  --prefix="${prefix}" 
+
 CFLAGS="-I@includedir@ @CFLAGS@" \
 LDFLAGS="-L@libdir@ @LDFLAGS@" \
 CPPFLAGS="@CPPFLAGS@" \
 CXXFLAGS="@CXXFLAGS@" \
 ASFLAGS="@ASFLAGS@" \
 PATH="$PATH:@abs_top_builddir@@bindir@@" sh "@abs_builddir@/csrc/Configure" \
-  ${OPENSSL_CONFIG} no-shared zlib -fPIC ${CFLAGS} \
+  ${OPENSSL_CONFIG} no-shared zlib -fPIC ${OPENSSL_FLAGS} \
   --cross-compile-prefix="${CROSS_COMPILE}" \
   --openssldir=${prefix} \
   --with-zlib-include="@includedir@" \

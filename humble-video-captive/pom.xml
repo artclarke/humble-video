@@ -45,7 +45,7 @@
               </arguments>
               <environmentVariables>
                 <HUMBLE_HOME>
-                  ${project.basedir}/../humble-video-stage/target
+                  ${project.basedir}/../humble-video-stage
                 </HUMBLE_HOME>
               </environmentVariables>
               <workingDirectory>

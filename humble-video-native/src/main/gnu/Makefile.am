@@ -172,7 +172,8 @@ EXTRA_DIST= \
   mk/lib
 
 install-exec-hook:
-	@mvn -f pom-@build@.xml install
+	@$(MKDIR_P) $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${host}
+	@cp -f pom-@host@.xml $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${host}/pom.xml
 
 doc: doxygen-doc
 

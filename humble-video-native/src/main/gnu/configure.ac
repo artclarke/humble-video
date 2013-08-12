@@ -389,6 +389,6 @@ AC_CONFIG_FILES([Makefile
                  test/io/humble/ferry/Makefile
                  test/io/humble/video/Makefile
                  test/io/humble/video/customio/Makefile
-                 pom-${build}.xml:mk/pom.xml.in
+                 pom-${host}.xml:mk/pom.xml.in
                  ])
 AC_OUTPUT

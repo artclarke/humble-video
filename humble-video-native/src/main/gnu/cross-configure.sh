@@ -6,7 +6,7 @@ HOST=$( ${DIR}/mk/config.guess )
 
 humble_configure()
 {
-  PREFIX="$1/$2/"
+  PREFIX="$1/humble-video-arch-$2/target/native"
   BUILD=$2
   if [ ! -e ./${cross_os}/Makefile ]; then
     echo "Building ${DIR}/configure in ${PREFIX}"

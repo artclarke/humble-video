@@ -2,10 +2,6 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
   <parent>
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
@@ -13,7 +9,7 @@
     <relativePath>../humble-video-parent/pom.xml</relativePath>
   </parent>
 
-  <version>0.1-SNAPSHOT</version>
+  <artifactId>humble-video-stage</artifactId>
   <packaging>pom</packaging>
 
   <name>humble-video-stage</name>
@@ -21,23 +17,22 @@
 
   <modules>
     <module>
-      humble-video-captive
+      humble-video-arch-x86_64-apple-darwin12
     </module>
     <module>
-      humble-video-native
+      humble-video-arch-i686-apple-darwin12
     </module>
     <module>
-      humble-video-arch-all
+      humble-video-arch-x86_64-w64-mingw32
     </module>
     <module>
-      humble-video-noarch
+      humble-video-arch-i686-w64-mingw32
     </module>
     <module>
-      humble-video-all
+      humble-video-arch-i686-pc-linux-gnu6
     </module>
     <module>
-      humble-video-test
+      humble-video-arch-x86_64-pc-linux-gnu6 
     </module>
   </modules>
-
 </project>

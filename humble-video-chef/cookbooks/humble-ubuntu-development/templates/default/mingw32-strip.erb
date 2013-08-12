@@ -2,10 +2,13 @@
 # A wrapper for the mingw32 strip methods that first copies the file being
 # stripped to a directory guaranteed to NOT be on a virtual shared box.
 # This works around: https://www.virtualbox.org/ticket/8463
-for f in $* ; do
- base=$(basename $f)
- cp -f $f /tmp/$base
- <%=@strip%>-orig /tmp/$base
- mv -f /tmp/$base $f
-done
+
+echo "Was asked to do <%=@strip%> on the following arguments, but we ain't no fools and don't do shit for da man:" $*
+
+# for f in $* ; do
+#  base=$(basename $f)
+#  cp -f $f /tmp/$base
+#  <%=@strip%>-orig /tmp/$base
+#  mv -f /tmp/$base $f
+# done
 
