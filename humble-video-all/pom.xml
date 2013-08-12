@@ -17,22 +17,28 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-arch-i686-apple-darwin12</artifactId>
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>
-      <artifactId>humble-video-arch-all</artifactId>
+      <artifactId>humble-video-arch-x86_64-apple-darwin12</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-arch-i686-pc-linux-gnu6</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-arch-x86_64-pc-linux-gnu6</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-arch-i686-w64-mingw32</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-arch-x86_64-w64-mingw32</artifactId>
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>

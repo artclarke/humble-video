@@ -22,6 +22,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-noarch</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>

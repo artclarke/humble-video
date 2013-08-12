@@ -28,9 +28,6 @@
       humble-video-test
     </module>
     <module>
-      humble-video-arch-all
-    </module>
-    <module>
       humble-video-all
     </module>
   </modules>
