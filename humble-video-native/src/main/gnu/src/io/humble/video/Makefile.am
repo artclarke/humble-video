@@ -12,6 +12,7 @@ noinst_LTLIBRARIES = libhumble-video.la
 libhumble_video_la_LIBADD= $(VS_PKG_LIBRARIES)
 
 libhumble_video_la_SOURCES= \
+  Mingw64Fixes.c \
   VideoExceptions.cpp \
   AVBufferSupport.cpp \
   PixelFormat.cpp \

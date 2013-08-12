@@ -28,9 +28,6 @@
 
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/MediaAudio.h>
-extern "C" {
-#include <libswresample/swresample.h>
-}
 
 namespace io {
 namespace humble {

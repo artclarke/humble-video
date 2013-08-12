@@ -46,7 +46,6 @@ namespace video {
  * to easily configure these objects from Java properties or
  * from a FFmpeg preset file.
  * </p>
- * @see Configuration#configure(java.util.Properties, Configurable)
  *
  * @author aclarke
  *

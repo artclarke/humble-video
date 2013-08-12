@@ -249,9 +249,9 @@ public:
     return name;
   }
 protected:
-  AudioChannel();
+  AudioChannel() {};
   virtual
-  ~AudioChannel();
+  ~AudioChannel() {};
 };
 
 /**

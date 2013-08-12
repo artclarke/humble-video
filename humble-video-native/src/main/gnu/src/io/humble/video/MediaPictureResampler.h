@@ -25,9 +25,7 @@
 #include <io/humble/video/PixelFormat.h>
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/MediaPicture.h>
-extern "C" {
-#include <libswscale/swscale.h>
-}
+
 namespace io { namespace humble { namespace video
 {
 
