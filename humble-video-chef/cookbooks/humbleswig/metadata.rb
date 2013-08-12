@@ -1,8 +1,8 @@
-name             "xuggleswig"
+name             "humbleswig"
 maintainer       "Humble Software"
 maintainer_email "art@humble.io"
 license          "All Rights Reserved"
-description      "Installs/Configures xuggleswig"
+description      "Installs/Configures humbleswig"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          "0.0.3"
 
@@ -13,5 +13,5 @@ end
 depends "build-essential"
 depends "git"
 
-recipe "xuggleswig", "Installs xuggleswig."
-recipe "xuggleswig::source", "Installs xuggleswig from source."
+recipe "humbleswig", "Installs humbleswig."
+recipe "humbleswig::source", "Installs humbleswig from source."
