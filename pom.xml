@@ -22,16 +22,16 @@
       humble-video-native
     </module>
     <module>
-      humble-video-arch-all
-    </module>
-    <module>
       humble-video-noarch
     </module>
     <module>
-      humble-video-all
+      humble-video-test
     </module>
     <module>
-      humble-video-test
+      humble-video-arch-all
+    </module>
+    <module>
+      humble-video-all
     </module>
   </modules>
 
