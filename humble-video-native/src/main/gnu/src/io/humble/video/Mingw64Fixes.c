@@ -19,4 +19,10 @@ void __mingw_raise_matherr (int typ, const char *name, double a1, double a2,
   fprintf(stderr, "_matherr(): %s in %s(%g, %g)  (retval=%g)\n", 
 	  typ, name, a1, a2, rslt);
 }
+
+#else
+// Let's have something to make the Gods of GCC warnings happy.
+int VS_NotAFunctionLikelyToEverBeNecessary() {
+  return -1;
+}
 #endif // VS_OS_WINDOWS
