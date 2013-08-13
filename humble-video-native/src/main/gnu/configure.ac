@@ -351,22 +351,13 @@ AC_SUBST([VS_CXXFLAGS])dnl
 AC_SUBST([VS_CPPFLAGS])dnl
 AC_SUBST([VS_LDFLAGS])dnl
 
-VS_FIND_STATIC_LIB([stdc++],
-[VS_LIBSTDCXX="-XCClinker ${VS_LIB}"], [VS_LIBSTDCXX="-XCClinker -lstdc++"])
-VS_FIND_STATIC_LIB([gcc],
-[VS_LIBGCC="-XCClinker ${VS_LIB}"], [])
-
-case $host in
-  *mingw*|*cygwin*)
-  # on windows use the shared library; it'll be there. trust me.
-  VS_LIBSTDCXX="-XCClinker -lstdc++"
-  ;;
-  *)
-  ;;
-esac
+VS_FIND_STATIC_LIB([stdc++], [VS_LIBSTDCXX="-XCClinker ${VS_LIB}"], [VS_LIBSTDCXX="-XCClinker -lstdc++"])
+VS_FIND_STATIC_LIB([gcc], [VS_LIBGCC="-XCClinker ${VS_LIB}"], [VS_LIBGCC="-XCClinker -lgcc"])
+VS_FIND_STATIC_LIB([gcc_eh], [VS_LIBGCC_EH="-XCClinker ${VS_LIB}"], [VS_LIBGCC_EH="-XCClinker -lgcc_eh"])
 
 AC_SUBST([VS_LIBSTDCXX])
 AC_SUBST([VS_LIBGCC])
+AC_SUBST([VS_LIBGCC_EH])
 
 dnl Now, output everything
 AC_CONFIG_SRCDIR([src/io/humble/Humble.h])
