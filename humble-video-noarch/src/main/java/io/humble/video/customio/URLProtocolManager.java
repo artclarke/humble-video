@@ -188,7 +188,7 @@ public class URLProtocolManager
         retval = url.substring(colonIndex+3);
       else {
         colonIndex = url.indexOf(":");
-        if (colonIndex > 0)
+        if (colonIndex > 1) // handle windows drive letters.
         {
           // remove the URL prefix
           retval = url.substring(colonIndex + 1);
