@@ -23,6 +23,43 @@
 
 #include <iostream>
 
+/**
+ * Searches backwards in a string s1 for the substring s2.
+ * From: http://www.noxeos.com/2011/01/29/reverse-string-search/
+ */
+static const char* vs_strrstr(const char* s1, const char* s2) {
+  const char * ss1;
+  const char * sss1;
+  const char * sss2;
+
+  if( !s2 || !*s2)
+      return s1;
+
+  if (!s1 || !*s1)
+    return 0;
+
+  ss1 = s1 + strlen( s1 );
+
+  while( ss1 != s1 )
+  {
+      --ss1;
+
+      for( sss1 = ss1, sss2 = s2; ; )
+      {
+          if( *( sss1++ ) != *( sss2++ ) )
+          {
+              break;
+          }
+          else if ( * sss2 == '\0' )
+          {
+              return ss1;
+          }
+      }
+  }
+
+  return 0;
+}
+
 namespace io { namespace humble { namespace ferry {
   bool Logger :: mInitialized = false;
   bool Logger :: mGlobalIsLogging[5] = { true, true, true, true, true };
@@ -49,11 +86,19 @@ namespace io { namespace humble { namespace ferry {
         bytesWritten += vsnprintf(msgBuf, bufLen, aFormat, ap);
 
         if (aFilename && *aFilename) {
+          // let's advance aFilename past the last /.
+          const char* filename = vs_strrstr(aFilename, "/");
+          if (!filename)
+            filename = aFilename;
+          else
+            // skip over the /
+            ++filename;
+
           bufLen -= bytesWritten;
           msgBuf += bytesWritten;
 
           bytesWritten += snprintf(msgBuf, bufLen, " (%s:%d)",
-              aFilename, lineNo);
+              filename, lineNo);
         }
       }
     }
