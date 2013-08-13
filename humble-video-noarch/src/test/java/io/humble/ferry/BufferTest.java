@@ -211,7 +211,7 @@ public class BufferTest
    * still be accessible even if the Buffer it came from goes out of
    * scope and is collected.
    */
-  @Test(timeout=5000)
+  @Test(timeout=60*1000)
   public void testDirectByteBufferCanBeAccessedAfterBufferDisappears()
   {
     Buffer buf = Buffer.make(null, 1024*1024); // 1 MB
