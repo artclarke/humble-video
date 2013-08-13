@@ -109,8 +109,10 @@ VS_API_HUMBLE_VIDEO_CUSTOMIO jint VS_API_CALL Java_io_humble_video_customio_Ffmp
     try
     {
       handleVal = URLProtocolManager::findHandler(nativeURL, flags, 0);
-      if (!handleVal)
-        throw std::runtime_error("could not find protocol manager for url");
+      if (!handleVal) {
+        std::string message=std::string("could not find protocol manager for: ") + std::string(nativeURL);
+        throw std::runtime_error(message);
+      }
       retval = handleVal->url_open(nativeURL, flags);
       VS_CHECK_INTERRUPT(retval, 1);
     }

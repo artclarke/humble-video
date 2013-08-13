@@ -58,6 +58,7 @@ URLProtocolManager::parseProtocol(
   if (url[proto_len] != ':' && url[proto_len] != ',') {
     return 0;
   }
+  // windows drive letter
   if (url[0] && url[1] == ':') {
     return 0;
   }
