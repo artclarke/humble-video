@@ -40,6 +40,7 @@ public:
   void testAddIO();
   void testFilterVideo();
   void testFilterAudio();
+  void testBadFilterGraph();
 private:
 
   void writePicture(const char* prefix, int32_t* frameNo, io::humble::video::MediaPicture* picture);
