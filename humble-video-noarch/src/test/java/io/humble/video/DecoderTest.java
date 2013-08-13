@@ -8,6 +8,7 @@ import io.humble.video.javaxsound.MediaAudioConverter;
 import io.humble.video.javaxsound.MediaAudioConverterFactory;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -23,7 +24,7 @@ public class DecoderTest {
   @Before
   public void setUp() throws Exception {
     final URL s = this.getClass().getResource("/ucl_h264_aac.mp4");
-    final String f = s.getPath();
+    final String f = new File(s.getPath()).getPath();
     source = Demuxer.make();
     source.open(f, null, false, true, null, null);
     source.queryStreamMetaData();

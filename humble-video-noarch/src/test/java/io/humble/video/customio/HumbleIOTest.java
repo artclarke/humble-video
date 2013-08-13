@@ -28,6 +28,7 @@ import io.humble.video.customio.InputOutputStreamHandler;
 import io.humble.video.customio.ReadableWritableChannelHandler;
 import io.humble.video.customio.URLProtocolManager;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -45,7 +46,7 @@ public class HumbleIOTest extends TestCase
 
   private HumbleIO mFactory = null;
   private IURLProtocolHandler mHandler = null;
-  private final String mSampleFile = this.getClass().getResource("/testfile.flv").getPath();
+  private final String mSampleFile = new File(this.getClass().getResource("/testfile.flv").getPath()).getPath();
   private final String mProtocolString = HumbleIO.DEFAULT_PROTOCOL;
 
   @Before
