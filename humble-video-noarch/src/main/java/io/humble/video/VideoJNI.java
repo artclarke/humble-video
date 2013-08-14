@@ -1105,6 +1105,7 @@ public class VideoJNI {
   public final static native String ContainerFormat_getLongName(long jarg1, ContainerFormat jarg1_);
   public final static native String ContainerFormat_getExtensions(long jarg1, ContainerFormat jarg1_);
   public final static native int ContainerFormat_getFlags(long jarg1, ContainerFormat jarg1_);
+  public final static native boolean ContainerFormat_getFlag(long jarg1, ContainerFormat jarg1_, int jarg2);
   public final static native int ContainerFormat_getNumSupportedCodecs(long jarg1, ContainerFormat jarg1_);
   public final static native int ContainerFormat_getSupportedCodecId(long jarg1, ContainerFormat jarg1_, int jarg2);
   public final static native long ContainerFormat_getSupportedCodecTag(long jarg1, ContainerFormat jarg1_, int jarg2);
@@ -1264,6 +1265,8 @@ public class VideoJNI {
   public final static native void Muxer_open(long jarg1, Muxer jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_) throws java.lang.InterruptedException, java.io.IOException;
   public final static native void Muxer_close(long jarg1, Muxer jarg1_);
   public final static native int Muxer_getNumStreams(long jarg1, Muxer jarg1_) throws java.lang.InterruptedException, java.io.IOException;
+  public final static native void Muxer_setOutputBufferLength(long jarg1, Muxer jarg1_, int jarg2);
+  public final static native int Muxer_getOutputBufferLength(long jarg1, Muxer jarg1_);
   public final static native long Demuxer_make();
   public final static native int Demuxer_getState(long jarg1, Demuxer jarg1_);
   public final static native long Demuxer_getFormat(long jarg1, Demuxer jarg1_);

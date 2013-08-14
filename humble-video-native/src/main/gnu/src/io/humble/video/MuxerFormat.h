@@ -182,11 +182,9 @@ public:
 
 #ifndef SWIG
   virtual AVOutputFormat* getCtx();
-#endif // ! SWIG
-
-protected:
   static MuxerFormat*
   make(AVOutputFormat* format);
+#endif // ! SWIG
 
 private:
   MuxerFormat();

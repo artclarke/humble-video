@@ -170,8 +170,34 @@ public class Muxer extends Container {
     VideoJNI.Muxer_close(swigCPtr, this);
   }
 
+/**
+ * Get the number of streams in this container.
+ */
   public int getNumStreams() throws java.lang.InterruptedException, java.io.IOException {
     return VideoJNI.Muxer_getNumStreams(swigCPtr, this);
+  }
+
+/**
+ * Set the buffer length Humble Video will suggest to FFMPEG for writing output data.<br>
+ * <br>
+ * If called when a Container is open, the call is ignored and -1 is returned.<br>
+ * <br>
+ * @param size The suggested buffer size.<br>
+ * @throws InvalidArgument if size &lt;= 0
+ */
+  public void setOutputBufferLength(int size) {
+    VideoJNI.Muxer_setOutputBufferLength(swigCPtr, this, size);
+  }
+
+/**
+ * Return the output buffer length.<br>
+ * <br>
+ * @return The input buffer length Humble Video told FFMPEG to assume.<br>
+ *   0 means FFMPEG should choose it's own<br>
+ *   size (and it'll probably be 32768).
+ */
+  public int getOutputBufferLength() {
+    return VideoJNI.Muxer_getOutputBufferLength(swigCPtr, this);
   }
 
   /**

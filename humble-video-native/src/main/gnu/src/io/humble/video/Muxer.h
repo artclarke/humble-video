@@ -30,6 +30,14 @@
 #include <io/humble/video/MuxerFormat.h>
 #include <io/humble/video/KeyValueBag.h>
 
+#ifndef SWIG
+#ifdef MUXER_H_
+
+#include <io/humble/video/customio/URLProtocolHandler.h>
+
+#endif
+#endif // ! SWIG
+
 namespace io {
 namespace humble {
 namespace video {
@@ -111,7 +119,31 @@ public:
   virtual void
   close();
 
+  /**
+   * Get the number of streams in this container.
+   */
   int32_t getNumStreams() { return getFormatCtx()->nb_streams; }
+
+  /**
+   * Set the buffer length Humble Video will suggest to FFMPEG for writing output data.
+   *
+   * If called when a Container is open, the call is ignored and -1 is returned.
+   *
+   * @param size The suggested buffer size.
+   * @throws InvalidArgument if size <= 0
+   */
+  virtual void
+  setOutputBufferLength(int32_t size);
+
+  /**
+   * Return the output buffer length.
+   *
+   * @return The input buffer length Humble Video told FFMPEG to assume.
+   *   0 means FFMPEG should choose it's own
+   *   size (and it'll probably be 32768).
+   */
+  virtual int32_t
+  getOutputBufferLength();
 
 protected:
   virtual AVFormatContext* getFormatCtx() { return mCtx; }
@@ -121,7 +153,10 @@ protected:
 private:
   State mState;
   AVFormatContext* mCtx;
+  io::humble::video::customio::URLProtocolHandler* mIOHandler;
+
   io::humble::ferry::RefPointer<MuxerFormat> mFormat;
+  int32_t mBufferLength;
 };
 
 } /* namespace video */

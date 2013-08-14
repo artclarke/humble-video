@@ -35,9 +35,8 @@ MuxerTest::~MuxerTest() {
 void
 MuxerTest::testCreation() {
   RefPointer<Muxer> muxer;
-  RefPointer<MuxerFormat> muxerFormat = MuxerFormat::guessFormat("flv", "foo.flv", "flv");
 
-  muxer = Muxer::make(muxerFormat.value(), 0, 0);
+  muxer = Muxer::make(0, "MuxerTest_testCreation.flv", 0);
 
   muxer->open(0, 0);
 

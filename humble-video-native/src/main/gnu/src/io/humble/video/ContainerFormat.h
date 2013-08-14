@@ -43,7 +43,7 @@ namespace io
          * A series of flags that different ContainerFormats and their subclasses
          * can support.
          */
-        typedef enum Flags
+        typedef enum Flag
         {
           INVALID_FLAG=-1,
 
@@ -98,7 +98,7 @@ namespace io
 
           /** Seeking is based on PTS */
           SEEK_TO_PTS = AVFMT_SEEK_TO_PTS,
-        } Flags;
+        } Flag;
 
         /**
          * Name for format.
@@ -124,6 +124,12 @@ namespace io
          */
         virtual int32_t
         getFlags()=0;
+
+        /**
+         * Find out if the given Flag is set for this ContainerFormat.
+         */
+        virtual bool
+        getFlag(Flag flag) { return getFlags() & flag; }
 
 
         /**

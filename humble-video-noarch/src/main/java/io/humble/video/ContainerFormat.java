@@ -223,6 +223,13 @@ public class ContainerFormat extends RefCounted {
   }
 
 /**
+ * Find out if the given Flag is set for this ContainerFormat.
+ */
+  public boolean getFlag(ContainerFormat.Flag flag) {
+    return VideoJNI.ContainerFormat_getFlag(swigCPtr, this, flag.swigValue());
+  }
+
+/**
  * Get total number of different codecs this container can output.
  */
   protected int getNumSupportedCodecs() {
@@ -255,7 +262,7 @@ public class ContainerFormat extends RefCounted {
    * A series of flags that different ContainerFormats and their subclasses<br>
    * can support.
    */
-  public enum Flags {
+  public enum Flag {
     INVALID_FLAG(VideoJNI.ContainerFormat_INVALID_FLAG_get()),
   /**
    * This format does not use an on-disk file (e.g. a network format)
@@ -331,29 +338,29 @@ public class ContainerFormat extends RefCounted {
       return swigValue;
     }
 
-    public static Flags swigToEnum(int swigValue) {
-      Flags[] swigValues = Flags.class.getEnumConstants();
+    public static Flag swigToEnum(int swigValue) {
+      Flag[] swigValues = Flag.class.getEnumConstants();
       if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
         return swigValues[swigValue];
-      for (Flags swigEnum : swigValues)
+      for (Flag swigEnum : swigValues)
         if (swigEnum.swigValue == swigValue)
           return swigEnum;
-      throw new IllegalArgumentException("No enum " + Flags.class + " with value " + swigValue);
+      throw new IllegalArgumentException("No enum " + Flag.class + " with value " + swigValue);
     }
 
     @SuppressWarnings("unused")
-    private Flags() {
+    private Flag() {
       this.swigValue = SwigNext.next++;
     }
 
     @SuppressWarnings("unused")
-    private Flags(int swigValue) {
+    private Flag(int swigValue) {
       this.swigValue = swigValue;
       SwigNext.next = swigValue+1;
     }
 
     @SuppressWarnings("unused")
-    private Flags(Flags swigEnum) {
+    private Flag(Flag swigEnum) {
       this.swigValue = swigEnum.swigValue;
       SwigNext.next = this.swigValue+1;
     }
