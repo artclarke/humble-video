@@ -75,7 +75,11 @@ inst_checkdir=$(bindir)
 
 # Make sure we set the abs_top_srcdir environment variable so the 
 # tests can auto-find their fixtures
-TESTS=$(check_PROGRAMS)
+TESTS=
+if VS_OS_WINDOWS
+else
+TESTS+=$(check_PROGRAMS)
+endif
 
 FilterGraphTester_SOURCES= \
   FilterGraphTest.cpp \

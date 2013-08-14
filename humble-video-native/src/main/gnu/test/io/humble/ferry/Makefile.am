@@ -11,7 +11,11 @@ check_PROGRAMS=\
   MutexTester \
   BufferTester
 
-TESTS=$(check_PROGRAMS)
+TESTS=
+if VS_OS_WINDOWS
+else
+TESTS+=$(check_PROGRAMS)
+endif
 
 LoggerTester_SOURCES= \
   LoggerTest.cpp \

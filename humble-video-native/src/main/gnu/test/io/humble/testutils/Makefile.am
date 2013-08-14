@@ -6,7 +6,11 @@ VS_TEST=1
 include @top_builddir@/mk/Makefile.global
 
 check_PROGRAMS=TrueTester
-TESTS=$(check_PROGRAMS)
+TESTS=
+if VS_OS_WINDOWS
+else
+TESTS+=$(check_PROGRAMS)
+endif
 
 TrueTester_SOURCES= \
   TrueTest.cpp \

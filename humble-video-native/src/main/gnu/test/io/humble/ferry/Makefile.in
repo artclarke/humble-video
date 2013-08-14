@@ -80,6 +80,7 @@ build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = LoggerTester$(EXEEXT) RefPointerTester$(EXEEXT) \
 	MutexTester$(EXEEXT) BufferTester$(EXEEXT)
+@VS_OS_WINDOWS_FALSE@am__append_1 = $(check_PROGRAMS)
 subdir = test/io/humble/ferry
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mk/depcomp $(noinst_HEADERS) \
@@ -576,7 +577,7 @@ VS_CPP_PATH = io/humble/ferry
 VS_CPP_PACKAGE = io.humble.ferry
 VS_CPP_NAMESPACE = io::humble::ferry
 VS_TEST = 1
-TESTS = $(check_PROGRAMS)
+TESTS = $(am__append_1)
 LoggerTester_SOURCES = \
   LoggerTest.cpp \
   Main.cpp

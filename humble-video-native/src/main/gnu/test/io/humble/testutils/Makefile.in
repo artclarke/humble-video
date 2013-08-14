@@ -79,6 +79,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = TrueTester$(EXEEXT)
+@VS_OS_WINDOWS_FALSE@am__append_1 = $(check_PROGRAMS)
 subdir = test/io/humble/testutils
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mk/depcomp $(noinst_HEADERS) \
@@ -553,7 +554,7 @@ VS_CPP_PATH = io/humble/testutils
 VS_CPP_PACKAGE = io.humble.testutils
 VS_CPP_NAMESPACE = io::humble::testutils
 VS_TEST = 1
-TESTS = $(check_PROGRAMS)
+TESTS = $(am__append_1)
 TrueTester_SOURCES = \
   TrueTest.cpp \
   Main.cpp
