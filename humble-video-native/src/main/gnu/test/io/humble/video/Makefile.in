@@ -85,9 +85,9 @@ check_PROGRAMS = FilterTypeTester$(EXEEXT) FilterGraphTester$(EXEEXT) \
 	IndexEntryTester$(EXEEXT) MediaPacketTester$(EXEEXT) \
 	MediaAudioTester$(EXEEXT) MediaPictureTester$(EXEEXT) \
 	KeyValueBagTester$(EXEEXT) DemuxerTester$(EXEEXT) \
-	DemuxerFormatTester$(EXEEXT) DemuxerStreamTester$(EXEEXT) \
-	MuxerFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
-	RationalTester$(EXEEXT)
+	MuxerTester$(EXEEXT) DemuxerFormatTester$(EXEEXT) \
+	DemuxerStreamTester$(EXEEXT) MuxerFormatTester$(EXEEXT) \
+	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
 @VS_OS_WINDOWS_FALSE@am__append_1 = $(check_PROGRAMS)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -125,7 +125,7 @@ DecoderTester_OBJECTS = $(am_DecoderTester_OBJECTS) \
 DecoderTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_DemuxerFormatTester_OBJECTS = DemuxerFormatTest.$(OBJEXT) \
-	Main.$(OBJEXT)
+	TestData.$(OBJEXT) Main.$(OBJEXT)
 nodist_DemuxerFormatTester_OBJECTS =  \
 	DemuxerFormatTest_CXXRunner.$(OBJEXT)
 DemuxerFormatTester_OBJECTS = $(am_DemuxerFormatTester_OBJECTS) \
@@ -227,6 +227,13 @@ MuxerFormatTester_OBJECTS = $(am_MuxerFormatTester_OBJECTS) \
 	$(nodist_MuxerFormatTester_OBJECTS)
 MuxerFormatTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
+am_MuxerTester_OBJECTS = MuxerTest.$(OBJEXT) TestData.$(OBJEXT) \
+	Main.$(OBJEXT)
+nodist_MuxerTester_OBJECTS = MuxerTest_CXXRunner.$(OBJEXT)
+MuxerTester_OBJECTS = $(am_MuxerTester_OBJECTS) \
+	$(nodist_MuxerTester_OBJECTS)
+MuxerTester_DEPENDENCIES =  \
+	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_PixelFormatTester_OBJECTS = PixelFormatTest.$(OBJEXT) \
 	TestData.$(OBJEXT) Main.$(OBJEXT)
 nodist_PixelFormatTester_OBJECTS =  \
@@ -303,8 +310,8 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(MediaPictureTester_SOURCES) \
 	$(nodist_MediaPictureTester_SOURCES) \
 	$(MuxerFormatTester_SOURCES) \
-	$(nodist_MuxerFormatTester_SOURCES) \
-	$(PixelFormatTester_SOURCES) \
+	$(nodist_MuxerFormatTester_SOURCES) $(MuxerTester_SOURCES) \
+	$(nodist_MuxerTester_SOURCES) $(PixelFormatTester_SOURCES) \
 	$(nodist_PixelFormatTester_SOURCES) $(PropertyTester_SOURCES) \
 	$(nodist_PropertyTester_SOURCES) $(RationalTester_SOURCES) \
 	$(nodist_RationalTester_SOURCES)
@@ -317,8 +324,8 @@ DIST_SOURCES = $(CodecTester_SOURCES) $(DecoderTester_SOURCES) \
 	$(MediaAudioTester_SOURCES) $(MediaPacketTester_SOURCES) \
 	$(MediaPictureResamplerTester_SOURCES) \
 	$(MediaPictureTester_SOURCES) $(MuxerFormatTester_SOURCES) \
-	$(PixelFormatTester_SOURCES) $(PropertyTester_SOURCES) \
-	$(RationalTester_SOURCES)
+	$(MuxerTester_SOURCES) $(PixelFormatTester_SOURCES) \
+	$(PropertyTester_SOURCES) $(RationalTester_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -786,6 +793,7 @@ BUILT_SOURCES = \
   MediaPictureTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
   DemuxerTest_CXXRunner.cpp \
+  MuxerTest_CXXRunner.cpp \
   DemuxerFormatTest_CXXRunner.cpp \
   DemuxerStreamTest_CXXRunner.cpp \
   MuxerFormatTest_CXXRunner.cpp \
@@ -806,6 +814,7 @@ noinst_HEADERS = \
   MediaPictureTest.h \
   KeyValueBagTest.h \
   DemuxerTest.h \
+  MuxerTest.h \
   DemuxerFormatTest.h \
   DemuxerStreamTest.h \
   MuxerFormatTest.h \
@@ -973,8 +982,20 @@ nodist_DemuxerTester_SOURCES = \
 DemuxerTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
+MuxerTester_SOURCES = \
+  MuxerTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_MuxerTester_SOURCES = \
+  MuxerTest_CXXRunner.cpp
+
+MuxerTester_LDADD = \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 DemuxerFormatTester_SOURCES = \
   DemuxerFormatTest.cpp \
+  TestData.cpp \
   Main.cpp
 
 nodist_DemuxerFormatTester_SOURCES = \
@@ -1118,6 +1139,10 @@ MuxerFormatTester$(EXEEXT): $(MuxerFormatTester_OBJECTS) $(MuxerFormatTester_DEP
 	@rm -f MuxerFormatTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(MuxerFormatTester_OBJECTS) $(MuxerFormatTester_LDADD) $(LIBS)
 
+MuxerTester$(EXEEXT): $(MuxerTester_OBJECTS) $(MuxerTester_DEPENDENCIES) $(EXTRA_MuxerTester_DEPENDENCIES) 
+	@rm -f MuxerTester$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(MuxerTester_OBJECTS) $(MuxerTester_LDADD) $(LIBS)
+
 PixelFormatTester$(EXEEXT): $(PixelFormatTester_OBJECTS) $(PixelFormatTester_DEPENDENCIES) $(EXTRA_PixelFormatTester_DEPENDENCIES) 
 	@rm -f PixelFormatTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(PixelFormatTester_OBJECTS) $(PixelFormatTester_LDADD) $(LIBS)
@@ -1167,6 +1192,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MuxerFormatTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MuxerFormatTest_CXXRunner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MuxerTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MuxerTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PixelFormatTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PixelFormatTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PropertyTest.Po@am__quote@
@@ -1530,6 +1557,13 @@ KeyValueBagTester.log: KeyValueBagTester$(EXEEXT)
 DemuxerTester.log: DemuxerTester$(EXEEXT)
 	@p='DemuxerTester$(EXEEXT)'; \
 	b='DemuxerTester'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+MuxerTester.log: MuxerTester$(EXEEXT)
+	@p='MuxerTester$(EXEEXT)'; \
+	b='MuxerTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

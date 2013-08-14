@@ -1402,6 +1402,7 @@ public class VideoJNI {
   public final static native long ContainerStream_SWIGUpcast(long jarg1);
   public final static native long Container_SWIGUpcast(long jarg1);
   public final static native long DemuxerStream_SWIGUpcast(long jarg1);
+  public final static native long Muxer_SWIGUpcast(long jarg1);
   public final static native long Demuxer_SWIGUpcast(long jarg1);
   public final static native long FilterType_SWIGUpcast(long jarg1);
   public final static native long FilterGraph_SWIGUpcast(long jarg1);

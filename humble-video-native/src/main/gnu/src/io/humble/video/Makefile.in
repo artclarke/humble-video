@@ -107,12 +107,13 @@ am_libhumble_video_la_OBJECTS = Mingw64Fixes.lo VideoExceptions.lo \
 	MediaSubtitleImpl.lo IndexEntry.lo IndexEntryImpl.lo \
 	MediaPacket.lo MediaPacketImpl.lo ContainerFormat.lo \
 	Configurable.lo Coder.lo Decoder.lo Encoder.lo \
-	ContainerStream.lo Container.lo DemuxerFormat.lo Demuxer.lo \
-	DemuxerImpl.lo DemuxerStream.lo DemuxerStreamImpl.lo \
-	MuxerFormat.lo FilterType.lo FilterGraph.lo Filter.lo \
-	FilterLink.lo FilterEndPoint.lo FilterSource.lo \
-	FilterAudioSource.lo FilterPictureSource.lo FilterSink.lo \
-	FilterAudioSink.lo FilterPictureSink.lo Global.lo
+	ContainerStream.lo Container.lo DemuxerFormat.lo Muxer.lo \
+	Demuxer.lo DemuxerImpl.lo DemuxerStream.lo \
+	DemuxerStreamImpl.lo MuxerFormat.lo FilterType.lo \
+	FilterGraph.lo Filter.lo FilterLink.lo FilterEndPoint.lo \
+	FilterSource.lo FilterAudioSource.lo FilterPictureSource.lo \
+	FilterSink.lo FilterAudioSink.lo FilterPictureSink.lo \
+	Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -490,6 +491,7 @@ libhumble_video_la_SOURCES = \
   ContainerStream.cpp \
   Container.cpp \
   DemuxerFormat.cpp \
+  Muxer.cpp \
   Demuxer.cpp \
   DemuxerImpl.cpp \
   DemuxerStream.cpp \
@@ -574,6 +576,8 @@ libhumble_video_la_HEADERS = \
   DemuxerStream.h \
   DemuxerStream.swg \
   DemuxerStreamImpl.h \
+  Muxer.h \
+  Muxer.swg \
   Demuxer.h \
   Demuxer.swg \
   DemuxerImpl.h \
@@ -694,6 +698,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaSubtitle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaSubtitleImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mingw64Fixes.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Muxer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MuxerFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PixelFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Property.Plo@am__quote@

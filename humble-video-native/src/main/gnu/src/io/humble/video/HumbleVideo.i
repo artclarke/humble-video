@@ -49,6 +49,7 @@
 #include <io/humble/video/Container.h>
 #include <io/humble/video/DemuxerStream.h>
 #include <io/humble/video/Demuxer.h>
+#include <io/humble/video/Muxer.h>
 #include <io/humble/video/FilterType.h>
 #include <io/humble/video/FilterGraph.h>
 #include <io/humble/video/Filter.h>
@@ -196,6 +197,7 @@ import io.humble.ferry.Buffer;
 %include <io/humble/video/ContainerStream.swg>
 %include <io/humble/video/Container.swg>
 %include <io/humble/video/DemuxerStream.swg>
+%include <io/humble/video/Muxer.swg>
 %include <io/humble/video/Demuxer.swg>
 %include <io/humble/video/FilterType.swg>
 %include <io/humble/video/FilterGraph.swg>

@@ -20,6 +20,7 @@ check_PROGRAMS=\
   MediaPictureTester \
   KeyValueBagTester \
   DemuxerTester \
+  MuxerTester \
   DemuxerFormatTester \
   DemuxerStreamTester \
   MuxerFormatTester \
@@ -40,6 +41,7 @@ BUILT_SOURCES= \
   MediaPictureTest_CXXRunner.cpp \
   KeyValueBagTest_CXXRunner.cpp \
   DemuxerTest_CXXRunner.cpp \
+  MuxerTest_CXXRunner.cpp \
   DemuxerFormatTest_CXXRunner.cpp \
   DemuxerStreamTest_CXXRunner.cpp \
   MuxerFormatTest_CXXRunner.cpp \
@@ -60,6 +62,7 @@ noinst_HEADERS = \
   MediaPictureTest.h \
   KeyValueBagTest.h \
   DemuxerTest.h \
+  MuxerTest.h \
   DemuxerFormatTest.h \
   DemuxerStreamTest.h \
   MuxerFormatTest.h \
@@ -233,8 +236,20 @@ nodist_DemuxerTester_SOURCES= \
 DemuxerTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
+MuxerTester_SOURCES= \
+  MuxerTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_MuxerTester_SOURCES= \
+  MuxerTest_CXXRunner.cpp
+
+MuxerTester_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
 DemuxerFormatTester_SOURCES= \
   DemuxerFormatTest.cpp \
+  TestData.cpp \
   Main.cpp
 
 nodist_DemuxerFormatTester_SOURCES= \

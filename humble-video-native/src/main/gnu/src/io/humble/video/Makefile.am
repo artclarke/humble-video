@@ -46,6 +46,7 @@ libhumble_video_la_SOURCES= \
   ContainerStream.cpp \
   Container.cpp \
   DemuxerFormat.cpp \
+  Muxer.cpp \
   Demuxer.cpp \
   DemuxerImpl.cpp \
   DemuxerStream.cpp \
@@ -130,6 +131,8 @@ libhumble_video_la_HEADERS= \
   DemuxerStream.h \
   DemuxerStream.swg \
   DemuxerStreamImpl.h \
+  Muxer.h \
+  Muxer.swg \
   Demuxer.h \
   Demuxer.swg \
   DemuxerImpl.h \
