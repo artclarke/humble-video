@@ -28,6 +28,7 @@
 
 #include <io/humble/video/Container.h>
 #include <io/humble/video/MuxerFormat.h>
+#include <io/humble/video/KeyValueBag.h>
 
 namespace io {
 namespace humble {
@@ -36,25 +37,91 @@ namespace video {
 class VS_API_HUMBLEVIDEO Muxer : public io::humble::video::Container
 {
 public:
+
+  /**
+   * Creates a new muxer.
+   *
+   * One of the three passed in parameter must be non-null. If the muxer requires a URL to write to,
+   * then that must be specified.
+   *
+   * @param format If non null, this will be the format this muxer assumes it is writting packets in.
+   * @param filename The filename/url to open. If format is null, this will also be examined to guess actual format.
+   * @param formatName The formatname of the muxer to use. This will only be examined if format is null.
+   *
+   * @return a Muxer
+   *
+   * @throws InvalidArgument if all parameters are null.
+   */
+  static Muxer*
+  make(MuxerFormat* format, const char* filename, const char* formatName);
+
   /**
    * Get the URL the Muxer was opened with.
    * May return null if unknown.
    * @return the URL opened, or null.
    */
   virtual const char*
-  getURL()=0;
+  getURL();
 
   /**
    * Get the MuxerFormat associated with this Muxer
    * or null if unknown.
    */
   virtual MuxerFormat *
-  getFormat() = 0;
+  getFormat() { return mFormat.get(); }
+
+  /**
+   * Muxers can only be in one of these states.
+   */
+  typedef enum State
+  {
+    /**
+     * Initialized but not yet opened. Transitions to STATE_OPENED or STATE_ERROR.
+     * New streams can be added.
+     */
+    STATE_INITED,
+    /**
+     * File is opened, and header is written. For most formats,
+     * you can no longer add new streams. Check flags to find out if you can.
+     */
+    STATE_OPENED,
+
+    /**
+     * Trailer is written, file is closed and all file-resources have been released. The Muxer
+     * should be discarded.
+     */
+    STATE_CLOSED,
+    /**
+     * An error has occured.
+     */
+    STATE_ERROR
+  } State;
+
+  /**
+   * Get the current state of the Muxer.
+   */
+  virtual State
+  getState() {
+    return mState;
+  }
+
+  virtual void
+  open(KeyValueBag* inputOptions, KeyValueBag* outputOptions);
+
+  virtual void
+  close();
+
+  int32_t getNumStreams() { return getFormatCtx()->nb_streams; }
 
 protected:
-  Muxer();
+  virtual AVFormatContext* getFormatCtx() { return mCtx; }
+  Muxer(MuxerFormat* format, const char* filename, const char* formatName);
   virtual
   ~Muxer();
+private:
+  State mState;
+  AVFormatContext* mCtx;
+  io::humble::ferry::RefPointer<MuxerFormat> mFormat;
 };
 
 } /* namespace video */

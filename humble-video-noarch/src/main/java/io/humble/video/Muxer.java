@@ -119,6 +119,25 @@ public class Muxer extends Container {
   }
 
 /**
+ * Creates a new muxer.<br>
+ * <br>
+ * One of the three passed in parameter must be non-null. If the muxer requires a URL to write to,<br>
+ * then that must be specified.<br>
+ * <br>
+ * @param format If non null, this will be the format this muxer assumes it is writting packets in.<br>
+ * @param filename The filename/url to open. If format is null, this will also be examined to guess actual format.<br>
+ * @param formatName The formatname of the muxer to use. This will only be examined if format is null.<br>
+ * <br>
+ * @return a Muxer<br>
+ * <br>
+ * @throws InvalidArgument if all parameters are null.
+ */
+  public static Muxer make(MuxerFormat format, String filename, String formatName) {
+    long cPtr = VideoJNI.Muxer_make(MuxerFormat.getCPtr(format), format, filename, formatName);
+    return (cPtr == 0) ? null : new Muxer(cPtr, false);
+  }
+
+/**
  * Get the URL the Muxer was opened with.<br>
  * May return null if unknown.<br>
  * @return the URL opened, or null.
@@ -134,6 +153,88 @@ public class Muxer extends Container {
   protected MuxerFormat getFormat() {
     long cPtr = VideoJNI.Muxer_getFormat(swigCPtr, this);
     return (cPtr == 0) ? null : new MuxerFormat(cPtr, false);
+  }
+
+/**
+ * Get the current state of the Muxer.
+ */
+  public Muxer.State getState() {
+    return Muxer.State.swigToEnum(VideoJNI.Muxer_getState(swigCPtr, this));
+  }
+
+  public void open(KeyValueBag inputOptions, KeyValueBag outputOptions) throws java.lang.InterruptedException, java.io.IOException {
+    VideoJNI.Muxer_open(swigCPtr, this, KeyValueBag.getCPtr(inputOptions), inputOptions, KeyValueBag.getCPtr(outputOptions), outputOptions);
+  }
+
+  public void close() {
+    VideoJNI.Muxer_close(swigCPtr, this);
+  }
+
+  public int getNumStreams() throws java.lang.InterruptedException, java.io.IOException {
+    return VideoJNI.Muxer_getNumStreams(swigCPtr, this);
+  }
+
+  /**
+   * Muxers can only be in one of these states.
+   */
+  public enum State {
+  /**
+   * Initialized but not yet opened. Transitions to STATE_OPENED or STATE_ERROR.<br>
+   * New streams can be added.
+   */
+    STATE_INITED,
+  /**
+   * File is opened, and header is written. For most formats,<br>
+   * you can no longer add new streams. Check flags to find out if you can.
+   */
+    STATE_OPENED,
+  /**
+   * Trailer is written, file is closed and all file-resources have been released. The Muxer<br>
+   * should be discarded.
+   */
+    STATE_CLOSED,
+  /**
+   * An error has occured.
+   */
+    STATE_ERROR,
+  ;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static State swigToEnum(int swigValue) {
+      State[] swigValues = State.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (State swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + State.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private State() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private State(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private State(State swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
   }
 
 }

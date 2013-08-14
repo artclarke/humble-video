@@ -34,5 +34,14 @@ MuxerTest::~MuxerTest() {
 
 void
 MuxerTest::testCreation() {
-  TS_SKIP("not imlemented");
+  RefPointer<Muxer> muxer;
+  RefPointer<MuxerFormat> muxerFormat = MuxerFormat::guessFormat("flv", "foo.flv", "flv");
+
+  muxer = Muxer::make(muxerFormat.value(), 0, 0);
+
+  muxer->open(0, 0);
+
+  muxer->close();
+
+
 }

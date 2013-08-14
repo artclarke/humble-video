@@ -48,7 +48,9 @@ DemuxerImpl::DemuxerImpl() {
   mInputBufferLength = 2048;
   mIOHandler = 0;
   mCtx = avformat_alloc_context();
-  if (!mCtx) throw std::bad_alloc();
+  if (!mCtx) {
+    VS_THROW(HumbleBadAlloc());
+  }
   // Set up thread interrupt capabilities
   mCtx->interrupt_callback.callback = Global::avioInterruptCB;
   mCtx->interrupt_callback.opaque = this;

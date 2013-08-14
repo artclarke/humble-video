@@ -23,19 +23,73 @@
  *      Author: aclarke
  */
 
+#include <io/humble/ferry/Logger.h>
+
 #include "Muxer.h"
+#include "VideoExceptions.h"
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
+
+using namespace io::humble::ferry;
 
 namespace io {
 namespace humble {
 namespace video {
 
-Muxer::Muxer() {
-  // TODO Auto-generated constructor stub
+Muxer::Muxer(MuxerFormat* format, const char* filename,
+    const char* formatName) {
+  mState = STATE_INITED;
 
+  mCtx = 0;
+  int e = avformat_alloc_output_context2(&mCtx, format->getCtx(), formatName,
+      filename);
+  FfmpegException::check(e, "could not allocate output context");
+  if (!mCtx) {
+    VS_THROW(HumbleBadAlloc());
+  }
+  if (!filename || !*filename)
+    mCtx->filename[0] = 0;
+  mCtx->interrupt_callback.callback = Global::avioInterruptCB;
+  mCtx->interrupt_callback.opaque = this;
 }
 
 Muxer::~Muxer() {
-  // TODO Auto-generated destructor stub
+  if (mState == STATE_OPENED) {
+    VS_LOG_ERROR(
+        "Open Muxer destroyed without Muxer.close() being called. Closing anyway: %s",
+        this->getURL());
+    (void) this->close();
+  }
+  if (mCtx) avformat_free_context(mCtx);
+}
+
+Muxer*
+Muxer::make(MuxerFormat *format, const char* filename, const char* formatName) {
+  RefPointer<Muxer> retval;
+
+  if (!format) {
+    if ((!filename || !*filename) && (!formatName && !*formatName)) {
+      VS_THROW(HumbleInvalidArgument("cannot pass in all nulll parameters"));
+    }
+  }
+  retval.reset(new Muxer(format, filename, formatName), true);
+  return retval.get();
+}
+
+void
+Muxer::open(KeyValueBag *aInputOptions, KeyValueBag* aOutputOptions) {
+  (void) aInputOptions;
+  (void) aOutputOptions;
+}
+
+void
+Muxer::close() {
+
+}
+
+const char*
+Muxer::getURL() {
+  return this->getFormatCtx()->filename;
 }
 
 } /* namespace video */

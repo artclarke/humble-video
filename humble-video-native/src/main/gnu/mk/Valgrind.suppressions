@@ -186,14 +186,6 @@
    fun:xpc_dictionary_set_string
    fun:_libxpc_initializer
    fun:libSystem_initializer
-   fun:_ZN16ImageLoaderMachO18doModInitFunctionsERKN11ImageLoader11LinkContextE
-   fun:_ZN16ImageLoaderMachO16doInitializationERKN11ImageLoader11LinkContextE
-   fun:_ZN11ImageLoader23recursiveInitializationERKNS_11LinkContextEjRNS_21InitializerTimingListE
-   fun:_ZN11ImageLoader23recursiveInitializationERKNS_11LinkContextEjRNS_21InitializerTimingListE
-   fun:_ZN11ImageLoader15runInitializersERKNS_11LinkContextERNS_21InitializerTimingListE
-   fun:_ZN4dyld24initializeMainExecutableEv
-   fun:_ZN4dyld5_mainEPK12macho_headermiPPKcS5_S5_
-   fun:_dyld_start
    obj:*
 }
 {
