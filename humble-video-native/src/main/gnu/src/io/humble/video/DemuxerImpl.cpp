@@ -52,13 +52,13 @@ DemuxerImpl::DemuxerImpl() {
   // Set up thread interrupt capabilities
   mCtx->interrupt_callback.callback = Global::avioInterruptCB;
   mCtx->interrupt_callback.opaque = this;
-  mState = Container::STATE_INITED;
+  mState = STATE_INITED;
 }
 
 DemuxerImpl::~DemuxerImpl() {
-  if (mState == Container::STATE_OPENED ||
-      mState == Container::STATE_PLAYING ||
-      mState == Container::STATE_PAUSED) {
+  if (mState == STATE_OPENED ||
+      mState == STATE_PLAYING ||
+      mState == STATE_PAUSED) {
     VS_LOG_ERROR("Open Demuxer destroyed without Demuxer.close() being called. Closing anyway: %s",
         this->getURL());
     (void) this->close();
@@ -69,7 +69,7 @@ DemuxerImpl::~DemuxerImpl() {
 AVFormatContext*
 DemuxerImpl::getFormatCtx() {
   // throw an exception if in wrong state.
-  if (mState == Container::STATE_CLOSED || mState == Container::STATE_ERROR) {
+  if (mState == STATE_CLOSED || mState == STATE_ERROR) {
     const char * MESSAGE="Method called on Demuxer in CLOSED or ERROR state.";
     VS_LOG_ERROR(MESSAGE);
     std::exception e = std::runtime_error(MESSAGE);
@@ -93,7 +93,7 @@ DemuxerImpl::open(const char *url, DemuxerFormat* format,
 {
   AVFormatContext* ctx = this->getFormatCtx();
   int retval = -1;
-  if (mState != Container::STATE_INITED) {
+  if (mState != STATE_INITED) {
     VS_THROW(HumbleRuntimeError::make("Open can only be called when container is in init state. Current state: %d", mState));
   }
   if (!url || !*url) {
@@ -121,7 +121,7 @@ DemuxerImpl::open(const char *url, DemuxerFormat* format,
     // free and realloc the input buffer length
     uint8_t* buffer = (uint8_t*)av_malloc(mInputBufferLength);
     if (!buffer) {
-      mState = Container::STATE_ERROR;
+      mState = STATE_ERROR;
       VS_THROW(HumbleBadAlloc());
     }
 
@@ -137,7 +137,7 @@ DemuxerImpl::open(const char *url, DemuxerFormat* format,
         Container::url_seek);
     if (!ctx->pb) {
       av_free(buffer);
-      mState = Container::STATE_ERROR;
+      mState = STATE_ERROR;
       VS_THROW(HumbleRuntimeError::make("could not open url due to internal error: %s", url));
     }
   }
@@ -159,7 +159,7 @@ DemuxerImpl::open(const char *url, DemuxerFormat* format,
   VS_CHECK_INTERRUPT(true);
 
   if (retval >= 0) {
-    mState = Container::STATE_OPENED;
+    mState = STATE_OPENED;
 
     if (oldFormat != ctx->iformat)
       mFormat = DemuxerFormat::make(ctx->iformat);
@@ -168,7 +168,7 @@ DemuxerImpl::open(const char *url, DemuxerFormat* format,
       ctx->ctx_flags |= AVFMTCTX_NOHEADER;
   }
   if (retval < 0) {
-    mState = Container::STATE_ERROR;
+    mState = STATE_ERROR;
     FfmpegException::check(retval, "Error opening url: %s; ", url);
   }
   if (queryMetaData)
@@ -180,7 +180,7 @@ void
 DemuxerImpl::setInputBufferLength(int32_t size) {
   if (size <= 0)
     VS_THROW(HumbleInvalidArgument("size <= 0"));
-  if (mState != Container::STATE_INITED)
+  if (mState != STATE_INITED)
     VS_THROW(HumbleRuntimeError("Demuxer object has already been opened"));
   mInputBufferLength = size;
 }
@@ -193,9 +193,9 @@ DemuxerImpl::getInputBufferLength() {
 int32_t
 DemuxerImpl::getNumStreams() {
   int32_t retval = 0;
-  if (!(mState == Container::STATE_OPENED ||
-      mState == Container::STATE_PLAYING ||
-      mState == Container::STATE_PAUSED)) {
+  if (!(mState == STATE_OPENED ||
+      mState == STATE_PLAYING ||
+      mState == STATE_PAUSED)) {
     VS_THROW(HumbleRuntimeError("Attempt to query number of streams in Demuxer when not opened, playing or paused is ignored"));
   }
   if ((int32_t) mCtx->nb_streams != mNumStreams)
@@ -209,9 +209,9 @@ DemuxerImpl::getNumStreams() {
 void
 DemuxerImpl::close() {
   int32_t retval=-1;
-  if (!(mState == Container::STATE_OPENED ||
-      mState == Container::STATE_PLAYING ||
-      mState == Container::STATE_PAUSED)) {
+  if (!(mState == STATE_OPENED ||
+      mState == STATE_PLAYING ||
+      mState == STATE_PAUSED)) {
     VS_THROW(HumbleRuntimeError("Attempt to close container when not opened, playing or paused"));
   }
 
@@ -239,11 +239,11 @@ DemuxerImpl::close() {
 
   retval = doCloseFileHandles(pb);
   if (retval < 0) {
-    mState = Container::STATE_ERROR;
+    mState = STATE_ERROR;
     FfmpegException::check(retval, "Error when closing container (%s): %d", getURL(), retval);
   }
 
-  mState = Container::STATE_CLOSED;
+  mState = STATE_CLOSED;
 }
 
 int32_t
@@ -266,9 +266,9 @@ DemuxerImpl::doCloseFileHandles(AVIOContext* pb)
 
 DemuxerStream*
 DemuxerImpl::getStream(int32_t position) {
-  if (!(mState == Container::STATE_OPENED ||
-      mState == Container::STATE_PLAYING ||
-      mState == Container::STATE_PAUSED)) {
+  if (!(mState == STATE_OPENED ||
+      mState == STATE_PLAYING ||
+      mState == STATE_PAUSED)) {
     VS_THROW(HumbleRuntimeError("Attempt to get Demuxer stream from Demuxer when not opened, playing or paused is ignored"));
   }
   DemuxerStream *retval = 0;
@@ -346,9 +346,9 @@ DemuxerImpl::read(MediaPacket* ipkt) {
 void
 DemuxerImpl::queryStreamMetaData() {
   int32_t retval = -1;
-  if (!(mState == Container::STATE_OPENED ||
-      mState == Container::STATE_PLAYING ||
-      mState == Container::STATE_PAUSED)) {
+  if (!(mState == STATE_OPENED ||
+      mState == STATE_PLAYING ||
+      mState == STATE_PAUSED)) {
     VS_THROW(HumbleRuntimeError("Attempt to query stream information from container when not opened, playing or paused"));
   }
   if (!mStreamInfoGotten) {
@@ -479,7 +479,7 @@ DemuxerImpl::getMaxDelay() {
 int32_t
 DemuxerImpl::seek(int32_t stream_index, int64_t min_ts, int64_t ts,
     int64_t max_ts, int32_t flags) {
-  if (mState != Container::STATE_OPENED)
+  if (mState != STATE_OPENED)
   {
     VS_THROW(HumbleRuntimeError("Can only seek on OPEN (not paused or playing) Demuxers"));
   }
@@ -497,24 +497,24 @@ DemuxerImpl::seek(int32_t stream_index, int64_t min_ts, int64_t ts,
 
 void
 DemuxerImpl::pause() {
-  if (mState != Container::STATE_PLAYING)
+  if (mState != STATE_PLAYING)
   {
     VS_THROW(HumbleRuntimeError("Can only pause containers in PLAYING state."));
   }
   int32_t retval = av_read_pause(this->getFormatCtx());
   FfmpegException::check(retval, "Could not pause url: %s; ", getURL());
-  mState = Container::STATE_PAUSED;
+  mState = STATE_PAUSED;
 }
 
 void
 DemuxerImpl::play() {
-  if (mState != Container::STATE_PAUSED || mState != Container::STATE_OPENED)
+  if (mState != STATE_PAUSED || mState != STATE_OPENED)
   {
     VS_THROW(HumbleRuntimeError("Can only play containers in OPENED or PAUSED states"));
   }
   int32_t retval = av_read_play(this->getFormatCtx());
   FfmpegException::check(retval, "Could not play url: %s; ", getURL());
-  mState = Container::STATE_PLAYING;
+  mState = STATE_PLAYING;
 }
 
 int32_t

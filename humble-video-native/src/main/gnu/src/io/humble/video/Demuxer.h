@@ -49,8 +49,43 @@ public:
   static Demuxer*
   make();
 
-  virtual State
-  getState() = 0;
+  /**
+   * Demuxers can only be in one of these states:
+   */
+  typedef enum State
+  {
+    /**
+     * STATE_INITED: Allocated but open has not been called yet. Transitions to STATE_OPENED when ::open(...)
+     *   is successfully called, or STATE_ERROR if ::open(...) has an error.
+     */
+    STATE_INITED,
+    /**
+     * STATE_OPENED: Opened and read to read or write data. Transitions to STATE_CLOSED on successful ::close(...)
+     *   or STATE_ERROR if ::close(...) has an error.
+     */
+    STATE_OPENED,
+    /**
+     * Some Sources can be live (i.e. in Play mode)
+     */
+    STATE_PLAYING,
+    /**
+     * Some containers (e.g. networks) can be paused.
+     */
+    STATE_PAUSED,
+    /**
+     * STATE_CLOSED: Container is closed and should be discarded.
+     */
+    STATE_CLOSED,
+    /**
+     * STATE_ERROR: Container had an error and should be discarded.
+     */
+    STATE_ERROR,
+  } State;
+
+  /**
+   * Get the current state of the container.
+   */
+  virtual State getState()=0;
 
   /**
    * Get the DemuxerFormat associated with this Demuxer

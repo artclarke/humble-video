@@ -145,7 +145,7 @@ private:
   int32_t doOpen(const char*, AVDictionary**);
   int32_t doCloseFileHandles(AVIOContext* pb);
   int32_t doSetupSourceStreams();
-  Container::State mState;
+  State mState;
   bool mStreamInfoGotten;
   AVFormatContext* mCtx;
   int32_t mReadRetryMax;

@@ -28100,52 +28100,6 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1FLAG_1KEEP_1SID
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1getState(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  io::humble::video::Container *arg1 = (io::humble::video::Container *) 0 ;
-  io::humble::video::Container::State result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(io::humble::video::Container **)&jarg1; 
-  
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
-      "invalid native object; delete() likely already called");
-    return 0;
-  }
-  
-  {
-    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,139,HUMBLE_HANDLE_EXCEPTION@*/
-    // HumbleVideo.i: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      result = (io::humble::video::Container::State)(arg1)->getState();
-    }
-    catch(std::exception & e)
-    {
-      io::humble::video::Global::catchException(e);
-      return 0;
-    }
-    catch(...)
-    {
-      std::runtime_error e("Unhandled and unknown native exception");
-      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
-      return 0;
-    }
-    
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // HumbleVideo.i: End generated code
-    
-    /*@SWIG@*/
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1getNumStreams(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   io::humble::video::Container *arg1 = (io::humble::video::Container *) 0 ;
@@ -28415,7 +28369,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Demuxer_1make(JNIEnv *jen
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getState(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   io::humble::video::Demuxer *arg1 = (io::humble::video::Demuxer *) 0 ;
-  io::humble::video::Container::State result;
+  io::humble::video::Demuxer::State result;
   
   (void)jenv;
   (void)jcls;
@@ -28434,7 +28388,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getState(JNIEnv *
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Container::State)(arg1)->getState();
+      result = (io::humble::video::Demuxer::State)(arg1)->getState();
     }
     catch(std::exception & e)
     {

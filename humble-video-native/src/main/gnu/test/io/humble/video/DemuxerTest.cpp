@@ -59,7 +59,7 @@ DemuxerTest::testMake() {
   (void) obj;
 
   TS_ASSERT(source);
-  TS_ASSERT(source->getState() == Container::STATE_INITED);
+  TS_ASSERT(source->getState() == Demuxer::STATE_INITED);
 }
 
 void
@@ -74,7 +74,7 @@ DemuxerTest::openTestHelper(const char* file)
   TS_ASSERT(source);
 
   source->open(file, 0, false, false, 0, 0);
-  TS_ASSERT(source->getState() == Container::STATE_OPENED);
+  TS_ASSERT(source->getState() == Demuxer::STATE_OPENED);
 
   // now, let's get the meta-data
   source->queryStreamMetaData();
@@ -145,7 +145,7 @@ DemuxerTest::testOpenDemuxerPrivatePropertySetting()
 
   source->open(file, 0, false, false, inputOptions.value(),
       outputOptions.value());
-  TS_ASSERT(source->getState() == Container::STATE_OPENED);
+  TS_ASSERT(source->getState() == Demuxer::STATE_OPENED);
 
   TS_ASSERT_EQUALS(1, outputOptions->getNumKeys());
   TSM_ASSERT("Expected option missing", outputOptions->getValue(INVALID_OPTION,
@@ -226,7 +226,7 @@ DemuxerTest::testRead()
   TS_ASSERT(source);
 
   source->open(mSampleFile, 0, false, true, 0, 0);
-  TS_ASSERT(source->getState() == Container::STATE_OPENED);
+  TS_ASSERT(source->getState() == Demuxer::STATE_OPENED);
 
   int64_t pktsRead = 0;
   RefPointer<MediaPacket> pkt = MediaPacket::make();

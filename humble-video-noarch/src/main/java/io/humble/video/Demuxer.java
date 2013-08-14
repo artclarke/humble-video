@@ -129,8 +129,11 @@ public class Demuxer extends Container {
     return (cPtr == 0) ? null : new Demuxer(cPtr, false);
   }
 
-  public Container.State getState() {
-    return Container.State.swigToEnum(VideoJNI.Demuxer_getState(swigCPtr, this));
+/**
+ * Get the current state of the container.
+ */
+  public Demuxer.State getState() {
+    return Demuxer.State.swigToEnum(VideoJNI.Demuxer_getState(swigCPtr, this));
   }
 
 /**
@@ -515,6 +518,76 @@ public class Demuxer extends Container {
  */
   public void pause() throws java.lang.InterruptedException, java.io.IOException {
     VideoJNI.Demuxer_pause(swigCPtr, this);
+  }
+
+  /**
+   * Demuxers can only be in one of these states:
+   */
+  public enum State {
+  /**
+   * STATE_INITED: Allocated but open has not been called yet. Transitions to STATE_OPENED when ::open(...)<br>
+   *   is successfully called, or STATE_ERROR if ::open(...) has an error.
+   */
+    STATE_INITED,
+  /**
+   * STATE_OPENED: Opened and read to read or write data. Transitions to STATE_CLOSED on successful ::close(...)<br>
+   *   or STATE_ERROR if ::close(...) has an error.
+   */
+    STATE_OPENED,
+  /**
+   * Some Sources can be live (i.e. in Play mode)
+   */
+    STATE_PLAYING,
+  /**
+   * Some containers (e.g. networks) can be paused.
+   */
+    STATE_PAUSED,
+  /**
+   * STATE_CLOSED: Container is closed and should be discarded.
+   */
+    STATE_CLOSED,
+  /**
+   * STATE_ERROR: Container had an error and should be discarded.
+   */
+    STATE_ERROR,
+  ;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static State swigToEnum(int swigValue) {
+      State[] swigValues = State.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (State swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + State.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private State() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private State(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private State(State swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
   }
 
   /**
