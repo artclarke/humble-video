@@ -38,7 +38,7 @@ namespace video {
 
 class FilterLink;
 
-class Filter : public io::humble::video::Configurable
+class VS_API_HUMBLEVIDEO Filter : public io::humble::video::Configurable
 {
 public:
   /**

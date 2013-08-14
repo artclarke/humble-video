@@ -404,11 +404,7 @@ public:
    * Finally if no pixel format has been found, returns AV_PIX_FMT_NONE.
    */
   static PixelFormat::Type
-  getFormat(const char* name) {
-    return
-        name && *name ?
-            (PixelFormat::Type) av_get_pix_fmt(name) : PixelFormat::PIX_FMT_NONE;
-  }
+  getFormat(const char* name);
 
   /**
    * Return the short name for a pixel format, NULL in case pix_fmt is
@@ -416,9 +412,7 @@ public:
    *
    */
   static const char*
-  getFormatName(PixelFormat::Type pix_fmt) {
-    return av_get_pix_fmt_name((enum AVPixelFormat) pix_fmt);
-  }
+  getFormatName(PixelFormat::Type pix_fmt);
 
   /**
    * @return a pixel format descriptor for provided pixel format or NULL if
@@ -446,9 +440,7 @@ public:
    * valid pixel format.
    */
   static int32_t
-  getNumPlanes(PixelFormat::Type pix_fmt) {
-    return av_pix_fmt_count_planes((enum AVPixelFormat) pix_fmt);
-  }
+  getNumPlanes(PixelFormat::Type pix_fmt);
 
   /**
    * Utility function to swap the endianness of a pixel format.
@@ -459,10 +451,7 @@ public:
    * otherwise AV_PIX_FMT_NONE
    */
   static PixelFormat::Type
-  swapEndianness(PixelFormat::Type pix_fmt) {
-    return (PixelFormat::Type) av_pix_fmt_swap_endianness(
-        (enum AVPixelFormat) pix_fmt);
-  }
+  swapEndianness(PixelFormat::Type pix_fmt);
 
   /**
    * Find the buffer size that would be necessary to store an image
@@ -540,7 +529,7 @@ private:
  *       and all the YUV variants) AVPixFmtDescriptor just stores how values
  *       are stored not what these values represent.
  */
-class PixelFormatDescriptor : public io::humble::ferry::RefCounted
+class VS_API_HUMBLEVIDEO PixelFormatDescriptor : public io::humble::ferry::RefCounted
 {
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(PixelFormatDescriptor)
 public:
@@ -644,18 +633,14 @@ public:
    * not counted.
    */
   int32_t
-  getBitsPerPixel() {
-    return av_get_bits_per_pixel(mCtx);
-  }
+  getBitsPerPixel();
 
   /**
    * Return the number of bits per pixel for the pixel format
    * described by pixdesc, including any padding or unused bits.
    */
   int32_t
-  getPaddedBitsPerPixel() {
-    return av_get_padded_bits_per_pixel(mCtx);
-  }
+  getPaddedBitsPerPixel();
 
   /**
    * Parameters that describe how pixels are packed.
@@ -673,9 +658,7 @@ public:
    * is not a valid pointer to a pixel format descriptor.
    */
   PixelFormat::Type
-  getFormat() {
-    return (PixelFormat::Type) av_pix_fmt_desc_get_id(mCtx);
-  }
+  getFormat();
 #ifndef SWIG
   static PixelFormatDescriptor*
   make(const AVPixFmtDescriptor* ctx);

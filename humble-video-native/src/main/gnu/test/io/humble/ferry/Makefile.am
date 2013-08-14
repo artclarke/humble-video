@@ -67,6 +67,8 @@ noinst_HEADERS= \
   MutexTest.h \
   RefPointerTest.h
 
+all-local: $(check_PROGRAMS)
+
 clean-local:
 	rm -rf $(BUILT_SOURCES)
 	rm -rf *.flv

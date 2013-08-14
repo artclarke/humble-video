@@ -45,7 +45,7 @@ class FilterSink;
 class FilterAudioSink;
 class FilterPictureSink;
 
-class FilterGraph : public io::humble::video::Configurable
+class VS_API_HUMBLEVIDEO FilterGraph : public io::humble::video::Configurable
 {
 public:
   /**
@@ -239,7 +239,7 @@ public:
    */
 #ifdef SWIG
   %newobject sendCommand(const char*, const char*, const char*, int);
-  %typemap(newfree) char * "av_free($1);";
+  %typemap(newfree) char * "FilterGraph::freeString($1);";
 #endif
 
   virtual char* sendCommand(
@@ -268,13 +268,15 @@ public:
 
 #ifdef SWIG
   %newobject getDisplayString();
-  %typemap(newfree) char * "av_free($1);";
+  %typemap(newfree) char * "FilterGraph::freeString($1);";
 #endif
   virtual char* getDisplayString();
 
   virtual State getState() { return mState; }
 
-
+#ifndef SWIG
+  static void freeString(char *str);
+#endif
 protected:
   virtual void* getCtx() { return mCtx; }
   FilterGraph();

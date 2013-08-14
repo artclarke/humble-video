@@ -462,6 +462,12 @@ FilterGraph::sendCommand(const char* target, const char* command,
   // create a copy
   return av_strdup(response);
 }
+
+void
+FilterGraph::freeString(char * str) {
+  av_freep(&str);
+}
+
 void
 FilterGraph::queueCommand(const char* target, const char* command,
     const char* arguments, int flags, double ts) {

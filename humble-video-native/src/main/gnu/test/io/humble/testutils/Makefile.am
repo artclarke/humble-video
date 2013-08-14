@@ -25,6 +25,8 @@ noinst_HEADERS = \
   TestUtils.h \
   TrueTest.h
 
+all-local: $(check_PROGRAMS)
+
 clean-local:
 	rm -rf $(BUILT_SOURCES)
 	rm -rf *.flv

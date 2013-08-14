@@ -39,4 +39,5 @@ namespace video {
 #ifndef VS_API_HUMBLEVIDEO
 #define VS_API_HUMBLEVIDEO VS_API_EXPORT
 #endif // ! VS_API_HUMBLEVIDEO
+
 #endif // ! __HUMBLEVIDEO_H__

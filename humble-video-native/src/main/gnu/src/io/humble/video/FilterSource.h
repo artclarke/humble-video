@@ -36,7 +36,7 @@ namespace video {
  * A source of MediaRaw objects for a FilterGraph.
  */
 
-class FilterSource : public io::humble::video::FilterEndPoint
+class VS_API_HUMBLEVIDEO FilterSource : public io::humble::video::FilterEndPoint
 {
 protected:
   void add(MediaRaw* media);

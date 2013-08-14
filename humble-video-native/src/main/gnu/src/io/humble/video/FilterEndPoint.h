@@ -35,7 +35,7 @@ namespace video {
 /**
  * An source or a sink that terminates the end points of a FilterGraph.
  */
-class FilterEndPoint : public io::humble::video::Filter
+class VS_API_HUMBLEVIDEO FilterEndPoint : public io::humble::video::Filter
 {
 protected:
   FilterEndPoint(FilterGraph* graph, AVFilterContext* ctx);

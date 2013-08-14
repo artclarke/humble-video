@@ -1004,7 +1004,7 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(HEADERS)
+all-am: Makefile $(HEADERS) all-local
 installdirs:
 install: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) install-am
@@ -1114,21 +1114,24 @@ uninstall-am:
 
 .MAKE: all check check-am install install-am install-strip
 
-.PHONY: CTAGS GTAGS TAGS all all-am check check-TESTS check-am clean \
-	clean-checkPROGRAMS clean-generic clean-libtool clean-local \
-	cscopelist-am ctags ctags-am distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	recheck tags tags-am uninstall uninstall-am
+.PHONY: CTAGS GTAGS TAGS all all-am all-local check check-TESTS \
+	check-am clean clean-checkPROGRAMS clean-generic clean-libtool \
+	clean-local cscopelist-am ctags ctags-am distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am recheck tags tags-am uninstall \
+	uninstall-am
 
 include @top_builddir@/mk/Makefile.global
+
+all-local: $(check_PROGRAMS)
 
 clean-local:
 	rm -rf $(BUILT_SOURCES)

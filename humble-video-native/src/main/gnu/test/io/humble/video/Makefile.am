@@ -283,6 +283,8 @@ nodist_RationalTester_SOURCES=\
 RationalTester_LDADD=\
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
+all-local: $(check_PROGRAMS)
+
 clean-local:
 	rm -rf $(BUILT_SOURCES)
 	rm -rf *.au

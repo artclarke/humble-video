@@ -39,7 +39,7 @@ namespace video {
 /**
  * A type of filter that can be created.
  */
-class FilterType : public io::humble::ferry::RefCounted
+class VS_API_HUMBLEVIDEO FilterType : public io::humble::ferry::RefCounted
 {
   VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(FilterType);
 public:

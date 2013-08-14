@@ -82,7 +82,7 @@ FilterGraphTest::testAddIO() {
   {
     // get the string
     char* s = graph->getDisplayString();
-    av_free(s);
+    FilterGraph::freeString(s);
     LoggerStack stack;
     stack.setGlobalLevel(Logger::LEVEL_DEBUG, false);
     VS_LOG_DEBUG("\nGraph: %s\n", s);
@@ -192,7 +192,7 @@ FilterGraphTest::testFilterVideo() {
     VS_LOG_DEBUG("Graph String:\n%s\n", graphStr);
     VS_LOG_DEBUG("(%d x %d) (%d)", filterPicture->getWidth(),
         filterPicture->getHeight(), filterPicture->getFormat());
-    av_freep(&graphStr);
+    FilterGraph::freeString(graphStr);
   }
 
   int32_t frameNo = 0;

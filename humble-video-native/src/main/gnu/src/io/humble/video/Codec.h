@@ -1115,10 +1115,7 @@ public:
    * Get the descriptor for the given id.
    */
   static CodecDescriptor*
-  make(Codec::ID id) {
-    const AVCodecDescriptor* d = avcodec_descriptor_get((enum AVCodecID) id);
-    return make(d);
-  }
+  make(Codec::ID id);
 
 #ifndef SWIG
   static CodecDescriptor*

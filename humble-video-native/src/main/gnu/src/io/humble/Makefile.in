@@ -463,6 +463,9 @@ libhumblevideo_la_LIBADD = \
   $(builddir)/video/customio/libhumble-video-customio.la \
   $(builddir)/video/libhumble-video.la
 
+
+# But because we're forcing C linkage, we need to tell the linker
+# about which STDCXX and which exception handling library to use.
 libhumblevideo_la_LDFLAGS = -no-undefined -shared -version-number \
 	@LIB_MAJOR_VERSION@:@LIB_MINOR_VERSION@:0 $(VS_LDFLAGS) \
 	$(VS_PKG_LIBRARIES) @VS_LIBSTDCXX@ @VS_LIBGCC_EH@ \

@@ -36,7 +36,7 @@ namespace video {
 /**
  * A source of MediaAudio objects for a FilterGraph.
  */
-class FilterAudioSource : public io::humble::video::FilterSource
+class VS_API_HUMBLEVIDEO FilterAudioSource : public io::humble::video::FilterSource
 {
 public:
 

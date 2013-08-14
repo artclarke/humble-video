@@ -36,7 +36,7 @@ namespace video {
 /**
  * A sink of MediaRaw objects for a FilterGraph.
  */
-class FilterSink : public io::humble::video::FilterEndPoint
+class VS_API_HUMBLEVIDEO FilterSink : public io::humble::video::FilterEndPoint
 {
 protected:
   int32_t get(MediaRaw*);

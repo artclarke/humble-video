@@ -36,7 +36,7 @@ namespace video {
 /**
  * A Sink of MediaPicture objects for a FilterGraph.
  */
-class FilterPictureSink : public io::humble::video::FilterSink
+class VS_API_HUMBLEVIDEO FilterPictureSink : public io::humble::video::FilterSink
 {
 public:
   /**

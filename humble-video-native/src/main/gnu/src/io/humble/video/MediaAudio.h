@@ -123,10 +123,7 @@ public:
    * Example: "stereo+FC" = "2+FC" = "2c+1c" = "0x7"
    */
   static int64_t
-  getChannelBitmask(const char* name) {
-    if (!name || !*name) return 0;
-    return av_get_channel_layout(name);
-  }
+  getChannelBitmask(const char* name);
 
   /**
    *
@@ -135,13 +132,11 @@ public:
    * Note to C/C++ callers. You must call free() on the returned value.
    */
   static char*
-  getChannelLayoutString(int32_t numChannels, int64_t layout) {
-    const int bufSize = 512;
-    char* retval = (char*) av_malloc(bufSize);
-    if (retval) av_get_channel_layout_string(retval, bufSize, numChannels,
-        (uint64_t) layout);
-    return retval;
-  }
+  getChannelLayoutString(int32_t numChannels, int64_t layout);
+#ifndef SWIG
+  static void freeString(char* str);
+#endif
+
 #ifdef SWIG
   %newobject getChannelLayoutString(int32_t, int64_t);
   %typemap(newfree) char * "av_free($1);";
@@ -151,17 +146,13 @@ public:
    * Return the number of channels in the channel layout.
    */
   static int32_t
-  getNumChannelsInLayout(Layout layout) {
-    return av_get_channel_layout_nb_channels((uint64_t) layout);
-  }
+  getNumChannelsInLayout(Layout layout);
 
   /**
    * Return default channel layout for a given number of channels.
    */
   static Layout
-  getDefaultLayout(int numChannels) {
-    return (Layout) av_get_default_channel_layout(numChannels);
-  }
+  getDefaultLayout(int numChannels);
 
   /**
    * Get the index of a channel in channel_layout.
@@ -186,19 +177,14 @@ public:
    * @return index of channel in channel_layout on success, a negative AVERROR
    *         on error.
    */
-  static int
-  getIndexOfChannelInLayout(Layout layout, Type channel) {
-    return av_get_channel_layout_channel_index((uint64_t) layout,
-        (uint64_t) channel);
-  }
+  static int32_t
+  getIndexOfChannelInLayout(Layout layout, Type channel);
 
   /**
    * Get the channel with the given index in channel_layout.
    */
   static Type
-  getChannelFromLayoutAtIndex(Layout layout, int32_t index) {
-    return (Type) av_channel_layout_extract_channel((uint64_t) layout, index);
-  }
+  getChannelFromLayoutAtIndex(Layout layout, int32_t index);
 
   /**
    * Get the name of a given channel.
@@ -206,9 +192,7 @@ public:
    * @return channel name on success, NULL on error.
    */
   static const char *
-  getChannelName(Type channel) {
-    return av_get_channel_name(channel);
-  }
+  getChannelName(Type channel);
 
   /**
    * Get the description of a given channel.
@@ -217,9 +201,7 @@ public:
    * @return  channel description on success, NULL on error
    */
   static const char *
-  getChannelDescription(Type channel) {
-    return av_get_channel_description(channel);
-  }
+  getChannelDescription(Type channel);
 
   /**
    * Get the value and name of a standard channel layout.
@@ -231,23 +213,8 @@ public:
    *          <0 if index is beyond the limits
    */
   static const char*
-  getLayoutName(Layout layout) {
-    const char* name = 0;
-    int i = 0;
-    int retval = 0;
-    uint64_t l = 0;
-    do {
-      retval = av_get_standard_channel_layout(i, &l, &name);
-      if (retval < 0) {
-        name = 0;
-        break;
-      }
-      if (l == (uint64_t) layout) break;
-      // and increment the index.
-      ++i;
-    } while (1);
-    return name;
-  }
+  getLayoutName(Layout layout);
+
 protected:
   AudioChannel() {};
   virtual
@@ -294,17 +261,14 @@ public:
    * recognized.
    */
   static const char*
-  getName(Type format) {
-    return av_get_sample_fmt_name((enum AVSampleFormat) format);
-  }
+  getName(Type format);
+
   /**
    * Return a sample format corresponding to name, or SAMPLE_FMT_NONE
    * on error.
    */
   static Type
-  getFormat(const char* name) {
-    return (Type) av_get_sample_fmt(name);
-  }
+  getFormat(const char* name);
 
   /**
    * Return the planar<->packed alternative form of the given sample format, or
@@ -313,10 +277,7 @@ public:
    * input.
    */
   static Type
-  getAlternateSampleFormat(Type sample_fmt, bool planar) {
-    return (Type) av_get_alt_sample_fmt((enum AVSampleFormat) sample_fmt,
-        (int) planar);
-  }
+  getAlternateSampleFormat(Type sample_fmt, bool planar);
 
   /**
    * Get the packed alternative form of the given sample format.
@@ -328,9 +289,7 @@ public:
    AV_SAMPLE_FMT_NONE on error.
    */
   static Type
-  getPackedSampleFormat(Type sample_fmt) {
-    return (Type) av_get_packed_sample_fmt((enum AVSampleFormat) sample_fmt);
-  }
+  getPackedSampleFormat(Type sample_fmt);
 
   /**
    * Get the planar alternative form of the given sample format.
@@ -342,9 +301,7 @@ public:
    SAMPLE_FMT_NONE on error.
    */
   static Type
-  getPlanarSampleFormat(Type sample_fmt) {
-    return (Type) av_get_planar_sample_fmt((enum AVSampleFormat) sample_fmt);
-  }
+  getPlanarSampleFormat(Type sample_fmt);
 
   /**
    * Return number of bytes per sample.
@@ -354,9 +311,7 @@ public:
    * sample format
    */
   static int32_t
-  getBytesPerSample(Type sample_fmt) {
-    return av_get_bytes_per_sample((enum AVSampleFormat) sample_fmt);
-  }
+  getBytesPerSample(Type sample_fmt);
 
   /**
    * Check if the sample format is planar.
@@ -365,18 +320,14 @@ public:
    * @return 1 if the sample format is planar, 0 if it is interleaved
    */
   static bool
-  isPlanar(Type sample_fmt) {
-    return av_sample_fmt_is_planar((enum AVSampleFormat) sample_fmt);
-  }
+  isPlanar(Type sample_fmt);
 
   /**
    * Get the size of a buffer in bytes that would be required to hold the
    * number of samples of audio in the given format and with the given number of channels.
    */
   static int32_t
-  getBufferSizeNeeded(int32_t numSamples, int32_t numChannels, Type format) {
-    return av_samples_get_buffer_size(0, numChannels, numSamples, (enum AVSampleFormat) format, 0);
-  }
+  getBufferSizeNeeded(int32_t numSamples, int32_t numChannels, Type format);
 
   /**
    * Get the size of a plane of audio bytes that would be required to hold the
@@ -386,12 +337,7 @@ public:
    * </p>
    */
   static int32_t
-  getDataPlaneSizeNeeded(int32_t numSamples, int32_t numChannels, Type format) {
-    int32_t linesize = 0;
-    (void) av_samples_get_buffer_size(&linesize, numChannels, numSamples, (enum AVSampleFormat) format, 0);
-    return linesize;
-  }
-
+  getDataPlaneSizeNeeded(int32_t numSamples, int32_t numChannels, Type format);
 protected:
   AudioFormat();
   virtual

@@ -37,7 +37,7 @@ namespace video {
  * A MediaAudioResampler object resamples MediaAudio objects from
  * one format/sample-rate/channel-layout to another.
  */
-class MediaAudioResampler : public io::humble::video::Configurable
+class VS_API_HUMBLEVIDEO MediaAudioResampler : public io::humble::video::Configurable
 {
 public:
   /**

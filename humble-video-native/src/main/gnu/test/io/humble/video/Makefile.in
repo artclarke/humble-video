@@ -1675,7 +1675,7 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-recursive
-all-am: Makefile $(HEADERS)
+all-am: Makefile $(HEADERS) all-local
 installdirs: installdirs-recursive
 installdirs-am:
 install: $(BUILT_SOURCES)
@@ -1787,10 +1787,10 @@ uninstall-am:
 .MAKE: $(am__recursive_targets) all check check-am install install-am \
 	install-strip
 
-.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am check \
-	check-TESTS check-am clean clean-checkPROGRAMS clean-generic \
-	clean-libtool clean-local cscopelist-am ctags ctags-am \
-	distclean distclean-compile distclean-generic \
+.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am all-local \
+	check check-TESTS check-am clean clean-checkPROGRAMS \
+	clean-generic clean-libtool clean-local cscopelist-am ctags \
+	ctags-am distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
@@ -1803,6 +1803,8 @@ uninstall-am:
 	recheck tags tags-am uninstall uninstall-am
 
 include @top_builddir@/mk/Makefile.global
+
+all-local: $(check_PROGRAMS)
 
 clean-local:
 	rm -rf $(BUILT_SOURCES)

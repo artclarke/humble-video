@@ -43,7 +43,7 @@ namespace video {
 /**
  * A link between two Filters in a FilterGraph.
  */
-class FilterLink : public io::humble::ferry::RefCounted
+class VS_API_HUMBLEVIDEO FilterLink : public io::humble::ferry::RefCounted
 {
 public:
   /**
