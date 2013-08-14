@@ -24,7 +24,7 @@
 #include <io/humble/video/MediaPictureImpl.h>
 #include <io/humble/video/Rational.h>
 #include <io/humble/video/Property.h>
-#include <io/humble/video/Error.h>
+#include <io/humble/video/VideoExceptions.h>
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
@@ -130,12 +130,8 @@ MediaPictureResamplerImpl :: resample(MediaPicture* pOutFrame, MediaPicture* pIn
   retval = sws_scale(mContext, inAVFrame->data, inAVFrame->linesize, 0,
       mIHeight, outAVFrame->data, outAVFrame->linesize);
 
-  if (retval < 0) {
-    // we got an error; throw an exception
-    // let's make an error
-    RefPointer<Error> error = Error::make(retval);
-    VS_THROW(HumbleRuntimeError::make("Error while resampling: %s", error ? error->getDescription() : ""));
-  }
+  FfmpegException::check(retval, "Error while resampling. ");
+
   outFrame->setQuality(inFrame->getQuality());
   outFrame->setComplete(retval >= 0);
 

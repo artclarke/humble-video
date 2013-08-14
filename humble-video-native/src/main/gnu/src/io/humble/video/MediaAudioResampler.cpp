@@ -26,7 +26,7 @@
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/RefCounted.h>
-#include <io/humble/video/Error.h>
+#include <io/humble/video/VideoExceptions.h>
 #include <io/humble/video/MediaAudioImpl.h>
 #include "MediaAudioResampler.h"
 
@@ -165,8 +165,7 @@ MediaAudioResampler::open() {
   int retval = swr_init(mCtx);
   if (retval < 0) {
     mState = STATE_ERROR;
-    RefPointer<Error> error = Error::make(retval);
-    VS_THROW(HumbleRuntimeError::make("Could not open audio resampler: %s", error ? error->getDescription() : ""));
+    FfmpegException::check(retval, "Could not open audio resampler: ");
   }
   mState = STATE_OPENED;
 }
@@ -208,8 +207,7 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
       inFrame? (const uint8_t**)inFrame->extended_data : 0,
       inFrame ? inFrame->nb_samples : 0);
   if (retval < 0) {
-    RefPointer<Error> error = Error::make(retval);
-    VS_THROW(HumbleRuntimeError::make("Could not convert audio: %s", error ? error->getDescription() : ""));
+    FfmpegException::check(retval, "Could not convert audio ");
   }
   outFrame->nb_samples = retval;
   // wrong; need to figure out PTS stuff.

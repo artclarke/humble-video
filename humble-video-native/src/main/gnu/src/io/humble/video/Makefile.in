@@ -104,16 +104,15 @@ am_libhumble_video_la_OBJECTS = Mingw64Fixes.lo VideoExceptions.lo \
 	MediaAudioImpl.lo MediaAudioResampler.lo MediaPicture.lo \
 	MediaPictureImpl.lo MediaPictureResampler.lo \
 	MediaPictureResamplerImpl.lo MediaSubtitle.lo \
-	MediaSubtitleImpl.lo IndexEntry.lo IndexEntryImpl.lo Error.lo \
-	ErrorImpl.lo MediaPacket.lo MediaPacketImpl.lo \
-	ContainerFormat.lo Configurable.lo Coder.lo Decoder.lo \
-	Encoder.lo ContainerStream.lo Container.lo DemuxerFormat.lo \
-	Demuxer.lo DemuxerImpl.lo DemuxerStream.lo \
-	DemuxerStreamImpl.lo MuxerFormat.lo FilterType.lo \
-	FilterGraph.lo Filter.lo FilterLink.lo FilterEndPoint.lo \
-	FilterSource.lo FilterAudioSource.lo FilterPictureSource.lo \
-	FilterSink.lo FilterAudioSink.lo FilterPictureSink.lo \
-	Global.lo
+	MediaSubtitleImpl.lo IndexEntry.lo IndexEntryImpl.lo \
+	MediaPacket.lo MediaPacketImpl.lo ContainerFormat.lo \
+	Configurable.lo Coder.lo Decoder.lo Encoder.lo \
+	ContainerStream.lo Container.lo DemuxerFormat.lo Demuxer.lo \
+	DemuxerImpl.lo DemuxerStream.lo DemuxerStreamImpl.lo \
+	MuxerFormat.lo FilterType.lo FilterGraph.lo Filter.lo \
+	FilterLink.lo FilterEndPoint.lo FilterSource.lo \
+	FilterAudioSource.lo FilterPictureSource.lo FilterSink.lo \
+	FilterAudioSink.lo FilterPictureSink.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -481,8 +480,6 @@ libhumble_video_la_SOURCES = \
   MediaSubtitleImpl.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
-  Error.cpp \
-  ErrorImpl.cpp \
   MediaPacket.cpp \
   MediaPacketImpl.cpp \
   ContainerFormat.cpp \
@@ -550,9 +547,6 @@ libhumble_video_la_HEADERS = \
   IndexEntry.h \
   IndexEntryImpl.h \
   IndexEntry.swg \
-  Error.h \
-  ErrorImpl.h \
-  Error.swg \
   MediaPacket.h \
   MediaPacketImpl.h \
   MediaPacket.swg \
@@ -669,8 +663,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerStream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerStreamImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Encoder.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Error.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Filter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterAudioSink.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterAudioSource.Plo@am__quote@

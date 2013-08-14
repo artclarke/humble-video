@@ -36,8 +36,6 @@ libhumble_video_la_SOURCES= \
   MediaSubtitleImpl.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
-  Error.cpp \
-  ErrorImpl.cpp \
   MediaPacket.cpp \
   MediaPacketImpl.cpp \
   ContainerFormat.cpp \
@@ -105,9 +103,6 @@ libhumble_video_la_HEADERS= \
   IndexEntry.h \
   IndexEntryImpl.h \
   IndexEntry.swg \
-  Error.h \
-  ErrorImpl.h \
-  Error.swg \
   MediaPacket.h \
   MediaPacketImpl.h \
   MediaPacket.swg \

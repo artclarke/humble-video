@@ -82,12 +82,12 @@ check_PROGRAMS = FilterTypeTester$(EXEEXT) FilterGraphTester$(EXEEXT) \
 	MediaAudioResamplerTester$(EXEEXT) \
 	MediaPictureResamplerTester$(EXEEXT) DecoderTester$(EXEEXT) \
 	PixelFormatTester$(EXEEXT) CodecTester$(EXEEXT) \
-	IndexEntryTester$(EXEEXT) ErrorTester$(EXEEXT) \
-	MediaPacketTester$(EXEEXT) MediaAudioTester$(EXEEXT) \
-	MediaPictureTester$(EXEEXT) KeyValueBagTester$(EXEEXT) \
-	DemuxerTester$(EXEEXT) DemuxerFormatTester$(EXEEXT) \
-	DemuxerStreamTester$(EXEEXT) MuxerFormatTester$(EXEEXT) \
-	PropertyTester$(EXEEXT) RationalTester$(EXEEXT)
+	IndexEntryTester$(EXEEXT) MediaPacketTester$(EXEEXT) \
+	MediaAudioTester$(EXEEXT) MediaPictureTester$(EXEEXT) \
+	KeyValueBagTester$(EXEEXT) DemuxerTester$(EXEEXT) \
+	DemuxerFormatTester$(EXEEXT) DemuxerStreamTester$(EXEEXT) \
+	MuxerFormatTester$(EXEEXT) PropertyTester$(EXEEXT) \
+	RationalTester$(EXEEXT)
 @VS_OS_WINDOWS_FALSE@am__append_1 = $(check_PROGRAMS)
 subdir = test/io/humble/video
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -146,12 +146,6 @@ nodist_DemuxerTester_OBJECTS = DemuxerTest_CXXRunner.$(OBJEXT)
 DemuxerTester_OBJECTS = $(am_DemuxerTester_OBJECTS) \
 	$(nodist_DemuxerTester_OBJECTS)
 DemuxerTester_DEPENDENCIES =  \
-	$(top_builddir)/src/io/humble/libhumblevideo.la
-am_ErrorTester_OBJECTS = ErrorTest.$(OBJEXT) Main.$(OBJEXT)
-nodist_ErrorTester_OBJECTS = ErrorTest_CXXRunner.$(OBJEXT)
-ErrorTester_OBJECTS = $(am_ErrorTester_OBJECTS) \
-	$(nodist_ErrorTester_OBJECTS)
-ErrorTester_DEPENDENCIES =  \
 	$(top_builddir)/src/io/humble/libhumblevideo.la
 am_FilterGraphTester_OBJECTS = FilterGraphTest.$(OBJEXT) \
 	TestData.$(OBJEXT) lodepng.$(OBJEXT) Main.$(OBJEXT)
@@ -293,8 +287,7 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(nodist_DemuxerFormatTester_SOURCES) \
 	$(DemuxerStreamTester_SOURCES) \
 	$(nodist_DemuxerStreamTester_SOURCES) $(DemuxerTester_SOURCES) \
-	$(nodist_DemuxerTester_SOURCES) $(ErrorTester_SOURCES) \
-	$(nodist_ErrorTester_SOURCES) $(FilterGraphTester_SOURCES) \
+	$(nodist_DemuxerTester_SOURCES) $(FilterGraphTester_SOURCES) \
 	$(nodist_FilterGraphTester_SOURCES) \
 	$(FilterTypeTester_SOURCES) $(nodist_FilterTypeTester_SOURCES) \
 	$(IndexEntryTester_SOURCES) $(nodist_IndexEntryTester_SOURCES) \
@@ -317,9 +310,9 @@ SOURCES = $(CodecTester_SOURCES) $(nodist_CodecTester_SOURCES) \
 	$(nodist_RationalTester_SOURCES)
 DIST_SOURCES = $(CodecTester_SOURCES) $(DecoderTester_SOURCES) \
 	$(DemuxerFormatTester_SOURCES) $(DemuxerStreamTester_SOURCES) \
-	$(DemuxerTester_SOURCES) $(ErrorTester_SOURCES) \
-	$(FilterGraphTester_SOURCES) $(FilterTypeTester_SOURCES) \
-	$(IndexEntryTester_SOURCES) $(KeyValueBagTester_SOURCES) \
+	$(DemuxerTester_SOURCES) $(FilterGraphTester_SOURCES) \
+	$(FilterTypeTester_SOURCES) $(IndexEntryTester_SOURCES) \
+	$(KeyValueBagTester_SOURCES) \
 	$(MediaAudioResamplerTester_SOURCES) \
 	$(MediaAudioTester_SOURCES) $(MediaPacketTester_SOURCES) \
 	$(MediaPictureResamplerTester_SOURCES) \
@@ -788,7 +781,6 @@ BUILT_SOURCES = \
   PixelFormatTest_CXXRunner.cpp \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
-  ErrorTest_CXXRunner.cpp \
   MediaPacketTest_CXXRunner.cpp \
   MediaAudioTest_CXXRunner.cpp \
   MediaPictureTest_CXXRunner.cpp \
@@ -809,7 +801,6 @@ noinst_HEADERS = \
   PixelFormatTest.h \
   CodecTest.h \
   IndexEntryTest.h \
-  ErrorTest.h \
   MediaPacketTest.h \
   MediaAudioTest.h \
   MediaPictureTest.h \
@@ -915,16 +906,6 @@ nodist_IndexEntryTester_SOURCES = \
   IndexEntryTest_CXXRunner.cpp
 
 IndexEntryTester_LDADD = \
-  $(top_builddir)/src/io/humble/libhumblevideo.la 
-
-ErrorTester_SOURCES = \
-  ErrorTest.cpp \
-  Main.cpp
-
-nodist_ErrorTester_SOURCES = \
-  ErrorTest_CXXRunner.cpp
-
-ErrorTester_LDADD = \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 MediaPacketTester_SOURCES = \
@@ -1097,10 +1078,6 @@ DemuxerTester$(EXEEXT): $(DemuxerTester_OBJECTS) $(DemuxerTester_DEPENDENCIES) $
 	@rm -f DemuxerTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(DemuxerTester_OBJECTS) $(DemuxerTester_LDADD) $(LIBS)
 
-ErrorTester$(EXEEXT): $(ErrorTester_OBJECTS) $(ErrorTester_DEPENDENCIES) $(EXTRA_ErrorTester_DEPENDENCIES) 
-	@rm -f ErrorTester$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(ErrorTester_OBJECTS) $(ErrorTester_LDADD) $(LIBS)
-
 FilterGraphTester$(EXEEXT): $(FilterGraphTester_OBJECTS) $(FilterGraphTester_DEPENDENCIES) $(EXTRA_FilterGraphTester_DEPENDENCIES) 
 	@rm -f FilterGraphTester$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(FilterGraphTester_OBJECTS) $(FilterGraphTester_LDADD) $(LIBS)
@@ -1169,8 +1146,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerStreamTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerTest_CXXRunner.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ErrorTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterGraphTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterGraphTest_CXXRunner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterTypeTest.Po@am__quote@
@@ -1520,13 +1495,6 @@ CodecTester.log: CodecTester$(EXEEXT)
 IndexEntryTester.log: IndexEntryTester$(EXEEXT)
 	@p='IndexEntryTester$(EXEEXT)'; \
 	b='IndexEntryTester'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-ErrorTester.log: ErrorTester$(EXEEXT)
-	@p='ErrorTester$(EXEEXT)'; \
-	b='ErrorTester'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

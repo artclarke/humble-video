@@ -27,7 +27,7 @@
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
-#include <io/humble/video/Error.h>
+#include <io/humble/video/VideoExceptions.h>
 #include <io/humble/video/IndexEntryImpl.h>
 #include <io/humble/video/MediaAudioImpl.h>
 #include <io/humble/video/MediaPictureImpl.h>
@@ -208,11 +208,7 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   av_frame_unref(frame);
   av_freep(&frame);
   /** END DO NOT THROW EXCEPTIONS **/
-  if (retval < 0) {
-    // let's make an error
-    RefPointer<Error> error = Error::make(retval);
-    VS_THROW(HumbleRuntimeError::make("Error while decoding: %s", error ? error->getDescription() : ""));
-  }
+  FfmpegException::check(retval, "Error while decoding ");
   return retval;
 }
 
@@ -295,11 +291,7 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
   av_frame_unref(frame);
   av_freep(&frame);
   /** END DO NOT THROW EXCEPTIONS **/
-  if (retval < 0) {
-    // let's make an error
-    RefPointer<Error> error = Error::make(retval);
-    VS_THROW(HumbleRuntimeError::make("Error while decoding: %s", error ? error->getDescription() : ""));
-  }
+  FfmpegException::check(retval, "Error while decoding ");
   return retval;
 }
 

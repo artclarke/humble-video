@@ -23,7 +23,7 @@
 #include <io/humble/video/PropertyImpl.h>
 #include <io/humble/video/VideoExceptions.h>
 #include <io/humble/video/KeyValueBagImpl.h>
-#include <io/humble/video/Error.h>
+#include <io/humble/video/VideoExceptions.h>
 extern "C" {
 #include "FfmpegIncludes.h"
 #include <libavutil/log.h>
@@ -63,8 +63,7 @@ PropertyImpl::checkError(int32_t e, const char* name) {
     if (e == AVERROR_OPTION_NOT_FOUND)
       VS_THROW(PropertyNotFoundException(name));
     else {
-      RefPointer<Error> error = Error::make(e);
-      VS_THROW(HumbleRuntimeError::make("error accessing property \"%s\": %s", name, error->getDescription()));
+      FfmpegException::check(e, "error access property: %s; ", name);
     }
   }
 

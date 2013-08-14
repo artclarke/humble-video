@@ -15,7 +15,6 @@ check_PROGRAMS=\
   PixelFormatTester \
   CodecTester \
   IndexEntryTester \
-  ErrorTester \
   MediaPacketTester \
   MediaAudioTester \
   MediaPictureTester \
@@ -36,7 +35,6 @@ BUILT_SOURCES= \
   PixelFormatTest_CXXRunner.cpp \
   CodecTest_CXXRunner.cpp \
   IndexEntryTest_CXXRunner.cpp \
-  ErrorTest_CXXRunner.cpp \
   MediaPacketTest_CXXRunner.cpp \
   MediaAudioTest_CXXRunner.cpp \
   MediaPictureTest_CXXRunner.cpp \
@@ -57,7 +55,6 @@ noinst_HEADERS = \
   PixelFormatTest.h \
   CodecTest.h \
   IndexEntryTest.h \
-  ErrorTest.h \
   MediaPacketTest.h \
   MediaAudioTest.h \
   MediaPictureTest.h \
@@ -169,16 +166,6 @@ nodist_IndexEntryTester_SOURCES= \
   IndexEntryTest_CXXRunner.cpp
 
 IndexEntryTester_LDADD= \
-  $(top_builddir)/src/io/humble/libhumblevideo.la 
-
-ErrorTester_SOURCES= \
-  ErrorTest.cpp \
-  Main.cpp
-
-nodist_ErrorTester_SOURCES= \
-  ErrorTest_CXXRunner.cpp
-
-ErrorTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 MediaPacketTester_SOURCES= \

@@ -262,13 +262,6 @@ public class VideoJNI {
   public final static native int KeyValueBag_setValue__SWIG_0(long jarg1, KeyValueBag jarg1_, String jarg2, String jarg3);
   public final static native long KeyValueBag_make();
   public final static native int KeyValueBag_setValue__SWIG_1(long jarg1, KeyValueBag jarg1_, String jarg2, String jarg3, int jarg4);
-  public final static native int Error_getType(long jarg1, Error jarg1_);
-  public final static native String Error_getDescription(long jarg1, Error jarg1_);
-  public final static native int Error_getErrorNumber(long jarg1, Error jarg1_);
-  public final static native long Error_make__SWIG_0(int jarg1);
-  public final static native long Error_make__SWIG_1(int jarg1);
-  public final static native int Error_errorNumberToType(int jarg1);
-  public final static native int Error_typeToErrorNumber(int jarg1);
   public final static native int Property_PROPERTY_CONST_get();
   public final static native int Property_PROPERTY_IMAGE_SIZE_get();
   public final static native int Property_PROPERTY_PIXEL_FMT_get();
@@ -1380,7 +1373,6 @@ public class VideoJNI {
   public final static native long Rational_SWIGUpcast(long jarg1);
   public final static native long Global_SWIGUpcast(long jarg1);
   public final static native long KeyValueBag_SWIGUpcast(long jarg1);
-  public final static native long Error_SWIGUpcast(long jarg1);
   public final static native long Property_SWIGUpcast(long jarg1);
   public final static native long Media_SWIGUpcast(long jarg1);
   public final static native long MediaEncoded_SWIGUpcast(long jarg1);
