@@ -53,7 +53,7 @@ public:
   getState() = 0;
 
   /**
-   * Get the InputFormat associated with this Demuxer
+   * Get the DemuxerFormat associated with this Demuxer
    * or null if unknown.
    */
   virtual DemuxerFormat *

@@ -1258,6 +1258,8 @@ public class VideoJNI {
   public final static native int Container_getNumStreams(long jarg1, Container jarg1_) throws java.lang.InterruptedException, java.io.IOException;
   public final static native long DemuxerStream_getAttachedPic(long jarg1, DemuxerStream jarg1_);
   public final static native long DemuxerStream_getDecoder(long jarg1, DemuxerStream jarg1_);
+  public final static native String Muxer_getURL(long jarg1, Muxer jarg1_);
+  public final static native long Muxer_getFormat(long jarg1, Muxer jarg1_);
   public final static native long Demuxer_make();
   public final static native int Demuxer_getState(long jarg1, Demuxer jarg1_);
   public final static native long Demuxer_getFormat(long jarg1, Demuxer jarg1_);

@@ -134,7 +134,7 @@ public class Demuxer extends Container {
   }
 
 /**
- * Get the InputFormat associated with this Demuxer<br>
+ * Get the DemuxerFormat associated with this Demuxer<br>
  * or null if unknown.
  */
   protected DemuxerFormat getFormat() {

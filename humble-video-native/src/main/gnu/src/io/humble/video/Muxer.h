@@ -27,6 +27,7 @@
 #define MUXER_H_
 
 #include <io/humble/video/Container.h>
+#include <io/humble/video/MuxerFormat.h>
 
 namespace io {
 namespace humble {
@@ -34,6 +35,22 @@ namespace video {
 
 class VS_API_HUMBLEVIDEO Muxer : public io::humble::video::Container
 {
+public:
+  /**
+   * Get the URL the Muxer was opened with.
+   * May return null if unknown.
+   * @return the URL opened, or null.
+   */
+  virtual const char*
+  getURL()=0;
+
+  /**
+   * Get the MuxerFormat associated with this Muxer
+   * or null if unknown.
+   */
+  virtual MuxerFormat *
+  getFormat() = 0;
+
 protected:
   Muxer();
   virtual
