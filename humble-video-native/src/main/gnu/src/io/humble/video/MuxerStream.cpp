@@ -29,7 +29,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-MuxerStream::MuxerStream() {
+MuxerStream::MuxerStream(Container* c, int32_t index) : ContainerStream(c, index) {
 
 }
 

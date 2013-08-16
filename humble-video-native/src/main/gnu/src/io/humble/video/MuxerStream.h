@@ -32,10 +32,10 @@ namespace io {
 namespace humble {
 namespace video {
 
-class MuxerStream : public io::humble::video::ContainerStream
+class VS_API_HUMBLEVIDEO MuxerStream : public io::humble::video::ContainerStream
 {
 protected:
-  MuxerStream();
+  MuxerStream(Container* container, int32_t index);
   virtual
   ~MuxerStream();
 };

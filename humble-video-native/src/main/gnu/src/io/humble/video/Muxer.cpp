@@ -197,7 +197,20 @@ Muxer::open(KeyValueBag *aInputOptions, KeyValueBag* aOutputOptions) {
 
 void
 Muxer::close() {
-
+  if (getState() != STATE_OPENED) {
+    VS_THROW(HumbleRuntimeError::make("closed container that was not open"));
+  }
+  AVFormatContext* ctx = getFormatCtx();
+  int e = av_write_trailer(ctx);
+  if (e < 0) {
+    mState = STATE_ERROR;
+    FfmpegException::check(e, "could not write trailer ");
+  }
+  if (mIOHandler) {
+    e = mIOHandler->url_close();
+  } else
+    e = avio_close(ctx->pb);
+  FfmpegException::check(e, "could not close url ");
   mState = STATE_CLOSED;
 }
 

@@ -42,9 +42,9 @@ MuxerTest::testCreation() {
 
 //  stream = muxer->addNewStream(Codec::CODEC_ID_FLV1);
 
-  muxer->open(0, 0);
-
-  muxer->close();
+//  muxer->open(0, 0);
+//
+//  muxer->close();
 
 
 }
