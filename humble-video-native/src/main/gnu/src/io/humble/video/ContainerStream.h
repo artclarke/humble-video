@@ -20,6 +20,7 @@
 #ifndef STREAM_H_
 #define STREAM_H_
 #include <io/humble/ferry/RefCounted.h>
+#include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/HumbleVideo.h>
 namespace io { namespace humble { namespace video
 {
@@ -106,13 +107,13 @@ namespace io { namespace humble { namespace video
      * Container object.
      * @return The Index within the Container of this stream.
      */
-    virtual int32_t getIndex()=0;
+    virtual int32_t getIndex();
 
     /**
      * Return a container format specific id for this stream.
      * @return The (container format specific) id of this stream.
      */
-    virtual int32_t getId()=0;
+    virtual int32_t getId();
 
     /**
      * Get the (sometimes estimated) average frame rate of this container.
@@ -123,7 +124,7 @@ namespace io { namespace humble { namespace video
      *
      * @return The frame-rate of this container.
      */
-    virtual Rational * getFrameRate()=0;
+    virtual Rational * getFrameRate();
 
     /**
      * The time base in which all timestamps (e.g. Presentation Time Stamp (PTS)
@@ -134,35 +135,35 @@ namespace io { namespace humble { namespace video
      *
      * @return The time base of this stream.
      */
-    virtual Rational * getTimeBase()=0;
+    virtual Rational * getTimeBase();
 
     /**
      * Return the start time, in #getTimeBase() units, when this stream
      * started.
      * @return The start time.
      */
-    virtual int64_t getStartTime()=0;
+    virtual int64_t getStartTime();
 
     /**
      * Return the duration, in #getTimeBase() units, of this stream,
      * or Global#NO_PTS if unknown.
      * @return The duration (in getTimeBase units) of this stream, if known.
      */
-    virtual int64_t getDuration()=0;
+    virtual int64_t getDuration();
 
     /**
      * The current Decompression Time Stamp that will be used on this stream,
      * in #getTimeBase() units.
      * @return The current Decompression Time Stamp that will be used on this stream.
      */
-    virtual int64_t getCurrentDts()=0;
+    virtual int64_t getCurrentDts();
 
     /**
      * Get the number of index entries in this stream.
      * @return The number of index entries in this stream.
      * @see #getIndexEntry(int)
      */
-    virtual int getNumIndexEntries()=0;
+    virtual int getNumIndexEntries();
 
     /**
      * Returns the number of encoded frames if known.  Note that frames here means
@@ -171,14 +172,14 @@ namespace io { namespace humble { namespace video
      *
      * @return The number of frames (encoded) in this stream.
      */
-    virtual int64_t getNumFrames()=0;
+    virtual int64_t getNumFrames();
     
     /**
      * Gets the sample aspect ratio.
      *
      * @return The sample aspect ratio.
      */
-    virtual Rational* getSampleAspectRatio()=0;
+    virtual Rational* getSampleAspectRatio();
 
     /**
      * Get the underlying container for this stream, or null if Humble Video
@@ -186,13 +187,13 @@ namespace io { namespace humble { namespace video
      * 
      * @return the container, or null if we don't know.
      */
-    virtual Container* getContainer()=0;
+    virtual Container* getContainer();
     
     /**
      * Get how the decoding codec should parse data from this stream.
      * @return the parse type.
      */
-    virtual ContainerStream::ParseType getParseType()=0;
+    virtual ContainerStream::ParseType getParseType();
     
     /**
      * Set the parse type the decoding codec should use.  Set to
@@ -205,7 +206,7 @@ namespace io { namespace humble { namespace video
      * 
      * @param type The type to set.
      */
-    virtual void setParseType(ParseType type)=0;
+    virtual void setParseType(ParseType type);
 
     /**
      * Get the KeyValueBag for this object,
@@ -225,7 +226,7 @@ namespace io { namespace humble { namespace video
      * </p>
      * @return the KeyValueBag.
      */
-   virtual KeyValueBag* getMetaData()=0;
+   virtual KeyValueBag* getMetaData();
 
    /**
     * Search for the given time stamp in the key-frame index for this Stream.
@@ -249,7 +250,7 @@ namespace io { namespace humble { namespace video
     *   in the index, or null if it can't be found.
     */
    virtual IndexEntry* findTimeStampEntryInIndex(
-       int64_t wantedTimeStamp, int32_t flags)=0;
+       int64_t wantedTimeStamp, int32_t flags);
 
    /**
     * Search for the given time stamp in the key-frame index for this Stream.
@@ -274,7 +275,7 @@ namespace io { namespace humble { namespace video
     * @see #getIndexEntry(int)
     */
    virtual int32_t findTimeStampPositionInIndex(
-       int64_t wantedTimeStamp, int32_t flags)=0;
+       int64_t wantedTimeStamp, int32_t flags);
 
    /**
     * Get the IndexEntry at the given position in this
@@ -292,15 +293,40 @@ namespace io { namespace humble { namespace video
     * </p>
     * @param position The position in the index table.
     */
-   virtual IndexEntry* getIndexEntry(int32_t position)=0;
+   virtual IndexEntry* getIndexEntry(int32_t position);
 
    /**
     * Get the Stream.Disposition of this stream.
     */
-   virtual ContainerStream::Disposition getDisposition()=0;
+   virtual ContainerStream::Disposition getDisposition();
+
+   /**
+    * For containers with Stream.Disposition.DISPOSITION_ATTACHED_PIC,
+    * this returns a read-only copy of the packet containing the
+    * picture (needs to be decoded separately).
+    */
+   virtual MediaPacket* getAttachedPic();
+
+#ifndef SWIG
+
+   virtual void setTimeBase(Rational *);
+   virtual void setFrameRate(Rational *);
+
+   virtual void setSampleAspectRatio(Rational* newRatio);
+
+   virtual void setMetaData(KeyValueBag* metaData);
+
+   virtual int32_t addIndexEntry(IndexEntry* entry);
+   void setId(int32_t id);
+
+   AVStream* getCtx();
+#endif
   protected:
-    virtual ~ContainerStream()=0;
-    ContainerStream();
+    virtual ~ContainerStream();
+    ContainerStream(Container*, int32_t);
+  private:
+    int32_t mIndex;
+    io::humble::ferry::RefPointer<Container> mContainer;
   };
 }}}
 

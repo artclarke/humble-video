@@ -108,12 +108,11 @@ am_libhumble_video_la_OBJECTS = Mingw64Fixes.lo VideoExceptions.lo \
 	MediaPacket.lo MediaPacketImpl.lo ContainerFormat.lo \
 	Configurable.lo Coder.lo Decoder.lo Encoder.lo \
 	ContainerStream.lo Container.lo DemuxerFormat.lo Muxer.lo \
-	Demuxer.lo DemuxerImpl.lo DemuxerStream.lo \
-	DemuxerStreamImpl.lo MuxerFormat.lo FilterType.lo \
-	FilterGraph.lo Filter.lo FilterLink.lo FilterEndPoint.lo \
-	FilterSource.lo FilterAudioSource.lo FilterPictureSource.lo \
-	FilterSink.lo FilterAudioSink.lo FilterPictureSink.lo \
-	Global.lo
+	Demuxer.lo DemuxerImpl.lo DemuxerStream.lo MuxerFormat.lo \
+	FilterType.lo FilterGraph.lo Filter.lo FilterLink.lo \
+	FilterEndPoint.lo FilterSource.lo FilterAudioSource.lo \
+	FilterPictureSource.lo FilterSink.lo FilterAudioSink.lo \
+	FilterPictureSink.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
 libhumble_video_la_OBJECTS = $(am_libhumble_video_la_OBJECTS) \
 	$(nodist_libhumble_video_la_OBJECTS)
@@ -495,7 +494,6 @@ libhumble_video_la_SOURCES = \
   Demuxer.cpp \
   DemuxerImpl.cpp \
   DemuxerStream.cpp \
-  DemuxerStreamImpl.cpp \
   MuxerFormat.cpp \
   FilterType.cpp \
   FilterGraph.cpp \
@@ -575,7 +573,6 @@ libhumble_video_la_HEADERS = \
   Container.swg \
   DemuxerStream.h \
   DemuxerStream.swg \
-  DemuxerStreamImpl.h \
   Muxer.h \
   Muxer.swg \
   Demuxer.h \
@@ -665,7 +662,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerFormat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerStream.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DemuxerStreamImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Encoder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Filter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilterAudioSink.Plo@am__quote@

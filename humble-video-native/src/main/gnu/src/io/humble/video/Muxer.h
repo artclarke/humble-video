@@ -144,6 +144,15 @@ public:
    */
   virtual int32_t
   getOutputBufferLength();
+//
+//  /**
+//   * Takes the packet given (in whatever timebase it was encoded with) and resets all timestamps
+//   * to align with the stream in this container that it will be added to.
+//   *
+//   * @param packet The packet to stamp. Packet#setStreamIndex must have been called to avoid an error,
+//   *  Packet#getStreamIndex must point to a stream number in this muxer.
+//   */
+//  virtual void stampOutputPacket(MediaPacket* packet);
 
 protected:
   virtual AVFormatContext* getFormatCtx() { return mCtx; }

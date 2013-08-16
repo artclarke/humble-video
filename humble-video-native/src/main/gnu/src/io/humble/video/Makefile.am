@@ -50,7 +50,6 @@ libhumble_video_la_SOURCES= \
   Demuxer.cpp \
   DemuxerImpl.cpp \
   DemuxerStream.cpp \
-  DemuxerStreamImpl.cpp \
   MuxerFormat.cpp \
   FilterType.cpp \
   FilterGraph.cpp \
@@ -130,7 +129,6 @@ libhumble_video_la_HEADERS= \
   Container.swg \
   DemuxerStream.h \
   DemuxerStream.swg \
-  DemuxerStreamImpl.h \
   Muxer.h \
   Muxer.swg \
   Demuxer.h \

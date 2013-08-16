@@ -1242,6 +1242,7 @@ public class VideoJNI {
   public final static native int ContainerStream_findTimeStampPositionInIndex(long jarg1, ContainerStream jarg1_, long jarg2, int jarg3);
   public final static native long ContainerStream_getIndexEntry(long jarg1, ContainerStream jarg1_, int jarg2);
   public final static native int ContainerStream_getDisposition(long jarg1, ContainerStream jarg1_);
+  public final static native long ContainerStream_getAttachedPic(long jarg1, ContainerStream jarg1_);
   public final static native int Container_FLAG_GENPTS_get();
   public final static native int Container_FLAG_IGNIDX_get();
   public final static native int Container_FLAG_NONBLOCK_get();
@@ -1256,8 +1257,8 @@ public class VideoJNI {
   public final static native int Container_FLAG_PRIV_OPT_get();
   public final static native int Container_FLAG_KEEP_SIDE_DATA_get();
   public final static native int Container_getNumStreams(long jarg1, Container jarg1_) throws java.lang.InterruptedException, java.io.IOException;
-  public final static native long DemuxerStream_getAttachedPic(long jarg1, DemuxerStream jarg1_);
   public final static native long DemuxerStream_getDecoder(long jarg1, DemuxerStream jarg1_);
+  public final static native long DemuxerStream_getDemuxer(long jarg1, DemuxerStream jarg1_);
   public final static native long Muxer_make(long jarg1, MuxerFormat jarg1_, String jarg2, String jarg3);
   public final static native String Muxer_getURL(long jarg1, Muxer jarg1_);
   public final static native long Muxer_getFormat(long jarg1, Muxer jarg1_);

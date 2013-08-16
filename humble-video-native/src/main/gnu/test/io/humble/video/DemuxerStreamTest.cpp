@@ -28,6 +28,20 @@ void
 DemuxerStreamTest::tearDown()
 {
 }
+void
+DemuxerStreamTest::testCreation()
+{
+  RefPointer<Demuxer> s = Demuxer::make();
+  TestData::Fixture* f = mFixtures.getFixture(0);
+  char path[2048];
+  mFixtures.fillPath(f, path, sizeof(path));
+
+  s->open(path, 0, false, true, 0, 0);
+
+  RefPointer<DemuxerStream> fs = s->getStream(0);
+
+  s->close();
+}
 
 void
 DemuxerStreamTest::testCreationAndDestruction()
@@ -69,5 +83,6 @@ DemuxerStreamTest::testCreationAndDestruction()
 
   // this test makes sure that accessing a stream
   // after a container is closed does not cause crashes.
-  TS_ASSERT(!fs->getContainer());
+  s = fs->getDemuxer();
+  TS_ASSERT(s);
 }

@@ -28,33 +28,41 @@
 
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/ContainerStream.h>
+#include <io/humble/video/Decoder.h>
 
 namespace io {
 namespace humble {
 namespace video {
 
-class Decoder;
+class Demuxer;
 /**
  * A ContainerStream class that was read from a Demuxer.
  */
 class VS_API_HUMBLEVIDEO DemuxerStream : public io::humble::video::ContainerStream
 {
 public:
-  /**
-   * For containers with Stream.Disposition.DISPOSITION_ATTACHED_PIC,
-   * this returns a read-only copy of the packet containing the
-   * picture (needs to be decoded separately).
-   */
-  virtual MediaPacket* getAttachedPic()=0;
+
   /**
    * Get the decoder that can decode the information in this Demuxer stream.
    */
-  virtual Decoder* getDecoder()=0;
+  virtual Decoder* getDecoder();
+
+  /**
+   * Get the Demuxer this DemuxerStream belongs to.
+   */
+  virtual Demuxer* getDemuxer();
+
+#ifndef SWIG
+  static DemuxerStream*
+  make(Container* container, int32_t index);
+#endif
 
 protected:
-  DemuxerStream();
+  DemuxerStream(Container* container, int32_t index);
   virtual
   ~DemuxerStream();
+private:
+  io::humble::ferry::RefPointer<Decoder> mDecoder;
 };
 
 } /* namespace video */

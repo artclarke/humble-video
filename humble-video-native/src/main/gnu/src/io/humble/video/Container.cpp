@@ -25,38 +25,41 @@
 #include "Container.h"
 #include "PropertyImpl.h"
 #include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/customio/URLProtocolHandler.h>
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 using namespace io::humble::video::customio;
+using namespace io::humble::ferry;
 
-namespace io
-{
-namespace humble
-{
-namespace video
-{
+namespace io {
+namespace humble {
+namespace video {
 
-Container::Container()
-{
+Container::Container() {
 }
 
-Container::~Container()
-{
+Container::~Container() {
+  // Remove all the stream meta-data objects.
+  while(mStreams.size() > 0)
+  {
+    Stream* stream=mStreams.back();
+    if (stream) {
+      delete stream;
+    }
+    mStreams.pop_back();
+  }
+
 }
 
 int
-Container::url_read(void*h, unsigned char* buf, int size)
-{
+Container::url_read(void*h, unsigned char* buf, int size) {
   int retval = -1;
-  try
-  {
+  try {
     URLProtocolHandler* handler = (URLProtocolHandler*) h;
-    if (handler)
-      retval = handler->url_read(buf, size);
-  } catch (...)
-  {
+    if (handler) retval = handler->url_read(buf, size);
+  } catch (...) {
     retval = -1;
   }
   VS_LOG_TRACE("URLProtocolHandler[%p]->url_read(%p, %d) ==> %d", h, buf, size,
@@ -64,16 +67,12 @@ Container::url_read(void*h, unsigned char* buf, int size)
   return retval;
 }
 int
-Container::url_write(void*h, unsigned char* buf, int size)
-{
+Container::url_write(void*h, unsigned char* buf, int size) {
   int retval = -1;
-  try
-  {
+  try {
     URLProtocolHandler* handler = (URLProtocolHandler*) h;
-    if (handler)
-      retval = handler->url_write(buf, size);
-  } catch (...)
-  {
+    if (handler) retval = handler->url_write(buf, size);
+  } catch (...) {
     retval = -1;
   }
   VS_LOG_TRACE("URLProtocolHandler[%p]->url_write(%p, %d) ==> %d", h, buf, size,
@@ -82,21 +81,87 @@ Container::url_write(void*h, unsigned char* buf, int size)
 }
 
 int64_t
-Container::url_seek(void*h, int64_t position, int whence)
-{
+Container::url_seek(void*h, int64_t position, int whence) {
   int64_t retval = -1;
-  try
-  {
+  try {
     URLProtocolHandler* handler = (URLProtocolHandler*) h;
-    if (handler)
-      retval = handler->url_seek(position, whence);
-  } catch (...)
-  {
+    if (handler) retval = handler->url_seek(position, whence);
+  } catch (...) {
     retval = -1;
   }
   VS_LOG_TRACE("URLProtocolHandler[%p]->url_seek(%p, %lld) ==> %d", h, position,
       whence, retval);
   return retval;
+}
+
+Container::Stream::Stream(Container* container, int32_t index) {
+  mContainer = container;
+  mIndex = index;
+  mLastDts = Global::NO_PTS;
+  mCtx = mContainer->getFormatCtx()->streams[index];
+}
+
+Container::Stream::~Stream() {
+
+}
+
+void
+Container::doSetupStreams() {
+  // do nothing if we're already all set up.
+  AVFormatContext* ctx = getFormatCtx();
+  if (!ctx) {
+    VS_THROW(HumbleRuntimeError("Attempt to setup streams on closed or error container"));
+  }
+  if (mStreams.size() == ctx->nb_streams) return;
+
+  // loop through and find the first non-zero time base
+  AVRational *goodTimebase = 0;
+  for (uint32_t i = 0; i < ctx->nb_streams; i++) {
+    AVStream *avStream = ctx->streams[i];
+    if (avStream && avStream->time_base.num && avStream->time_base.den) {
+      goodTimebase = &avStream->time_base;
+      break;
+    }
+  }
+
+  // Only look for new streams
+  for (uint32_t i = mStreams.size(); i < ctx->nb_streams; i++) {
+    AVStream *avStream = ctx->streams[i];
+    if (!avStream)
+      VS_THROW(HumbleRuntimeError::make("no FFMPEG allocated stream: %d", i));
+    if (!avStream->time_base.num || !avStream->time_base.den) {
+      if (avStream->codec && avStream->codec->sample_rate && avStream->codec->codec_type == AVMEDIA_TYPE_AUDIO)
+      {
+        // for audio, 1/sample-rate is a good timebase.
+        avStream->time_base.num = 1;
+        avStream->time_base.den = avStream->codec->sample_rate;
+      } else if(goodTimebase) {
+        avStream->time_base = *goodTimebase;
+      }
+    }
+    // now let's initialize our stream object.
+    Stream* stream = new Stream(this, i);
+    mStreams.push_back(stream);
+  }
+}
+
+Container::Stream*
+Container::getStream(int32_t index) {
+  if (index < 0) {
+    VS_THROW(HumbleInvalidArgument("index must be >= 0"));
+  }
+  doSetupStreams();
+  if ((size_t)index >= mStreams.size()) {
+    VS_THROW(HumbleInvalidArgument("index must be < #getNumStreams()"));
+  }
+  return mStreams[index];
+}
+
+int32_t
+Container::getNumStreams()
+{
+  doSetupStreams();
+  return mStreams.size();
 }
 
 } /* namespace video */

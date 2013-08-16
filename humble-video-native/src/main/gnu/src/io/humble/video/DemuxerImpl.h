@@ -28,7 +28,7 @@
 
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/Demuxer.h>
-#include <io/humble/video/DemuxerStreamImpl.h>
+#include <io/humble/video/DemuxerStream.h>
 #include <io/humble/video/customio/URLProtocolHandler.h>
 
 #include <vector>
@@ -144,7 +144,6 @@ protected:
 private:
   int32_t doOpen(const char*, AVDictionary**);
   int32_t doCloseFileHandles(AVIOContext* pb);
-  int32_t doSetupSourceStreams();
   State mState;
   bool mStreamInfoGotten;
   AVFormatContext* mCtx;
@@ -152,13 +151,6 @@ private:
   int32_t mInputBufferLength;
   io::humble::video::customio::URLProtocolHandler* mIOHandler;
   io::humble::ferry::RefPointer<DemuxerFormat> mFormat;
-  // We do pointer to RefPointers to avoid too many
-  // acquire() / release() cycles as the vector manages
-  // itself.
-  std::vector<
-    io::humble::ferry::RefPointer<DemuxerStreamImpl>*
-    > mStreams;
-  int32_t mNumStreams;
   io::humble::ferry::RefPointer<KeyValueBag> mMetaData;
 };
 

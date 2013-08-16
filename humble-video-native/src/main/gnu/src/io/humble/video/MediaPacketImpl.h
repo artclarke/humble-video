@@ -43,6 +43,9 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
      * it's settings
      */
     static MediaPacketImpl* make(MediaPacketImpl* packet, bool);
+#ifndef SWIG
+    static MediaPacketImpl* make(AVPacket *packet);
+#endif // ! SWIG
   public:
 
     virtual int64_t getTimeStamp() { return getDts(); }

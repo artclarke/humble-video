@@ -206,6 +206,72 @@ Muxer::getURL() {
   return this->getFormatCtx()->filename;
 }
 
+/*
+void
+Muxer::stampOutputPacket(MediaPacket* packet) {
+  if (!packet) {
+    VS_THROW(HumbleInvalidArgument("no packet specified"));
+  }
+
+  //    VS_LOG_DEBUG("input:  duration: %lld; dts: %lld; pts: %lld;",
+  //        packet->getDuration(), packet->getDts(), packet->getPts());
+
+  // Always just reset this; cheaper than checking if it's
+  // already set
+  packet->setStreamIndex(this->getIndex());
+
+  io::humble::ferry::RefPointer<Rational> thisBase = getTimeBase();
+  io::humble::ferry::RefPointer<Rational> packetBase = packet->getTimeBase();
+  if (!thisBase || !packetBase) {
+    VS_THROW(HumbleRuntimeError("no timebases on either stream or packet"));
+  }
+  if (thisBase->compareTo(packetBase.value()) == 0) {
+    //      VS_LOG_DEBUG("Same timebase: %d/%d vs %d/%d",
+    //          thisBase->getNumerator(), thisBase->getDenominator(),
+    //          packetBase->getNumerator(), packetBase->getDenominator());
+    // it's already got the right time values
+    return;
+  }
+
+  int64_t duration = packet->getDuration();
+  int64_t dts = packet->getDts();
+  int64_t pts = packet->getPts();
+
+  if (duration >= 0) duration = thisBase->rescale(duration, packetBase.value(),
+      Rational::ROUND_DOWN);
+
+  if (pts != Global::NO_PTS) {
+    pts = thisBase->rescale(pts, packetBase.value(), Rational::ROUND_DOWN);
+  }
+  if (dts != Global::NO_PTS) {
+    dts = thisBase->rescale(dts, packetBase.value(), Rational::ROUND_DOWN);
+    if (mLastDts != Global::NO_PTS && dts == mLastDts) {
+      // adjust for rounding; we never want to insert a frame that
+      // is not monotonically increasing.  Note we only do this if
+      // we're off by one; that's because we ROUND_DOWN and then assume
+      // that can be off by at most one.  If we're off by more than one
+      // then it's really an error on the person muxing to this stream.
+      dts = mLastDts + 1;
+      // and round up pts
+      if (pts != Global::NO_PTS) ++pts;
+      // and if after all that adjusting, pts is less than dts
+      // let dts win.
+      if (pts == Global::NO_PTS || pts < dts) pts = dts;
+    }
+    mLastDts = dts;
+  }
+
+  //    VS_LOG_DEBUG("output: duration: %lld; dts: %lld; pts: %lld;",
+  //        duration, dts, pts);
+  packet->setDuration(duration);
+  packet->setPts(pts);
+  packet->setDts(dts);
+  packet->setTimeBase(thisBase.value());
+  //    VS_LOG_DEBUG("Reset timebase: %d/%d",
+  //        thisBase->getNumerator(), thisBase->getDenominator());
+}
+*/
+
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

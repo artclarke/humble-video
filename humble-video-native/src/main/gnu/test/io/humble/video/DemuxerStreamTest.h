@@ -14,7 +14,9 @@ public:
   setUp();
   void
   tearDown();
+  void testCreation();
   void testCreationAndDestruction();
+
 private:
   TestData mFixtures;
 };

@@ -384,6 +384,16 @@ public class ContainerStream extends RefCounted {
     return ContainerStream.Disposition.swigToEnum(VideoJNI.ContainerStream_getDisposition(swigCPtr, this));
   }
 
+/**
+ * For containers with Stream.Disposition.DISPOSITION_ATTACHED_PIC,<br>
+ * this returns a read-only copy of the packet containing the<br>
+ * picture (needs to be decoded separately).
+ */
+  public MediaPacket getAttachedPic() {
+    long cPtr = VideoJNI.ContainerStream_getAttachedPic(swigCPtr, this);
+    return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
+  }
+
   /**
    * The disposition of this stream. Some streams can have special<br>
    * meanings in some Containers.

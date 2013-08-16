@@ -25,6 +25,8 @@
 #ifndef CONTAINER_H_
 #define CONTAINER_H_
 
+#include <vector>
+
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/Rational.h>
@@ -97,7 +99,61 @@ public:
    * @return The number of streams in this container.
    */
   virtual int32_t
-  getNumStreams()=0;
+  getNumStreams();
+
+#ifndef SWIG
+  /*
+   *  This method contains classes that the Container shares internally inside Humble Video,
+   *  but which Swig should not care about.
+   *
+   *  Mostly it is the meta-data associated with Streams. The big reason to have it here
+   *  rather than in the ContainerStream and sub-class objects is that in FFmpeg
+   *  the AVFormatContext object owns all the memory, and since we're a referencing-counting
+   *  system we need to put our meta-data for streams in the same object that mirrors
+   *  the AVFormatContext
+   */
+  class Stream {
+  public:
+    Stream(Container* container, int32_t index);
+    ~Stream();
+
+    Container*
+    getContainer() {
+      VS_REF_ACQUIRE(mContainer);
+      return mContainer;
+    }
+
+    int32_t
+    getIndex() const {
+      return mIndex;
+    }
+
+    int64_t
+    getLastDts() const {
+      return mLastDts;
+    }
+
+    void
+    setLastDts(int64_t lastDts) {
+      mLastDts = lastDts;
+    }
+
+    KeyValueBag*
+    getMetaData() {
+      return mMetaData.get();
+    }
+    AVStream*
+    getCtx() { return mCtx; }
+
+  private:
+    int32_t mIndex;
+    int64_t mLastDts;
+    io::humble::ferry::RefPointer<KeyValueBag> mMetaData;
+    Container* mContainer;
+    AVStream* mCtx;
+  };
+  Stream* getStream(int32_t i);
+#endif // ! SWIG
 
 protected:
   Container();
@@ -112,6 +168,9 @@ protected:
   static int64_t url_seek(void*h, int64_t position, int whence);
 #endif // ! SWIG
 protected:
+  void doSetupStreams();
+private:
+  std::vector<Stream*> mStreams;
 
 };
 

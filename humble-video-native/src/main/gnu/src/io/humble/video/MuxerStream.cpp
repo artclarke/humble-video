@@ -17,34 +17,25 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * MuxerTest.cpp
+ * MuxerStream.cpp
  *
  *  Created on: Aug 14, 2013
  *      Author: aclarke
  */
 
-#include "MuxerTest.h"
+#include "MuxerStream.h"
 
-MuxerTest::MuxerTest() {
+namespace io {
+namespace humble {
+namespace video {
 
-}
-
-MuxerTest::~MuxerTest() {
-}
-
-void
-MuxerTest::testCreation() {
-  RefPointer<Muxer> muxer;
-
-  muxer = Muxer::make(0, "MuxerTest_testCreation.flv", 0);
-
-//  RefPointer<MuxerStream> stream;
-
-//  stream = muxer->addNewStream(Codec::CODEC_ID_FLV1);
-
-  muxer->open(0, 0);
-
-  muxer->close();
-
+MuxerStream::MuxerStream() {
 
 }
+
+MuxerStream::~MuxerStream() {
+}
+
+} /* namespace video */
+} /* namespace humble */
+} /* namespace io */

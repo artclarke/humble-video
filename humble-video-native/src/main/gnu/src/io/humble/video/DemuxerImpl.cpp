@@ -29,7 +29,6 @@
 #include "DemuxerImpl.h"
 #include "MediaPacketImpl.h"
 #include "KeyValueBagImpl.h"
-#include "DemuxerStreamImpl.h"
 #include "VideoExceptions.h"
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
@@ -42,7 +41,6 @@ namespace humble {
 namespace video {
 
 DemuxerImpl::DemuxerImpl() {
-  mNumStreams = 0;
   mStreamInfoGotten = 0;
   mReadRetryMax = 1;
   mInputBufferLength = 2048;
@@ -68,14 +66,12 @@ DemuxerImpl::~DemuxerImpl() {
   if (mCtx)
     avformat_free_context(mCtx);
 }
+
 AVFormatContext*
 DemuxerImpl::getFormatCtx() {
   // throw an exception if in wrong state.
-  if (mState == STATE_CLOSED || mState == STATE_ERROR) {
-    const char * MESSAGE="Method called on Demuxer in CLOSED or ERROR state.";
-    VS_LOG_ERROR(MESSAGE);
-    std::exception e = std::runtime_error(MESSAGE);
-    throw e;
+  if (mState == STATE_CLOSED || mState == STATE_ERROR || !mCtx) {
+    VS_THROW(HumbleRuntimeError::make("Method called on Demuxer in CLOSED or ERROR state."));
   }
   return mCtx;
 }
@@ -194,18 +190,12 @@ DemuxerImpl::getInputBufferLength() {
 
 int32_t
 DemuxerImpl::getNumStreams() {
-  int32_t retval = 0;
   if (!(mState == STATE_OPENED ||
       mState == STATE_PLAYING ||
       mState == STATE_PAUSED)) {
     VS_THROW(HumbleRuntimeError("Attempt to query number of streams in Demuxer when not opened, playing or paused is ignored"));
   }
-  if ((int32_t) mCtx->nb_streams != mNumStreams)
-    doSetupSourceStreams();
-  retval = mNumStreams;
-
-  VS_CHECK_INTERRUPT(true);
-  return retval;
+  return Container::getNumStreams();
 }
 
 void
@@ -217,23 +207,11 @@ DemuxerImpl::close() {
     VS_THROW(HumbleRuntimeError("Attempt to close container when not opened, playing or paused"));
   }
 
-  // tell the streams we're closing.
-  while(mStreams.size() > 0)
-  {
-    RefPointer<DemuxerStreamImpl> * stream=mStreams.back();
-
-    VS_ASSERT(stream && *stream, "no stream?");
-    if (stream && *stream) {
-      (*stream)->containerClosed(this);
-      delete stream;
-    }
-    mStreams.pop_back();
-  }
-  mNumStreams = 0;
-
-
   // we need to remember the avio context
   AVIOContext* pb = this->getFormatCtx()->pb;
+
+  // set this BEFORE we close the input so that potential races can be minimized.
+  mState = STATE_CLOSED;
 
   avformat_close_input(&mCtx);
   // avformat_close_input frees the context, so...
@@ -244,8 +222,6 @@ DemuxerImpl::close() {
     mState = STATE_ERROR;
     FfmpegException::check(retval, "Error when closing container (%s): %d", getURL(), retval);
   }
-
-  mState = STATE_CLOSED;
 }
 
 int32_t
@@ -273,21 +249,9 @@ DemuxerImpl::getStream(int32_t position) {
       mState == STATE_PAUSED)) {
     VS_THROW(HumbleRuntimeError("Attempt to get Demuxer stream from Demuxer when not opened, playing or paused is ignored"));
   }
-  DemuxerStream *retval = 0;
-  if ((int32_t)mCtx->nb_streams != mNumStreams)
-    doSetupSourceStreams();
-
-  if (position < 0 || position >= mNumStreams) {
-    VS_THROW(HumbleInvalidArgument("position out of range of number of streams"));
-  }
-  if (position < mNumStreams)
-  {
-    // will acquire for caller.
-    RefPointer<DemuxerStreamImpl> * p = mStreams.at(position);
-    retval = p ? p->get() : 0;
-  }
-  return retval;
-
+  // always make a new object, but do not maintain a reference to it in this
+  // container to avoid a reference count loop.
+  return DemuxerStream::make(this, position);
 }
 
 int32_t
@@ -347,25 +311,19 @@ DemuxerImpl::read(MediaPacket* ipkt) {
 
 void
 DemuxerImpl::queryStreamMetaData() {
-  int32_t retval = -1;
   if (!(mState == STATE_OPENED ||
       mState == STATE_PLAYING ||
       mState == STATE_PAUSED)) {
     VS_THROW(HumbleRuntimeError("Attempt to query stream information from container when not opened, playing or paused"));
   }
   if (!mStreamInfoGotten) {
-    retval = avformat_find_stream_info(this->getFormatCtx(), 0);
-    if (retval >= 0)
-      mStreamInfoGotten = true;
-    else
-      FfmpegException::check(retval, "could not queryStreamMetaData on: %s; ", getURL());
-  } else
-    retval = 0;
+    FfmpegException::check(avformat_find_stream_info(this->getFormatCtx(), 0), "could not queryStreamMetaData on: %s; ", getURL());
+    mStreamInfoGotten = true;
+  }
+  Container::doSetupStreams();
 
-  if (retval >= 0 && mCtx->nb_streams > 0)
+  if (getFormatCtx()->nb_streams <= 0)
   {
-    doSetupSourceStreams();
-  } else {
     VS_LOG_WARN("Could not find streams in input container");
   }
 }
@@ -540,65 +498,6 @@ DemuxerImpl::doOpen(const char* url, AVDictionary** options)
   }
 
   return retval;
-}
-
-int32_t
-DemuxerImpl::doSetupSourceStreams()
-{
-  // do nothing if we're already all set up.
-  if (mNumStreams == (int32_t) mCtx->nb_streams)
-    return 0;
-
-  int32_t retval = -1;
-  // loop through and find the first non-zero time base
-  AVRational *goodTimebase = 0;
-  for(uint32_t i = 0;i < mCtx->nb_streams;i++){
-    AVStream *avStream = mCtx->streams[i];
-    if(avStream && avStream->time_base.num && avStream->time_base.den){
-      goodTimebase = &avStream->time_base;
-      break;
-    }
-  }
-
-  // Only look for new streams
-  for (uint32_t i =mNumStreams ; i < mCtx->nb_streams; i++)
-  {
-    AVStream *avStream = mCtx->streams[i];
-    if (avStream)
-    {
-      if (goodTimebase && (!avStream->time_base.num || !avStream->time_base.den))
-      {
-        avStream->time_base = *goodTimebase;
-      }
-
-      RefPointer<DemuxerStreamImpl>* stream = new RefPointer<DemuxerStreamImpl>(
-          DemuxerStreamImpl::make(this, avStream, 0)
-      );
-
-      if (stream)
-      {
-        if (stream->value())
-        {
-          mStreams.push_back(stream);
-          mNumStreams++;
-        } else {
-          VS_LOG_ERROR("Couldn't make a stream %d", i);
-          delete stream;
-        }
-        stream = 0;
-      }
-      else
-      {
-        VS_LOG_ERROR("Could not make Stream %d", i);
-        retval = -1;
-      }
-    } else {
-      VS_LOG_ERROR("no FFMPEG allocated stream: %d", i);
-      retval = -1;
-    }
-  }
-  return retval;
-
 }
 
 } /* namespace video */

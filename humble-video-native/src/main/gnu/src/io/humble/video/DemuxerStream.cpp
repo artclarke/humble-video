@@ -23,19 +23,55 @@
  *      Author: aclarke
  */
 
+#include "Demuxer.h"
 #include "DemuxerStream.h"
+#include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/video/VideoExceptions.h>
+
+using namespace io::humble::ferry;
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 namespace io {
 namespace humble {
 namespace video {
 
-DemuxerStream::DemuxerStream() {
-  // TODO Auto-generated constructor stub
+DemuxerStream::DemuxerStream(Container* container, int32_t index) :
+    ContainerStream(container, index) {
 
 }
 
 DemuxerStream::~DemuxerStream() {
-  // TODO Auto-generated destructor stub
+}
+
+DemuxerStream*
+DemuxerStream::make(Container* container, int32_t index) {
+  RefPointer<DemuxerStream> r;
+  r.reset(new DemuxerStream(container, index), true);
+  return r.get();
+}
+Demuxer*
+DemuxerStream::getDemuxer() {
+  return dynamic_cast<Demuxer*>(getContainer());
+}
+
+Decoder*
+DemuxerStream::getDecoder() {
+  AVStream* stream = getCtx();
+
+  if (!mDecoder) {
+    if (stream->codec) {
+      // make a copy of the decoder so we decouple it from the container
+      // completely
+      RefPointer<Codec> codec = Codec::findDecodingCodec((Codec::ID)stream->codec->codec_id);
+      if (!codec) {
+        VS_THROW(HumbleRuntimeError("could not find decoding codec"));
+      }
+      mDecoder = Decoder::make(codec.value(), stream->codec);
+    }
+  }
+  return mDecoder.get();
 }
 
 } /* namespace video */

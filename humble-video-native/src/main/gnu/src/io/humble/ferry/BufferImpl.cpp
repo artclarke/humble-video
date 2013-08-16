@@ -22,7 +22,7 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/ferry/JNIMemoryManager.h>
-
+#include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/BufferImpl.h>
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
@@ -91,14 +91,15 @@ namespace io { namespace humble { namespace ferry
   BufferImpl*
   BufferImpl :: make(io::humble::ferry::RefCounted* requestor, int32_t bufferSize)
   {
-    BufferImpl* retval = 0;
+    RefPointer<BufferImpl> retval;
     if (bufferSize <= 0)
       VS_THROW(HumbleInvalidArgument("bufferSize must be > 0"));
     
     void * allocator = requestor ? requestor->getJavaAllocator() : 0;
     void *buffer = JNIMemoryManager::malloc(allocator, bufferSize);
-    if (!buffer)
+    if (!buffer) {
       VS_THROW(HumbleBadAlloc());
+    }
       
     try {
       retval = BufferImpl::make();
@@ -106,24 +107,26 @@ namespace io { namespace humble { namespace ferry
       retval->mBuffer = buffer;
       retval->mBufferSize = bufferSize;
       retval->mInternallyAllocated = true;
-    } catch (std::bad_alloc & e) {
+    } catch (std::exception & e) {
       JNIMemoryManager::free(buffer);
       throw;
     }
-    return retval;
+    return retval.get();
   }
 
   BufferImpl*
   BufferImpl :: make(io::humble::ferry::RefCounted* /*unused*/, void *bufToWrap, int32_t bufferSize,
       FreeFunc freeFunc, void *closure)
   {
-    BufferImpl * retval = 0;
+    RefPointer<BufferImpl> retval;
 
-    if (!bufToWrap)
+    if (!bufToWrap) {
       VS_THROW(HumbleInvalidArgument("bufToWrap must be non null"));
+    }
 
-    if (bufferSize <= 0)
+    if (bufferSize <= 0) {
       VS_THROW(HumbleInvalidArgument("bufferSize must be > 0"));
+    }
 
     if (bufToWrap && bufferSize>0)
     {
@@ -134,7 +137,7 @@ namespace io { namespace humble { namespace ferry
       retval->mBuffer = bufToWrap;
       retval->mInternallyAllocated = false;
     }
-    return retval;
+    return retval.get();
   }
   
   Buffer::Type

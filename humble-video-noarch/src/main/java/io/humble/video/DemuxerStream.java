@@ -134,21 +134,19 @@ public class DemuxerStream extends ContainerStream {
 
 
 /**
- * For containers with Stream.Disposition.DISPOSITION_ATTACHED_PIC,<br>
- * this returns a read-only copy of the packet containing the<br>
- * picture (needs to be decoded separately).
- */
-  public MediaPacket getAttachedPic() {
-    long cPtr = VideoJNI.DemuxerStream_getAttachedPic(swigCPtr, this);
-    return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
-  }
-
-/**
  * Get the decoder that can decode the information in this Demuxer stream.
  */
   public Decoder getDecoder() {
     long cPtr = VideoJNI.DemuxerStream_getDecoder(swigCPtr, this);
     return (cPtr == 0) ? null : new Decoder(cPtr, false);
+  }
+
+/**
+ * Get the Demuxer this DemuxerStream belongs to.
+ */
+  public Demuxer getDemuxer() {
+    long cPtr = VideoJNI.DemuxerStream_getDemuxer(swigCPtr, this);
+    return (cPtr == 0) ? null : new Demuxer(cPtr, false);
   }
 
 }

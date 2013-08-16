@@ -22,6 +22,7 @@
 
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/Buffer.h>
+#include <io/humble/video/VideoExceptions.h>
 
 // for memset
 #include <cstring>
@@ -168,16 +169,14 @@ namespace io { namespace humble { namespace video {
   void
   MediaPacketImpl::wrapAVPacket(AVPacket* pkt)
   {
-    VS_ASSERT(mPacket, "No packet?");
+    if (!pkt) {
+      VS_THROW(HumbleInvalidArgument("no packet"));
+    }
     av_free_packet(mPacket);
     av_init_packet(mPacket);
     
     int32_t retval = av_copy_packet(mPacket, pkt);
-    VS_ASSERT(retval >= 0, "Failed to copy packet");
-    if (retval < 0) {
-      VS_LOG_ERROR("Failed to copy packet");
-      throw std::bad_alloc();
-    }
+    FfmpegException::check(retval, "Failed to copy packet ");
     
     // And assume we're now complete.
     setComplete(true, mPacket->size);
@@ -186,63 +185,44 @@ namespace io { namespace humble { namespace video {
   MediaPacketImpl*
   MediaPacketImpl::make (int32_t payloadSize)
   {
-    MediaPacketImpl* retval= 0;
-    try {
-      retval = MediaPacketImpl::make();
-      if (av_new_packet(retval->mPacket, payloadSize) < 0)
-      {
-        throw std::bad_alloc();
-      }
-    }
-    catch (std::bad_alloc & e)
-    {
-      VS_REF_RELEASE(retval);
-      throw e;
-    }
-
-    return retval;
+    RefPointer<MediaPacketImpl> retval;
+    retval = MediaPacketImpl::make();
+    FfmpegException::check(av_new_packet(retval->mPacket, payloadSize), "could not allocate packet ");
+    return retval.get();
   }
   
   MediaPacketImpl*
   MediaPacketImpl::make (Buffer* buffer)
   {
-    MediaPacketImpl *retval= 0;
+    RefPointer<MediaPacketImpl> retval;
     retval = MediaPacketImpl::make();
-    if (retval)
-    {
-      retval->wrapBuffer(buffer);
-    }
-    return retval;
+    retval->wrapBuffer(buffer);
+    return retval.get();
   }
   
   MediaPacketImpl*
   MediaPacketImpl::make (MediaPacketImpl* packet, bool copyData)
   {
-    MediaPacketImpl* retval=0;
+    RefPointer<MediaPacketImpl> retval;
     RefPointer<Rational> timeBase;
-    try
-    {
-      if (!packet)
-        throw std::runtime_error("need packet to copy");
+    if (!packet) {
+      VS_THROW(HumbleInvalidArgument("no packet"));
+    }
 
       // use the nice copy method.
       retval = make();
       int32_t r = av_copy_packet(retval->mPacket, packet->mPacket);
-      if (r < 0) {
-        VS_LOG_ERROR("Could not copy packet");
-        throw std::bad_alloc();
-      }
+      FfmpegException::check(r, "could not copy packet ");
       int32_t numBytes = packet->getSize();
       if (copyData && numBytes > 0)
       {
-        if (!retval || !retval->mPacket || !retval->mPacket->data)
-          throw std::bad_alloc();
+        if (!retval || !retval->mPacket || !retval->mPacket->data) {
+          VS_THROW(HumbleBadAlloc());
+        }
 
         // we don't just want to reference count the data -- we want
         // to copy it. So we're going to create a new copy.
-        RefPointer<Buffer> copy = Buffer::make(retval, numBytes + FF_INPUT_BUFFER_PADDING_SIZE);
-        if (!copy)
-          throw std::bad_alloc();
+        RefPointer<Buffer> copy = Buffer::make(retval.value(), numBytes + FF_INPUT_BUFFER_PADDING_SIZE);
         uint8_t* data = (uint8_t*)copy->getBytes(0, numBytes);
 
         // copy the data into our Buffer backed data
@@ -264,15 +244,17 @@ namespace io { namespace humble { namespace video {
 
       retval->setComplete(retval->mPacket->size > 0,
           retval->mPacket->size);
-    }
-    catch (std::exception &e)
-    {
-      VS_REF_RELEASE(retval);
-    }
     
-    return retval;
+    return retval.get();
   }
   
+  MediaPacketImpl*
+  MediaPacketImpl::make(AVPacket* packet) {
+    RefPointer<MediaPacketImpl> retval = make();
+    retval->wrapAVPacket(packet);
+    return retval.get();
+  }
+
 
   int32_t
   MediaPacketImpl::reset(int32_t payloadSize)
