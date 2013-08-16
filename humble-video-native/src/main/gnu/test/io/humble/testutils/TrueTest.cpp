@@ -24,4 +24,7 @@ TrueTestSuite :: testSuccess()
 {
   TS_ASSERT(1 + 1 > 1);
   TS_ASSERT_EQUALS(1 + 1, 2);
+  // allocate some memory
+  char* memory = new char[15];
+  delete [] memory;
 }
