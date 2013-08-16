@@ -58,7 +58,11 @@ Also, on Mac OS X the Valgrind test suite only works for 64-bit builds.
 
 ## Linux Build Notes
 
-You need to make sure the Chef recipes that are in `./Vagrantfile` get installed on your Linux box.
+You need to make sure the Chef recipes that are in `./Vagrantfile` get installed on your Linux box. I've only tested on Ubuntu 12.04 LTS, so that's all that suppored to build on.
+
+To build, once the chef recipes have run on a clean box, just run:
+
+    mvn install
 
 ## Windows Build Notes
 Don't do it. It's not supported. Instead you have to cross-compile for Linux. Sorry.
