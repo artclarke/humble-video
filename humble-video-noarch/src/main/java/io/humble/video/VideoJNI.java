@@ -1257,6 +1257,8 @@ public class VideoJNI {
   public final static native int Container_FLAG_PRIV_OPT_get();
   public final static native int Container_FLAG_KEEP_SIDE_DATA_get();
   public final static native int Container_getNumStreams(long jarg1, Container jarg1_) throws java.lang.InterruptedException, java.io.IOException;
+  public final static native long MuxerStream_getEncoder(long jarg1, MuxerStream jarg1_);
+  public final static native long MuxerStream_getMuxer(long jarg1, MuxerStream jarg1_);
   public final static native long DemuxerStream_getDecoder(long jarg1, DemuxerStream jarg1_);
   public final static native long DemuxerStream_getDemuxer(long jarg1, DemuxerStream jarg1_);
   public final static native long Muxer_make(long jarg1, MuxerFormat jarg1_, String jarg2, String jarg3);

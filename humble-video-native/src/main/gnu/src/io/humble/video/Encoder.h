@@ -54,6 +54,10 @@ public:
    */
   static Encoder* make(Encoder* src);
 
+#ifndef SWIG
+  static Encoder* make(Codec* codec, AVCodecContext* src);
+#endif // ! SWIG
+
   /**
    * Encode the given MediaPicture using this encoder.
    *
@@ -110,7 +114,7 @@ public:
       MediaSubtitle* subtitles)=0;
 
 protected:
-  Encoder(Codec*, const AVCodecContext* src);
+  Encoder(Codec*, AVCodecContext* src, bool copySrc);
   virtual
   ~Encoder();
 private:

@@ -129,4 +129,20 @@ public class MuxerStream extends ContainerStream {
   }
 
 
+/**
+ * Get the Encoder that this stream was created with.
+ */
+  public Encoder getEncoder() {
+    long cPtr = VideoJNI.MuxerStream_getEncoder(swigCPtr, this);
+    return (cPtr == 0) ? null : new Encoder(cPtr, false);
+  }
+
+/**
+ * Get the Muxer that this stream belongs to.
+ */
+  public Muxer getMuxer() {
+    long cPtr = VideoJNI.MuxerStream_getMuxer(swigCPtr, this);
+    return (cPtr == 0) ? null : new Muxer(cPtr, false);
+  }
+
 }

@@ -24,6 +24,8 @@
 
 #include "Container.h"
 #include "PropertyImpl.h"
+#include "Encoder.h"
+#include "Decoder.h"
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/customio/URLProtocolHandler.h>
@@ -103,6 +105,41 @@ Container::Stream::Stream(Container* container, int32_t index) {
 
 Container::Stream::~Stream() {
 
+}
+
+Coder*
+Container::Stream::getCoder() {
+  if (!mCoder) {
+    // we need to know the stream direction...
+    AVFormatContext* ctx = mContainer->getFormatCtx();
+    AVStream* stream = getCtx();
+
+    if (!ctx || !stream) {
+      VS_THROW(HumbleRuntimeError("could not get container context to find coder"));
+    }
+    if (!stream->codec) {
+      VS_THROW(HumbleRuntimeError("No codec set for stream"));
+    }
+    RefPointer<Codec> codec;
+
+    if (ctx->iformat) {
+      // make a copy of the decoder so we decouple it from the container
+      // completely
+      codec = Codec::findDecodingCodec((Codec::ID)stream->codec->codec_id);
+      if (!codec) {
+        VS_THROW(HumbleRuntimeError("could not find decoding codec"));
+      }
+      mCoder = Decoder::make(codec.value(), stream->codec);
+    } else {
+      // encoding
+      codec = Codec::findEncodingCodec((Codec::ID)stream->codec->codec_id);
+      if (!codec) {
+              VS_THROW(HumbleRuntimeError("could not find decoding codec"));
+            }
+      mCoder = Encoder::make(codec.value(), stream->codec);
+    }
+  }
+  return mCoder.get();
 }
 
 void

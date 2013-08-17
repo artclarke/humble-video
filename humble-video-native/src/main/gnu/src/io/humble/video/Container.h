@@ -35,6 +35,7 @@
 #include <io/humble/video/Codec.h>
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/ContainerFormat.h>
+#include <io/humble/video/Coder.h>
 
 namespace io
 {
@@ -142,13 +143,18 @@ public:
     getMetaData() {
       return mMetaData.get();
     }
+
     AVStream*
     getCtx() { return mCtx; }
+
+    Coder*
+    getCoder();
 
   private:
     int32_t mIndex;
     int64_t mLastDts;
     io::humble::ferry::RefPointer<KeyValueBag> mMetaData;
+    io::humble::ferry::RefPointer<Coder> mCoder;
     Container* mContainer;
     AVStream* mCtx;
   };

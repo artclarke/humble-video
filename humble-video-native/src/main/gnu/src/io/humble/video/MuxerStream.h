@@ -27,13 +27,25 @@
 #define MUXERSTREAM_H_
 
 #include <io/humble/video/ContainerStream.h>
+#include <io/humble/video/Encoder.h>
 
 namespace io {
 namespace humble {
 namespace video {
 
+class Muxer;
 class VS_API_HUMBLEVIDEO MuxerStream : public io::humble::video::ContainerStream
 {
+public:
+  /**
+   * Get the Encoder that this stream was created with.
+   */
+  virtual Encoder* getEncoder();
+
+  /**
+   * Get the Muxer that this stream belongs to.
+   */
+  virtual Muxer* getMuxer();
 protected:
   MuxerStream(Container* container, int32_t index);
   virtual

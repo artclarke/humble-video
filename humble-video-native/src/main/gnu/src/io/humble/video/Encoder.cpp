@@ -24,15 +24,25 @@
  */
 
 #include "Encoder.h"
+#include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/HumbleException.h>
 
 using namespace io::humble::ferry;
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 namespace io {
 namespace humble {
 namespace video {
 
-Encoder::Encoder(Codec* codec, const AVCodecContext* src) : Coder(codec, src) {
+Encoder::Encoder(Codec* codec, AVCodecContext* src, bool copySrc) : Coder(codec, src, copySrc) {
+  if (!codec)
+    throw HumbleInvalidArgument("no codec passed in");
+
+  if (!codec->canEncode())
+    throw HumbleInvalidArgument("passed in codec cannot encode");
+  VS_LOG_TRACE("Created encoder");
+
 }
 
 Encoder::~Encoder() {
@@ -57,6 +67,22 @@ Encoder::make(Encoder* src)
     throw HumbleInvalidArgument("no Encoder to copy");
   return 0;
 }
+
+Encoder*
+Encoder::make(Codec* codec, AVCodecContext* src) {
+  if (!src)
+    throw HumbleInvalidArgument("no Encoder to copy");
+  if (!src->codec_id)
+    throw HumbleRuntimeError("No codec set on coder???");
+
+  RefPointer<Encoder> retval;
+  // new Encoder DOES NOT increment refcount but the reset should catch it.
+//  retval.reset(new Encoder(codec, src, false), true);
+  (void) codec;
+  throw HumbleRuntimeError("not implemented");
+  return retval.get();
+}
+
 
 } /* namespace video */
 } /* namespace humble */

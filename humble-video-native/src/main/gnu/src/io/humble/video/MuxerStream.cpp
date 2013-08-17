@@ -24,6 +24,7 @@
  */
 
 #include "MuxerStream.h"
+#include "Muxer.h"
 
 namespace io {
 namespace humble {
@@ -34,6 +35,16 @@ MuxerStream::MuxerStream(Container* c, int32_t index) : ContainerStream(c, index
 }
 
 MuxerStream::~MuxerStream() {
+}
+
+Muxer*
+MuxerStream::getMuxer() {
+  return dynamic_cast<Muxer*>(getContainer());
+}
+
+Encoder*
+MuxerStream::getEncoder() {
+  return 0;
 }
 
 } /* namespace video */

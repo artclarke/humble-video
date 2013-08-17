@@ -42,7 +42,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-Decoder::Decoder(Codec* codec, const AVCodecContext* src) : Coder(codec, src) {
+Decoder::Decoder(Codec* codec, AVCodecContext* src) : Coder(codec, src) {
   if (!codec)
     throw HumbleInvalidArgument("no codec passed in");
 
@@ -336,7 +336,7 @@ Decoder::make(Decoder* src)
 }
 
 Decoder*
-Decoder::make(Codec* codec, const AVCodecContext* src) {
+Decoder::make(Codec* codec, AVCodecContext* src) {
   if (!src)
     throw HumbleInvalidArgument("no Decoder to copy");
   if (!src->codec_id)

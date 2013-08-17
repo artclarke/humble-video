@@ -55,7 +55,7 @@ public:
    */
   static Decoder* make(Decoder* src);
 #ifndef SWIG
-  static Decoder* make(Codec* codec, const AVCodecContext* src);
+  static Decoder* make(Codec* codec, AVCodecContext* src);
 #endif // ! SWIG
 
   /**
@@ -127,7 +127,7 @@ public:
       MediaPacket *packet, int32_t byteOffset);
 
 protected:
-  Decoder(Codec* codec, const AVCodecContext* src);
+  Decoder(Codec* codec, AVCodecContext* src);
   virtual
   ~Decoder();
 
