@@ -12984,3 +12984,11 @@
    fun:malloc
    fun:gmtime
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:__GI___strncasecmp_l
+   fun:____strtod_l_internal
+   fun:av_strtod
+   fun:parse_primary
+}
