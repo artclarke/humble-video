@@ -80,7 +80,7 @@ public:
    * @ return >= 0 on success; <0 on error.
    */
   virtual int32_t encodeVideo(MediaPacket * output,
-      MediaPicture * frame, int32_t suggestedBufferSize)=0;
+      MediaPicture * frame, int32_t suggestedBufferSize);
 
   /**
    * Encode the given MediaAudio using this encoder.
@@ -105,13 +105,13 @@ public:
    * @return number of samples we consumed when encoding, or negative for errors.
    */
   virtual int32_t encodeAudio(MediaPacket * output,
-      MediaAudio* samples, int32_t sampleToStartFrom)=0;
+      MediaAudio* samples, int32_t sampleToStartFrom);
 
   /**
    * Not final API yet; do not use.
    */
   virtual int32_t encodeSubtitle(MediaPacket* output,
-      MediaSubtitle* subtitles)=0;
+      MediaSubtitle* subtitles);
 
 protected:
   Encoder(Codec*, AVCodecContext* src, bool copySrc);

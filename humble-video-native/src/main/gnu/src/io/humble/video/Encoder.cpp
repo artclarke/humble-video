@@ -77,11 +77,38 @@ Encoder::make(Codec* codec, AVCodecContext* src) {
 
   RefPointer<Encoder> retval;
   // new Encoder DOES NOT increment refcount but the reset should catch it.
-//  retval.reset(new Encoder(codec, src, false), true);
-  (void) codec;
-  throw HumbleRuntimeError("not implemented");
+  retval.reset(new Encoder(codec, src, false), true);
   return retval.get();
 }
+
+int32_t
+Encoder::encodeVideo(MediaPacket* output, MediaPicture* frame,
+    int32_t suggestedBufferSize) {
+  (void) output;
+  (void) frame;
+  (void) suggestedBufferSize;
+  VS_THROW(HumbleRuntimeError("not implemented"));
+  return 0;
+}
+
+int32_t
+Encoder::encodeAudio(MediaPacket* output, MediaAudio* samples,
+    int32_t sampleToStartFrom) {
+  (void) output;
+  (void) samples;
+  (void) sampleToStartFrom;
+  VS_THROW(HumbleRuntimeError("not implemented"));
+  return 0;
+}
+
+int32_t
+Encoder::encodeSubtitle(MediaPacket* output, MediaSubtitle* subtitles) {
+  (void) output;
+  (void) subtitles;
+  VS_THROW(HumbleRuntimeError("not implemented"));
+  return 0;
+}
+
 
 
 } /* namespace video */
