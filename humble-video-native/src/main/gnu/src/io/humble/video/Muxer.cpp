@@ -88,7 +88,13 @@ Muxer::~Muxer() {
         this->getURL());
     (void) this->close();
   }
-  if (mCtx) avformat_free_context(mCtx);
+  if (mCtx) {
+    for(uint32_t i = 0; i < mCtx->nb_streams; i++) {
+      if (mCtx->streams[i]->codec)
+        (void) avcodec_close(mCtx->streams[i]->codec);
+    }
+    avformat_free_context(mCtx);
+  }
 }
 
 Muxer*
@@ -177,8 +183,10 @@ Muxer::open(KeyValueBag *aInputOptions, KeyValueBag* aOutputOptions) {
       FfmpegException::check(retval, "Error opening url: %s; ", url);
     }
 
+    pushCoders();
     /* Write the stream header, if any. */
     retval = avformat_write_header(ctx, &tmp);
+    popCoders();
     if (retval < 0) {
       mState = STATE_ERROR;
       FfmpegException::check(retval, "Could not write header for url: %s. ", url);
@@ -201,7 +209,9 @@ Muxer::close() {
     VS_THROW(HumbleRuntimeError::make("closed container that was not open"));
   }
   AVFormatContext* ctx = getFormatCtx();
+  pushCoders();
   int e = av_write_trailer(ctx);
+  popCoders();
   if (e < 0) {
     mState = STATE_ERROR;
     FfmpegException::check(e, "could not write trailer ");
@@ -218,6 +228,36 @@ const char*
 Muxer::getURL() {
   return this->getFormatCtx()->filename;
 }
+
+MuxerStream*
+Muxer::addNewStream(Encoder* encoder) {
+  if (!encoder) {
+    VS_THROW(HumbleInvalidArgument("encoder must be not null"));
+  }
+  if (encoder->getState() != Encoder::STATE_OPENED) {
+    VS_THROW(HumbleInvalidArgument("encoder must be open"));
+  }
+  if (getState() != STATE_INITED) {
+    VS_THROW(HumbleInvalidArgument("cannot add MuxerStream after Muxer is opened"));
+  }
+
+  RefPointer<MuxerStream> r;
+
+  AVFormatContext* ctx = getFormatCtx();
+  // Tell Ffmpeg about the new stream.
+  AVStream* avStream = avformat_new_stream(ctx, encoder->getCodecCtx()->codec);
+  if (!avStream) {
+    VS_THROW(HumbleRuntimeError("Could not add new stream to container"));
+  }
+  // tell the container to update all the known streams.
+  doSetupStreams();
+  // and set the coder for the given stream
+  Container::Stream* stream = Container::getStream(avStream->index);
+  // grab a reference to the passed in coder.
+  stream->setCoder(encoder);
+  return r.get();
+}
+
 
 /*
 void

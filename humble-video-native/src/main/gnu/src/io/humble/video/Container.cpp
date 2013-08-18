@@ -100,6 +100,7 @@ Container::Stream::Stream(Container* container, int32_t index) {
   mContainer = container;
   mIndex = index;
   mLastDts = Global::NO_PTS;
+  mCachedCtx = 0;
   mCtx = mContainer->getFormatCtx()->streams[index];
 }
 
@@ -131,12 +132,7 @@ Container::Stream::getCoder() {
       }
       mCoder = Decoder::make(codec.value(), stream->codec);
     } else {
-      // encoding
-      codec = Codec::findEncodingCodec((Codec::ID)stream->codec->codec_id);
-      if (!codec) {
-              VS_THROW(HumbleRuntimeError("could not find decoding codec"));
-            }
-      mCoder = Encoder::make(codec.value(), stream->codec);
+      VS_THROW(HumbleRuntimeError("Got null encoder on MuxerStream which should not be possible"));
     }
   }
   return mCoder.get();
@@ -194,6 +190,23 @@ Container::getStream(int32_t index) {
   return mStreams[index];
 }
 
+void
+Container::popCoders() {
+  int32_t n = getNumStreams();
+  for(int32_t i = 0; i < n; i++) {
+    Container::Stream* stream = mStreams[i];
+    stream->popCoder();
+  }
+}
+
+void
+Container::pushCoders() {
+  int32_t n = getNumStreams();
+  for(int32_t i = 0; i < n; i++) {
+    Container::Stream* stream = mStreams[i];
+    stream->pushCoder();
+  }
+}
 int32_t
 Container::getNumStreams()
 {

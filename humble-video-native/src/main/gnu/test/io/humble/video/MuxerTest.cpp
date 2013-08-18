@@ -38,13 +38,24 @@ MuxerTest::testCreation() {
 
   muxer = Muxer::make(0, "MuxerTest_testCreation.flv", 0);
 
-//  RefPointer<MuxerStream> stream;
+  RefPointer<MuxerStream> stream;
 
-//  stream = muxer->addNewStream(Codec::CODEC_ID_FLV1);
+  RefPointer<Codec> c = Codec::findEncodingCodec(Codec::CODEC_ID_FLV1);
+  RefPointer<Encoder> e = Encoder::make(c.value());
+  RefPointer<Rational> t = Rational::make(1, 1000);
 
-//  muxer->open(0, 0);
-//
-//  muxer->close();
+  e->setWidth(480);
+  e->setHeight(320);
+  e->setPixelType(PixelFormat::PIX_FMT_YUV420P);
+  e->setTimeBase(t.value());
+
+  e->open(0, 0);
+
+  stream = muxer->addNewStream(e.value());
+
+  muxer->open(0, 0);
+
+  muxer->close();
 
 
 }

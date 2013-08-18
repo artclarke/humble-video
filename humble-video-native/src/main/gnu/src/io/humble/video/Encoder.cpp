@@ -51,13 +51,16 @@ Encoder::~Encoder() {
 Encoder*
 Encoder::make(Codec* codec)
 {
+  RefPointer<Encoder> r;
   if (!codec)
     throw HumbleInvalidArgument("no codec passed in");
 
   if (!codec->canEncode())
     throw HumbleInvalidArgument("passed in codec cannot encode");
 
-  return 0;
+  r.reset(new Encoder(codec, 0, false), true);
+
+  return r.get();
 }
 
 Encoder*
@@ -65,7 +68,11 @@ Encoder::make(Encoder* src)
 {
   if (!src)
     throw HumbleInvalidArgument("no Encoder to copy");
-  return 0;
+
+  RefPointer<Encoder> r;
+  RefPointer<Codec> c = src->getCodec();
+  r.reset(new Encoder(c.value(), src->getCodecCtx(), false), true);
+  return r.get();
 }
 
 Encoder*

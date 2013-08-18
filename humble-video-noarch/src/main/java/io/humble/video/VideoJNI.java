@@ -1270,6 +1270,7 @@ public class VideoJNI {
   public final static native int Muxer_getNumStreams(long jarg1, Muxer jarg1_) throws java.lang.InterruptedException, java.io.IOException;
   public final static native void Muxer_setOutputBufferLength(long jarg1, Muxer jarg1_, int jarg2);
   public final static native int Muxer_getOutputBufferLength(long jarg1, Muxer jarg1_);
+  public final static native long Muxer_addNewStream(long jarg1, Muxer jarg1_, long jarg2, Encoder jarg2_);
   public final static native long Demuxer_make();
   public final static native int Demuxer_getState(long jarg1, Demuxer jarg1_);
   public final static native long Demuxer_getFormat(long jarg1, Demuxer jarg1_);

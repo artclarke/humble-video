@@ -200,6 +200,27 @@ public class Muxer extends Container {
     return VideoJNI.Muxer_getOutputBufferLength(swigCPtr, this);
   }
 
+/**
+ * Adds a new stream that will have packets written to it that are encoded<br>
+ * by the given Encoder.<br>
+ * <br>
+ * Note on thread safety: Callers must ensure that the encoder is not encoding<br>
+ * packets at the same time that Muxer#open or Muxer#close is being called. It should<br>
+ * be safe to call Encoder#encodeVideo or Encoder#encodeAudio whem Muxer#writePacket<br>
+ * is being called. But if possible, we recommend serializing Encoder and Muxer calls<br>
+ * as not all FFmpeg encoder implements can be thread-safe outside the container they<br>
+ * write to.<br>
+ * <br>
+ * @param encoder The encoder that will be used for packets written to this stream.<br>
+ * <br>
+ * @throws InvalidArgument if encoder is null.<br>
+ * @throws InvalidArgument if encoder is not open.
+ */
+  public MuxerStream addNewStream(Encoder encoder) {
+    long cPtr = VideoJNI.Muxer_addNewStream(swigCPtr, this, Encoder.getCPtr(encoder), encoder);
+    return (cPtr == 0) ? null : new MuxerStream(cPtr, false);
+  }
+
   /**
    * Muxers can only be in one of these states.
    */

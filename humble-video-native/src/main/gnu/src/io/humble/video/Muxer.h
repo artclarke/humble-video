@@ -29,6 +29,8 @@
 #include <io/humble/video/Container.h>
 #include <io/humble/video/MuxerFormat.h>
 #include <io/humble/video/KeyValueBag.h>
+#include <io/humble/video/MuxerStream.h>
+#include <io/humble/video/Encoder.h>
 
 #ifndef SWIG
 #ifdef MUXER_H_
@@ -144,6 +146,27 @@ public:
    */
   virtual int32_t
   getOutputBufferLength();
+
+  /**
+   * Adds a new stream that will have packets written to it that are encoded
+   * by the given Encoder.
+   *
+   * Note on thread safety: Callers must ensure that the encoder is not encoding
+   * packets at the same time that Muxer#open or Muxer#close is being called. It should
+   * be safe to call Encoder#encodeVideo or Encoder#encodeAudio whem Muxer#writePacket
+   * is being called. But if possible, we recommend serializing Encoder and Muxer calls
+   * as not all FFmpeg encoder implements can be thread-safe outside the container they
+   * write to.
+   *
+   * @param encoder The encoder that will be used for packets written to this stream.
+   *
+   * @throws InvalidArgument if encoder is null.
+   * @throws InvalidArgument if encoder is not open.
+   *
+   */
+  virtual MuxerStream*
+  addNewStream(Encoder* encoder);
+
 //
 //  /**
 //   * Takes the packet given (in whatever timebase it was encoded with) and resets all timestamps

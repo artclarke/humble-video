@@ -2022,7 +2022,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getFormat(JNI
     if (!arg1) return 0;
   }
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2061,7 +2061,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getFormatN
   (void)jcls;
   arg1 = (io::humble::video::PixelFormat::Type)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2099,7 +2099,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getDescripto
   (void)jcls;
   arg1 = (io::humble::video::PixelFormat::Type)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2135,7 +2135,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getNumInstall
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2173,7 +2173,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getInstalled
   (void)jcls;
   arg1 = (int32_t)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2211,7 +2211,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getNumPlanes(
   (void)jcls;
   arg1 = (io::humble::video::PixelFormat::Type)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2249,7 +2249,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1swapEndiannes
   (void)jcls;
   arg1 = (io::humble::video::PixelFormat::Type)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2291,7 +2291,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormat_1getBufferSize
   arg2 = (int32_t)jarg2; 
   arg3 = (io::humble::video::PixelFormat::Type)jarg3; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2337,7 +2337,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2383,7 +2383,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2429,7 +2429,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2475,7 +2475,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2521,7 +2521,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelComponentDescriptor_1
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2663,7 +2663,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2709,7 +2709,7 @@ SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1g
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2755,7 +2755,7 @@ SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1g
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2801,7 +2801,7 @@ SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1g
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2847,7 +2847,7 @@ SWIGEXPORT jshort JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1g
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2895,7 +2895,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2941,7 +2941,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1get
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -2987,7 +2987,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1get
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3035,7 +3035,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1ge
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3081,7 +3081,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_PixelFormatDescriptor_1get
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3199,7 +3199,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1getNumerator(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3245,7 +3245,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1getDenominator(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3291,7 +3291,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1copy(JNIEnv *je
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3340,7 +3340,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1compareTo(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3382,7 +3382,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1sCompareTo(JNIEn
   arg1 = *(io::humble::video::Rational **)&jarg1; 
   arg2 = *(io::humble::video::Rational **)&jarg2; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3428,7 +3428,7 @@ SWIGEXPORT jdouble JNICALL Java_io_humble_video_VideoJNI_Rational_1getDouble(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3480,7 +3480,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1reduce(JNIEnv *j
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3525,7 +3525,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Rational_1sReduce(JNIEnv *
   arg3 = (int64_t)jarg3; 
   arg4 = (int64_t)jarg4; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3574,7 +3574,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1multiply(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3616,7 +3616,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sMultiply(JNIEn
   arg1 = *(io::humble::video::Rational **)&jarg1; 
   arg2 = *(io::humble::video::Rational **)&jarg2; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3665,7 +3665,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1divide(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3707,7 +3707,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sDivide(JNIEnv 
   arg1 = *(io::humble::video::Rational **)&jarg1; 
   arg2 = *(io::humble::video::Rational **)&jarg2; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3756,7 +3756,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1subtract(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3798,7 +3798,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sSubtract(JNIEn
   arg1 = *(io::humble::video::Rational **)&jarg1; 
   arg2 = *(io::humble::video::Rational **)&jarg2; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3847,7 +3847,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1add(JNIEnv *jen
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3889,7 +3889,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sAdd(JNIEnv *je
   arg1 = *(io::humble::video::Rational **)&jarg1; 
   arg2 = *(io::humble::video::Rational **)&jarg2; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3940,7 +3940,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1rescale_1_1SWIG
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -3984,7 +3984,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sRescale_1_1SWI
   arg2 = *(io::humble::video::Rational **)&jarg2; 
   arg3 = *(io::humble::video::Rational **)&jarg3; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4020,7 +4020,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1make_1_1SWIG_10
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4058,7 +4058,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1make_1_1SWIG_11
   (void)jcls;
   arg1 = (double)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4097,7 +4097,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1make_1_1SWIG_12
   (void)jarg1_;
   arg1 = *(io::humble::video::Rational **)&jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4137,7 +4137,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1make_1_1SWIG_13
   arg1 = (int32_t)jarg1; 
   arg2 = (int32_t)jarg2; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4190,7 +4190,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1rescale_1_1SWIG
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4236,7 +4236,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1sRescale_1_1SWI
   arg3 = *(io::humble::video::Rational **)&jarg3; 
   arg4 = (io::humble::video::Rational::Rounding)jarg4; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4284,7 +4284,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Rational_1rescale_1_1SWIG
   arg5 = (int32_t)jarg5; 
   arg6 = (io::humble::video::Rational::Rounding)jarg6; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4330,7 +4330,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Rational_1setNumerator(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4374,7 +4374,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Rational_1setDenominator(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4418,7 +4418,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Rational_1setValue(JNIEnv 
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4462,7 +4462,7 @@ SWIGEXPORT jdouble JNICALL Java_io_humble_video_VideoJNI_Rational_1getValue(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4508,7 +4508,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Rational_1isFinalized(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4552,7 +4552,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Rational_1init(JNIEnv *jen
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4610,7 +4610,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Global_1getDefaultTimeBas
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4646,7 +4646,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Global_1getVersionMajor(JN
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4682,7 +4682,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Global_1getVersionMinor(JN
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4718,7 +4718,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Global_1getVersionStr(J
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4754,7 +4754,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Global_1getAVFormatVersion
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4790,7 +4790,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Global_1getAVFormatVers
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4826,7 +4826,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Global_1getAVCodecVersion(
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4862,7 +4862,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Global_1getAVCodecVersi
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4895,7 +4895,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Global_1init(JNIEnv *jenv,
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -4929,7 +4929,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Global_1setFFmpegLoggingLe
   (void)jcls;
   arg1 = (int32_t)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5021,7 +5021,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1getNumKeys(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5069,7 +5069,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1getKey(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5123,7 +5123,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1getValue(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5182,7 +5182,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1setValue_1_1S
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5220,7 +5220,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1make(JNIEnv 
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5280,7 +5280,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_KeyValueBag_1setValue_1_1S
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5496,7 +5496,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Property_1getName(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5542,7 +5542,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Property_1getHelp(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5588,7 +5588,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Property_1getUnit(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5634,7 +5634,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Property_1getType(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5680,7 +5680,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Property_1getFlags(JNIEnv 
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5726,7 +5726,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Property_1getDefault(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5772,7 +5772,7 @@ SWIGEXPORT jdouble JNICALL Java_io_humble_video_VideoJNI_Property_1getDefaultAsD
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5818,7 +5818,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Property_1getNumFlagSettin
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5866,7 +5866,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Property_1getFlagConstant
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5918,7 +5918,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Property_1getFlagConstant
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -5965,7 +5965,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Media_1getTimeStamp(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6011,7 +6011,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Media_1setTimeStamp(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6055,7 +6055,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Media_1getTimeBase(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6101,7 +6101,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Media_1isKey(JNIEnv *j
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6147,7 +6147,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Media_1isComplete(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6194,7 +6194,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaEncoded_1setTimeBase(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6238,7 +6238,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getTimeStamp(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6284,7 +6284,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1setTimeStamp(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6328,7 +6328,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getTimeBase(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6374,7 +6374,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1isKey(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6420,7 +6420,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getPts(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6466,7 +6466,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getMetaData(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6512,7 +6512,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getPacketPts(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6558,7 +6558,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getPacketDts(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6604,7 +6604,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getPacketSize(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6650,7 +6650,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getPacketDurati
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6696,7 +6696,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1getBestEffortTi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6742,7 +6742,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaRaw_1setComplete(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -6786,7 +6786,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSampled_1getNumSample
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -7488,7 +7488,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getChannelB
     if (!arg1) return 0;
   }
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -7529,7 +7529,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getChanne
   arg1 = (int32_t)jarg1; 
   arg2 = (int64_t)jarg2; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -7567,7 +7567,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getNumChanne
   (void)jcls;
   arg1 = (io::humble::video::AudioChannel::Layout)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -7605,7 +7605,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getDefaultLa
   (void)jcls;
   arg1 = (int)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -7645,7 +7645,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getIndexOfCh
   arg1 = (io::humble::video::AudioChannel::Layout)jarg1; 
   arg2 = (io::humble::video::AudioChannel::Type)jarg2; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -7685,7 +7685,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getChannelFr
   arg1 = (io::humble::video::AudioChannel::Layout)jarg1; 
   arg2 = (int32_t)jarg2; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -7723,7 +7723,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getChanne
   (void)jcls;
   arg1 = (io::humble::video::AudioChannel::Type)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -7761,7 +7761,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getChanne
   (void)jcls;
   arg1 = (io::humble::video::AudioChannel::Type)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -7799,7 +7799,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioChannel_1getLayout
   (void)jcls;
   arg1 = (io::humble::video::AudioChannel::Layout)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -7969,7 +7969,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getName(JN
   (void)jcls;
   arg1 = (io::humble::video::AudioFormat::Type)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8011,7 +8011,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getFormat(JNI
     if (!arg1) return 0;
   }
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8052,7 +8052,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getAlternateS
   arg1 = (io::humble::video::AudioFormat::Type)jarg1; 
   arg2 = jarg2 ? true : false; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8090,7 +8090,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getPackedSamp
   (void)jcls;
   arg1 = (io::humble::video::AudioFormat::Type)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8128,7 +8128,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getPlanarSamp
   (void)jcls;
   arg1 = (io::humble::video::AudioFormat::Type)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8166,7 +8166,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getBytesPerSa
   (void)jcls;
   arg1 = (io::humble::video::AudioFormat::Type)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8204,7 +8204,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1isPlanar(
   (void)jcls;
   arg1 = (io::humble::video::AudioFormat::Type)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8246,7 +8246,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getBufferSize
   arg2 = (int32_t)jarg2; 
   arg3 = (io::humble::video::AudioFormat::Type)jarg3; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8288,7 +8288,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_AudioFormat_1getDataPlaneS
   arg2 = (int32_t)jarg2; 
   arg3 = (io::humble::video::AudioFormat::Type)jarg3; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8334,7 +8334,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
   arg4 = (io::humble::video::AudioChannel::Layout)jarg4; 
   arg5 = (io::humble::video::AudioFormat::Type)jarg5; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8383,7 +8383,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
   arg5 = (io::humble::video::AudioChannel::Layout)jarg5; 
   arg6 = (io::humble::video::AudioFormat::Type)jarg6; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8424,7 +8424,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1make_1_1SWIG_
   arg1 = *(io::humble::video::MediaAudio **)&jarg1; 
   arg2 = jarg2 ? true : false; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8472,7 +8472,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getData(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8520,7 +8520,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getDataPlaneSi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8566,7 +8566,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getNumDataPlan
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8612,7 +8612,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getMaxNumSampl
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8658,7 +8658,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getNumSamples(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8704,7 +8704,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1setNumSamples(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8748,7 +8748,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getBytesPerSam
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8794,7 +8794,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1setComplete(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8838,7 +8838,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getSampleRate(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8884,7 +8884,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getChannels(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8930,7 +8930,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getFormat(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -8976,7 +8976,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1isComplete
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9022,7 +9022,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1isKey(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9068,7 +9068,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1isPlanar(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9114,7 +9114,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudio_1getChannelLayo
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9252,7 +9252,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1make_1_1SWI
   arg2 = (int32_t)jarg2; 
   arg3 = (io::humble::video::PixelFormat::Type)jarg3; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9297,7 +9297,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1make_1_1SWI
   arg3 = (int32_t)jarg3; 
   arg4 = (io::humble::video::PixelFormat::Type)jarg4; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9338,7 +9338,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1make_1_1SWI
   arg1 = *(io::humble::video::MediaPicture **)&jarg1; 
   arg2 = jarg2 ? true : false; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9386,7 +9386,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getData(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9434,7 +9434,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getDataPlane
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9480,7 +9480,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getNumDataPl
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9528,7 +9528,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getLineSize(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9574,7 +9574,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setComplete(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9618,7 +9618,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1isComple
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9664,7 +9664,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getWidth(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9710,7 +9710,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getHeight(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9756,7 +9756,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getFormat(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9802,7 +9802,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getCodedPict
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9848,7 +9848,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setCodedPict
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9892,7 +9892,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getDisplayPi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9938,7 +9938,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setDisplayPi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -9982,7 +9982,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getQuality(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10028,7 +10028,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setQuality(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10074,7 +10074,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getError(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10120,7 +10120,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getRepeatPic
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10166,7 +10166,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setRepeatPic
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10210,7 +10210,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1isInterl
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10256,7 +10256,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setInterlace
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10300,7 +10300,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1isTopFie
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10346,7 +10346,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setTopFieldF
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10390,7 +10390,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1isPalett
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10436,7 +10436,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setPaletteCh
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10480,7 +10480,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1getType(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10526,7 +10526,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPicture_1setType(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10570,7 +10570,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getFormat(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10616,7 +10616,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getStartDi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10662,7 +10662,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getEndDisp
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10708,7 +10708,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getNumRecta
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10754,7 +10754,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getTimeSta
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10802,7 +10802,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getRectang
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10848,7 +10848,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1setTimeStam
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10892,7 +10892,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1isKey(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10938,7 +10938,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getPts(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -10984,7 +10984,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getPacketP
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11030,7 +11030,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getPacketD
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11076,7 +11076,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getPacketSi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11122,7 +11122,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getPacketD
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11168,7 +11168,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1getBestEff
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11214,7 +11214,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1isCompl
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11262,7 +11262,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1setComplete
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11306,7 +11306,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaSubtitle_1setComplete
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11362,7 +11362,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11408,7 +11408,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11454,7 +11454,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11500,7 +11500,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11546,7 +11546,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11592,7 +11592,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11638,7 +11638,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11684,7 +11684,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11730,7 +11730,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11778,7 +11778,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1ge
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -11826,7 +11826,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1g
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12006,7 +12006,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12045,7 +12045,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG
   (void)jarg1_;
   arg1 = *(io::humble::ferry::Buffer **)&jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12086,7 +12086,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG
   arg1 = *(io::humble::video::MediaPacket **)&jarg1; 
   arg2 = jarg2 ? true : false; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12124,7 +12124,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1make_1_1SWIG
   (void)jcls;
   arg1 = (int32_t)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12170,7 +12170,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getData(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12216,7 +12216,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getNumSideDat
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12264,7 +12264,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getSideData(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12312,7 +12312,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getSideDataTy
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12358,7 +12358,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getPts(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12404,7 +12404,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setPts(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12448,7 +12448,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getDts(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12494,7 +12494,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setDts(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12538,7 +12538,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getSize(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12584,7 +12584,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getMaxSize(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12630,7 +12630,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getStreamInde
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12676,7 +12676,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getFlags(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12722,7 +12722,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1isKeyPack
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12768,7 +12768,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getDuration(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12814,7 +12814,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getPosition(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12860,7 +12860,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setKeyPacket(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12904,7 +12904,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setFlags(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12948,7 +12948,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setStreamInde
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -12992,7 +12992,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setDuration(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13036,7 +13036,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setPosition(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13080,7 +13080,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getConvergen
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13126,7 +13126,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setConvergenc
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13172,7 +13172,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1reset(JNIEnv 
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13218,7 +13218,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Configurable_1getNumProper
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13266,7 +13266,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProperty
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13318,7 +13318,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProperty
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13375,7 +13375,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13427,7 +13427,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13478,7 +13478,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13529,7 +13529,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13581,7 +13581,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13632,7 +13632,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProper
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13686,7 +13686,7 @@ SWIGEXPORT jdouble JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProper
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13739,7 +13739,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProperty
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13792,7 +13792,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Configurable_1getPropertyA
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13845,7 +13845,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Configurable_1getProperty
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13898,7 +13898,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Configurable_1getPrope
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -13949,7 +13949,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Configurable_1setProperty_
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14233,7 +14233,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14279,7 +14279,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14325,7 +14325,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14371,7 +14371,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14417,7 +14417,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14463,7 +14463,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14509,7 +14509,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1get
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14553,7 +14553,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1ope
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14601,7 +14601,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1res
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14649,7 +14649,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPictureResampler_1ma
   arg6 = (io::humble::video::PixelFormat::Type)jarg6; 
   arg7 = (int32_t)jarg7; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14697,7 +14697,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1make
   arg5 = (int32_t)jarg5; 
   arg6 = (io::humble::video::AudioFormat::Type)jarg6; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14743,7 +14743,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getOu
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14789,7 +14789,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getIn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14835,7 +14835,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getOu
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14881,7 +14881,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getIn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14927,7 +14927,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getOu
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -14973,7 +14973,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getIn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -15019,7 +15019,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getIn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -15065,7 +15065,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getOu
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -15109,7 +15109,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1open(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -15159,7 +15159,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1resam
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -15207,7 +15207,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -15255,7 +15255,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1setCo
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -15301,7 +15301,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1dropO
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -15349,7 +15349,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1injec
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -15397,7 +15397,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getD
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -15445,7 +15445,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getNu
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -15491,7 +15491,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getSt
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -16281,7 +16281,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecProfile_1getProfile(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -16327,7 +16327,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_CodecProfile_1getName(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21211,7 +21211,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Codec_1hasCapability(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21257,7 +21257,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getCapabilities(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21303,7 +21303,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Codec_1getName(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21349,7 +21349,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getIDAsInt(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21395,7 +21395,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getID(JNIEnv *jenv,
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21441,7 +21441,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getType(JNIEnv *jen
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21487,7 +21487,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Codec_1canDecode(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21533,7 +21533,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Codec_1canEncode(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21571,7 +21571,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findEncodingCodec(
   (void)jcls;
   arg1 = (io::humble::video::Codec::ID)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21609,7 +21609,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findEncodingCodecB
   (void)jcls;
   arg1 = (int)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21651,7 +21651,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findEncodingCodecB
     if (!arg1) return 0;
   }
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21690,7 +21690,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findDecodingCodec(
   (void)jcls;
   arg1 = (io::humble::video::Codec::ID)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21728,7 +21728,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findDecodingCodecB
   (void)jcls;
   arg1 = (int)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21770,7 +21770,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1findDecodingCodecB
     if (!arg1) return 0;
   }
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21830,7 +21830,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1guessEncodingCodec
   }
   arg5 = (io::humble::video::MediaDescriptor::Type)jarg5; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21879,7 +21879,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Codec_1getLongName(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21915,7 +21915,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumInstalledCode
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21953,7 +21953,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1getInstalledCodec(
   (void)jcls;
   arg1 = (int32_t)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -21999,7 +21999,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedVide
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22047,7 +22047,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedVideoF
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22093,7 +22093,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedVide
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22141,7 +22141,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedVideoPi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22187,7 +22187,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedAudi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22235,7 +22235,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedAudioSa
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22281,7 +22281,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedAudi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22329,7 +22329,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedAudioFo
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22375,7 +22375,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedAudi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22423,7 +22423,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedAudioCh
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22469,7 +22469,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Codec_1getNumSupportedProf
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22517,7 +22517,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Codec_1getSupportedProfil
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22613,7 +22613,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1hasPr
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22659,7 +22659,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getNam
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22705,7 +22705,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getLon
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22751,7 +22751,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getProper
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22797,7 +22797,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getId(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22843,7 +22843,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1getType(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -22881,7 +22881,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_CodecDescriptor_1make(JNI
   (void)jcls;
   arg1 = (io::humble::video::Codec::ID)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23143,7 +23143,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getNam
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23189,7 +23189,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getLon
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23235,7 +23235,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getExt
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23281,7 +23281,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getFlags(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23329,7 +23329,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getFl
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23375,7 +23375,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getNumSup
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23423,7 +23423,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getSuppor
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23471,7 +23471,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerFormat_1getSuppo
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23514,7 +23514,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_delete_1ContainerFormat(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23558,7 +23558,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getName(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23604,7 +23604,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getLongNam
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23650,7 +23650,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getExtensi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23696,7 +23696,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getFlags(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23742,7 +23742,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getDefaultAud
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23788,7 +23788,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getDefaultVid
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23834,7 +23834,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getDefaultSub
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23880,7 +23880,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getMimeTyp
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -23934,7 +23934,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1guessFormat(
     if (!arg3) return 0;
   }
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24003,7 +24003,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1guessCodec(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24052,7 +24052,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getNumSupport
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24100,7 +24100,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getSupportedC
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24148,7 +24148,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getSupported
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24184,7 +24184,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getNumFormats
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24222,7 +24222,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getFormat(JN
   (void)jcls;
   arg1 = (int32_t)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24268,7 +24268,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_DemuxerFormat_1getName(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24314,7 +24314,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_DemuxerFormat_1getLongN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24360,7 +24360,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_DemuxerFormat_1getExten
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24406,7 +24406,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_DemuxerFormat_1getFlags(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24452,7 +24452,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_DemuxerFormat_1getNumSuppo
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24500,7 +24500,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_DemuxerFormat_1getSupporte
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24548,7 +24548,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_DemuxerFormat_1getSupport
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24590,7 +24590,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_DemuxerFormat_1findFormat
     if (!arg1) return 0;
   }
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24627,7 +24627,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_DemuxerFormat_1getNumForma
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24665,7 +24665,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_DemuxerFormat_1getFormat(
   (void)jcls;
   arg1 = (int32_t)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24723,7 +24723,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1make(JNIEnv *
   arg4 = (int32_t)jarg4; 
   arg5 = (int32_t)jarg5; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24769,7 +24769,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1getPosition(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24815,7 +24815,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1getTimeStamp(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24861,7 +24861,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1getFlags(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24907,7 +24907,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1getSize(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24953,7 +24953,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1getMinDistance
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -24999,7 +24999,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_IndexEntry_1isKeyFrame
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25397,7 +25397,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1open(JNIEnv *jenv, 
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25441,7 +25441,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Coder_1getCodec(JNIEnv *j
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25487,7 +25487,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getCodecType(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25533,7 +25533,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getCodecID(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25579,7 +25579,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getHeight(JNIEnv *j
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25625,7 +25625,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setHeight(JNIEnv *j
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25669,7 +25669,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getWidth(JNIEnv *je
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25715,7 +25715,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setWidth(JNIEnv *je
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25759,7 +25759,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getPixelFormat(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25805,7 +25805,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setPixelType(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25849,7 +25849,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getSampleRate(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25895,7 +25895,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setSampleRate(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25939,7 +25939,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getSampleFormat(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -25985,7 +25985,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setSampleFormat(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26029,7 +26029,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getChannels(JNIEnv 
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26075,7 +26075,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setChannels(JNIEnv 
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26119,7 +26119,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getChannelLayout(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26165,7 +26165,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setChannelLayout(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26209,7 +26209,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Coder_1getTimeBase(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26256,7 +26256,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setTimeBase(JNIEnv 
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26300,7 +26300,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getState(JNIEnv *je
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26346,7 +26346,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getFrameCount(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26392,7 +26392,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getFrameSize(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26431,7 +26431,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Decoder_1make_1_1SWIG_10(
   (void)jarg1_;
   arg1 = *(io::humble::video::Codec **)&jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26470,7 +26470,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Decoder_1make_1_1SWIG_11(
   (void)jarg1_;
   arg1 = *(io::humble::video::Decoder **)&jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26514,7 +26514,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Decoder_1flush(JNIEnv *jen
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26566,7 +26566,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1decodeAudio(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26620,7 +26620,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1decodeVideo(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26674,7 +26674,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1decodeSubtitle(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26713,7 +26713,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Encoder_1make_1_1SWIG_10(
   (void)jarg1_;
   arg1 = *(io::humble::video::Codec **)&jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26752,7 +26752,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Encoder_1make_1_1SWIG_11(
   (void)jarg1_;
   arg1 = *(io::humble::video::Encoder **)&jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26806,7 +26806,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeVideo(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26860,7 +26860,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeAudio(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -26912,7 +26912,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeSubtitle(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27174,7 +27174,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getIndex(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27220,7 +27220,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getId(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27266,7 +27266,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getFrame
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27312,7 +27312,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getTimeB
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27358,7 +27358,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getStart
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27404,7 +27404,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getDurat
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27450,7 +27450,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getCurre
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27496,7 +27496,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getNumInd
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27542,7 +27542,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getNumFr
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27588,7 +27588,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getSampl
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27634,7 +27634,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getConta
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27680,7 +27680,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getParseT
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27726,7 +27726,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1setParseT
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27770,7 +27770,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getMetaD
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27820,7 +27820,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1findTime
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27870,7 +27870,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1findTimeS
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27918,7 +27918,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getIndex
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -27964,7 +27964,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getDispos
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28010,7 +28010,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_ContainerStream_1getAttac
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28212,7 +28212,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1getNumStreams(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28258,7 +28258,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MuxerStream_1getEncoder(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28304,7 +28304,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MuxerStream_1getMuxer(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28350,7 +28350,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_DemuxerStream_1getDecoder
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28396,7 +28396,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_DemuxerStream_1getDemuxer
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28447,7 +28447,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Muxer_1make(JNIEnv *jenv,
     if (!arg3) return 0;
   }
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28495,7 +28495,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Muxer_1getURL(JNIEnv *j
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28541,7 +28541,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Muxer_1getFormat(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28587,7 +28587,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Muxer_1getState(JNIEnv *je
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28637,7 +28637,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Muxer_1open(JNIEnv *jenv, 
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28679,7 +28679,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Muxer_1close(JNIEnv *jenv,
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28723,7 +28723,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Muxer_1getNumStreams(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28769,7 +28769,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Muxer_1setOutputBufferLeng
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28813,7 +28813,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Muxer_1getOutputBufferLeng
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28842,6 +28842,55 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Muxer_1getOutputBufferLeng
 }
 
 
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Muxer_1addNewStream(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  io::humble::video::Muxer *arg1 = (io::humble::video::Muxer *) 0 ;
+  io::humble::video::Encoder *arg2 = (io::humble::video::Encoder *) 0 ;
+  io::humble::video::MuxerStream *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(io::humble::video::Muxer **)&jarg1; 
+  arg2 = *(io::humble::video::Encoder **)&jarg2; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (io::humble::video::MuxerStream *)(arg1)->addNewStream(arg2);
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return 0;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+  *(io::humble::video::MuxerStream **)&jresult = result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Demuxer_1make(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   io::humble::video::Demuxer *result = 0 ;
@@ -28849,7 +28898,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Demuxer_1make(JNIEnv *jen
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28895,7 +28944,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getState(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28941,7 +28990,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getFormat(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -28987,7 +29036,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Demuxer_1setInputBufferLen
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29031,7 +29080,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getInputBufferLen
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29094,7 +29143,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Demuxer_1open(JNIEnv *jenv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29137,7 +29186,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Demuxer_1close(JNIEnv *jen
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29183,7 +29232,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getStream(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29232,7 +29281,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1read(JNIEnv *jenv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29276,7 +29325,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Demuxer_1queryStreamMetaDa
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29320,7 +29369,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getDuration(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29366,7 +29415,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getStartTime(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29412,7 +29461,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getFileSize(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29458,7 +29507,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getBitRate(JNIEnv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29504,7 +29553,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getFlags(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29550,7 +29599,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Demuxer_1setFlags(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29596,7 +29645,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getFlag(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29644,7 +29693,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Demuxer_1setFlag(JNIEnv *j
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29688,7 +29737,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getURL(JNIEnv 
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29734,7 +29783,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getReadRetryCount
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29780,7 +29829,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Demuxer_1setReadRetryCount
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29824,7 +29873,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Demuxer_1canStreamsBeA
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29870,7 +29919,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getMetaData(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29918,7 +29967,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1setForcedAudioCod
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -29966,7 +30015,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1setForcedVideoCod
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30014,7 +30063,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1setForcedSubtitle
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30118,7 +30167,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1seek(JNIEnv *jenv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30164,7 +30213,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Demuxer_1getMaxDelay(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30208,7 +30257,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Demuxer_1play(JNIEnv *jenv
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30250,7 +30299,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Demuxer_1pause(JNIEnv *jen
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30378,7 +30427,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterType_1getName(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30424,7 +30473,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterType_1getDescript
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30470,7 +30519,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterType_1getFlags(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30518,7 +30567,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_FilterType_1getFlag(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30564,7 +30613,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterType_1getNumInputs(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30612,7 +30661,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterType_1getInputNam
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30660,7 +30709,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterType_1getInputType(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30706,7 +30755,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterType_1getNumOutputs(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30754,7 +30803,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterType_1getOutputNa
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30802,7 +30851,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterType_1getOutputType(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30844,7 +30893,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterType_1findFilterTyp
     if (!arg1) return 0;
   }
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30881,7 +30930,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterType_1getNumFilterTy
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30919,7 +30968,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterType_1getFilterType
   (void)jcls;
   arg1 = (int32_t)jarg1; 
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -30979,7 +31028,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1make(JNIEnv 
   (void)jenv;
   (void)jcls;
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31034,7 +31083,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addFilter(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31087,7 +31136,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getFilter(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31149,7 +31198,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addAudioSour
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31214,7 +31263,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addPictureSo
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31273,7 +31322,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addAudioSink
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31328,7 +31377,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1addPictureSi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31375,7 +31424,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getNumSources
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31423,7 +31472,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getSource_1_
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31475,7 +31524,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getSource_1_
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31522,7 +31571,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getNumSinks(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31570,7 +31619,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getSink_1_1S
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31622,7 +31671,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getSink_1_1S
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31669,7 +31718,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1setAutoConver
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31713,7 +31762,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getAutoConver
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31763,7 +31812,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1open(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31828,7 +31877,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1sendComman
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31898,7 +31947,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1queueCommand(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31945,7 +31994,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getDisplay
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -31992,7 +32041,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterGraph_1getState(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32062,7 +32111,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Filter_1getName(JNIEnv 
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32108,7 +32157,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Filter_1getNumInputs(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32156,7 +32205,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Filter_1getInputName(JN
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32204,7 +32253,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Filter_1getInputType(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32252,7 +32301,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Filter_1getInputLink(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32298,7 +32347,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Filter_1getNumOutputs(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32346,7 +32395,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_Filter_1getOutputName(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32394,7 +32443,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Filter_1getOutputType(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32442,7 +32491,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Filter_1getOutputLink(JNI
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32488,7 +32537,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Filter_1getGraph(JNIEnv *
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32534,7 +32583,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getFilterGrap
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32580,7 +32629,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getInputFilte
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32626,7 +32675,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getInputPad
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32672,7 +32721,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getInputPadTyp
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32718,7 +32767,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getOutputFilt
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32764,7 +32813,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getOutputPa
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32810,7 +32859,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getOutputPadTy
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32856,7 +32905,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getMediaType(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32902,7 +32951,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getWidth(JNIEn
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32948,7 +32997,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getHeight(JNIE
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -32994,7 +33043,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getPixelFormat
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -33040,7 +33089,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getPixelAspec
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -33086,7 +33135,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getChannelLayo
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -33132,7 +33181,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getSampleRate(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -33178,7 +33227,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getSampleForma
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -33224,7 +33273,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_FilterLink_1getTimeBase(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -33275,7 +33324,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterLink_1insertFilter(J
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -33320,7 +33369,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterAudioSource_1addAudi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -33365,7 +33414,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterPictureSource_1addPi
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -33412,7 +33461,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterAudioSink_1getAudio(
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
@@ -33461,7 +33510,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterPictureSink_1getPict
   }
   
   {
-    /*@SWIG:/vagrant/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
