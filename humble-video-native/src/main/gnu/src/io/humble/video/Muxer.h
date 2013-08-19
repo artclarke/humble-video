@@ -167,6 +167,21 @@ public:
   virtual MuxerStream*
   addNewStream(Encoder* encoder);
 
+  /**
+   * Writes the given packet to the Muxer.
+   *
+   * @param packet The packet to write. If null, it tells the muxer to flush any data queued up to
+   *   the underlying storage (disk, network, etc).
+   *
+   * @returns true if all data has been flushed, false if data remains to be flushed.
+   *
+   * @throw InvalidArgument if packet is null.
+   * @throw InvalidArgument if packet is not complete.
+   * @throw RuntimeException for other errors.
+   */
+  virtual bool
+  writePacket(MediaPacket* packet);
+
 //
 //  /**
 //   * Takes the packet given (in whatever timebase it was encoded with) and resets all timestamps

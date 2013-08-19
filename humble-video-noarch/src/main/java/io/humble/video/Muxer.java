@@ -221,6 +221,22 @@ public class Muxer extends Container {
     return (cPtr == 0) ? null : new MuxerStream(cPtr, false);
   }
 
+/**
+ * Writes the given packet to the Muxer.<br>
+ * <br>
+ * @param packet The packet to write. If null, it tells the muxer to flush any data queued up to<br>
+ *   the underlying storage (disk, network, etc).<br>
+ * <br>
+ * @return true if all data has been flushed, false if data remains to be flushed.<br>
+ * <br>
+ * @throws InvalidArgument if packet is null.<br>
+ * @throws InvalidArgument if packet is not complete.<br>
+ * @throws RuntimeException for other errors.
+ */
+  public boolean writePacket(MediaPacket packet) {
+    return VideoJNI.Muxer_writePacket(swigCPtr, this, MediaPacket.getCPtr(packet), packet);
+  }
+
   /**
    * Muxers can only be in one of these states.
    */

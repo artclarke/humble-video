@@ -259,6 +259,34 @@ Muxer::addNewStream(Encoder* encoder) {
 }
 
 
+bool
+Muxer::writePacket(MediaPacket* packet) {
+  if (getState() != STATE_OPENED) {
+    VS_THROW(HumbleRuntimeError("Cannot write to unopened Muxer"));
+  }
+  if (!packet) {
+    VS_THROW(HumbleInvalidArgument("null packet"));
+  }
+  if (!packet->isComplete()) {
+    VS_THROW(HumbleInvalidArgument("cannot write incomplete packet"));
+  }
+  int numStreams = getNumStreams();
+  if (packet->getStreamIndex() >= numStreams) {
+    VS_THROW(HumbleRuntimeError("attempt to write packet to stream that does not exist in this muxer"));
+  }
+  if (!packet->getSize()) {
+    VS_THROW(HumbleRuntimeError("Cannot write empty packet"));
+  }
+
+  VS_THROW(HumbleRuntimeError("not yet implemented"));
+
+  /// now, do the madness.
+  pushCoders();
+  popCoders();
+
+  return false;
+}
+
 /*
 void
 Muxer::stampOutputPacket(MediaPacket* packet) {
