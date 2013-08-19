@@ -226,6 +226,10 @@ public class Muxer extends Container {
  * <br>
  * @param packet The packet to write. If null, it tells the muxer to flush any data queued up to<br>
  *   the underlying storage (disk, network, etc).<br>
+ * @param forceInterleave If true, this Muxer will ensure that all packets are interleaved across streams<br>
+ *   (i.e. monotonically increasing timestamps in the Muxer container). If false, then the caller<br>
+ *   is responsible for ensuring the interleaving is valid for the container. Note this method is faster<br>
+ *   if forceInterleave is false.<br>
  * <br>
  * @return true if all data has been flushed, false if data remains to be flushed.<br>
  * <br>
@@ -233,8 +237,8 @@ public class Muxer extends Container {
  * @throws InvalidArgument if packet is not complete.<br>
  * @throws RuntimeException for other errors.
  */
-  public boolean writePacket(MediaPacket packet) {
-    return VideoJNI.Muxer_writePacket(swigCPtr, this, MediaPacket.getCPtr(packet), packet);
+  public boolean write(MediaPacket packet, boolean forceInterleave) {
+    return VideoJNI.Muxer_write(swigCPtr, this, MediaPacket.getCPtr(packet), packet, forceInterleave);
   }
 
   /**

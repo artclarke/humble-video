@@ -49,13 +49,13 @@ public:
   static Decoder* make(Codec* codec);
 
   /**
-   * Creates a Decoder from a given Decoder
+   * Creates a Decoder from a given Coder (either an encoder or a decoder).
    * @return a Decoder
    * @throws InvalidArgument if src is null
    */
-  static Decoder* make(Decoder* src);
+  static Decoder* make(Coder* src);
 #ifndef SWIG
-  static Decoder* make(Codec* codec, AVCodecContext* src);
+  static Decoder* make(Codec* codec, AVCodecContext* src, bool copy);
 #endif // ! SWIG
 
   /**
@@ -127,7 +127,7 @@ public:
       MediaPacket *packet, int32_t byteOffset);
 
 protected:
-  Decoder(Codec* codec, AVCodecContext* src);
+  Decoder(Codec* codec, AVCodecContext* src, bool copy);
   virtual
   ~Decoder();
 

@@ -52,7 +52,7 @@ public:
    * @return a Encoder
    * @throws InvalidArgument if src is null
    */
-  static Encoder* make(Encoder* src);
+  static Encoder* make(Coder* src);
 
 #ifndef SWIG
   static Encoder* make(Codec* codec, AVCodecContext* src);

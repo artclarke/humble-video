@@ -24,6 +24,13 @@
  */
 
 #include "MuxerTest.h"
+#include <io/humble/ferry/Logger.h>
+
+#include <io/humble/video/Demuxer.h>
+#include <io/humble/video/Decoder.h>
+#include <io/humble/video/MediaPacket.h>
+
+VS_LOG_SETUP(io.humble.video);
 
 MuxerTest::MuxerTest() {
 
@@ -58,4 +65,45 @@ MuxerTest::testCreation() {
   muxer->close();
 
 
+}
+
+void
+MuxerTest::testRemuxing() {
+  RefPointer<Muxer> muxer;
+
+  muxer = Muxer::make(0, "MuxerTest_testRemuxing.mp4", 0);
+
+  //  TestData::Fixture* fixture=mFixtures.getFixture("testfile_h264_mp4a_tmcd.mov");
+  TestData::Fixture* fixture=mFixtures.getFixture("ucl_h264_aac.mp4");
+  TS_ASSERT(fixture);
+  char filepath[2048];
+  mFixtures.fillPath(fixture, filepath, sizeof(filepath));
+
+  RefPointer<Demuxer> demuxer = Demuxer::make();
+
+  demuxer->open(filepath, 0, false, true, 0, 0);
+
+  int32_t n = demuxer->getNumStreams();
+  for(int i = 0; i < n; i++) {
+    RefPointer<DemuxerStream> demuxerStream = demuxer->getStream(i);
+    RefPointer<Decoder> d = demuxerStream->getDecoder();
+    RefPointer<Encoder> e = Encoder::make(d.value());
+    e->open(0, 0);
+    RefPointer<MuxerStream> muxerStream = muxer->addNewStream(e.value());
+  }
+  RefPointer<MediaPacket> packet = MediaPacket::make();
+
+  muxer->open(0, 0);
+  int32_t packetNo = 0;
+  bool isMemcheck = getenv("VS_TEST_MEMCHECK");
+  while(demuxer->read(packet.value()) >= 0) {
+    muxer->write(packet.value(), false);
+    ++packetNo;
+    if (isMemcheck && packetNo > 10) {
+      VS_LOG_DEBUG("Cutting short when running under valgrind");
+      break;
+    }
+  }
+  muxer->close();
+  demuxer->close();
 }

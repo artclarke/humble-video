@@ -1196,13 +1196,13 @@ public class VideoJNI {
   public final static native int Coder_getFrameCount(long jarg1, Coder jarg1_);
   public final static native int Coder_getFrameSize(long jarg1, Coder jarg1_);
   public final static native long Decoder_make__SWIG_0(long jarg1, Codec jarg1_);
-  public final static native long Decoder_make__SWIG_1(long jarg1, Decoder jarg1_);
+  public final static native long Decoder_make__SWIG_1(long jarg1, Coder jarg1_);
   public final static native void Decoder_flush(long jarg1, Decoder jarg1_);
   public final static native int Decoder_decodeAudio(long jarg1, Decoder jarg1_, long jarg2, MediaAudio jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native int Decoder_decodeVideo(long jarg1, Decoder jarg1_, long jarg2, MediaPicture jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native int Decoder_decodeSubtitle(long jarg1, Decoder jarg1_, long jarg2, MediaSubtitle jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native long Encoder_make__SWIG_0(long jarg1, Codec jarg1_);
-  public final static native long Encoder_make__SWIG_1(long jarg1, Encoder jarg1_);
+  public final static native long Encoder_make__SWIG_1(long jarg1, Coder jarg1_);
   public final static native int Encoder_encodeVideo(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaPicture jarg3_, int jarg4);
   public final static native int Encoder_encodeAudio(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaAudio jarg3_, int jarg4);
   public final static native int Encoder_encodeSubtitle(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaSubtitle jarg3_);
@@ -1271,7 +1271,7 @@ public class VideoJNI {
   public final static native void Muxer_setOutputBufferLength(long jarg1, Muxer jarg1_, int jarg2);
   public final static native int Muxer_getOutputBufferLength(long jarg1, Muxer jarg1_);
   public final static native long Muxer_addNewStream(long jarg1, Muxer jarg1_, long jarg2, Encoder jarg2_);
-  public final static native boolean Muxer_writePacket(long jarg1, Muxer jarg1_, long jarg2, MediaPacket jarg2_);
+  public final static native boolean Muxer_write(long jarg1, Muxer jarg1_, long jarg2, MediaPacket jarg2_, boolean jarg3);
   public final static native long Demuxer_make();
   public final static native int Demuxer_getState(long jarg1, Demuxer jarg1_);
   public final static native long Demuxer_getFormat(long jarg1, Demuxer jarg1_);

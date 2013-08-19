@@ -172,6 +172,10 @@ public:
    *
    * @param packet The packet to write. If null, it tells the muxer to flush any data queued up to
    *   the underlying storage (disk, network, etc).
+   * @param forceInterleave If true, this Muxer will ensure that all packets are interleaved across streams
+   *   (i.e. monotonically increasing timestamps in the Muxer container). If false, then the caller
+   *   is responsible for ensuring the interleaving is valid for the container. Note this method is faster
+   *   if forceInterleave is false.
    *
    * @returns true if all data has been flushed, false if data remains to be flushed.
    *
@@ -180,20 +184,19 @@ public:
    * @throw RuntimeException for other errors.
    */
   virtual bool
-  writePacket(MediaPacket* packet);
-
-//
-//  /**
-//   * Takes the packet given (in whatever timebase it was encoded with) and resets all timestamps
-//   * to align with the stream in this container that it will be added to.
-//   *
-//   * @param packet The packet to stamp. Packet#setStreamIndex must have been called to avoid an error,
-//   *  Packet#getStreamIndex must point to a stream number in this muxer.
-//   */
-//  virtual void stampOutputPacket(MediaPacket* packet);
+  write(MediaPacket* packet, bool forceInterleave);
 
 protected:
   virtual AVFormatContext* getFormatCtx() { return mCtx; }
+
+  /**
+   * Takes the packet given (in whatever timebase it was encoded with) and resets all timestamps
+   * to align with the stream in this container that it will be added to.
+   *
+   * @param packet The packet to stamp. Packet#setStreamIndex must have been called to avoid an error,
+   *  Packet#getStreamIndex must point to a stream number in this muxer.
+   */
+  static void stampOutputPacket(Container::Stream* stream, MediaPacket* packet);
   Muxer(MuxerFormat* format, const char* filename, const char* formatName);
   virtual
   ~Muxer();

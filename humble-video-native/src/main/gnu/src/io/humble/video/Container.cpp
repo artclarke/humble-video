@@ -130,7 +130,7 @@ Container::Stream::getCoder() {
       if (!codec) {
         VS_THROW(HumbleRuntimeError("could not find decoding codec"));
       }
-      mCoder = Decoder::make(codec.value(), stream->codec);
+      mCoder = Decoder::make(codec.value(), stream->codec, true);
     } else {
       VS_THROW(HumbleRuntimeError("Got null encoder on MuxerStream which should not be possible"));
     }

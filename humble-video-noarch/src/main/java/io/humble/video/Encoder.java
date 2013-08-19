@@ -125,8 +125,8 @@ public class Encoder extends Coder {
  * @return a Encoder<br>
  * @throws InvalidArgument if src is null
  */
-  public static Encoder make(Encoder src) {
-    long cPtr = VideoJNI.Encoder_make__SWIG_1(Encoder.getCPtr(src), src);
+  public static Encoder make(Coder src) {
+    long cPtr = VideoJNI.Encoder_make__SWIG_1(Coder.getCPtr(src), src);
     return (cPtr == 0) ? null : new Encoder(cPtr, false);
   }
 

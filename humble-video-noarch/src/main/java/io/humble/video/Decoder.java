@@ -121,12 +121,12 @@ public class Decoder extends Coder {
   }
 
 /**
- * Creates a Decoder from a given Decoder<br>
+ * Creates a Decoder from a given Coder (either an encoder or a decoder).<br>
  * @return a Decoder<br>
  * @throws InvalidArgument if src is null
  */
-  public static Decoder make(Decoder src) {
-    long cPtr = VideoJNI.Decoder_make__SWIG_1(Decoder.getCPtr(src), src);
+  public static Decoder make(Coder src) {
+    long cPtr = VideoJNI.Decoder_make__SWIG_1(Coder.getCPtr(src), src);
     return (cPtr == 0) ? null : new Decoder(cPtr, false);
   }
 

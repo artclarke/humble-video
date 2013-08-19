@@ -26462,13 +26462,13 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Decoder_1make_1_1SWIG_10(
 
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Decoder_1make_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Decoder *arg1 = (io::humble::video::Decoder *) 0 ;
+  io::humble::video::Coder *arg1 = (io::humble::video::Coder *) 0 ;
   io::humble::video::Decoder *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Decoder **)&jarg1; 
+  arg1 = *(io::humble::video::Coder **)&jarg1; 
   {
     /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
@@ -26744,13 +26744,13 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Encoder_1make_1_1SWIG_10(
 
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Encoder_1make_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  io::humble::video::Encoder *arg1 = (io::humble::video::Encoder *) 0 ;
+  io::humble::video::Coder *arg1 = (io::humble::video::Coder *) 0 ;
   io::humble::video::Encoder *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(io::humble::video::Encoder **)&jarg1; 
+  arg1 = *(io::humble::video::Coder **)&jarg1; 
   {
     /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
     // HumbleVideo.i: Start generated code
@@ -28891,10 +28891,11 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Muxer_1addNewStream(JNIEn
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Muxer_1writePacket(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Muxer_1write(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jboolean jarg3) {
   jboolean jresult = 0 ;
   io::humble::video::Muxer *arg1 = (io::humble::video::Muxer *) 0 ;
   io::humble::video::MediaPacket *arg2 = (io::humble::video::MediaPacket *) 0 ;
+  bool arg3 ;
   bool result;
   
   (void)jenv;
@@ -28903,6 +28904,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Muxer_1writePacket(JNI
   (void)jarg2_;
   arg1 = *(io::humble::video::Muxer **)&jarg1; 
   arg2 = *(io::humble::video::MediaPacket **)&jarg2; 
+  arg3 = jarg3 ? true : false; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -28916,7 +28918,7 @@ SWIGEXPORT jboolean JNICALL Java_io_humble_video_VideoJNI_Muxer_1writePacket(JNI
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (bool)(arg1)->writePacket(arg2);
+      result = (bool)(arg1)->write(arg2,arg3);
     }
     catch(std::exception & e)
     {

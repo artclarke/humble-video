@@ -42,7 +42,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-Decoder::Decoder(Codec* codec, AVCodecContext* src) : Coder(codec, src) {
+Decoder::Decoder(Codec* codec, AVCodecContext* src, bool copy) : Coder(codec, src, copy) {
   if (!codec)
     throw HumbleInvalidArgument("no codec passed in");
 
@@ -321,22 +321,22 @@ Decoder::make(Codec* codec)
 
   RefPointer<Decoder> retval;
   // new Decoder DOES NOT increment refcount but the reset should catch it.
-  retval.reset(new Decoder(codec, 0), true);
+  retval.reset(new Decoder(codec, 0, true), true);
   return retval.get();
 }
 
 Decoder*
-Decoder::make(Decoder* src)
+Decoder::make(Coder* src)
 {
   if (!src)
-    throw HumbleInvalidArgument("no Decoder to copy");
+    throw HumbleInvalidArgument("no coder to copy");
 
   RefPointer<Codec> codec = src->getCodec();
-  return make(codec.value(), src->mCtx);
+  return make(codec.value(), src->getCodecCtx(), true);
 }
 
 Decoder*
-Decoder::make(Codec* codec, AVCodecContext* src) {
+Decoder::make(Codec* codec, AVCodecContext* src, bool copy) {
   if (!src)
     throw HumbleInvalidArgument("no Decoder to copy");
   if (!src->codec_id)
@@ -344,7 +344,7 @@ Decoder::make(Codec* codec, AVCodecContext* src) {
 
   RefPointer<Decoder> retval;
   // new Decoder DOES NOT increment refcount but the reset should catch it.
-  retval.reset(new Decoder(codec, src), true);
+  retval.reset(new Decoder(codec, src, copy), true);
   return retval.get();
 }
 

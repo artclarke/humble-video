@@ -41,6 +41,9 @@ public:
   virtual
   ~MuxerTest();
   void testCreation();
+  void testRemuxing();
+private:
+  TestData mFixtures;
 };
 
 #endif /* MUXERTEST_H_ */

@@ -30,6 +30,7 @@
 #include "Muxer.h"
 #include "VideoExceptions.h"
 #include "KeyValueBagImpl.h"
+#include "MediaPacketImpl.h"
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
@@ -260,7 +261,10 @@ Muxer::addNewStream(Encoder* encoder) {
 
 
 bool
-Muxer::writePacket(MediaPacket* packet) {
+Muxer::write(MediaPacket* aPacket, bool forceInterleave) {
+  MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(aPacket);
+  bool allDataFlushed = false;
+
   if (getState() != STATE_OPENED) {
     VS_THROW(HumbleRuntimeError("Cannot write to unopened Muxer"));
   }
@@ -280,16 +284,34 @@ Muxer::writePacket(MediaPacket* packet) {
 
   VS_THROW(HumbleRuntimeError("not yet implemented"));
 
-  /// now, do the madness.
-  pushCoders();
-  popCoders();
+  // Get the stream for the packet
+  Container::Stream* stream = getStream(packet->getStreamIndex());
 
-  return false;
+  // we copy the metadata into a new packet, but not the actual data.
+  RefPointer<MediaPacketImpl> outPacket = MediaPacketImpl::make(packet, false);
+
+  // then we adjust timestamps if necessary for this muxer.
+  stampOutputPacket(stream, outPacket.value());
+
+  /// now, do the madness.
+  AVPacket* out = outPacket->getCtx();
+  int e;
+  pushCoders();
+  if (forceInterleave)
+    e = av_interleaved_write_frame(getFormatCtx(), out);
+  else
+    e = av_write_frame(getFormatCtx(), out);
+  popCoders();
+  FfmpegException::check(e, "Could not write packet to muxer ");
+  if (e == 1)
+    allDataFlushed = true;
+
+  return allDataFlushed;
 }
 
-/*
 void
-Muxer::stampOutputPacket(MediaPacket* packet) {
+Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
+
   if (!packet) {
     VS_THROW(HumbleInvalidArgument("no packet specified"));
   }
@@ -299,9 +321,11 @@ Muxer::stampOutputPacket(MediaPacket* packet) {
 
   // Always just reset this; cheaper than checking if it's
   // already set
-  packet->setStreamIndex(this->getIndex());
+  packet->setStreamIndex(stream->getIndex());
 
-  io::humble::ferry::RefPointer<Rational> thisBase = getTimeBase();
+  AVStream* avStream = stream->getCtx();
+
+  io::humble::ferry::RefPointer<Rational> thisBase = Rational::make(avStream->time_base.num, avStream->time_base.den);
   io::humble::ferry::RefPointer<Rational> packetBase = packet->getTimeBase();
   if (!thisBase || !packetBase) {
     VS_THROW(HumbleRuntimeError("no timebases on either stream or packet"));
@@ -326,20 +350,20 @@ Muxer::stampOutputPacket(MediaPacket* packet) {
   }
   if (dts != Global::NO_PTS) {
     dts = thisBase->rescale(dts, packetBase.value(), Rational::ROUND_DOWN);
-    if (mLastDts != Global::NO_PTS && dts == mLastDts) {
+    if (stream->getLastDts() != Global::NO_PTS && dts == stream->getLastDts()) {
       // adjust for rounding; we never want to insert a frame that
       // is not monotonically increasing.  Note we only do this if
       // we're off by one; that's because we ROUND_DOWN and then assume
       // that can be off by at most one.  If we're off by more than one
       // then it's really an error on the person muxing to this stream.
-      dts = mLastDts + 1;
+      dts = stream->getLastDts() + 1;
       // and round up pts
       if (pts != Global::NO_PTS) ++pts;
       // and if after all that adjusting, pts is less than dts
       // let dts win.
       if (pts == Global::NO_PTS || pts < dts) pts = dts;
     }
-    mLastDts = dts;
+    stream->setLastDts(dts);
   }
 
   //    VS_LOG_DEBUG("output: duration: %lld; dts: %lld; pts: %lld;",
@@ -351,7 +375,7 @@ Muxer::stampOutputPacket(MediaPacket* packet) {
   //    VS_LOG_DEBUG("Reset timebase: %d/%d",
   //        thisBase->getNumerator(), thisBase->getDenominator());
 }
-*/
+
 
 } /* namespace video */
 } /* namespace humble */

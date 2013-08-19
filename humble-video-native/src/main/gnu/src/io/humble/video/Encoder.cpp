@@ -64,10 +64,10 @@ Encoder::make(Codec* codec)
 }
 
 Encoder*
-Encoder::make(Encoder* src)
+Encoder::make(Coder* src)
 {
   if (!src)
-    throw HumbleInvalidArgument("no Encoder to copy");
+    throw HumbleInvalidArgument("no coder to copy");
 
   RefPointer<Encoder> r;
   RefPointer<Codec> c = src->getCodec();
