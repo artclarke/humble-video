@@ -106,7 +106,7 @@ Muxer::make(MuxerFormat *format, const char* filename, const char* formatName) {
 
   if (!format) {
     if ((!filename || !*filename) && (!formatName && !*formatName)) {
-      VS_THROW(HumbleInvalidArgument("cannot pass in all nulll parameters"));
+      VS_THROW(HumbleInvalidArgument("cannot pass in all null parameters"));
     }
   }
   retval.reset(new Muxer(format, filename, formatName), true);
@@ -256,7 +256,22 @@ Muxer::addNewStream(Encoder* encoder) {
   Container::Stream* stream = Container::getStream(avStream->index);
   // grab a reference to the passed in coder.
   stream->setCoder(encoder);
+  r.reset(this->getStream(avStream->index), false);
   return r.get();
+}
+
+MuxerStream*
+Muxer::getStream(int32_t i) {
+  if (!(getState() == STATE_OPENED || getState() == STATE_INITED)) {
+    VS_THROW(HumbleRuntimeError("Attempt to get MuxerStream from Muxer when Muxer is in invalid state"));
+  }
+  if (i < 0) {
+    VS_THROW(HumbleInvalidArgument("position must be >= 0"));
+  }
+  if (i >= getNumStreams()) {
+    VS_THROW(HumbleInvalidArgument("position must be < getNumStreams()"));
+  }
+  return MuxerStream::make(this, i);
 }
 
 
@@ -285,7 +300,7 @@ Muxer::write(MediaPacket* aPacket, bool forceInterleave) {
   VS_THROW(HumbleRuntimeError("not yet implemented"));
 
   // Get the stream for the packet
-  Container::Stream* stream = getStream(packet->getStreamIndex());
+  Container::Stream* stream = Container::getStream(packet->getStreamIndex());
 
   // we copy the metadata into a new packet, but not the actual data.
   RefPointer<MediaPacketImpl> outPacket = MediaPacketImpl::make(packet, false);

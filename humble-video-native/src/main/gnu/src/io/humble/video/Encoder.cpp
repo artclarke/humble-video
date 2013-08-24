@@ -52,11 +52,13 @@ Encoder*
 Encoder::make(Codec* codec)
 {
   RefPointer<Encoder> r;
-  if (!codec)
-    throw HumbleInvalidArgument("no codec passed in");
+  if (!codec) {
+    VS_THROW(HumbleInvalidArgument("no codec passed in"));
+  }
 
-  if (!codec->canEncode())
-    throw HumbleInvalidArgument("passed in codec cannot encode");
+  if (!codec->canEncode()) {
+    VS_THROW(HumbleInvalidArgument("passed in codec cannot encode"));
+  }
 
   r.reset(new Encoder(codec, 0, false), true);
 
@@ -66,12 +68,26 @@ Encoder::make(Codec* codec)
 Encoder*
 Encoder::make(Coder* src)
 {
-  if (!src)
-    throw HumbleInvalidArgument("no coder to copy");
+  if (!src) {
+    VS_THROW(HumbleInvalidArgument("no coder to copy"));
+  }
 
   RefPointer<Encoder> r;
   RefPointer<Codec> c = src->getCodec();
-  r.reset(new Encoder(c.value(), src->getCodecCtx(), false), true);
+  if (!c) {
+    VS_THROW(HumbleRuntimeError("coder has no codec"));
+  }
+  if (!c->canEncode()) {
+    // this codec cannot encode, so we try to find a new codec that can
+    // of the same type.
+    Codec::ID id = c->getID();
+    c = Codec::findEncodingCodec(id);
+    if (!c) {
+      RefPointer<CodecDescriptor> cd = CodecDescriptor::make(id);
+      VS_THROW(HumbleRuntimeError::make("cannot find encoder for id: %s", cd ? cd->getName() : "unknown"));
+    }
+  }
+  r.reset(new Encoder(c.value(), src->getCodecCtx(), true), true);
   return r.get();
 }
 

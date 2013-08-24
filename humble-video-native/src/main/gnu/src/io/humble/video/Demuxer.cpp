@@ -32,6 +32,7 @@ Demuxer::~Demuxer() {
 
 Demuxer*
 Demuxer::make() {
+  Global::init();
   return DemuxerImpl::make();
 }
 

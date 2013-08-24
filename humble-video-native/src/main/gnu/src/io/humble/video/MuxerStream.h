@@ -46,6 +46,9 @@ public:
    * Get the Muxer that this stream belongs to.
    */
   virtual Muxer* getMuxer();
+#ifndef SWIG
+  static MuxerStream* make(Container*, int32_t);
+#endif // SWIG
 protected:
   MuxerStream(Container* container, int32_t index);
   virtual

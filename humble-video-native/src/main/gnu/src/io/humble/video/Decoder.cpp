@@ -331,8 +331,21 @@ Decoder::make(Coder* src)
   if (!src)
     throw HumbleInvalidArgument("no coder to copy");
 
-  RefPointer<Codec> codec = src->getCodec();
-  return make(codec.value(), src->getCodecCtx(), true);
+  RefPointer<Codec> c = src->getCodec();
+  if (!c) {
+    VS_THROW(HumbleRuntimeError("coder has no codec"));
+  }
+  if (!c->canDecode()) {
+    // this codec cannot encode, so we try to find a new codec that can
+    // of the same type.
+    Codec::ID id = c->getID();
+    c = Codec::findDecodingCodec(id);
+    if (!c) {
+      RefPointer<CodecDescriptor> cd = CodecDescriptor::make(id);
+      VS_THROW(HumbleRuntimeError::make("cannot find decoder for id: %s", cd ? cd->getName() : "unknown"));
+    }
+  }
+  return make(c.value(), src->getCodecCtx(), true);
 }
 
 Decoder*

@@ -26,6 +26,8 @@
 #include "MuxerStream.h"
 #include "Muxer.h"
 
+using namespace io::humble::ferry;
+
 namespace io {
 namespace humble {
 namespace video {
@@ -46,6 +48,14 @@ Encoder*
 MuxerStream::getEncoder() {
   return 0;
 }
+
+MuxerStream*
+MuxerStream::make(Container* container, int32_t index) {
+  RefPointer<MuxerStream> r;
+  r.reset(new MuxerStream(container, index), true);
+  return r.get();
+}
+
 
 } /* namespace video */
 } /* namespace humble */

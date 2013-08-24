@@ -222,6 +222,14 @@ public class Muxer extends Container {
   }
 
 /**
+ * Get the MuxerStream at the given position.
+ */
+  public MuxerStream getStream(int position) throws java.lang.InterruptedException, java.io.IOException {
+    long cPtr = VideoJNI.Muxer_getStream(swigCPtr, this, position);
+    return (cPtr == 0) ? null : new MuxerStream(cPtr, false);
+  }
+
+/**
  * Writes the given packet to the Muxer.<br>
  * <br>
  * @param packet The packet to write. If null, it tells the muxer to flush any data queued up to<br>

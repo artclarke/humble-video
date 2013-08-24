@@ -168,6 +168,12 @@ public:
   addNewStream(Encoder* encoder);
 
   /**
+   * Get the MuxerStream at the given position.
+   */
+  virtual MuxerStream*
+  getStream(int32_t position);
+
+  /**
    * Writes the given packet to the Muxer.
    *
    * @param packet The packet to write. If null, it tells the muxer to flush any data queued up to

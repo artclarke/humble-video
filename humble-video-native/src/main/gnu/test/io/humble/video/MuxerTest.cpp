@@ -69,6 +69,7 @@ MuxerTest::testCreation() {
 
 void
 MuxerTest::testRemuxing() {
+  TS_SKIP("leak fixed but still need to determine right muxing strategy");
   RefPointer<Muxer> muxer;
 
   muxer = Muxer::make(0, "MuxerTest_testRemuxing.mp4", 0);
