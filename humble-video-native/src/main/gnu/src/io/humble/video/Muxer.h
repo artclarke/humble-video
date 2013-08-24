@@ -63,7 +63,7 @@ public:
    * @throws InvalidArgument if all parameters are null.
    */
   static Muxer*
-  make(MuxerFormat* format, const char* filename, const char* formatName);
+  make(const char* filename, MuxerFormat* format, const char* formatName);
 
   /**
    * Get the URL the Muxer was opened with.
@@ -160,7 +160,7 @@ public:
    *
    */
   virtual MuxerStream*
-  addNewStream(Coder* encoder);
+  addNewStream(Coder* coder);
 
   /**
    * Get the MuxerStream at the given position.

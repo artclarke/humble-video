@@ -43,7 +43,7 @@ void
 MuxerTest::testCreation() {
   RefPointer<Muxer> muxer;
 
-  muxer = Muxer::make(0, "MuxerTest_testCreation.flv", 0);
+  muxer = Muxer::make("MuxerTest_testCreation.flv", 0, 0);
 
   RefPointer<MuxerStream> stream;
 
@@ -72,7 +72,7 @@ MuxerTest::testRemuxing() {
 //  TS_SKIP("leak fixed but still need to determine right muxing strategy");
   RefPointer<Muxer> muxer;
 
-  muxer = Muxer::make(0, "MuxerTest_testRemuxing.mp4", 0);
+  muxer = Muxer::make("MuxerTest_testRemuxing.mp4", 0, 0);
 
   //  TestData::Fixture* fixture=mFixtures.getFixture("testfile_h264_mp4a_tmcd.mov");
   TestData::Fixture* fixture=mFixtures.getFixture("ucl_h264_aac.mp4");

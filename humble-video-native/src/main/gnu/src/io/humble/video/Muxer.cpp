@@ -100,7 +100,7 @@ Muxer::~Muxer() {
 }
 
 Muxer*
-Muxer::make(MuxerFormat *format, const char* filename, const char* formatName) {
+Muxer::make(const char* filename, MuxerFormat *format, const char* formatName) {
   Global::init();
 
   RefPointer<Muxer> retval;

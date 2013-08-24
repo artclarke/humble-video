@@ -36,7 +36,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-class Encoder : public io::humble::video::Coder
+class VS_API_HUMBLEVIDEO Encoder : public io::humble::video::Coder
 {
 public:
   /**

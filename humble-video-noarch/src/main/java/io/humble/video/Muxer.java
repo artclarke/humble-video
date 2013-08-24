@@ -132,8 +132,8 @@ public class Muxer extends Container {
  * <br>
  * @throws InvalidArgument if all parameters are null.
  */
-  public static Muxer make(MuxerFormat format, String filename, String formatName) {
-    long cPtr = VideoJNI.Muxer_make(MuxerFormat.getCPtr(format), format, filename, formatName);
+  public static Muxer make(String filename, MuxerFormat format, String formatName) {
+    long cPtr = VideoJNI.Muxer_make(filename, MuxerFormat.getCPtr(format), format, formatName);
     return (cPtr == 0) ? null : new Muxer(cPtr, false);
   }
 
@@ -206,13 +206,13 @@ public class Muxer extends Container {
  * Note on thread safety: Callers must ensure that the coder is not encoding or decoding<br>
  * packets at the same time that Muxer#open or Muxer#close is being called.<br>
  * <br>
- * <br>
+ * @param coder The coder that will be used for packets written to this stream.<br>
  * <br>
  * @throws InvalidArgument if encoder is null.<br>
  * @throws InvalidArgument if encoder is not open.
  */
-  public MuxerStream addNewStream(Coder encoder) {
-    long cPtr = VideoJNI.Muxer_addNewStream(swigCPtr, this, Coder.getCPtr(encoder), encoder);
+  public MuxerStream addNewStream(Coder coder) {
+    long cPtr = VideoJNI.Muxer_addNewStream(swigCPtr, this, Coder.getCPtr(coder), coder);
     return (cPtr == 0) ? null : new MuxerStream(cPtr, false);
   }
 

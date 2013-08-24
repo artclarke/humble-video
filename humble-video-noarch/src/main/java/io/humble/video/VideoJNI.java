@@ -1262,7 +1262,7 @@ public class VideoJNI {
   public final static native long MuxerStream_getMuxer(long jarg1, MuxerStream jarg1_);
   public final static native long DemuxerStream_getDecoder(long jarg1, DemuxerStream jarg1_);
   public final static native long DemuxerStream_getDemuxer(long jarg1, DemuxerStream jarg1_);
-  public final static native long Muxer_make(long jarg1, MuxerFormat jarg1_, String jarg2, String jarg3);
+  public final static native long Muxer_make(String jarg1, long jarg2, MuxerFormat jarg2_, String jarg3);
   public final static native String Muxer_getURL(long jarg1, Muxer jarg1_);
   public final static native long Muxer_getFormat(long jarg1, Muxer jarg1_);
   public final static native int Muxer_getState(long jarg1, Muxer jarg1_);
