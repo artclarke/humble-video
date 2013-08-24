@@ -317,9 +317,10 @@ namespace io { namespace humble { namespace video
    virtual void setMetaData(KeyValueBag* metaData);
 
    virtual int32_t addIndexEntry(IndexEntry* entry);
-   void setId(int32_t id);
+   virtual void setId(int32_t id);
 
    AVStream* getCtx();
+
 #endif
   protected:
     virtual ~ContainerStream();

@@ -25,8 +25,12 @@
 
 #include "MuxerStream.h"
 #include "Muxer.h"
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/video/VideoExceptions.h>
 
 using namespace io::humble::ferry;
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 namespace io {
 namespace humble {
@@ -44,9 +48,14 @@ MuxerStream::getMuxer() {
   return dynamic_cast<Muxer*>(getContainer());
 }
 
-Encoder*
-MuxerStream::getEncoder() {
-  return 0;
+Coder*
+MuxerStream::getCoder() {
+  RefPointer<Container> c = getContainer();
+  Container::Stream* stream = c->getStream(getIndex());
+  if (!stream) {
+    VS_THROW(HumbleRuntimeError("could not get stream"));
+  }
+  return stream->getCoder();
 }
 
 MuxerStream*

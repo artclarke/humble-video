@@ -231,12 +231,12 @@ Muxer::getURL() {
 }
 
 MuxerStream*
-Muxer::addNewStream(Encoder* encoder) {
-  if (!encoder) {
-    VS_THROW(HumbleInvalidArgument("encoder must be not null"));
+Muxer::addNewStream(Coder* coder) {
+  if (!coder) {
+    VS_THROW(HumbleInvalidArgument("coder must be not null"));
   }
-  if (encoder->getState() != Encoder::STATE_OPENED) {
-    VS_THROW(HumbleInvalidArgument("encoder must be open"));
+  if (coder->getState() != Coder::STATE_OPENED) {
+    VS_THROW(HumbleInvalidArgument("coder must be open"));
   }
   if (getState() != STATE_INITED) {
     VS_THROW(HumbleInvalidArgument("cannot add MuxerStream after Muxer is opened"));
@@ -246,7 +246,7 @@ Muxer::addNewStream(Encoder* encoder) {
 
   AVFormatContext* ctx = getFormatCtx();
   // Tell Ffmpeg about the new stream.
-  AVStream* avStream = avformat_new_stream(ctx, encoder->getCodecCtx()->codec);
+  AVStream* avStream = avformat_new_stream(ctx, coder->getCodecCtx()->codec);
   if (!avStream) {
     VS_THROW(HumbleRuntimeError("Could not add new stream to container"));
   }
@@ -255,7 +255,7 @@ Muxer::addNewStream(Encoder* encoder) {
   // and set the coder for the given stream
   Container::Stream* stream = Container::getStream(avStream->index);
   // grab a reference to the passed in coder.
-  stream->setCoder(encoder);
+  stream->setCoder(coder);
   r.reset(this->getStream(avStream->index), false);
   return r.get();
 }

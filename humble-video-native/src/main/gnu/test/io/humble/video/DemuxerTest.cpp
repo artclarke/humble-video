@@ -25,6 +25,7 @@
 
 // for getenv
 #include <cstdlib>
+#include <vector>
 
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/LoggerStack.h>
@@ -222,17 +223,36 @@ DemuxerTest::testOpenInvalidArguments()
 void
 DemuxerTest::testRead()
 {
+  std::vector<MediaDescriptor::Type> streamTypes;
+
   RefPointer<Demuxer> source = Demuxer::make();
   TS_ASSERT(source);
 
   source->open(mSampleFile, 0, false, true, 0, 0);
   TS_ASSERT(source->getState() == Demuxer::STATE_OPENED);
 
+  int32_t n = source->getNumStreams();
+  for(int i = 0; i < n; i++) {
+    RefPointer<DemuxerStream> ds = source->getStream(i);
+    RefPointer<Decoder> d = ds->getDecoder();
+    MediaDescriptor::Type t = d->getCodecType();
+    streamTypes.push_back(t);
+  }
+
   int64_t pktsRead = 0;
   RefPointer<MediaPacket> pkt = MediaPacket::make();
   int32_t retval;
   do {
     retval = source->read(pkt.value());
+    if (pkt->isComplete()) {
+      int32_t stream = pkt->getStreamIndex();
+      TS_ASSERT(stream >= 0 && stream < n);
+      if (streamTypes[stream] == MediaDescriptor::MEDIA_VIDEO) {
+        // every video stream should have a valid PTS and DTS
+        TSM_ASSERT_DIFFERS("no dts set", Global::NO_PTS, pkt->getDts());
+        TSM_ASSERT_DIFFERS("no pts set", Global::NO_PTS, pkt->getPts());
+      }
+    }
     if (retval >= 0)
       ++pktsRead;
   } while (retval >= 0);

@@ -130,11 +130,12 @@ public class MuxerStream extends ContainerStream {
 
 
 /**
- * Get the Encoder that this stream was created with.
+ * Get the Coder that this stream was created with.<br>
+ * Note: this can be either an Encoder or a Decoder.
  */
-  public Encoder getEncoder() {
-    long cPtr = VideoJNI.MuxerStream_getEncoder(swigCPtr, this);
-    return (cPtr == 0) ? null : new Encoder(cPtr, false);
+  public Coder getCoder() {
+    long cPtr = VideoJNI.MuxerStream_getCoder(swigCPtr, this);
+    return (cPtr == 0) ? null : new Coder(cPtr, false);
   }
 
 /**

@@ -88,9 +88,8 @@ MuxerTest::testRemuxing() {
   for(int i = 0; i < n; i++) {
     RefPointer<DemuxerStream> demuxerStream = demuxer->getStream(i);
     RefPointer<Decoder> d = demuxerStream->getDecoder();
-    RefPointer<Encoder> e = Encoder::make(d.value());
-    e->open(0, 0);
-    RefPointer<MuxerStream> muxerStream = muxer->addNewStream(e.value());
+    d->open(0, 0);
+    RefPointer<MuxerStream> muxerStream = muxer->addNewStream(d.value());
   }
   RefPointer<MediaPacket> packet = MediaPacket::make();
 

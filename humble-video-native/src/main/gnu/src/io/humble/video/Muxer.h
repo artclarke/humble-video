@@ -148,24 +148,19 @@ public:
   getOutputBufferLength();
 
   /**
-   * Adds a new stream that will have packets written to it that are encoded
-   * by the given Encoder.
+   * Adds a new stream that will have packets written to it.
    *
-   * Note on thread safety: Callers must ensure that the encoder is not encoding
-   * packets at the same time that Muxer#open or Muxer#close is being called. It should
-   * be safe to call Encoder#encodeVideo or Encoder#encodeAudio whem Muxer#writePacket
-   * is being called. But if possible, we recommend serializing Encoder and Muxer calls
-   * as not all FFmpeg encoder implements can be thread-safe outside the container they
-   * write to.
+   * Note on thread safety: Callers must ensure that the coder is not encoding or decoding
+   * packets at the same time that Muxer#open or Muxer#close is being called.
    *
-   * @param encoder The encoder that will be used for packets written to this stream.
+   * @param coder The coder that will be used for packets written to this stream.
    *
    * @throws InvalidArgument if encoder is null.
    * @throws InvalidArgument if encoder is not open.
    *
    */
   virtual MuxerStream*
-  addNewStream(Encoder* encoder);
+  addNewStream(Coder* encoder);
 
   /**
    * Get the MuxerStream at the given position.

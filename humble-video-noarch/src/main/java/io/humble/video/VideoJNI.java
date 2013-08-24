@@ -1257,7 +1257,7 @@ public class VideoJNI {
   public final static native int Container_FLAG_PRIV_OPT_get();
   public final static native int Container_FLAG_KEEP_SIDE_DATA_get();
   public final static native int Container_getNumStreams(long jarg1, Container jarg1_) throws java.lang.InterruptedException, java.io.IOException;
-  public final static native long MuxerStream_getEncoder(long jarg1, MuxerStream jarg1_);
+  public final static native long MuxerStream_getCoder(long jarg1, MuxerStream jarg1_);
   public final static native long MuxerStream_getMuxer(long jarg1, MuxerStream jarg1_);
   public final static native long DemuxerStream_getDecoder(long jarg1, DemuxerStream jarg1_);
   public final static native long DemuxerStream_getDemuxer(long jarg1, DemuxerStream jarg1_);
@@ -1270,7 +1270,7 @@ public class VideoJNI {
   public final static native int Muxer_getNumStreams(long jarg1, Muxer jarg1_) throws java.lang.InterruptedException, java.io.IOException;
   public final static native void Muxer_setOutputBufferLength(long jarg1, Muxer jarg1_, int jarg2);
   public final static native int Muxer_getOutputBufferLength(long jarg1, Muxer jarg1_);
-  public final static native long Muxer_addNewStream(long jarg1, Muxer jarg1_, long jarg2, Encoder jarg2_);
+  public final static native long Muxer_addNewStream(long jarg1, Muxer jarg1_, long jarg2, Coder jarg2_);
   public final static native long Muxer_getStream(long jarg1, Muxer jarg1_, int jarg2) throws java.lang.InterruptedException, java.io.IOException;
   public final static native boolean Muxer_write(long jarg1, Muxer jarg1_, long jarg2, MediaPacket jarg2_, boolean jarg3);
   public final static native long Demuxer_make();

@@ -28241,10 +28241,10 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1getNumStreams(J
 }
 
 
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MuxerStream_1getEncoder(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MuxerStream_1getCoder(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   io::humble::video::MuxerStream *arg1 = (io::humble::video::MuxerStream *) 0 ;
-  io::humble::video::Encoder *result = 0 ;
+  io::humble::video::Coder *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -28263,7 +28263,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MuxerStream_1getEncoder(J
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::Encoder *)(arg1)->getEncoder();
+      result = (io::humble::video::Coder *)(arg1)->getCoder();
     }
     catch(std::exception & e)
     {
@@ -28282,7 +28282,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MuxerStream_1getEncoder(J
     
     /*@SWIG@*/
   }
-  *(io::humble::video::Encoder **)&jresult = result; 
+  *(io::humble::video::Coder **)&jresult = result; 
   return jresult;
 }
 
@@ -28845,7 +28845,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Muxer_1getOutputBufferLeng
 SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Muxer_1addNewStream(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   io::humble::video::Muxer *arg1 = (io::humble::video::Muxer *) 0 ;
-  io::humble::video::Encoder *arg2 = (io::humble::video::Encoder *) 0 ;
+  io::humble::video::Coder *arg2 = (io::humble::video::Coder *) 0 ;
   io::humble::video::MuxerStream *result = 0 ;
   
   (void)jenv;
@@ -28853,7 +28853,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Muxer_1addNewStream(JNIEn
   (void)jarg1_;
   (void)jarg2_;
   arg1 = *(io::humble::video::Muxer **)&jarg1; 
-  arg2 = *(io::humble::video::Encoder **)&jarg2; 
+  arg2 = *(io::humble::video::Coder **)&jarg2; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,

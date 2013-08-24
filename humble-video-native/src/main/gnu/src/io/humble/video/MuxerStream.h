@@ -26,6 +26,7 @@
 #ifndef MUXERSTREAM_H_
 #define MUXERSTREAM_H_
 
+#include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/ContainerStream.h>
 #include <io/humble/video/Encoder.h>
 
@@ -38,9 +39,10 @@ class VS_API_HUMBLEVIDEO MuxerStream : public io::humble::video::ContainerStream
 {
 public:
   /**
-   * Get the Encoder that this stream was created with.
+   * Get the Coder that this stream was created with.
+   * Note: this can be either an Encoder or a Decoder.
    */
-  virtual Encoder* getEncoder();
+  virtual Coder* getCoder();
 
   /**
    * Get the Muxer that this stream belongs to.
@@ -53,6 +55,8 @@ protected:
   MuxerStream(Container* container, int32_t index);
   virtual
   ~MuxerStream();
+private:
+  io::humble::ferry::RefPointer<Coder> mCoder;
 };
 
 } /* namespace video */
