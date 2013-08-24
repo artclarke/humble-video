@@ -84,7 +84,6 @@ DemuxerFormat::getFormat(int32_t index)
   return 0;
 }
 
-
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

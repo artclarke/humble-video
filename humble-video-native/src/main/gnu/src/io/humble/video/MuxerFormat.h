@@ -137,6 +137,13 @@ public:
   {
     return ContainerFormat::getNumSupportedCodecs(mFormat->codec_tag);
   }
+
+  /**
+   * Get the 'best' codec tag for the given codec id for this container.
+   */
+  virtual uint32_t
+  getBestCodecTag(Codec::ID id);
+
   /**
    * Get the Codec.ID for the n'th codec supported by this container.
    *

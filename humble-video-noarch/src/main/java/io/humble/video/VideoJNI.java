@@ -1121,6 +1121,7 @@ public class VideoJNI {
   public final static native long MuxerFormat_guessFormat(String jarg1, String jarg2, String jarg3);
   public final static native int MuxerFormat_guessCodec(long jarg1, MuxerFormat jarg1_, String jarg2, String jarg3, String jarg4, int jarg5);
   public final static native int MuxerFormat_getNumSupportedCodecs(long jarg1, MuxerFormat jarg1_);
+  public final static native long MuxerFormat_getBestCodecTag(long jarg1, MuxerFormat jarg1_, int jarg2);
   public final static native int MuxerFormat_getSupportedCodecId(long jarg1, MuxerFormat jarg1_, int jarg2);
   public final static native long MuxerFormat_getSupportedCodecTag(long jarg1, MuxerFormat jarg1_, int jarg2);
   public final static native int MuxerFormat_getNumFormats();

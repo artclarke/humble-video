@@ -104,6 +104,7 @@ public:
   {
     return ContainerFormat::getSupportedCodecTag(mFormat->codec_tag, n);
   }
+
   /**
    * Find DemuxerFormat based on the short name of the input format.
    * @return An DemuxerFormat or null if none found.
@@ -130,9 +131,13 @@ public:
   static DemuxerFormat* getFormat(int32_t index);
 
 #ifndef SWIG
-  virtual AVInputFormat* getCtx() { return mFormat; }
+  virtual const AVInputFormat* getCtx() { return mFormat; }
   static DemuxerFormat*
   make(AVInputFormat* format);
+  void
+  setFormat(const AVInputFormat*& format) {
+    mFormat = format;
+  }
 #endif // ! SWIG
 
 protected:
@@ -142,7 +147,7 @@ private:
   ~DemuxerFormat();
 
 private:
-  AVInputFormat *mFormat;
+  const AVInputFormat *mFormat;
 };
 
 } /* namespace video */

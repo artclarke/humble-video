@@ -103,7 +103,7 @@ DemuxerImpl::open(const char *url, DemuxerFormat* format,
   if (format) {
     // acquire a long-lived reference
     mFormat.reset(format, true);
-    ctx->iformat = mFormat->getCtx();
+    ctx->iformat = (struct AVInputFormat*) mFormat->getCtx();
   }
 
   AVInputFormat* oldFormat = ctx->iformat;

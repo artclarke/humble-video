@@ -231,6 +231,13 @@ public class MuxerFormat extends ContainerFormat {
   }
 
 /**
+ * Get the 'best' codec tag for the given codec id for this container.
+ */
+  public long getBestCodecTag(Codec.ID id) {
+    return VideoJNI.MuxerFormat_getBestCodecTag(swigCPtr, this, id.swigValue());
+  }
+
+/**
  * Get the Codec.ID for the n'th codec supported by this container.<br>
  * <br>
  * @param n The n'th codec supported by this codec. Lower n are higher priority.<br>

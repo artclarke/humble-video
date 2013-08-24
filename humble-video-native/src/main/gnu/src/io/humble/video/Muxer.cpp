@@ -28,6 +28,7 @@
 #include <io/humble/video/customio/URLProtocolManager.h>
 
 #include "Muxer.h"
+#include "Decoder.h"
 #include "VideoExceptions.h"
 #include "KeyValueBagImpl.h"
 #include "MediaPacketImpl.h"
@@ -231,10 +232,25 @@ Muxer::getURL() {
 }
 
 MuxerStream*
-Muxer::addNewStream(Coder* coder) {
-  if (!coder) {
+Muxer::addNewStream(Coder* aCoder) {
+  if (!aCoder) {
     VS_THROW(HumbleInvalidArgument("coder must be not null"));
   }
+  RefPointer<Coder> coder;
+  if (dynamic_cast<Decoder*>(aCoder)) {
+    // we're going to make a copy as we will modify some items to support
+    // remuxing.
+    coder = Decoder::make(aCoder);
+    // now we're doing to fix some stuff.
+    AVCodecContext* ctx = coder->getCodecCtx();
+    // right; got to find a codec tag for the id passed in. Suck.
+    ctx->codec_tag = mFormat->getBestCodecTag(coder->getCodecID());
+    // and open the new decoder
+    (dynamic_cast<Decoder*>(coder.value()))->open(0, 0);
+
+  } else
+    coder.reset(aCoder, true);
+
   if (coder->getState() != Coder::STATE_OPENED) {
     VS_THROW(HumbleInvalidArgument("coder must be open"));
   }
@@ -255,7 +271,8 @@ Muxer::addNewStream(Coder* coder) {
   // and set the coder for the given stream
   Container::Stream* stream = Container::getStream(avStream->index);
   // grab a reference to the passed in coder.
-  stream->setCoder(coder);
+  stream->setCoder(coder.value());
+
   r.reset(this->getStream(avStream->index), false);
   return r.get();
 }
@@ -296,8 +313,6 @@ Muxer::write(MediaPacket* aPacket, bool forceInterleave) {
   if (!packet->getSize()) {
     VS_THROW(HumbleRuntimeError("Cannot write empty packet"));
   }
-
-  VS_THROW(HumbleRuntimeError("not yet implemented"));
 
   // Get the stream for the packet
   Container::Stream* stream = Container::getStream(packet->getStreamIndex());

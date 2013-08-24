@@ -96,6 +96,21 @@ MuxerFormat::getCtx()
 {
   return mFormat;
 }
+
+uint32_t
+MuxerFormat::getBestCodecTag(Codec::ID id) {
+  int32_t n = getNumSupportedCodecs();
+  uint32_t r = 0;
+  for (int32_t i = 0; i < n; i++) {
+    Codec::ID sId = getSupportedCodecId(i);
+    if (sId == id) {
+      r = getSupportedCodecTag(i);
+      break;
+    }
+  }
+  return r;
+}
+
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

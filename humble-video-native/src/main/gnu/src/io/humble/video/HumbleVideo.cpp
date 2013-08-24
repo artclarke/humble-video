@@ -24081,6 +24081,54 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getNumSupport
 }
 
 
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getBestCodecTag(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  io::humble::video::MuxerFormat *arg1 = (io::humble::video::MuxerFormat *) 0 ;
+  io::humble::video::Codec::ID arg2 ;
+  uint32_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::MuxerFormat **)&jarg1; 
+  arg2 = (io::humble::video::Codec::ID)jarg2; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (uint32_t)(arg1)->getBestCodecTag(arg2);
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return 0;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MuxerFormat_1getSupportedCodecId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jint jresult = 0 ;
   io::humble::video::MuxerFormat *arg1 = (io::humble::video::MuxerFormat *) 0 ;
