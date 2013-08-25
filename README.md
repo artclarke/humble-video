@@ -89,7 +89,7 @@ To build, once the chef recipes have run on a clean box, just run:
     mvn install
 
 ## Windows Build Notes
-Don't do it. It's not supported. Instead you have to cross-compile for Linux. Sorry.
+Don't do it. It's not supported. Instead you have to cross-compile for Windows from a Linux box. Sorry.
 
 Enjoy!
 
