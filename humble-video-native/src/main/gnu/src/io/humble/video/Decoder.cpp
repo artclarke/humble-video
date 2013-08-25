@@ -61,41 +61,7 @@ void
 Decoder::flush() {
   if (getState() != STATE_OPENED)
     throw HumbleRuntimeError("Attempt to flush Decoder when not opened");
-  avcodec_flush_buffers(mCtx);
-}
-
-void
-Decoder::ensurePictureParamsMatch(MediaPicture* pict)
-{
-  if (!pict)
-    VS_THROW(HumbleInvalidArgument("null picture passed to decoder"));
-
-  if (getWidth() != pict->getWidth())
-    VS_THROW(HumbleInvalidArgument("width on picture does not match what decoder expects"));
-
-  if (getHeight() != pict->getHeight())
-    VS_THROW(HumbleInvalidArgument("height on picture does not match what decoder expects"));
-
-  if (getPixelFormat() != pict->getFormat())
-    VS_THROW(HumbleInvalidArgument("Pixel format on picture does not match what decoder expects"));
-
-}
-
-void
-Decoder::ensureAudioParamsMatch(MediaAudio* audio)
-{
-  if (!audio)
-    VS_THROW(HumbleInvalidArgument("null audio passed to decoder"));
-
-  if (getChannels() != audio->getChannels())
-    VS_THROW(HumbleInvalidArgument("audio channels does not match what decoder expects"));
-
-  if (getSampleRate() != audio->getSampleRate())
-    VS_THROW(HumbleInvalidArgument("audio sample rate does not match what decoder expects"));
-
-  if (getSampleFormat() != audio->getFormat())
-    VS_THROW(HumbleInvalidArgument("audio sample format does not match what decoder expects"));
-
+  avcodec_flush_buffers(getCodecCtx());
 }
 
 int
@@ -197,7 +163,7 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
 
   mCachedMedia.reset(output, true);
   // try out decode
-  retval = avcodec_decode_audio4(mCtx, frame, &got_frame, pkt);
+  retval = avcodec_decode_audio4(getCodecCtx(), frame, &got_frame, pkt);
   // always free the packet so that we don't have an exception make us leak it.
   av_free_packet(pkt);
   if (got_frame) {
@@ -284,7 +250,7 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
 
   mCachedMedia.reset(output, true);
   // try out decode
-  retval = avcodec_decode_video2(mCtx, frame, &got_frame, pkt);
+  retval = avcodec_decode_video2(getCodecCtx(), frame, &got_frame, pkt);
   // always free the packet so that we don't have an exception make us leak it.
   av_free_packet(pkt);
   if (got_frame) {

@@ -27,6 +27,8 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/KeyValueBagImpl.h>
+#include <io/humble/video/MediaAudio.h>
+#include <io/humble/video/MediaPicture.h>
 
 VS_LOG_SETUP(VS_CPP_PACKAGE);
 
@@ -162,8 +164,39 @@ Coder::getFrameSize() {
   return retval;
 }
 
+void
+Coder::ensurePictureParamsMatch(MediaPicture* pict)
+{
+  if (!pict)
+    VS_THROW(HumbleInvalidArgument("null picture passed to coder"));
 
+  if (getWidth() != pict->getWidth())
+    VS_THROW(HumbleInvalidArgument("width on picture does not match what coder expects"));
 
+  if (getHeight() != pict->getHeight())
+    VS_THROW(HumbleInvalidArgument("height on picture does not match what coder expects"));
+
+  if (getPixelFormat() != pict->getFormat())
+    VS_THROW(HumbleInvalidArgument("Pixel format on picture does not match what coder expects"));
+
+}
+
+void
+Coder::ensureAudioParamsMatch(MediaAudio* audio)
+{
+  if (!audio)
+    VS_THROW(HumbleInvalidArgument("null audio passed to coder"));
+
+  if (getChannels() != audio->getChannels())
+    VS_THROW(HumbleInvalidArgument("audio channels does not match what coder expects"));
+
+  if (getSampleRate() != audio->getSampleRate())
+    VS_THROW(HumbleInvalidArgument("audio sample rate does not match what coder expects"));
+
+  if (getSampleFormat() != audio->getFormat())
+    VS_THROW(HumbleInvalidArgument("audio sample format does not match what coder expects"));
+
+}
 
 } /* namespace video */
 } /* namespace humble */

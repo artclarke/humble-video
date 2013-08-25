@@ -107,9 +107,26 @@ Encoder::make(Codec* codec, AVCodecContext* src) {
 int32_t
 Encoder::encodeVideo(MediaPacket* output, MediaPicture* frame,
     int32_t suggestedBufferSize) {
-  (void) output;
-  (void) frame;
-  (void) suggestedBufferSize;
+
+  if (getState() != STATE_OPENED) {
+    VS_THROW(HumbleRuntimeError("Cannot encode with unopened encoder"));
+  }
+  if (getCodecType() != MediaDescriptor::MEDIA_VIDEO) {
+    VS_THROW(HumbleRuntimeError("Attempting to encode picture on non-video encoder"));
+  }
+  if (!output) {
+    VS_THROW(HumbleInvalidArgument("output cannot be null"));
+  }
+  if (suggestedBufferSize < 0) {
+    VS_THROW(HumbleInvalidArgument("buffer size must be >= 0"));
+  }
+  // let's check the picture parameters.
+  ensurePictureParamsMatch(frame);
+
+  if (!frame->isComplete()) {
+    VS_THROW(HumbleInvalidArgument("Can only pass complete media to encode"));
+  }
+
   VS_THROW(HumbleRuntimeError("not implemented"));
   return 0;
 }
@@ -117,9 +134,26 @@ Encoder::encodeVideo(MediaPacket* output, MediaPicture* frame,
 int32_t
 Encoder::encodeAudio(MediaPacket* output, MediaAudio* samples,
     int32_t sampleToStartFrom) {
-  (void) output;
-  (void) samples;
-  (void) sampleToStartFrom;
+
+  if (getState() != STATE_OPENED) {
+    VS_THROW(HumbleRuntimeError("Cannot encode with unopened encoder"));
+  }
+  if (getCodecType() != MediaDescriptor::MEDIA_AUDIO) {
+    VS_THROW(HumbleRuntimeError("Attempting to encode audio on non-audio encoder"));
+  }
+  if (!output) {
+    VS_THROW(HumbleInvalidArgument("output cannot be null"));
+  }
+  if (sampleToStartFrom < 0) {
+    VS_THROW(HumbleInvalidArgument("sampleToStartFrom must be >= 0"));
+  }
+  // let's check the audio parameters.
+  ensureAudioParamsMatch(samples);
+
+  if (!samples->isComplete()) {
+    VS_THROW(HumbleInvalidArgument("Can only pass complete media to encode"));
+  }
+
   VS_THROW(HumbleRuntimeError("not implemented"));
   return 0;
 }

@@ -35,6 +35,11 @@ namespace io {
 namespace humble {
 namespace video {
 
+#ifndef SWIG
+class MediaAudio;
+class MediaPicture;
+#endif
+
 /**
  * An object that either converts MediaRaw objects into MediaEncoded
  * objects (called an Encoder), or converts in the reverse direction (called
@@ -326,8 +331,14 @@ protected:
   Coder(Codec* codec, AVCodecContext* src, bool copySrc);
   virtual
   ~Coder();
-  AVCodecContext *mCtx;
+  /**
+   * Make sure the audio passed in has parameters that match this decoder.
+   */
+  void ensureAudioParamsMatch(MediaAudio* audio);
+  void ensurePictureParamsMatch(MediaPicture* audio);
 private:
+
+  AVCodecContext *mCtx;
   static int getBuffer(struct AVCodecContext *s, AVFrame *frame, int flags);
 
   io::humble::ferry::RefPointer<Codec> mCodec;
