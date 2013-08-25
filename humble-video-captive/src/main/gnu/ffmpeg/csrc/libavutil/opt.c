@@ -609,6 +609,8 @@ int av_opt_get(void *obj, const char *name, int search_flags, uint8_t **out_val)
         if (!(*out_val = av_malloc(len*2 + 1)))
             return AVERROR(ENOMEM);
         bin = *(uint8_t**)dst;
+        // covers case where len == 0, ensuring we return null termed string
+        **out_val=0;
         for (i = 0; i < len; i++)
             snprintf(*out_val + i*2, 3, "%02X", bin[i]);
         return 0;
