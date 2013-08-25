@@ -177,6 +177,9 @@ DecoderTest::testDecodeAudio() {
       do {
         bytesRead = decoder->decodeAudio(audio.value(), packet.value(), byteOffset);
         if (audio->isComplete()) {
+          TS_ASSERT_DIFFERS(Global::NO_PTS, audio->getPacketDts());
+          TS_ASSERT_DIFFERS(Global::NO_PTS, audio->getTimeStamp());
+
           writeAudio(output, audio.value());
         }
         byteOffset += bytesRead;
@@ -281,6 +284,9 @@ DecoderTest::testDecodeVideo() {
       do {
         bytesRead = decoder->decodeVideo(picture.value(), packet.value(), byteOffset);
         if (picture->isComplete()) {
+          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketDts());
+          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketPts());
+          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getTimeStamp());
           writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
         }
         byteOffset += bytesRead;

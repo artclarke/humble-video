@@ -48,6 +48,7 @@ Decoder::Decoder(Codec* codec, AVCodecContext* src, bool copy) : Coder(codec, sr
 
   if (!codec->canDecode())
     throw HumbleInvalidArgument("passed in codec cannot decode");
+
   VS_LOG_TRACE("Created decoder");
 }
 
@@ -200,6 +201,10 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   // always free the packet so that we don't have an exception make us leak it.
   av_free_packet(pkt);
   if (got_frame) {
+    // never allow a video frame without a guessed best effort timestamp.
+    if (frame->pts == Global::NO_PTS)
+      frame->pts = frame->best_effort_timestamp;
+
     // copy the output frame to our frame
     output->copy(frame, true);
   }
@@ -283,6 +288,9 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
   // always free the packet so that we don't have an exception make us leak it.
   av_free_packet(pkt);
   if (got_frame) {
+    // never allow a video frame without a guessed best effort timestamp.
+    if (frame->pts == Global::NO_PTS)
+      frame->pts = frame->best_effort_timestamp;
     // copy the output frame to our frame
     output->copy(frame, true);
   }
