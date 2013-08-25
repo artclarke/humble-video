@@ -23,7 +23,17 @@ It consists of several sub-projects which are detailed below:
 * `humble-video-noarch/`: All Java code (and only Java code), including some generated Java code from `humble-video-native`. Unit tests run from here.  These are built with maven. 
 * `humble-video-test/`: All integration (very long running) tests for humble-video. Depends on humble-video-noarch and (via maven profiles) whatever architecture specific versions of the native code Jars it needs.
 * `humble-video-all/`: A pom that depends on humble-video-noarch and humble-video-arch-all. This will only successfully build on build machines that have all architecture files required staged (i.e. probably not your box).
-* `humble-video-stage/`: Where all the native code's final artifacts (DLLs and the like) end up being place so that all the rest of the maven build system knows where to find them.
+* `humble-video-stage/`: Where all the native code's final artifacts (DLLs and the like) end up being place so that all the rest of the maven build system knows where to find them
+
+To build, assuming you have all the prerequisites installed for your OS (see below), run:
+
+    mvn install
+
+To clean out a build tree, you need to do:
+
+    (cd humble-video-stage && mvn clean) && mvn clean
+
+That will clean out all the staged binaries in addition to the intermediate files built for each operating system.
 
 # Pre-requisites on build machines
 
@@ -35,8 +45,8 @@ To build the native code the autotools stack is required:
 
 * GNU c++ compilers
 * YASM (for assembly)
-* The Xuggle-Swig version of Swig (Use https://github.com/artclarke/xuggle-swig to get JavaDoc generated).
-  If you can't do that, you must use Swig 1.3.  **SWIG 2.0 will not work with Humble Video.**
+* pkg-config
+* The Humble-Swig version of Swig (Use https://github.com/artclarke/humble-swig to get JavaDoc generated).
 * Doxygen & DOT (for C++ documentation)
 * Valgrind (for auto memory leak detection -- try 'make memcheck')
 * Java JDK 1.6 or higher
@@ -51,10 +61,24 @@ You must install the JDK on your mac, and also Apple's xCode developer tools.
 
 The 'brew' utility is your on Mac OS X friend. Use it often. You can install yasm using that.
 
+    brew install pkg-config
     brew install yasm
     brew install valgrind
 
 Also, on Mac OS X the Valgrind test suite only works for 64-bit builds.
+
+To cross-compile for linux and windows in addition to Mac OS X, run:
+
+    # On your Mac OS X terminal
+    mvn install
+    vagrant up
+
+    # Once your vagrant box is provisioned
+    vagrant ssh
+
+    # From the Vagrant shell
+    cd /vagrant
+    mvn install
 
 ## Linux Build Notes
 
