@@ -213,10 +213,7 @@ static const OptionDef *find_option(const OptionDef *po, const char *name)
     return po;
 }
 
-/* _WIN32 means using the windows libc - cygwin doesn't define that
- * by default. HAVE_COMMANDLINETOARGVW is true on cygwin, while
- * it doesn't provide the actual command line via GetCommandLineW(). */
-#if HAVE_COMMANDLINETOARGVW && defined(_WIN32)
+#if HAVE_COMMANDLINETOARGVW
 #include <windows.h>
 #include <shellapi.h>
 /* Will be leaked on exit */

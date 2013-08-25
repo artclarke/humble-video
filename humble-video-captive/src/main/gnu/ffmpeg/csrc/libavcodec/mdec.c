@@ -121,7 +121,7 @@ static inline int mdec_decode_block_intra(MDECContext *a, int16_t *block, int n)
 static inline int decode_mb(MDECContext *a, int16_t block[6][64])
 {
     int i, ret;
-    static const int block_index[6] = { 5, 4, 0, 1, 2, 3 };
+    const int block_index[6] = { 5, 4, 0, 1, 2, 3 };
 
     a->dsp.clear_blocks(block[0]);
 
@@ -177,8 +177,7 @@ static int decode_frame(AVCodecContext *avctx,
         a->bitstream_buffer[i]     = buf[i + 1];
         a->bitstream_buffer[i + 1] = buf[i];
     }
-    if ((ret = init_get_bits8(&a->gb, a->bitstream_buffer, buf_size)) < 0)
-        return ret;
+    init_get_bits(&a->gb, a->bitstream_buffer, buf_size * 8);
 
     /* skip over 4 preamble bytes in stream (typically 0xXX 0xXX 0x00 0x38) */
     skip_bits(&a->gb, 32);

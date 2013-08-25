@@ -314,7 +314,8 @@ static int parse_3dl(AVFilterContext *ctx, FILE *f)
     const float scale = 16*16*16;
 
     lut3d->lutsize = size;
-    NEXT_LINE(skip_line(line));
+    if (!fgets(line, sizeof(line), f))
+        return AVERROR_INVALIDDATA;
     for (k = 0; k < size; k++) {
         for (j = 0; j < size; j++) {
             for (i = 0; i < size; i++) {

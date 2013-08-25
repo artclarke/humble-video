@@ -89,13 +89,13 @@ typedef struct MOVTrack {
     int         has_keyframes;
 #define MOV_TRACK_CTTS         0x0001
 #define MOV_TRACK_STPS         0x0002
-#define MOV_TRACK_ENABLED      0x0004
     uint32_t    flags;
 #define MOV_TIMECODE_FLAG_DROPFRAME     0x0001
 #define MOV_TIMECODE_FLAG_24HOURSMAX    0x0002
 #define MOV_TIMECODE_FLAG_ALLOWNEGATIVE 0x0004
     uint32_t    timecode_flags;
     int         language;
+    int         secondary;
     int         track_id;
     int         tag; ///< stsd fourcc
     AVCodecContext *enc;
@@ -156,6 +156,8 @@ typedef struct MOVMuxContext {
 
     int flags;
     int rtp_flags;
+    int reserved_moov_size; ///< 0 for disabled, -1 for automatic, size otherwise
+    int64_t reserved_moov_pos;
 
     int iods_skip;
     int iods_video_profile;
@@ -170,9 +172,6 @@ typedef struct MOVMuxContext {
 
     int use_editlist;
     int video_track_timescale;
-
-    int reserved_moov_size; ///< 0 for disabled, -1 for automatic, size otherwise
-    int64_t reserved_moov_pos;
 } MOVMuxContext;
 
 #define FF_MOV_FLAG_RTP_HINT 1

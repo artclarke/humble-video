@@ -24,12 +24,10 @@
  * internal API functions
  */
 
-#include "libavutil/internal.h"
 #include "avfilter.h"
 #include "avfiltergraph.h"
 #include "formats.h"
 #include "thread.h"
-#include "version.h"
 #include "video.h"
 
 #define POOL_SIZE 32
@@ -155,13 +153,23 @@ struct AVFilterInternal {
                    int *ret, int nb_jobs);
 };
 
-#if FF_API_AVFILTERBUFFER
 /** default handler for freeing audio/video buffer when there are no references left */
 void ff_avfilter_default_free_buffer(AVFilterBuffer *buf);
-#endif
 
 /** Tell is a format is contained in the provided list terminated by -1. */
 int ff_fmt_is_in(int fmt, const int *fmts);
+
+/**
+ * Return a copy of a list of integers terminated by -1, or NULL in
+ * case of copy failure.
+ */
+int *ff_copy_int_list(const int * const list);
+
+/**
+ * Return a copy of a list of 64-bit integers, or NULL in case of
+ * copy failure.
+ */
+int64_t *ff_copy_int64_list(const int64_t * const list);
 
 /* Functions to parse audio format arguments */
 
@@ -261,9 +269,7 @@ static inline void ff_insert_inpad(AVFilterContext *f, unsigned index,
     ff_insert_pad(index, &f->nb_inputs, offsetof(AVFilterLink, dstpad),
                   &f->input_pads, &f->inputs, p);
 #if FF_API_FOO_COUNT
-FF_DISABLE_DEPRECATION_WARNINGS
     f->input_count = f->nb_inputs;
-FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 }
 
@@ -274,9 +280,7 @@ static inline void ff_insert_outpad(AVFilterContext *f, unsigned index,
     ff_insert_pad(index, &f->nb_outputs, offsetof(AVFilterLink, srcpad),
                   &f->output_pads, &f->outputs, p);
 #if FF_API_FOO_COUNT
-FF_DISABLE_DEPRECATION_WARNINGS
     f->output_count = f->nb_outputs;
-FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 }
 

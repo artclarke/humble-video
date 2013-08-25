@@ -25,7 +25,7 @@
  * libmpcodecs/vf_gradfun.c
  *
  * Apply a boxblur debanding algorithm (based on the gradfun2db
- * AviSynth filter by prunedtree).
+ * Avisynth filter by prunedtree).
  * Foreach pixel, if it's within threshold of the blurred value, make it closer.
  * So now we have a smoothed and higher bitdepth version of all the shallow
  * gradients, while leaving detailed areas untouched.
@@ -149,10 +149,10 @@ static int query_formats(AVFilterContext *ctx)
 {
     static const enum AVPixelFormat pix_fmts[] = {
         AV_PIX_FMT_YUV410P,            AV_PIX_FMT_YUV420P,
-        AV_PIX_FMT_GRAY8,              AV_PIX_FMT_YUV444P,
+        AV_PIX_FMT_GRAY8,              AV_PIX_FMT_NV12,
+        AV_PIX_FMT_NV21,               AV_PIX_FMT_YUV444P,
         AV_PIX_FMT_YUV422P,            AV_PIX_FMT_YUV411P,
         AV_PIX_FMT_YUV440P,
-        AV_PIX_FMT_GBRP,
         AV_PIX_FMT_NONE
     };
 

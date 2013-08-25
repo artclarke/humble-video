@@ -31,6 +31,7 @@
 #include "h264.h"
 #include "golomb.h"
 
+//#undef NDEBUG
 #include <assert.h>
 
 #define COPY_PICTURE(dst, src) \

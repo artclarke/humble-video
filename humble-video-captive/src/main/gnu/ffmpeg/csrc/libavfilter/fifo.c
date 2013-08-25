@@ -147,13 +147,9 @@ static int return_audio_frame(AVFilterContext *ctx)
 {
     AVFilterLink *link = ctx->outputs[0];
     FifoContext *s = ctx->priv;
-    AVFrame *head = s->root.next ? s->root.next->frame : NULL;
+    AVFrame *head = s->root.next->frame;
     AVFrame *out;
     int ret;
-
-    /* if head is NULL then we're flushing the remaining samples in out */
-    if (!head && !s->out)
-        return AVERROR_EOF;
 
     if (!s->out &&
         head->nb_samples >= link->request_samples &&
@@ -201,7 +197,6 @@ static int return_audio_frame(AVFilterContext *ctx)
                     break;
                 } else if (ret < 0)
                     return ret;
-                av_assert0(s->root.next); // If ff_request_frame() succeeded then we should have a frame
             }
             head = s->root.next->frame;
 
@@ -232,11 +227,8 @@ static int request_frame(AVFilterLink *outlink)
     int ret = 0;
 
     if (!fifo->root.next) {
-        if ((ret = ff_request_frame(outlink->src->inputs[0])) < 0) {
-            if (ret == AVERROR_EOF && outlink->request_samples)
-                return return_audio_frame(outlink->src);
+        if ((ret = ff_request_frame(outlink->src->inputs[0])) < 0)
             return ret;
-        }
         av_assert0(fifo->root.next);
     }
 

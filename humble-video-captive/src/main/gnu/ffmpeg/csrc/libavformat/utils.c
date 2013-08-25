@@ -28,7 +28,6 @@
 #include "libavutil/avassert.h"
 #include "libavutil/opt.h"
 #include "libavutil/dict.h"
-#include "libavutil/internal.h"
 #include "libavutil/pixdesc.h"
 #include "metadata.h"
 #include "id3v2.h"
@@ -97,6 +96,10 @@ static int64_t wrap_timestamp(AVStream *st, int64_t timestamp)
     }
     return timestamp;
 }
+
+#define MAKE_ACCESSORS(str, name, type, field) \
+    type av_##name##_get_##field(const str *s) { return s->field; } \
+    void av_##name##_set_##field(str *s, type v) { s->field = v; }
 
 MAKE_ACCESSORS(AVStream, stream, AVRational, r_frame_rate)
 
@@ -1014,9 +1017,7 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
         pc && pc->pict_type != AV_PICTURE_TYPE_B)
         presentation_delayed = 1;
 
-    if (pkt->pts != AV_NOPTS_VALUE && pkt->dts != AV_NOPTS_VALUE &&
-        st->pts_wrap_bits < 63 &&
-        pkt->dts - (1LL << (st->pts_wrap_bits - 1)) > pkt->pts) {
+    if(pkt->pts != AV_NOPTS_VALUE && pkt->dts != AV_NOPTS_VALUE && st->pts_wrap_bits<63 && pkt->dts - (1LL<<(st->pts_wrap_bits-1)) > pkt->pts){
         if(is_relative(st->cur_dts) || pkt->dts - (1LL<<(st->pts_wrap_bits-1)) > st->cur_dts) {
             pkt->dts -= 1LL<<st->pts_wrap_bits;
         } else
@@ -1238,10 +1239,8 @@ static int parse_packet(AVFormatContext *s, AVPacket *pkt, int stream_index)
             out_pkt.buf   = pkt->buf;
             pkt->buf      = NULL;
 #if FF_API_DESTRUCT_PACKET
-FF_DISABLE_DEPRECATION_WARNINGS
             out_pkt.destruct = pkt->destruct;
             pkt->destruct = NULL;
-FF_ENABLE_DEPRECATION_WARNINGS
 #endif
         }
         if ((ret = av_dup_packet(&out_pkt)) < 0)
@@ -2779,9 +2778,9 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
             break;
         }
 
-        if (ic->flags & AVFMT_FLAG_NOBUFFER)
-            free_packet_buffer(&ic->packet_buffer, &ic->packet_buffer_end);
-        {
+        if (ic->flags & AVFMT_FLAG_NOBUFFER) {
+            pkt = &pkt1;
+        } else {
             pkt = add_to_pktbuf(&ic->packet_buffer, &pkt1,
                                 &ic->packet_buffer_end);
             if (!pkt) {
@@ -2955,9 +2954,6 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
                 int      best_fps = 0;
                 double best_error = 0.01;
 
-                if (st->info->codec_info_duration        >= INT64_MAX / st->time_base.num / 2||
-                    st->info->codec_info_duration_fields >= INT64_MAX / st->time_base.den)
-                    continue;
                 av_reduce(&st->avg_frame_rate.num, &st->avg_frame_rate.den,
                           st->info->codec_info_duration_fields*(int64_t)st->time_base.den,
                           st->info->codec_info_duration*2*(int64_t)st->time_base.num, 60000);
@@ -3709,10 +3705,26 @@ static void pkt_dump_internal(void *avcl, FILE *f, int level, AVPacket *pkt, int
         av_hex_dump(f, pkt->data, pkt->size);
 }
 
+#if FF_API_PKT_DUMP
+void av_pkt_dump(FILE *f, AVPacket *pkt, int dump_payload)
+{
+    AVRational tb = { 1, AV_TIME_BASE };
+    pkt_dump_internal(NULL, f, 0, pkt, dump_payload, tb);
+}
+#endif
+
 void av_pkt_dump2(FILE *f, AVPacket *pkt, int dump_payload, AVStream *st)
 {
     pkt_dump_internal(NULL, f, 0, pkt, dump_payload, st->time_base);
 }
+
+#if FF_API_PKT_DUMP
+void av_pkt_dump_log(void *avcl, int level, AVPacket *pkt, int dump_payload)
+{
+    AVRational tb = { 1, AV_TIME_BASE };
+    pkt_dump_internal(avcl, NULL, level, pkt, dump_payload, tb);
+}
+#endif
 
 void av_pkt_dump_log2(void *avcl, int level, AVPacket *pkt, int dump_payload,
                       AVStream *st)

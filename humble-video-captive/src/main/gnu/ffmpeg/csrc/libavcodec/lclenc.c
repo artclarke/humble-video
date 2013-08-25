@@ -56,6 +56,7 @@
 typedef struct LclEncContext {
 
     AVCodecContext *avctx;
+    AVFrame pic;
 
     // Image type
     int imgtype;
@@ -72,15 +73,20 @@ typedef struct LclEncContext {
  *
  */
 static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
-                        const AVFrame *p, int *got_packet)
+                        const AVFrame *pict, int *got_packet)
 {
     LclEncContext *c = avctx->priv_data;
+    AVFrame * const p = &c->pic;
     int i, ret;
     int zret; // Zlib return code
     int max_size = deflateBound(&c->zstream, avctx->width * avctx->height * 3);
 
     if ((ret = ff_alloc_packet2(avctx, pkt, max_size)) < 0)
-        return ret;
+            return ret;
+
+    *p = *pict;
+    p->pict_type= AV_PICTURE_TYPE_I;
+    p->key_frame= 1;
 
     if(avctx->pix_fmt != AV_PIX_FMT_BGR24){
         av_log(avctx, AV_LOG_ERROR, "Format not supported!\n");
@@ -131,9 +137,8 @@ static av_cold int encode_init(AVCodecContext *avctx)
 
     av_assert0(avctx->width && avctx->height);
 
-    avctx->extradata = av_mallocz(8 + FF_INPUT_BUFFER_PADDING_SIZE);
-    if (!avctx->extradata)
-        return AVERROR(ENOMEM);
+    avctx->extradata= av_mallocz(8);
+    avctx->coded_frame= &c->pic;
 
     c->compression = avctx->compression_level == FF_COMPRESSION_DEFAULT ?
                             COMP_ZLIB_NORMAL :

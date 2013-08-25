@@ -1,8 +1,5 @@
 /*
- * Video Acceleration API (video decoding)
- * HW decode acceleration for MPEG-2, MPEG-4, H.264 and VC-1
- *
- * Copyright (C) 2013 Anton Khirnov
+ * Copyright (c) 2010 Mans Rullgard <mans@mansr.com>
  *
  * This file is part of FFmpeg.
  *
@@ -21,28 +18,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "avcodec.h"
-#include "vaapi_internal.h"
+#include <stdint.h>
 
-int ff_vaapi_mpeg_end_frame(AVCodecContext *avctx)
+#include "libavutil/attributes.h"
+#include "libavutil/arm/cpu.h"
+#include "libavcodec/avcodec.h"
+#include "libavcodec/vp56dsp.h"
+
+void ff_vp6_edge_filter_hor_neon(uint8_t *yuv, int stride, int t);
+void ff_vp6_edge_filter_ver_neon(uint8_t *yuv, int stride, int t);
+
+av_cold void ff_vp56dsp_init_arm(VP56DSPContext *s, enum AVCodecID codec)
 {
-    struct vaapi_context * const vactx = avctx->hwaccel_context;
-    MpegEncContext *s = avctx->priv_data;
-    int ret;
+    int cpu_flags = av_get_cpu_flags();
 
-    ret = ff_vaapi_commit_slices(vactx);
-    if (ret < 0)
-        goto finish;
-
-    ret = ff_vaapi_render_picture(vactx,
-                                  ff_vaapi_get_surface_id(s->current_picture_ptr));
-    if (ret < 0)
-        goto finish;
-
-    ff_mpeg_draw_horiz_band(s, 0, s->avctx->height);
-
-finish:
-    ff_vaapi_common_end_frame(avctx);
-    return ret;
+    if (codec != AV_CODEC_ID_VP5 && have_neon(cpu_flags)) {
+        s->edge_filter_hor = ff_vp6_edge_filter_hor_neon;
+        s->edge_filter_ver = ff_vp6_edge_filter_ver_neon;
+    }
 }
-

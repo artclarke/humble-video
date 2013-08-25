@@ -48,7 +48,6 @@ void avfilter_register_all(void)
 #if FF_API_ACONVERT_FILTER
     REGISTER_FILTER(ACONVERT,       aconvert,       af);
 #endif
-    REGISTER_FILTER(AECHO,          aecho,          af);
     REGISTER_FILTER(AFADE,          afade,          af);
     REGISTER_FILTER(AFORMAT,        aformat,        af);
     REGISTER_FILTER(AINTERLEAVE,    ainterleave,    af);
@@ -80,7 +79,6 @@ void avfilter_register_all(void)
     REGISTER_FILTER(BIQUAD,         biquad,         af);
     REGISTER_FILTER(CHANNELMAP,     channelmap,     af);
     REGISTER_FILTER(CHANNELSPLIT,   channelsplit,   af);
-    REGISTER_FILTER(COMPAND,        compand,        af);
     REGISTER_FILTER(EARWAX,         earwax,         af);
     REGISTER_FILTER(EBUR128,        ebur128,        af);
     REGISTER_FILTER(EQUALIZER,      equalizer,      af);
@@ -162,7 +160,6 @@ void avfilter_register_all(void)
     REGISTER_FILTER(OWDENOISE,      owdenoise,      vf);
     REGISTER_FILTER(PAD,            pad,            vf);
     REGISTER_FILTER(PERMS,          perms,          vf);
-    REGISTER_FILTER(PERSPECTIVE,    perspective,    vf);
     REGISTER_FILTER(PIXDESCTEST,    pixdesctest,    vf);
     REGISTER_FILTER(PP,             pp,             vf);
     REGISTER_FILTER(PSNR,           psnr,           vf);

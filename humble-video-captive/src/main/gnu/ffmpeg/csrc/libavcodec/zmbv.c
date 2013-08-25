@@ -28,7 +28,6 @@
 #include <stdlib.h>
 
 #include "libavutil/common.h"
-#include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 #include "internal.h"
@@ -494,7 +493,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPac
         c->bx = (c->width + c->bw - 1) / c->bw;
         c->by = (c->height+ c->bh - 1) / c->bh;
         if (!c->cur || !c->prev)
-            return AVERROR(ENOMEM);
+            return -1;
         memset(c->cur, 0, avctx->width * avctx->height * (c->bpp / 8));
         memset(c->prev, 0, avctx->width * avctx->height * (c->bpp / 8));
         c->decode_intra= decode_intra;
@@ -555,8 +554,11 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPac
         case ZMBV_FMT_24BPP:
 #endif
         case ZMBV_FMT_32BPP:
-            av_image_copy_plane(out, frame->linesize[0], src, c->stride,
-                                c->stride, c->height);
+            for (j = 0; j < c->height; j++) {
+                memcpy(out, src, c->stride);
+                src += c->stride;
+                out += frame->linesize[0];
+            }
             break;
         default:
             av_log(avctx, AV_LOG_ERROR, "Cannot handle format %i\n", c->fmt);

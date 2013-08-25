@@ -312,7 +312,7 @@ int av_isxdigit(int c)
 int main(void)
 {
     int i;
-    static const char * const strings[] = {
+    const char *strings[] = {
         "''",
         "",
         ":",

@@ -60,7 +60,6 @@ typedef enum {
     STATE_HANDSHAKED, ///< client has performed handshake
     STATE_FCPUBLISH,  ///< client FCPublishing stream (for output)
     STATE_PLAYING,    ///< client has started receiving multimedia data from server
-    STATE_SEEKING,    ///< client has started the seek operation. Back on STATE_PLAYING when the time comes
     STATE_PUBLISHING, ///< client has started sending multimedia data to server (for output)
     STATE_RECEIVING,  ///< received a publish command (for input)
     STATE_STOPPED,    ///< the broadcast has been stopped
@@ -185,7 +184,7 @@ static int find_tracked_method(URLContext *s, RTMPPacket *pkt, int offset,
     int ret;
     int i;
 
-    bytestream2_init(&gbc, pkt->data + offset, pkt->size - offset);
+    bytestream2_init(&gbc, pkt->data + offset, pkt->data_size - offset);
     if ((ret = ff_amf_read_number(&gbc, &pkt_id)) < 0)
         return ret;
 
@@ -223,7 +222,7 @@ static int rtmp_send_packet(RTMPContext *rt, RTMPPacket *pkt, int track)
         double pkt_id;
         int len;
 
-        bytestream2_init(&gbc, pkt->data, pkt->size);
+        bytestream2_init(&gbc, pkt->data, pkt->data_size);
         if ((ret = ff_amf_read_string(&gbc, name, sizeof(name), &len)) < 0)
             goto fail;
 
@@ -384,7 +383,7 @@ static int gen_connect(URLContext *s, RTMPContext *rt)
         }
     }
 
-    pkt.size = p - pkt.data;
+    pkt.data_size = p - pkt.data;
 
     return rtmp_send_packet(rt, &pkt, 1);
 }
@@ -405,7 +404,7 @@ static int read_connect(URLContext *s, RTMPContext *rt)
                                    rt->prev_pkt[1])) < 0)
         return ret;
     cp = pkt.data;
-    bytestream2_init(&gbc, cp, pkt.size);
+    bytestream2_init(&gbc, cp, pkt.data_size);
     if (ff_amf_read_string(&gbc, command, sizeof(command), &stringlen)) {
         av_log(s, AV_LOG_ERROR, "Unable to read command string\n");
         ff_rtmp_packet_destroy(&pkt);
@@ -436,7 +435,7 @@ static int read_connect(URLContext *s, RTMPContext *rt)
         return ret;
     p = pkt.data;
     bytestream_put_be32(&p, rt->server_bw);
-    pkt.size = p - pkt.data;
+    pkt.data_size = p - pkt.data;
     ret = ff_rtmp_packet_write(rt->stream, &pkt, rt->out_chunk_size,
                                rt->prev_pkt[1]);
     ff_rtmp_packet_destroy(&pkt);
@@ -449,7 +448,7 @@ static int read_connect(URLContext *s, RTMPContext *rt)
     p = pkt.data;
     bytestream_put_be32(&p, rt->server_bw);
     bytestream_put_byte(&p, 2); // dynamic
-    pkt.size = p - pkt.data;
+    pkt.data_size = p - pkt.data;
     ret = ff_rtmp_packet_write(rt->stream, &pkt, rt->out_chunk_size,
                                rt->prev_pkt[1]);
     ff_rtmp_packet_destroy(&pkt);
@@ -511,7 +510,7 @@ static int read_connect(URLContext *s, RTMPContext *rt)
     ff_amf_write_number(&p, 0);
     ff_amf_write_object_end(&p);
 
-    pkt.size = p - pkt.data;
+    pkt.data_size = p - pkt.data;
     ret = ff_rtmp_packet_write(rt->stream, &pkt, rt->out_chunk_size,
                                rt->prev_pkt[1]);
     ff_rtmp_packet_destroy(&pkt);
@@ -526,7 +525,7 @@ static int read_connect(URLContext *s, RTMPContext *rt)
     ff_amf_write_number(&p, 0);
     ff_amf_write_null(&p);
     ff_amf_write_number(&p, 8192);
-    pkt.size = p - pkt.data;
+    pkt.data_size = p - pkt.data;
     ret = ff_rtmp_packet_write(rt->stream, &pkt, rt->out_chunk_size,
                                rt->prev_pkt[1]);
     ff_rtmp_packet_destroy(&pkt);
@@ -705,29 +704,6 @@ static int gen_play(URLContext *s, RTMPContext *rt)
     return rtmp_send_packet(rt, &pkt, 1);
 }
 
-static int gen_seek(URLContext *s, RTMPContext *rt, int64_t timestamp)
-{
-    RTMPPacket pkt;
-    uint8_t *p;
-    int ret;
-
-    av_log(s, AV_LOG_DEBUG, "Sending seek command for timestamp %"PRId64"\n",
-           timestamp);
-
-    if ((ret = ff_rtmp_packet_create(&pkt, 3, RTMP_PT_INVOKE, 0, 26)) < 0)
-        return ret;
-
-    pkt.extra = rt->main_channel_id;
-
-    p = pkt.data;
-    ff_amf_write_string(&p, "seek");
-    ff_amf_write_number(&p, 0); //no tracking back responses
-    ff_amf_write_null(&p); //as usual, the first null param
-    ff_amf_write_number(&p, timestamp); //where we want to jump
-
-    return rtmp_send_packet(rt, &pkt, 1);
-}
-
 /**
  * Generate 'publish' call and send it to the server.
  */
@@ -764,9 +740,9 @@ static int gen_pong(URLContext *s, RTMPContext *rt, RTMPPacket *ppkt)
     uint8_t *p;
     int ret;
 
-    if (ppkt->size < 6) {
+    if (ppkt->data_size < 6) {
         av_log(s, AV_LOG_ERROR, "Too short ping packet (%d)\n",
-               ppkt->size);
+               ppkt->data_size);
         return AVERROR_INVALIDDATA;
     }
 
@@ -1440,10 +1416,10 @@ static int handle_chunk_size(URLContext *s, RTMPPacket *pkt)
     RTMPContext *rt = s->priv_data;
     int ret;
 
-    if (pkt->size < 4) {
+    if (pkt->data_size < 4) {
         av_log(s, AV_LOG_ERROR,
                "Too short chunk size change packet (%d)\n",
-               pkt->size);
+               pkt->data_size);
         return AVERROR_INVALIDDATA;
     }
 
@@ -1473,9 +1449,9 @@ static int handle_ping(URLContext *s, RTMPPacket *pkt)
     RTMPContext *rt = s->priv_data;
     int t, ret;
 
-    if (pkt->size < 2) {
+    if (pkt->data_size < 2) {
         av_log(s, AV_LOG_ERROR, "Too short ping packet (%d)\n",
-               pkt->size);
+               pkt->data_size);
         return AVERROR_INVALIDDATA;
     }
 
@@ -1499,10 +1475,10 @@ static int handle_client_bw(URLContext *s, RTMPPacket *pkt)
 {
     RTMPContext *rt = s->priv_data;
 
-    if (pkt->size < 4) {
+    if (pkt->data_size < 4) {
         av_log(s, AV_LOG_ERROR,
                "Client bandwidth report packet is less than 4 bytes long (%d)\n",
-               pkt->size);
+               pkt->data_size);
         return AVERROR_INVALIDDATA;
     }
 
@@ -1523,10 +1499,10 @@ static int handle_server_bw(URLContext *s, RTMPPacket *pkt)
 {
     RTMPContext *rt = s->priv_data;
 
-    if (pkt->size < 4) {
+    if (pkt->data_size < 4) {
         av_log(s, AV_LOG_ERROR,
                "Too short server bandwidth report packet (%d)\n",
-               pkt->size);
+               pkt->data_size);
         return AVERROR_INVALIDDATA;
     }
 
@@ -1726,7 +1702,7 @@ static int handle_connect_error(URLContext *s, const char *desc)
 static int handle_invoke_error(URLContext *s, RTMPPacket *pkt)
 {
     RTMPContext *rt = s->priv_data;
-    const uint8_t *data_end = pkt->data + pkt->size;
+    const uint8_t *data_end = pkt->data + pkt->data_size;
     char *tracked_method = NULL;
     int level = AV_LOG_ERROR;
     uint8_t tmpstr[256];
@@ -1774,7 +1750,7 @@ static int send_invoke_response(URLContext *s, RTMPPacket *pkt)
     GetByteContext gbc;
     int ret;
 
-    bytestream2_init(&gbc, p, pkt->size);
+    bytestream2_init(&gbc, p, pkt->data_size);
     if (ff_amf_read_string(&gbc, command, sizeof(command),
                            &stringlen)) {
         av_log(s, AV_LOG_ERROR, "Error in PT_INVOKE\n");
@@ -1826,7 +1802,7 @@ static int send_invoke_response(URLContext *s, RTMPPacket *pkt)
             return ret;
         }
         pp = spkt.data;
-        bytestream2_init_writer(&pbc, pp, spkt.size);
+        bytestream2_init_writer(&pbc, pp, spkt.data_size);
         bytestream2_put_be16(&pbc, 0);          // 0 -> Stream Begin
         bytestream2_put_be32(&pbc, rt->nb_streamid);
         ret = ff_rtmp_packet_write(rt->stream, &spkt, rt->out_chunk_size,
@@ -1885,7 +1861,7 @@ static int send_invoke_response(URLContext *s, RTMPPacket *pkt)
              * if a client creates more than 2^32 - 2 streams. */
         }
     }
-    spkt.size = pp - spkt.data;
+    spkt.data_size = pp - spkt.data;
     ret = ff_rtmp_packet_write(rt->stream, &spkt, rt->out_chunk_size,
                                rt->prev_pkt[1]);
     ff_rtmp_packet_destroy(&spkt);
@@ -1906,7 +1882,7 @@ static int handle_invoke_result(URLContext *s, RTMPPacket *pkt)
         return ret;
     }
 
-    if (!strcmp(tracked_method, "connect")) {
+    if (!memcmp(tracked_method, "connect", 7)) {
         if (!rt->is_input) {
             if ((ret = gen_release_stream(s, rt)) < 0)
                 goto fail;
@@ -1932,7 +1908,7 @@ static int handle_invoke_result(URLContext *s, RTMPPacket *pkt)
                     goto fail;
             }
         }
-    } else if (!strcmp(tracked_method, "createStream")) {
+    } else if (!memcmp(tracked_method, "createStream", 12)) {
         //extract a number from the result
         if (pkt->data[10] || pkt->data[19] != 5 || pkt->data[20]) {
             av_log(s, AV_LOG_WARNING, "Unexpected reply on connect()\n");
@@ -1959,7 +1935,7 @@ fail:
 static int handle_invoke_status(URLContext *s, RTMPPacket *pkt)
 {
     RTMPContext *rt = s->priv_data;
-    const uint8_t *data_end = pkt->data + pkt->size;
+    const uint8_t *data_end = pkt->data + pkt->data_size;
     const uint8_t *ptr = pkt->data + 11;
     uint8_t tmpstr[256];
     int i, t;
@@ -1984,7 +1960,6 @@ static int handle_invoke_status(URLContext *s, RTMPPacket *pkt)
     if (!t && !strcmp(tmpstr, "NetStream.Play.Stop")) rt->state = STATE_STOPPED;
     if (!t && !strcmp(tmpstr, "NetStream.Play.UnpublishNotify")) rt->state = STATE_STOPPED;
     if (!t && !strcmp(tmpstr, "NetStream.Publish.Start")) rt->state = STATE_PUBLISHING;
-    if (!t && !strcmp(tmpstr, "NetStream.Seek.Notify")) rt->state = STATE_PLAYING;
 
     return 0;
 }
@@ -1995,23 +1970,23 @@ static int handle_invoke(URLContext *s, RTMPPacket *pkt)
     int ret = 0;
 
     //TODO: check for the messages sent for wrong state?
-    if (ff_amf_match_string(pkt->data, pkt->size, "_error")) {
+    if (!memcmp(pkt->data, "\002\000\006_error", 9)) {
         if ((ret = handle_invoke_error(s, pkt)) < 0)
             return ret;
-    } else if (ff_amf_match_string(pkt->data, pkt->size, "_result")) {
+    } else if (!memcmp(pkt->data, "\002\000\007_result", 10)) {
         if ((ret = handle_invoke_result(s, pkt)) < 0)
             return ret;
-    } else if (ff_amf_match_string(pkt->data, pkt->size, "onStatus")) {
+    } else if (!memcmp(pkt->data, "\002\000\010onStatus", 11)) {
         if ((ret = handle_invoke_status(s, pkt)) < 0)
             return ret;
-    } else if (ff_amf_match_string(pkt->data, pkt->size, "onBWDone")) {
+    } else if (!memcmp(pkt->data, "\002\000\010onBWDone", 11)) {
         if ((ret = gen_check_bw(s, rt)) < 0)
             return ret;
-    } else if (ff_amf_match_string(pkt->data, pkt->size, "releaseStream") ||
-               ff_amf_match_string(pkt->data, pkt->size, "FCPublish")     ||
-               ff_amf_match_string(pkt->data, pkt->size, "publish")       ||
-               ff_amf_match_string(pkt->data, pkt->size, "_checkbw")      ||
-               ff_amf_match_string(pkt->data, pkt->size, "createStream")) {
+    } else if (!memcmp(pkt->data, "\002\000\015releaseStream", 16) ||
+               !memcmp(pkt->data, "\002\000\011FCPublish", 12)     ||
+               !memcmp(pkt->data, "\002\000\007publish", 10)       ||
+               !memcmp(pkt->data, "\002\000\010_checkbw", 11)      ||
+               !memcmp(pkt->data, "\002\000\014createStream", 15)) {
         if ((ret = send_invoke_response(s, pkt)) < 0)
             return ret;
     }
@@ -2034,7 +2009,7 @@ static int handle_notify(URLContext *s, RTMPPacket *pkt) {
     unsigned datatowritelength;
 
     p = pkt->data;
-    bytestream2_init(&gbc, p, pkt->size);
+    bytestream2_init(&gbc, p, pkt->data_size);
     if (ff_amf_read_string(&gbc, commandbuffer, sizeof(commandbuffer),
                            &stringlen))
         return AVERROR_INVALIDDATA;
@@ -2148,7 +2123,7 @@ static int get_packet(URLContext *s, int for_header)
     int ret;
     uint8_t *p;
     const uint8_t *next;
-    uint32_t size;
+    uint32_t data_size;
     uint32_t ts, cts, pts=0;
 
     if (rt->state == STATE_STOPPED)
@@ -2173,17 +2148,6 @@ static int get_packet(URLContext *s, int for_header)
         }
 
         ret = rtmp_parse_result(s, rt, &rpkt);
-
-        // At this point we must check if we are in the seek state and continue
-        // with the next packet. handle_invoke will get us out of this state
-        // when the right message is encountered
-        if (rt->state == STATE_SEEKING) {
-            ff_rtmp_packet_destroy(&rpkt);
-            // We continue, let the natural flow of things happen:
-            // AVERROR(EAGAIN) or handle_invoke gets us out of here
-            continue;
-        }
-
         if (ret < 0) {//serious error in current packet
             ff_rtmp_packet_destroy(&rpkt);
             return ret;
@@ -2202,25 +2166,24 @@ static int get_packet(URLContext *s, int for_header)
             ff_rtmp_packet_destroy(&rpkt);
             return 0;
         }
-        if (!rpkt.size || !rt->is_input) {
+        if (!rpkt.data_size || !rt->is_input) {
             ff_rtmp_packet_destroy(&rpkt);
             continue;
         }
         if (rpkt.type == RTMP_PT_VIDEO || rpkt.type == RTMP_PT_AUDIO ||
-           (rpkt.type == RTMP_PT_NOTIFY &&
-            ff_amf_match_string(rpkt.data, rpkt.size, "onMetaData"))) {
+           (rpkt.type == RTMP_PT_NOTIFY && !memcmp("\002\000\012onMetaData", rpkt.data, 13))) {
             ts = rpkt.timestamp;
 
             // generate packet header and put data into buffer for FLV demuxer
             rt->flv_off  = 0;
-            rt->flv_size = rpkt.size + 15;
+            rt->flv_size = rpkt.data_size + 15;
             rt->flv_data = p = av_realloc(rt->flv_data, rt->flv_size);
             bytestream_put_byte(&p, rpkt.type);
-            bytestream_put_be24(&p, rpkt.size);
+            bytestream_put_be24(&p, rpkt.data_size);
             bytestream_put_be24(&p, ts);
             bytestream_put_byte(&p, ts >> 24);
             bytestream_put_be24(&p, 0);
-            bytestream_put_buffer(&p, rpkt.data, rpkt.size);
+            bytestream_put_buffer(&p, rpkt.data, rpkt.data_size);
             bytestream_put_be32(&p, 0);
             ff_rtmp_packet_destroy(&rpkt);
             return 0;
@@ -2235,14 +2198,14 @@ static int get_packet(URLContext *s, int for_header)
         } else if (rpkt.type == RTMP_PT_METADATA) {
             // we got raw FLV data, make it available for FLV demuxer
             rt->flv_off  = 0;
-            rt->flv_size = rpkt.size;
+            rt->flv_size = rpkt.data_size;
             rt->flv_data = av_realloc(rt->flv_data, rt->flv_size);
             /* rewrite timestamps */
             next = rpkt.data;
             ts = rpkt.timestamp;
-            while (next - rpkt.data < rpkt.size - 11) {
+            while (next - rpkt.data < rpkt.data_size - 11) {
                 next++;
-                size = bytestream_get_be24(&next);
+                data_size = bytestream_get_be24(&next);
                 p=next;
                 cts = bytestream_get_be24(&next);
                 cts |= bytestream_get_byte(&next) << 24;
@@ -2252,9 +2215,9 @@ static int get_packet(URLContext *s, int for_header)
                 pts = cts;
                 bytestream_put_be24(&p, ts);
                 bytestream_put_byte(&p, ts >> 24);
-                next += size + 3 + 4;
+                next += data_size + 3 + 4;
             }
-            memcpy(rt->flv_data, rpkt.data, rpkt.size);
+            memcpy(rt->flv_data, rpkt.data, rpkt.data_size);
             ff_rtmp_packet_destroy(&rpkt);
             return 0;
         }
@@ -2269,7 +2232,7 @@ static int rtmp_close(URLContext *h)
 
     if (!rt->is_input) {
         rt->flv_data = NULL;
-        if (rt->out_pkt.size)
+        if (rt->out_pkt.data_size)
             ff_rtmp_packet_destroy(&rt->out_pkt);
         if (rt->state > STATE_FCPUBLISH)
             ret = gen_fcunpublish_stream(h, rt);
@@ -2310,13 +2273,6 @@ static int rtmp_open(URLContext *s, const char *uri, int flags)
     av_url_split(proto, sizeof(proto), auth, sizeof(auth),
                  hostname, sizeof(hostname), &port,
                  path, sizeof(path), s->filename);
-
-    if (strchr(path, ' ')) {
-        av_log(s, AV_LOG_WARNING,
-               "Detected librtmp style URL parameters, these aren't supported "
-               "by the libavformat internal RTMP handler currently enabled. "
-               "See the documentation for the correct way to pass parameters.\n");
-    }
 
     if (auth[0]) {
         char *ptr = strchr(auth, ':');
@@ -2556,26 +2512,6 @@ static int rtmp_read(URLContext *s, uint8_t *buf, int size)
     return orig_size;
 }
 
-static int64_t rtmp_seek(URLContext *s, int stream_index, int64_t timestamp,
-                         int flags)
-{
-    RTMPContext *rt = s->priv_data;
-    int ret;
-    av_log(s, AV_LOG_DEBUG,
-           "Seek on stream index %d at timestamp %"PRId64" with flags %08x\n",
-           stream_index, timestamp, flags);
-    if ((ret = gen_seek(s, rt, timestamp)) < 0) {
-        av_log(s, AV_LOG_ERROR,
-               "Unable to send seek command on stream index %d at timestamp "
-               "%"PRId64" with flags %08x\n",
-               stream_index, timestamp, flags);
-        return ret;
-    }
-    rt->flv_off = rt->flv_size;
-    rt->state = STATE_SEEKING;
-    return timestamp;
-}
-
 static int rtmp_write(URLContext *s, const uint8_t *buf, int size)
 {
     RTMPContext *rt = s->priv_data;
@@ -2727,7 +2663,6 @@ URLProtocol ff_##flavor##_protocol = {           \
     .name           = #flavor,                   \
     .url_open       = rtmp_open,                 \
     .url_read       = rtmp_read,                 \
-    .url_read_seek  = rtmp_seek,                 \
     .url_write      = rtmp_write,                \
     .url_close      = rtmp_close,                \
     .priv_data_size = sizeof(RTMPContext),       \

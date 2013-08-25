@@ -273,11 +273,6 @@ static int get_siz(Jpeg2000DecoderContext *s)
         s->sgnd[i]   = !!(x & 0x80);
         s->cdx[i]    = bytestream2_get_byteu(&s->g);
         s->cdy[i]    = bytestream2_get_byteu(&s->g);
-        if (   !s->cdx[i] || s->cdx[i] == 3 || s->cdx[i] > 4
-            || !s->cdy[i] || s->cdy[i] == 3 || s->cdy[i] > 4) {
-            av_log(s->avctx, AV_LOG_ERROR, "Invalid sample seperation\n");
-            return AVERROR_INVALIDDATA;
-        }
         log2_chroma_wh |= s->cdy[i] >> 1 << i * 4 | s->cdx[i] >> 1 << i * 4 + 2;
     }
 
@@ -382,11 +377,6 @@ static int get_cox(Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *c)
         c->log2_cblk_width + c->log2_cblk_height > 12) {
         av_log(s->avctx, AV_LOG_ERROR, "cblk size invalid\n");
         return AVERROR_INVALIDDATA;
-    }
-
-    if (c->log2_cblk_width > 6 || c->log2_cblk_height > 6) {
-        avpriv_request_sample(s->avctx, "cblk size > 64");
-        return AVERROR_PATCHWELCOME;
     }
 
     c->cblk_style = bytestream2_get_byteu(&s->g);
@@ -1030,9 +1020,6 @@ static int decode_cblk(Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *codsty,
     int bpass_csty_symbol           = codsty->cblk_style & JPEG2000_CBLK_BYPASS;
     int vert_causal_ctx_csty_symbol = codsty->cblk_style & JPEG2000_CBLK_VSC;
 
-    av_assert0(width  <= JPEG2000_MAX_CBLKW);
-    av_assert0(height <= JPEG2000_MAX_CBLKH);
-
     for (y = 0; y < height; y++)
         memset(t1->data[y], 0, width * sizeof(**t1->data));
 
@@ -1352,15 +1339,13 @@ static void jpeg2000_dec_cleanup(Jpeg2000DecoderContext *s)
 {
     int tileno, compno;
     for (tileno = 0; tileno < s->numXtiles * s->numYtiles; tileno++) {
-        if (s->tile[tileno].comp) {
-            for (compno = 0; compno < s->ncomponents; compno++) {
-                Jpeg2000Component *comp     = s->tile[tileno].comp   + compno;
-                Jpeg2000CodingStyle *codsty = s->tile[tileno].codsty + compno;
+        for (compno = 0; compno < s->ncomponents; compno++) {
+            Jpeg2000Component *comp     = s->tile[tileno].comp   + compno;
+            Jpeg2000CodingStyle *codsty = s->tile[tileno].codsty + compno;
 
-                ff_jpeg2000_cleanup(comp, codsty);
-            }
-            av_freep(&s->tile[tileno].comp);
+            ff_jpeg2000_cleanup(comp, codsty);
         }
+        av_freep(&s->tile[tileno].comp);
     }
     av_freep(&s->tile);
     s->numXtiles = s->numYtiles = 0;
@@ -1484,39 +1469,42 @@ static int jpeg2000_read_bitstream_packets(Jpeg2000DecoderContext *s)
 
 static int jp2_find_codestream(Jpeg2000DecoderContext *s)
 {
-    uint32_t atom_size, atom, atom_end;
-    int search_range = 10;
+    uint32_t atom_size, atom;
+    int found_codestream = 0, search_range = 10;
 
-    while (search_range
+    while (!found_codestream && search_range
            &&
            bytestream2_get_bytes_left(&s->g) >= 8) {
         atom_size = bytestream2_get_be32u(&s->g);
         atom      = bytestream2_get_be32u(&s->g);
-        atom_end  = bytestream2_tell(&s->g) + atom_size - 8;
-
-        if (atom == JP2_CODESTREAM)
-            return 1;
-
-        if (bytestream2_get_bytes_left(&s->g) < atom_size || atom_end < atom_size)
-            return 0;
-
-        if (atom == JP2_HEADER &&
+        if (atom == JP2_CODESTREAM) {
+            found_codestream = 1;
+        } else if (atom == JP2_HEADER &&
+                   bytestream2_get_bytes_left(&s->g) >= atom_size &&
                    atom_size >= 16) {
-            uint32_t atom2_size, atom2, atom2_end;
+            uint32_t atom2_size, atom2;
+            atom_size -= 8;
             do {
                 atom2_size = bytestream2_get_be32u(&s->g);
                 atom2      = bytestream2_get_be32u(&s->g);
-                atom2_end  = bytestream2_tell(&s->g) + atom2_size - 8;
-                if (atom2_size < 8 || atom2_end > atom_end || atom2_end < atom2_size)
+                atom_size  -= 8;
+                if (atom2_size < 8 || atom2_size - 8 > atom_size)
                     break;
+                atom2_size -= 8;
                 if (atom2 == JP2_CODESTREAM) {
                     return 1;
                 } else if (atom2 == MKBETAG('c','o','l','r') && atom2_size >= 7) {
                     int method = bytestream2_get_byteu(&s->g);
                     bytestream2_skipu(&s->g, 2);
+                    atom_size  -= 3;
+                    atom2_size -= 3;
                     if (method == 1) {
                         s->colour_space = bytestream2_get_be32u(&s->g);
+                        atom_size  -= 4;
+                        atom2_size -= 4;
                     }
+                    bytestream2_skipu(&s->g, atom2_size);
+                    atom_size -= atom2_size;
                 } else if (atom2 == MKBETAG('p','c','l','r') && atom2_size >= 6) {
                     int i, size, colour_count, colour_channels, colour_depth[3];
                     uint32_t r, g, b;
@@ -1526,6 +1514,8 @@ static int jp2_find_codestream(Jpeg2000DecoderContext *s)
                     colour_depth[0] = (bytestream2_get_byteu(&s->g) & 0x7f) + 1;
                     colour_depth[1] = (bytestream2_get_byteu(&s->g) & 0x7f) + 1;
                     colour_depth[2] = (bytestream2_get_byteu(&s->g) & 0x7f) + 1;
+                    atom_size  -= 6;
+                    atom2_size -= 6;
                     size = (colour_depth[0] + 7 >> 3) * colour_count +
                            (colour_depth[1] + 7 >> 3) * colour_count +
                            (colour_depth[2] + 7 >> 3) * colour_count;
@@ -1536,7 +1526,8 @@ static int jp2_find_codestream(Jpeg2000DecoderContext *s)
                         colour_depth[2] > 16 ||
                         atom2_size < size) {
                         avpriv_request_sample(s->avctx, "Unknown palette");
-                        bytestream2_seek(&s->g, atom2_end, SEEK_SET);
+                        bytestream2_skipu(&s->g, atom2_size);
+                        atom_size -= atom2_size;
                         continue;
                     }
                     s->pal8 = 1;
@@ -1561,24 +1552,41 @@ static int jp2_find_codestream(Jpeg2000DecoderContext *s)
                         }
                         s->palette[i] = 0xffu << 24 | r << 16 | g << 8 | b;
                     }
-                } else if (atom2 == MKBETAG('c','d','e','f') && atom2_size >= 2) {
+                    atom_size  -= size;
+                    atom2_size -= size;
+                    bytestream2_skipu(&s->g, atom2_size);
+                    atom_size -= atom2_size;
+                } else if (atom2 == MKBETAG('c','d','e','f') && atom2_size >= 2 &&
+                    bytestream2_get_bytes_left(&s->g) >= atom2_size) {
                     int n = bytestream2_get_be16u(&s->g);
+                    atom_size  -= 2;
+                    atom2_size -= 2;
                     for (; n>0; n--) {
                         int cn   = bytestream2_get_be16(&s->g);
                         int av_unused typ  = bytestream2_get_be16(&s->g);
                         int asoc = bytestream2_get_be16(&s->g);
                         if (cn < 4 || asoc < 4)
                             s->cdef[cn] = asoc;
+                        atom_size  -= 6;
+                        atom2_size -= 6;
                     }
+                    bytestream2_skipu(&s->g, atom2_size);
+                } else {
+                    bytestream2_skipu(&s->g, atom2_size);
+                    atom_size -= atom2_size;
                 }
-                bytestream2_seek(&s->g, atom2_end, SEEK_SET);
-            } while (atom_end - atom2_end >= 8);
+            } while (atom_size >= 8);
+            bytestream2_skipu(&s->g, atom_size);
         } else {
+            if (bytestream2_get_bytes_left(&s->g) < atom_size - 8)
+                return 0;
+            bytestream2_skipu(&s->g, atom_size - 8);
             search_range--;
         }
-        bytestream2_seek(&s->g, atom_end, SEEK_SET);
     }
 
+    if (found_codestream)
+        return 1;
     return 0;
 }
 

@@ -29,6 +29,7 @@
 #include "libavutil/buffer.h"
 
 #include "vp56.h"
+#include "vp56data.h"
 #include "vp8dsp.h"
 #include "h264pred.h"
 #include "thread.h"

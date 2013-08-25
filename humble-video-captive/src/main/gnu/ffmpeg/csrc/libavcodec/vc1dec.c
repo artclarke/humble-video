@@ -409,10 +409,8 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
         use_ic = v->next_use_ic;
     }
 
-    if (!srcY || !srcU) {
-        av_log(v->s.avctx, AV_LOG_ERROR, "Referenced frame missing.\n");
+    if(!srcY)
         return;
-    }
 
     src_x   = s->mb_x * 16 + (mx   >> 2);
     src_y   = s->mb_y * 16 + (my   >> 2);
@@ -590,10 +588,8 @@ static void vc1_mc_4mv_luma(VC1Context *v, int n, int dir, int avg)
         use_ic = v->next_use_ic;
     }
 
-    if (!srcY) {
-        av_log(v->s.avctx, AV_LOG_ERROR, "Referenced frame missing.\n");
+    if(!srcY)
         return;
-    }
 
     if (v->field_mode) {
         if (v->cur_field_type != v->ref_field_type[dir])
@@ -893,10 +889,8 @@ static void vc1_mc_4mv_chroma(VC1Context *v, int dir)
         use_ic = v->next_use_ic;
     }
 
-    if (!srcU) {
-        av_log(v->s.avctx, AV_LOG_ERROR, "Referenced frame missing.\n");
+    if(!srcU)
         return;
-    }
 
     srcU += uvsrc_y * s->uvlinesize + uvsrc_x;
     srcV += uvsrc_y * s->uvlinesize + uvsrc_x;
@@ -6069,9 +6063,6 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
             s->uvlinesize                    <<= 1;
         }
         mb_height = s->mb_height >> v->field_mode;
-
-        av_assert0 (mb_height > 0);
-
         for (i = 0; i <= n_slices; i++) {
             if (i > 0 &&  slices[i - 1].mby_start >= mb_height) {
                 if (v->field_mode <= 0) {

@@ -1,7 +1,7 @@
 /*
  * FFV1 encoder
  *
- * Copyright (c) 2003-2013 Michael Niedermayer <michaelni@gmx.at>
+ * Copyright (c) 2003-2012 Michael Niedermayer <michaelni@gmx.at>
  *
  * This file is part of FFmpeg.
  *
@@ -529,16 +529,14 @@ static int write_extradata(FFV1Context *f)
     f->avctx->extradata_size = 10000 + 4 +
                                     (11 * 11 * 5 * 5 * 5 + 11 * 11 * 11) * 32;
     f->avctx->extradata = av_malloc(f->avctx->extradata_size);
-    if (!f->avctx->extradata)
-        return AVERROR(ENOMEM);
     ff_init_range_encoder(c, f->avctx->extradata, f->avctx->extradata_size);
     ff_build_rac_states(c, 0.05 * (1LL << 32), 256 - 8);
 
     put_symbol(c, state, f->version, 0);
     if (f->version > 2) {
         if (f->version == 3)
-            f->micro_version = 4;
-        put_symbol(c, state, f->micro_version, 0);
+            f->minor_version = 3;
+        put_symbol(c, state, f->minor_version, 0);
     }
 
     put_symbol(c, state, f->ac, 0);
@@ -721,11 +719,9 @@ static av_cold int encode_init(AVCodecContext *avctx)
     case AV_PIX_FMT_RGB32:
         s->colorspace = 1;
         s->transparency = 1;
-        s->chroma_planes = 1;
         break;
     case AV_PIX_FMT_0RGB32:
         s->colorspace = 1;
-        s->chroma_planes = 1;
         break;
     case AV_PIX_FMT_GBRP9:
         if (!avctx->bits_per_raw_sample)
@@ -801,9 +797,6 @@ static av_cold int encode_init(AVCodecContext *avctx)
 
     if (!s->transparency)
         s->plane_count = 2;
-    if (!s->chroma_planes && s->version > 3)
-        s->plane_count--;
-
     avcodec_get_chroma_sub_sample(avctx->pix_fmt, &s->chroma_h_shift, &s->chroma_v_shift);
     s->picture_number = 0;
 
@@ -904,8 +897,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
                avctx->slices);
         return AVERROR(ENOSYS);
 slices_ok:
-        if ((ret = write_extradata(s)) < 0)
-            return ret;
+        write_extradata(s);
     }
 
     if ((ret = ffv1_init_slice_contexts(s)) < 0)

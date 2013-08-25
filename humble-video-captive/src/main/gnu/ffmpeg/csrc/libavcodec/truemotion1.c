@@ -407,8 +407,6 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
         s->avctx->pix_fmt = new_pix_fmt;
         avcodec_set_dimensions(s->avctx, s->w, s->h);
         av_fast_malloc(&s->vert_pred, &s->vert_pred_size, s->avctx->width * sizeof(unsigned int));
-        if (!s->vert_pred)
-            return AVERROR(ENOMEM);
     }
 
     /* There is 1 change bit per 4 pixels, so each change byte represents
@@ -475,8 +473,6 @@ static av_cold int truemotion1_decode_init(AVCodecContext *avctx)
     /* there is a vertical predictor for each pixel in a line; each vertical
      * predictor is 0 to start with */
     av_fast_malloc(&s->vert_pred, &s->vert_pred_size, s->avctx->width * sizeof(unsigned int));
-    if (!s->vert_pred)
-        return AVERROR(ENOMEM);
 
     return 0;
 }
@@ -895,7 +891,7 @@ static av_cold int truemotion1_decode_end(AVCodecContext *avctx)
     TrueMotion1Context *s = avctx->priv_data;
 
     av_frame_unref(&s->frame);
-    av_freep(&s->vert_pred);
+    av_free(s->vert_pred);
 
     return 0;
 }

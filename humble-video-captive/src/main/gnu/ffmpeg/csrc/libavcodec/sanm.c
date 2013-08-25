@@ -1044,10 +1044,8 @@ static int decode_5(SANMVideoContext *ctx)
 #if HAVE_BIGENDIAN
     npixels = ctx->npixels;
     frm = ctx->frm0;
-    while (npixels--) {
-        *frm = av_bswap16(*frm);
-        frm++;
-    }
+    while (npixels--)
+        *frm++ = av_bswap16(*frm);
 #endif
 
     return 0;

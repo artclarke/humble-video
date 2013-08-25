@@ -1405,9 +1405,6 @@ const AVClass *avformat_get_class(void);
  *
  * When muxing, should be called by the user before avformat_write_header().
  *
- * User is required to call avcodec_close() and avformat_free_context() to
- * clean up the allocation by avformat_new_stream().
- *
  * @param c If non-NULL, the AVCodecContext corresponding to the new stream
  * will be initialized to use this codec. This is needed for e.g. codec-specific
  * defaults to be set, so codec should be provided if it is known.
@@ -1422,6 +1419,12 @@ AVProgram *av_new_program(AVFormatContext *s, int id);
  * @}
  */
 
+
+#if FF_API_PKT_DUMP
+attribute_deprecated void av_pkt_dump(FILE *f, AVPacket *pkt, int dump_payload);
+attribute_deprecated void av_pkt_dump_log(void *avcl, int level, AVPacket *pkt,
+                                          int dump_payload);
+#endif
 
 #if FF_API_ALLOC_OUTPUT_CONTEXT
 /**
@@ -1513,7 +1516,7 @@ int av_probe_input_buffer(AVIOContext *pb, AVInputFormat **fmt,
 
 /**
  * Open an input stream and read the header. The codecs are not opened.
- * The stream must be closed with avformat_close_input().
+ * The stream must be closed with av_close_input_file().
  *
  * @param ps Pointer to user-supplied AVFormatContext (allocated by avformat_alloc_context).
  *           May be a pointer to NULL, in which case an AVFormatContext is allocated by this
@@ -1648,8 +1651,8 @@ int av_read_packet(AVFormatContext *s, AVPacket *pkt);
  * information possible for decoding.
  *
  * If pkt->buf is NULL, then the packet is valid until the next
- * av_read_frame() or until avformat_close_input(). Otherwise the packet
- * is valid indefinitely. In both cases the packet must be freed with
+ * av_read_frame() or until av_close_input_file(). Otherwise the packet is valid
+ * indefinitely. In both cases the packet must be freed with
  * av_free_packet when it is no longer needed. For video, the packet contains
  * exactly one frame. For audio, it contains an integer number of frames if each
  * frame has a known fixed size (e.g. PCM or ADPCM data). If the audio frames
