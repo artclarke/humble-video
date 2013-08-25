@@ -154,6 +154,18 @@ Encoder::encodeAudio(MediaPacket* output, MediaAudio* samples,
     VS_THROW(HumbleInvalidArgument("Can only pass complete media to encode"));
   }
 
+  RefPointer<Codec> codec = getCodec();
+  if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
+    // this codec requires that the right number of audio samples
+    // gets passed in each call.
+    if (samples->getNumSamples() > getFrameSize()) {
+      VS_THROW(HumbleRuntimeError("Codec for this encoder requires the number of audio samples to always equal the frame size of the encoder"));
+    }
+  }
+
+  // now in theory we've done all of our bounds checking. Let's do the heavy lifting
+  // and get raw audio to convert to raw packet data.
+
   VS_THROW(HumbleRuntimeError("not implemented"));
   return 0;
 }
