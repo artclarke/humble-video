@@ -1195,8 +1195,9 @@ void x264_pixel_init( int cpu, x264_pixel_function_t *pixf )
         }
         else
         {
-            INIT2( sad_x3, _ssse3 );
-            INIT5( sad_x4, _ssse3 );
+            pixf->sad_x4[PIXEL_8x4] = x264_pixel_sad_x4_8x4_ssse3;
+            pixf->sad_x4[PIXEL_8x8] = x264_pixel_sad_x4_8x8_ssse3;
+            pixf->sad_x4[PIXEL_8x16] = x264_pixel_sad_x4_8x16_ssse3;
         }
         if( (cpu&X264_CPU_SLOW_ATOM) || (cpu&X264_CPU_SLOW_SHUFFLE) )
         {

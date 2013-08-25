@@ -307,7 +307,7 @@ mk_writer *mk_create_writer( const char *filename )
     if( !strcmp( filename, "-" ) )
         w->fp = stdout;
     else
-        w->fp = x264_fopen( filename, "wb" );
+        w->fp = fopen( filename, "wb" );
     if( !w->fp )
     {
         mk_destroy_contexts( w );

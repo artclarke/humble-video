@@ -81,7 +81,7 @@ static int open_file( char *psz_filename, hnd_t *p_handle, video_info_t *info, c
     if( !strcmp( psz_filename, "-" ) )
         h->fh = stdin;
     else
-        h->fh = x264_fopen(psz_filename, "rb");
+        h->fh = fopen(psz_filename, "rb");
     if( h->fh == NULL )
         return -1;
 

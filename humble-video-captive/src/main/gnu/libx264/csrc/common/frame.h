@@ -35,7 +35,6 @@
 typedef struct x264_frame
 {
     /* */
-    uint8_t *base;       /* Base pointer for all malloced data in this frame. */
     int     i_poc;
     int     i_delta_poc[2];
     int     i_type;

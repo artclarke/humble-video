@@ -365,14 +365,14 @@ void x264_me_search_ref( x264_t *h, x264_me_t *m, int16_t (*mvc)[2], int i_mvc, 
 
             /* hexagon */
             COST_MV_X3_DIR( -2,0, -1, 2,  1, 2, costs   );
-            COST_MV_X3_DIR(  2,0,  1,-2, -1,-2, costs+4 ); /* +4 for 16-byte alignment */
+            COST_MV_X3_DIR(  2,0,  1,-2, -1,-2, costs+3 );
             bcost <<= 3;
             COPY1_IF_LT( bcost, (costs[0]<<3)+2 );
             COPY1_IF_LT( bcost, (costs[1]<<3)+3 );
             COPY1_IF_LT( bcost, (costs[2]<<3)+4 );
-            COPY1_IF_LT( bcost, (costs[4]<<3)+5 );
-            COPY1_IF_LT( bcost, (costs[5]<<3)+6 );
-            COPY1_IF_LT( bcost, (costs[6]<<3)+7 );
+            COPY1_IF_LT( bcost, (costs[3]<<3)+5 );
+            COPY1_IF_LT( bcost, (costs[4]<<3)+6 );
+            COPY1_IF_LT( bcost, (costs[5]<<3)+7 );
 
             if( bcost&7 )
             {
@@ -671,7 +671,7 @@ void x264_me_search_ref( x264_t *h, x264_me_t *m, int16_t (*mvc)[2], int i_mvc, 
                     for( i = 0; i < xn-2; i += 3 )
                     {
                         pixel *ref = p_fref_w+min_x+my*stride;
-                        ALIGNED_ARRAY_16( int, sads,[4] ); /* padded to [4] for asm */
+                        int sads[3];
                         h->pixf.sad_x3[i_pixel]( p_fenc, ref+xs[i], ref+xs[i+1], ref+xs[i+2], stride, sads );
                         for( int j = 0; j < 3; j++ )
                         {

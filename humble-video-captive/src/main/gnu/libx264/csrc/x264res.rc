@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2012-2013 x264 project
  *
- * Authors: Henrik Gramner <henrik@gramner.com>
+ * Authors: Henrik Gramner <hengar-6@student.ltu.se>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ FILESUBTYPE     VFT2_UNKNOWN
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904B0"
+        BLOCK "040904E4"
         BEGIN
             VALUE "CompanyName",      "x264 project"
 #ifdef DLL
@@ -73,6 +73,6 @@ BEGIN
 
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x0409, 0x04B0 /* U.S. English (Unicode) */
+        VALUE "Translation", 0x0409, 0x04E4
     END
 END

@@ -91,7 +91,7 @@ void x264_sei_write( bs_t *s, uint8_t *payload, int payload_size, int payload_ty
     bs_write( s, 8, payload_size-i );
 
     for( i = 0; i < payload_size; i++ )
-        bs_write( s, 8, payload[i] );
+        bs_write(s, 8, payload[i] );
 
     bs_rbsp_trailing( s );
     bs_flush( s );
@@ -249,7 +249,7 @@ void x264_sps_init( x264_sps_t *sps, int i_id, x264_param_t *param )
 
     // NOTE: HRD related parts of the SPS are initialised in x264_ratecontrol_init_reconfigurable
 
-    sps->vui.b_bitstream_restriction = param->i_keyint_max > 1;
+    sps->vui.b_bitstream_restriction = 1;
     if( sps->vui.b_bitstream_restriction )
     {
         sps->vui.b_motion_vectors_over_pic_boundaries = 1;
@@ -421,7 +421,7 @@ void x264_pps_init( x264_pps_t *pps, int i_id, x264_param_t *param, x264_sps_t *
     pps->i_sps_id = sps->i_id;
     pps->b_cabac = param->b_cabac;
 
-    pps->b_pic_order = !param->b_avcintra_compat && param->b_interlaced;
+    pps->b_pic_order = param->b_interlaced;
     pps->i_num_slice_groups = 1;
 
     pps->i_num_ref_idx_l0_default_active = param->i_frame_reference;
@@ -723,25 +723,6 @@ void x264_sei_dec_ref_pic_marking_write( x264_t *h, bs_t *s )
     bs_flush( &q );
 
     x264_sei_write( s, tmp_buf, bs_pos( &q ) / 8, SEI_DEC_REF_PIC_MARKING );
-}
-
-int x264_sei_avcintra_write( x264_t *h, bs_t *s, int len, const char *msg )
-{
-    const static uint8_t avcintra_uuid[] = {0xF7, 0x49, 0x3E, 0xB3, 0xD4, 0x00, 0x47, 0x96, 0x86, 0x86, 0xC9, 0x70, 0x7B, 0x64, 0x37, 0x2A};
-    uint8_t data[6000];
-    if( len > sizeof(data) )
-    {
-        x264_log( h, X264_LOG_ERROR, "AVC-Intra SEI is too large (%d)\n", len );
-        return -1;
-    }
-
-    memset( data, 0xff, len );
-    memcpy( data, avcintra_uuid, sizeof(avcintra_uuid) );
-    memcpy( data+16, msg, strlen(msg) );
-
-    x264_sei_write( &h->out.bs, data, len, SEI_USER_DATA_UNREGISTERED );
-
-    return 0;
 }
 
 const x264_level_t x264_levels[] =
