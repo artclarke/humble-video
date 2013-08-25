@@ -567,7 +567,7 @@ static av_always_inline void decode_subband_internal(DiracContext *s, SubBand *b
     if (!b->length)
         return;
 
-    init_get_bits8(&gb, b->coeff_data, b->length);
+    init_get_bits(&gb, b->coeff_data, b->length*8);
 
     if (is_arith)
         ff_dirac_init_arith_decoder(&c, &gb, b->length);

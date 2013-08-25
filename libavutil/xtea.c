@@ -244,7 +244,7 @@ int main(void)
     AVXTEA ctx;
     uint8_t buf[8], iv[8];
     int i;
-    static const uint8_t src[32] = "HelloWorldHelloWorldHelloWorld";
+    const uint8_t src[32] = "HelloWorldHelloWorldHelloWorld";
     uint8_t ct[32];
     uint8_t pl[32];
 

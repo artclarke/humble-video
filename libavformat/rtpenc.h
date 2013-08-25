@@ -38,9 +38,11 @@ struct RTPMuxContext {
     int max_payload_size;
     int num_frames;
 
-    /* rtcp sender statistics */
+    /* rtcp sender statistics receive */
     int64_t last_rtcp_ntp_time;
     int64_t first_rtcp_ntp_time;
+
+    /* rtcp sender statistics */
     unsigned int packet_count;
     unsigned int octet_count;
     unsigned int last_octet_count;

@@ -27,7 +27,9 @@
 av_cold void ff_float_dsp_init_ppc(AVFloatDSPContext *fdsp, int bit_exact)
 {
 #if HAVE_ALTIVEC
-    if (!(av_get_cpu_flags() & AV_CPU_FLAG_ALTIVEC))
+    int mm_flags = av_get_cpu_flags();
+
+    if (!(mm_flags & AV_CPU_FLAG_ALTIVEC))
         return;
 
     fdsp->vector_fmul = ff_vector_fmul_altivec;

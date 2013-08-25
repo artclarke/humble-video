@@ -338,7 +338,6 @@ void avcodec_register_all(void)
     REGISTER_DECODER(IMC,               imc);
     REGISTER_DECODER(MACE3,             mace3);
     REGISTER_DECODER(MACE6,             mace6);
-    REGISTER_DECODER(METASOUND,         metasound);
     REGISTER_DECODER(MLP,               mlp);
     REGISTER_DECODER(MP1,               mp1);
     REGISTER_DECODER(MP1FLOAT,          mp1float);
@@ -371,7 +370,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER(TWINVQ,            twinvq);
     REGISTER_DECODER(VMDAUDIO,          vmdaudio);
     REGISTER_ENCDEC (VORBIS,            vorbis);
-    REGISTER_ENCDEC (WAVPACK,           wavpack);
+    REGISTER_DECODER(WAVPACK,           wavpack);
     REGISTER_DECODER(WMALOSSLESS,       wmalossless);
     REGISTER_DECODER(WMAPRO,            wmapro);
     REGISTER_ENCDEC (WMAV1,             wmav1);
@@ -479,7 +478,7 @@ void avcodec_register_all(void)
     /* external libraries */
     REGISTER_DECODER(LIBCELT,           libcelt);
     REGISTER_ENCODER(LIBFAAC,           libfaac);
-    REGISTER_ENCDEC (LIBFDK_AAC,        libfdk_aac);
+    REGISTER_ENCODER(LIBFDK_AAC,        libfdk_aac);
     REGISTER_ENCDEC (LIBGSM,            libgsm);
     REGISTER_ENCDEC (LIBGSM_MS,         libgsm_ms);
     REGISTER_ENCDEC (LIBILBC,           libilbc);

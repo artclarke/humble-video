@@ -18,9 +18,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <stdlib.h>
 #include "libavutil/avstring.h"
+#include "libavutil/time.h"
 #include "avformat.h"
 #include "internal.h"
+#include "network.h"
+#include "os_support.h"
 #include "url.h"
 #include "libavutil/opt.h"
 #include "libavutil/bprint.h"
@@ -114,8 +118,9 @@ static int ftp_get_line(FTPContext *s, char *line, int line_size)
 
 /*
  * This routine returns ftp server response code.
- * Server may send more than one response for a certain command.
- * First expected code is returned.
+ * Server may send more than one response for a certain command, following priorities are used:
+ *   - When pref_codes are set then pref_code is return if occurred. (expected result)
+ *   - 0 is returned when no pref_codes or not occurred
  */
 static int ftp_status(FTPContext *s, char **line, const int response_codes[])
 {
@@ -382,7 +387,7 @@ static int ftp_restart(FTPContext *s, int64_t pos)
 
 static int ftp_connect_control_connection(URLContext *h)
 {
-    char buf[CONTROL_BUFFER_SIZE], opts_format[20], *response = NULL;
+    char buf[CONTROL_BUFFER_SIZE], opts_format[20];
     int err;
     AVDictionary *opts = NULL;
     FTPContext *s = h->priv_data;
@@ -403,16 +408,11 @@ static int ftp_connect_control_connection(URLContext *h)
             return err;
         }
 
-        /* check if server is ready */
-        if (ftp_status(s, ((h->flags & AVIO_FLAG_WRITE) ? &response : NULL), connect_codes) != 220) {
+        /* consume all messages from server */
+        if (ftp_status(s, NULL, connect_codes) != 220) {
             av_log(h, AV_LOG_ERROR, "FTP server not ready for new users\n");
             return AVERROR(EACCES);
         }
-
-        if ((h->flags & AVIO_FLAG_WRITE) && av_stristr(response, "pure-ftpd")) {
-            av_log(h, AV_LOG_WARNING, "Pure-FTPd server is used as an output protocol. It is known issue this implementation may produce incorrect content and it cannot be fixed at this moment.");
-        }
-        av_free(response);
 
         if ((err = ftp_auth(s)) < 0) {
             av_log(h, AV_LOG_ERROR, "FTP authentication failed\n");
@@ -575,7 +575,6 @@ static int64_t ftp_seek(URLContext *h, int64_t pos, int whence)
     if  (h->is_streamed)
         return AVERROR(EIO);
 
-    /* XXX: Simulate behaviour of lseek in file protocol, which could be treated as a reference */
     new_pos = FFMAX(0, new_pos);
     fake_pos = s->filesize != -1 ? FFMIN(new_pos, s->filesize) : new_pos;
 
@@ -595,7 +594,6 @@ static int ftp_read(URLContext *h, unsigned char *buf, int size)
     av_dlog(h, "ftp protocol read %d bytes\n", size);
   retry:
     if (s->state == DISCONNECTED) {
-        /* optimization */
         if (s->position >= s->filesize)
             return 0;
         if ((err = ftp_connect_data_connection(h)) < 0)
@@ -613,7 +611,6 @@ static int ftp_read(URLContext *h, unsigned char *buf, int size)
             s->position += read;
             if (s->position >= s->filesize) {
                 /* server will terminate, but keep current position to avoid madness */
-                /* save position to restart from it */
                 int64_t pos = s->position;
                 if (ftp_abort(h) < 0) {
                     s->position = pos;

@@ -26,9 +26,10 @@
 
 
 static int pnm_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
-                            const AVFrame *p, int *got_packet)
+                            const AVFrame *pict, int *got_packet)
 {
     PNMContext *s     = avctx->priv_data;
+    AVFrame * const p = &s->picture;
     int i, h, h1, c, n, linesize, ret;
     uint8_t *ptr, *ptr1, *ptr2;
 
@@ -36,6 +37,10 @@ static int pnm_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                                                        avctx->width,
                                                        avctx->height) + 200)) < 0)
         return ret;
+
+    *p           = *pict;
+    p->pict_type = AV_PICTURE_TYPE_I;
+    p->key_frame = 1;
 
     s->bytestream_start =
     s->bytestream       = pkt->data;
@@ -127,6 +132,7 @@ AVCodec ff_pgm_encoder = {
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_PGM,
     .priv_data_size = sizeof(PNMContext),
+    .init           = ff_pnm_init,
     .encode2        = pnm_encode_frame,
     .pix_fmts       = (const enum AVPixelFormat[]){
         AV_PIX_FMT_GRAY8, AV_PIX_FMT_GRAY16BE, AV_PIX_FMT_NONE
@@ -141,6 +147,7 @@ AVCodec ff_pgmyuv_encoder = {
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_PGMYUV,
     .priv_data_size = sizeof(PNMContext),
+    .init           = ff_pnm_init,
     .encode2        = pnm_encode_frame,
     .pix_fmts       = (const enum AVPixelFormat[]){
         AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV420P16BE, AV_PIX_FMT_NONE
@@ -155,6 +162,7 @@ AVCodec ff_ppm_encoder = {
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_PPM,
     .priv_data_size = sizeof(PNMContext),
+    .init           = ff_pnm_init,
     .encode2        = pnm_encode_frame,
     .pix_fmts       = (const enum AVPixelFormat[]){
         AV_PIX_FMT_RGB24, AV_PIX_FMT_RGB48BE, AV_PIX_FMT_NONE
@@ -169,6 +177,7 @@ AVCodec ff_pbm_encoder = {
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_PBM,
     .priv_data_size = sizeof(PNMContext),
+    .init           = ff_pnm_init,
     .encode2        = pnm_encode_frame,
     .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_MONOWHITE,
                                                   AV_PIX_FMT_NONE },

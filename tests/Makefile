@@ -45,10 +45,7 @@ tests/data/filtergraphs/%: TAG = COPY
 tests/data/filtergraphs/%: $(SRC_PATH)/tests/filtergraphs/% | tests/data/filtergraphs
 	$(M)cp $< $@
 
-# Check sanity of dependencies when running FATE tests.
-ifneq (,$(filter check fate%,$(filter-out fate-rsync,$(MAKECMDGOALS))))
 CHKCFG  = $(if $($(1))$(!$(1)),$($(1)), $(error No such config: $(1)))
-endif
 
 ALLYES  = $(strip $(call XYES, $(1)))
 XYES    = $(if $(strip $(1)),                                           \
@@ -93,7 +90,6 @@ include $(SRC_PATH)/tests/fate/demux.mak
 include $(SRC_PATH)/tests/fate/dfa.mak
 include $(SRC_PATH)/tests/fate/dpcm.mak
 include $(SRC_PATH)/tests/fate/ea.mak
-include $(SRC_PATH)/tests/fate/exif.mak
 include $(SRC_PATH)/tests/fate/ffmpeg.mak
 include $(SRC_PATH)/tests/fate/ffprobe.mak
 include $(SRC_PATH)/tests/fate/filter-audio.mak
@@ -105,7 +101,6 @@ include $(SRC_PATH)/tests/fate/h264.mak
 include $(SRC_PATH)/tests/fate/image.mak
 include $(SRC_PATH)/tests/fate/indeo.mak
 include $(SRC_PATH)/tests/fate/libavcodec.mak
-include $(SRC_PATH)/tests/fate/libavdevice.mak
 include $(SRC_PATH)/tests/fate/libavformat.mak
 include $(SRC_PATH)/tests/fate/libavutil.mak
 include $(SRC_PATH)/tests/fate/lossless-audio.mak

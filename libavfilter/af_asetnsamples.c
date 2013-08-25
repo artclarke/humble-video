@@ -73,8 +73,9 @@ static av_cold void uninit(AVFilterContext *ctx)
 static int config_props_output(AVFilterLink *outlink)
 {
     ASNSContext *asns = outlink->src->priv;
+    int nb_channels = av_get_channel_layout_nb_channels(outlink->channel_layout);
 
-    asns->fifo = av_audio_fifo_alloc(outlink->format, outlink->channels, asns->nb_out_samples);
+    asns->fifo = av_audio_fifo_alloc(outlink->format, nb_channels, asns->nb_out_samples);
     if (!asns->fifo)
         return AVERROR(ENOMEM);
     outlink->flags |= FF_LINK_FLAG_REQUEST_LOOP;
@@ -108,7 +109,7 @@ static int push_samples(AVFilterLink *outlink)
 
     if (nb_pad_samples)
         av_samples_set_silence(outsamples->extended_data, nb_out_samples - nb_pad_samples,
-                               nb_pad_samples, outlink->channels,
+                               nb_pad_samples, av_get_channel_layout_nb_channels(outlink->channel_layout),
                                outlink->format);
     outsamples->nb_samples     = nb_out_samples;
     outsamples->channel_layout = outlink->channel_layout;

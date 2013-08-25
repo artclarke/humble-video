@@ -35,7 +35,6 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include "avutil.h"
-#include "bprint.h"
 #include "common.h"
 #include "internal.h"
 #include "log.h"
@@ -169,44 +168,38 @@ static int get_category(void *ptr){
 }
 
 static void format_line(void *ptr, int level, const char *fmt, va_list vl,
-                        AVBPrint part[3], int *print_prefix, int type[2])
+                        char part[3][LINE_SZ], int part_size, int *print_prefix, int type[2])
 {
     AVClass* avc = ptr ? *(AVClass **) ptr : NULL;
-    av_bprint_init(part+0, 0, 1);
-    av_bprint_init(part+1, 0, 1);
-    av_bprint_init(part+2, 0, 65536);
-
+    part[0][0] = part[1][0] = part[2][0] = 0;
     if(type) type[0] = type[1] = AV_CLASS_CATEGORY_NA + 16;
     if (*print_prefix && avc) {
         if (avc->parent_log_context_offset) {
             AVClass** parent = *(AVClass ***) (((uint8_t *) ptr) +
                                    avc->parent_log_context_offset);
             if (parent && *parent) {
-                av_bprintf(part+0, "[%s @ %p] ",
+                snprintf(part[0], part_size, "[%s @ %p] ",
                          (*parent)->item_name(parent), parent);
                 if(type) type[0] = get_category(parent);
             }
         }
-        av_bprintf(part+1, "[%s @ %p] ",
+        snprintf(part[1], part_size, "[%s @ %p] ",
                  avc->item_name(ptr), ptr);
         if(type) type[1] = get_category(ptr);
     }
 
-    av_vbprintf(part+2, fmt, vl);
+    vsnprintf(part[2], part_size, fmt, vl);
 
-    if(*part[0].str || *part[1].str || *part[2].str) {
-        char lastc = part[2].len ? part[2].str[part[2].len - 1] : 0;
-        *print_prefix = lastc == '\n' || lastc == '\r';
-    }
+    if(*part[0] || *part[1] || *part[2])
+        *print_prefix = strlen(part[2]) && part[2][strlen(part[2]) - 1] == '\n';
 }
 
 void av_log_format_line(void *ptr, int level, const char *fmt, va_list vl,
                         char *line, int line_size, int *print_prefix)
 {
-    AVBPrint part[3];
-    format_line(ptr, level, fmt, vl, part, print_prefix, NULL);
-    snprintf(line, line_size, "%s%s%s", part[0].str, part[1].str, part[2].str);
-    av_bprint_finalize(part+2, NULL);
+    char part[3][LINE_SZ];
+    format_line(ptr, level, fmt, vl, part, sizeof(part[0]), print_prefix, NULL);
+    snprintf(line, line_size, "%s%s%s", part[0], part[1], part[2]);
 }
 
 void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
@@ -214,27 +207,25 @@ void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
     static int print_prefix = 1;
     static int count;
     static char prev[LINE_SZ];
-    AVBPrint part[3];
+    char part[3][LINE_SZ];
     char line[LINE_SZ];
     static int is_atty;
     int type[2];
 
     if (level > av_log_level)
         return;
-    format_line(ptr, level, fmt, vl, part, &print_prefix, type);
-    snprintf(line, sizeof(line), "%s%s%s", part[0].str, part[1].str, part[2].str);
+    format_line(ptr, level, fmt, vl, part, sizeof(part[0]), &print_prefix, type);
+    snprintf(line, sizeof(line), "%s%s%s", part[0], part[1], part[2]);
 
 #if HAVE_ISATTY
     if (!is_atty)
         is_atty = isatty(2) ? 1 : -1;
 #endif
 
-    if (print_prefix && (flags & AV_LOG_SKIP_REPEATED) && !strcmp(line, prev) &&
-        *line && line[strlen(line) - 1] != '\r'){
+    if (print_prefix && (flags & AV_LOG_SKIP_REPEATED) && !strcmp(line, prev) && *line){
         count++;
         if (is_atty == 1)
             fprintf(stderr, "    Last message repeated %d times\r", count);
-        av_bprint_finalize(part+2, NULL);
         return;
     }
     if (count > 0) {
@@ -242,13 +233,12 @@ void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
         count = 0;
     }
     strcpy(prev, line);
-    sanitize(part[0].str);
-    colored_fputs(type[0], part[0].str);
-    sanitize(part[1].str);
-    colored_fputs(type[1], part[1].str);
-    sanitize(part[2].str);
-    colored_fputs(av_clip(level >> 3, 0, 6), part[2].str);
-    av_bprint_finalize(part+2, NULL);
+    sanitize(part[0]);
+    colored_fputs(type[0], part[0]);
+    sanitize(part[1]);
+    colored_fputs(type[1], part[1]);
+    sanitize(part[2]);
+    colored_fputs(av_clip(level >> 3, 0, 6), part[2]);
 }
 
 static void (*av_log_callback)(void*, int, const char*, va_list) =

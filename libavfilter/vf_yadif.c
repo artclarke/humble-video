@@ -28,6 +28,9 @@
 #include "video.h"
 #include "yadif.h"
 
+#undef NDEBUG
+#include <assert.h>
+
 typedef struct ThreadData {
     AVFrame *frame;
     int plane;

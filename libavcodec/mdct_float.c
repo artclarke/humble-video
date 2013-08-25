@@ -17,5 +17,4 @@
  */
 
 #define CONFIG_FFT_FLOAT 1
-#define CONFIG_FFT_FIXED_32 0
 #include "mdct.c"

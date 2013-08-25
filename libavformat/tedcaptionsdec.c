@@ -153,8 +153,7 @@ static int parse_label(AVIOContext *pb, int *cur_byte, AVBPrint *bp)
 
 static int parse_boolean(AVIOContext *pb, int *cur_byte, int *result)
 {
-    static const char * const text[] = { "false", "true" };
-    const char *p;
+    const char *text[] = { "false", "true" }, *p;
     int i;
 
     skip_spaces(pb, cur_byte);

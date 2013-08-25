@@ -17,7 +17,6 @@
  */
 
 #define CONFIG_FFT_FLOAT 0
-#define CONFIG_FFT_FIXED_32 0
 #include "mdct.c"
 
 /* same as ff_mdct_calcw_c with double-width unscaled output */

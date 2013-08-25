@@ -244,9 +244,11 @@ static int decode_frame(AVCodecContext *avctx,
     case 16:
         elements *= 2;
     case 8:
-        av_image_copy_plane(ptr[0], p->linesize[0],
-                            buf, elements * avctx->width,
-                            elements * avctx->width, avctx->height);
+        for (x = 0; x < avctx->height; x++) {
+            memcpy(ptr[0], buf, elements*avctx->width);
+            ptr[0] += p->linesize[0];
+            buf += elements*avctx->width;
+        }
         break;
     }
 

@@ -78,19 +78,16 @@ int ff_rtp_chain_mux_open(AVFormatContext **out, AVFormatContext *s,
     avcodec_copy_context(rtpctx->streams[0]->codec, st->codec);
 
     if (handle) {
-        ret = ffio_fdopen(&rtpctx->pb, handle);
-        if (ret < 0)
-            ffurl_close(handle);
+        ffio_fdopen(&rtpctx->pb, handle);
     } else
-        ret = ffio_open_dyn_packet_buf(&rtpctx->pb, packet_size);
-    if (!ret)
-        ret = avformat_write_header(rtpctx, &opts);
+        ffio_open_dyn_packet_buf(&rtpctx->pb, packet_size);
+    ret = avformat_write_header(rtpctx, &opts);
     av_dict_free(&opts);
 
     if (ret) {
-        if (handle && rtpctx->pb) {
+        if (handle) {
             avio_close(rtpctx->pb);
-        } else if (rtpctx->pb) {
+        } else {
             uint8_t *ptr;
             avio_close_dyn_buf(rtpctx->pb, &ptr);
             av_free(ptr);

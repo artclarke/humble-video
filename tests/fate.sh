@@ -46,7 +46,6 @@ configure()(
         --samples="${samples}"                                          \
         --enable-gpl                                                    \
         --enable-memory-poisoning                                       \
-        --enable-avresample                                             \
         ${arch:+--arch=$arch}                                           \
         ${cpu:+--cpu="$cpu"}                                            \
         ${cross_prefix:+--cross-prefix="$cross_prefix"}                 \

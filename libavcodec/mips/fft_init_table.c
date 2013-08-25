@@ -26,9 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * Authors:  Stanislav Ocovaj (socovaj@mips.com)
- *           Goran Cordasic   (goran@mips.com)
- *           Djordje Pesut    (djordje@mips.com)
+ * Author:  Stanislav Ocovaj (socovaj@mips.com)
  *
  * This file is part of FFmpeg.
  *
@@ -47,6 +45,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#define CONFIG_FFT_FLOAT 0
-#define CONFIG_FFT_FIXED_32 1
-#include "mdct.c"
+/**
+ * @file
+ * definitions and initialization of LUT table for MIPS FFT
+ */
+#include "fft_table.h"
+
+uint16_t fft_offsets_lut[0x2aab];
+
+void ff_fft_lut_init(uint16_t *table, int off, int size, int *index)
+{
+    if (size < 16) {
+        table[*index] = off >> 2;
+        (*index)++;
+    }
+    else {
+        ff_fft_lut_init(table, off, size>>1, index);
+        ff_fft_lut_init(table, off+(size>>1), size>>2, index);
+        ff_fft_lut_init(table, off+3*(size>>2), size>>2, index);
+    }
+}

@@ -62,10 +62,10 @@ static void find_sse(SnowContext *s, Plane *p, int *score, int score_stride, IDW
             int sx= (x-xo + step/2) / step / Q2_STEP;
             int sy= (y-yo + step/2) / step / Q2_STEP;
             int v= r0[x + y*p->width] - r1[x + y*p->width];
-            av_assert2(sx>=0 && sy>=0 && sx < score_stride);
+            assert(sx>=0 && sy>=0 && sx < score_stride);
             v= ((v+8)>>4)<<4;
             score[sx + sy*score_stride] += v*v;
-            av_assert2(score[sx + sy*score_stride] >= 0);
+            assert(score[sx + sy*score_stride] >= 0);
         }
     }
 }
@@ -390,8 +390,8 @@ static int encode_q_branch(SnowContext *s, int level, int x, int y){
     s->m.mb_y= 0;
     c->skip= 0;
 
-    av_assert1(c->  stride ==   stride);
-    av_assert1(c->uvstride == uvstride);
+    assert(c->  stride ==   stride);
+    assert(c->uvstride == uvstride);
 
     c->penalty_factor    = get_penalty_factor(s->lambda, s->lambda2, c->avctx->me_cmp);
     c->sub_penalty_factor= get_penalty_factor(s->lambda, s->lambda2, c->avctx->me_sub_cmp);
@@ -430,10 +430,10 @@ static int encode_q_branch(SnowContext *s, int level, int x, int y){
         ref_score= ff_epzs_motion_search(&s->m, &ref_mx, &ref_my, P, 0, /*ref_index*/ 0, last_mv,
                                          (1<<16)>>shift, level-LOG2_MB_SIZE+4, block_w);
 
-        av_assert2(ref_mx >= c->xmin);
-        av_assert2(ref_mx <= c->xmax);
-        av_assert2(ref_my >= c->ymin);
-        av_assert2(ref_my <= c->ymax);
+        assert(ref_mx >= c->xmin);
+        assert(ref_mx <= c->xmax);
+        assert(ref_my >= c->ymin);
+        assert(ref_my <= c->ymax);
 
         ref_score= c->sub_motion_search(&s->m, &ref_mx, &ref_my, ref_score, 0, 0, level-LOG2_MB_SIZE+4, block_w);
         ref_score= ff_get_mb_score(&s->m, ref_mx, ref_my, 0, 0, level-LOG2_MB_SIZE+4, block_w, 0);
@@ -776,7 +776,7 @@ static int get_block_rd(SnowContext *s, int mb_x, int mb_y, int plane_index, uin
             }
         }
     }else{
-        av_assert2(block_w==8);
+        assert(block_w==8);
         distortion = s->dsp.me_cmp[0](&s->m, src + sx + sy*ref_stride, dst + sx + sy*ref_stride, ref_stride, block_w*2);
     }
 
@@ -963,10 +963,10 @@ static int encode_subband_c0run(SnowContext *s, SubBand *b, const IDWTELEM *src,
 
                         if(run_index <= max_index)
                             put_symbol2(&s->c, b->state[1], run, 3);
-                        av_assert2(v);
+                        assert(v);
                     }else{
                         run--;
-                        av_assert2(!v);
+                        assert(!v);
                     }
                 }
                 if(v){
@@ -997,8 +997,8 @@ static av_always_inline int check_block(SnowContext *s, int mb_x, int mb_y, int 
     unsigned value;
     int rd, index;
 
-    av_assert2(mb_x>=0 && mb_y>=0);
-    av_assert2(mb_x<b_stride);
+    assert(mb_x>=0 && mb_y>=0);
+    assert(mb_x<b_stride);
 
     if(intra){
         block->color[0] = p[0];
@@ -1051,9 +1051,9 @@ static av_always_inline int check_4block_inter(SnowContext *s, int mb_x, int mb_
     backup[2] = block[b_stride];
     backup[3] = block[b_stride + 1];
 
-    av_assert2(mb_x>=0 && mb_y>=0);
-    av_assert2(mb_x<b_stride);
-    av_assert2(((mb_x|mb_y)&1) == 0);
+    assert(mb_x>=0 && mb_y>=0);
+    assert(mb_x<b_stride);
+    assert(((mb_x|mb_y)&1) == 0);
 
     index= (p0 + 31*p1) & (ME_CACHE_SIZE-1);
     value= s->me_cache_generation + (p0>>10) + (p1<<6) + (block->ref<<12);
@@ -1601,7 +1601,7 @@ static int ratecontrol_1pass(SnowContext *s, AVFrame *pict)
 
     /* ugly, ratecontrol just takes a sqrt again */
     coef_sum = (uint64_t)coef_sum * coef_sum >> 16;
-    av_assert0(coef_sum < INT_MAX);
+    assert(coef_sum < INT_MAX);
 
     if(pict->pict_type == AV_PICTURE_TYPE_I){
         s->m.current_picture.mb_var_sum= coef_sum;

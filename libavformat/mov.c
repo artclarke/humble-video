@@ -785,12 +785,6 @@ static int mov_read_moov(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 {
     int ret;
 
-    if (c->found_moov) {
-        av_log(c->fc, AV_LOG_WARNING, "Found duplicated MOOV Atom. Skipped it\n");
-        avio_skip(pb, atom.size);
-        return 0;
-    }
-
     if ((ret = mov_read_default(c, pb, atom)) < 0)
         return ret;
     /* we parsed the 'moov' atom, we can terminate the parsing as soon as we find the 'mdat' */
@@ -835,11 +829,6 @@ static int mov_read_mdhd(MOVContext *c, AVIOContext *pb, MOVAtom atom)
         return 0;
     st = c->fc->streams[c->fc->nb_streams-1];
     sc = st->priv_data;
-
-    if (sc->time_scale) {
-        av_log(c->fc, AV_LOG_ERROR, "Multiple mdhd?\n");
-        return AVERROR_INVALIDDATA;
-    }
 
     version = avio_r8(pb);
     if (version > 1) {
@@ -1023,20 +1012,6 @@ static int mov_read_jp2h(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 static int mov_read_avid(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 {
     return mov_read_extradata(c, pb, atom, AV_CODEC_ID_AVUI);
-}
-
-static int mov_read_targa_y216(MOVContext *c, AVIOContext *pb, MOVAtom atom)
-{
-    int ret = mov_read_extradata(c, pb, atom, AV_CODEC_ID_TARGA_Y216);
-
-    if (!ret && c->fc->nb_streams >= 1) {
-        AVCodecContext *avctx = c->fc->streams[c->fc->nb_streams-1]->codec;
-        if (avctx->extradata_size >= 40) {
-            avctx->height = AV_RB16(&avctx->extradata[36]);
-            avctx->width  = AV_RB16(&avctx->extradata[38]);
-        }
-    }
-    return ret;
 }
 
 static int mov_read_ares(MOVContext *c, AVIOContext *pb, MOVAtom atom)
@@ -2384,7 +2359,6 @@ static int mov_read_tkhd(MOVContext *c, AVIOContext *pb, MOVAtom atom)
     AVStream *st;
     MOVStreamContext *sc;
     int version;
-    int flags;
 
     if (c->fc->nb_streams < 1)
         return 0;
@@ -2392,8 +2366,13 @@ static int mov_read_tkhd(MOVContext *c, AVIOContext *pb, MOVAtom atom)
     sc = st->priv_data;
 
     version = avio_r8(pb);
-    flags = avio_rb24(pb);
-    st->disposition |= (flags & MOV_TKHD_FLAG_ENABLED) ? AV_DISPOSITION_DEFAULT : 0;
+    avio_rb24(pb); /* flags */
+    /*
+    MOV_TRACK_ENABLED 0x0001
+    MOV_TRACK_IN_MOVIE 0x0002
+    MOV_TRACK_IN_PREVIEW 0x0004
+    MOV_TRACK_IN_POSTER 0x0008
+    */
 
     if (version == 1) {
         avio_rb64(pb);
@@ -2898,7 +2877,6 @@ static const MOVParseTableEntry mov_default_parse_table[] = {
 { MKTAG('d','v','c','1'), mov_read_dvc1 },
 { MKTAG('s','b','g','p'), mov_read_sbgp },
 { MKTAG('u','u','i','d'), mov_read_uuid },
-{ MKTAG('C','i','n', 0x8e), mov_read_targa_y216 },
 { 0, NULL }
 };
 
@@ -2972,10 +2950,8 @@ static int mov_read_default(MOVContext *c, AVIOContext *pb, MOVAtom atom)
             left = a.size - avio_tell(pb) + start_pos;
             if (left > 0) /* skip garbage at atom end */
                 avio_skip(pb, left);
-            else if (left < 0) {
-                av_log(c->fc, AV_LOG_WARNING,
-                       "overread end of atom '%.4s' by %"PRId64" bytes\n",
-                       (char*)&a.type, -left);
+            else if(left < 0) {
+                av_log(c->fc, AV_LOG_DEBUG, "undoing overread of %"PRId64" in '%.4s'\n", -left, (char*)&a.type);
                 avio_seek(pb, left, SEEK_CUR);
             }
         }

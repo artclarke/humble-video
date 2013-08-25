@@ -91,7 +91,6 @@
 #define MATROSKA_ID_CODECINFOURL 0x3B4040
 #define MATROSKA_ID_CODECDOWNLOADURL 0x26B240
 #define MATROSKA_ID_CODECDECODEALL 0xAA
-#define MATROSKA_ID_SEEKPREROLL 0x56BB
 #define MATROSKA_ID_TRACKNAME  0x536E
 #define MATROSKA_ID_TRACKLANGUAGE 0x22B59C
 #define MATROSKA_ID_TRACKFLAGENABLED 0xB9
@@ -157,7 +156,6 @@
 /* IDs in the cuetrackposition master */
 #define MATROSKA_ID_CUETRACK   0xF7
 #define MATROSKA_ID_CUECLUSTERPOSITION 0xF1
-#define MATROSKA_ID_CUERELATIVEPOSITION 0xF0
 #define MATROSKA_ID_CUEBLOCKNUMBER 0x5378
 
 /* IDs in the tags master */
@@ -265,7 +263,7 @@ typedef enum {
  */
 
 typedef struct CodecTags{
-    char str[22];
+    char str[20];
     enum AVCodecID id;
 }CodecTags;
 

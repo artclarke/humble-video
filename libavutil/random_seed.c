@@ -32,7 +32,6 @@
 #include <time.h>
 #include <string.h>
 #include "avassert.h"
-#include "internal.h"
 #include "timer.h"
 #include "random_seed.h"
 #include "sha.h"
@@ -45,7 +44,7 @@
 static int read_random(uint32_t *dst, const char *file)
 {
 #if HAVE_UNISTD_H
-    int fd = avpriv_open(file, O_RDONLY);
+    int fd = open(file, O_RDONLY);
     int err = -1;
 
     if (fd == -1)

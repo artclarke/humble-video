@@ -77,10 +77,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpicref)
 
     inpicref->pts = outlink->frame_count * sf->ts_unit;
     ret = ff_filter_frame(outlink, inpicref);
-    if (ret < 0) {
-        av_frame_free(&second);
+    if (ret < 0)
         return ret;
-    }
 
     second->pts = outlink->frame_count * sf->ts_unit;
     return ff_filter_frame(outlink, second);

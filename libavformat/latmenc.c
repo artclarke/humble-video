@@ -124,7 +124,7 @@ static void latm_write_frame_header(AVFormatContext *s, PutBitContext *bs)
 
             if (!ctx->channel_conf) {
                 GetBitContext gb;
-                init_get_bits8(&gb, avctx->extradata, avctx->extradata_size);
+                init_get_bits(&gb, avctx->extradata, avctx->extradata_size * 8);
                 skip_bits_long(&gb, ctx->off + 3);
                 avpriv_copy_pce_data(bs, &gb);
             }

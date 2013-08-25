@@ -28,7 +28,6 @@
  * @see http://www.w3.org/Graphics/GIF/spec-gif89a.txt
  */
 
-#define BITSTREAM_WRITER_LE
 #include "libavutil/opt.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
@@ -37,6 +36,7 @@
 #include "lzw.h"
 #include "gif.h"
 
+#define BITSTREAM_WRITER_LE
 #include "put_bits.h"
 
 typedef struct {
@@ -168,7 +168,7 @@ static int gif_image_write_image(AVCodecContext *avctx,
 
     bytestream_put_byte(bytestream, 0x08);
 
-    ff_lzw_encode_init(s->lzw, s->buf, 2 * width * height,
+    ff_lzw_encode_init(s->lzw, s->buf, width * height,
                        12, FF_LZW_GIF, put_bits);
 
     ptr = buf + y_start*linesize + x_start;

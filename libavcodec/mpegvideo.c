@@ -146,8 +146,7 @@ static void mpeg_er_decode_mb(void *opaque, int ref, int mv_dir, int mv_type,
     s->dest[1] = s->current_picture.f.data[1] + (s->mb_y * (16 >> s->chroma_y_shift) * s->uvlinesize) + s->mb_x * (16 >> s->chroma_x_shift);
     s->dest[2] = s->current_picture.f.data[2] + (s->mb_y * (16 >> s->chroma_y_shift) * s->uvlinesize) + s->mb_x * (16 >> s->chroma_x_shift);
 
-    if (ref)
-        av_log(s->avctx, AV_LOG_DEBUG, "Interlaced error concealment is not fully implemented\n");
+    assert(ref == 0);
     ff_MPV_decode_mb(s, s->block);
 }
 
@@ -386,10 +385,10 @@ int ff_alloc_picture(MpegEncContext *s, Picture *pic, int shared)
             free_picture_tables(pic);
 
     if (shared) {
-        av_assert0(pic->f.data[0]);
+        assert(pic->f.data[0]);
         pic->shared = 1;
     } else {
-        av_assert0(!pic->f.data[0]);
+        assert(!pic->f.data[0]);
 
         if (alloc_frame_buffer(s, pic) < 0)
             return -1;
@@ -1669,7 +1668,7 @@ int ff_MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
             return ret;
     }
 
-    av_assert0(s->pict_type == AV_PICTURE_TYPE_I || (s->last_picture_ptr &&
+    assert(s->pict_type == AV_PICTURE_TYPE_I || (s->last_picture_ptr &&
                                                  s->last_picture_ptr->f.data[0]));
 
     if (s->picture_structure!= PICT_FRAME) {
@@ -1761,7 +1760,7 @@ void ff_MPV_frame_end(MpegEncContext *s)
             break;
         }
     }
-    av_assert0(i < MAX_PICTURE_COUNT);
+    assert(i < MAX_PICTURE_COUNT);
 #endif
 
     // clear copies, to avoid confusion
@@ -2989,8 +2988,8 @@ void ff_draw_horiz_band(AVCodecContext *avctx, DSPContext *dsp, Picture *cur,
 void ff_mpeg_draw_horiz_band(MpegEncContext *s, int y, int h)
 {
     int draw_edges = s->unrestricted_mv && !s->intra_only;
-    ff_draw_horiz_band(s->avctx, &s->dsp, s->current_picture_ptr,
-                       s->last_picture_ptr, y, h, s->picture_structure,
+    ff_draw_horiz_band(s->avctx, &s->dsp, &s->current_picture,
+                       &s->last_picture, y, h, s->picture_structure,
                        s->first_field, draw_edges, s->low_delay,
                        s->v_edge_pos, s->h_edge_pos);
 }

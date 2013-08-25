@@ -25,6 +25,7 @@
 #include "sunrast.h"
 
 typedef struct SUNRASTContext {
+    AVFrame picture;
     PutByteContext p;
     int depth;      ///< depth of pixel
     int length;     ///< length (bytes) of image
@@ -148,6 +149,9 @@ static av_cold int sunrast_encode_init(AVCodecContext *avctx)
         return AVERROR(EINVAL);
     }
 
+    avctx->coded_frame            = &s->picture;
+    avctx->coded_frame->key_frame = 1;
+    avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
     s->maptype                    = RMT_NONE;
     s->maplength                  = 0;
 

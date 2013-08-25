@@ -18,11 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <fcntl.h>
+#include "libavutil/avutil.h"
 #include "network.h"
 #include "url.h"
 #include "libavcodec/internal.h"
-#include "libavutil/avutil.h"
 #include "libavutil/mem.h"
 #include "url.h"
 #include "libavutil/time.h"
@@ -158,11 +157,11 @@ int ff_network_wait_fd_timeout(int fd, int write, int64_t timeout, AVIOInterrupt
     int64_t wait_start = 0;
 
     while (1) {
-        if (ff_check_interrupt(int_cb))
-            return AVERROR_EXIT;
         ret = ff_network_wait_fd(fd, write);
         if (ret != AVERROR(EAGAIN))
             return ret;
+        if (ff_check_interrupt(int_cb))
+            return AVERROR_EXIT;
         if (timeout > 0) {
             if (!wait_start)
                 wait_start = av_gettime();
@@ -236,24 +235,6 @@ static int ff_poll_interrupt(struct pollfd *p, nfds_t nfds, int timeout,
     return ret;
 }
 
-int ff_socket(int af, int type, int proto)
-{
-    int fd;
-
-#ifdef SOCK_CLOEXEC
-    fd = socket(af, type | SOCK_CLOEXEC, proto);
-    if (fd == -1 && errno == EINVAL)
-#endif
-    {
-        fd = socket(af, type, proto);
-#if HAVE_FCNTL
-        if (fd != -1)
-            fcntl(fd, F_SETFD, FD_CLOEXEC);
-#endif
-    }
-    return fd;
-}
-
 int ff_listen_bind(int fd, const struct sockaddr *addr,
                    socklen_t addrlen, int timeout, URLContext *h)
 {
@@ -286,8 +267,7 @@ int ff_listen_bind(int fd, const struct sockaddr *addr,
 }
 
 int ff_listen_connect(int fd, const struct sockaddr *addr,
-                      socklen_t addrlen, int timeout, URLContext *h,
-                      int will_try_next)
+                      socklen_t addrlen, int timeout, URLContext *h)
 {
     struct pollfd p = {fd, POLLOUT, 0};
     int ret;
@@ -314,13 +294,9 @@ int ff_listen_connect(int fd, const struct sockaddr *addr,
                 char errbuf[100];
                 ret = AVERROR(ret);
                 av_strerror(ret, errbuf, sizeof(errbuf));
-                if (will_try_next)
-                    av_log(h, AV_LOG_WARNING,
-                           "Connection to %s failed (%s), trying next address\n",
-                           h->filename, errbuf);
-                else
-                    av_log(h, AV_LOG_ERROR, "Connection to %s failed: %s\n",
-                           h->filename, errbuf);
+                av_log(h, AV_LOG_ERROR,
+                       "Connection to %s failed: %s\n",
+                       h->filename, errbuf);
             }
         default:
             return ret;

@@ -20,6 +20,7 @@
 
 #include <inttypes.h>
 #include <stdio.h>
+#include <assert.h>
 #include "softfloat.h"
 #include "common.h"
 #include "log.h"

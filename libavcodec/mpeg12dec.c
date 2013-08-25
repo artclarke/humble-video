@@ -34,6 +34,7 @@
 #include "error_resilience.h"
 #include "mpeg12.h"
 #include "mpeg12data.h"
+#include "mpeg12decdata.h"
 #include "bytestream.h"
 #include "vdpau_internal.h"
 #include "xvmc_internal.h"
@@ -53,39 +54,6 @@ typedef struct Mpeg1Context {
     int tmpgexs;
     int extradata_decoded;
 } Mpeg1Context;
-
-#define MB_TYPE_ZERO_MV   0x20000000
-
-static const uint32_t ptype2mb_type[7] = {
-                    MB_TYPE_INTRA,
-                    MB_TYPE_L0 | MB_TYPE_CBP | MB_TYPE_ZERO_MV | MB_TYPE_16x16,
-                    MB_TYPE_L0,
-                    MB_TYPE_L0 | MB_TYPE_CBP,
-    MB_TYPE_QUANT | MB_TYPE_INTRA,
-    MB_TYPE_QUANT | MB_TYPE_L0 | MB_TYPE_CBP | MB_TYPE_ZERO_MV | MB_TYPE_16x16,
-    MB_TYPE_QUANT | MB_TYPE_L0 | MB_TYPE_CBP,
-};
-
-static const uint32_t btype2mb_type[11] = {
-                    MB_TYPE_INTRA,
-                    MB_TYPE_L1,
-                    MB_TYPE_L1   | MB_TYPE_CBP,
-                    MB_TYPE_L0,
-                    MB_TYPE_L0   | MB_TYPE_CBP,
-                    MB_TYPE_L0L1,
-                    MB_TYPE_L0L1 | MB_TYPE_CBP,
-    MB_TYPE_QUANT | MB_TYPE_INTRA,
-    MB_TYPE_QUANT | MB_TYPE_L1   | MB_TYPE_CBP,
-    MB_TYPE_QUANT | MB_TYPE_L0   | MB_TYPE_CBP,
-    MB_TYPE_QUANT | MB_TYPE_L0L1 | MB_TYPE_CBP,
-};
-
-static const uint8_t non_linear_qscale[32] = {
-    0, 1, 2, 3, 4, 5, 6, 7,
-    8,10,12,14,16,18,20,22,
-    24,28,32,36,40,44,48,52,
-    56,64,72,80,88,96,104,112,
-};
 
 /* as H.263, but only 17 codes */
 static int mpeg_decode_motion(MpegEncContext *s, int fcode, int pred)
@@ -703,6 +671,8 @@ static int mpeg_decode_mb(MpegEncContext *s, int16_t block[12][64])
             }
             s->current_picture.mb_type[s->mb_x + s->mb_y*s->mb_stride] =
                 mb_type | MB_TYPE_SKIP;
+
+//            assert(s->current_picture.mb_type[s->mb_x + s->mb_y * s->mb_stride - 1] & (MB_TYPE_16x16 | MB_TYPE_16x8));
 
             if ((s->mv[0][0][0] | s->mv[0][0][1] | s->mv[1][0][0] | s->mv[1][0][1]) == 0)
                 s->mb_skipped = 1;
@@ -1377,8 +1347,8 @@ static void mpeg_decode_sequence_extension(Mpeg1Context *s1)
     s->codec_id      = s->avctx->codec_id = AV_CODEC_ID_MPEG2VIDEO;
 
     if (s->avctx->debug & FF_DEBUG_PICT_INFO)
-        av_log(s->avctx, AV_LOG_DEBUG, "profile: %d, level: %d ps: %d cf:%d vbv buffer: %d, bitrate:%d\n",
-               s->avctx->profile, s->avctx->level, s->progressive_sequence, s->chroma_format, s->avctx->rc_buffer_size, s->bit_rate);
+        av_log(s->avctx, AV_LOG_DEBUG, "profile: %d, level: %d vbv buffer: %d, bitrate:%d\n",
+               s->avctx->profile, s->avctx->level, s->avctx->rc_buffer_size, s->bit_rate);
 
 }
 
@@ -2339,11 +2309,6 @@ static int decode_chunks(AVCodecContext *avctx,
                 mb_y <<= field_pic;
                 if (s2->picture_structure == PICT_BOTTOM_FIELD)
                     mb_y++;
-
-                if (buf_end - buf_ptr < 2) {
-                    av_log(s2->avctx, AV_LOG_ERROR, "slice too small\n");
-                    return AVERROR_INVALIDDATA;
-                }
 
                 if (mb_y >= s2->mb_height) {
                     av_log(s2->avctx, AV_LOG_ERROR, "slice below image (%d >= %d)\n", mb_y, s2->mb_height);
