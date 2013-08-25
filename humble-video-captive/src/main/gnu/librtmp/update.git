@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # This script is here to update the branch to the latest version
-git subtree pull --prefix=librtmp/csrc/src --squash git://git.ffmpeg.org/rtmpdump master
+git subtree pull --prefix=humble-video-captive/src/main/gnu/librtmp/csrc/src --squash git://git.ffmpeg.org/rtmpdump master
