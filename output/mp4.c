@@ -27,10 +27,6 @@
 #include "output.h"
 #include <gpac/isomedia.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #if HAVE_GF_MALLOC
 #undef malloc
 #undef free
@@ -177,7 +173,7 @@ static int open_file( char *psz_filename, hnd_t *p_handle, cli_output_opt_t *opt
     mp4_hnd_t *p_mp4;
 
     *p_handle = NULL;
-    FILE *fh = x264_fopen( psz_filename, "w" );
+    FILE *fh = fopen( psz_filename, "w" );
     if( !fh )
         return -1;
     FAIL_IF_ERR( !x264_is_regular_file( fh ), "mp4", "MP4 output is incompatible with non-regular file `%s'\n", psz_filename )
@@ -187,15 +183,7 @@ static int open_file( char *psz_filename, hnd_t *p_handle, cli_output_opt_t *opt
         return -1;
 
     memset( p_mp4, 0, sizeof(mp4_hnd_t) );
-
-#ifdef _WIN32
-    /* GPAC doesn't support Unicode filenames. */
-    char ansi_filename[MAX_PATH];
-    FAIL_IF_ERR( !x264_ansi_filename( psz_filename, ansi_filename, MAX_PATH, 1 ), "mp4", "invalid ansi filename\n" )
-    p_mp4->p_file = gf_isom_open( ansi_filename, GF_ISOM_OPEN_WRITE, NULL );
-#else
     p_mp4->p_file = gf_isom_open( psz_filename, GF_ISOM_OPEN_WRITE, NULL );
-#endif
 
     p_mp4->b_dts_compress = opt->use_dts_compress;
 

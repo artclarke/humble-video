@@ -32,9 +32,6 @@
 #if HAVE_MALLOC_H
 #include <malloc.h>
 #endif
-#if HAVE_THP
-#include <sys/mman.h>
-#endif
 
 const int x264_bit_depth = BIT_DEPTH;
 
@@ -671,8 +668,6 @@ int x264_param_parse( x264_param_t *p, const char *name, const char *value )
     }
     OPT("bluray-compat")
         p->b_bluray_compat = atobool(value);
-    OPT("avcintra-compat")
-        p->b_avcintra_compat = atobool(value);
     OPT("sar")
     {
         b_error = ( 2 != sscanf( value, "%d:%d", &p->vui.i_sar_width, &p->vui.i_sar_height ) &&
@@ -1104,7 +1099,7 @@ static void x264_log_default( void *p_unused, int i_level, const char *psz_fmt, 
             break;
     }
     fprintf( stderr, "x264 [%s]: ", psz_prefix );
-    x264_vfprintf( stderr, psz_fmt, arg );
+    vfprintf( stderr, psz_fmt, arg );
 }
 
 /****************************************************************************
@@ -1188,25 +1183,7 @@ void *x264_malloc( int i_size )
 {
     uint8_t *align_buf = NULL;
 #if HAVE_MALLOC_H
-#if HAVE_THP
-#define HUGE_PAGE_SIZE 2*1024*1024
-#define HUGE_PAGE_THRESHOLD HUGE_PAGE_SIZE*7/8 /* FIXME: Is this optimal? */
-    /* Attempt to allocate huge pages to reduce TLB misses. */
-    if( i_size >= HUGE_PAGE_THRESHOLD )
-    {
-        align_buf = memalign( HUGE_PAGE_SIZE, i_size );
-        if( align_buf )
-        {
-            /* Round up to the next huge page boundary if we are close enough. */
-            size_t madv_size = (i_size + HUGE_PAGE_SIZE - HUGE_PAGE_THRESHOLD) & ~(HUGE_PAGE_SIZE-1);
-            madvise( align_buf, madv_size, MADV_HUGEPAGE );
-        }
-    }
-    else
-#undef HUGE_PAGE_SIZE
-#undef HUGE_PAGE_THRESHOLD
-#endif
-        align_buf = memalign( NATIVE_ALIGN, i_size );
+    align_buf = memalign( NATIVE_ALIGN, i_size );
 #else
     uint8_t *buf = malloc( i_size + (NATIVE_ALIGN-1) + sizeof(void **) );
     if( buf )
@@ -1269,7 +1246,7 @@ char *x264_slurp_file( const char *filename )
     int b_error = 0;
     size_t i_size;
     char *buf;
-    FILE *fh = x264_fopen( filename, "rb" );
+    FILE *fh = fopen( filename, "rb" );
     if( !fh )
         return NULL;
     b_error |= fseek( fh, 0, SEEK_END ) < 0;

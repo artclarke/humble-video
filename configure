@@ -290,8 +290,7 @@ cross_prefix=""
 EXE=""
 
 # list of all preprocessor HAVE values we can define
-CONFIG_HAVE="MALLOC_H ALTIVEC ALTIVEC_H MMX ARMV6 ARMV6T2 NEON BEOSTHREAD POSIXTHREAD WIN32THREAD THREAD LOG2F VISUALIZE SWSCALE \
-             LAVF FFMS GPAC GF_MALLOC AVS GPL VECTOREXT INTERLACED CPU_COUNT OPENCL THP"
+CONFIG_HAVE="MALLOC_H ALTIVEC ALTIVEC_H MMX ARMV6 ARMV6T2 NEON BEOSTHREAD POSIXTHREAD WIN32THREAD THREAD LOG2F VISUALIZE SWSCALE LAVF FFMS GPAC GF_MALLOC AVS GPL VECTOREXT INTERLACED CPU_COUNT OPENCL"
 
 # parse options
 
@@ -504,13 +503,12 @@ case $host_os in
             CFLAGS="$CFLAGS -mno-cygwin"
             LDFLAGS="$LDFLAGS -mno-cygwin"
         fi
-        if cpp_check "" "" "defined(__CYGWIN__)" ; then
+        if cpp_check "" "" "defined(__CYGWIN32__)" ; then
             define HAVE_MALLOC_H
             SYS="CYGWIN"
         else
             SYS="WINDOWS"
             DEVNULL="NUL"
-            LDFLAGSCLI="$LDFLAGSCLI -lshell32"
             RC="${RC-${cross_prefix}windres}"
         fi
         ;;
@@ -518,7 +516,6 @@ case $host_os in
         SYS="WINDOWS"
         EXE=".exe"
         DEVNULL="NUL"
-        LDFLAGSCLI="$LDFLAGSCLI -lshell32"
         [ $compiler = ICL ] && RC="${RC-rc}" || RC="${RC-${cross_prefix}windres}"
         ;;
     sunos*|solaris*)
@@ -598,7 +595,7 @@ case $host_cpu in
                 CFLAGS="$CFLAGS -arch x86_64"
                 LDFLAGS="$LDFLAGS -arch x86_64"
             fi
-        elif [ "$SYS" = WINDOWS -o "$SYS" = CYGWIN ]; then
+        elif [ "$SYS" = WINDOWS ]; then
             ASFLAGS="$ASFLAGS -f win32 -m amd64"
             # only the GNU toolchain is inconsistent in prefixing function names with _
             [ $compiler = GNU ] && cc_check "" "-S" && grep -q "_main:" conftest && ASFLAGS="$ASFLAGS -DPREFIX"
@@ -823,10 +820,6 @@ if cc_check "math.h" "-Werror" "return log2f(2);" ; then
     define HAVE_LOG2F
 fi
 
-if [ "$SYS" = "LINUX" -a \( "$ARCH" = "X86" -o "$ARCH" = "X86_64" \) ] && cc_check "sys/mman.h" "" "MADV_HUGEPAGE;" ; then
-    define HAVE_THP
-fi
-
 if [ "$vis" = "yes" ] ; then
     save_CFLAGS="$CFLAGS"
     CFLAGS="$CFLAGS -I/usr/X11R6/include"
@@ -947,7 +940,7 @@ fi
 if [ "$avs" = "auto" ] ; then
     avs="no"
     # cygwin can use avisynth if it can use LoadLibrary
-    if [ $SYS = WINDOWS ] || ([ $SYS = CYGWIN ] && cc_check windows.h "" "LoadLibraryW(0);") ; then
+    if [ $SYS = WINDOWS ] || ([ $SYS = CYGWIN ] && cc_check windows.h "" "LoadLibrary(0);") ; then
         avs="avisynth"
         define HAVE_AVS
         define USE_AVXSYNTH 0
@@ -1045,7 +1038,7 @@ if [ "$opencl" = "yes" ]; then
     fi
     log_ok
     # cygwin can use opencl if it can use LoadLibrary
-    if [ $SYS = WINDOWS ] || ([ $SYS = CYGWIN ] && cc_check windows.h "" "LoadLibraryW(0);") ; then
+    if [ $SYS = WINDOWS ] || ([ $SYS = CYGWIN ] && cc_check windows.h "" "LoadLibrary(0);") ; then
         opencl="yes"
         define HAVE_OPENCL
     elif [ "$SYS" = "LINUX" -o "$SYS" = "MACOSX" ] ; then

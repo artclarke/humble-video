@@ -96,7 +96,7 @@ flv_buffer *flv_create_writer( const char *filename )
     if( !strcmp( filename, "-" ) )
         c->fp = stdout;
     else
-        c->fp = x264_fopen( filename, "wb" );
+        c->fp = fopen( filename, "wb" );
     if( !c->fp )
     {
         free( c );

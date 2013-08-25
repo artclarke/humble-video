@@ -32,6 +32,7 @@
 SECTION_RODATA 32
 
 pb_shuf8x8c2: times 2 db 0,0,0,0,8,8,8,8,-1,-1,-1,-1,-1,-1,-1,-1
+deinterleave_sadx4: dd 0,4,2,6
 hpred_shuf: db 0,0,2,2,8,8,10,10,1,1,3,3,9,9,11,11
 
 SECTION .text
@@ -1241,34 +1242,21 @@ SAD_X 4,  4,  4
 %endmacro
 
 %macro SAD_X3_END_SSE2 0
-    movifnidn r5, r5mp
-%if cpuflag(ssse3)
-    packssdw m0, m1
-    packssdw m2, m2
-    phaddd   m0, m2
-    mova   [r5], m0
-%else
     movhlps  m3, m0
     movhlps  m4, m1
     movhlps  m5, m2
     paddw    m0, m3
     paddw    m1, m4
     paddw    m2, m5
+    movifnidn r5, r5mp
     movd [r5+0], m0
     movd [r5+4], m1
     movd [r5+8], m2
-%endif
     RET
 %endmacro
 
 %macro SAD_X4_END_SSE2 0
     mov      r0, r6mp
-%if cpuflag(ssse3)
-    packssdw m0, m1
-    packssdw m2, m3
-    phaddd   m0, m2
-    mova   [r0], m0
-%else
     psllq    m1, 32
     psllq    m3, 32
     paddw    m0, m1
@@ -1279,7 +1267,6 @@ SAD_X 4,  4,  4
     paddw    m2, m3
     movq [r0+0], m0
     movq [r0+8], m2
-%endif
     RET
 %endmacro
 
@@ -1400,12 +1387,12 @@ SAD_X 4,  4,  4
     vbroadcasti128 m4, [r0]
     vbroadcasti128 m5, [r0+FENC_STRIDE]
     movu   xm0, [r1]
-    movu   xm1, [r2]
+    movu   xm1, [r3]
     movu   xm2, [r1+r5]
-    movu   xm3, [r2+r5]
-    vinserti128 m0, m0, [r3], 1
+    movu   xm3, [r3+r5]
+    vinserti128 m0, m0, [r2], 1
     vinserti128 m1, m1, [r4], 1
-    vinserti128 m2, m2, [r3+r5], 1
+    vinserti128 m2, m2, [r2+r5], 1
     vinserti128 m3, m3, [r4+r5], 1
     psadbw  m0, m4
     psadbw  m1, m4
@@ -1419,12 +1406,12 @@ SAD_X 4,  4,  4
     vbroadcasti128 m6, [r0+%1]
     vbroadcasti128 m7, [r0+%3]
     movu   xm2, [r1+%2]
-    movu   xm3, [r2+%2]
+    movu   xm3, [r3+%2]
     movu   xm4, [r1+%4]
-    movu   xm5, [r2+%4]
-    vinserti128 m2, m2, [r3+%2], 1
+    movu   xm5, [r3+%4]
+    vinserti128 m2, m2, [r2+%2], 1
     vinserti128 m3, m3, [r4+%2], 1
-    vinserti128 m4, m4, [r3+%4], 1
+    vinserti128 m4, m4, [r2+%4], 1
     vinserti128 m5, m5, [r4+%4], 1
     psadbw  m2, m6
     psadbw  m3, m6
@@ -1456,22 +1443,35 @@ SAD_X 4,  4,  4
 %endmacro
 
 %macro SAD_X3_END_AVX2 0
+    vextracti128 xm4, m0, 1
+    vextracti128 xm5, m1, 1
+    vextracti128 xm6, m2, 1
+    paddw   xm0, xm4
+    paddw   xm1, xm5
+    paddw   xm2, xm6
+    movhlps xm4, xm0
+    movhlps xm5, xm1
+    movhlps xm6, xm2
+    paddw   xm0, xm4
+    paddw   xm1, xm5
+    paddw   xm2, xm6
     movifnidn r5, r5mp
-    packssdw  m0, m1        ; 0 0 1 1 0 0 1 1
-    packssdw  m2, m2        ; 2 2 _ _ 2 2 _ _
-    phaddd    m0, m2        ; 0 1 2 _ 0 1 2 _
-    vextracti128 xm1, m0, 1
-    paddd    xm0, xm1       ; 0 1 2 _
-    mova    [r5], xm0
+    movd [r5+0], xm0
+    movd [r5+4], xm1
+    movd [r5+8], xm2
     RET
 %endmacro
 
 %macro SAD_X4_END_AVX2 0
-    mov       r0, r6mp
-    packssdw  m0, m1        ; 0 0 1 1 2 2 3 3
-    vextracti128 xm1, m0, 1
-    phaddd   xm0, xm1       ; 0 1 2 3
-    mova    [r0], xm0
+    mov      r0, r6mp
+    punpckhqdq m2, m0, m0
+    punpckhqdq m3, m1, m1
+    paddw    m0, m2
+    paddw    m1, m3
+    packssdw m0, m1
+    mova    xm2, [deinterleave_sadx4]
+    vpermd   m0, m2, m0
+    mova   [r0], xm0
     RET
 %endmacro
 
@@ -1518,13 +1518,9 @@ cglobal pixel_sad_x%1_%2x%3, 2+%1,3+%1,8
 %endmacro
 
 INIT_XMM ssse3
-SAD_X_SSE2  3, 16, 16, 7
-SAD_X_SSE2  3, 16,  8, 7
-SAD_X_SSE2  4, 16, 16, 7
-SAD_X_SSE2  4, 16,  8, 7
-SAD_X_SSSE3 4,  8, 16
-SAD_X_SSSE3 4,  8,  8
-SAD_X_SSSE3 4,  8,  4
+SAD_X_SSSE3 4, 8, 16
+SAD_X_SSSE3 4, 8,  8
+SAD_X_SSSE3 4, 8,  4
 
 INIT_XMM avx
 SAD_X_SSE2 3, 16, 16, 6
