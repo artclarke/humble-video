@@ -26,6 +26,7 @@
 #include "Encoder.h"
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/HumbleException.h>
+#include <io/humble/video/MediaPacketImpl.h>
 
 using namespace io::humble::ferry;
 
@@ -104,9 +105,27 @@ Encoder::make(Codec* codec, AVCodecContext* src) {
   return retval.get();
 }
 
+void
+Encoder::open(KeyValueBag * inputOptions, KeyValueBag* unsetOptions) {
+  Coder::open(inputOptions, unsetOptions);
+  // now check to see if we require an audio resampler.
+  RefPointer<Codec> codec = getCodec();
+  if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
+    // yes, we do. Let's create one. This looks odd, as it's converting
+    // the same params into the same params, but it's really just being
+    // used as an audio buffer for us.
+    mAResampler = MediaAudioResampler::make(
+        getChannelLayout(),
+        getSampleRate(),
+        getSampleFormat(),
+        getChannelLayout(),
+        getSampleRate(),
+        getSampleFormat()
+        );
+  }
+}
 int32_t
-Encoder::encodeVideo(MediaPacket* output, MediaPicture* frame,
-    int32_t suggestedBufferSize) {
+Encoder::encodeVideo(MediaPacket* output, MediaPicture* frame) {
 
   if (getState() != STATE_OPENED) {
     VS_THROW(HumbleRuntimeError("Cannot encode with unopened encoder"));
@@ -116,9 +135,6 @@ Encoder::encodeVideo(MediaPacket* output, MediaPicture* frame,
   }
   if (!output) {
     VS_THROW(HumbleInvalidArgument("output cannot be null"));
-  }
-  if (suggestedBufferSize < 0) {
-    VS_THROW(HumbleInvalidArgument("buffer size must be >= 0"));
   }
   // let's check the picture parameters.
   ensurePictureParamsMatch(frame);
@@ -132,8 +148,8 @@ Encoder::encodeVideo(MediaPacket* output, MediaPicture* frame,
 }
 
 int32_t
-Encoder::encodeAudio(MediaPacket* output, MediaAudio* samples,
-    int32_t sampleToStartFrom) {
+Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
+  MediaPacketImpl* output = dynamic_cast<MediaPacketImpl*>(aOutput);
 
   if (getState() != STATE_OPENED) {
     VS_THROW(HumbleRuntimeError("Cannot encode with unopened encoder"));
@@ -144,30 +160,43 @@ Encoder::encodeAudio(MediaPacket* output, MediaAudio* samples,
   if (!output) {
     VS_THROW(HumbleInvalidArgument("output cannot be null"));
   }
-  if (sampleToStartFrom < 0) {
-    VS_THROW(HumbleInvalidArgument("sampleToStartFrom must be >= 0"));
-  }
   // let's check the audio parameters.
   ensureAudioParamsMatch(samples);
 
-  if (!samples->isComplete()) {
+  if (samples && !samples->isComplete()) {
     VS_THROW(HumbleInvalidArgument("Can only pass complete media to encode"));
   }
 
   RefPointer<Codec> codec = getCodec();
+  RefPointer<MediaAudio> inputAudio;
+
+  inputAudio.reset(samples, true);
   if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
     // this codec requires that the right number of audio samples
     // gets passed in each call.
-    if (samples->getNumSamples() > getFrameSize()) {
-      VS_THROW(HumbleRuntimeError("Codec for this encoder requires the number of audio samples to always equal the frame size of the encoder"));
+    if (!mResampledAudio) {
+      if (samples)
+        mResampledAudio = MediaAudio::make(getFrameSize(),
+            samples->getSampleRate(), samples->getChannels(),
+            samples->getChannelLayout(), samples->getFormat());
+    }
+    if (mResampledAudio) {
+      mAResampler->resample(mResampledAudio.value(), samples);
+      inputAudio = mResampledAudio.get();
     }
   }
 
-  // now in theory we've done all of our bounds checking. Let's do the heavy lifting
-  // and get raw audio to convert to raw packet data.
+  AVFrame* in = inputAudio ? inputAudio->getCtx() : 0;
+  AVPacket* out = output->getCtx();
 
-  VS_THROW(HumbleRuntimeError("not implemented"));
-  return 0;
+  int got_frame = 0;
+  int e = avcodec_encode_audio2(getCodecCtx(), out, in, &got_frame);
+  FfmpegException::check(e, "could not encode audio ");
+  if (got_frame) {
+    output->setComplete(true, out->size);
+  }
+
+  return e;
 }
 
 int32_t

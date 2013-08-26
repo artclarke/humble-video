@@ -31,6 +31,7 @@
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaSubtitle.h>
+#include <io/humble/video/MediaAudioResampler.h>
 
 namespace io {
 namespace humble {
@@ -59,6 +60,16 @@ public:
 #endif // ! SWIG
 
   /**
+   * Open this Coder, using the given bag of Codec-specific options.
+   *
+   * @param inputOptions If non-null, a bag of codec-specific options.
+   * @param unsetOptions If non-null, the bag will be emptied and then filled with
+   *                     the options in <code>inputOptions</code> that were not set.
+   *
+   */
+  virtual void open(KeyValueBag* inputOptions, KeyValueBag* unsetOptions);
+
+  /**
    * Encode the given MediaPicture using this encoder.
    *
    * The MediaPicture will allocate a buffer to use internally for this, and
@@ -72,15 +83,11 @@ public:
    *     to a buffer allocated in the frame.  Caller should check MediaPacket.isComplete()
    *     after call to find out if we had enough information to encode a full packet.
    * @param frame [in/out] The frame to encode
-   * @param suggestedBufferSize The suggested buffer size to allocate or -1 for choose ourselves.
-   *        If -1 we'll allocate a buffer exactly the same size (+1) as the decoded frame
-   *        with the guess that you're encoding a frame because you want to use LESS space
-   *        than that.
    *
    * @ return >= 0 on success; <0 on error.
    */
   virtual int32_t encodeVideo(MediaPacket * output,
-      MediaPicture * frame, int32_t suggestedBufferSize);
+      MediaPicture * frame);
 
   /**
    * Encode the given MediaAudio using this encoder.
@@ -96,16 +103,11 @@ public:
    *          to a buffer allocated in the frame.  Caller should check MediaPacket.isComplete()
    *     after call to find out if we had enough information to encode a full packet.
    * @param samples [in] The samples to consume
-   * @param sampleToStartFrom [in] Which sample you want to start with
-   *          This is usually zero, but if you're using a codec that
-   *          packetizes output with small number of samples, you may
-   *          need to call encodeAudio repeatedly with different starting
-   *          samples to consume all of your samples.
    *
    * @return number of samples we consumed when encoding, or negative for errors.
    */
   virtual int32_t encodeAudio(MediaPacket * output,
-      MediaAudio* samples, int32_t sampleToStartFrom);
+      MediaAudio* samples);
 
   /**
    * Not final API yet; do not use.
@@ -118,6 +120,10 @@ protected:
   virtual
   ~Encoder();
 private:
+  // Used to ensure we have the right frame-size for codecs that
+  // require fixed frame sizes on audio.
+  io::humble::ferry::RefPointer<MediaAudioResampler> mAResampler;
+  io::humble::ferry::RefPointer<MediaAudio> mResampledAudio;
 };
 
 } /* namespace video */

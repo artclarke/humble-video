@@ -131,6 +131,17 @@ public class Encoder extends Coder {
   }
 
 /**
+ * Open this Coder, using the given bag of Codec-specific options.<br>
+ * <br>
+ * @param inputOptions If non-null, a bag of codec-specific options.<br>
+ * @param unsetOptions If non-null, the bag will be emptied and then filled with<br>
+ *                     the options in <code>inputOptions</code> that were not set.
+ */
+  public void open(KeyValueBag inputOptions, KeyValueBag unsetOptions) {
+    VideoJNI.Encoder_open(swigCPtr, this, KeyValueBag.getCPtr(inputOptions), inputOptions, KeyValueBag.getCPtr(unsetOptions), unsetOptions);
+  }
+
+/**
  * Encode the given MediaPicture using this encoder.<br>
  * <br>
  * The MediaPicture will allocate a buffer to use internally for this, and<br>
@@ -144,15 +155,11 @@ public class Encoder extends Coder {
  *     to a buffer allocated in the frame.  Caller should check MediaPacket.isComplete()<br>
  *     after call to find out if we had enough information to encode a full packet.<br>
  * @param frame [in/out] The frame to encode<br>
- * @param suggestedBufferSize The suggested buffer size to allocate or -1 for choose ourselves.<br>
- *        If -1 we'll allocate a buffer exactly the same size (+1) as the decoded frame<br>
- *        with the guess that you're encoding a frame because you want to use LESS space<br>
- *        than that.<br>
  * <br>
  * @ return &gt;= 0 on success; &lt;0 on error.
  */
-  public int encodeVideo(MediaPacket output, MediaPicture frame, int suggestedBufferSize) {
-    return VideoJNI.Encoder_encodeVideo(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaPicture.getCPtr(frame), frame, suggestedBufferSize);
+  public int encodeVideo(MediaPacket output, MediaPicture frame) {
+    return VideoJNI.Encoder_encodeVideo(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaPicture.getCPtr(frame), frame);
   }
 
 /**
@@ -169,16 +176,11 @@ public class Encoder extends Coder {
  *          to a buffer allocated in the frame.  Caller should check MediaPacket.isComplete()<br>
  *     after call to find out if we had enough information to encode a full packet.<br>
  * @param samples [in] The samples to consume<br>
- * @param sampleToStartFrom [in] Which sample you want to start with<br>
- *          This is usually zero, but if you're using a codec that<br>
- *          packetizes output with small number of samples, you may<br>
- *          need to call encodeAudio repeatedly with different starting<br>
- *          samples to consume all of your samples.<br>
  * <br>
  * @return number of samples we consumed when encoding, or negative for errors.
  */
-  public int encodeAudio(MediaPacket output, MediaAudio samples, int sampleToStartFrom) {
-    return VideoJNI.Encoder_encodeAudio(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaAudio.getCPtr(samples), samples, sampleToStartFrom);
+  public int encodeAudio(MediaPacket output, MediaAudio samples) {
+    return VideoJNI.Encoder_encodeAudio(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaAudio.getCPtr(samples), samples);
   }
 
 /**

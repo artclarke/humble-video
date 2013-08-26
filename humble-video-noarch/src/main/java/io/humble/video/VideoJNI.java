@@ -1204,8 +1204,9 @@ public class VideoJNI {
   public final static native int Decoder_decodeSubtitle(long jarg1, Decoder jarg1_, long jarg2, MediaSubtitle jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native long Encoder_make__SWIG_0(long jarg1, Codec jarg1_);
   public final static native long Encoder_make__SWIG_1(long jarg1, Coder jarg1_);
-  public final static native int Encoder_encodeVideo(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaPicture jarg3_, int jarg4);
-  public final static native int Encoder_encodeAudio(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaAudio jarg3_, int jarg4);
+  public final static native void Encoder_open(long jarg1, Encoder jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_);
+  public final static native int Encoder_encodeVideo(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaPicture jarg3_);
+  public final static native int Encoder_encodeAudio(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaAudio jarg3_);
   public final static native int Encoder_encodeSubtitle(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaSubtitle jarg3_);
   public final static native int ContainerStream_DISPOSITION_NONE_get();
   public final static native int ContainerStream_DISPOSITION_DEFAULT_get();

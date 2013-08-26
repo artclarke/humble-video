@@ -111,6 +111,9 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   if (STATE_OPENED != getState())
     VS_THROW(HumbleRuntimeError("Attempt to decodeAudio, but Decoder is not opened"));
 
+  if (!aOutput)
+    VS_THROW(HumbleInvalidArgument("null audio passed to coder"));
+
   // let's check the audio parameters.
   ensureAudioParamsMatch(aOutput);
 
@@ -198,6 +201,9 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
   }
   if (STATE_OPENED != getState())
     VS_THROW(HumbleRuntimeError("Attempt to decodeAudio, but Decoder is not opened"));
+
+  if (!output)
+    VS_THROW(HumbleInvalidArgument("null picture passed to coder"));
 
   // let's check the picture parameters.
   ensurePictureParamsMatch(output);

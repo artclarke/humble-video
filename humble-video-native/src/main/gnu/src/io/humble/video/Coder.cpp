@@ -168,7 +168,7 @@ void
 Coder::ensurePictureParamsMatch(MediaPicture* pict)
 {
   if (!pict)
-    VS_THROW(HumbleInvalidArgument("null picture passed to coder"));
+    return;
 
   if (getWidth() != pict->getWidth())
     VS_THROW(HumbleInvalidArgument("width on picture does not match what coder expects"));
@@ -185,7 +185,7 @@ void
 Coder::ensureAudioParamsMatch(MediaAudio* audio)
 {
   if (!audio)
-    VS_THROW(HumbleInvalidArgument("null audio passed to coder"));
+    return;
 
   if (getChannels() != audio->getChannels())
     VS_THROW(HumbleInvalidArgument("audio channels does not match what coder expects"));

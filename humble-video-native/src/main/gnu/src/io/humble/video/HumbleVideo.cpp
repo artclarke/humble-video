@@ -26829,12 +26829,59 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Encoder_1make_1_1SWIG_11(
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeVideo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jint jarg4) {
+SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Encoder_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+  io::humble::video::Encoder *arg1 = (io::humble::video::Encoder *) 0 ;
+  io::humble::video::KeyValueBag *arg2 = (io::humble::video::KeyValueBag *) 0 ;
+  io::humble::video::KeyValueBag *arg3 = (io::humble::video::KeyValueBag *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  (void)jarg3_;
+  arg1 = *(io::humble::video::Encoder **)&jarg1; 
+  arg2 = *(io::humble::video::KeyValueBag **)&jarg2; 
+  arg3 = *(io::humble::video::KeyValueBag **)&jarg3; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return ;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      (arg1)->open(arg2,arg3);
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return ;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeVideo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
   jint jresult = 0 ;
   io::humble::video::Encoder *arg1 = (io::humble::video::Encoder *) 0 ;
   io::humble::video::MediaPacket *arg2 = (io::humble::video::MediaPacket *) 0 ;
   io::humble::video::MediaPicture *arg3 = (io::humble::video::MediaPicture *) 0 ;
-  int32_t arg4 ;
   int32_t result;
   
   (void)jenv;
@@ -26845,7 +26892,6 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeVideo(JNIEn
   arg1 = *(io::humble::video::Encoder **)&jarg1; 
   arg2 = *(io::humble::video::MediaPacket **)&jarg2; 
   arg3 = *(io::humble::video::MediaPicture **)&jarg3; 
-  arg4 = (int32_t)jarg4; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -26859,7 +26905,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeVideo(JNIEn
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)(arg1)->encodeVideo(arg2,arg3,arg4);
+      result = (int32_t)(arg1)->encodeVideo(arg2,arg3);
     }
     catch(std::exception & e)
     {
@@ -26883,12 +26929,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeVideo(JNIEn
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeAudio(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jint jarg4) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeAudio(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
   jint jresult = 0 ;
   io::humble::video::Encoder *arg1 = (io::humble::video::Encoder *) 0 ;
   io::humble::video::MediaPacket *arg2 = (io::humble::video::MediaPacket *) 0 ;
   io::humble::video::MediaAudio *arg3 = (io::humble::video::MediaAudio *) 0 ;
-  int32_t arg4 ;
   int32_t result;
   
   (void)jenv;
@@ -26899,7 +26944,6 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeAudio(JNIEn
   arg1 = *(io::humble::video::Encoder **)&jarg1; 
   arg2 = *(io::humble::video::MediaPacket **)&jarg2; 
   arg3 = *(io::humble::video::MediaAudio **)&jarg3; 
-  arg4 = (int32_t)jarg4; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -26913,7 +26957,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1encodeAudio(JNIEn
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)(arg1)->encodeAudio(arg2,arg3,arg4);
+      result = (int32_t)(arg1)->encodeAudio(arg2,arg3);
     }
     catch(std::exception & e)
     {
