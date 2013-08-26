@@ -154,7 +154,7 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
   } else {
     output->setComplete(false, 0);
   }
-  FfmpegException::check(e, "could not encode audio ");
+  FfmpegException::check(e, "could not encode video ");
 }
 
 void
