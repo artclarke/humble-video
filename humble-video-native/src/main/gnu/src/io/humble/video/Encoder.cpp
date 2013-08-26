@@ -124,8 +124,9 @@ Encoder::open(KeyValueBag * inputOptions, KeyValueBag* unsetOptions) {
         );
   }
 }
-int32_t
-Encoder::encodeVideo(MediaPacket* output, MediaPicture* frame) {
+void
+Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
+  MediaPacketImpl* output = dynamic_cast<MediaPacketImpl*>(aOutput);
 
   if (getState() != STATE_OPENED) {
     VS_THROW(HumbleRuntimeError("Cannot encode with unopened encoder"));
@@ -139,15 +140,24 @@ Encoder::encodeVideo(MediaPacket* output, MediaPicture* frame) {
   // let's check the picture parameters.
   ensurePictureParamsMatch(frame);
 
-  if (!frame->isComplete()) {
+  if (frame && !frame->isComplete()) {
     VS_THROW(HumbleInvalidArgument("Can only pass complete media to encode"));
   }
 
-  VS_THROW(HumbleRuntimeError("not implemented"));
-  return 0;
+  AVFrame* in = frame ? frame->getCtx() : 0;
+  AVPacket* out = output->getCtx();
+
+  int got_frame = 0;
+  int e = avcodec_encode_video2(getCodecCtx(), out, in, &got_frame);
+  if (got_frame) {
+    output->setComplete(true, out->size);
+  } else {
+    output->setComplete(false, 0);
+  }
+  FfmpegException::check(e, "could not encode audio ");
 }
 
-int32_t
+void
 Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
   MediaPacketImpl* output = dynamic_cast<MediaPacketImpl*>(aOutput);
 
@@ -191,23 +201,14 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
 
   int got_frame = 0;
   int e = avcodec_encode_audio2(getCodecCtx(), out, in, &got_frame);
-  FfmpegException::check(e, "could not encode audio ");
   if (got_frame) {
     output->setComplete(true, out->size);
+  } else {
+    output->setComplete(false, 0);
   }
 
-  return e;
+  FfmpegException::check(e, "could not encode audio ");
 }
-
-int32_t
-Encoder::encodeSubtitle(MediaPacket* output, MediaSubtitle* subtitles) {
-  (void) output;
-  (void) subtitles;
-  VS_THROW(HumbleRuntimeError("not implemented"));
-  return 0;
-}
-
-
 
 } /* namespace video */
 } /* namespace humble */

@@ -187,23 +187,4 @@ public class Decoder extends Coder {
     return VideoJNI.Decoder_decodeVideo(swigCPtr, this, MediaPicture.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
   }
 
-/**
- * Decode this packet into output.<br>
- * <br>
- * The caller is responsible for allocating the<br>
- * MediaPicture object.  This function will potentially<br>
- * overwrite any data in the frame object, but<br>
- * you should pass the same MediaPicture into this function<br>
- * repeatedly until Media.isComplete() is true.<br>
- * <br>
- * @param output The MediaPicture we decode. Caller must check if it is complete on return.<br>
- * @param packet  The packet we're attempting to decode from.<br>
- * @param byteOffset Where in the packet payload to start decoding<br>
- * <br>
- * @return number of bytes actually processed from the packet, or negative for error
- */
-  public int decodeSubtitle(MediaSubtitle output, MediaPacket packet, int byteOffset) {
-    return VideoJNI.Decoder_decodeSubtitle(swigCPtr, this, MediaSubtitle.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
-  }
-
 }

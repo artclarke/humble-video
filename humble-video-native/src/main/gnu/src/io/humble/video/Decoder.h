@@ -126,8 +126,8 @@ public:
    *
    * @return number of bytes actually processed from the packet, or negative for error
    */
-  virtual int32_t decodeSubtitle(MediaSubtitle * output,
-      MediaPacket *packet, int32_t byteOffset);
+//  virtual int32_t decodeSubtitle(MediaSubtitle * output,
+//      MediaPacket *packet, int32_t byteOffset);
 
 protected:
   Decoder(Codec* codec, AVCodecContext* src, bool copy);

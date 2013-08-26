@@ -275,21 +275,6 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
   return retval;
 }
 
-int32_t
-Decoder::decodeSubtitle(MediaSubtitle* output, MediaPacket* packet,
-    int32_t byteOffset) {
-
-  if (getCodecType() != MediaDescriptor::MEDIA_SUBTITLE)
-    VS_THROW(HumbleRuntimeError("Attempting to decode subtitle on non-subtitle decoder"));
-
-
-  (void) output;
-  (void) packet;
-  (void) byteOffset;
-  VS_THROW(HumbleRuntimeError("Not implemented yet."));
-  return -1;
-}
-
 Decoder*
 Decoder::make(Codec* codec)
 {

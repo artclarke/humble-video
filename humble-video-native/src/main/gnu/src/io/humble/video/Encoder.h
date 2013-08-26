@@ -84,9 +84,8 @@ public:
    *     after call to find out if we had enough information to encode a full packet.
    * @param frame [in/out] The frame to encode
    *
-   * @ return >= 0 on success; <0 on error.
    */
-  virtual int32_t encodeVideo(MediaPacket * output,
+  virtual void encodeVideo(MediaPacket * output,
       MediaPicture * frame);
 
   /**
@@ -104,16 +103,9 @@ public:
    *     after call to find out if we had enough information to encode a full packet.
    * @param samples [in] The samples to consume
    *
-   * @return number of samples we consumed when encoding, or negative for errors.
    */
-  virtual int32_t encodeAudio(MediaPacket * output,
+  virtual void encodeAudio(MediaPacket * output,
       MediaAudio* samples);
-
-  /**
-   * Not final API yet; do not use.
-   */
-  virtual int32_t encodeSubtitle(MediaPacket* output,
-      MediaSubtitle* subtitles);
 
 protected:
   Encoder(Codec*, AVCodecContext* src, bool copySrc);

@@ -154,12 +154,10 @@ public class Encoder extends Coder {
  * @param output [out] The packet to encode into.  It will point<br>
  *     to a buffer allocated in the frame.  Caller should check MediaPacket.isComplete()<br>
  *     after call to find out if we had enough information to encode a full packet.<br>
- * @param frame [in/out] The frame to encode<br>
- * <br>
- * @ return &gt;= 0 on success; &lt;0 on error.
+ * @param frame [in/out] The frame to encode
  */
-  public int encodeVideo(MediaPacket output, MediaPicture frame) {
-    return VideoJNI.Encoder_encodeVideo(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaPicture.getCPtr(frame), frame);
+  public void encodeVideo(MediaPacket output, MediaPicture frame) {
+    VideoJNI.Encoder_encodeVideo(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaPicture.getCPtr(frame), frame);
   }
 
 /**
@@ -175,19 +173,10 @@ public class Encoder extends Coder {
  * @param output [out] The packet to encode into.  It will point<br>
  *          to a buffer allocated in the frame.  Caller should check MediaPacket.isComplete()<br>
  *     after call to find out if we had enough information to encode a full packet.<br>
- * @param samples [in] The samples to consume<br>
- * <br>
- * @return number of samples we consumed when encoding, or negative for errors.
+ * @param samples [in] The samples to consume
  */
-  public int encodeAudio(MediaPacket output, MediaAudio samples) {
-    return VideoJNI.Encoder_encodeAudio(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaAudio.getCPtr(samples), samples);
-  }
-
-/**
- * Not final API yet; do not use.
- */
-  public int encodeSubtitle(MediaPacket output, MediaSubtitle subtitles) {
-    return VideoJNI.Encoder_encodeSubtitle(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaSubtitle.getCPtr(subtitles), subtitles);
+  public void encodeAudio(MediaPacket output, MediaAudio samples) {
+    VideoJNI.Encoder_encodeAudio(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaAudio.getCPtr(samples), samples);
   }
 
 }
