@@ -7,10 +7,10 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A type of filter that can be created.
  */
-import io.humble.ferry.*;
 public class FilterType extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

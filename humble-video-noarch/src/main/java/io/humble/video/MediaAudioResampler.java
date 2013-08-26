@@ -7,11 +7,11 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A MediaAudioResampler object resamples MediaAudio objects from<br>
  * one format/sample-rate/channel-layout to another.
  */
-import io.humble.ferry.*;
 public class MediaAudioResampler extends Configurable {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

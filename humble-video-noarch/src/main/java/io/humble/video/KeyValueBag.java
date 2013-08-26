@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * KeyValueBag is a bag of key/value pairs that can be embedded<br>
  * in some Container or some Stream<br>
@@ -26,7 +27,6 @@ package io.humble.video;
  * is not supported.<br>
  * </p>
  */
-import io.humble.ferry.*;
 public class KeyValueBag extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

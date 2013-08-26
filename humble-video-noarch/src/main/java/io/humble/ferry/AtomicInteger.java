@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+
 /**
  * Internal only.  Atomic Integer represents Integers than can be updated<br>
  * atomically from native code.<br>
@@ -26,7 +27,6 @@ package io.humble.ferry;
  * java.util.concurrent.atomic.AtomicInteger<br>
  * </p>
  */
-
 public class AtomicInteger {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

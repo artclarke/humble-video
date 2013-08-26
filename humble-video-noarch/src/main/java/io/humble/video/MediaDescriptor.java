@@ -7,11 +7,11 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A descriptor for different types of media that can be handled<br>
  * by Humble Video.
  */
-import io.humble.ferry.*;
 public class MediaDescriptor extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

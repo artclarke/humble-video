@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * Raw audio data.<br>
  * <p><br>
@@ -25,7 +26,6 @@ package io.humble.video;
  * MediaAudio#getDataLineSize(int) is the buffer size, in bytes, for the 1 plane.<br>
  * </p>
  */
-import io.humble.ferry.*;
 public class MediaAudio extends MediaSampled {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

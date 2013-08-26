@@ -7,10 +7,10 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A Source of Packet data.
  */
-import io.humble.ferry.*;
 public class Demuxer extends Container {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

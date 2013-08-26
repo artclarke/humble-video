@@ -7,10 +7,10 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * An source or a sink that terminates the end points of a FilterGraph.
  */
-import io.humble.ferry.*;
 public class FilterEndPoint extends Filter {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

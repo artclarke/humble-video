@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * Methods that implement this class can be configured<br>
  * using setProperty and getProperty methods, and expose<br>
@@ -19,7 +20,6 @@ package io.humble.video;
  * <br>
  * @author aclarke
  */
-import io.humble.ferry.*;
 public class Configurable extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

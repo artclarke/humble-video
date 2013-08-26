@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * An index entry for a Stream.<br>
  * <p><br>
@@ -33,7 +34,6 @@ package io.humble.video;
  * @see Stream#getNumIndexEntries()<br>
  * @see Stream#getIndexEntries()
  */
-import io.humble.ferry.*;
 public class IndexEntry extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

@@ -7,10 +7,10 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A class that defines meta-data about audio channels and layouts.
  */
-import io.humble.ferry.*;
 public class AudioChannel extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

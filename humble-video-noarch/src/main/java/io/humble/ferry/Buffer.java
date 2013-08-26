@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+
 /**
  * Allows Java code to get data from a native buffers, and optionally modify native memory directly.<br>
  * <p> <br>
@@ -27,7 +28,6 @@ package io.humble.ferry;
  * <br>
  * </p>
  */
-
 public class Buffer extends RefCounted {
   // Buffer.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

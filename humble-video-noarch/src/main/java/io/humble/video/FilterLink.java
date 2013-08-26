@@ -7,10 +7,10 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A link between two Filters in a FilterGraph.
  */
-import io.humble.ferry.*;
 public class FilterLink extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+
 /**
  * Parent of all Ferry objects -- it mains reference counts<br>
  * in native code.<br>
@@ -16,7 +17,6 @@ package io.humble.ferry;
  * make(...).<br>
  * </p>
  */
-
 public class RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

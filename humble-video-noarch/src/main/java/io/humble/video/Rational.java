@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * This class wraps represents a Rational number.<br>
  * <p><br>
@@ -20,7 +21,6 @@ package io.humble.video;
  * (as opposed to overloading methods (e.g. sAdd(...) vs. add(...)).<br>
  * </p>
  */
-import io.humble.ferry.*;
 public class Rational extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

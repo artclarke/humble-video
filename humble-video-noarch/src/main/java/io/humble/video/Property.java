@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * Represents settable properties that effect how Humble Video objects<br>
  * operate.<br>
@@ -16,7 +17,6 @@ package io.humble.video;
  * to encode at.<br>
  * </p> 
  */
-import io.humble.ferry.*;
 public class Property extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

@@ -7,11 +7,11 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A packet of data that was read from a Source or<br>
  * will be written to a Sink.
  */
-import io.humble.ferry.*;
 public class MediaPacket extends MediaEncoded {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

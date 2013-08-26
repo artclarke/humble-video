@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * An object that either converts MediaRaw objects into MediaEncoded<br>
  * objects (called an Encoder), or converts in the reverse direction (called<br>
@@ -15,7 +16,6 @@ package io.humble.video;
  * Although this object might seem very sparse, use the methods on Configurable<br>
  * to see the vast array of options that can be get/set on it.
  */
-import io.humble.ferry.*;
 public class Coder extends Configurable {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

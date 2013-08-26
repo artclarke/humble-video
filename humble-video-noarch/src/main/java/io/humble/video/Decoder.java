@@ -8,6 +8,9 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * Decodes MediaPacket objects into MediaAudio, MediaPicture or MediaSubtitle objects.
+ */
 public class Decoder extends Coder {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

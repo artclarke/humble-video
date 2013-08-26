@@ -7,10 +7,10 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A source of MediaPicture objects for a FilterGraph.
  */
-import io.humble.ferry.*;
 public class FilterPictureSource extends FilterSource {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

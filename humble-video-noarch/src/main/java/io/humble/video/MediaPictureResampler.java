@@ -7,11 +7,11 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * Converts MediaPicture objects of a given width, height and format to a new<br>
  * width, height or format.
  */
-import io.humble.ferry.*;
 public class MediaPictureResampler extends Configurable {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

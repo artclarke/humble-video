@@ -7,12 +7,12 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * Media that represents samples of some continugous stream.<br>
  * Examples of Sampled data are MediaAudio (digital samples of continuous audio)<br>
  * or MediaPicture (digital samples of a continuous visual stream).
  */
-import io.humble.ferry.*;
 public class MediaSampled extends MediaRaw {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

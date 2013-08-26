@@ -7,11 +7,11 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * Picture formats and various static member functions for getting<br>
  * meta data about them.
  */
-import io.humble.ferry.*;
 public class PixelFormat extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

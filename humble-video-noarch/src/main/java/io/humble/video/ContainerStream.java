@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * Represents a stream of similar data (eg video) in a Container.<br>
  * <p><br>
@@ -22,7 +23,6 @@ package io.humble.video;
  * decoding.<br>
  * </p>
  */
-import io.humble.ferry.*;
 public class ContainerStream extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

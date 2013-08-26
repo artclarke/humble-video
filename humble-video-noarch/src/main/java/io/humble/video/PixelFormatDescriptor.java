@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * Descriptor that unambiguously describes how the bits of a pixel are<br>
  * stored in the up to 4 data planes of an image. It also stores the<br>
@@ -16,7 +17,6 @@ package io.humble.video;
  *       and all the YUV variants) AVPixFmtDescriptor just stores how values<br>
  *       are stored not what these values represent.
  */
-import io.humble.ferry.*;
 public class PixelFormatDescriptor extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

@@ -7,10 +7,10 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A source of MediaRaw objects for a FilterGraph.
  */
-import io.humble.ferry.*;
 public class FilterSource extends FilterEndPoint {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

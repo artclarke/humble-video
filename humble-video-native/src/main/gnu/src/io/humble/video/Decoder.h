@@ -37,6 +37,9 @@ namespace io {
 namespace humble {
 namespace video {
 
+/**
+ * Decodes MediaPacket objects into MediaAudio, MediaPicture or MediaSubtitle objects.
+ */
 class VS_API_HUMBLEVIDEO Decoder : public io::humble::video::Coder
 {
 public:

@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+
 /**
  * Internal Only.  This object exists in order for the ferry test<br>
  * libraries to test the memory management functionality<br>
@@ -14,7 +15,6 @@ package io.humble.ferry;
  * <br>
  * It is NOT part of the public API.
  */
-
 public class RefCountedTester extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

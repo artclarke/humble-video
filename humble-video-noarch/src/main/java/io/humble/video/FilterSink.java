@@ -7,10 +7,10 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A sink of MediaRaw objects for a FilterGraph.
  */
-import io.humble.ferry.*;
 public class FilterSink extends FilterEndPoint {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

@@ -7,10 +7,10 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A Sink of MediaPicture objects for a FilterGraph.
  */
-import io.humble.ferry.*;
 public class FilterPictureSink extends FilterSink {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

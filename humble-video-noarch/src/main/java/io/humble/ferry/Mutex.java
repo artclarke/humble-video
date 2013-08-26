@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+
 /**
  * Internal Only.<br>
  * <p><br>
@@ -20,7 +21,6 @@ package io.humble.ferry;
  * are NO-OPs.<br>
  * </p>
  */
-
 public class Mutex extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

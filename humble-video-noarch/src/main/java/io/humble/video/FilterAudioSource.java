@@ -7,10 +7,10 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.video;
+import io.humble.ferry.*;
 /**
  * A source of MediaAudio objects for a FilterGraph.
  */
-import io.humble.ferry.*;
 public class FilterAudioSource extends FilterSource {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

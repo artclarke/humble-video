@@ -7,6 +7,7 @@
  * ----------------------------------------------------------------------------- */
 
 package io.humble.ferry;
+
 /**
  * Internal Only<br>
  * <p><br>
@@ -21,7 +22,6 @@ package io.humble.ferry;
  * Otherwise, it forwards to Java's SLF4J logging framework.<br>
  * </p>
  */
-
 public class Logger {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
