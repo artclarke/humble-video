@@ -469,6 +469,10 @@ private:
   }
 };
 
+/**
+ * Describes how different pixel components (e.g. the YUV values) are
+ * represented in memory for a given PixelFormat.
+ */
 class PixelComponentDescriptor : public io::humble::ferry::RefCounted
 {
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(PixelComponentDescriptor)

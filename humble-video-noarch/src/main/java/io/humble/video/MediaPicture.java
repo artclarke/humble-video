@@ -8,6 +8,10 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * Picture (or video) raw data that can be displayed or modified, and also<br>
+ * encoded by Encoder objects.
+ */
 public class MediaPicture extends MediaSampled {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

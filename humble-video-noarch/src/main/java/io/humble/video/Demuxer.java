@@ -9,7 +9,7 @@
 package io.humble.video;
 import io.humble.ferry.*;
 /**
- * A Source of Packet data.
+ * A Container that MediaPacket objects can be read from.
  */
 public class Demuxer extends Container {
   // JNIHelper.swg: Start generated code

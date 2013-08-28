@@ -8,6 +8,11 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * Creates a graph (or map) of Filter objects that can modify MediaRaw<br>
+ * objects to do lots of advanced stuff like edge-detection, cropping,<br>
+ * blurring, etc.
+ */
 public class FilterGraph extends Configurable {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

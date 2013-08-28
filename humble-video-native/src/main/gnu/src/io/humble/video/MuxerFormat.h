@@ -32,6 +32,10 @@ namespace io {
 namespace humble {
 namespace video {
 
+/**
+ * An object that describes Containers that HumbleVideo can write MediaPacket objects
+ * to.
+ */
 class VS_API_HUMBLEVIDEO MuxerFormat : public ContainerFormat
 {
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MuxerFormat)

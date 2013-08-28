@@ -8,6 +8,10 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * Parent class for objects that describe different container formats<br>
+ * for media (e.g. MP4 vs. FLV).
+ */
 public class ContainerFormat extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

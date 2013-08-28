@@ -8,6 +8,10 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * A Filter that can convert one MediaRaw object into zero or more other<br>
+ * MediaRaw objects.
+ */
 public class Filter extends Configurable {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

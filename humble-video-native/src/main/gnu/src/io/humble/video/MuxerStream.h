@@ -35,6 +35,10 @@ namespace humble {
 namespace video {
 
 class Muxer;
+
+/**
+ * A ContainerStream object representing a stream contained in a writable Container.
+ */
 class VS_API_HUMBLEVIDEO MuxerStream : public io::humble::video::ContainerStream
 {
 public:

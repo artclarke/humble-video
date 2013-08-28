@@ -45,6 +45,11 @@ class FilterSink;
 class FilterAudioSink;
 class FilterPictureSink;
 
+/**
+ * Creates a graph (or map) of Filter objects that can modify MediaRaw
+ * objects to do lots of advanced stuff like edge-detection, cropping,
+ * blurring, etc.
+ */
 class VS_API_HUMBLEVIDEO FilterGraph : public io::humble::video::Configurable
 {
 public:

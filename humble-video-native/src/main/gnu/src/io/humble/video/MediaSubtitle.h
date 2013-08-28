@@ -35,6 +35,9 @@ namespace video {
 
 class MediaSubtitleRectangle;
 
+/**
+ * NOT CURRENTLY USED.
+ */
 class MediaSubtitle : public io::humble::video::MediaRaw
 {
   VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MediaSubtitle);
@@ -110,6 +113,9 @@ private:
   bool mComplete;
 };
 
+/**
+ * NOT CURRENTLY USED.
+ */
 class MediaSubtitleRectangle : public io::humble::ferry::RefCounted
 {
   VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MediaSubtitleRectangle);

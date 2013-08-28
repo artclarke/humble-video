@@ -44,6 +44,9 @@ namespace io {
 namespace humble {
 namespace video {
 
+/**
+ * A Container that MediaPacket objects can be written to.
+ */
 class VS_API_HUMBLEVIDEO Muxer : public io::humble::video::Container
 {
 public:

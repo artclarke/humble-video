@@ -8,6 +8,10 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * An object that describes Containers that HumbleVideo can write MediaPacket objects<br>
+ * to.
+ */
 public class MuxerFormat extends ContainerFormat {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

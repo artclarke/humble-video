@@ -38,6 +38,10 @@ namespace video {
 
 class FilterLink;
 
+/**
+ * A Filter that can convert one MediaRaw object into zero or more other
+ * MediaRaw objects.
+ */
 class VS_API_HUMBLEVIDEO Filter : public io::humble::video::Configurable
 {
 public:

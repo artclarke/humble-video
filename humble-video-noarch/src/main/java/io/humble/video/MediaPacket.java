@@ -9,8 +9,8 @@
 package io.humble.video;
 import io.humble.ferry.*;
 /**
- * A packet of data that was read from a Source or<br>
- * will be written to a Sink.
+ * A packet of encoded data that was read from a Demuxer or<br>
+ * will be written to a Muxer.
  */
 public class MediaPacket extends MediaEncoded {
   // JNIHelper.swg: Start generated code

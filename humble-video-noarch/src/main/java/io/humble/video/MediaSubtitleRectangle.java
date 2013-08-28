@@ -8,6 +8,9 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * NOT CURRENTLY USED.
+ */
 public class MediaSubtitleRectangle extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

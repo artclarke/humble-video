@@ -36,7 +36,7 @@ namespace video {
 
 class Demuxer;
 /**
- * A ContainerStream class that was read from a Demuxer.
+ * A ContainerStream object representing a stream contained in a readable Container.
  */
 class VS_API_HUMBLEVIDEO DemuxerStream : public io::humble::video::ContainerStream
 {

@@ -8,6 +8,9 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * NOT CURRENTLY USED.
+ */
 public class MediaSubtitle extends MediaRaw {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

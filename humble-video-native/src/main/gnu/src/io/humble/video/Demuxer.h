@@ -33,7 +33,7 @@ namespace humble {
 namespace video {
 
 /**
- * A Source of Packet data.
+ * A Container that MediaPacket objects can be read from.
  */
 class VS_API_HUMBLEVIDEO Demuxer : public io::humble::video::Container
 {

@@ -8,6 +8,10 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * An object that describes Containers that HumbleVideo can read MediaPacket objects<br>
+ * from.
+ */
 public class DemuxerFormat extends ContainerFormat {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

@@ -818,7 +818,7 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_AIC_get();
   public final static native int Codec_CODEC_ID_ESCAPE130_DEPRECATED_get();
   public final static native int Codec_CODEC_ID_G2M_DEPRECATED_get();
-  public final static native int Codec_AV_CODEC_ID_BRENDER_PIX_get();
+  public final static native int Codec_CODEC_ID_BRENDER_PIX_get();
   public final static native int Codec_CODEC_ID_Y41P_get();
   public final static native int Codec_CODEC_ID_ESCAPE130_get();
   public final static native int Codec_CODEC_ID_EXR_get();
@@ -918,7 +918,6 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_XAN_DPCM_get();
   public final static native int Codec_CODEC_ID_SOL_DPCM_get();
   public final static native int Codec_CODEC_ID_MP2_get();
-  public final static native int Codec_CODEC_ID_MP3_get();
   public final static native int Codec_CODEC_ID_AAC_get();
   public final static native int Codec_CODEC_ID_AC3_get();
   public final static native int Codec_CODEC_ID_DTS_get();

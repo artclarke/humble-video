@@ -8,6 +8,9 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * A ContainerStream object representing a stream contained in a writable Container.
+ */
 public class MuxerStream extends ContainerStream {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

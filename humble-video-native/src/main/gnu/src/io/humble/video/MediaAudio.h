@@ -43,6 +43,10 @@ class VS_API_HUMBLEVIDEO AudioChannel : public io::humble::ferry::RefCounted
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(AudioChannel)
   ;
 public:
+
+  /**
+   * Flags for each type of audio channel that can be in multi-channel audio.
+   */
   typedef enum Type
   {
     CH_UNKNOWN = 0,
@@ -72,6 +76,12 @@ public:
     CH_SURROUND_DIRECT_RIGHT = AV_CH_SURROUND_DIRECT_RIGHT,
     CH_LOW_FREQUENCY_2 = AV_CH_LOW_FREQUENCY_2,
   } Type;
+
+  /**
+   * Different layouts of audio channels. The
+   * value of these flags are ultimately a
+   * bitmask of different {#Type} flags.
+   */
   typedef enum Layout
   {
     CH_LAYOUT_UNKNOWN = 0,

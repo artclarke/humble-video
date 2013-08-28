@@ -32,6 +32,10 @@ namespace io {
 namespace humble {
 namespace video {
 
+/**
+ * An object that describes Containers that HumbleVideo can read MediaPacket objects
+ * from.
+ */
 class VS_API_HUMBLEVIDEO DemuxerFormat : public io::humble::video::ContainerFormat
 {
 VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(DemuxerFormat)

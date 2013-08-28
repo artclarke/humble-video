@@ -29,8 +29,8 @@ namespace humble {
 namespace video {
 
 /**
- * A packet of data that was read from a Source or
- * will be written to a Sink.
+ * A packet of encoded data that was read from a Demuxer or
+ * will be written to a Muxer.
  */
 class VS_API_HUMBLEVIDEO MediaPacket : public io::humble::video::MediaEncoded
 {

@@ -8,6 +8,9 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * A Container that MediaPacket objects can be written to.
+ */
 public class Muxer extends Container {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

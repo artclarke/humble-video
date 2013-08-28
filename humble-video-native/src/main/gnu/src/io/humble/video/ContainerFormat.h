@@ -29,160 +29,168 @@
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/Codec.h>
 
-namespace io
+namespace io {
+namespace humble {
+namespace video {
+
+/**
+ * Parent class for objects that describe different container formats
+ * for media (e.g. MP4 vs. FLV).
+ */
+class VS_API_HUMBLEVIDEO ContainerFormat : public io::humble::ferry::RefCounted
 {
-  namespace humble
+public:
+  /**
+   * A series of flags that different ContainerFormats and their subclasses
+   * can support.
+   */
+  typedef enum Flag
   {
-    namespace video
-    {
+    INVALID_FLAG = -1,
 
-      class VS_API_HUMBLEVIDEO ContainerFormat : public io::humble::ferry::RefCounted
-      {
-      public:
-        /**
-         * A series of flags that different ContainerFormats and their subclasses
-         * can support.
-         */
-        typedef enum Flag
-        {
-          INVALID_FLAG=-1,
+    /**
+     * This format does not use an on-disk file (e.g. a network format)
+     */
+    NO_FILE = AVFMT_NOFILE,
+    /** Needs a percent-d in filename. */
+    NEED_NUMBER = AVFMT_NEEDNUMBER,
 
-          /**
-           * This format does not use an on-disk file (e.g. a network format)
-           */
-          NO_FILE = AVFMT_NOFILE,
-          /** Needs a percent-d in filename. */
-          NEED_NUMBER = AVFMT_NEEDNUMBER,
+    /** Show format stream IDs numbers. */
+    SHOW_IDS = AVFMT_SHOW_IDS,
 
-          /** Show format stream IDs numbers. */
-          SHOW_IDS = AVFMT_SHOW_IDS,
+    /** Format wants AVPicture structure for raw picture data. */
+    RAW_PICTURE = AVFMT_RAWPICTURE,
 
-          /** Format wants AVPicture structure for raw picture data. */
-          RAW_PICTURE = AVFMT_RAWPICTURE,
+    /** Format wants global header. */
+    GLOBAL_HEADER = AVFMT_GLOBALHEADER,
 
-          /** Format wants global header. */
-          GLOBAL_HEADER = AVFMT_GLOBALHEADER,
+    /** Format does not need / have any timestamps. */
+    NO_TIMESTAMPS = AVFMT_NOTIMESTAMPS,
 
-          /** Format does not need / have any timestamps. */
-          NO_TIMESTAMPS = AVFMT_NOTIMESTAMPS,
+    /** Use generic index building code. */
+    GENERIC_INDEX = AVFMT_GENERIC_INDEX,
 
-          /** Use generic index building code. */
-          GENERIC_INDEX = AVFMT_GENERIC_INDEX,
+    /** Format allows timestamp discontinuities. Note, muxers always require valid (monotone) timestamps */
+    TIMESTAMP_DISCONTINUITIES = AVFMT_TS_DISCONT,
 
-          /** Format allows timestamp discontinuities. Note, muxers always require valid (monotone) timestamps */
-          TIMESTAMP_DISCONTINUITIES = AVFMT_TS_DISCONT,
+    /** Format allows variable fps. */
+    VARIABLE_FPS = AVFMT_VARIABLE_FPS,
 
-          /** Format allows variable fps. */
-          VARIABLE_FPS = AVFMT_VARIABLE_FPS,
+    /** Format does not need width/height */
+    NO_DIMENSIONS = AVFMT_NODIMENSIONS,
 
-          /** Format does not need width/height */
-          NO_DIMENSIONS = AVFMT_NODIMENSIONS,
+    /** Format does not require any streams */
+    NO_STREAMS = AVFMT_NOSTREAMS,
 
-          /** Format does not require any streams */
-          NO_STREAMS = AVFMT_NOSTREAMS,
+    /** Format does not allow to fallback to binary search via read_timestamp */
+    NO_BINARY_SEARCH = AVFMT_NOBINSEARCH,
 
-          /** Format does not allow to fallback to binary search via read_timestamp */
-          NO_BINARY_SEARCH = AVFMT_NOBINSEARCH,
+    /** Format does not allow to fallback to generic search */
+    NO_GENERIC_SEARCH = AVFMT_NOGENSEARCH,
 
-          /** Format does not allow to fallback to generic search */
-          NO_GENERIC_SEARCH = AVFMT_NOGENSEARCH,
+    /** Format does not allow seeking by bytes */
+    NO_BYTE_SEEKING = AVFMT_NO_BYTE_SEEK,
 
-          /** Format does not allow seeking by bytes */
-          NO_BYTE_SEEKING = AVFMT_NO_BYTE_SEEK,
+    /** Format allows flushing. If not set, the muxer will not receive a NULL packet in the write_packet function. */
+    ALLOW_FLUSH = AVFMT_ALLOW_FLUSH,
 
-          /** Format allows flushing. If not set, the muxer will not receive a NULL packet in the write_packet function. */
-          ALLOW_FLUSH = AVFMT_ALLOW_FLUSH,
+    /** Format does not require strictly increasing timestamps, but they must still be monotonic */
+    NONSTRICT_TIMESTAMPS = AVFMT_TS_NONSTRICT,
 
-          /** Format does not require strictly increasing timestamps, but they must still be monotonic */
-          NONSTRICT_TIMESTAMPS = AVFMT_TS_NONSTRICT,
+    /** Seeking is based on PTS */
+    SEEK_TO_PTS = AVFMT_SEEK_TO_PTS,
+  } Flag;
 
-          /** Seeking is based on PTS */
-          SEEK_TO_PTS = AVFMT_SEEK_TO_PTS,
-        } Flag;
+  /**
+   * Name for format.
+   */
+  virtual const char*
+  getName()=0;
 
-        /**
-         * Name for format.
-         */
-        virtual const char*
-        getName()=0;
+  /**
+   * Descriptive name for the format, meant to be more human-readable
+   * than name.
+   */
+  virtual const char*
+  getLongName()=0;
 
-        /**
-         * Descriptive name for the format, meant to be more human-readable
-         * than name.
-         */
-        virtual const char*
-        getLongName()=0;
+  /** A comma-separated list of supported filename extensions */
+  virtual const char*
+  getExtensions()=0;
 
-        /** A comma-separated list of supported filename extensions */
-        virtual const char*
-        getExtensions()=0;
+  /**
+   * Flags that tell you what capabilities this format supports.
+   *
+   * @return a bitmask of Flags
+   */
+  virtual int32_t
+  getFlags()=0;
 
-        /**
-         * Flags that tell you what capabilities this format supports.
-         *
-         * @return a bitmask of Flags
-         */
-        virtual int32_t
-        getFlags()=0;
+  /**
+   * Find out if the given Flag is set for this ContainerFormat.
+   */
+  virtual bool
+  getFlag(Flag flag) {
+    return getFlags() & flag;
+  }
 
-        /**
-         * Find out if the given Flag is set for this ContainerFormat.
-         */
-        virtual bool
-        getFlag(Flag flag) { return getFlags() & flag; }
-
-
-        /**
-         * Get total number of different codecs this container can output.
-         */
-        virtual int32_t getNumSupportedCodecs() = 0;
-        /**
-         * Get the Codec.ID for the n'th codec supported by this container.
-         *
-         * @param n The n'th codec supported by this codec. Lower n are higher priority.
-         *   n must be < #getNumSupportedCodecs()
-         * @return the Codec.ID at the n'th slot, or Codec.ID.CODEC_ID_NONE if none.
-         */
-        virtual Codec::ID getSupportedCodecId(int32_t n) = 0;
-        /**
-         * Get the 32-bit Codec Tag for the n'th codec supported by this container.
-         *
-         * @param n The n'th codec supported by this codec. Lower n are higher priority.
-         *   n must be < #getNumSupportedCodecs()
-         * @return the codec tag at the n'th slot, or 0 if none.
-         */
-        virtual uint32_t getSupportedCodecTag(int32_t n) = 0;
+  /**
+   * Get total number of different codecs this container can output.
+   */
+  virtual int32_t
+  getNumSupportedCodecs() = 0;
+  /**
+   * Get the Codec.ID for the n'th codec supported by this container.
+   *
+   * @param n The n'th codec supported by this codec. Lower n are higher priority.
+   *   n must be < #getNumSupportedCodecs()
+   * @return the Codec.ID at the n'th slot, or Codec.ID.CODEC_ID_NONE if none.
+   */
+  virtual Codec::ID
+  getSupportedCodecId(int32_t n) = 0;
+  /**
+   * Get the 32-bit Codec Tag for the n'th codec supported by this container.
+   *
+   * @param n The n'th codec supported by this codec. Lower n are higher priority.
+   *   n must be < #getNumSupportedCodecs()
+   * @return the codec tag at the n'th slot, or 0 if none.
+   */
+  virtual uint32_t
+  getSupportedCodecTag(int32_t n) = 0;
 
 #ifndef SWIG
-        /**
-         * Get total number of different codecs this container can output.
-         */
-        static int32_t getNumSupportedCodecs(const struct AVCodecTag * const * tags);
+  /**
+   * Get total number of different codecs this container can output.
+   */
+  static int32_t
+  getNumSupportedCodecs(const struct AVCodecTag * const * tags);
 
-        /**
-         * Get the Codec.ID for the n'th codec supported by this container.
-         *
-         * @param n The n'th codec supported by this codec. Lower n are higher priority.
-         *   n must be < #getNumSupportedCodecs()
-         * @return the Codec.ID at the n'th slot, or Codec.ID.CODEC_ID_NONE if none.
-         */
-        static Codec::ID getSupportedCodecId(const struct AVCodecTag * const * tags, int32_t n);
+  /**
+   * Get the Codec.ID for the n'th codec supported by this container.
+   *
+   * @param n The n'th codec supported by this codec. Lower n are higher priority.
+   *   n must be < #getNumSupportedCodecs()
+   * @return the Codec.ID at the n'th slot, or Codec.ID.CODEC_ID_NONE if none.
+   */
+  static Codec::ID
+  getSupportedCodecId(const struct AVCodecTag * const * tags, int32_t n);
 
-        /**
-         * Get the 32-bit Codec Tag for the n'th codec supported by this container.
-         *
-         * @param n The n'th codec supported by this codec. Lower n are higher priority.
-         *   n must be < #getNumSupportedCodecs()
-         * @return the codec tag at the n'th slot, or 0 if none.
-         */
-        static uint32_t getSupportedCodecTag(const struct AVCodecTag * const * tags, int32_t n);
+  /**
+   * Get the 32-bit Codec Tag for the n'th codec supported by this container.
+   *
+   * @param n The n'th codec supported by this codec. Lower n are higher priority.
+   *   n must be < #getNumSupportedCodecs()
+   * @return the codec tag at the n'th slot, or 0 if none.
+   */
+  static uint32_t
+  getSupportedCodecTag(const struct AVCodecTag * const * tags, int32_t n);
 #endif // !SWIG
-        ContainerFormat();
-        virtual
-        ~ContainerFormat();
-      };
+  ContainerFormat();
+  virtual
+  ~ContainerFormat();
+};
 
-    } /* namespace video */
-  } /* namespace humble */
+} /* namespace video */
+} /* namespace humble */
 } /* namespace io */
 #endif /* CONTAINERFORMAT_H_ */

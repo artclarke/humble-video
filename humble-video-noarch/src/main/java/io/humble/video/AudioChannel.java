@@ -218,6 +218,9 @@ public class AudioChannel extends RefCounted {
     return VideoJNI.AudioChannel_getLayoutName(layout.swigValue());
   }
 
+  /**
+   * Flags for each type of audio channel that can be in multi-channel audio.
+   */
   public enum Type {
     CH_UNKNOWN(VideoJNI.AudioChannel_CH_UNKNOWN_get()),
     CH_FRONT_LEFT(VideoJNI.AudioChannel_CH_FRONT_LEFT_get()),
@@ -285,6 +288,11 @@ public class AudioChannel extends RefCounted {
     }
   }
 
+  /**
+   * Different layouts of audio channels. The<br>
+   * value of these flags are ultimately a<br>
+   * bitmask of different {#Type} flags.
+   */
   public enum Layout {
     CH_LAYOUT_UNKNOWN(VideoJNI.AudioChannel_CH_LAYOUT_UNKNOWN_get()),
     CH_LAYOUT_NATIVE(VideoJNI.AudioChannel_CH_LAYOUT_NATIVE_get()),

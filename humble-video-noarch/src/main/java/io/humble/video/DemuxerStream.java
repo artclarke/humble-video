@@ -9,7 +9,7 @@
 package io.humble.video;
 import io.humble.ferry.*;
 /**
- * A ContainerStream class that was read from a Demuxer.
+ * A ContainerStream object representing a stream contained in a readable Container.
  */
 public class DemuxerStream extends ContainerStream {
   // JNIHelper.swg: Start generated code

@@ -8,6 +8,10 @@
 
 package io.humble.video;
 import io.humble.ferry.*;
+/**
+ * Describes how different pixel components (e.g. the YUV values) are<br>
+ * represented in memory for a given PixelFormat.
+ */
 public class PixelComponentDescriptor extends RefCounted {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>

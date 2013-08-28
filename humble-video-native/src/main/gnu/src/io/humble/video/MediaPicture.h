@@ -34,6 +34,10 @@ namespace io {
 namespace humble {
 namespace video {
 
+/**
+ * Picture (or video) raw data that can be displayed or modified, and also
+ * encoded by Encoder objects.
+ */
 class VS_API_HUMBLEVIDEO MediaPicture : public io::humble::video::MediaSampled
 {
 public:
