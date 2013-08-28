@@ -41,6 +41,7 @@ public:
   void testCreation();
   void testResampleErrors();
   void testResample();
+  void testFlushResampler();
 private:
   void writeAudio(FILE* output, io::humble::video::MediaAudio* audio,
       io::humble::video::MediaAudioResampler*,

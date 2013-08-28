@@ -278,3 +278,28 @@ MediaAudioResamplerTest::testResampleErrors()
     TS_ASSERT_THROWS(resampler->resample(out.value(), in.value()), HumbleInvalidArgument);
   }
 }
+
+void
+MediaAudioResamplerTest::testFlushResampler() {
+  RefPointer<MediaAudioResampler> resampler;
+  AudioChannel::Layout outLayout = AudioChannel::CH_LAYOUT_STEREO;
+  AudioChannel::Layout inLayout = AudioChannel::CH_LAYOUT_5POINT1;
+  int32_t outSampleRate = 22050;
+  int32_t inSampleRate = 44100;
+  AudioFormat::Type outFormat = AudioFormat::SAMPLE_FMT_S16;
+  AudioFormat::Type inFormat = AudioFormat::SAMPLE_FMT_DBLP;
+
+  resampler = MediaAudioResampler::make(outLayout, outSampleRate, outFormat,
+      inLayout, inSampleRate, inFormat);
+  TS_ASSERT(resampler);
+  resampler->open();
+
+  RefPointer<MediaAudio> out;
+  out = MediaAudio::make(1000, outSampleRate,
+      AudioChannel::getNumChannelsInLayout(outLayout),
+      outLayout, outFormat);
+
+  // make sure we can pass a null input.
+  resampler->resample(out.value(), 0);
+  TS_ASSERT(!out->isComplete());
+}
