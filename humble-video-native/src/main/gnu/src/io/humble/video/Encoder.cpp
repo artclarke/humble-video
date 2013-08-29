@@ -110,7 +110,8 @@ Encoder::open(KeyValueBag * inputOptions, KeyValueBag* unsetOptions) {
   Coder::open(inputOptions, unsetOptions);
   // now check to see if we require an audio resampler.
   RefPointer<Codec> codec = getCodec();
-  if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
+  if (codec->getType() == MediaDescriptor::MEDIA_AUDIO &&
+      !(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
     // yes, we do. Let's create one. This looks odd, as it's converting
     // the same params into the same params, but it's really just being
     // used as an audio buffer for us.
