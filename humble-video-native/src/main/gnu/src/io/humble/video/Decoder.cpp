@@ -49,8 +49,8 @@ Decoder::Decoder(Codec* codec, AVCodecContext* src, bool copy) : Coder(codec, sr
   if (!codec->canDecode())
     throw HumbleInvalidArgument("passed in codec cannot decode");
 
-  mSamplesDecoded = 0;
-  mNextPts = Global::NO_PTS;
+  mSamplesSinceLastTimeStampDiscontinuity = 0;
+  mAudioDiscontinuityStartingTimeStamp = Global::NO_PTS;
 
   VS_LOG_TRACE("Created decoder");
 }
@@ -149,13 +149,13 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   }
 
   int64_t packetTs = packet ? packet->getPts() : Global::NO_PTS;
-  if (mNextPts == Global::NO_PTS) {
+  if (mAudioDiscontinuityStartingTimeStamp == Global::NO_PTS) {
     if (packet && packet->getPts() != Global::NO_PTS) {
       // rebase packet timestamp to coder's timestamp
-      mNextPts = rebase(packet->getPts(), packet);
+      mAudioDiscontinuityStartingTimeStamp = rebase(packet->getPts(), packet);
     } else {
       VS_LOG_DEBUG("Packet had no timestamp, so setting fake timestamp to 0");
-      mNextPts = 0;
+      mAudioDiscontinuityStartingTimeStamp = 0;
     }
   }
 
@@ -202,48 +202,49 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   av_free_packet(pkt);
   if (got_frame) {
     RefPointer<Rational> coderBase = getTimeBase();
+    // if we have a packet
+    if (packetTs != Global::NO_PTS) {
+      // make sure the packet timestamps and our fake timestamps are not
+      // drifting apart by too much
+      RefPointer<Rational> packetBase = packet->getTimeBase();
+      // convert our calculated timestamp to the packet base and compare
+      int64_t rebasedTs = packetBase ? packetBase->rescale(mAudioDiscontinuityStartingTimeStamp, coderBase.value()) : mAudioDiscontinuityStartingTimeStamp;
+      int64_t delta = rebasedTs - packetTs;
+      VS_LOG_TRACE("packet: %lld; calculated: %lld; delta: %lld; tb (%d/%d); nextPts: %lld; samples: %lld",
+          packetTs,
+          rebasedTs,
+          delta,
+          packetBase->getNumerator(),
+          packetBase->getDenominator(),
+          mAudioDiscontinuityStartingTimeStamp,
+          mSamplesSinceLastTimeStampDiscontinuity);
+      if (delta <= 1 && delta >= -1) {
+        // within one tick; keep the original measure of discontinuity start
+      } else {
+        // drift occurring
+        int64_t newNext = coderBase ? coderBase->rescale(packetTs, packetBase.value()) : mAudioDiscontinuityStartingTimeStamp;
+        VS_LOG_DEBUG("Gap in audio (%lld). Resetting calculated time stamp from %lld to %lld",
+            delta,
+            mAudioDiscontinuityStartingTimeStamp,
+            newNext);
+        mAudioDiscontinuityStartingTimeStamp = newNext;
+        mSamplesSinceLastTimeStampDiscontinuity = 0;
+      }
+    }
 
     // never allow an audio frame without a guessed best effort timestamp.
     if (frame->pts == Global::NO_PTS) {
-      // if we have a packet
-      if (packetTs != Global::NO_PTS) {
-        // make sure the packet timestamps and our fake timestamps are not
-        // drifting apart by too much
-        RefPointer<Rational> packetBase = packet->getTimeBase();
-        // convert our calculated timestamp to the packet base and compare
-        int64_t rebasedTs = packetBase ? packetBase->rescale(mNextPts, coderBase.value()) : mNextPts;
-        int64_t delta = rebasedTs - packetTs;
-        VS_LOG_TRACE("packet: %lld; calculated: %lld; delta: %lld; tb (%d/%d); nextPts: %lld; samples: %lld",
-            packetTs,
-            rebasedTs,
-            delta,
-            packetBase->getNumerator(),
-            packetBase->getDenominator(),
-            mNextPts,
-            mSamplesDecoded);
-        if (delta <= 1 && delta >= -1) {
-          // within one tick; keep the fake
-        } else {
-          // drift occurring
-          int64_t newNext = coderBase ? coderBase->rescale(packetTs, packetBase.value()) : mNextPts;
-          VS_LOG_DEBUG("Gap in audio (%lld). Resetting calculated time stamp from %lld to %lld",
-              delta,
-              mNextPts,
-              newNext);
-          mNextPts = newNext;
-        }
-      }
-
-      // now we set the time stamp to the calculated value
-      frame->pts = mNextPts;
+      // now we set the time stamp to the calculated value. We use the number
+      // of samples as the main measure of audio time to reduce audio timestamp
+      // drift.
+      frame->pts = mAudioDiscontinuityStartingTimeStamp + Rational::rescale(
+          mSamplesSinceLastTimeStampDiscontinuity,
+          getCodecCtx()->time_base.num, getCodecCtx()->time_base.den,
+          1, getSampleRate(), Rational::ROUND_DOWN);;
     }
 
-    // calculate the next timestamp based on the audio samples
-    mSamplesDecoded += frame->nb_samples;
-
-    mNextPts += Rational::rescale(frame->nb_samples,
-        getCodecCtx()->time_base.num, getCodecCtx()->time_base.den,
-        1, getSampleRate(), Rational::ROUND_DOWN);
+    // calculate the next time stamp based on the audio samples
+    mSamplesSinceLastTimeStampDiscontinuity += frame->nb_samples;
 
     // copy the output frame to our frame
     output->copy(frame, true);
@@ -340,7 +341,7 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
     output->copy(frame, true);
     RefPointer<Rational> tb = getTimeBase();
     output->setTimeBase(tb.value());
-    mSamplesDecoded += 1;
+    mSamplesSinceLastTimeStampDiscontinuity += 1;
   }
   // release the temporary reference
   mCachedMedia = 0;

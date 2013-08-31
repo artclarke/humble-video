@@ -138,8 +138,8 @@ protected:
 private:
   int64_t rebase(int64_t ts, MediaPacket* packet);
   io::humble::ferry::RefPointer<MediaRaw> mCachedMedia;
-  int64_t mNextPts;
-  int64_t mSamplesDecoded;
+  int64_t mAudioDiscontinuityStartingTimeStamp;
+  int64_t mSamplesSinceLastTimeStampDiscontinuity;
 };
 
 } /* namespace video */
