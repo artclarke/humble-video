@@ -168,6 +168,7 @@ DecoderTest::testDecodeAudio() {
       decoder->getSampleFormat()
   );
 
+  int64_t oldTimeStamp = Global::NO_PTS;
   while(source->read(packet.value()) >= 0) {
     // got a packet; now we try to decode it.
     if (packet->getStreamIndex() == streamToDecode &&
@@ -177,24 +178,29 @@ DecoderTest::testDecodeAudio() {
       do {
         bytesRead = decoder->decodeAudio(audio.value(), packet.value(), byteOffset);
         if (audio->isComplete()) {
+          RefPointer<Rational> timeBase = audio->getTimeBase();
+          TS_ASSERT(timeBase);
           TS_ASSERT_DIFFERS(Global::NO_PTS, audio->getPacketDts());
           TS_ASSERT_DIFFERS(Global::NO_PTS, audio->getTimeStamp());
-
+          if (oldTimeStamp != Global::NO_PTS) {
+            // check for monotonically increasing
+            TS_ASSERT(oldTimeStamp < audio->getTimeStamp());
+          }
+          oldTimeStamp = audio->getTimeStamp();
           writeAudio(output, audio.value());
         }
         byteOffset += bytesRead;
       } while(byteOffset < packet->getSize());
-      // now, handle the case where bytesRead is 0; we need to flush any
-      // cached packets
-      do {
-        decoder->decodeAudio(audio.value(), 0, 0);
-        if (audio->isComplete()) {
-          writeAudio(output, audio.value());
-        }
-      } while (audio->isComplete());
     }
-
   }
+  // now, flush any cached packets
+  do {
+    decoder->decodeAudio(audio.value(), 0, 0);
+    if (audio->isComplete()) {
+      writeAudio(output, audio.value());
+    }
+  } while (audio->isComplete());
+
 
   fclose(output);
   source->close();

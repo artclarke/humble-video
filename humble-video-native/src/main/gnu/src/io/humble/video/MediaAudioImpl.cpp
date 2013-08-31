@@ -175,6 +175,8 @@ MediaAudioImpl::copy(AVFrame* src, bool complete) {
   av_frame_unref(mFrame);
   // and copy any data in.
   av_frame_ref(mFrame, src);
+  RefPointer<Rational> timeBase = getTimeBase();
+  setTimeBase(timeBase.value());
   mComplete=complete;
 }
 
@@ -192,9 +194,8 @@ MediaAudioImpl::make(MediaAudioImpl* src, bool copy) {
         src->getChannelLayout(),
         src->getFormat());
 
-    retval->setComplete(src->isComplete());
     retval->setNumSamples(src->getNumSamples());
-
+    retval->setTimeStamp(src->getTimeStamp());
     // then copy the data into retval
     int32_t n = src->getNumDataPlanes();
     for(int32_t i = 0; i < n; i++ )
@@ -211,8 +212,12 @@ MediaAudioImpl::make(MediaAudioImpl* src, bool copy) {
 
     // then do the reference
     av_frame_ref(retval->mFrame, src->mFrame);
-    retval->setComplete(src->isComplete());
   }
+  // copy the items not embedded in the frame
+  retval->setComplete(src->isComplete());
+  RefPointer<Rational> timeBase = src->getTimeBase();
+  retval->setTimeBase(timeBase.value());
+
   return retval.get();
 }
 

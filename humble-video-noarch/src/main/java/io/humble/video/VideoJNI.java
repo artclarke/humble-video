@@ -304,6 +304,8 @@ public class VideoJNI {
   public final static native long MediaRaw_getPacketDuration(long jarg1, MediaRaw jarg1_);
   public final static native long MediaRaw_getBestEffortTimeStamp(long jarg1, MediaRaw jarg1_);
   public final static native void MediaRaw_setComplete(long jarg1, MediaRaw jarg1_, boolean jarg2);
+  public final static native void MediaRaw_setTimeBase__SWIG_0(long jarg1, MediaRaw jarg1_, long jarg2, Rational jarg2_);
+  public final static native void MediaRaw_setTimeBase__SWIG_1(long jarg1, MediaRaw jarg1_, long jarg2, Rational jarg2_, int jarg3);
   public final static native int MediaSampled_getNumSamples(long jarg1, MediaSampled jarg1_);
   public final static native int AudioChannel_CH_UNKNOWN_get();
   public final static native int AudioChannel_CH_FRONT_LEFT_get();

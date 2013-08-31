@@ -1,5 +1,6 @@
 package io.humble.video;
 
+import static org.junit.Assert.assertTrue;
 import io.humble.video.awt.MediaPictureConverter;
 import io.humble.video.awt.MediaPictureConverterFactory;
 import io.humble.video.awt.ImageFrame;
@@ -16,9 +17,11 @@ import java.nio.ByteBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DecoderTest {
-
+  private static final Logger log = LoggerFactory.getLogger(DecoderTest.class);
   private Demuxer source;
   
   @Before
@@ -58,6 +61,7 @@ public class DecoderTest {
     final AudioFrame audioFrame = AudioFrame.make(converter.getJavaFormat());
     ByteBuffer rawAudio = null;
     
+    long lastTimeStamp = Global.NO_PTS;
     while(source.read(packet)>=0) {
      if (packet.isComplete() && packet.getStreamIndex()==audioStream) {
        // let's try decoding
@@ -68,6 +72,13 @@ public class DecoderTest {
          rawAudio = converter.toJavaAudio(rawAudio, audio);
          if (audioFrame != null) 
            audioFrame.play(rawAudio);
+         log.error("TS: {}, TB: {}", audio.getTimeStamp(), audio.getTimeBase());
+         assertTrue(audio.getTimeStamp() != Global.NO_PTS);
+         if (lastTimeStamp != Global.NO_PTS) {
+           // make sure time stamps are monotonically increasing
+           assertTrue(lastTimeStamp < audio.getTimeStamp());
+         }
+         lastTimeStamp = audio.getTimeStamp();
          byteOffset += bytesRead;
        } while (byteOffset < packet.getSize());
      }

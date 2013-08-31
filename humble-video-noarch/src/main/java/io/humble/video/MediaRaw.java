@@ -220,4 +220,25 @@ public class MediaRaw extends Media {
     VideoJNI.MediaRaw_setComplete(swigCPtr, this, value);
   }
 
+/**
+ * Sets the timebase on this object.<br>
+ * <br>
+ * If the object has a timestamp, then it is automatically rescaled to the new timebase.<br>
+ * By default the timestamp will be rounded down if there is any fractional component<br>
+ * after the rebasing.
+ */
+  public void setTimeBase(Rational timeBase) {
+    VideoJNI.MediaRaw_setTimeBase__SWIG_0(swigCPtr, this, Rational.getCPtr(timeBase), timeBase);
+  }
+
+/**
+ * Sets the timbase on this object.<br>
+ * <br>
+ * If the object has a timestamp, then it is automatically rescaled (with the<br>
+ * given rounding parameter) to the new timebase.
+ */
+  public void setTimeBase(Rational timeBase, Rational.Rounding rounding) {
+    VideoJNI.MediaRaw_setTimeBase__SWIG_1(swigCPtr, this, Rational.getCPtr(timeBase), timeBase, rounding.swigValue());
+  }
+
 }

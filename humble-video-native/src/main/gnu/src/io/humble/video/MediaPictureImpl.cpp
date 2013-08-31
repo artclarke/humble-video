@@ -194,6 +194,8 @@ MediaPictureImpl::copy(AVFrame* src, bool complete) {
   av_frame_unref(mFrame);
   // and copy any data in.
   av_frame_ref(mFrame, src);
+  RefPointer<Rational> timeBase = getTimeBase();
+  setTimeBase(timeBase.value());
   mComplete=complete;
 }
 

@@ -49,6 +49,9 @@ Decoder::Decoder(Codec* codec, AVCodecContext* src, bool copy) : Coder(codec, sr
   if (!codec->canDecode())
     throw HumbleInvalidArgument("passed in codec cannot decode");
 
+  mSamplesDecoded = 0;
+  mNextPts = Global::NO_PTS;
+
   VS_LOG_TRACE("Created decoder");
 }
 
@@ -96,6 +99,21 @@ Decoder::prepareFrame(AVFrame* frame, int flags) {
   return 0;
 }
 
+int64_t
+Decoder::rebase(int64_t ts, MediaPacket* packet) {
+  if (!packet)
+    return ts;
+
+  RefPointer<Rational> srcTs = packet->getTimeBase();
+  RefPointer<Rational> dstTs = this->getTimeBase();
+
+  if (!srcTs
+      || !dstTs
+      || !srcTs->getDenominator()
+      || !dstTs->getDenominator())
+    return ts;
+  return dstTs->rescale(ts, srcTs.value());
+}
 int32_t
 Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
     int32_t byteOffset) {
@@ -127,6 +145,17 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   } else {
     if (byteOffset > 0) {
       VS_LOG_WARN("Passing null packet with a non zero byte offset makes no sense");
+    }
+  }
+
+  int64_t packetTs = packet ? packet->getPts() : Global::NO_PTS;
+  if (mNextPts == Global::NO_PTS) {
+    if (packet && packet->getPts() != Global::NO_PTS) {
+      // rebase packet timestamp to coder's timestamp
+      mNextPts = rebase(packet->getPts(), packet);
+    } else {
+      VS_LOG_DEBUG("Packet had no timestamp, so setting fake timestamp to 0");
+      mNextPts = 0;
     }
   }
 
@@ -165,17 +194,61 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   // frame by setting a call back that Coder::getBuffer2 will use.
 
   mCachedMedia.reset(output, true);
+  // reset the frame timestamp so ffmpeg doesn't get confused
+  output->setTimeStamp(Global::NO_PTS);
   // try out decode
   retval = avcodec_decode_audio4(getCodecCtx(), frame, &got_frame, pkt);
   // always free the packet so that we don't have an exception make us leak it.
   av_free_packet(pkt);
   if (got_frame) {
-    // never allow a video frame without a guessed best effort timestamp.
-    if (frame->pts == Global::NO_PTS)
-      frame->pts = frame->best_effort_timestamp;
+    RefPointer<Rational> coderBase = getTimeBase();
+
+    // never allow an audio frame without a guessed best effort timestamp.
+    if (frame->pts == Global::NO_PTS) {
+      // if we have a packet
+      if (packetTs != Global::NO_PTS) {
+        // make sure the packet timestamps and our fake timestamps are not
+        // drifting apart by too much
+        RefPointer<Rational> packetBase = packet->getTimeBase();
+        // convert our calculated timestamp to the packet base and compare
+        int64_t rebasedTs = packetBase ? packetBase->rescale(mNextPts, coderBase.value()) : mNextPts;
+        int64_t delta = rebasedTs - packetTs;
+        VS_LOG_TRACE("packet: %lld; calculated: %lld; delta: %lld; tb (%d/%d); nextPts: %lld; samples: %lld",
+            packetTs,
+            rebasedTs,
+            delta,
+            packetBase->getNumerator(),
+            packetBase->getDenominator(),
+            mNextPts,
+            mSamplesDecoded);
+        if (delta <= 1 && delta >= -1) {
+          // within one tick; keep the fake
+        } else {
+          // drift occurring
+          int64_t newNext = coderBase ? coderBase->rescale(packetTs, packetBase.value()) : mNextPts;
+          VS_LOG_DEBUG("Gap in audio (%lld). Resetting calculated time stamp from %lld to %lld",
+              delta,
+              mNextPts,
+              newNext);
+          mNextPts = newNext;
+        }
+      }
+
+      // now we set the time stamp to the calculated value
+      frame->pts = mNextPts;
+    }
+
+    // calculate the next timestamp based on the audio samples
+    mSamplesDecoded += frame->nb_samples;
+
+    mNextPts += Rational::rescale(frame->nb_samples,
+        getCodecCtx()->time_base.num, getCodecCtx()->time_base.den,
+        1, getSampleRate(), Rational::ROUND_DOWN);
 
     // copy the output frame to our frame
     output->copy(frame, true);
+    RefPointer<Rational> tb = getTimeBase();
+    output->setTimeBase(tb.value());
   }
   // release the temporary reference
   mCachedMedia = 0;
@@ -265,6 +338,9 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
       frame->pts = frame->best_effort_timestamp;
     // copy the output frame to our frame
     output->copy(frame, true);
+    RefPointer<Rational> tb = getTimeBase();
+    output->setTimeBase(tb.value());
+    mSamplesDecoded += 1;
   }
   // release the temporary reference
   mCachedMedia = 0;

@@ -136,7 +136,10 @@ protected:
 
   virtual int prepareFrame(AVFrame* frame, int flags);
 private:
+  int64_t rebase(int64_t ts, MediaPacket* packet);
   io::humble::ferry::RefPointer<MediaRaw> mCachedMedia;
+  int64_t mNextPts;
+  int64_t mSamplesDecoded;
 };
 
 } /* namespace video */
