@@ -208,16 +208,6 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
   AVFrame* outFrame = out->getCtx();
   AVFrame* inFrame = in ? in->getCtx() : 0;
 
-  // now, we know the audio is hidden in extended_data
-  int retval = swr_convert(mCtx,
-      outFrame ? outFrame->extended_data : 0,
-      out ? out->getMaxNumSamples() : 0 ,
-      inFrame? (const uint8_t**)inFrame->extended_data : 0,
-      inFrame ? inFrame->nb_samples : 0);
-  if (retval < 0) {
-    FfmpegException::check(retval, "Could not convert audio ");
-  }
-  outFrame->nb_samples = retval;
 
   // first convert PTS to sample number
   int64_t inputTs = Global::NO_PTS;
@@ -239,6 +229,17 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
       Rational::ROUND_DOWN);
   // and set our time base.
   out->setTimeBase(mTimeBase.value());
+
+  // now, we know the audio is hidden in extended_data
+  int retval = swr_convert(mCtx,
+      outFrame->extended_data,
+      out->getMaxNumSamples(),
+      inFrame? (const uint8_t**)inFrame->extended_data : 0,
+      inFrame ? inFrame->nb_samples : 0);
+  if (retval < 0) {
+    FfmpegException::check(retval, "Could not convert audio ");
+  }
+  outFrame->nb_samples = retval;
   out->setComplete(retval > 0);
   return retval;
 

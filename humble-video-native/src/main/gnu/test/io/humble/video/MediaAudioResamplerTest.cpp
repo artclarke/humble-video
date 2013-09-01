@@ -110,6 +110,9 @@ MediaAudioResamplerTest::writeAudio(FILE* output, MediaAudio* audio,
     int resampled = 0;
     do {
       resampled = resampler->resample(rAudio, audio);
+      VS_LOG_TRACE("Input ts: %lld; Output ts: %lld",
+          audio ? audio->getTimeStamp() : Global::NO_PTS,
+          rAudio->getTimeStamp());
       if (rAudio->isComplete()) {
         // we successfully resampled some audio; write it.
         writeAudioHelper(output, rAudio);
@@ -204,20 +207,19 @@ MediaAudioResamplerTest::testResample() {
         }
         byteOffset += bytesRead;
       } while(byteOffset < packet->getSize());
-      // now, handle the case where bytesRead is 0; we need to flush any
-      // cached packets
-      do {
-        decoder->decodeAudio(audio.value(), 0, 0);
-        if (audio->isComplete()) {
-          writeAudio(output, audio.value(), resampler.value(), rAudio.value());
-          numSamples += audio->getNumSamples();
-        }
-      } while (audio->isComplete());
     }
     if (getenv("VS_TEST_MEMCHECK") && numSamples > 10240)
       // short circuit if running under valgrind.
       break;
   }
+  do {
+    decoder->decodeAudio(audio.value(), 0, 0);
+    if (audio->isComplete()) {
+      writeAudio(output, audio.value(), resampler.value(), rAudio.value());
+      numSamples += audio->getNumSamples();
+    }
+  } while (audio->isComplete());
+
   source->close();
   fclose(output);
 }
