@@ -195,9 +195,18 @@ public:
   virtual int32_t getNumResampledSamples(int32_t numSamples);
 
   /**
-   * Get the timebase used when putting timestamps on output audio.
+   * Get the timebase used when outputting time stamps for audio.
    *
-   * Defaults to 1 / (#getInputSampleRate() * #getOutputSampleRate())
+   * Defaults to 1 / (the lowest common multiple of getInputSampleRate()
+   *   and getOutputSampleRate()) in order to ensure that no rounding
+   *   of time stamps occur.
+   *
+   * For example, if the input sample rate is 22050 and the output sample
+   * rate is 44100, then the output time base will be (1/44100). But if the
+   * input sample rate is 48000 and the output sample rate is 22050, then
+   * the output time base will be (1/lcm(48000,22050)) which will be 1/7056000
+   * (trust me). This is done so that timestamp values do not get rounded (and
+   * therefore introduce drift).
    */
   virtual Rational* getTimeBase() { return mTimeBase.get(); }
 

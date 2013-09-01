@@ -293,9 +293,18 @@ public class MediaAudioResampler extends Configurable {
   }
 
 /**
- * Get the timebase used when putting timestamps on output audio.<br>
+ * Get the timebase used when outputting time stamps for audio.<br>
  * <br>
- * Defaults to 1 / (#getInputSampleRate() * #getOutputSampleRate())
+ * Defaults to 1 / (the lowest common multiple of getInputSampleRate()<br>
+ *   and getOutputSampleRate()) in order to ensure that no rounding<br>
+ *   of time stamps occur.<br>
+ * <br>
+ * For example, if the input sample rate is 22050 and the output sample<br>
+ * rate is 44100, then the output time base will be (1/44100). But if the<br>
+ * input sample rate is 48000 and the output sample rate is 22050, then<br>
+ * the output time base will be (1/lcm(48000,22050)) which will be 1/7056000<br>
+ * (trust me). This is done so that timestamp values do not get rounded (and<br>
+ * therefore introduce drift).
  */
   public Rational getTimeBase() {
     long cPtr = VideoJNI.MediaAudioResampler_getTimeBase(swigCPtr, this);

@@ -87,6 +87,18 @@ MediaAudioResamplerTest::testCreation()
   resampler = MediaAudioResampler::make(outLayout, outSampleRate, outFormat,
       inLayout, inSampleRate, inFormat);
   TS_ASSERT(resampler);
+  RefPointer<Rational> tb = resampler->getTimeBase();
+  TS_ASSERT_EQUALS(1, tb->getNumerator());
+  TS_ASSERT_EQUALS(inSampleRate, tb->getDenominator());
+
+  // now make sure LCM works
+  resampler = MediaAudioResampler::make(outLayout, 48000, outFormat,
+      inLayout, 22050, inFormat);
+  TS_ASSERT(resampler);
+  tb = resampler->getTimeBase();
+  TS_ASSERT_EQUALS(1, tb->getNumerator());
+  TS_ASSERT_EQUALS(7056000, tb->getDenominator());
+
 }
 
 static void writeAudioHelper(FILE* output, MediaAudio* audio) {
@@ -109,10 +121,17 @@ MediaAudioResamplerTest::writeAudio(FILE* output, MediaAudio* audio,
     // resampling correctly is tricky; need to make sure that we flush everything.
     int resampled = 0;
     do {
+      RefPointer<Rational> inputTb = audio ? audio->getTimeBase() : Rational::make(1, 1);
       resampled = resampler->resample(rAudio, audio);
-      VS_LOG_TRACE("Input ts: %lld; Output ts: %lld",
+      RefPointer<Rational> outputTb = rAudio->getTimeBase();
+      VS_LOG_TRACE("Input ts: %lld (%d/%d); Output ts: %lld (%d/%d); Rebased: %lld (%d/%d)",
           audio ? audio->getTimeStamp() : Global::NO_PTS,
-          rAudio->getTimeStamp());
+              inputTb->getNumerator(), inputTb->getDenominator(),
+              rAudio->getTimeStamp(),
+              outputTb->getNumerator(), outputTb->getDenominator(),
+              Rational::rescale(rAudio->getTimeStamp(), 1, resampler->getOutputSampleRate(),
+                  outputTb->getNumerator(), outputTb->getDenominator(), Rational::ROUND_DOWN),
+              1, resampler->getOutputSampleRate());
       if (rAudio->isComplete()) {
         // we successfully resampled some audio; write it.
         writeAudioHelper(output, rAudio);

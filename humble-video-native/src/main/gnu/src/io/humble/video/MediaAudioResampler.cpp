@@ -81,7 +81,13 @@ MediaAudioResampler::make(AudioChannel::Layout outLayout, int32_t outSampleRate,
   av_opt_set_int(retval->mCtx, "och", av_get_channel_layout_nb_channels(outLayout), 0);
   av_opt_set_int(retval->mCtx, "uch", 0, 0);
 
-  retval->mTimeBase = Rational::make(1, inSampleRate*outSampleRate);
+  // find the LCM of the input and output sample rates
+  int64_t gcd = av_gcd(inSampleRate, outSampleRate);
+  int64_t lcm = inSampleRate / gcd * outSampleRate;
+  if (lcm > INT32_MAX) {
+    VS_LOG_INFO("LCM of input and output sample rates is greater than can be fit in a 32-bit value");
+  }
+  retval->mTimeBase = Rational::make(1, (int32_t)lcm);
 
   // now we set all the values
   return retval.get();
