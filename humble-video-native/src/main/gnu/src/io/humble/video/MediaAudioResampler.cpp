@@ -81,6 +81,7 @@ MediaAudioResampler::make(AudioChannel::Layout outLayout, int32_t outSampleRate,
   av_opt_set_int(retval->mCtx, "och", av_get_channel_layout_nb_channels(outLayout), 0);
   av_opt_set_int(retval->mCtx, "uch", 0, 0);
 
+  retval->mTimeBase = Rational::make(1, inSampleRate*outSampleRate);
 
   // now we set all the values
   return retval.get();
@@ -140,7 +141,6 @@ MediaAudioResampler::getInputFormat() {
     return (AudioFormat::Type)val;
 }
 
-
 int32_t
 MediaAudioResampler::getInputChannels() {
   int64_t val;
@@ -168,6 +168,14 @@ MediaAudioResampler::open() {
     FfmpegException::check(retval, "Could not open audio resampler: ");
   }
   mState = STATE_OPENED;
+}
+
+void
+MediaAudioResampler::setTimeBase(Rational* tb) {
+  if (!tb) {
+    VS_THROW(HumbleInvalidArgument("time base must be non null"));
+  }
+  mTimeBase.reset(tb, true);
 }
 
 int32_t
@@ -210,8 +218,27 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
     FfmpegException::check(retval, "Could not convert audio ");
   }
   outFrame->nb_samples = retval;
-  // wrong; need to figure out PTS stuff.
-  outFrame->pts = getNextPts(inFrame ? inFrame->pts : Global::NO_PTS);
+
+  // first convert PTS to sample number
+  int64_t inputTs = Global::NO_PTS;
+  if (in) {
+    inputTs = in->getTimeStamp();
+    RefPointer<Rational> inBase = in->getTimeBase();
+    /// convert to 1/samplerate
+    inputTs = Rational::rescale(inputTs, 1,
+        getInputSampleRate()*getOutputSampleRate(),
+        inBase ? inBase->getNumerator() : 1,
+        inBase ? inBase->getDenominator() : getInputSampleRate(),
+        Rational::ROUND_DOWN);
+  }
+  // now convert the new PTS back to the right timebase
+  outFrame->pts = Rational::rescale(
+      getNextPts(inputTs == Global::NO_PTS ? INT64_MIN : inputTs),
+      mTimeBase->getNumerator(), mTimeBase->getDenominator(),
+      1, getInputSampleRate() * getOutputSampleRate(),
+      Rational::ROUND_DOWN);
+  // and set our time base.
+  out->setTimeBase(mTimeBase.value());
   out->setComplete(retval > 0);
   return retval;
 

@@ -194,6 +194,20 @@ public:
    */
   virtual int32_t getNumResampledSamples(int32_t numSamples);
 
+  /**
+   * Get the timebase used when putting timestamps on output audio.
+   *
+   * Defaults to 1 / (#getInputSampleRate() * #getOutputSampleRate())
+   */
+  virtual Rational* getTimeBase() { return mTimeBase.get(); }
+
+  /**
+   * Set the timebase to use for timestamps on output audio.
+   *
+   * @throws InvalidArgument if null.
+   */
+  virtual void setTimeBase(Rational* rational);
+
   typedef enum State {
     STATE_INITED,
     STATE_OPENED,
@@ -208,6 +222,7 @@ protected:
 private:
   SwrContext* mCtx;
   State mState;
+  io::humble::ferry::RefPointer<Rational> mTimeBase;
 };
 
 } /* namespace video */

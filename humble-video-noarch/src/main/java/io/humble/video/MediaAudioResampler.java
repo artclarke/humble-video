@@ -292,6 +292,25 @@ public class MediaAudioResampler extends Configurable {
     return VideoJNI.MediaAudioResampler_getNumResampledSamples(swigCPtr, this, numSamples);
   }
 
+/**
+ * Get the timebase used when putting timestamps on output audio.<br>
+ * <br>
+ * Defaults to 1 / (#getInputSampleRate() * #getOutputSampleRate())
+ */
+  public Rational getTimeBase() {
+    long cPtr = VideoJNI.MediaAudioResampler_getTimeBase(swigCPtr, this);
+    return (cPtr == 0) ? null : new Rational(cPtr, false);
+  }
+
+/**
+ * Set the timebase to use for timestamps on output audio.<br>
+ * <br>
+ * @throws InvalidArgument if null.
+ */
+  public void setTimeBase(Rational rational) {
+    VideoJNI.MediaAudioResampler_setTimeBase(swigCPtr, this, Rational.getCPtr(rational), rational);
+  }
+
   public MediaAudioResampler.State getState() {
     return MediaAudioResampler.State.swigToEnum(VideoJNI.MediaAudioResampler_getState(swigCPtr, this));
   }

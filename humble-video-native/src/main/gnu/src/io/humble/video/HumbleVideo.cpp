@@ -15566,6 +15566,97 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getNu
 }
 
 
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getTimeBase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  io::humble::video::MediaAudioResampler *arg1 = (io::humble::video::MediaAudioResampler *) 0 ;
+  io::humble::video::Rational *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::MediaAudioResampler **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (io::humble::video::Rational *)(arg1)->getTimeBase();
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return 0;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+  *(io::humble::video::Rational **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1setTimeBase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  io::humble::video::MediaAudioResampler *arg1 = (io::humble::video::MediaAudioResampler *) 0 ;
+  io::humble::video::Rational *arg2 = (io::humble::video::Rational *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(io::humble::video::MediaAudioResampler **)&jarg1; 
+  arg2 = *(io::humble::video::Rational **)&jarg2; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return ;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      (arg1)->setTimeBase(arg2);
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return ;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+}
+
+
 SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaAudioResampler_1getState(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   io::humble::video::MediaAudioResampler *arg1 = (io::humble::video::MediaAudioResampler *) 0 ;

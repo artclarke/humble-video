@@ -150,9 +150,9 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
 
   int64_t packetTs = packet ? packet->getPts() : Global::NO_PTS;
   if (mAudioDiscontinuityStartingTimeStamp == Global::NO_PTS) {
-    if (packet && packet->getPts() != Global::NO_PTS) {
+    if (packetTs != Global::NO_PTS) {
       // rebase packet timestamp to coder's timestamp
-      mAudioDiscontinuityStartingTimeStamp = rebase(packet->getPts(), packet);
+      mAudioDiscontinuityStartingTimeStamp = rebase(packetTs, packet);
     } else {
       VS_LOG_DEBUG("Packet had no timestamp, so setting fake timestamp to 0");
       mAudioDiscontinuityStartingTimeStamp = 0;
@@ -202,13 +202,20 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   av_free_packet(pkt);
   if (got_frame) {
     RefPointer<Rational> coderBase = getTimeBase();
+
+    // calculate what we think the new timestamp should be
+    int64_t newPts = mAudioDiscontinuityStartingTimeStamp + Rational::rescale(
+        mSamplesSinceLastTimeStampDiscontinuity,
+        getCodecCtx()->time_base.num, getCodecCtx()->time_base.den,
+        1, getSampleRate(), Rational::ROUND_DOWN);
+
     // if we have a packet
     if (packetTs != Global::NO_PTS) {
       // make sure the packet timestamps and our fake timestamps are not
       // drifting apart by too much
       RefPointer<Rational> packetBase = packet->getTimeBase();
       // convert our calculated timestamp to the packet base and compare
-      int64_t rebasedTs = packetBase ? packetBase->rescale(mAudioDiscontinuityStartingTimeStamp, coderBase.value()) : mAudioDiscontinuityStartingTimeStamp;
+      int64_t rebasedTs = packetBase ? packetBase->rescale(newPts, coderBase.value()) : newPts;
       int64_t delta = rebasedTs - packetTs;
       VS_LOG_TRACE("packet: %lld; calculated: %lld; delta: %lld; tb (%d/%d); nextPts: %lld; samples: %lld",
           packetTs,
@@ -216,13 +223,13 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
           delta,
           packetBase->getNumerator(),
           packetBase->getDenominator(),
-          mAudioDiscontinuityStartingTimeStamp,
+          newPts,
           mSamplesSinceLastTimeStampDiscontinuity);
       if (delta <= 1 && delta >= -1) {
         // within one tick; keep the original measure of discontinuity start
       } else {
         // drift occurring
-        int64_t newNext = coderBase ? coderBase->rescale(packetTs, packetBase.value()) : mAudioDiscontinuityStartingTimeStamp;
+        int64_t newNext = coderBase ? coderBase->rescale(packetTs, packetBase.value()) : packetTs;
         VS_LOG_DEBUG("Gap in audio (%lld). Resetting calculated time stamp from %lld to %lld",
             delta,
             mAudioDiscontinuityStartingTimeStamp,
