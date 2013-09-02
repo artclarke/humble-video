@@ -1,0 +1,8 @@
+#!/bin/sh
+exec 2>&1
+cd <%= node['jenkins']['node']['home'] %>
+exec chpst -u <%= node['jenkins']['node']['user'] %> \
+  java -jar <%= node['jenkins']['node']['home'] %>/slave.jar \
+  -jnlpUrl <%= node['jenkins']['server']['url'] %>/computer/<%= node['jenkins']['node']['name'] %>/slave-agent.jnlp \
+  <%= !@options[:secret] || @options[:secret].empty? ? '' : "-secret #{@options[:secret]}" %> \
+  <%= node['jenkins']['node']['jvm_options'] %>

@@ -1,0 +1,46 @@
+  ServerName        <%= @host_name %>
+  ProxyRequests     Off
+<% @host_aliases.each do |a| -%>
+  ServerAlias       <%= a %>
+<% end -%>
+
+
+  # Local reverse proxy authorization override
+  # Most unix distribution deny proxy by default
+  # (ie /etc/apache2/mods-enabled/proxy.conf in Ubuntu)
+  <Proxy http://localhost:<%= @jenkins_port %>/*>
+    Order deny,allow
+    Allow from all
+  </Proxy>
+
+  ProxyPreserveHost on
+  ProxyPass         /  http://localhost:<%= @jenkins_port %>/
+  ProxyPassReverse  /  http://localhost:<%= @jenkins_port %>/
+  ProxyPassReverse  /  http://<%= @host_name %>/
+<% @host_aliases.each do |a| -%>
+  ProxyPassReverse  /  http://<%= a%>
+<% end -%>
+
+<% case node['jenkins']['http_proxy']['server_auth_method'] -%>
+<% when "cas" -%>
+  CASLoginURL <%= node['jenkins']['http_proxy']['cas_login_url'] %>
+  CASValidateURL <%= node['jenkins']['http_proxy']['cas_validate_url'] %>
+  CASValidateServer <%= node['jenkins']['http_proxy']['cas_validate_server'] %>
+  <% if node['jenkins']['http_proxy']['cas_root_proxy_url'] -%>
+  CASRootProxiedAs <%= node['jenkins']['http_proxy']['cas_root_proxy_url'] %>
+  <% end -%>
+
+  <Location />
+    AuthType CAS
+    require valid-user
+  </Location>
+<% when "basic" -%>
+  <Location />
+    AuthType basic
+    AuthName "Jenkins"
+    AuthBasicProvider file
+    AuthUserFile <%= File.join(node.apache.dir, "htpasswd") %>
+    require valid-user
+  </Location>
+<% end -%>
+
