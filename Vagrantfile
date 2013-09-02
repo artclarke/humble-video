@@ -92,6 +92,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_recipe "humble-ubuntu-development"
     chef.add_recipe "chef-yasm::source"
     chef.add_recipe "humbleswig"
+    chef.add_recipe "iptables"
+    chef.add_recipe "apache2"
     chef.add_recipe "jenkins"
   
     # You may also specify custom JSON attributes:
