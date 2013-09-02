@@ -1,0 +1,3 @@
+#!/bin/sh
+
+git subtree add --prefix=humble-video-chef/cookbooks/nginx --squash git@github.com:opscode-cookbooks/nginx master
