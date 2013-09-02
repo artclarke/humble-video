@@ -94,6 +94,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_recipe "iptables"
     chef.add_recipe "apache2"
     chef.add_recipe "java"
+    chef.add_recipe "nginx"
+    chef.add_recipe "yum"
+    chef.add_recipe "runit"
     chef.add_recipe "jenkins"
     chef.add_recipe "humble-ubuntu-development"
   
