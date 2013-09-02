@@ -1,0 +1,67 @@
+---
+driver_plugin: vagrant
+driver_config:
+  require_chef_omnibus: true
+
+platforms:
+- name: ubuntu-12.04
+  driver_config:
+    box: opscode-ubuntu-12.04
+    box_url: https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_ubuntu-12.04_provisionerless.box
+  run_list: ["recipe[apt]"]
+
+- name: ubuntu-10.04
+  driver_config:
+    box: opscode-ubuntu-10.04
+    box_url: https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_ubuntu-10.04_provisionerless.box
+    require_chef_omnibus: true
+  run_list: ["recipe[apt]"]
+
+- name: debian-6
+  driver_config:
+    box: opscode-debian-6
+    box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_debian-6.0.7_provisionerless.box
+  run_list: ["recipe[apt]"]
+
+- name: centos-6.4
+  driver_config:
+    box: opscode-centos-6.4
+    box_url: https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_centos-6.4_provisionerless.box
+
+- name: centos-5.9
+  driver_config:
+    box: opscode-centos-5.9
+    box_url: https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_centos-5.9_provisionerless.box
+
+- name: fedora-18
+  driver_config:
+    box: opscode-fedora-18
+    box_url: https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode-fedora-18_provisionerless.box
+
+suites:
+- name: openjdk
+  excludes: ["fedora-18"]
+  run_list: ["recipe[minitest-handler]", "recipe[java::openjdk]"]
+  attributes: {}
+- name: openjdk-7
+  excludes: ["ubuntu-10.04", "debian-6"]
+  run_list: ["recipe[minitest-handler]", "recipe[java::openjdk]"]
+  attributes:
+    java:
+      jdk_version: "7"
+
+- name: oracle
+  run_list: ["recipe[minitest-handler]", "recipe[java::oracle]"]
+  attributes:
+    java:
+      oracle:
+        accept_oracle_download_terms: true
+      install_flavor: "oracle"
+- name: oracle-7
+  run_list: ["recipe[minitest-handler]", "recipe[java::oracle]"]
+  attributes:
+    java:
+      jdk_version: "7"
+      oracle:
+        accept_oracle_download_terms: true
+      install_flavor: "oracle"
