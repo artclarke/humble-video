@@ -62,7 +62,7 @@ FilterSink::get(MediaRaw* media)
 
   int e = av_buffersink_get_frame(ctx, frame);
   if (e != AVERROR_EOF && e != AVERROR(EAGAIN)) {
-    FfmpegException::check(e, "could not add frame to audio source:");
+    FfmpegException::check(e, "could not get frame from audio sink:");
     // now, copy this into our frame
 
     // release any memory we have

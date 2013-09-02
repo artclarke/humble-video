@@ -26,6 +26,7 @@
 #ifndef FILTERENDPOINT_H_
 #define FILTERENDPOINT_H_
 
+#include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/Filter.h>
 
 namespace io {
@@ -35,7 +36,7 @@ namespace video {
 /**
  * An source or a sink that terminates the end points of a FilterGraph.
  */
-class VS_API_HUMBLEVIDEO FilterEndPoint : public io::humble::video::Filter
+class VS_API_HUMBLEVIDEO FilterEndPoint : public Filter
 {
 protected:
   FilterEndPoint(FilterGraph* graph, AVFilterContext* ctx);
