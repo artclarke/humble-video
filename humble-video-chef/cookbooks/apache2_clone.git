@@ -1,0 +1,3 @@
+#!/bin/sh
+
+git subtree add --prefix=humble-video-chef/cookbooks/apache2 --squash git@github.com:opscode-cookbooks/apache2.git v1.7.0
