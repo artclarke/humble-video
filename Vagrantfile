@@ -91,6 +91,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_recipe "git"
     chef.add_recipe "chef-yasm::source"
     chef.add_recipe "humbleswig"
+    chef.add_recipe "ohai"
     chef.add_recipe "iptables"
     chef.add_recipe "apache2"
     chef.add_recipe "java"

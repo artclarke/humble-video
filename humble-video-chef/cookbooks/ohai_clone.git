@@ -1,0 +1,3 @@
+#!/bin/sh
+
+git subtree add --prefix=humble-video-chef/cookbooks/ohai --squash git@github.com:opscode-cookbooks/ohai master
