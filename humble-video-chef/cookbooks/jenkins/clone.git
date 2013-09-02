@@ -1,0 +1,3 @@
+#!/bin/sh
+
+git subtree add --prefix=humble-video-chef/cookbooks/jenkins --squash git@github.com:opscode-cookbooks/jenkins.git 818c6d039ee02271f08a7521592e42bfa87544cf
