@@ -1,0 +1,36 @@
+<% if @www_redirect -%>
+<VirtualHost *:80>
+  ServerName        www.<%= @host_name %>
+<% @host_aliases.each do |a| -%>
+  ServerAlias       www.<%= a %>
+<% end -%>
+
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^www.<%= @host_name %>$ [NC]
+  RewriteRule ^/(.*)$ http://<%= @host_name %>/$1 [R=301,L]
+</VirtualHost>
+
+<% end -%>
+<VirtualHost *:80>
+<% if @redirect_http -%>
+  RewriteEngine On
+  # rewrite non ssl -> ssl
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+<% end -%>
+
+<%= render "_apache_common.erb" %>
+
+</VirtualHost>
+
+<% if @ssl_enabled -%>
+<VirtualHost *:<%= @ssl_listen_ports.join ' *:' %>>
+
+<%= render "_apache_common.erb" %>
+
+  SSLEngine on
+  SSLCertificateFile <%= node[:jenkins][:http_proxy][:ssl][:cert_path] %>
+  SSLCertificateKeyFile <%= node[:jenkins][:http_proxy][:ssl][:key_path] %>
+
+</VirtualHost>
+<% end -%>
