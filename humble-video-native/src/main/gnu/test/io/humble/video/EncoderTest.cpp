@@ -157,8 +157,10 @@ EncoderTest::testEncodeAudio() {
 
   RefPointer<FilterAudioSink> fsink = graph->addAudioSink("out", audio->getSampleRate(), audio->getChannelLayout(), audio->getFormat());
 
-  // Generate a 220 Hz sine wave with a 880 Hz beep each second, for 5 seconds.
-  graph->open("sine=frequency=220:beep_factor=4:duration=5[out]");
+  // Generate a 220 Hz sine wave with a 880 Hz beep each second, for 60 seconds.
+//  graph->open("sine=frequency=220:beep_factor=4:duration=60[out]");
+  // Generate an amplitude modulated signal
+  graph->open("aevalsrc=sin(10*2*PI*t)*sin(880*2*PI*t)[out]");
 
   // create an output muxer
   RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeAudio.mp3", 0, 0);
