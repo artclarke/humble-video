@@ -43,6 +43,15 @@ namespace video {
 class VS_API_HUMBLEVIDEO Encoder : public io::humble::video::Coder
 {
 public:
+
+  /**
+   * the number of media object the encoder had to drop (i.e. skip
+   * encoding) in order to ensure that time stamp values are
+   * monotonically increasing.  See https://code.google.com/p/xuggle/issues/detail?id=180
+   * for details on why this is.
+   */
+  virtual int64_t getNumDroppedFrames() { return mNumDroppedFrames; }
+
   /**
    * Create a Encoder that will use the given Codec.
    *
@@ -82,14 +91,24 @@ public:
    * this method passing in 0 (null) for frame to tell the encoder
    * to flush any data it was keeping a hold of.
    *
-   * @param output [out] The packet to encode into.  It will point
-   *     to a buffer allocated in the frame.  Caller should check MediaPacket.isComplete()
-   *     after call to find out if we had enough information to encode a full packet.
-   * @param frame [in/out] The frame to encode
+   * @param output [out] The packet to encode into.  Caller should check
+   *       MediaPacket.isComplete() after call to find out if we had enough
+   *       information to encode a full packet.
+   * @param picture [in] The picture to encode
    *
+   * Note: caller must ensure that output has sufficient space to
+   *   contain a full packet. Alas, there is currently no way to
+   *   query an encoder to find out the maximum packet size that
+   *   can be output (bummer, I know). That leaves the caller two
+   *   options. (1) You can call Packet.make() before each encode
+   *   call, and then the encoder will automagically create the correct
+   *   sized buffer for that call (but if you reuse the packet, it
+   *   may be too small for the next caller). Or (2) you  can call
+   *   Packet.make(int) with a value that will be larger than your
+   *   max packet size (in which case you can reuse the packet).
    */
   virtual void encodeVideo(MediaPacket * output,
-      MediaPicture * frame);
+      MediaPicture * picture);
 
   /**
    * Encode the given MediaAudio using this encoder.
@@ -101,10 +120,21 @@ public:
    * this method passing in 0 (null) for samples to tell the encoder
    * to flush any data it was keeping a hold of.
    *
-   * @param output [out] The packet to encode into.  It will point
-   *          to a buffer allocated in the frame.  Caller should check MediaPacket.isComplete()
-   *     after call to find out if we had enough information to encode a full packet.
+   * @param output [out] The packet to encode into.  Caller should check
+   *       MediaPacket.isComplete() after call to find out if we had enough
+   *       information to encode a full packet.
    * @param samples [in] The samples to consume
+   *
+   * Note: caller must ensure that output has sufficient space to
+   *   contain a full packet. Alas, there is currently no way to
+   *   query an encoder to find out the maximum packet size that
+   *   can be output (bummer, I know). That leaves the caller two
+   *   options. (1) You can call Packet.make() before each encode
+   *   call, and then the encoder will automagically create the correct
+   *   sized buffer for that call (but if you reuse the packet, it
+   *   may be too small for the next caller). Or (2) you  can call
+   *   Packet.make(int) with a value that will be larger than your
+   *   max packet size (in which case you can reuse the packet).
    *
    */
   virtual void encodeAudio(MediaPacket * output,
@@ -121,6 +151,7 @@ private:
   io::humble::ferry::RefPointer<MediaAudio> mResampledAudio;
 
   int64_t mLastPtsEncoded;
+  int64_t mNumDroppedFrames;
 };
 
 } /* namespace video */

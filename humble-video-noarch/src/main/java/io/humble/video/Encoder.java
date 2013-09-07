@@ -113,6 +113,16 @@ public class Encoder extends Coder {
   
 
 /**
+ * the number of media object the encoder had to drop (i.e. skip<br>
+ * encoding) in order to ensure that time stamp values are<br>
+ * monotonically increasing.  See https://code.google.com/p/xuggle/issues/detail?id=180<br>
+ * for details on why this is.
+ */
+  public long getNumDroppedFrames() {
+    return VideoJNI.Encoder_getNumDroppedFrames(swigCPtr, this);
+  }
+
+/**
  * Create a Encoder that will use the given Codec.<br>
  * <br>
  * @return a Encoder<br>

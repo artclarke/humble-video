@@ -26007,7 +26007,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Coder_1getPixelFormat(JNIE
 }
 
 
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setPixelType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setPixelFormat(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   io::humble::video::Coder *arg1 = (io::humble::video::Coder *) 0 ;
   io::humble::video::PixelFormat::Type arg2 ;
   
@@ -26029,7 +26029,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Coder_1setPixelType(JNIEnv
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      (arg1)->setPixelType(arg2);
+      (arg1)->setPixelFormat(arg2);
     }
     catch(std::exception & e)
     {
@@ -26864,6 +26864,52 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1decodeVideo(JNIEn
     /*@SWIG@*/
   }
   jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Encoder_1getNumDroppedFrames(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  io::humble::video::Encoder *arg1 = (io::humble::video::Encoder *) 0 ;
+  int64_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(io::humble::video::Encoder **)&jarg1; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,140,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (int64_t)(arg1)->getNumDroppedFrames();
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return 0;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+  jresult = (jlong)result; 
   return jresult;
 }
 

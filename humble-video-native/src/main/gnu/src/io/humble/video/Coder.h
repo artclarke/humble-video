@@ -214,7 +214,7 @@ public:
    *
    * @param pixelFmt Pixel format to use.
    */
-  virtual void setPixelType(PixelFormat::Type pixelFmt) { mCtx->pix_fmt = (enum AVPixelFormat)pixelFmt; }
+  virtual void setPixelFormat(PixelFormat::Type pixelFmt) { mCtx->pix_fmt = (enum AVPixelFormat)pixelFmt; }
 
   /**
    * Get the sample rate we use for this coder.

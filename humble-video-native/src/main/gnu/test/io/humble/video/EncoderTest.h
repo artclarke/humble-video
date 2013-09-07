@@ -40,6 +40,7 @@ public:
   ~EncoderTest();
 
   void testCreation();
+  void testEncodeVideo();
 };
 
 #endif /* ENCODERTEST_H_ */

@@ -1185,7 +1185,7 @@ public class VideoJNI {
   public final static native int Coder_getWidth(long jarg1, Coder jarg1_);
   public final static native void Coder_setWidth(long jarg1, Coder jarg1_, int jarg2);
   public final static native int Coder_getPixelFormat(long jarg1, Coder jarg1_);
-  public final static native void Coder_setPixelType(long jarg1, Coder jarg1_, int jarg2);
+  public final static native void Coder_setPixelFormat(long jarg1, Coder jarg1_, int jarg2);
   public final static native int Coder_getSampleRate(long jarg1, Coder jarg1_);
   public final static native void Coder_setSampleRate(long jarg1, Coder jarg1_, int jarg2);
   public final static native int Coder_getSampleFormat(long jarg1, Coder jarg1_);
@@ -1204,6 +1204,7 @@ public class VideoJNI {
   public final static native void Decoder_flush(long jarg1, Decoder jarg1_);
   public final static native int Decoder_decodeAudio(long jarg1, Decoder jarg1_, long jarg2, MediaAudio jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native int Decoder_decodeVideo(long jarg1, Decoder jarg1_, long jarg2, MediaPicture jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
+  public final static native long Encoder_getNumDroppedFrames(long jarg1, Encoder jarg1_);
   public final static native long Encoder_make__SWIG_0(long jarg1, Codec jarg1_);
   public final static native long Encoder_make__SWIG_1(long jarg1, Coder jarg1_);
   public final static native void Encoder_open(long jarg1, Encoder jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_);

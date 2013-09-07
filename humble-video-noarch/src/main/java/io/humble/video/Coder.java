@@ -243,8 +243,8 @@ public class Coder extends Configurable {
  * <br>
  * @param pixelFmt Pixel format to use.
  */
-  public void setPixelType(PixelFormat.Type pixelFmt) {
-    VideoJNI.Coder_setPixelType(swigCPtr, this, pixelFmt.swigValue());
+  public void setPixelFormat(PixelFormat.Type pixelFmt) {
+    VideoJNI.Coder_setPixelFormat(swigCPtr, this, pixelFmt.swigValue());
   }
 
 /**

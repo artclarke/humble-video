@@ -62,7 +62,7 @@ FfmpegException::check(int32_t error, const char* fmt, ...) {
   const size_t finalStrLen = 1048;
   char finalStr[finalStrLen];
 
-  snprintf(finalStr, finalStrLen, "%s%s (%d)", buf, ffmpegErrorStr, error);
+  snprintf(finalStr, finalStrLen, "%s: %s (%d)", buf, ffmpegErrorStr, error);
 
   switch (error)
   {
