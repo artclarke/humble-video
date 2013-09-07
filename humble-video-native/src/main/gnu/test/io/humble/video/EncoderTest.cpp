@@ -25,6 +25,7 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/FilterGraph.h>
 #include <io/humble/video/FilterPictureSink.h>
+#include <io/humble/video/FilterAudioSink.h>
 #include <io/humble/video/Muxer.h>
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaPacket.h>
@@ -123,4 +124,77 @@ EncoderTest::testEncodeVideo() {
 
   muxer->close();
 
+}
+
+void
+EncoderTest::testEncodeAudio() {
+  const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
+  const int32_t sampleRate = 44100;
+  const int32_t maxSamples = isMemCheck ? sampleRate*0.5 : sampleRate*10;
+  const int32_t numSamples = 1024;
+  const AudioChannel::Layout channelLayout = AudioChannel::CH_LAYOUT_STEREO;
+  const int32_t channels = AudioChannel::getNumChannelsInLayout(channelLayout);
+  const AudioFormat::Type audioFormat = AudioFormat::SAMPLE_FMT_S16P;
+  RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_MP3);
+  RefPointer<Encoder> encoder = Encoder::make(codec.value());
+
+  RefPointer<FilterGraph> graph = FilterGraph::make();
+
+  RefPointer<MediaAudio> audio = MediaAudio::make(numSamples, sampleRate, channels, channelLayout,
+      audioFormat);
+
+  // set the encoder properties we need
+  encoder->setSampleRate(audio->getSampleRate());
+  encoder->setSampleFormat(audio->getFormat());
+  encoder->setChannelLayout(audio->getChannelLayout());
+  encoder->setChannels(audio->getChannels());
+  encoder->setProperty("b", (int64_t)64000); // bitrate
+  RefPointer<Rational> tb = Rational::make(1, audio->getSampleRate());
+  encoder->setTimeBase(tb.value());
+
+  // open the encoder
+  encoder->open(0, 0);
+
+  RefPointer<FilterAudioSink> fsink = graph->addAudioSink("out", audio->getSampleRate(), audio->getChannelLayout(), audio->getFormat());
+
+  // Generate a 220 Hz sine wave with a 880 Hz beep each second, for 5 seconds.
+  graph->open("sine=frequency=220:beep_factor=4:duration=5[out]");
+
+  // create an output muxer
+  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeAudio.mp3", 0, 0);
+
+  // add a stream for the encoded packets
+  {
+    RefPointer<MuxerStream> stream = muxer->addNewStream(encoder.value());
+  }
+
+  // and open the muxer
+  muxer->open(0, 0);
+
+  // now we're (in theory) ready to start writing data.
+  int32_t numFrames = 0;
+  RefPointer<MediaPacket> packet;
+
+  while(fsink->getAudio(audio.value()) >= 0 && numFrames*audio->getNumSamples() < maxSamples) {
+    audio->setTimeBase(tb.value());
+    audio->setTimeStamp(numFrames*audio->getNumSamples());
+
+    // let's encode
+    packet = MediaPacket::make();
+    encoder->encodeAudio(packet.value(), audio.value());
+    if (packet->isComplete()) {
+      muxer->write(packet.value(), false);
+    }
+    ++numFrames;
+  }
+  // now flush the encoder
+  do {
+    packet = MediaPacket::make();
+    encoder->encodeAudio(packet.value(), 0);
+    if (packet->isComplete()) {
+      muxer->write(packet.value(), false);
+    }
+  } while (packet->isComplete());
+
+  muxer->close();
 }

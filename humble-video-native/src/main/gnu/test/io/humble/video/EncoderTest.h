@@ -41,6 +41,7 @@ public:
 
   void testCreation();
   void testEncodeVideo();
+  void testEncodeAudio();
 };
 
 #endif /* ENCODERTEST_H_ */
