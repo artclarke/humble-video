@@ -47,10 +47,10 @@ Container::~Container() {
   while(mStreams.size() > 0)
   {
     Stream* stream=mStreams.back();
+    mStreams.pop_back();
     if (stream) {
       delete stream;
     }
-    mStreams.pop_back();
   }
 
 }
@@ -105,7 +105,7 @@ Container::Stream::Stream(Container* container, int32_t index) {
 }
 
 Container::Stream::~Stream() {
-
+  VS_LOG_TRACE("Destroying stream: %p", this);
 }
 
 Coder*

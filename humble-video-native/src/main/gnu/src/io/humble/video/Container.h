@@ -156,6 +156,7 @@ public:
     void popCoder() {
       AVStream* ctx = getCtx();
       ctx->codec = mCachedCtx;
+      mCachedCtx = 0;
     }
     void pushCoder() {
       AVStream* ctx = getCtx();

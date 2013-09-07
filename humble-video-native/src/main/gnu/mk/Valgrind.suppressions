@@ -12992,3 +12992,10 @@
    fun:av_strtod
    fun:parse_primary
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   ...
+   fun:__dtoa
+   fun:__vfprintf
+}

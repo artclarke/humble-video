@@ -42,6 +42,21 @@ namespace io {
 namespace humble {
 namespace video {
 
+#if 0
+int32_t
+Muxer::acquire()
+{
+  VS_LOG_DEBUG("muxer acquire: %p", this);
+  return RefCounted::acquire();
+}
+int32_t
+Muxer::release()
+{
+  VS_LOG_DEBUG("muxer release: %p", this);
+  return RefCounted::release();
+}
+#endif // 0
+
 Muxer::Muxer(MuxerFormat* format, const char* filename,
     const char* formatName) {
   mState = STATE_INITED;
@@ -265,6 +280,10 @@ Muxer::addNewStream(Coder* aCoder) {
   AVStream* avStream = avformat_new_stream(ctx, coder->getCodecCtx()->codec);
   if (!avStream) {
     VS_THROW(HumbleRuntimeError("Could not add new stream to container"));
+  }
+  if (avStream->codec && !avStream->codec->codec) {
+    // fixes a memory leak on closing.
+    avStream->codec->codec = coder->getCodecCtx()->codec;
   }
   // tell the container to update all the known streams.
   doSetupStreams();

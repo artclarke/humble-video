@@ -190,6 +190,13 @@ public:
   virtual bool
   write(MediaPacket* packet, bool forceInterleave);
 
+#if 0
+#ifndef SWIG
+  virtual int32_t acquire();
+  virtual int32_t release();
+#endif
+#endif
+
 protected:
   virtual AVFormatContext* getFormatCtx() { return mCtx; }
 

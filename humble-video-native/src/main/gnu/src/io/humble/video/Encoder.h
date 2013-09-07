@@ -140,6 +140,13 @@ public:
   virtual void encodeAudio(MediaPacket * output,
       MediaAudio* samples);
 
+#if 0
+#ifndef SWIG
+  virtual int32_t acquire();
+  virtual int32_t release();
+#endif // ! SWIG
+#endif // 0
+
 protected:
   Encoder(Codec*, AVCodecContext* src, bool copySrc);
   virtual

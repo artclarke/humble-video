@@ -34,7 +34,23 @@ VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 namespace io {
 namespace humble {
-namespace video {
+namespace
+video {
+
+#if 0
+int32_t
+Encoder::acquire()
+{
+  VS_LOG_DEBUG("encoder acquire: %p", this);
+  return RefCounted::acquire();
+}
+int32_t
+Encoder::release()
+{
+  VS_LOG_DEBUG("encoder release: %p", this);
+  return RefCounted::release();
+}
+#endif // 0
 
 Encoder::Encoder(Codec* codec, AVCodecContext* src, bool copySrc) : Coder(codec, src, copySrc) {
   if (!codec)
@@ -47,7 +63,6 @@ Encoder::Encoder(Codec* codec, AVCodecContext* src, bool copySrc) : Coder(codec,
   mLastPtsEncoded = Global::NO_PTS;
 
   VS_LOG_TRACE("Created encoder");
-
 }
 
 Encoder::~Encoder() {
@@ -190,7 +205,8 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
   int got_frame = 0;
 
   // set the packet to be the max size if can be
-  if (out->buf)
+  output->setComplete(false, 0);
+  if (out->buf && out->data)
     out->size = out->buf->size;
   else
     out->size = 0;
@@ -199,8 +215,6 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
   if (got_frame) {
     output->setTimeBase(coderTb.value());
     output->setComplete(out->size > 0, out->size);
-  } else {
-    output->setComplete(false, 0);
   }
   FfmpegException::check(e, "could not encode video ");
 }

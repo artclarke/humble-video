@@ -52,19 +52,18 @@ EncoderTest::testEncodeVideo() {
 
   RefPointer<FilterGraph> graph = FilterGraph::make();
 
-  RefPointer<MediaPicture> picture = MediaPicture::make(320*2,
-      240*2,
+  RefPointer<MediaPicture> picture = MediaPicture::make(320*2,240*2,
       PixelFormat::PIX_FMT_YUV420P);
 
   // set the encoder properties we need
   encoder->setWidth(picture->getWidth());
   encoder->setHeight(picture->getHeight());
   encoder->setPixelFormat(picture->getFormat());
-  encoder->setProperty("b", (int64_t)400000);
+  encoder->setProperty("b", (int64_t)400000); // bitrate
+  encoder->setProperty("g", (int64_t) 10); // gop
+  encoder->setProperty("bf", (int64_t)1); // max b frames
   RefPointer<Rational> tb = Rational::make(1, 25);
   encoder->setTimeBase(tb.value());
-  encoder->setProperty("g", (int64_t) 10);
-  encoder->setProperty("bf", (int64_t)1);
 
   // open the encoder
   encoder->open(0, 0);
@@ -83,27 +82,30 @@ EncoderTest::testEncodeVideo() {
       "[x][c]overlay=0:h[y];"
       "[y][d]overlay=w:h[out]");
 
+  // let's set a frame time base of 1/30
+  RefPointer<Rational> pictureTb = Rational::make(1,30);
+
   // create an output muxer
   RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeVideo.mp4", 0, 0);
 
-  // add the encoder
-  muxer->addNewStream(encoder.value());
+  // add a stream for the encoded packets
+  {
+    RefPointer<MuxerStream> stream = muxer->addNewStream(encoder.value());
+  }
 
   // and open the muxer
   muxer->open(0, 0);
 
   // now we're (in theory) ready to start writing data.
   int32_t numPics = 0;
-  // let's set a frame time base of 1/30
-  RefPointer<Rational> pictureTb = Rational::make(1,30);
-  picture->setTimeBase(pictureTb.value());
-
-  RefPointer<MediaPacket> packet = MediaPacket::make();
+  RefPointer<MediaPacket> packet;
 
   while(fsink->getPicture(picture.value()) >= 0 && numPics < maxPics) {
-    packet = MediaPacket::make();
+    picture->setTimeBase(pictureTb.value());
     picture->setTimeStamp(numPics);
+
     // let's encode
+    packet = MediaPacket::make();
     encoder->encodeVideo(packet.value(), picture.value());
     if (packet->isComplete()) {
       muxer->write(packet.value(), false);

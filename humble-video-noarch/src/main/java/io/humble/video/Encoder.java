@@ -164,13 +164,24 @@ public class Encoder extends Coder {
  * this method passing in 0 (null) for frame to tell the encoder<br>
  * to flush any data it was keeping a hold of.<br>
  * <br>
- * @param output [out] The packet to encode into.  It will point<br>
- *     to a buffer allocated in the frame.  Caller should check MediaPacket.isComplete()<br>
- *     after call to find out if we had enough information to encode a full packet.<br>
- * @param frame [in/out] The frame to encode
+ * @param output [out] The packet to encode into.  Caller should check<br>
+ *       MediaPacket.isComplete() after call to find out if we had enough<br>
+ *       information to encode a full packet.<br>
+ * @param picture [in] The picture to encode<br>
+ * <br>
+ * Note: caller must ensure that output has sufficient space to<br>
+ *   contain a full packet. Alas, there is currently no way to<br>
+ *   query an encoder to find out the maximum packet size that<br>
+ *   can be output (bummer, I know). That leaves the caller two<br>
+ *   options. (1) You can call Packet.make() before each encode<br>
+ *   call, and then the encoder will automagically create the correct<br>
+ *   sized buffer for that call (but if you reuse the packet, it<br>
+ *   may be too small for the next caller). Or (2) you  can call<br>
+ *   Packet.make(int) with a value that will be larger than your<br>
+ *   max packet size (in which case you can reuse the packet).
  */
-  public void encodeVideo(MediaPacket output, MediaPicture frame) {
-    VideoJNI.Encoder_encodeVideo(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaPicture.getCPtr(frame), frame);
+  public void encodeVideo(MediaPacket output, MediaPicture picture) {
+    VideoJNI.Encoder_encodeVideo(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaPicture.getCPtr(picture), picture);
   }
 
 /**
@@ -183,10 +194,21 @@ public class Encoder extends Coder {
  * this method passing in 0 (null) for samples to tell the encoder<br>
  * to flush any data it was keeping a hold of.<br>
  * <br>
- * @param output [out] The packet to encode into.  It will point<br>
- *          to a buffer allocated in the frame.  Caller should check MediaPacket.isComplete()<br>
- *     after call to find out if we had enough information to encode a full packet.<br>
- * @param samples [in] The samples to consume
+ * @param output [out] The packet to encode into.  Caller should check<br>
+ *       MediaPacket.isComplete() after call to find out if we had enough<br>
+ *       information to encode a full packet.<br>
+ * @param samples [in] The samples to consume<br>
+ * <br>
+ * Note: caller must ensure that output has sufficient space to<br>
+ *   contain a full packet. Alas, there is currently no way to<br>
+ *   query an encoder to find out the maximum packet size that<br>
+ *   can be output (bummer, I know). That leaves the caller two<br>
+ *   options. (1) You can call Packet.make() before each encode<br>
+ *   call, and then the encoder will automagically create the correct<br>
+ *   sized buffer for that call (but if you reuse the packet, it<br>
+ *   may be too small for the next caller). Or (2) you  can call<br>
+ *   Packet.make(int) with a value that will be larger than your<br>
+ *   max packet size (in which case you can reuse the packet).
  */
   public void encodeAudio(MediaPacket output, MediaAudio samples) {
     VideoJNI.Encoder_encodeAudio(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaAudio.getCPtr(samples), samples);
