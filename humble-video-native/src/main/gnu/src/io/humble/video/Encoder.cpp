@@ -42,6 +42,9 @@ Encoder::Encoder(Codec* codec, AVCodecContext* src, bool copySrc) : Coder(codec,
 
   if (!codec->canEncode())
     throw HumbleInvalidArgument("passed in codec cannot encode");
+
+  mLastPtsEncoded = Global::NO_PTS;
+
   VS_LOG_TRACE("Created encoder");
 
 }

@@ -119,6 +119,8 @@ private:
   // require fixed frame sizes on audio.
   io::humble::ferry::RefPointer<MediaAudioResampler> mAResampler;
   io::humble::ferry::RefPointer<MediaAudio> mResampledAudio;
+
+  int64_t mLastPtsEncoded;
 };
 
 } /* namespace video */

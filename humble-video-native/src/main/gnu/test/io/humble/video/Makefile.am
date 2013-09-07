@@ -11,6 +11,7 @@ check_PROGRAMS=\
   FilterGraphTester \
   MediaAudioResamplerTester \
   MediaPictureResamplerTester \
+  EncoderTester \
   DecoderTester \
   PixelFormatTester \
   CodecTester \
@@ -32,6 +33,7 @@ BUILT_SOURCES= \
   FilterGraphTest_CXXRunner.cpp \
   MediaAudioResamplerTest_CXXRunner.cpp \
   MediaPictureResamplerTest_CXXRunner.cpp \
+  EncoderTest_CXXRunner.cpp \
   DecoderTest_CXXRunner.cpp \
   PixelFormatTest_CXXRunner.cpp \
   CodecTest_CXXRunner.cpp \
@@ -53,6 +55,7 @@ noinst_HEADERS = \
   FilterGraphTest.h \
   MediaAudioResamplerTest.h \
   MediaPictureResamplerTest.h \
+  EncoderTest.h \
   DecoderTest.h \
   PixelFormatTest.h \
   CodecTest.h \
@@ -126,6 +129,17 @@ nodist_MediaPictureResamplerTester_SOURCES= \
   MediaPictureResamplerTest_CXXRunner.cpp
 
 MediaPictureResamplerTester_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+
+EncoderTester_SOURCES= \
+  EncoderTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_EncoderTester_SOURCES= \
+  EncoderTest_CXXRunner.cpp
+
+EncoderTester_LDADD= \
   $(top_builddir)/src/io/humble/libhumblevideo.la 
 
 DecoderTester_SOURCES= \
