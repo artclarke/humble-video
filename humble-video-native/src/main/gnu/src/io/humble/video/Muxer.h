@@ -118,9 +118,23 @@ public:
     return mState;
   }
 
+  /**
+   * Open the Muxer and write any headers.
+   *
+   * @param inputOptions muxer-specific options to set before opening the muxer. Can be null.
+   * @param outputOptions if non null, the passed in bag will be emptied, and the filled
+   *    with any options from inputOptions that could not be set on the muxer.
+   */
   virtual void
   open(KeyValueBag* inputOptions, KeyValueBag* outputOptions);
 
+  /**
+   * Close the muxer and write any trailers.
+   *
+   * Note: Calls MUST call this method -- it will not automatically be called
+   * when the object is finalized as some muxers struggle when you write trailers
+   * on a different thread (the finalizer thread) than the header was written on.
+   */
   virtual void
   close();
 
@@ -144,8 +158,7 @@ public:
    * Return the output buffer length.
    *
    * @return The input buffer length Humble Video told FFMPEG to assume.
-   *   0 means FFMPEG should choose it's own
-   *   size (and it'll probably be 32768).
+   *   0 means FFMPEG should choose it's own size (and it'll probably be 32768).
    */
   virtual int32_t
   getOutputBufferLength();
@@ -174,8 +187,7 @@ public:
   /**
    * Writes the given packet to the Muxer.
    *
-   * @param packet The packet to write. If null, it tells the muxer to flush any data queued up to
-   *   the underlying storage (disk, network, etc).
+   * @param packet The packet to write.
    * @param forceInterleave If true, this Muxer will ensure that all packets are interleaved across streams
    *   (i.e. monotonically increasing timestamps in the Muxer container). If false, then the caller
    *   is responsible for ensuring the interleaving is valid for the container. Note this method is faster
@@ -201,7 +213,7 @@ protected:
   virtual AVFormatContext* getFormatCtx() { return mCtx; }
 
   /**
-   * Takes the packet given (in whatever timebase it was encoded with) and resets all timestamps
+   * Takes the packet given (in whatever time base it was encoded with) and resets all time stamps
    * to align with the stream in this container that it will be added to.
    *
    * @param packet The packet to stamp. Packet#setStreamIndex must have been called to avoid an error,
