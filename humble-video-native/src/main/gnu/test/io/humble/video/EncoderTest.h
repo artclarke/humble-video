@@ -26,8 +26,7 @@
 #ifndef ENCODERTEST_H_
 #define ENCODERTEST_H_
 #include <io/humble/testutils/TestUtils.h>
-#include <io/humble/video/Decoder.h>
-#include <io/humble/video/MediaAudio.h>
+#include <io/humble/video/Encoder.h>
 #include "TestData.h"
 
 using namespace io::humble::video;

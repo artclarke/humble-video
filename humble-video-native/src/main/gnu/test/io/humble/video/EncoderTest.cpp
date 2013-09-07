@@ -22,7 +22,7 @@
  *  Created on: Sep 6, 2013
  *      Author: aclarke
  */
-
+#include <io/humble/ferry/RefPointer.h>
 #include "EncoderTest.h"
 
 EncoderTest::EncoderTest() {
@@ -33,5 +33,7 @@ EncoderTest::~EncoderTest() {
 
 void
 EncoderTest::testCreation() {
-
+  RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_H264);
+  RefPointer<Encoder> encoder = Encoder::make(codec.value());
+  TS_ASSERT(encoder);
 }

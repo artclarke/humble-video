@@ -47,6 +47,7 @@ Coder::Coder(Codec* codec, AVCodecContext* src, bool copySrc) {
     mCtx = avcodec_alloc_context3(codec->getCtx());
     if (!mCtx)
       throw HumbleRuntimeError("could not allocate coder context");
+    mCtx->codec = codec->getCtx();
   } else if (copySrc) {
     // create again for the copy
     mCtx = avcodec_alloc_context3(0);
