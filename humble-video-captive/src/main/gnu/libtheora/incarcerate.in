@@ -27,7 +27,7 @@ case $HOST_OS in
 esac
 
 CC="@CC@" \
-CFLAGS="-I@includedir@ @CFLAGS@" \
+CFLAGS="-I@includedir@ -Wno-error=unused-command-line-argument-hard-error-in-future @CFLAGS@" \
 LD="@LD@" \
 LDFLAGS="-L@libdir@ @LDFLAGS@" \
 CPP="@CPP@" \
