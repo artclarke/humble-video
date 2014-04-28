@@ -107,7 +107,7 @@ host_triplet = @host@
 @VS_OS_LINUX_TRUE@@VS_OS_WINDOWS_FALSE@	-nostdlib -static-libtool-libs -XCClinker -static-libgcc
 
 @VS_OS_LINUX_FALSE@@VS_OS_WINDOWS_FALSE@am__append_3 = \
-@VS_OS_LINUX_FALSE@@VS_OS_WINDOWS_FALSE@	-nostdlib -static-libtool-libs -XCClinker -static-libgcc
+@VS_OS_LINUX_FALSE@@VS_OS_WINDOWS_FALSE@	-nostdlib -static-libtool-libs
 
 subdir = src/io/humble
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -464,11 +464,14 @@ libhumblevideo_la_LIBADD = \
   $(builddir)/video/libhumble-video.la
 
 
+#
+# FIXME include @VS_LIBGCC_EH@ for GCC compilers
+#
 # But because we're forcing C linkage, we need to tell the linker
 # about which STDCXX and which exception handling library to use.
 libhumblevideo_la_LDFLAGS = -no-undefined -shared -version-number \
 	@LIB_MAJOR_VERSION@:@LIB_MINOR_VERSION@:0 $(VS_LDFLAGS) \
-	$(VS_PKG_LIBRARIES) @VS_LIBSTDCXX@ @VS_LIBGCC_EH@ \
+	$(VS_PKG_LIBRARIES) @VS_LIBSTDCXX@ \ #@VS_LIBGCC_EH@ \
 	$(am__append_1) $(am__append_2) $(am__append_3)
 all: all-recursive
 

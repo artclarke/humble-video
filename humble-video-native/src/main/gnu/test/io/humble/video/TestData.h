@@ -58,7 +58,7 @@ public:
     int64_t duration;
     int64_t filesize;
     int32_t bitrate;
-    io::humble::video::Codec::ID codec_ids[];
+//    io::humble::video::Codec::ID codec_ids[];
     io::humble::video::MediaDescriptor::Type codec_types[];
   };
   void fillPath(TestData::Fixture* f, char *dst, size_t size);
