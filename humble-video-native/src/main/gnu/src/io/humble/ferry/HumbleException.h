@@ -33,6 +33,7 @@
 #define HUMBLEEXCEPTION_H_
 
 #include <stdexcept>
+#include <string>
 #include <io/humble/ferry/Ferry.h>
 
 namespace io {

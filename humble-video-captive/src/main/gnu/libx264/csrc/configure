@@ -464,7 +464,7 @@ case $host_os in
         ;;
     darwin*)
         SYS="MACOSX"
-        CFLAGS="$CFLAGS -falign-loops=16"
+        CFLAGS="$CFLAGS"
         libm="-lm"
         if [ "$pic" = "no" ]; then
             cc_check "" -mdynamic-no-pic && CFLAGS="$CFLAGS -mdynamic-no-pic"
