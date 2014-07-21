@@ -41,7 +41,7 @@ namespace humble {
 namespace video {
 
 ContainerStream::ContainerStream(Container *container, int32_t index) {
-  if (!index < 0) {
+  if (index < 0) {
     VS_THROW(HumbleInvalidArgument("no stream"));
   }
   if (!container) {
