@@ -63,7 +63,8 @@ EncoderTest::testEncodeVideo() {
   encoder->setProperty("b", (int64_t)400000); // bitrate
   encoder->setProperty("g", (int64_t) 10); // gop
   encoder->setProperty("bf", (int64_t)1); // max b frames
-  RefPointer<Rational> tb = Rational::make(1, 25);
+
+  RefPointer<Rational> tb = Rational::make(1,25);
   encoder->setTimeBase(tb.value());
 
   // open the encoder
@@ -149,7 +150,7 @@ EncoderTest::testEncodeAudio() {
   encoder->setChannelLayout(audio->getChannelLayout());
   encoder->setChannels(audio->getChannels());
   encoder->setProperty("b", (int64_t)64000); // bitrate
-  RefPointer<Rational> tb = Rational::make(1, audio->getSampleRate());
+  RefPointer<Rational> tb = Rational::make(1,25);
   encoder->setTimeBase(tb.value());
 
   // open the encoder
@@ -178,7 +179,6 @@ EncoderTest::testEncodeAudio() {
   RefPointer<MediaPacket> packet;
 
   while(fsink->getAudio(audio.value()) >= 0 && numFrames*audio->getNumSamples() < maxSamples) {
-    audio->setTimeBase(tb.value());
     audio->setTimeStamp(numFrames*audio->getNumSamples());
 
     // let's encode

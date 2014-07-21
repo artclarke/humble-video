@@ -66,7 +66,7 @@ MediaAudioImpl::make(int32_t numSamples, int32_t sampleRate, int32_t channels,
   RefPointer<Buffer> buffer = Buffer::make(0, bufSize);
   MediaAudioImpl* retval = make(buffer.value(), numSamples, sampleRate, channels, layout,
       format);
-  if (retval) buffer->setJavaAllocator(retval->getJavaAllocator());
+  buffer->setJavaAllocator(retval->getJavaAllocator());
   return retval;
 }
 
@@ -113,6 +113,8 @@ MediaAudioImpl::make(io::humble::ferry::Buffer* buffer, int32_t numSamples,
   // free them and replace them with their own objects, so we
   // must let mFrame->buf[] and mFrame->extended_buf[] win.
   RefPointer<MediaAudioImpl> retval = make();
+  RefPointer<Rational> tb = Rational::make(1,sampleRate); // a sensible default.
+  retval->setTimeBase(tb.value());
   AVFrame* frame = retval->mFrame;
   av_frame_set_sample_rate(frame, sampleRate);
   av_frame_set_channels(frame, channels);
@@ -172,11 +174,11 @@ MediaAudioImpl::copy(AVFrame* src, bool complete) {
   if (!src)
     VS_THROW(HumbleInvalidArgument("no src"));
   // release any memory we have
+  RefPointer<Rational> timeBase = Rational::make(1, src->sample_rate); // a default
+  setTimeBase(timeBase.value());
   av_frame_unref(mFrame);
   // and copy any data in.
   av_frame_ref(mFrame, src);
-  RefPointer<Rational> timeBase = getTimeBase();
-  setTimeBase(timeBase.value());
   mComplete=complete;
 }
 
