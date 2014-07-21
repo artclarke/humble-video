@@ -464,7 +464,8 @@ case $host_os in
         ;;
     darwin*)
         SYS="MACOSX"
-        CFLAGS="$CFLAGS -falign-loops=16"
+# From http://stackoverflow.com/questions/22678938/error-compiling-x264-on-mac-os-x
+        CFLAGS="$CFLAGS"
         libm="-lm"
         if [ "$pic" = "no" ]; then
             cc_check "" -mdynamic-no-pic && CFLAGS="$CFLAGS -mdynamic-no-pic"
