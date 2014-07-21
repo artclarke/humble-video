@@ -355,6 +355,14 @@ VS_FIND_STATIC_LIB([stdc++], [VS_LIBSTDCXX="-XCClinker ${VS_LIB}"], [VS_LIBSTDCX
 VS_FIND_STATIC_LIB([gcc], [VS_LIBGCC="-XCClinker ${VS_LIB}"], [VS_LIBGCC="-XCClinker -lgcc"])
 VS_FIND_STATIC_LIB([gcc_eh], [VS_LIBGCC_EH="-XCClinker ${VS_LIB}"], [VS_LIBGCC_EH="-XCClinker -lgcc_eh"])
 
+# For Xcode 5.1.1 don't attempt to do static linking with gcc with exception handling 
+case $host in
+  *darwin*)
+  VS_LIBGCC=
+  VS_LIBGCC_EH=
+  ;;
+esac
+
 AC_SUBST([VS_LIBSTDCXX])
 AC_SUBST([VS_LIBGCC])
 AC_SUBST([VS_LIBGCC_EH])

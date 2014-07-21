@@ -132,8 +132,11 @@ MediaPictureResamplerImpl :: resample(MediaPicture* pOutFrame, MediaPicture* pIn
 
   FfmpegException::check(retval, "Error while resampling. ");
 
+  outFrame->setTimeStamp(inFrame->getTimeStamp());
+
   RefPointer<Rational> timeBase = inFrame->getTimeBase();
   outFrame->setTimeBase(timeBase.value());
+
   outFrame->setQuality(inFrame->getQuality());
   outFrame->setComplete(retval >= 0);
 

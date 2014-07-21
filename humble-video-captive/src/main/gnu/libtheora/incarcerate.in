@@ -18,16 +18,18 @@ else
 fi
 
 DISABLE_ASM=
+VS_CFLAGS="@CFLAGS@"
 case $HOST_OS in
   *darwin*)
   DISABLE_ASM="--disable-asm"
+  VS_CFLAGS="-Wno-error=unused-command-line-argument-hard-error-in-future @CFLAGS@"
   ;;
   *)
   ;;
 esac
 
 CC="@CC@" \
-CFLAGS="-I@includedir@ @CFLAGS@" \
+CFLAGS="-I@includedir@ ${VS_CFLAGS}" \
 LD="@LD@" \
 LDFLAGS="-L@libdir@ @LDFLAGS@" \
 CPP="@CPP@" \
