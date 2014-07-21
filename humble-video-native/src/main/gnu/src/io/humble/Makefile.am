@@ -62,7 +62,8 @@ if VS_OS_LINUX
 libhumblevideo_la_LDFLAGS+= \
 	-nostdlib -static-libtool-libs -XCClinker -static-libgcc
 else
+# Should be Mac OS X
 libhumblevideo_la_LDFLAGS+= \
-	-nostdlib -static-libtool-libs -XCClinker -static-libgcc
+	-nostdlib -static-libtool-libs
 endif
 endif
