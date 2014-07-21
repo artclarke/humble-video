@@ -84,7 +84,7 @@ MediaAudioResampler::make(AudioChannel::Layout outLayout, int32_t outSampleRate,
   // find the LCM of the input and output sample rates
   int64_t gcd = av_gcd(inSampleRate, outSampleRate);
   int64_t lcm = inSampleRate / gcd * outSampleRate;
-  if (lcm > INT32_MAX) {
+  if (lcm > LONG_MAX) {
     VS_LOG_INFO("LCM of input and output sample rates is greater than can be fit in a 32-bit value");
   }
   retval->mTimeBase = Rational::make(1, (int32_t)lcm);
@@ -229,7 +229,7 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
   }
   // now convert the new PTS back to the right timebase
   outFrame->pts = Rational::rescale(
-      getNextPts(inputTs == Global::NO_PTS ? INT64_MIN : inputTs),
+      getNextPts(inputTs == Global::NO_PTS ? LLONG_MIN : inputTs),
       mTimeBase->getNumerator(), mTimeBase->getDenominator(),
       1, getInputSampleRate() * getOutputSampleRate(),
       Rational::ROUND_DOWN);
