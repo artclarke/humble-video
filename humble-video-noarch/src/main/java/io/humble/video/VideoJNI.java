@@ -1199,6 +1199,14 @@ public class VideoJNI {
   public final static native int Coder_getState(long jarg1, Coder jarg1_);
   public final static native int Coder_getFrameCount(long jarg1, Coder jarg1_);
   public final static native int Coder_getFrameSize(long jarg1, Coder jarg1_);
+  public final static native int Coder_getFlags(long jarg1, Coder jarg1_);
+  public final static native int Coder_getFlag(long jarg1, Coder jarg1_, int jarg2);
+  public final static native int Coder_getFlags2(long jarg1, Coder jarg1_);
+  public final static native int Coder_getFlag2(long jarg1, Coder jarg1_, int jarg2);
+  public final static native void Coder_setFlags(long jarg1, Coder jarg1_, int jarg2);
+  public final static native void Coder_setFlag(long jarg1, Coder jarg1_, int jarg2, boolean jarg3);
+  public final static native void Coder_setFlags2(long jarg1, Coder jarg1_, int jarg2);
+  public final static native void Coder_setFlag2(long jarg1, Coder jarg1_, int jarg2, boolean jarg3);
   public final static native long Decoder_make__SWIG_0(long jarg1, Codec jarg1_);
   public final static native long Decoder_make__SWIG_1(long jarg1, Coder jarg1_);
   public final static native void Decoder_flush(long jarg1, Decoder jarg1_);

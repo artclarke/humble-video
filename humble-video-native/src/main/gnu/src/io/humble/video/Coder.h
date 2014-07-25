@@ -314,6 +314,38 @@ public:
    */
   virtual int32_t getFrameSize();
 
+  /**
+   * Get the 32-bit compliment of all flags.
+   */
+  virtual int32_t getFlags();
+  /**
+   * Check if a given flag is set.
+   */
+  virtual int32_t getFlag(Flag flag);
+  /**
+   * Get the 32-bit compliment of all flags 2 flags
+   */
+  virtual int32_t getFlags2();
+  /**
+   * Check if a given flag2 flag is set.
+   */
+  virtual int32_t getFlag2(Flag2 flag);
+  /**
+   * Set a new bitmask of all Flag values (bit xored together).
+   */
+  virtual void setFlags(int32_t newVal);
+  /**
+   * Set a flag to true or false.
+   */
+  virtual void setFlag(Flag flag, bool value);
+  /**
+   * Set a new bitmask of all Flag2 values (bit xored together).
+   */
+  virtual void setFlags2(int32_t newVal);
+  /**
+   * Set a flag2 to true or false.
+   */
+  virtual void setFlag2(Flag2 flag, bool value);
 
 #ifndef SWIG
   virtual void* getCtx() { return getCodecCtx(); }

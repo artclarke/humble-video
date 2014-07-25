@@ -200,6 +200,22 @@ Muxer::open(KeyValueBag *aInputOptions, KeyValueBag* aOutputOptions) {
       FfmpegException::check(retval, "Error opening url: %s; ", url);
     }
 
+    int32_t numStreams = getNumStreams();
+    if (numStreams < 0 &&
+        !(ctx->ctx_flags & AVFMTCTX_NOHEADER))
+      VS_THROW(io::humble::ferry::HumbleIOException("no streams added to muxer"));
+
+    if (numStreams == 0)
+    {
+      RefPointer<ContainerFormat> format = getFormat();
+      if (format)
+      {
+        const char *shortName = format->getName();
+        if (shortName && !strcmp(shortName, "mp3"))
+          VS_THROW(io::humble::ferry::HumbleIOException("no streams added to mp3 muxer"));
+      }
+    }
+
     pushCoders();
     /* Write the stream header, if any. */
     retval = avformat_write_header(ctx, &tmp);
@@ -271,6 +287,13 @@ Muxer::addNewStream(Coder* aCoder) {
   }
   if (getState() != STATE_INITED) {
     VS_THROW(HumbleInvalidArgument("cannot add MuxerStream after Muxer is opened"));
+  }
+
+  if (mFormat->getFlag(ContainerFormat::GLOBAL_HEADER)) {
+    // the Codec must have the global header flag set. We'll throw an error if not.
+    if (!coder->getFlag(Coder::FLAG_GLOBAL_HEADER)) {
+      VS_THROW(HumbleInvalidArgument("this container requires a global header, and this Coder does not have the global header flag set"));
+    }
   }
 
   RefPointer<MuxerStream> r;

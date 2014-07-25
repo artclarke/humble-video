@@ -22,6 +22,7 @@
  *  Created on: Sep 6, 2013
  *      Author: aclarke
  */
+#include <io/humble/ferry/LoggerStack.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/FilterGraph.h>
 #include <io/humble/video/FilterPictureSink.h>
@@ -30,6 +31,8 @@
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaPacket.h>
 #include "EncoderTest.h"
+
+using namespace io::humble::ferry;
 
 EncoderTest::EncoderTest() {
 }
@@ -48,12 +51,12 @@ void
 EncoderTest::testEncodeVideo() {
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
   const int32_t maxPics = isMemCheck ? 10 : 500;
+  int32_t width=176;
+  int32_t height=144;
+
   RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_H264);
   RefPointer<Encoder> encoder = Encoder::make(codec.value());
-
-  RefPointer<FilterGraph> graph = FilterGraph::make();
-
-  RefPointer<MediaPicture> picture = MediaPicture::make(320*2,240*2,
+  RefPointer<MediaPicture> picture = MediaPicture::make(width*2,height*2,
       PixelFormat::PIX_FMT_YUV420P);
 
   // set the encoder properties we need
@@ -67,14 +70,10 @@ EncoderTest::testEncodeVideo() {
   RefPointer<Rational> tb = Rational::make(1,25);
   encoder->setTimeBase(tb.value());
 
-  // open the encoder
-  encoder->open(0, 0);
-
-  RefPointer<FilterPictureSink> fsink = graph->addPictureSink("out", picture->getFormat());
-
   // mandlebrot, that is then negated, horizontally flipped, and edge detected, before
   // final outputting to a new picture with each version in one of 4 quadrants.
-  graph->open("mandelbrot=s=320x240[mb];"
+  char graphCommand[1024];
+  snprintf(graphCommand,sizeof(graphCommand),"mandelbrot=s=%dx%d[mb];"
       "[mb]split=4[0][1][2][3];"
       "[0]pad=iw*2:ih*2[a];"
       "[1]negate[b];"
@@ -82,13 +81,25 @@ EncoderTest::testEncodeVideo() {
       "[3]edgedetect[d];"
       "[a][b]overlay=w[x];"
       "[x][c]overlay=0:h[y];"
-      "[y][d]overlay=w:h[out]");
+      "[y][d]overlay=w:h[out]", width, height);
+
+  RefPointer<FilterGraph> graph = FilterGraph::make();
+  RefPointer<FilterPictureSink> fsink = graph->addPictureSink("out", picture->getFormat());
+  graph->open(graphCommand);
 
   // let's set a frame time base of 1/30
   RefPointer<Rational> pictureTb = Rational::make(1,30);
 
   // create an output muxer
-  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeVideo.mp4", 0, 0);
+  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeVideo.mov", 0, 0);
+  RefPointer<MuxerFormat> format = muxer->getFormat();
+
+  // if the container will require a global header, then the encoder needs to set this.
+  if (format->getFlag(MuxerFormat::GLOBAL_HEADER))
+    encoder->setFlag(Encoder::FLAG_GLOBAL_HEADER, true);
+
+  // open the encoder
+  encoder->open(0, 0);
 
   // add a stream for the encoded packets
   {
@@ -199,4 +210,83 @@ EncoderTest::testEncodeAudio() {
   } while (packet->isComplete());
 
   muxer->close();
+}
+
+/**
+ * Test that memory is not leaked/corrupted during error paths.
+ */
+void
+EncoderTest::testEncodeInvalidParameters()
+{
+  // Sub-test 1
+  {
+    int32_t width=176;
+    int32_t height=360; // invalid dimensions for H263 codec
+    RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_H263);
+    RefPointer<Encoder> encoder = Encoder::make(codec.value());
+
+    RefPointer<MediaPicture> picture = MediaPicture::make(width*2,height*2,
+        PixelFormat::PIX_FMT_YUV420P);
+
+    // set the encoder properties we need
+    encoder->setWidth(picture->getWidth());
+    encoder->setHeight(picture->getHeight());
+    encoder->setPixelFormat(picture->getFormat());
+    encoder->setProperty("b", (int64_t)400000); // bitrate
+    encoder->setProperty("g", (int64_t) 10); // gop
+
+    RefPointer<Rational> tb = Rational::make(1,25);
+    encoder->setTimeBase(tb.value());
+
+    // open the encoder
+    try {
+      // Temporarily turn down logging
+      LoggerStack stack;
+      stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
+
+      encoder->open(0, 0);
+      TS_FAIL("should never get here");
+    } catch (std::exception & e) {
+      // ignore exception
+    }
+  }
+
+  // Sub-test 2
+  {
+    int32_t width=176;
+    int32_t height=144;
+
+    RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_H264);
+    RefPointer<Encoder> encoder = Encoder::make(codec.value());
+    RefPointer<MediaPicture> picture = MediaPicture::make(width*2,height*2,
+        PixelFormat::PIX_FMT_YUV420P);
+
+    // set the encoder properties we need
+    encoder->setWidth(picture->getWidth());
+    encoder->setHeight(picture->getHeight());
+    encoder->setPixelFormat(picture->getFormat());
+    encoder->setProperty("b", (int64_t)400000); // bitrate
+    encoder->setProperty("g", (int64_t) 10); // gop
+    encoder->setProperty("bf", (int64_t)1); // max b frames
+
+    RefPointer<Rational> tb = Rational::make(1,25);
+    encoder->setTimeBase(tb.value());
+
+    // Do not open the encoder
+
+    // create an output muxer
+    RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeVideo.mov", 0, 0);
+
+    // add a stream for the encoded packets
+    try {
+      // Temporarily turn down logging
+      LoggerStack stack;
+      stack.setGlobalLevel(Logger::LEVEL_ERROR, false);
+
+      RefPointer<MuxerStream> stream = muxer->addNewStream(encoder.value());
+      TS_FAIL("should never get here");
+    } catch (std::exception & e) {
+      // success
+    }
+  }
 }
