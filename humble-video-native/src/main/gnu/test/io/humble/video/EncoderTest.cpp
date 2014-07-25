@@ -47,7 +47,7 @@ EncoderTest::testCreation() {
 void
 EncoderTest::testEncodeVideo() {
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
-  const int32_t maxPics = isMemCheck ? 20 : 500;
+  const int32_t maxPics = isMemCheck ? 10 : 500;
   RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_H264);
   RefPointer<Encoder> encoder = Encoder::make(codec.value());
 
