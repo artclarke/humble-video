@@ -13002,7 +13002,6 @@
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
-   match-leak-kinds: reachable
    fun:malloc
    fun:__smakebuf
    fun:__swsetup
@@ -13040,7 +13039,6 @@
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
-   match-leak-kinds: reachable
    fun:malloc
    fun:_ZL29getPerThreadBufferFor_dlerrorj
    fun:_ZL10dlerrorSetPKc
@@ -13051,7 +13049,6 @@
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
-   match-leak-kinds: possible
    fun:malloc
    fun:_Znwm
    fun:_ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9__grow_byEmmmmmm
@@ -13080,7 +13077,6 @@
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
-   match-leak-kinds: possible
    fun:malloc
    fun:_Znwm
    fun:_ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE9__grow_byEmmmmmm
@@ -13107,7 +13103,6 @@
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
-   match-leak-kinds: possible
    fun:malloc
    fun:_Znwm
    fun:_ZN7CxxTest12XmlFormatter9enterTestERKNS_15TestDescriptionE
