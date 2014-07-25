@@ -297,7 +297,7 @@ namespace io { namespace humble { namespace video {
   bool
   MediaPacketImpl::isComplete()
   {
-    return mIsComplete && mPacket->data;
+    return mIsComplete && mPacket->data && mPacket->size;
   }
 
   int64_t

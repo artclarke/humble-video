@@ -47,6 +47,7 @@ Coder::Coder(Codec* codec, AVCodecContext* src, bool copySrc) {
     mCtx = avcodec_alloc_context3(codec->getCtx());
     if (!mCtx)
       throw HumbleRuntimeError("could not allocate coder context");
+    mCtx->codec = codec->getCtx();
   } else if (copySrc) {
     // create again for the copy
     mCtx = avcodec_alloc_context3(0);
@@ -197,6 +198,72 @@ Coder::ensureAudioParamsMatch(MediaAudio* audio)
     VS_THROW(HumbleInvalidArgument("audio sample format does not match what coder expects"));
 
 }
+
+int32_t
+Coder::getFlags()
+{
+  return mCtx->flags;
+}
+int32_t
+Coder::getFlag(Flag flag) {
+  return mCtx->flags & flag;
+}
+int32_t
+Coder::getFlags2()
+{
+  return mCtx->flags2;
+}
+int32_t
+Coder::getFlag2(Flag2 flag) {
+  return mCtx->flags2 & flag;
+}
+void
+Coder::setFlags(int32_t val)
+{
+  if (getState() != STATE_INITED)
+    VS_THROW(HumbleInvalidArgument("Cannot set flags after coder is opened"));
+
+  mCtx->flags = val;
+}
+void
+Coder::setFlag(Flag flag, bool value)
+{
+  if (getState() != STATE_INITED)
+    VS_THROW(HumbleInvalidArgument("Cannot set flags after coder is opened"));
+
+  if (value)
+  {
+    mCtx->flags |= flag;
+  }
+  else
+  {
+    mCtx->flags &= (~flag);
+  }
+}
+void
+Coder::setFlags2(int32_t val)
+{
+  if (getState() != STATE_INITED)
+    VS_THROW(HumbleInvalidArgument("Cannot set flags after coder is opened"));
+
+  mCtx->flags2 = val;
+}
+void
+Coder::setFlag2(Flag2 flag, bool value)
+{
+  if (getState() != STATE_INITED)
+    VS_THROW(HumbleInvalidArgument("Cannot set flags after coder is opened"));
+
+  if (value)
+  {
+    mCtx->flags2 |= flag;
+  }
+  else
+  {
+    mCtx->flags2 &= (~flag);
+  }
+}
+
 
 } /* namespace video */
 } /* namespace humble */

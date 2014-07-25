@@ -165,10 +165,24 @@ public class Muxer extends Container {
     return Muxer.State.swigToEnum(VideoJNI.Muxer_getState(swigCPtr, this));
   }
 
+/**
+ * Open the Muxer and write any headers.<br>
+ * <br>
+ * @param inputOptions muxer-specific options to set before opening the muxer. Can be null.<br>
+ * @param outputOptions if non null, the passed in bag will be emptied, and the filled<br>
+ *    with any options from inputOptions that could not be set on the muxer.
+ */
   public void open(KeyValueBag inputOptions, KeyValueBag outputOptions) throws java.lang.InterruptedException, java.io.IOException {
     VideoJNI.Muxer_open(swigCPtr, this, KeyValueBag.getCPtr(inputOptions), inputOptions, KeyValueBag.getCPtr(outputOptions), outputOptions);
   }
 
+/**
+ * Close the muxer and write any trailers.<br>
+ * <br>
+ * Note: Calls MUST call this method -- it will not automatically be called<br>
+ * when the object is finalized as some muxers struggle when you write trailers<br>
+ * on a different thread (the finalizer thread) than the header was written on.
+ */
   public void close() {
     VideoJNI.Muxer_close(swigCPtr, this);
   }
@@ -196,8 +210,7 @@ public class Muxer extends Container {
  * Return the output buffer length.<br>
  * <br>
  * @return The input buffer length Humble Video told FFMPEG to assume.<br>
- *   0 means FFMPEG should choose it's own<br>
- *   size (and it'll probably be 32768).
+ *   0 means FFMPEG should choose it's own size (and it'll probably be 32768).
  */
   public int getOutputBufferLength() {
     return VideoJNI.Muxer_getOutputBufferLength(swigCPtr, this);
@@ -230,8 +243,7 @@ public class Muxer extends Container {
 /**
  * Writes the given packet to the Muxer.<br>
  * <br>
- * @param packet The packet to write. If null, it tells the muxer to flush any data queued up to<br>
- *   the underlying storage (disk, network, etc).<br>
+ * @param packet The packet to write.<br>
  * @param forceInterleave If true, this Muxer will ensure that all packets are interleaved across streams<br>
  *   (i.e. monotonically increasing timestamps in the Muxer container). If false, then the caller<br>
  *   is responsible for ensuring the interleaving is valid for the container. Note this method is faster<br>

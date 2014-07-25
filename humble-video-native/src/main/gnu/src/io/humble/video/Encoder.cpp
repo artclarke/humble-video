@@ -34,7 +34,23 @@ VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 namespace io {
 namespace humble {
-namespace video {
+namespace
+video {
+
+#if 0
+int32_t
+Encoder::acquire()
+{
+  VS_LOG_DEBUG("encoder acquire: %p", this);
+  return RefCounted::acquire();
+}
+int32_t
+Encoder::release()
+{
+  VS_LOG_DEBUG("encoder release: %p", this);
+  return RefCounted::release();
+}
+#endif // 0
 
 Encoder::Encoder(Codec* codec, AVCodecContext* src, bool copySrc) : Coder(codec, src, copySrc) {
   if (!codec)
@@ -42,8 +58,11 @@ Encoder::Encoder(Codec* codec, AVCodecContext* src, bool copySrc) : Coder(codec,
 
   if (!codec->canEncode())
     throw HumbleInvalidArgument("passed in codec cannot encode");
-  VS_LOG_TRACE("Created encoder");
 
+  mNumDroppedFrames = 0;
+  mLastPtsEncoded = Global::NO_PTS;
+
+  VS_LOG_TRACE("Created encoder");
 }
 
 Encoder::~Encoder() {
@@ -123,6 +142,7 @@ Encoder::open(KeyValueBag * inputOptions, KeyValueBag* unsetOptions) {
         getSampleRate(),
         getSampleFormat()
         );
+    mAResampler->open();
   }
 }
 void
@@ -145,15 +165,57 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
     VS_THROW(HumbleInvalidArgument("Can only pass complete media to encode"));
   }
 
+  if (frame && frame->getPts() == Global::NO_PTS) {
+    VS_THROW(HumbleInvalidArgument("Passed in media must have a valid time stamp"));
+  }
+
+  /**
+   * Ah, this is naive. Here's what we actually need to do:
+   *
+   * 1) Copy the video frame into a new frame since some codecs will
+   * need byte aligned frames (and if the frame came from a Java user, we
+   * can't be guaranteed it'll be aligned on the right boundaries).
+   *
+   * 2) check time stamps and drop frames when needed if the time
+   * base of the input frame cannot be converted to the encoder
+   * time base without rounding.
+   *
+   */
   AVFrame* in = frame ? frame->getCtx() : 0;
   AVPacket* out = output->getCtx();
 
+  RefPointer<Rational> coderTb = this->getTimeBase();
+
+  if (in) {
+    RefPointer<Rational> frameTb = frame->getTimeBase();
+    bool dropFrame = false;
+
+    int64_t inTs = coderTb->rescale(in->pts, frameTb.value());
+    if (mLastPtsEncoded != Global::NO_PTS) {
+      if (inTs < mLastPtsEncoded) {
+        VS_LOG_DEBUG(
+            "Dropping frame with timestamp %lld (if coder supports higher time-base use that instead)",
+            frame->getPts());
+        dropFrame = true;
+      }
+    } else {
+      if (!dropFrame)
+        mLastPtsEncoded = inTs;
+    }
+  }
   int got_frame = 0;
+
+  // set the packet to be the max size if can be
+  output->setComplete(false, 0);
+  if (out->buf && out->data)
+    out->size = out->buf->size;
+  else
+    out->size = 0;
+
   int e = avcodec_encode_video2(getCodecCtx(), out, in, &got_frame);
   if (got_frame) {
-    output->setComplete(true, out->size);
-  } else {
-    output->setComplete(false, 0);
+    output->setTimeBase(coderTb.value());
+    output->setComplete(out->size > 0, out->size);
   }
   FfmpegException::check(e, "could not encode video ");
 }
@@ -196,6 +258,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
       inputAudio = mResampledAudio.get();
     }
   }
+  RefPointer<Rational> coderTb = this->getTimeBase();
 
   AVFrame* in = inputAudio ? inputAudio->getCtx() : 0;
   AVPacket* out = output->getCtx();
@@ -203,6 +266,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
   int got_frame = 0;
   int e = avcodec_encode_audio2(getCodecCtx(), out, in, &got_frame);
   if (got_frame) {
+    output->setTimeBase(coderTb.value());
     output->setComplete(true, out->size);
   } else {
     output->setComplete(false, 0);

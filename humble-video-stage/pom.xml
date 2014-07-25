@@ -32,7 +32,25 @@
       humble-video-arch-i686-pc-linux-gnu6
     </module>
     <module>
-      humble-video-arch-x86_64-pc-linux-gnu6 
+      humble-video-arch-x86_64-pc-linux-gnu6
+    </module>
+    <module>
+      humble-video-arch-x86_64-apple-darwin12-debug
+    </module>
+    <module>
+      humble-video-arch-i686-apple-darwin12-debug
+    </module>
+    <module>
+      humble-video-arch-x86_64-w64-mingw32-debug
+    </module>
+    <module>
+      humble-video-arch-i686-w64-mingw32-debug
+    </module>
+    <module>
+      humble-video-arch-i686-pc-linux-gnu6-debug
+    </module>
+    <module>
+      humble-video-arch-x86_64-pc-linux-gnu6-debug
     </module>
   </modules>
 </project>

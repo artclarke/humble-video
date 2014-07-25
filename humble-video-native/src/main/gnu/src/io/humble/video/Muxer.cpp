@@ -42,6 +42,21 @@ namespace io {
 namespace humble {
 namespace video {
 
+#if 0
+int32_t
+Muxer::acquire()
+{
+  VS_LOG_DEBUG("muxer acquire: %p", this);
+  return RefCounted::acquire();
+}
+int32_t
+Muxer::release()
+{
+  VS_LOG_DEBUG("muxer release: %p", this);
+  return RefCounted::release();
+}
+#endif // 0
+
 Muxer::Muxer(MuxerFormat* format, const char* filename,
     const char* formatName) {
   mState = STATE_INITED;
@@ -185,6 +200,22 @@ Muxer::open(KeyValueBag *aInputOptions, KeyValueBag* aOutputOptions) {
       FfmpegException::check(retval, "Error opening url: %s; ", url);
     }
 
+    int32_t numStreams = getNumStreams();
+    if (numStreams < 0 &&
+        !(ctx->ctx_flags & AVFMTCTX_NOHEADER))
+      VS_THROW(io::humble::ferry::HumbleIOException("no streams added to muxer"));
+
+    if (numStreams == 0)
+    {
+      RefPointer<ContainerFormat> format = getFormat();
+      if (format)
+      {
+        const char *shortName = format->getName();
+        if (shortName && !strcmp(shortName, "mp3"))
+          VS_THROW(io::humble::ferry::HumbleIOException("no streams added to mp3 muxer"));
+      }
+    }
+
     pushCoders();
     /* Write the stream header, if any. */
     retval = avformat_write_header(ctx, &tmp);
@@ -258,6 +289,13 @@ Muxer::addNewStream(Coder* aCoder) {
     VS_THROW(HumbleInvalidArgument("cannot add MuxerStream after Muxer is opened"));
   }
 
+  if (mFormat->getFlag(ContainerFormat::GLOBAL_HEADER)) {
+    // the Codec must have the global header flag set. We'll throw an error if not.
+    if (!coder->getFlag(Coder::FLAG_GLOBAL_HEADER)) {
+      VS_THROW(HumbleInvalidArgument("this container requires a global header, and this Coder does not have the global header flag set"));
+    }
+  }
+
   RefPointer<MuxerStream> r;
 
   AVFormatContext* ctx = getFormatCtx();
@@ -265,6 +303,10 @@ Muxer::addNewStream(Coder* aCoder) {
   AVStream* avStream = avformat_new_stream(ctx, coder->getCodecCtx()->codec);
   if (!avStream) {
     VS_THROW(HumbleRuntimeError("Could not add new stream to container"));
+  }
+  if (avStream->codec && !avStream->codec->codec) {
+    // fixes a memory leak on closing.
+    avStream->codec->codec = coder->getCodecCtx()->codec;
   }
   // tell the container to update all the known streams.
   doSetupStreams();

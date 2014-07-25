@@ -6,8 +6,17 @@ HOST=$( ${DIR}/mk/config.guess )
 
 humble_configure()
 {
-  PREFIX="$1/humble-video-arch-$2/target/native"
   BUILD=$2
+  PREFIX_DEBUG="$1/humble-video-arch-$2-debug/target/native"
+  if [ ! -e ./${cross_os}-debug/Makefile ]; then
+    echo "Building ${DIR}/configure in ${PREFIX_DEBUG}"
+    mkdir -p ./${cross_os}-debug
+    mkdir -p "${PREFIX_DEBUG}"
+    (cd ./${cross_os}-debug && (${DIR}/configure --enable-optimizations=no --prefix="${PREFIX_DEBUG}" --host="${BUILD}" ${HUMBLE_CONFIGURE} | tee configure.log))
+  else
+    echo "Makefile appears to be up-to-date in ${cross_os}-debug"
+  fi
+  PREFIX="$1/humble-video-arch-$2/target/native"
   if [ ! -e ./${cross_os}/Makefile ]; then
     echo "Building ${DIR}/configure in ${PREFIX}"
     mkdir -p ./$cross_os
