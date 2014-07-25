@@ -12999,3 +12999,41 @@
    fun:__dtoa
    fun:__vfprintf
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:__smakebuf
+   fun:__swsetup
+   fun:__sfvwrite
+   fun:fwrite
+   fun:_ZNSt3__111__stdoutbufIcE8overflowEi
+   fun:_ZNSt3__115basic_streambufIcNS_11char_traitsIcEEE6xsputnEPKcl
+   fun:_ZNSt3__116__pad_and_outputIcNS_11char_traitsIcEEEENS_19ostreambuf_iteratorIT_T0_EES6_PKS4_S8_S8_RNS_8ios_baseES4_
+   fun:_ZNSt3__1lsINS_11char_traitsIcEEEERNS_13basic_ostreamIcT_EES6_PKc
+   fun:_ZN7CxxTest12ErrorPrinter7AdapterlsEPKc
+   fun:_ZN7CxxTest14ErrorFormatter10enterWorldERKNS_16WorldDescriptionE
+   fun:_ZN7CxxTest11TeeListener10enterWorldERKNS_16WorldDescriptionE
+   fun:_ZN7CxxTest11TestTracker10enterWorldERKNS_16WorldDescriptionE
+   fun:_ZN7CxxTest10TestRunner8runWorldEv
+   fun:_ZN7CxxTest10TestRunner11runAllTestsERNS_12TestListenerE
+   fun:_ZN7CxxTest12XUnitPrinter3runEv
+   fun:_ZN7CxxTest4MainINS_12XUnitPrinterEEEiRT_iPPc
+   fun:_Z11VS_TestMainiPPc
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:create_scalable_zone
+   fun:_malloc_initialize
+   fun:posix_memalign
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:create_scalable_zone
+   fun:_malloc_initialize
+   fun:posix_memalign
+}
