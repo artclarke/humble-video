@@ -55,6 +55,7 @@ MuxerTest::testCreation() {
   e->setHeight(320);
   e->setPixelFormat(PixelFormat::PIX_FMT_YUV420P);
   e->setTimeBase(t.value());
+  e->setFlag(Coder::FLAG_GLOBAL_HEADER, true);
 
   e->open(0, 0);
 

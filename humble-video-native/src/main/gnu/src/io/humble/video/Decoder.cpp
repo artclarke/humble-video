@@ -359,6 +359,29 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
   return retval;
 }
 
+int32_t
+Decoder::decode(Media* output, MediaPacket* packet, int32_t offset) {
+  MediaDescriptor::Type type = getCodecType();
+  switch(type) {
+  case MediaDescriptor::MEDIA_AUDIO: {
+    MediaAudio* audio = dynamic_cast<MediaAudio*>(output);
+    if (!audio)
+      VS_THROW(HumbleInvalidArgument("passed non-audio Media to an audio decoder"));
+    return decodeAudio(audio, packet, offset);
+  }
+  break;
+  case MediaDescriptor::MEDIA_VIDEO: {
+    MediaPicture* picture = dynamic_cast<MediaPicture*>(output);
+    if (!picture)
+      VS_THROW(HumbleInvalidArgument("passed non-video Media to an video decoder"));
+    return decodeVideo(picture, packet, offset);
+  }
+  break;
+  default:
+    VS_THROW(HumbleInvalidArgument("passed a media type that is not compatible with this decoder"));
+  }
+  return -1;
+}
 Decoder*
 Decoder::make(Codec* codec)
 {
@@ -385,7 +408,7 @@ Decoder::make(Coder* src)
     VS_THROW(HumbleRuntimeError("coder has no codec"));
   }
   if (!c->canDecode()) {
-    // this codec cannot encode, so we try to find a new codec that can
+    // this codec cannot decode, so we try to find a new codec that can
     // of the same type.
     Codec::ID id = c->getID();
     c = Codec::findDecodingCodec(id);

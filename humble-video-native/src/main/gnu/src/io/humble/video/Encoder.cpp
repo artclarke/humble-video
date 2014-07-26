@@ -221,6 +221,28 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
 }
 
 void
+Encoder::encode(MediaPacket* output, Media* media) {
+  MediaDescriptor::Type type = getCodecType();
+  switch(type) {
+  case MediaDescriptor::MEDIA_AUDIO: {
+    MediaAudio* audio = dynamic_cast<MediaAudio*>(media);
+    if (!audio)
+      VS_THROW(HumbleInvalidArgument("passed non-audio Media to an audio encoder"));
+    encodeAudio(output, audio);
+  }
+  break;
+  case MediaDescriptor::MEDIA_VIDEO: {
+    MediaPicture* picture = dynamic_cast<MediaPicture*>(media);
+    if (!picture)
+      VS_THROW(HumbleInvalidArgument("passed non-video Media to an video encoder"));
+    encodeVideo(output, picture);
+  }
+  break;
+  default:
+    VS_THROW(HumbleInvalidArgument("passed a media type that is not compatible with this encoder"));
+  }
+}
+void
 Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
   MediaPacketImpl* output = dynamic_cast<MediaPacketImpl*>(aOutput);
 

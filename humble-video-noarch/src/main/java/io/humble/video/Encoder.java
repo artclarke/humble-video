@@ -214,4 +214,38 @@ public class Encoder extends Coder {
     VideoJNI.Encoder_encodeAudio(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaAudio.getCPtr(samples), samples);
   }
 
+/**
+ * Encode the given Media using this encoder.<br>
+ * <br>
+ * Callers should call this repeatedly on a media object ntil<br>
+ * we consume all the media.<br>
+ * <br>
+ * Also, when done in order to flush the encoder, caller should call<br>
+ * this method passing in 0 (null) for media to tell the encoder<br>
+ * to flush any data it was keeping a hold of.<br>
+ * <br>
+ * @param output [out] The packet to encode into.  Caller should check<br>
+ *       MediaPacket.isComplete() after call to find out if we had enough<br>
+ *       information to encode a full packet.<br>
+ * <br>
+ * <br>
+ * Note: caller must ensure that output has sufficient space to<br>
+ *   contain a full packet. Alas, there is currently no way to<br>
+ *   query an encoder to find out the maximum packet size that<br>
+ *   can be output (bummer, I know). That leaves the caller two<br>
+ *   options. (1) You can call Packet.make() before each encode<br>
+ *   call, and then the encoder will automagically create the correct<br>
+ *   sized buffer for that call (but if you reuse the packet, it<br>
+ *   may be too small for the next caller). Or (2) you  can call<br>
+ *   Packet.make(int) with a value that will be larger than your<br>
+ *   max packet size (in which case you can reuse the packet).<br>
+ * <br>
+ * @throws throws an exception if getCodecType() and the underlying<br>
+ * media object do not align (e.g. if you pass in a MediaPicture but the<br>
+ * CodecType is audio data).
+ */
+  public void encode(MediaPacket output, Media media) {
+    VideoJNI.Encoder_encode(swigCPtr, this, MediaPacket.getCPtr(output), output, Media.getCPtr(media), media);
+  }
+
 }

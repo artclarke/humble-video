@@ -112,6 +112,29 @@ public:
       MediaPacket *packet, int32_t byteOffset);
 
   /**
+   * Decode this packet into output.  It will
+   * try to fill up the media object, starting
+   * from the byteOffset inside this packet.
+   * <p>
+   * The caller is responsible for allocating the
+   * correct underlying Media object.  This function will overwrite
+   * any data in the samples object.
+   * </p>
+   * @param output The Media we decode to. Caller must check if it is complete on return.
+   * @param packet    The packet we're attempting to decode from.
+   * @param byteOffset Where in the packet payload to start decoding
+   *
+   * @return number of bytes actually processed from the packet, or negative for error
+   *
+   * @throws InvalidArgument if the media type is not compatible with this decoder.
+   * @see decodeVideo
+   * @see decodeAudio
+   */
+  virtual int32_t decode(Media * output,
+      MediaPacket *packet, int32_t byteOffset);
+
+
+  /**
    * Decode this packet into output.
    *
    * The caller is responsible for allocating the

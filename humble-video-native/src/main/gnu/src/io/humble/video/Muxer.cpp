@@ -276,6 +276,11 @@ Muxer::addNewStream(Coder* aCoder) {
     AVCodecContext* ctx = coder->getCodecCtx();
     // right; got to find a codec tag for the id passed in. Suck.
     ctx->codec_tag = mFormat->getBestCodecTag(coder->getCodecID());
+
+    // not sure this is the right fix here
+    if (mFormat->getFlag(ContainerFormat::GLOBAL_HEADER))
+      coder->setFlag(Coder::FLAG_GLOBAL_HEADER, true);
+
     // and open the new decoder
     (dynamic_cast<Decoder*>(coder.value()))->open(0, 0);
 

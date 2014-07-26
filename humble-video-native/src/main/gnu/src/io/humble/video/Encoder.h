@@ -140,6 +140,39 @@ public:
   virtual void encodeAudio(MediaPacket * output,
       MediaAudio* samples);
 
+  /**
+   * Encode the given Media using this encoder.
+   *
+   * Callers should call this repeatedly on a media object ntil
+   * we consume all the media.
+   *
+   * Also, when done in order to flush the encoder, caller should call
+   * this method passing in 0 (null) for media to tell the encoder
+   * to flush any data it was keeping a hold of.
+   *
+   * @param output [out] The packet to encode into.  Caller should check
+   *       MediaPacket.isComplete() after call to find out if we had enough
+   *       information to encode a full packet.
+   * @param samples [in] The media to consume
+   *
+   * Note: caller must ensure that output has sufficient space to
+   *   contain a full packet. Alas, there is currently no way to
+   *   query an encoder to find out the maximum packet size that
+   *   can be output (bummer, I know). That leaves the caller two
+   *   options. (1) You can call Packet.make() before each encode
+   *   call, and then the encoder will automagically create the correct
+   *   sized buffer for that call (but if you reuse the packet, it
+   *   may be too small for the next caller). Or (2) you  can call
+   *   Packet.make(int) with a value that will be larger than your
+   *   max packet size (in which case you can reuse the packet).
+   *
+   * @throws throws an exception if getCodecType() and the underlying
+   * media object do not align (e.g. if you pass in a MediaPicture but the
+   * CodecType is audio data).
+   *
+   */
+  virtual void encode(MediaPacket * output,
+      Media* media);
 #if 0
 #ifndef SWIG
   virtual int32_t acquire();

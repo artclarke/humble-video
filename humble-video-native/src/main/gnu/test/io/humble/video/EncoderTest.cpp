@@ -22,17 +22,18 @@
  *  Created on: Sep 6, 2013
  *      Author: aclarke
  */
+#include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/LoggerStack.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/FilterGraph.h>
 #include <io/humble/video/FilterPictureSink.h>
 #include <io/humble/video/FilterAudioSink.h>
-#include <io/humble/video/Muxer.h>
 #include <io/humble/video/MediaPicture.h>
-#include <io/humble/video/MediaPacket.h>
+#include <io/humble/video/MediaAudio.h>
 #include "EncoderTest.h"
 
 using namespace io::humble::ferry;
+VS_LOG_SETUP(VS_CPP_PACKAGE);
 
 EncoderTest::EncoderTest() {
 }
@@ -170,7 +171,7 @@ EncoderTest::testEncodeAudio() {
   RefPointer<FilterAudioSink> fsink = graph->addAudioSink("out", audio->getSampleRate(), audio->getChannelLayout(), audio->getFormat());
 
   // Generate a 220 Hz sine wave with a 880 Hz beep each second, for 60 seconds.
-//  graph->open("sine=frequency=220:beep_factor=4:duration=60[out]");
+  //  graph->open("sine=frequency=220:beep_factor=4:duration=60[out]");
   // Generate an amplitude modulated signal
   graph->open("aevalsrc=sin(10*2*PI*t)*sin(880*2*PI*t)[out]");
 
@@ -289,4 +290,191 @@ EncoderTest::testEncodeInvalidParameters()
       // success
     }
   }
+}
+
+void
+EncoderTest::encodeAndMux(
+    Media* media,
+    Muxer* muxer,
+    Encoder* encoder)
+{
+  RefPointer<MediaPacket> packet = MediaPacket::make();
+  do {
+    encoder->encode(packet.value(), media);
+    if (packet->isComplete()) {
+      VS_LOG_DEBUG("Encode: %p; TS: %lld", encoder, packet->getDts());
+      muxer->write(packet.value(), true);
+    }
+  } while (!media && packet->isComplete()); // this forces flushing if media is null
+}
+
+void
+EncoderTest::decodeAndEncode(
+    MediaPacket* packet,
+    Decoder* decoder,
+    Media* media,
+    Muxer* muxer,
+    Encoder* encoder
+)
+{
+  int32_t offset = 0;
+  int32_t bytesRead = 0;
+  do {
+    VS_LOG_DEBUG("Decode: %p; TS: %lld; offset: %lld",
+        decoder, packet ? packet->getDts() : Global::NO_PTS,
+            offset);
+    bytesRead += decoder->decode(media, packet, offset);
+    if (media->isComplete()) {
+      // we encode and write it
+      encodeAndMux(media, muxer, encoder);
+    }
+    offset += bytesRead;
+  } while ((!packet && media->isComplete()) || (packet && offset < packet->getSize()));
+  if (!packet) {
+    // we should also flush the encoders
+    encodeAndMux(0, muxer, encoder);
+  }
+}
+
+/**
+ * This test will read ironman (FLV, H263 video and mp3 audio) and transcode
+ * to MP4 (H264 Video and aac audio).
+ */
+void
+EncoderTest::testTranscode()
+{
+  TS_SKIP("not yet working");
+  const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
+  if (isMemCheck)
+    return; // don't test this under Valgrind yet
+
+  TestData::Fixture* fixture=mFixtures.getFixture("testfile.flv");
+  TS_ASSERT(fixture);
+  char filepath[2048];
+  mFixtures.fillPath(fixture, filepath, sizeof(filepath));
+
+  RefPointer<Demuxer> source = Demuxer::make();
+  source->open(filepath, 0, false, true, 0, 0);
+  int32_t numStreams = source->getNumStreams();
+  TS_ASSERT_EQUALS(fixture->num_streams, numStreams);
+
+  // Let's create a helper object to help us with decoding
+  typedef struct {
+    MediaDescriptor::Type type;
+    RefPointer<DemuxerStream> stream;
+    RefPointer<Decoder> decoder;
+    RefPointer<Media> media;
+  } DemuxerStreamHelper;
+
+  // I know there are only 2 in the input file.
+  DemuxerStreamHelper inputHelpers[10];
+  for(int32_t i = 0; i < numStreams; i++) {
+    DemuxerStreamHelper* helper = &inputHelpers[i];
+    helper->stream = source->getStream(i);
+    helper->decoder = helper->stream->getDecoder();
+    helper->decoder->open(0, 0);
+    helper->type = helper->decoder->getCodecType();
+    if (helper->type == MediaDescriptor::MEDIA_AUDIO)
+      helper->media = MediaAudio::make(
+          helper->decoder->getFrameSize(),
+          helper->decoder->getSampleRate(),
+          helper->decoder->getChannels(),
+          helper->decoder->getChannelLayout(),
+          helper->decoder->getSampleFormat());
+    else if (helper->type  == MediaDescriptor::MEDIA_VIDEO)
+      helper->media = MediaPicture::make(
+          helper->decoder->getWidth(),
+          helper->decoder->getHeight(),
+          helper->decoder->getPixelFormat()
+      );
+  }
+
+  // now, let's set up our output file.
+  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_testTranscode.mp4", 0, 0);
+  RefPointer<MuxerFormat> format = muxer->getFormat();
+
+  // Let's create a helper object to help us with decoding
+  typedef struct {
+    MediaDescriptor::Type type;
+    RefPointer<MuxerStream> stream;
+    RefPointer<MediaAudioResampler> audioResampler;
+    RefPointer<Encoder> encoder;
+  } MuxerStreamHelper;
+  MuxerStreamHelper outputHelpers[10];
+  for(int32_t i = 0; i < numStreams; i++) {
+    DemuxerStreamHelper *input = &inputHelpers[i];
+    MuxerStreamHelper *output = &outputHelpers[i];
+    output->type = input->type;
+    RefPointer<Encoder> encoder;
+    if (output->type == MediaDescriptor::MEDIA_VIDEO) {
+      RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_H264);
+      encoder = Encoder::make(codec.value());
+
+      // set the encoder properties we need
+      encoder->setWidth(input->decoder->getWidth());
+      encoder->setHeight(input->decoder->getHeight());
+      encoder->setPixelFormat(input->decoder->getPixelFormat());
+      encoder->setProperty("b", (int64_t)400000); // bitrate
+      encoder->setProperty("g", (int64_t) 10); // gop
+      encoder->setProperty("bf", (int64_t)1); // max b frames
+
+    } else if (output->type == MediaDescriptor::MEDIA_AUDIO) {
+      RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_AAC);
+      encoder = Encoder::make(codec.value());
+
+      // set the encoder properties we need
+      encoder->setSampleRate(input->decoder->getSampleRate());
+      encoder->setSampleFormat(input->decoder->getSampleFormat());
+      encoder->setChannelLayout(input->decoder->getChannelLayout());
+      encoder->setChannels(input->decoder->getChannels());
+      encoder->setProperty("b", (int64_t)64000); // bitrate
+    }
+    output->encoder = encoder;
+    if (output->encoder) {
+      // if the container will require a global header, then the encoder needs to set this.
+      RefPointer<Rational> tb = input->decoder->getTimeBase();
+      output->encoder->setTimeBase(tb.value());
+
+      if (format->getFlag(MuxerFormat::GLOBAL_HEADER))
+        output->encoder->setFlag(Encoder::FLAG_GLOBAL_HEADER, true);
+
+      output->encoder->open(0,0);
+      output->stream = muxer->addNewStream(output->encoder.value());
+    }
+  }
+  // now we should be ready to open the muxer
+  muxer->open(0, 0);
+
+  // now, let's start a decoding loop.
+  RefPointer<MediaPacket> packet = MediaPacket::make();
+
+  while(source->read(packet.value()) >= 0) {
+    // got a packet; now we try to decode it.
+    if (packet->isComplete()) {
+      int32_t streamNo = packet->getStreamIndex();
+      DemuxerStreamHelper *input = &inputHelpers[streamNo];
+      MuxerStreamHelper* output = &outputHelpers[streamNo];
+      decodeAndEncode(
+          packet.value(),
+          input->decoder.value(),
+          input->media.value(),
+          muxer.value(),
+          output->encoder.value());
+    }
+  }
+
+  // now, flush any cached packets
+  for(int i = 0; i < numStreams; i++) {
+    DemuxerStreamHelper *input = &inputHelpers[i];
+    MuxerStreamHelper* output = &outputHelpers[i];
+    decodeAndEncode(
+        0,
+        input->decoder.value(),
+        input->media.value(),
+        muxer.value(),
+        output->encoder.value());
+
+  }
+  source->close();
+  muxer->close();
 }

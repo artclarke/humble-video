@@ -195,7 +195,8 @@ Coder::ensureAudioParamsMatch(MediaAudio* audio)
     VS_THROW(HumbleInvalidArgument("audio sample rate does not match what coder expects"));
 
   if (getSampleFormat() != audio->getFormat())
-    VS_THROW(HumbleInvalidArgument("audio sample format does not match what coder expects"));
+    VS_THROW(HumbleInvalidArgument::make("audio sample format does not match what coder expects: %d vs %d",
+        getSampleFormat(), audio->getFormat()));
 
 }
 

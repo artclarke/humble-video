@@ -26,7 +26,14 @@
 #ifndef ENCODERTEST_H_
 #define ENCODERTEST_H_
 #include <io/humble/testutils/TestUtils.h>
+#include <io/humble/video/Muxer.h>
+#include <io/humble/video/Media.h>
+#include <io/humble/video/Demuxer.h>
+#include <io/humble/video/Decoder.h>
 #include <io/humble/video/Encoder.h>
+#include <io/humble/video/MediaPacket.h>
+#include <io/humble/video/MediaAudioResampler.h>
+
 #include "TestData.h"
 
 using namespace io::humble::video;
@@ -43,6 +50,18 @@ public:
   void testEncodeVideo();
   void testEncodeAudio();
   void testEncodeInvalidParameters();
+  void testTranscode();
+private:
+  void decodeAndEncode(
+      MediaPacket*,
+      Decoder*,
+      Media*,
+      Muxer*,
+      Encoder*
+      );
+  void encodeAndMux(Media*, Muxer*, Encoder*);
+  TestData mFixtures;
+
 };
 
 #endif /* ENCODERTEST_H_ */
