@@ -226,14 +226,14 @@ Encoder::encode(MediaPacket* output, MediaSampled* media) {
   switch(type) {
   case MediaDescriptor::MEDIA_AUDIO: {
     MediaAudio* audio = dynamic_cast<MediaAudio*>(media);
-    if (!audio)
+    if (!audio && media)
       VS_THROW(HumbleInvalidArgument("passed non-audio Media to an audio encoder"));
     encodeAudio(output, audio);
   }
   break;
   case MediaDescriptor::MEDIA_VIDEO: {
     MediaPicture* picture = dynamic_cast<MediaPicture*>(media);
-    if (!picture)
+    if (!picture && media)
       VS_THROW(HumbleInvalidArgument("passed non-video Media to an video encoder"));
     encodeVideo(output, picture);
   }

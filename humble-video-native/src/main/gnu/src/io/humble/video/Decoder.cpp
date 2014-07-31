@@ -365,14 +365,14 @@ Decoder::decode(MediaSampled* output, MediaPacket* packet, int32_t offset) {
   switch(type) {
   case MediaDescriptor::MEDIA_AUDIO: {
     MediaAudio* audio = dynamic_cast<MediaAudio*>(output);
-    if (!audio)
+    if (!audio && output)
       VS_THROW(HumbleInvalidArgument("passed non-audio Media to an audio decoder"));
     return decodeAudio(audio, packet, offset);
   }
   break;
   case MediaDescriptor::MEDIA_VIDEO: {
     MediaPicture* picture = dynamic_cast<MediaPicture*>(output);
-    if (!picture)
+    if (!picture && output)
       VS_THROW(HumbleInvalidArgument("passed non-video Media to an video decoder"));
     return decodeVideo(picture, packet, offset);
   }
