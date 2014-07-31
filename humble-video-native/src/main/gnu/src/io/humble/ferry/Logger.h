@@ -224,7 +224,7 @@ namespace io { namespace humble { namespace ferry {
   int __humble_num_frames = __humble_trace.getNumFrames(); \
   if (vs_logger_static_context->isPrintStackTrace()) { for(int __humble_i = 0; __humble_i < __humble_num_frames; __humble_i++) { \
     const char* __humble_frame = __humble_trace.getFrameDescription(__humble_i); \
-    VS_LOG_ERROR("Stack frame [%d]: %s", __humble_i, __humble_frame); \
+    VS_LOG_DEBUG("Stack frame [%d]: %s", __humble_i, __humble_frame); \
   } } \
   __humble_trace.raise(); \
 } while (0)

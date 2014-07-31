@@ -27,12 +27,12 @@
 #define ENCODERTEST_H_
 #include <io/humble/testutils/TestUtils.h>
 #include <io/humble/video/Muxer.h>
-#include <io/humble/video/Media.h>
+#include <io/humble/video/MediaRaw.h>
 #include <io/humble/video/Demuxer.h>
 #include <io/humble/video/Decoder.h>
 #include <io/humble/video/Encoder.h>
 #include <io/humble/video/MediaPacket.h>
-#include <io/humble/video/MediaAudioResampler.h>
+#include <io/humble/video/MediaResampler.h>
 
 #include "TestData.h"
 
@@ -55,11 +55,22 @@ private:
   void decodeAndEncode(
       MediaPacket*,
       Decoder*,
-      Media*,
+      MediaSampled* decoded,
+      MediaResampler*,
+      MediaSampled* resampled,
       Muxer*,
       Encoder*
       );
-  void encodeAndMux(Media*, Muxer*, Encoder*);
+
+  void resampleEncodeAndMux(
+      MediaSampled* in,
+      MediaResampler*,
+      MediaSampled* out,
+      Muxer*,
+      Encoder*
+      );
+
+  void encodeAndMux(MediaSampled*, Muxer*, Encoder*);
   TestData mFixtures;
 
 };

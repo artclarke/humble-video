@@ -100,17 +100,17 @@ libhumble_video_la_DEPENDENCIES =
 am_libhumble_video_la_OBJECTS = Mingw64Fixes.lo VideoExceptions.lo \
 	AVBufferSupport.lo PixelFormat.lo KeyValueBag.lo \
 	KeyValueBagImpl.lo Property.lo PropertyImpl.lo Rational.lo \
-	RationalImpl.lo Codec.lo Media.lo MediaRaw.lo MediaAudio.lo \
-	MediaAudioImpl.lo MediaAudioResampler.lo MediaPicture.lo \
-	MediaPictureImpl.lo MediaPictureResampler.lo \
-	MediaPictureResamplerImpl.lo MediaSubtitle.lo \
-	MediaSubtitleImpl.lo IndexEntry.lo IndexEntryImpl.lo \
-	MediaPacket.lo MediaPacketImpl.lo ContainerFormat.lo \
-	Configurable.lo Coder.lo Decoder.lo Encoder.lo \
-	ContainerStream.lo Container.lo DemuxerFormat.lo Muxer.lo \
-	MuxerStream.lo Demuxer.lo DemuxerImpl.lo DemuxerStream.lo \
-	MuxerFormat.lo FilterType.lo FilterGraph.lo Filter.lo \
-	FilterLink.lo FilterEndPoint.lo FilterSource.lo \
+	RationalImpl.lo Codec.lo Media.lo MediaRaw.lo \
+	MediaResampler.lo MediaAudio.lo MediaAudioImpl.lo \
+	MediaAudioResampler.lo MediaPicture.lo MediaPictureImpl.lo \
+	MediaPictureResampler.lo MediaPictureResamplerImpl.lo \
+	MediaSubtitle.lo MediaSubtitleImpl.lo IndexEntry.lo \
+	IndexEntryImpl.lo MediaPacket.lo MediaPacketImpl.lo \
+	ContainerFormat.lo Configurable.lo Coder.lo Decoder.lo \
+	Encoder.lo ContainerStream.lo Container.lo DemuxerFormat.lo \
+	Muxer.lo MuxerStream.lo Demuxer.lo DemuxerImpl.lo \
+	DemuxerStream.lo MuxerFormat.lo FilterType.lo FilterGraph.lo \
+	Filter.lo FilterLink.lo FilterEndPoint.lo FilterSource.lo \
 	FilterAudioSource.lo FilterPictureSource.lo FilterSink.lo \
 	FilterAudioSink.lo FilterPictureSink.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
@@ -469,6 +469,7 @@ libhumble_video_la_SOURCES = \
   Codec.cpp \
   Media.cpp \
   MediaRaw.cpp \
+  MediaResampler.cpp \
   MediaAudio.cpp \
   MediaAudioImpl.cpp \
   MediaAudioResampler.cpp \
@@ -535,6 +536,7 @@ libhumble_video_la_HEADERS = \
   MediaAudio.h \
   MediaAudioImpl.h \
   MediaAudio.swg \
+  MediaResampler.h \
   MediaAudioResampler.h \
   MediaPicture.h \
   MediaPictureImpl.h \
@@ -694,6 +696,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureResampler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureResamplerImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaRaw.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaResampler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaSubtitle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaSubtitleImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mingw64Fixes.Plo@am__quote@

@@ -419,7 +419,8 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
   int64_t dts = packet->getDts();
   int64_t pts = packet->getPts();
 
-  if (duration >= 0) duration = thisBase->rescale(duration, packetBase.value(),
+  if (duration >= 0)
+    duration = thisBase->rescale(duration, packetBase.value(),
       Rational::ROUND_DOWN);
 
   if (pts != Global::NO_PTS) {

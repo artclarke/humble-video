@@ -231,6 +231,7 @@ namespace io { namespace humble { namespace ferry {
         // can
         JNIHelper::sRegisterTerminationCallback(Logger::shutdownJavaBindings,
             logger);
+        logger->setPrintStackTrace(true);
     }
     return logger;
   }

@@ -360,7 +360,7 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
 }
 
 int32_t
-Decoder::decode(Media* output, MediaPacket* packet, int32_t offset) {
+Decoder::decode(MediaSampled* output, MediaPacket* packet, int32_t offset) {
   MediaDescriptor::Type type = getCodecType();
   switch(type) {
   case MediaDescriptor::MEDIA_AUDIO: {

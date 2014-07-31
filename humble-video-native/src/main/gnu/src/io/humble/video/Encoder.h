@@ -172,7 +172,7 @@ public:
    *
    */
   virtual void encode(MediaPacket * output,
-      Media* media);
+      MediaSampled* media);
 #if 0
 #ifndef SWIG
   virtual int32_t acquire();

@@ -185,7 +185,18 @@ MediaAudioResampler::setTimeBase(Rational* tb) {
 }
 
 int32_t
-MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
+MediaAudioResampler::resample(MediaSampled* aOut, MediaSampled*aIn)
+{
+  MediaAudio* out = dynamic_cast<MediaAudio*>(aOut);
+  MediaAudio*  in = dynamic_cast<MediaAudio*>(aIn);
+  if (aOut && !out)
+    VS_THROW(HumbleInvalidArgument("out must be a MediaAudio object"));
+  if (aIn && !in)
+    VS_THROW(HumbleInvalidArgument("out must be a MediaAudio object"));
+  return resampleAudio(out, in);
+}
+int32_t
+MediaAudioResampler::resampleAudio(MediaAudio* aOut, MediaAudio* aIn) {
   MediaAudioImpl* out = dynamic_cast<MediaAudioImpl*>(aOut);
   MediaAudioImpl* in = dynamic_cast<MediaAudioImpl*>(aIn);
 

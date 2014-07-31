@@ -529,6 +529,8 @@ public class VideoJNI {
   public final static native long Configurable_getPropertyAsRational(long jarg1, Configurable jarg1_, String jarg2);
   public final static native boolean Configurable_getPropertyAsBoolean(long jarg1, Configurable jarg1_, String jarg2);
   public final static native void Configurable_setProperty__SWIG_5(long jarg1, Configurable jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_);
+  public final static native int MediaResampler_getState(long jarg1, MediaResampler jarg1_);
+  public final static native int MediaResampler_resample(long jarg1, MediaResampler jarg1_, long jarg2, MediaSampled jarg2_, long jarg3, MediaSampled jarg3_);
   public final static native int MediaPictureResampler_FLAG_FAST_BILINEAR_get();
   public final static native int MediaPictureResampler_FLAG_BILINEAR_get();
   public final static native int MediaPictureResampler_FLAG_BICUBIC_get();
@@ -549,7 +551,6 @@ public class VideoJNI {
   public final static native int MediaPictureResampler_FLAG_ACCURATE_RND_get();
   public final static native int MediaPictureResampler_FLAG_BITEXACT_get();
   public final static native int MediaPictureResampler_FLAG_ERROR_DIFFUSION_get();
-  public final static native int MediaPictureResampler_getState(long jarg1, MediaPictureResampler jarg1_);
   public final static native int MediaPictureResampler_getInputWidth(long jarg1, MediaPictureResampler jarg1_);
   public final static native int MediaPictureResampler_getInputHeight(long jarg1, MediaPictureResampler jarg1_);
   public final static native int MediaPictureResampler_getInputFormat(long jarg1, MediaPictureResampler jarg1_);
@@ -557,7 +558,8 @@ public class VideoJNI {
   public final static native int MediaPictureResampler_getOutputHeight(long jarg1, MediaPictureResampler jarg1_);
   public final static native int MediaPictureResampler_getOutputFormat(long jarg1, MediaPictureResampler jarg1_);
   public final static native void MediaPictureResampler_open(long jarg1, MediaPictureResampler jarg1_);
-  public final static native void MediaPictureResampler_resample(long jarg1, MediaPictureResampler jarg1_, long jarg2, MediaPicture jarg2_, long jarg3, MediaPicture jarg3_);
+  public final static native int MediaPictureResampler_resample(long jarg1, MediaPictureResampler jarg1_, long jarg2, MediaSampled jarg2_, long jarg3, MediaSampled jarg3_);
+  public final static native int MediaPictureResampler_resamplePicture(long jarg1, MediaPictureResampler jarg1_, long jarg2, MediaPicture jarg2_, long jarg3, MediaPicture jarg3_);
   public final static native long MediaPictureResampler_make(int jarg1, int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, int jarg7);
   public final static native long MediaAudioResampler_make(int jarg1, int jarg2, int jarg3, int jarg4, int jarg5, int jarg6);
   public final static native int MediaAudioResampler_getOutputLayout(long jarg1, MediaAudioResampler jarg1_);
@@ -569,7 +571,8 @@ public class VideoJNI {
   public final static native int MediaAudioResampler_getInputChannels(long jarg1, MediaAudioResampler jarg1_);
   public final static native int MediaAudioResampler_getOutputChannels(long jarg1, MediaAudioResampler jarg1_);
   public final static native void MediaAudioResampler_open(long jarg1, MediaAudioResampler jarg1_);
-  public final static native int MediaAudioResampler_resample(long jarg1, MediaAudioResampler jarg1_, long jarg2, MediaAudio jarg2_, long jarg3, MediaAudio jarg3_);
+  public final static native int MediaAudioResampler_resample(long jarg1, MediaAudioResampler jarg1_, long jarg2, MediaSampled jarg2_, long jarg3, MediaSampled jarg3_);
+  public final static native int MediaAudioResampler_resampleAudio(long jarg1, MediaAudioResampler jarg1_, long jarg2, MediaAudio jarg2_, long jarg3, MediaAudio jarg3_);
   public final static native long MediaAudioResampler_getNextPts(long jarg1, MediaAudioResampler jarg1_, long jarg2);
   public final static native void MediaAudioResampler_setCompensation(long jarg1, MediaAudioResampler jarg1_, int jarg2, int jarg3);
   public final static native int MediaAudioResampler_dropOutput(long jarg1, MediaAudioResampler jarg1_, int jarg2);
@@ -1212,14 +1215,14 @@ public class VideoJNI {
   public final static native void Decoder_flush(long jarg1, Decoder jarg1_);
   public final static native int Decoder_decodeAudio(long jarg1, Decoder jarg1_, long jarg2, MediaAudio jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native int Decoder_decodeVideo(long jarg1, Decoder jarg1_, long jarg2, MediaPicture jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
-  public final static native int Decoder_decode(long jarg1, Decoder jarg1_, long jarg2, Media jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
+  public final static native int Decoder_decode(long jarg1, Decoder jarg1_, long jarg2, MediaSampled jarg2_, long jarg3, MediaPacket jarg3_, int jarg4);
   public final static native long Encoder_getNumDroppedFrames(long jarg1, Encoder jarg1_);
   public final static native long Encoder_make__SWIG_0(long jarg1, Codec jarg1_);
   public final static native long Encoder_make__SWIG_1(long jarg1, Coder jarg1_);
   public final static native void Encoder_open(long jarg1, Encoder jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_);
   public final static native void Encoder_encodeVideo(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaPicture jarg3_);
   public final static native void Encoder_encodeAudio(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaAudio jarg3_);
-  public final static native void Encoder_encode(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, Media jarg3_);
+  public final static native void Encoder_encode(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaSampled jarg3_);
   public final static native int ContainerStream_DISPOSITION_NONE_get();
   public final static native int ContainerStream_DISPOSITION_DEFAULT_get();
   public final static native int ContainerStream_DISPOSITION_DUB_get();
@@ -1415,6 +1418,7 @@ public class VideoJNI {
   public final static native long MediaSubtitleRectangle_SWIGUpcast(long jarg1);
   public final static native long MediaPacket_SWIGUpcast(long jarg1);
   public final static native long Configurable_SWIGUpcast(long jarg1);
+  public final static native long MediaResampler_SWIGUpcast(long jarg1);
   public final static native long MediaPictureResampler_SWIGUpcast(long jarg1);
   public final static native long MediaAudioResampler_SWIGUpcast(long jarg1);
   public final static native long MediaDescriptor_SWIGUpcast(long jarg1);

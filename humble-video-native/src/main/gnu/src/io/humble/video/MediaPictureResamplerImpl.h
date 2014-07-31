@@ -47,7 +47,8 @@ virtual int32_t getOutputHeight();
 virtual PixelFormat::Type getOutputFormat();
 
 virtual void open();
-virtual void resample(MediaPicture *pOutFrame, MediaPicture *pInFrame);
+virtual int32_t resample(MediaSampled *pOutFrame, MediaSampled *pInFrame);
+virtual int32_t resamplePicture(MediaPicture *pOutFrame, MediaPicture *pInFrame);
 
 virtual State getState() { return mState; }
 static MediaPictureResamplerImpl* make(

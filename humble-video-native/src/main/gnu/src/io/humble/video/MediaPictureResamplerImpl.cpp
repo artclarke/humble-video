@@ -92,8 +92,21 @@ void
 MediaPictureResamplerImpl::open() {
   mState = STATE_OPENED;
 }
-void
-MediaPictureResamplerImpl :: resample(MediaPicture* pOutFrame, MediaPicture* pInFrame)
+
+int32_t
+MediaPictureResamplerImpl::resample(MediaSampled* aOut, MediaSampled* aIn)
+{
+  MediaPicture* out = dynamic_cast<MediaPicture*>(aOut);
+  MediaPicture* in  = dynamic_cast<MediaPicture*>(aIn);
+  if (aOut && !out)
+    VS_THROW(HumbleInvalidArgument("out must be a MediaPicture object"));
+  if (aIn && !in)
+    VS_THROW(HumbleInvalidArgument("in must be a MediaPicture object"));
+  return resamplePicture(out, in);
+}
+
+int32_t
+MediaPictureResamplerImpl :: resamplePicture(MediaPicture* pOutFrame, MediaPicture* pInFrame)
 {
   int32_t retval = -1;
   if (mState != STATE_OPENED) {
@@ -140,6 +153,7 @@ MediaPictureResamplerImpl :: resample(MediaPicture* pOutFrame, MediaPicture* pIn
   outFrame->setQuality(inFrame->getQuality());
   outFrame->setComplete(retval >= 0);
 
+  return retval;
 }
 
 MediaPictureResamplerImpl*

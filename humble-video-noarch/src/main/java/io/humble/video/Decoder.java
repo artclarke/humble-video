@@ -206,8 +206,8 @@ public class Decoder extends Coder {
  * @see decodeVideo<br>
  * @see decodeAudio
  */
-  public int decode(Media output, MediaPacket packet, int byteOffset) {
-    return VideoJNI.Decoder_decode(swigCPtr, this, Media.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
+  public int decode(MediaSampled output, MediaPacket packet, int byteOffset) {
+    return VideoJNI.Decoder_decode(swigCPtr, this, MediaSampled.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
   }
 
 }

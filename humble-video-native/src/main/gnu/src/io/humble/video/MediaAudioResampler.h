@@ -26,7 +26,7 @@
 #ifndef MEDIAAUDIORESAMPLER_H_
 #define MEDIAAUDIORESAMPLER_H_
 
-#include <io/humble/video/Configurable.h>
+#include <io/humble/video/MediaResampler.h>
 #include <io/humble/video/MediaAudio.h>
 
 namespace io {
@@ -37,7 +37,7 @@ namespace video {
  * A MediaAudioResampler object resamples MediaAudio objects from
  * one format/sample-rate/channel-layout to another.
  */
-class VS_API_HUMBLEVIDEO MediaAudioResampler : public io::humble::video::Configurable
+class VS_API_HUMBLEVIDEO MediaAudioResampler : public io::humble::video::MediaResampler
 {
 public:
   /**
@@ -109,7 +109,8 @@ public:
    * @throws RuntimeError if we get an error or InvalidArgument if the attributes of
    *   in or out do not match what this resampler expected.
    */
-  virtual int32_t resample(MediaAudio* out, MediaAudio* in);
+  virtual int32_t resample(MediaSampled* out, MediaSampled* in);
+  virtual int32_t resampleAudio(MediaAudio* out, MediaAudio* in);
 
   /**
    * Convert the next timestamp from input to output
@@ -217,11 +218,6 @@ public:
    */
   virtual void setTimeBase(Rational* rational);
 
-  typedef enum State {
-    STATE_INITED,
-    STATE_OPENED,
-    STATE_ERROR
-  } State;
   virtual State getState() { return mState; }
 protected:
   void* getCtx() { return mCtx; }

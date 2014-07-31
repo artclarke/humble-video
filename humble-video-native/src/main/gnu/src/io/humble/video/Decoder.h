@@ -130,7 +130,7 @@ public:
    * @see decodeVideo
    * @see decodeAudio
    */
-  virtual int32_t decode(Media * output,
+  virtual int32_t decode(MediaSampled * output,
       MediaPacket *packet, int32_t byteOffset);
 
 

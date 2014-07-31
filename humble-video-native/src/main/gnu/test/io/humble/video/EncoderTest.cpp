@@ -30,6 +30,7 @@
 #include <io/humble/video/FilterAudioSink.h>
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaAudio.h>
+#include <io/humble/video/MediaAudioResampler.h>
 #include "EncoderTest.h"
 
 using namespace io::humble::ferry;
@@ -294,7 +295,7 @@ EncoderTest::testEncodeInvalidParameters()
 
 void
 EncoderTest::encodeAndMux(
-    Media* media,
+    MediaSampled* media,
     Muxer* muxer,
     Encoder* encoder)
 {
@@ -309,10 +310,29 @@ EncoderTest::encodeAndMux(
 }
 
 void
+EncoderTest::resampleEncodeAndMux(
+    MediaSampled* input,
+    MediaResampler* resampler,
+    MediaSampled* output,
+    Muxer* muxer,
+    Encoder* encoder
+    )
+{
+  do {
+    if (resampler) {
+      resampler->resample(output, input);
+    }
+    encodeAndMux(output, muxer, encoder);
+  } while (!input && output->isComplete());
+}
+
+void
 EncoderTest::decodeAndEncode(
     MediaPacket* packet,
     Decoder* decoder,
-    Media* media,
+    MediaSampled* input,
+    MediaResampler* resampler,
+    MediaSampled* output,
     Muxer* muxer,
     Encoder* encoder
 )
@@ -323,13 +343,13 @@ EncoderTest::decodeAndEncode(
     VS_LOG_DEBUG("Decode: %p; TS: %lld; offset: %lld",
         decoder, packet ? packet->getDts() : Global::NO_PTS,
             offset);
-    bytesRead += decoder->decode(media, packet, offset);
-    if (media->isComplete()) {
+    bytesRead += decoder->decode(input, packet, offset);
+    if (input->isComplete()) {
       // we encode and write it
-      encodeAndMux(media, muxer, encoder);
+      resampleEncodeAndMux(input, resampler, output, muxer, encoder);
     }
     offset += bytesRead;
-  } while ((!packet && media->isComplete()) || (packet && offset < packet->getSize()));
+  } while ((!packet && input->isComplete()) || (packet && offset < packet->getSize()));
   if (!packet) {
     // we should also flush the encoders
     encodeAndMux(0, muxer, encoder);
@@ -363,29 +383,29 @@ EncoderTest::testTranscode()
     MediaDescriptor::Type type;
     RefPointer<DemuxerStream> stream;
     RefPointer<Decoder> decoder;
-    RefPointer<Media> media;
+    RefPointer<MediaSampled> media;
   } DemuxerStreamHelper;
 
   // I know there are only 2 in the input file.
   DemuxerStreamHelper inputHelpers[10];
   for(int32_t i = 0; i < numStreams; i++) {
-    DemuxerStreamHelper* helper = &inputHelpers[i];
-    helper->stream = source->getStream(i);
-    helper->decoder = helper->stream->getDecoder();
-    helper->decoder->open(0, 0);
-    helper->type = helper->decoder->getCodecType();
-    if (helper->type == MediaDescriptor::MEDIA_AUDIO)
-      helper->media = MediaAudio::make(
-          helper->decoder->getFrameSize(),
-          helper->decoder->getSampleRate(),
-          helper->decoder->getChannels(),
-          helper->decoder->getChannelLayout(),
-          helper->decoder->getSampleFormat());
-    else if (helper->type  == MediaDescriptor::MEDIA_VIDEO)
-      helper->media = MediaPicture::make(
-          helper->decoder->getWidth(),
-          helper->decoder->getHeight(),
-          helper->decoder->getPixelFormat()
+    DemuxerStreamHelper* input = &inputHelpers[i];
+    input->stream = source->getStream(i);
+    input->decoder = input->stream->getDecoder();
+    input->decoder->open(0, 0);
+    input->type = input->decoder->getCodecType();
+    if (input->type == MediaDescriptor::MEDIA_AUDIO)
+      input->media = MediaAudio::make(
+          input->decoder->getFrameSize(),
+          input->decoder->getSampleRate(),
+          input->decoder->getChannels(),
+          input->decoder->getChannelLayout(),
+          input->decoder->getSampleFormat());
+    else if (input->type  == MediaDescriptor::MEDIA_VIDEO)
+      input->media = MediaPicture::make(
+          input->decoder->getWidth(),
+          input->decoder->getHeight(),
+          input->decoder->getPixelFormat()
       );
   }
 
@@ -397,9 +417,11 @@ EncoderTest::testTranscode()
   typedef struct {
     MediaDescriptor::Type type;
     RefPointer<MuxerStream> stream;
-    RefPointer<MediaAudioResampler> audioResampler;
+    RefPointer<MediaResampler> resampler;
+    RefPointer<MediaSampled> media;
     RefPointer<Encoder> encoder;
   } MuxerStreamHelper;
+
   MuxerStreamHelper outputHelpers[10];
   for(int32_t i = 0; i < numStreams; i++) {
     DemuxerStreamHelper *input = &inputHelpers[i];
@@ -439,7 +461,41 @@ EncoderTest::testTranscode()
         output->encoder->setFlag(Encoder::FLAG_GLOBAL_HEADER, true);
 
       output->encoder->open(0,0);
+
+      // sometimes encoders need to change parameters to fit; let's see
+      // if that happened.
       output->stream = muxer->addNewStream(output->encoder.value());
+    }
+    output->media = input->media;
+    output->resampler = 0;
+    if (output->type == MediaDescriptor::MEDIA_AUDIO) {
+      // sometimes encoders only accept certain media types and discard
+      // our suggestions. Let's check.
+      if (
+          output->encoder->getSampleRate() != input->decoder->getSampleRate() ||
+          output->encoder->getSampleFormat() != input->decoder->getSampleFormat() ||
+          output->encoder->getChannelLayout() != input->decoder->getChannelLayout() ||
+          output->encoder->getChannels() != input->decoder->getChannels()
+          )
+      {
+        // we need a resampler.
+        RefPointer<MediaAudioResampler> resampler = MediaAudioResampler::make(
+            output->encoder->getChannelLayout(),
+            output->encoder->getSampleRate(),
+            output->encoder->getSampleFormat(),
+            input->decoder->getChannelLayout(),
+            input->decoder->getSampleRate(),
+            input->decoder->getSampleFormat()
+            );
+        resampler->open();
+        output->resampler.reset(resampler.value(), true);
+        output->media = MediaAudio::make(
+                  output->encoder->getFrameSize(),
+                  output->encoder->getSampleRate(),
+                  output->encoder->getChannels(),
+                  output->encoder->getChannelLayout(),
+                  output->encoder->getSampleFormat());
+      }
     }
   }
   // now we should be ready to open the muxer
@@ -458,6 +514,8 @@ EncoderTest::testTranscode()
           packet.value(),
           input->decoder.value(),
           input->media.value(),
+          output->resampler.value(),
+          output->media.value(),
           muxer.value(),
           output->encoder.value());
     }
@@ -471,6 +529,8 @@ EncoderTest::testTranscode()
         0,
         input->decoder.value(),
         input->media.value(),
+        output->resampler.value(),
+        output->media.value(),
         muxer.value(),
         output->encoder.value());
 

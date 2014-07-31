@@ -221,7 +221,7 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
 }
 
 void
-Encoder::encode(MediaPacket* output, Media* media) {
+Encoder::encode(MediaPacket* output, MediaSampled* media) {
   MediaDescriptor::Type type = getCodecType();
   switch(type) {
   case MediaDescriptor::MEDIA_AUDIO: {
