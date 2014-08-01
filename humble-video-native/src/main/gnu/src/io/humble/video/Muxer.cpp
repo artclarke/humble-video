@@ -444,8 +444,8 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
     stream->setLastDts(dts);
   }
 
-  //    VS_LOG_DEBUG("output: duration: %lld; dts: %lld; pts: %lld;",
-  //        duration, dts, pts);
+//      VS_LOG_DEBUG("output: duration: %lld; dts: %lld; pts: %lld;",
+//          duration, dts, pts);
   packet->setDuration(duration);
   packet->setPts(pts);
   packet->setDts(dts);
