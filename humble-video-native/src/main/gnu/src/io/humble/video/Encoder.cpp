@@ -158,6 +158,9 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
   if (!output) {
     VS_THROW(HumbleInvalidArgument("output cannot be null"));
   }
+  // now reset the packet so we allocate new memory (because encoders sometimes change packet sizes).
+  output->reset(0);
+
   // let's check the picture parameters.
   ensurePictureParamsMatch(frame);
 
@@ -255,6 +258,9 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
   if (!output) {
     VS_THROW(HumbleInvalidArgument("output cannot be null"));
   }
+  // now reset the packet so we allocate new memory (because encoders sometimes change packet sizes).
+  output->reset(0);
+
   // let's check the audio parameters.
   ensureAudioParamsMatch(samples);
 
