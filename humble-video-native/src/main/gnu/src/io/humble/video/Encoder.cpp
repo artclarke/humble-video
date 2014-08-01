@@ -283,7 +283,10 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
     }
     if (mResampledAudio) {
       mAResampler->resample(mResampledAudio.value(), samples);
-      inputAudio = mResampledAudio.get();
+      if (mResampledAudio->isComplete())
+        inputAudio = mResampledAudio.get();
+      else
+        inputAudio = 0;
     }
   }
   RefPointer<Rational> coderTb = this->getTimeBase();
