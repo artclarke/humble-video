@@ -28,7 +28,7 @@
 #include <cstring>
 #include <stdexcept>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.MediaPacket);
 
 using namespace io::humble::ferry;
   

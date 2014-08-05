@@ -32,7 +32,7 @@
 
 using namespace io::humble::ferry;
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.FilterType);
 
 namespace io {
 namespace humble {

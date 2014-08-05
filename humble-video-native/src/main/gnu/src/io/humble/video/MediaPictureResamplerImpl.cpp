@@ -26,7 +26,7 @@
 #include <io/humble/video/Property.h>
 #include <io/humble/video/VideoExceptions.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.MediaPictureResampler);
 
 using namespace io::humble::ferry;
 

@@ -30,7 +30,7 @@
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaPicture.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Coder);
 
 namespace io {
 namespace humble {

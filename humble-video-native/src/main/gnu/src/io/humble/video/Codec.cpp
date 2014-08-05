@@ -24,7 +24,7 @@
 #include <io/humble/video/Codec.h>
 #include <io/humble/video/MuxerFormat.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Codec);
 
 namespace io {
 namespace humble {

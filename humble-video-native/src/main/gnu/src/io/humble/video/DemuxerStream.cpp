@@ -31,7 +31,7 @@
 
 using namespace io::humble::ferry;
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.DemuxerStream);
 
 namespace io {
 namespace humble {

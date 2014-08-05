@@ -32,7 +32,7 @@
 
 #include "FfmpegIncludes.h"
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.ContainerStream);
 
 using namespace io::humble::ferry;
 

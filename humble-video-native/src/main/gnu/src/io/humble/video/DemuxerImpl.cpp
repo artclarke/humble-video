@@ -31,7 +31,7 @@
 #include "KeyValueBagImpl.h"
 #include "VideoExceptions.h"
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Demuxer);
 
 using namespace io::humble::video::customio;
 using namespace io::humble::ferry;

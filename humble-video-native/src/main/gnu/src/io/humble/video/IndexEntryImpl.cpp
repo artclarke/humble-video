@@ -23,7 +23,7 @@
 #include <cstring>
 #include <stdexcept>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.IndexEntry);
 
 namespace io { namespace humble { namespace video
 {

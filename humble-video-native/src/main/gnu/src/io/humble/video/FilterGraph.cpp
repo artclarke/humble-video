@@ -38,7 +38,7 @@ extern "C" {
 
 using namespace io::humble::ferry;
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.FilterGraph);
 
 #define VS_FILTER_AUDIO_SINK "abuffersink"
 #define VS_FILTER_AUDIO_SOURCE "abuffer"

@@ -33,7 +33,7 @@
 #include "KeyValueBagImpl.h"
 #include "MediaPacketImpl.h"
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Muxer);
 
 using namespace io::humble::ferry;
 using namespace io::humble::video::customio;

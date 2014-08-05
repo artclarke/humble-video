@@ -25,7 +25,7 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/BufferImpl.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Buffer);
 
 namespace io { namespace humble { namespace ferry
 {

@@ -26,7 +26,7 @@
 
 #include <io/humble/video/PixelFormat.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.PixelFormat);
 
 namespace io {
 namespace humble {

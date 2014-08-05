@@ -29,7 +29,7 @@
 #include "FilterGraph.h"
 #include "FilterLink.h"
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.FilterLink);
 
 using namespace io::humble::ferry;
 namespace io {

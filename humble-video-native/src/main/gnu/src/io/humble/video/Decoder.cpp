@@ -34,7 +34,7 @@
 #include <io/humble/video/MediaPacketImpl.h>
 #include <io/humble/video/MediaSubtitleImpl.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Decoder);
 
 using namespace io::humble::ferry;
 

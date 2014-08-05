@@ -32,7 +32,7 @@ extern "C" {
 #include <stdexcept>
 #include <cstring>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Property);
 
 using namespace io::humble::ferry;
 

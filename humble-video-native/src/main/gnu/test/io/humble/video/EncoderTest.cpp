@@ -34,7 +34,7 @@
 #include "EncoderTest.h"
 
 using namespace io::humble::ferry;
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.EncoderTest);
 
 EncoderTest::EncoderTest() {
 }
@@ -44,6 +44,8 @@ EncoderTest::~EncoderTest() {
 
 void
 EncoderTest::testCreation() {
+  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, false);
+
   RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_H264);
   RefPointer<Encoder> encoder = Encoder::make(codec.value());
   TS_ASSERT(encoder);
@@ -142,14 +144,16 @@ EncoderTest::testEncodeVideo() {
 
 void
 EncoderTest::testEncodeAudio() {
+  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, true);
+
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
   const int32_t sampleRate = 44100;
   const int32_t maxSamples = isMemCheck ? sampleRate*0.5 : sampleRate*10;
   const int32_t numSamples = 1024;
   const AudioChannel::Layout channelLayout = AudioChannel::CH_LAYOUT_STEREO;
   const int32_t channels = AudioChannel::getNumChannelsInLayout(channelLayout);
-  const AudioFormat::Type audioFormat = AudioFormat::SAMPLE_FMT_S16P;
-  RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_MP3);
+  const AudioFormat::Type audioFormat = AudioFormat::SAMPLE_FMT_S16;
+  RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_AAC);
   RefPointer<Encoder> encoder = Encoder::make(codec.value());
 
   RefPointer<FilterGraph> graph = FilterGraph::make();
@@ -166,18 +170,21 @@ EncoderTest::testEncodeAudio() {
   RefPointer<Rational> tb = Rational::make(1,25);
   encoder->setTimeBase(tb.value());
 
+  // create an output muxer
+  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeAudio.mp4", 0, 0);
+  RefPointer<MuxerFormat> format = muxer->getFormat();
+  if (format->getFlag(MuxerFormat::GLOBAL_HEADER))
+    encoder->setFlag(Encoder::FLAG_GLOBAL_HEADER, true);
+
   // open the encoder
   encoder->open(0, 0);
 
   RefPointer<FilterAudioSink> fsink = graph->addAudioSink("out", audio->getSampleRate(), audio->getChannelLayout(), audio->getFormat());
 
-  // Generate a 220 Hz sine wave with a 880 Hz beep each second, for 60 seconds.
-  //  graph->open("sine=frequency=220:beep_factor=4:duration=60[out]");
+  // Generate a 220 Hz sine wave with a 880 Hz beep each second, for 10 seconds.
+  graph->open("sine=frequency=220:beep_factor=4:duration=11[out]");
   // Generate an amplitude modulated signal
-  graph->open("aevalsrc=sin(10*2*PI*t)*sin(880*2*PI*t)[out]");
-
-  // create an output muxer
-  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeAudio.mp3", 0, 0);
+  //graph->open("aevalsrc=sin(10*2*PI*t)*sin(880*2*PI*t)[out]");
 
   // add a stream for the encoded packets
   {
@@ -191,7 +198,7 @@ EncoderTest::testEncodeAudio() {
   int32_t numFrames = 0;
   RefPointer<MediaPacket> packet;
 
-  while(fsink->getAudio(audio.value()) >= 0 && numFrames*audio->getNumSamples() < maxSamples) {
+  while(fsink->getAudio(audio.value()) >= 0 && audio->isComplete() && numFrames*audio->getNumSamples() < maxSamples) {
     audio->setTimeStamp(numFrames*audio->getNumSamples());
 
     // let's encode
@@ -202,6 +209,7 @@ EncoderTest::testEncodeAudio() {
     }
     ++numFrames;
   }
+  VS_LOG_DEBUG("Now flushing");
   // now flush the encoder
   do {
     packet = MediaPacket::make();
@@ -370,10 +378,8 @@ void
 EncoderTest::testTranscode()
 {
   // enable trace logging
-  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, false);
+  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, true);
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
-  if (isMemCheck)
-    return; // don't test this under Valgrind yet
 
   TestData::Fixture* fixture=mFixtures.getFixture("testfile.flv");
   TS_ASSERT(fixture);
@@ -511,6 +517,7 @@ EncoderTest::testTranscode()
   // now, let's start a decoding loop.
   RefPointer<MediaPacket> packet = MediaPacket::make();
 
+  int numPackets = 0;
   while(source->read(packet.value()) >= 0) {
     // got a packet; now we try to decode it.
     if (packet->isComplete()) {
@@ -525,6 +532,11 @@ EncoderTest::testTranscode()
           output->media.value(),
           muxer.value(),
           output->encoder.value());
+      ++numPackets;
+      if (isMemCheck && numPackets > 100) {
+        VS_LOG_WARN("Exiting early under valgrind");
+        break;
+      }
     }
   }
 

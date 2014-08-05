@@ -36,7 +36,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.MediaAudioResampler);
 
 MediaAudioResampler::MediaAudioResampler() {
   mCtx = swr_alloc();
@@ -240,7 +240,7 @@ MediaAudioResampler::resampleAudio(MediaAudio* aOut, MediaAudio* aIn) {
   }
   // now convert the new PTS back to the right timebase
   outFrame->pts = Rational::rescale(
-      getNextPts(inputTs == Global::NO_PTS ? LLONG_MIN : inputTs),
+      getNextPts(inputTs == Global::NO_PTS ? LONG_LONG_MIN : inputTs),
       mTimeBase->getNumerator(), mTimeBase->getDenominator(),
       1, getInputSampleRate() * getOutputSampleRate(),
       Rational::ROUND_DOWN);

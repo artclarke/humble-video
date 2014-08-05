@@ -30,7 +30,7 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/customio/URLProtocolHandler.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Container);
 
 using namespace io::humble::video::customio;
 using namespace io::humble::ferry;

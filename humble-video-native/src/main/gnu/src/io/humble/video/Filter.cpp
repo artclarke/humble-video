@@ -28,7 +28,7 @@
 #include "Filter.h"
 #include "FilterLink.h"
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Filter);
 
 using namespace io::humble::ferry;
 
