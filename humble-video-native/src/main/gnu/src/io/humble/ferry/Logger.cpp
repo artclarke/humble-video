@@ -295,7 +295,7 @@ namespace io { namespace humble { namespace ferry {
       break;
     case LEVEL_TRACE:
       levelStr = "TRACE ";
-      didLog = false;
+      didLog = true;
       break;
     }
     if (didLog && msg && *msg)

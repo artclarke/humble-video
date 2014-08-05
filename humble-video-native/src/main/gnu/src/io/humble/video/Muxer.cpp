@@ -431,11 +431,8 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
     VS_THROW(HumbleRuntimeError("no timebases on either stream or packet"));
   }
   if (thisBase->compareTo(packetBase.value()) == 0) {
-    //      VS_LOG_DEBUG("Same timebase: %d/%d vs %d/%d",
-    //          thisBase->getNumerator(), thisBase->getDenominator(),
-    //          packetBase->getNumerator(), packetBase->getDenominator());
     // it's already got the right time values
-    VS_LOG_DEBUG("muxer stamp input  MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
+    VS_LOG_TRACE("muxer stamp input  MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
                  packet,
                  packet->getStreamIndex(),
                  packet->getDts(),
@@ -444,7 +441,7 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
                  (int64_t)thisBase->getDenominator(),
                  packet->getDuration()
                  );
-    VS_LOG_DEBUG("muxer stamp output MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
+    VS_LOG_TRACE("muxer stamp output MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
                  packet,
                  packet->getStreamIndex(),
                  packet->getDts(),
@@ -491,7 +488,7 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
   packet->setDts(dts);
   packet->setTimeBase(thisBase.value());
 
-  VS_LOG_DEBUG("muxer stamp input  MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
+  VS_LOG_TRACE("muxer stamp input  MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
                packet,
                origPacket->getStreamIndex(),
                origPacket->getDts(),
@@ -500,7 +497,7 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
                (int64_t)packetBase->getDenominator(),
                origPacket->getDuration()
                );
-  VS_LOG_DEBUG("muxer stamp output MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
+  VS_LOG_TRACE("muxer stamp output MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
                packet,
                packet->getStreamIndex(),
                packet->getDts(),
