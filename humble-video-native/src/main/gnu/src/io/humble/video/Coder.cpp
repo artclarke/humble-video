@@ -68,11 +68,12 @@ Coder::Coder(Codec* codec, AVCodecContext* src, bool copySrc) {
 
   mState = STATE_INITED;
 
-  VS_LOG_TRACE("Created coder");
+  VS_LOG_TRACE("Created: %p", this);
 
 }
 
 Coder::~Coder() {
+  VS_LOG_TRACE("Destroyed: %p", this);
   (void) avcodec_close(mCtx);
   if (mCtx->extradata)
     av_freep(&mCtx->extradata);

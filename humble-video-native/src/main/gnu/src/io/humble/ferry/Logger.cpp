@@ -62,7 +62,8 @@ static const char* vs_strrstr(const char* s1, const char* s2) {
 
 namespace io { namespace humble { namespace ferry {
   bool Logger :: mInitialized = false;
-  bool Logger :: mGlobalIsLogging[5] = { true, true, true, true, true };
+  // Default to TRACE not being logged, but it can be programatically turned on.
+  bool Logger :: mGlobalIsLogging[5] = { true, true, true, true, false };
   jclass Logger :: mClass = 0;
   jmethodID Logger :: mGetLoggerMethod = 0;
   jmethodID Logger :: mLogMethod = 0;

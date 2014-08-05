@@ -49,10 +49,12 @@ ContainerStream::ContainerStream(Container *container, int32_t index) {
   }
   mIndex = index;
   mContainer.reset(container, true); // acquire it so that this object lives.
+  VS_LOG_TRACE("Created: %p", this);
 }
 
 ContainerStream::~ContainerStream() {
   // nothing should be required.
+  VS_LOG_TRACE("Destroyed: %p", this);
 }
 
 Container*

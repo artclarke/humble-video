@@ -62,10 +62,11 @@ Encoder::Encoder(Codec* codec, AVCodecContext* src, bool copySrc) : Coder(codec,
   mNumDroppedFrames = 0;
   mLastPtsEncoded = Global::NO_PTS;
 
-  VS_LOG_TRACE("Created encoder");
+  VS_LOG_TRACE("Created: %p", this);
 }
 
 Encoder::~Encoder() {
+  VS_LOG_TRACE("Destroyed: %p", this);
 }
 
 Encoder*

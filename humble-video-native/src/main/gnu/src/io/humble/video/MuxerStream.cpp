@@ -37,10 +37,11 @@ namespace humble {
 namespace video {
 
 MuxerStream::MuxerStream(Container* c, int32_t index) : ContainerStream(c, index) {
-
+  VS_LOG_TRACE("Created: %p", this);
 }
 
 MuxerStream::~MuxerStream() {
+  VS_LOG_TRACE("Destroyed: %p", this);
 }
 
 Muxer*

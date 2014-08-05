@@ -39,10 +39,11 @@ namespace video {
 
 DemuxerStream::DemuxerStream(Container* container, int32_t index) :
     ContainerStream(container, index) {
-
+  VS_LOG_TRACE("Created: %p", this);
 }
 
 DemuxerStream::~DemuxerStream() {
+  VS_LOG_TRACE("Destroyed: %p", this);
 }
 
 DemuxerStream*

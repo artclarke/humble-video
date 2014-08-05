@@ -32,11 +32,12 @@ namespace video {
 using namespace io::humble::ferry;
 
 Codec::Codec() {
-  VS_LOG_TRACE("Starting");
+  VS_LOG_TRACE("Created: %p", this);
   mCodec = 0;
 }
 
 Codec::~Codec() {
+  VS_LOG_TRACE("Destroyed: %p", this);
   // no memory freeing required.
   mCodec = 0;
 }

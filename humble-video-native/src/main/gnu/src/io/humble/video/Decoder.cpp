@@ -52,12 +52,12 @@ Decoder::Decoder(Codec* codec, AVCodecContext* src, bool copy) : Coder(codec, sr
   mSamplesSinceLastTimeStampDiscontinuity = 0;
   mAudioDiscontinuityStartingTimeStamp = Global::NO_PTS;
 
-  VS_LOG_TRACE("Created decoder");
+  VS_LOG_TRACE("Created: %p", this);
 }
 
 
 Decoder::~Decoder() {
-
+  VS_LOG_TRACE("Destroyed: %p", this);
 }
 
 void

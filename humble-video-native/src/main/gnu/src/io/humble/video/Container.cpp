@@ -40,6 +40,7 @@ namespace humble {
 namespace video {
 
 Container::Container() {
+  VS_LOG_TRACE("Created: %p");
 }
 
 Container::~Container() {
@@ -52,7 +53,7 @@ Container::~Container() {
       delete stream;
     }
   }
-
+  VS_LOG_TRACE("Destroyed: %p");
 }
 
 int
@@ -105,7 +106,6 @@ Container::Stream::Stream(Container* container, int32_t index) {
 }
 
 Container::Stream::~Stream() {
-  VS_LOG_TRACE("Destroying stream: %p", this);
 }
 
 Coder*

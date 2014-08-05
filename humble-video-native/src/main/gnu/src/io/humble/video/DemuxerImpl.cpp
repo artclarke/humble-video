@@ -53,6 +53,7 @@ DemuxerImpl::DemuxerImpl() {
   mCtx->interrupt_callback.callback = Global::avioInterruptCB;
   mCtx->interrupt_callback.opaque = this;
   mState = STATE_INITED;
+  VS_LOG_TRACE("Created: %p");
 }
 
 DemuxerImpl::~DemuxerImpl() {
@@ -65,6 +66,7 @@ DemuxerImpl::~DemuxerImpl() {
   }
   if (mCtx)
     avformat_free_context(mCtx);
+  VS_LOG_TRACE("Destroyed: %p");
 }
 
 AVFormatContext*
@@ -289,13 +291,17 @@ DemuxerImpl::read(MediaPacket* ipkt) {
     if (retval >= 0) {
       if (pkt->getStreamIndex() >= 0)
       {
-        RefPointer<DemuxerStream> stream = this->getStream(pkt->getStreamIndex());
+        // Get a Container Stream rather than a DemuxerStream; this avoids unnecessarily
+        // recreating all the demuxer streams, decoders and codecs.
+        Container::Stream* stream = ((Container*)this)->getStream(pkt->getStreamIndex());
         if (stream)
         {
           // let's set the packet coder.
-          RefPointer<Coder> coder = stream->getDecoder();
+          RefPointer<Coder> coder = stream->getCoder();
           pkt->setCoder(coder.value());
-          RefPointer<Rational> streamBase = stream->getTimeBase();
+          AVStream* avStream = stream->getCtx();
+          RefPointer<Rational> streamBase = Rational::make(avStream->time_base.num,
+                                                           avStream->time_base.den);
           if (streamBase)
           {
             pkt->setTimeBase(streamBase.value());

@@ -96,6 +96,7 @@ Muxer::Muxer(MuxerFormat* format, const char* filename,
               filename, formatName));
     }
   }
+  VS_LOG_TRACE("Created: %p", this);
 }
 
 Muxer::~Muxer() {
@@ -112,6 +113,7 @@ Muxer::~Muxer() {
     }
     avformat_free_context(mCtx);
   }
+  VS_LOG_TRACE("Destroyed: %p", this);
 }
 
 Muxer*

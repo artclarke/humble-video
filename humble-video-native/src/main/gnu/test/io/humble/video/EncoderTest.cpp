@@ -369,6 +369,8 @@ EncoderTest::decodeAndEncode(
 void
 EncoderTest::testTranscode()
 {
+  // enable trace logging
+  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, false);
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
   if (isMemCheck)
     return; // don't test this under Valgrind yet
