@@ -299,11 +299,16 @@ EncoderTest::encodeAndMux(
     Muxer* muxer,
     Encoder* encoder)
 {
+//  if (encoder->getCodecType() == MediaDescriptor::MEDIA_VIDEO)
+//    // skip all video for now
+//    return;
   RefPointer<MediaPacket> packet = MediaPacket::make();
   do {
     encoder->encode(packet.value(), media);
     if (packet->isComplete()) {
-      VS_LOG_DEBUG("Encode: %p; TS: %lld", encoder, packet->getDts());
+      VS_LOG_DEBUG("Encode: %p; TS: %lld; flush: %d, type: %s, stream: %d", encoder, packet->getDts(), !media,
+          encoder->getCodecType() == MediaDescriptor::MEDIA_AUDIO ? "audio" : "video",
+              packet->getStreamIndex());
       muxer->write(packet.value(), true);
     }
   } while (!media && packet->isComplete()); // this forces flushing if media is null
@@ -340,9 +345,14 @@ EncoderTest::decodeAndEncode(
   int32_t offset = 0;
   int32_t bytesRead = 0;
   do {
-    VS_LOG_DEBUG("Decode: %p; TS: %lld; offset: %lld",
+    VS_LOG_DEBUG("Decode: %p; TS: %lld; offset: %lld; flush: %d, type: %s",
         decoder, packet ? packet->getDts() : Global::NO_PTS,
-            offset);
+            offset, !packet,
+            decoder->getCodecType() == MediaDescriptor::MEDIA_AUDIO ? "audio" : "video");
+    if (!packet) {
+      // we are flushing
+      VS_LOG_DEBUG("FLUSH");
+    }
     bytesRead += decoder->decode(input, packet, offset);
     if (input->isComplete()) {
       // we encode and write it
@@ -363,7 +373,6 @@ EncoderTest::decodeAndEncode(
 void
 EncoderTest::testTranscode()
 {
-  TS_SKIP("not yet working");
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
   if (isMemCheck)
     return; // don't test this under Valgrind yet
@@ -438,7 +447,7 @@ EncoderTest::testTranscode()
       encoder->setPixelFormat(input->decoder->getPixelFormat());
       encoder->setProperty("b", (int64_t)400000); // bitrate
       encoder->setProperty("g", (int64_t) 10); // gop
-      encoder->setProperty("bf", (int64_t)1); // max b frames
+      encoder->setProperty("bf", (int64_t)3); // max b frames
 
     } else if (output->type == MediaDescriptor::MEDIA_AUDIO) {
       RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_AAC);
@@ -451,7 +460,7 @@ EncoderTest::testTranscode()
       encoder->setChannels(input->decoder->getChannels());
       encoder->setProperty("b", (int64_t)64000); // bitrate
     }
-    output->encoder = encoder;
+    output->encoder.reset(encoder.value(), true);
     if (output->encoder) {
       // if the container will require a global header, then the encoder needs to set this.
       RefPointer<Rational> tb = input->decoder->getTimeBase();

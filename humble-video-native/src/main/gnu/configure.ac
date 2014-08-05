@@ -116,11 +116,17 @@ AC_ARG_ENABLE([optimizations],
 AC_MSG_CHECKING([whether to enable compiler optimizations])
 AC_MSG_RESULT([$enable_optimizations])
 
+# default name we use for the Maven bundle
+VS_MVN_HOST=$host
 AM_CONDITIONAL([VS_DEBUG], [ test "$x$enable_optimizations" = xno ])
 if test "x$enable_optimizations" = xno; then
   VS_DEBUG=1
   AC_SUBST([VS_DEBUG])
+  # If debug, we have a separate MVN name
+  VS_MVN_HOST="$host-debug"
 fi
+# This will be used to build our MVN pom file.
+AC_SUBST(VS_MVN_HOST)
 
 PKG_PROG_PKG_CONFIG
 AC_PATH_PROG([SWIG],[swig])
@@ -388,6 +394,6 @@ AC_CONFIG_FILES([Makefile
                  test/io/humble/ferry/Makefile
                  test/io/humble/video/Makefile
                  test/io/humble/video/customio/Makefile
-                 pom-${host}.xml:mk/pom.xml.in
+                 pom.xml:mk/pom.xml.in
                  ])
 AC_OUTPUT

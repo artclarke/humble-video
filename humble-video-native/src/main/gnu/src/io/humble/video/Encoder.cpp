@@ -215,8 +215,13 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
   else
     out->size = 0;
 
+  int oldStreamIndex = output->getStreamIndex();
   int e = avcodec_encode_video2(getCodecCtx(), out, in, &got_frame);
+  // some codec erroneously set stream_index, but our encoders are always
+  // muxer independent. we fix that here.
+  output->setStreamIndex(oldStreamIndex);
   if (got_frame) {
+    output->setCoder(this);
     output->setTimeBase(coderTb.value());
     output->setComplete(out->size > 0, out->size);
   }
@@ -295,8 +300,13 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
   AVPacket* out = output->getCtx();
 
   int got_frame = 0;
+  int oldStreamIndex = output->getStreamIndex();
   int e = avcodec_encode_audio2(getCodecCtx(), out, in, &got_frame);
+  // some codec erroneously set stream_index, but our encoders are always
+  // muxer independent. we fix that here.
+  output->setStreamIndex(oldStreamIndex);
   if (got_frame) {
+    output->setCoder(this);
     output->setTimeBase(coderTb.value());
     output->setComplete(true, out->size);
   } else {

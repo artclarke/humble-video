@@ -44,6 +44,8 @@ namespace io { namespace humble { namespace video {
     // initialize because ffmpeg doesn't
     mPacket->data = 0;
     mPacket->size = 0;
+    // set this to -1 if it's not set.
+    mPacket->stream_index = -1;
     mIsComplete = false;
   }
 
@@ -256,16 +258,21 @@ namespace io { namespace humble { namespace video {
   }
 
 
-  int32_t
+  void
   MediaPacketImpl::reset(int32_t payloadSize)
   {
+    int32_t e=-1;
     av_free_packet(mPacket);
     if (payloadSize > 0)
-      return av_new_packet(mPacket, payloadSize);
+      e = av_new_packet(mPacket, payloadSize);
     else {
       av_init_packet(mPacket);
-      return 0;
+      e = 0;
     }
+    FfmpegException::check(e, "Could not reset packet.");
+
+    // set this to -1 if it's not set.
+    mPacket->stream_index = -1;
   }
 
   void
@@ -345,6 +352,14 @@ namespace io { namespace humble { namespace video {
     if (!mPacket->side_data)
       throw HumbleRuntimeError("no data where data expected");
     return (MediaPacket::SideDataType)mPacket->side_data[n].type;
+  }
+  Coder*
+  MediaPacketImpl::getCoder() {
+    return mCoder.get();
+  }
+  void
+  MediaPacketImpl::setCoder(Coder* coder) {
+    mCoder.reset(coder, true);
   }
 
 }}}

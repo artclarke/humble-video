@@ -23,6 +23,7 @@
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/Media.h>
+#include <io/humble/video/Coder.h>
 
 namespace io {
 namespace humble {
@@ -299,7 +300,7 @@ public:
   /**
    * Get the container-specific index for the stream this packet is
    * part of.
-   * @return Stream in container that this packet has data for.
+   * @return Stream in container that this packet has data for, or <0 if unsure.
    */
   virtual int32_t
   getStreamIndex()=0;
@@ -422,11 +423,17 @@ public:
    * </p>
    * @param payloadSize The (minimum) payloadSize of this packet in bytes. It is ok to
    *   pass in 0 here, in which case the packet will later allocate memory if needed.
-   *
-   * @return >= 0 if successful.  < 0 if error.
    */
-  virtual int32_t
+  virtual void
   reset(int32_t payloadSize)=0;
+
+  /**
+   * Gets the Coder* that made this packet.
+   *
+   * @return the coder if known, or null if not.
+   */
+  virtual Coder*
+  getCoder()=0;
 
 protected:
   MediaPacket();

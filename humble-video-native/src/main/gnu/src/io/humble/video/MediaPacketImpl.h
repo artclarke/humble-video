@@ -65,7 +65,7 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
     virtual int64_t getDuration();
     virtual int64_t getPosition();
     virtual io::humble::ferry::Buffer* getData();
-    virtual int32_t reset(int32_t payloadSize);
+    virtual void reset(int32_t payloadSize);
     virtual bool isComplete();
     
     virtual void setKeyPacket(bool keyPacket);
@@ -84,6 +84,8 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
     virtual io::humble::ferry::Buffer* getSideData(int32_t n);
     virtual SideDataType getSideDataType(int32_t n);
 
+    virtual Coder* getCoder();
+    virtual void setCoder(Coder*);
 #ifndef SWIG
     AVPacket *getCtx() { return mPacket; }
     /*
@@ -102,6 +104,7 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
   private:
     AVPacket* mPacket;
     io::humble::ferry::RefPointer<Rational> mTimeBase;
+    io::humble::ferry::RefPointer<Coder> mCoder;
     bool mIsComplete;
 
 };

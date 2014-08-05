@@ -292,6 +292,9 @@ DemuxerImpl::read(MediaPacket* ipkt) {
         RefPointer<DemuxerStream> stream = this->getStream(pkt->getStreamIndex());
         if (stream)
         {
+          // let's set the packet coder.
+          RefPointer<Coder> coder = stream->getDecoder();
+          pkt->setCoder(coder.value());
           RefPointer<Rational> streamBase = stream->getTimeBase();
           if (streamBase)
           {
@@ -299,6 +302,7 @@ DemuxerImpl::read(MediaPacket* ipkt) {
           }
         }
       }
+
       pkt->setComplete(true, pkt->getSize());
     }
   }
