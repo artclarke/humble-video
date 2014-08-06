@@ -182,7 +182,7 @@ EncoderTest::testEncodeAudio() {
   RefPointer<FilterAudioSink> fsink = graph->addAudioSink("out", audio->getSampleRate(), audio->getChannelLayout(), audio->getFormat());
 
   // Generate a 220 Hz sine wave with a 880 Hz beep each second, for 10 seconds.
-  graph->open("sine=frequency=220:beep_factor=4:duration=11[out]");
+  graph->open("sine=frequency=660:beep_factor=4:duration=11[out]");
   // Generate an amplitude modulated signal
   //graph->open("aevalsrc=sin(10*2*PI*t)*sin(880*2*PI*t)[out]");
 
