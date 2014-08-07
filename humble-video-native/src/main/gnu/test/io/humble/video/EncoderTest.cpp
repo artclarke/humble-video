@@ -209,7 +209,6 @@ EncoderTest::testEncodeAudio() {
     }
     ++numFrames;
   }
-  VS_LOG_DEBUG("Now flushing");
   // now flush the encoder
   do {
     packet = MediaPacket::make();
@@ -314,9 +313,6 @@ EncoderTest::encodeAndMux(
   do {
     encoder->encode(packet.value(), media);
     if (packet->isComplete()) {
-      VS_LOG_TRACE("Encode: %p; TS: %lld; flush: %d, type: %s, stream: %d", encoder, packet->getDts(), !media,
-          encoder->getCodecType() == MediaDescriptor::MEDIA_AUDIO ? "audio" : "video",
-              packet->getStreamIndex());
       muxer->write(packet.value(), true);
     }
   } while (!media && packet->isComplete()); // this forces flushing if media is null
@@ -353,10 +349,6 @@ EncoderTest::decodeAndEncode(
   int32_t offset = 0;
   int32_t bytesRead = 0;
   do {
-    VS_LOG_TRACE("Decode: %p; TS: %lld; offset: %lld; flush: %d, type: %s",
-        decoder, packet ? packet->getDts() : Global::NO_PTS,
-            offset, !packet,
-            decoder->getCodecType() == MediaDescriptor::MEDIA_AUDIO ? "audio" : "video");
     bytesRead += decoder->decode(input, packet, offset);
     if (input->isComplete()) {
       // we encode and write it

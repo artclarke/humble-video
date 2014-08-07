@@ -217,14 +217,14 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
       // convert our calculated timestamp to the packet base and compare
       int64_t rebasedTs = packetBase ? packetBase->rescale(newPts, coderBase.value()) : newPts;
       int64_t delta = rebasedTs - packetTs;
-      VS_LOG_TRACE("packet: %lld; calculated: %lld; delta: %lld; tb (%d/%d); nextPts: %lld; samples: %lld",
-          packetTs,
-          rebasedTs,
-          delta,
-          packetBase->getNumerator(),
-          packetBase->getDenominator(),
-          newPts,
-          mSamplesSinceLastTimeStampDiscontinuity);
+//      VS_LOG_TRACE("packet: %lld; calculated: %lld; delta: %lld; tb (%d/%d); nextPts: %lld; samples: %lld",
+//          packetTs,
+//          rebasedTs,
+//          delta,
+//          packetBase->getNumerator(),
+//          packetBase->getDenominator(),
+//          newPts,
+//          mSamplesSinceLastTimeStampDiscontinuity);
       if (delta <= 1 && delta >= -1) {
         // within one tick; keep the original measure of discontinuity start
       } else {
@@ -262,6 +262,20 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   mCachedMedia = 0;
   av_frame_unref(frame);
   av_freep(&frame);
+
+#ifdef VS_DEBUG
+  char outDescr[256]; *outDescr = 0;
+  char inDescr[256]; *inDescr = 0;
+  if (aPacket) aPacket->logMetadata(inDescr, sizeof(inDescr));
+  if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+  VS_LOG_TRACE("decodeAudio Decoder@%p[out:%s;in:%s;offset:%lld;decoded:%" PRIi64,
+               this,
+               outDescr,
+               inDescr,
+               (int64_t)byteOffset,
+               (int64_t)retval);
+#endif
+
   /** END DO NOT THROW EXCEPTIONS **/
   FfmpegException::check(retval, "Error while decoding ");
   return retval;
@@ -354,6 +368,19 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
   mCachedMedia = 0;
   av_frame_unref(frame);
   av_freep(&frame);
+
+#ifdef VS_DEBUG
+  char outDescr[256]; *outDescr = 0;
+  char inDescr[256]; *inDescr = 0;
+  if (aPacket) aPacket->logMetadata(inDescr, sizeof(inDescr));
+  if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+  VS_LOG_TRACE("decodeVideo Decoder@%p[out:%s;in:%s;offset:%lld;decoded:%" PRIi64,
+               this,
+               outDescr,
+               inDescr,
+               (int64_t)byteOffset,
+               (int64_t)retval);
+#endif
   /** END DO NOT THROW EXCEPTIONS **/
   FfmpegException::check(retval, "Error while decoding ");
   return retval;

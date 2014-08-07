@@ -226,6 +226,18 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
     output->setTimeBase(coderTb.value());
     output->setComplete(out->size > 0, out->size);
   }
+#ifdef VS_DEBUG
+  char outDescr[256]; *outDescr = 0;
+  char inDescr[256]; *inDescr = 0;
+  if (frame) frame->logMetadata(inDescr, sizeof(inDescr));
+  if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+  VS_LOG_TRACE("encodeVideo Encoder@%p[out:%s;in:%s;encoded:%" PRIi64,
+               this,
+               outDescr,
+               inDescr,
+               (int64_t)e);
+#endif
+
   FfmpegException::check(e, "could not encode video ");
 }
 
@@ -313,6 +325,19 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
   } else {
     output->setComplete(false, 0);
   }
+
+#ifdef VS_DEBUG
+  char outDescr[256]; *outDescr = 0;
+  char inDescr[256]; *inDescr = 0;
+  if (samples) samples->logMetadata(inDescr, sizeof(inDescr));
+  if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+  VS_LOG_TRACE("encodeAudio Encoder@%p[out:%s;in:%s;encoded:%" PRIi64,
+               this,
+               outDescr,
+               inDescr,
+               (int64_t)e);
+#endif
+
 
   FfmpegException::check(e, "could not encode audio ");
 }

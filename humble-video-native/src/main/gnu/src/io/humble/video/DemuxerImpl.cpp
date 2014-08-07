@@ -302,10 +302,10 @@ DemuxerImpl::read(MediaPacket* ipkt) {
     }
     char descr[256];
     pkt->logMetadata(descr, sizeof(descr));
-    VS_LOG_TRACE("read Demuxer@%p[p:%s;e:%lld]",
+    VS_LOG_TRACE("read Demuxer@%p[p:%s;e:%"  PRIi64 "]",
                  this,
                  descr,
-                 retval);
+                 (int64_t)retval);
   }
   VS_CHECK_INTERRUPT(true);
   if (retval < 0 && retval != AVERROR_EOF)
