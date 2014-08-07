@@ -207,46 +207,49 @@ namespace io { namespace humble { namespace video {
   {
     RefPointer<MediaPacketImpl> retval;
     RefPointer<Rational> timeBase;
+    RefPointer<Coder> coder;
     if (!packet) {
       VS_THROW(HumbleInvalidArgument("no packet"));
     }
 
-      // use the nice copy method.
-      retval = make();
-      int32_t r = av_copy_packet(retval->mPacket, packet->mPacket);
-      FfmpegException::check(r, "could not copy packet ");
-      int32_t numBytes = packet->getSize();
-      if (copyData && numBytes > 0)
-      {
-        if (!retval || !retval->mPacket || !retval->mPacket->data) {
-          VS_THROW(HumbleBadAlloc());
-        }
-
-        // we don't just want to reference count the data -- we want
-        // to copy it. So we're going to create a new copy.
-        RefPointer<Buffer> copy = Buffer::make(retval.value(), numBytes + FF_INPUT_BUFFER_PADDING_SIZE);
-        uint8_t* data = (uint8_t*)copy->getBytes(0, numBytes);
-
-        // copy the data into our Buffer backed data
-        memcpy(data, packet->mPacket->data,
-            numBytes);
-
-        // now, release the reference currently in the packet
-        if (retval->mPacket->buf)
-          av_buffer_unref(&retval->mPacket->buf);
-        retval->mPacket->buf = AVBufferSupport::wrapBuffer(copy.value());
-        // and set the data member to the copy
-        retval->mPacket->data = retval->mPacket->buf->data;
-        retval->mPacket->size = numBytes;
-
+    // use the nice copy method.
+    retval = make();
+    int32_t r = av_copy_packet(retval->mPacket, packet->mPacket);
+    FfmpegException::check(r, "could not copy packet ");
+    int32_t numBytes = packet->getSize();
+    if (copyData && numBytes > 0)
+    {
+      if (!retval || !retval->mPacket || !retval->mPacket->data) {
+        VS_THROW(HumbleBadAlloc());
       }
-      // separate here to catch addRef()
-      timeBase = packet->getTimeBase();
-      retval->setTimeBase(timeBase.value());
 
-      retval->setComplete(retval->mPacket->size > 0,
-          retval->mPacket->size);
-    
+      // we don't just want to reference count the data -- we want
+      // to copy it. So we're going to create a new copy.
+      RefPointer<Buffer> copy = Buffer::make(retval.value(), numBytes + FF_INPUT_BUFFER_PADDING_SIZE);
+      uint8_t* data = (uint8_t*)copy->getBytes(0, numBytes);
+
+      // copy the data into our Buffer backed data
+      memcpy(data, packet->mPacket->data,
+             numBytes);
+
+      // now, release the reference currently in the packet
+      if (retval->mPacket->buf)
+        av_buffer_unref(&retval->mPacket->buf);
+      retval->mPacket->buf = AVBufferSupport::wrapBuffer(copy.value());
+      // and set the data member to the copy
+      retval->mPacket->data = retval->mPacket->buf->data;
+      retval->mPacket->size = numBytes;
+
+    }
+    // separate here to catch addRef()
+    timeBase = packet->getTimeBase();
+    retval->setTimeBase(timeBase.value());
+    coder = packet->getCoder();
+    retval->setCoder(coder.value());
+
+    retval->setComplete(retval->mPacket->size > 0,
+                        retval->mPacket->size);
+
     return retval.get();
   }
   
@@ -360,6 +363,35 @@ namespace io { namespace humble { namespace video {
   void
   MediaPacketImpl::setCoder(Coder* coder) {
     mCoder.reset(coder, true);
+  }
+  int64_t
+  MediaPacketImpl::logMetadata(char* buffer, size_t len)
+  {
+    char pts[48];
+    if (getPts() == Global::NO_PTS) {
+      snprintf(pts, sizeof(pts), "NONE");
+    } else
+      snprintf(pts, sizeof(pts), "%lld", getPts());
+    char dts[48];
+    if (getDts() == Global::NO_PTS) {
+      snprintf(dts, sizeof(dts), "NONE");
+    } else
+      snprintf(dts, sizeof(dts), "%lld", getDts());
+
+    return snprintf(buffer, len,
+                    "MediaPacket@%p:[i:%lld;pts:%s;dts:%s;dur:%lld;tb:%lld/%lld;coder:%p;co:%s;key:%s;size:%lld]",
+                    this,
+                    (int64_t)getStreamIndex(),
+                    pts,
+                    dts,
+                    (int64_t)getDuration(),
+                    (int64_t)mTimeBase->getNumerator(),
+                    (int64_t)mTimeBase->getDenominator(),
+                    mCoder.value(),
+                    isComplete()?"true":"false",
+                    isKey()?"true":"false",
+                    (int64_t)getSize()
+                    );
   }
 
 }}}

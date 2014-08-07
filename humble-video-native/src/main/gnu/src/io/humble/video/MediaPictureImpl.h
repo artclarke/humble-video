@@ -136,6 +136,7 @@ public:
   getCtx() {
     return mFrame;
   }
+  virtual int64_t logMetadata(char*, size_t);
 protected:
   MediaPictureImpl();
   virtual

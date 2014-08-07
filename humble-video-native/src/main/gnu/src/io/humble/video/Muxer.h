@@ -211,6 +211,10 @@ public:
 
 protected:
   virtual AVFormatContext* getFormatCtx() { return mCtx; }
+  /**
+   * Function to log the write event as a trace
+   */
+  static void logWrite(Muxer* muxer, MediaPacket* in, MediaPacket* out, int32_t retval);
 
   /**
    * Takes the packet given (in whatever time base it was encoded with) and resets all time stamps

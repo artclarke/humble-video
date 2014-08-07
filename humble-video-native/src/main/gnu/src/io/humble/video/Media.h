@@ -74,7 +74,16 @@ public:
    */
   virtual bool isComplete()=0;
 
-  
+#ifndef SWIG
+  /**
+   * Logs the metadata of this media item to the passed
+   * in buffer (up to len bytes).
+   *
+   * @return number of bytes actually written.
+   */
+  virtual int64_t logMetadata(char* buffer, size_t len)=0;
+#endif // ! SWIG
+
 protected:
   Media();
   virtual ~Media();

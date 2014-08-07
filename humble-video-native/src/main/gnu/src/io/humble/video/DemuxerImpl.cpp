@@ -276,17 +276,6 @@ DemuxerImpl::read(MediaPacket* ipkt) {
     while (retval == AVERROR(EAGAIN) &&
         (mReadRetryMax < 0 || numReads <= mReadRetryMax));
 
-    // and dump it's contents
-    VS_LOG_TRACE("read: %lld, %lld, %d, %d, %d, %lld, %lld: %p",
-        pkt->getDts(),
-        pkt->getPts(),
-        pkt->getFlags(),
-        pkt->getStreamIndex(),
-        pkt->getSize(),
-        pkt->getDuration(),
-        pkt->getPosition(),
-        packet->data);
-
     // and let's try to set the packet time base if known
     if (retval >= 0) {
       if (pkt->getStreamIndex() >= 0)
@@ -311,6 +300,12 @@ DemuxerImpl::read(MediaPacket* ipkt) {
 
       pkt->setComplete(true, pkt->getSize());
     }
+    char descr[256];
+    pkt->logMetadata(descr, sizeof(descr));
+    VS_LOG_TRACE("read Demuxer@%p[p:%s;e:%lld]",
+                 this,
+                 descr,
+                 retval);
   }
   VS_CHECK_INTERRUPT(true);
   if (retval < 0 && retval != AVERROR_EOF)

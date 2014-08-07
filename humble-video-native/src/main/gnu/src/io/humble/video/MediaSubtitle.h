@@ -102,7 +102,8 @@ public:
   virtual void setComplete(bool complete) { setComplete(complete, Global::NO_PTS); }
 
 #ifndef SWIG
-   virtual AVFrame *getCtx() { return 0; }
+  virtual AVFrame *getCtx() { return 0; }
+  virtual int64_t logMetadata(char* buffer, size_t len);
 #endif
 protected:
   MediaSubtitle();

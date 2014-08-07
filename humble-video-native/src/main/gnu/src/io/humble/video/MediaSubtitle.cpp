@@ -26,8 +26,13 @@
 #include "MediaSubtitle.h"
 #include "MediaSubtitleImpl.h"
 #include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/HumbleException.h>
+
 
 using namespace io::humble::ferry;
+
+VS_LOG_SETUP(VS_CPP_PACKAGE.MediaSubtitle);
 
 namespace io {
 namespace humble {
@@ -89,6 +94,12 @@ MediaSubtitleRectangle::getPictureData(int line)
   if (!retval)
     this->release();
   return retval.get();
+}
+
+int64_t
+MediaSubtitle::logMetadata(char * buffer, size_t len) {
+  VS_THROW(HumbleRuntimeError("NOT IMPLEMENTED"));
+  return snprintf(buffer, len, "NOT IMPLEMENTED");
 }
 
 } /* namespace video */

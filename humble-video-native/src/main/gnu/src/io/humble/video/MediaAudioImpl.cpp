@@ -369,6 +369,31 @@ MediaAudioImpl::setBufferType(AudioFormat::Type format,
   }
 }
 
+int64_t
+MediaAudioImpl::logMetadata(char* buffer, size_t len)
+{
+  RefPointer<Rational> tb = getTimeBase();
+  char pts[48];
+  if (getPts() == Global::NO_PTS) {
+    snprintf(pts, sizeof(pts), "NONE");
+  } else
+    snprintf(pts, sizeof(pts), "%lld", getPts());
+
+  return snprintf(buffer, len,
+                  "MediaAudio@%p:[pts:%s;tb:%lld/%lld;sr:%lld;ch:%lld;fo:%lld;co:%s;sam:%lld]",
+                  this,
+                  pts,
+                  (int64_t)tb->getNumerator(),
+                  (int64_t)tb->getDenominator(),
+                  (int64_t)getSampleRate(),
+                  (int64_t)getChannels(),
+                  (int64_t)getFormat(),
+                  isComplete()?"true":"false",
+                  (int64_t)getNumSamples()
+                  );
+}
+
+
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

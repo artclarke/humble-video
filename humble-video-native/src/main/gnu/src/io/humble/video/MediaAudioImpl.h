@@ -94,6 +94,9 @@ public:
   virtual AVFrame* getCtx();
   // Copies data from src into this context, first releasing any memory we have.
   virtual void copy(AVFrame* src, bool complete);
+#ifndef SWIG
+  virtual int64_t logMetadata(char *, size_t);
+#endif
 protected:
   MediaAudioImpl();
   virtual

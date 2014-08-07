@@ -341,6 +341,30 @@ Muxer::getStream(int32_t i) {
 }
 
 
+void
+Muxer::logWrite(Muxer* muxer, MediaPacket* in, MediaPacket* out, int32_t retval)
+{
+  // necessary to avoid a compiler warning in release mode since
+  // in that case, this is a NO_OP method.
+  (void) muxer;
+  (void) in;
+  (void) out;
+  (void) retval;
+#ifdef VS_DEBUG
+  char inDescr[256];
+  char outDescr[256];
+  if (in)
+    in->logMetadata(inDescr, sizeof(inDescr));
+  if (out)
+    out->logMetadata(outDescr, sizeof(outDescr));
+  VS_LOG_TRACE("write Muxer@%p[in:%s;out:%s;e:%lld]",
+               muxer,
+               inDescr?inDescr:"(null)",
+               outDescr?outDescr:"(null)",
+               retval);
+#endif // VS_DEBUG
+}
+
 bool
 Muxer::write(MediaPacket* aPacket, bool forceInterleave) {
   MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(aPacket);
@@ -402,6 +426,7 @@ Muxer::write(MediaPacket* aPacket, bool forceInterleave) {
   else
     e = av_write_frame(getFormatCtx(), out);
   popCoders();
+  Muxer::logWrite(this, aPacket, outPacket.value(), e);
   FfmpegException::check(e, "Could not write packet to muxer ");
   if (e == 1)
     allDataFlushed = true;
@@ -434,25 +459,6 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
   }
   if (thisBase->compareTo(packetBase.value()) == 0) {
     // it's already got the right time values
-    VS_LOG_TRACE("muxer stamp input  MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
-                 packet,
-                 packet->getStreamIndex(),
-                 packet->getDts(),
-                 packet->getPts(),
-                 (int64_t)thisBase->getNumerator(),
-                 (int64_t)thisBase->getDenominator(),
-                 packet->getDuration()
-                 );
-    VS_LOG_TRACE("muxer stamp output MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
-                 packet,
-                 packet->getStreamIndex(),
-                 packet->getDts(),
-                 packet->getPts(),
-                 (int64_t)thisBase->getNumerator(),
-                 (int64_t)thisBase->getDenominator(),
-                 packet->getDuration()
-                 );
-
     return;
   }
 
@@ -489,25 +495,6 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
   packet->setPts(pts);
   packet->setDts(dts);
   packet->setTimeBase(thisBase.value());
-
-  VS_LOG_TRACE("muxer stamp input  MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
-               packet,
-               origPacket->getStreamIndex(),
-               origPacket->getDts(),
-               origPacket->getPts(),
-               (int64_t)packetBase->getNumerator(),
-               (int64_t)packetBase->getDenominator(),
-               origPacket->getDuration()
-               );
-  VS_LOG_TRACE("muxer stamp output MediaPacket@%p[s: %d; dts: %lld; pts: %lld; tb: %lld/%lld; dur: %lld];",
-               packet,
-               packet->getStreamIndex(),
-               packet->getDts(),
-               packet->getPts(),
-               (int64_t)thisBase->getNumerator(),
-               (int64_t)thisBase->getDenominator(),
-               packet->getDuration()
-               );
 }
 
 

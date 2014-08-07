@@ -255,6 +255,30 @@ MediaPictureImpl::getNumDataPlanes() {
   return i;
 }
 
+int64_t
+MediaPictureImpl::logMetadata(char* buffer, size_t len)
+{
+  RefPointer<Rational> tb = getTimeBase();
+  char pts[48];
+  if (getPts() == Global::NO_PTS) {
+    snprintf(pts, sizeof(pts), "NONE");
+  } else
+    snprintf(pts, sizeof(pts), "%lld", getPts());
+
+  return snprintf(buffer, len,
+                  "MediaPictureo@%p:[pts:%s;tb:%lld/%lld;w:%lld;h:%lld;fo:%lld;co:%s]",
+                  this,
+                  pts,
+                  (int64_t)tb->getNumerator(),
+                  (int64_t)tb->getDenominator(),
+                  (int64_t)getWidth(),
+                  (int64_t)getHeight(),
+                  (int64_t)getFormat(),
+                  isComplete()?"true":"false"
+                  );
+}
+
+
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

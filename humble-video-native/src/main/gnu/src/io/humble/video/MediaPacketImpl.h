@@ -96,6 +96,8 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
      */
     void wrapAVPacket(AVPacket* pkt);
     void wrapBuffer(io::humble::ferry::Buffer *buffer);
+  virtual int64_t logMetadata(char* buffer, size_t len);
+
 #endif // ! SWIG
 
   protected:
