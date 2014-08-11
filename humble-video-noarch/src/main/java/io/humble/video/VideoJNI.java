@@ -514,7 +514,6 @@ public class VideoJNI {
   public final static native long MediaPacket_getConvergenceDuration(long jarg1, MediaPacket jarg1_);
   public final static native void MediaPacket_setConvergenceDuration(long jarg1, MediaPacket jarg1_, long jarg2);
   public final static native void MediaPacket_reset(long jarg1, MediaPacket jarg1_, int jarg2);
-  public final static native long MediaPacket_getCoder(long jarg1, MediaPacket jarg1_);
   public final static native int Configurable_getNumProperties(long jarg1, Configurable jarg1_);
   public final static native long Configurable_getPropertyMetaData__SWIG_0(long jarg1, Configurable jarg1_, int jarg2);
   public final static native long Configurable_getPropertyMetaData__SWIG_1(long jarg1, Configurable jarg1_, String jarg2);

@@ -181,6 +181,7 @@ public:
 #endif // 0
 
 protected:
+  virtual void checkOptionsBeforeOpen();
   Encoder(Codec*, AVCodecContext* src, bool copySrc);
   virtual
   ~Encoder();

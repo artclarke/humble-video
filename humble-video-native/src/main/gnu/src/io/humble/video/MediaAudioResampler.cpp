@@ -258,6 +258,22 @@ MediaAudioResampler::resampleAudio(MediaAudio* aOut, MediaAudio* aIn) {
   }
   outFrame->nb_samples = retval;
   out->setComplete(retval > 0);
+#ifdef VS_DEBUG
+  {
+    char inDescr[256];
+    char outDescr[256];
+    if (in)
+      in->logMetadata(inDescr, sizeof(inDescr));
+    else
+      *inDescr = 0;
+    if (out)
+      out->logMetadata(outDescr, sizeof(outDescr));
+    else
+      *outDescr = 0;
+    VS_LOG_TRACE("resample MediaAudioResampler@%p[out:%s;in:%s;]", this, outDescr, inDescr);
+
+  }
+#endif
   return retval;
 
 }

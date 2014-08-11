@@ -171,6 +171,9 @@ DemuxerImpl::open(const char *url, DemuxerFormat* format,
     mState = STATE_ERROR;
     FfmpegException::check(retval, "Error opening url: %s; ", url);
   }
+  VS_LOG_TRACE("open Demuxer@%p[url:%s;]",
+               this,
+               this->getURL());
   if (queryMetaData)
     queryStreamMetaData();
   return;

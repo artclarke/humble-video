@@ -364,10 +364,16 @@ protected:
   virtual
   ~Coder();
   /**
-   * Make sure the audio passed in has parameters that match this decoder.
+   * Make sure the audio passed in has parameters that match this coder.
    */
   void ensureAudioParamsMatch(MediaAudio* audio);
   void ensurePictureParamsMatch(MediaPicture* audio);
+
+  // This gets called after options are set on a Codec but before
+  // open. Subclasses should override to check or prepare any
+  // other contexts they need before open. Throw an exception
+  // if not ready to proceed.
+  virtual void checkOptionsBeforeOpen() {};
 private:
 
   AVCodecContext *mCtx;

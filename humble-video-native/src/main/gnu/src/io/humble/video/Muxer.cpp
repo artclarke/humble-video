@@ -236,6 +236,8 @@ Muxer::open(KeyValueBag *aInputOptions, KeyValueBag* aOutputOptions) {
   if (tmp) av_dict_free(&tmp);
 
   mState = STATE_OPENED;
+  // let's log the state of the world.
+  logOpen(this);
 }
 
 void
@@ -323,6 +325,16 @@ Muxer::addNewStream(Coder* aCoder) {
   stream->setCoder(coder.value());
 
   r.reset(this->getStream(avStream->index), false);
+
+
+  // let's log the state of the world.
+  VS_LOG_TRACE("addNewStream Muxer@%p[i:%"PRId32";c:%p;tb:%"PRId32"/%"PRId32"]",
+               this,
+               (int32_t)avStream->index,
+               coder.value(),
+               (int32_t)avStream->time_base.num,
+               (int32_t)avStream->time_base.den
+               );
   return r.get();
 }
 
@@ -357,12 +369,48 @@ Muxer::logWrite(Muxer* muxer, MediaPacket* in, MediaPacket* out, int32_t retval)
     in->logMetadata(inDescr, sizeof(inDescr));
   if (out)
     out->logMetadata(outDescr, sizeof(outDescr));
-  VS_LOG_TRACE("write Muxer@%p[in:%s;out:%s;e:%"  PRIi64 "]",
+  VS_LOG_TRACE("write Muxer@%p[out:%s;in:%s;e:%"  PRIi64 "]",
                muxer,
-               inDescr?inDescr:"(null)",
                outDescr?outDescr:"(null)",
+               inDescr?inDescr:"(null)",
                (int64_t)retval);
 #endif // VS_DEBUG
+}
+
+void
+Muxer::logOpen(Muxer* muxer) {
+  (void) muxer;
+#ifdef VS_DEBUG
+  // We only do this in debug mode. Because a muxer can have effectively
+  // an unlimited number of strings, we need to build our log up piece meal.
+
+  int32_t n = muxer->getNumStreams();
+
+  char msg[4096];
+  char* buf = msg;
+  size_t bufSize = sizeof(msg);
+  int32_t chars = snprintf(buf, bufSize, "open Muxer@%p[u:%s;n:%"PRId32";", muxer,
+                           muxer->getURL(),
+                           (int32_t)n);
+  buf += chars;
+  bufSize -= chars;
+
+  for(int i = 0; i < n; i++) {
+    Container::Stream* s = ((Container*)muxer)->getStream(i);
+    RefPointer<Coder> c = s->getCoder();
+    AVStream* avStream = s->getCtx();
+    chars = snprintf(buf, bufSize, "s@%"PRId32"[c:%p;tb:%"PRId32"/%"PRId32"];",
+           (int32_t)i,
+           c.value(),
+           (int32_t)avStream->time_base.num,
+           (int32_t)avStream->time_base.den
+    );
+    buf+= chars;
+    bufSize -= chars;
+  }
+  chars = snprintf(buf, bufSize, "]");
+  VS_LOG_TRACE(msg);
+#endif
 }
 
 bool

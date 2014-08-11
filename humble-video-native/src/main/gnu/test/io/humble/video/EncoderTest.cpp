@@ -53,6 +53,8 @@ EncoderTest::testCreation() {
 
 void
 EncoderTest::testEncodeVideo() {
+  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, true);
+
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
   const int32_t maxPics = isMemCheck ? 10 : 500;
   int32_t width=176;
@@ -171,7 +173,7 @@ EncoderTest::testEncodeAudio() {
   encoder->setTimeBase(tb.value());
 
   // create an output muxer
-  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeAudio.mp4", 0, 0);
+  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeAudio.mov", 0, 0);
   RefPointer<MuxerFormat> format = muxer->getFormat();
   if (format->getFlag(MuxerFormat::GLOBAL_HEADER))
     encoder->setFlag(Encoder::FLAG_GLOBAL_HEADER, true);
@@ -373,7 +375,10 @@ EncoderTest::testTranscode()
   Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, true);
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
 
-  TestData::Fixture* fixture=mFixtures.getFixture("testfile.flv");
+  TestData::Fixture* fixture;
+  fixture=mFixtures.getFixture("testfile.flv");
+//  fixture=mFixtures.getFixture("testfile_h264_mp4a_tmcd.mov");
+//  fixture=mFixtures.getFixture("bigbuckbunny_h264_aac_5.1.mp4");
   TS_ASSERT(fixture);
   char filepath[2048];
   mFixtures.fillPath(fixture, filepath, sizeof(filepath));
@@ -397,6 +402,9 @@ EncoderTest::testTranscode()
     DemuxerStreamHelper* input = &inputHelpers[i];
     input->stream = source->getStream(i);
     input->decoder = input->stream->getDecoder();
+    if (!input->decoder)
+      // skip
+      break;
     input->decoder->open(0, 0);
     input->type = input->decoder->getCodecType();
     if (input->type == MediaDescriptor::MEDIA_AUDIO)
@@ -431,6 +439,9 @@ EncoderTest::testTranscode()
   for(int32_t i = 0; i < numStreams; i++) {
     DemuxerStreamHelper *input = &inputHelpers[i];
     MuxerStreamHelper *output = &outputHelpers[i];
+    if (!input->decoder)
+      // skip
+      break;
     output->type = input->type;
     RefPointer<Encoder> encoder;
     if (output->type == MediaDescriptor::MEDIA_VIDEO) {
@@ -444,6 +455,9 @@ EncoderTest::testTranscode()
       encoder->setProperty("b", (int64_t)400000); // bitrate
       encoder->setProperty("g", (int64_t) 10); // gop
       encoder->setProperty("bf", (int64_t)3); // max b frames
+      RefPointer<Rational> tb = Rational::make(1,2997);
+      encoder->setTimeBase(tb.value());
+
 
     } else if (output->type == MediaDescriptor::MEDIA_AUDIO) {
       RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_AAC);
@@ -452,16 +466,18 @@ EncoderTest::testTranscode()
       // set the encoder properties we need
       encoder->setSampleRate(input->decoder->getSampleRate());
       encoder->setSampleFormat(input->decoder->getSampleFormat());
+      encoder->setSampleFormat(AudioFormat::SAMPLE_FMT_S16);
       encoder->setChannelLayout(input->decoder->getChannelLayout());
       encoder->setChannels(input->decoder->getChannels());
       encoder->setProperty("b", (int64_t)64000); // bitrate
+      RefPointer<Rational> tb = Rational::make(1,encoder->getSampleRate());
+      encoder->setTimeBase(tb.value());
+      //      //input->decoder->getTimeBase();
+      //      output->encoder->setTimeBase(tb.value());
+
     }
     output->encoder.reset(encoder.value(), true);
     if (output->encoder) {
-      // if the container will require a global header, then the encoder needs to set this.
-      RefPointer<Rational> tb = input->decoder->getTimeBase();
-      output->encoder->setTimeBase(tb.value());
-
       if (format->getFlag(MuxerFormat::GLOBAL_HEADER))
         output->encoder->setFlag(Encoder::FLAG_GLOBAL_HEADER, true);
 
@@ -484,6 +500,14 @@ EncoderTest::testTranscode()
           )
       {
         // we need a resampler.
+        VS_LOG_DEBUG("Resampling: [%"PRId32", %"PRId32", %"PRId32"] [%"PRId32", %"PRId32", %"PRId32"]",
+                     (int32_t)output->encoder->getChannelLayout(),
+                     (int32_t)output->encoder->getSampleRate(),
+                     (int32_t)output->encoder->getSampleFormat(),
+                     (int32_t)input->decoder->getChannelLayout(),
+                     (int32_t)input->decoder->getSampleRate(),
+                     (int32_t)input->decoder->getSampleFormat()
+        );
         RefPointer<MediaAudioResampler> resampler = MediaAudioResampler::make(
             output->encoder->getChannelLayout(),
             output->encoder->getSampleRate(),
@@ -516,7 +540,7 @@ EncoderTest::testTranscode()
       int32_t streamNo = packet->getStreamIndex();
       DemuxerStreamHelper *input = &inputHelpers[streamNo];
       MuxerStreamHelper* output = &outputHelpers[streamNo];
-      decodeAndEncode(
+      if (input->decoder) decodeAndEncode(
           packet.value(),
           input->decoder.value(),
           input->media.value(),
@@ -536,7 +560,7 @@ EncoderTest::testTranscode()
   for(int i = 0; i < numStreams; i++) {
     DemuxerStreamHelper *input = &inputHelpers[i];
     MuxerStreamHelper* output = &outputHelpers[i];
-    decodeAndEncode(
+    if (input->decoder) decodeAndEncode(
         0,
         input->decoder.value(),
         input->media.value(),

@@ -215,6 +215,10 @@ protected:
    * Function to log the write event as a trace
    */
   static void logWrite(Muxer* muxer, MediaPacket* in, MediaPacket* out, int32_t retval);
+  /**
+   * Log an open.
+   */
+  static void logOpen(Muxer*);
 
   /**
    * Takes the packet given (in whatever time base it was encoded with) and resets all time stamps

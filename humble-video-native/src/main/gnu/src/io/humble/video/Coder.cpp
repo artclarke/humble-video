@@ -92,14 +92,17 @@ Coder::open(KeyValueBag* inputOptions, KeyValueBag* aUnsetOptions) {
       av_dict_copy(&tmp, options->getDictionary(), 0);
     }
 
-    RefPointer<Codec> codec = getCodec();
-    retval = avcodec_open2(mCtx, codec->getCtx(), &tmp);
+    // first we're going to set options (and we'll set them again later)
+    retval = av_opt_set_dict(mCtx, &tmp);
+    FfmpegException::check(retval, "could not set options on coder");
 
-    if (retval < 0)
-    {
-      mState = STATE_ERROR;
-      throw HumbleRuntimeError("could not open codec");
-    }
+    // we check that the options passed in our valid
+    checkOptionsBeforeOpen();
+
+    RefPointer<Codec> codec = getCodec();
+    // we pass in the options again because codec-specific options can be set.
+    retval = avcodec_open2(mCtx, codec->getCtx(), &tmp);
+    FfmpegException::check(retval, "could not open codec");
     mState  = STATE_OPENED;
 
     if (aUnsetOptions)
@@ -107,14 +110,14 @@ Coder::open(KeyValueBag* inputOptions, KeyValueBag* aUnsetOptions) {
       KeyValueBagImpl* unsetOptions = dynamic_cast<KeyValueBagImpl*>(aUnsetOptions);
       unsetOptions->copy(tmp);
     }
-  } catch (std::exception & e) {
     if (tmp)
       av_dict_free(&tmp);
-    tmp = 0;
-    throw e;
+  } catch (...) {
+    mState = STATE_ERROR;
+    if (tmp)
+      av_dict_free(&tmp);
+    throw;
   }
-  if (tmp)
-    av_dict_free(&tmp);
 }
 
 

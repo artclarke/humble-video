@@ -452,16 +452,6 @@ public class MediaPacket extends MediaEncoded {
     VideoJNI.MediaPacket_reset(swigCPtr, this, payloadSize);
   }
 
-/**
- * Gets the Coder* that made this packet.<br>
- * <br>
- * @return the coder if known, or null if not.
- */
-  public SWIGTYPE_p_Coder getCoder() {
-    long cPtr = VideoJNI.MediaPacket_getCoder(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_Coder(cPtr, false);
-  }
-
   public enum SideDataType {
     DATA_UNKNOWN(VideoJNI.MediaPacket_DATA_UNKNOWN_get()),
     DATA_PALETTE(VideoJNI.MediaPacket_DATA_PALETTE_get()),

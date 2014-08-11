@@ -427,6 +427,12 @@ public:
   virtual void
   reset(int32_t payloadSize)=0;
 
+#ifndef SWIG
+
+  // do not return this via SWIG. Instead we will need to make a helper
+  // method that casts this to a Decoder or an Encoder, and then casts
+  // it back up from Java.
+
   /**
    * Gets the Coder* that made this packet.
    *
@@ -434,6 +440,7 @@ public:
    */
   virtual Coder*
   getCoder()=0;
+#endif
 
 protected:
   MediaPacket();
