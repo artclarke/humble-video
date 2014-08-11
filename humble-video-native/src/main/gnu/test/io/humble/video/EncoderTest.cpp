@@ -173,7 +173,7 @@ EncoderTest::testEncodeAudio() {
   encoder->setTimeBase(tb.value());
 
   // create an output muxer
-  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeAudio.mov", 0, 0);
+  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_encodeAudio.mp4", 0, 0);
   RefPointer<MuxerFormat> format = muxer->getFormat();
   if (format->getFlag(MuxerFormat::GLOBAL_HEADER))
     encoder->setFlag(Encoder::FLAG_GLOBAL_HEADER, true);
@@ -454,7 +454,7 @@ EncoderTest::testTranscode()
       encoder->setPixelFormat(input->decoder->getPixelFormat());
       encoder->setProperty("b", (int64_t)400000); // bitrate
       encoder->setProperty("g", (int64_t) 10); // gop
-      encoder->setProperty("bf", (int64_t)3); // max b frames
+      encoder->setProperty("bf", (int64_t)0); // max b frames
       RefPointer<Rational> tb = Rational::make(1,2997);
       encoder->setTimeBase(tb.value());
 

@@ -270,9 +270,10 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* aFrame) {
      */
     int64_t inTs = coderTb->rescale(frame->getTimeStamp(), frameTb.value(), Rational::ROUND_DOWN);
     if (mLastPtsEncoded != Global::NO_PTS) {
-      if (inTs < mLastPtsEncoded) {
+      if (inTs <= mLastPtsEncoded) {
         VS_LOG_DEBUG(
-            "Dropping frame with timestamp %lld (if coder supports higher time-base use that instead)",
+            "Encoder@%p: Dropping frame with timestamp %lld (if coder supports higher time-base use that instead)",
+            this,
             frame->getPts());
         dropFrame = true;
       }
@@ -387,9 +388,10 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
      */
     int64_t inTs = coderTb->rescale(inputAudio->getTimeStamp(), inputAudioTb.value(), Rational::ROUND_DOWN);
     if (mLastPtsEncoded != Global::NO_PTS) {
-      if (inTs < mLastPtsEncoded) {
+      if (inTs <= mLastPtsEncoded) {
         VS_LOG_DEBUG(
-            "Dropping frame with timestamp %lld (if coder supports higher time-base use that instead)",
+            "Encoder@%p Dropping frame with timestamp %lld (if coder supports higher time-base use that instead)",
+            this,
             inputAudio->getPts());
         dropFrame = true;
       }

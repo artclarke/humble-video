@@ -120,19 +120,11 @@ public:
    /**
     * Sets the timebase on this object.
     *
-    * If the object has a timestamp, then it is automatically rescaled to the new timebase.
-    * By default the timestamp will be rounded down if there is any fractional component
-    * after the rebasing.
+    * Note: This will NOT automatically rescale the timestamp set -- so if you change
+    * the timebase, you almost definitely want to change the timestamp as well.
     */
    virtual void setTimeBase(Rational* timeBase);
 
-   /**
-    * Sets the timbase on this object.
-    *
-    * If the object has a timestamp, then it is automatically rescaled (with the
-    * given rounding parameter) to the new timebase.
-    */
-   virtual void setTimeBase(Rational* timeBase, Rational::Rounding rounding);
 
 #ifndef SWIG
    virtual AVFrame *getCtx()=0;

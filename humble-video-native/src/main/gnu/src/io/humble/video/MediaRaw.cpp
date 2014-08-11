@@ -39,17 +39,6 @@ MediaRaw::getMetaData()
 void
 MediaRaw::setTimeBase(Rational* timeBase)
 {
-  setTimeBase(timeBase, Rational::ROUND_DOWN);
-}
-
-void
-MediaRaw::setTimeBase(Rational* timeBase, Rational::Rounding rounding)
-{
-  int64_t timeStamp = getTimeStamp();
-  if (timeBase && timeStamp != Global::NO_PTS && mTimeBase.value()) {
-    timeStamp = timeBase->rescale(timeStamp, mTimeBase.value(), rounding);
-    setTimeStamp(timeStamp);
-  }
   mTimeBase.reset(timeBase, true);
 }
 
