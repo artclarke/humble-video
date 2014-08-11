@@ -184,6 +184,10 @@ MediaPictureImpl::make(MediaPictureImpl* src, bool copy) {
     retval->mComplete = src->mComplete;
     av_frame_ref(retval->mFrame, src->mFrame);
   }
+  // set the timebase
+  retval->setComplete(src->isComplete());
+  RefPointer<Rational> timeBase = src->getTimeBase();
+  retval->setTimeBase(timeBase.value());
   return retval.get();
 }
 void
