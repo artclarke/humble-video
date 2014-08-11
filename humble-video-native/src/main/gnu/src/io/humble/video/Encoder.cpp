@@ -268,7 +268,7 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* aFrame) {
      * time base without rounding.
      *
      */
-    int64_t inTs = coderTb->rescale(frame->getTimeStamp(), frameTb.value());
+    int64_t inTs = coderTb->rescale(frame->getTimeStamp(), frameTb.value(), Rational::ROUND_DOWN);
     if (mLastPtsEncoded != Global::NO_PTS) {
       if (inTs < mLastPtsEncoded) {
         VS_LOG_DEBUG(
@@ -279,8 +279,9 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* aFrame) {
     }
     if (!dropFrame) {
         mLastPtsEncoded = inTs;
-        frame->setTimeStamp(inTs);
         frame->setTimeBase(coderTb.value());
+        // set the timestamp after the timbase as setTimeBase does a conversion.
+        frame->setTimeStamp(inTs);
     }
   }
 
@@ -384,7 +385,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
      * time base without rounding.
      *
      */
-    int64_t inTs = coderTb->rescale(inputAudio->getTimeStamp(), inputAudioTb.value());
+    int64_t inTs = coderTb->rescale(inputAudio->getTimeStamp(), inputAudioTb.value(), Rational::ROUND_DOWN);
     if (mLastPtsEncoded != Global::NO_PTS) {
       if (inTs < mLastPtsEncoded) {
         VS_LOG_DEBUG(
@@ -395,8 +396,9 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
     }
     if (!dropFrame) {
         mLastPtsEncoded = inTs;
-        inputAudio->setTimeStamp(inTs);
         inputAudio->setTimeBase(coderTb.value());
+        // set the timestamp after the timbase as setTimeBase does a conversion.
+        inputAudio->setTimeStamp(inTs);
     }
   }
   if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
