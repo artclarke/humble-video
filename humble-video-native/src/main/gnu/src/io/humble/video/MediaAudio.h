@@ -236,6 +236,7 @@ protected:
  */
 class VS_API_HUMBLEVIDEO AudioFormat : public virtual io::humble::ferry::RefCounted
 {
+
 public:
   /**
    * The format we use to represent audio.
@@ -374,7 +375,7 @@ protected:
  */
 class VS_API_HUMBLEVIDEO MediaAudio : public MediaSampled
 {
-
+  VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(MediaAudio)
 public:
   /**
    * Create a MediaAudio and the underlying data. Will allocate a buffer to back this data.
@@ -438,7 +439,7 @@ public:
    * @return The raw data, or null if not accessible.
    */
   virtual io::humble::ferry::Buffer*
-  getData(int32_t plane)=0;
+  getData(int32_t plane);
 
   /**
    * The total number of bytes in #getData() that represent valid audio data.
@@ -449,23 +450,23 @@ public:
    * @return The size in bytes of that plane of audio data.
    */
   virtual int32_t
-  getDataPlaneSize(int32_t plane)=0;
+  getDataPlaneSize(int32_t plane);
 
   /** Returns the number of data planes in this object. */
   virtual int32_t
-  getNumDataPlanes()=0;
+  getNumDataPlanes();
 
   /**
    * @return maximum of samples of #getChannels() #getFormat() audio that can be put in this MediaAudio object.
    */
   virtual int32_t
-  getMaxNumSamples()=0;
+  getMaxNumSamples();
 
   /**
    * @return the actual number of samples in this object
    */
   virtual int32_t
-  getNumSamples()=0;
+  getNumSamples();
 
   /**
    * Set the number of samples in the buffer. Must not be more than
@@ -473,13 +474,13 @@ public:
    * sure buffer actually matches this.
    */
   virtual void
-  setNumSamples(int32_t numSamples)=0;
+  setNumSamples(int32_t numSamples);
 
   /**
    * Number of bytes in one sample of one channel of audio in this object.
    */
   virtual int32_t
-  getBytesPerSample()=0;
+  getBytesPerSample();
 
   /**
    * Call this if you modify the samples and are now done.  This
@@ -488,48 +489,115 @@ public:
    * @param complete true if complete; false if not.
    */
   virtual void
-  setComplete(bool complete)=0;
+  setComplete(bool complete);
 
   /**
    * Sample rate of audio, or 0 if unknown.
    */
   virtual int32_t
-  getSampleRate()=0;
+  getSampleRate();
   /**
    * Number of channels of audio in this object.
    */
   virtual int32_t
-  getChannels()=0;
+  getChannels();
   /**
    * Format of audio in this object.
    */
   virtual AudioFormat::Type
-  getFormat()=0;
+  getFormat();
   /**
    * Does this object have complete data? If not, other methods may return unknown.
    */
   virtual bool
-  isComplete()=0;
+  isComplete();
   /**
    * Was this audio decoded from a key packet?
    */
   virtual bool
-  isKey()=0;
+  isKey();
   /**
    * Is audio laid out in a planar format?
    */
   virtual bool
-  isPlanar()=0;
+  isPlanar();
   /**
    * What is the channel layout of the audio in this buffer?
    */
   virtual AudioChannel::Layout
-  getChannelLayout() = 0;
+  getChannelLayout();
+
+  /**
+   * Returns the minimum next timestamp value that would be expected for audio that
+   * follows this packet.
+   *
+   * For example, if the timestamp of this audio is 1152, the sample rate is 22050,
+   * and the timebase is 1/44100, and
+   * getNumSamples() returns 576, getNextTimeStamp() will return 2304.
+   *
+   * @return the minimum timestamp of audio that must follow.
+   *
+   * @throws InvalidArgument if !isComplete().
+   *
+   */
+//  virtual int64_t getNextTimeStamp() = 0;
+
+  /**
+   * Adds input audio to this object, copying up to X number of samples.
+   *
+   * It does NOT modify input in any way. If this object is !isComplete() then
+   * this is equivalent to copying the data into this object. If isComplete() then
+   * data will be copied on the end (and the buffers may get expanded).
+   *
+   * @param input Audio to copy from. Must not be null and must be complete().
+   * @param numSamples Number of samples to copy. If 0, then all samples are copied.
+   * @param injectSilence If true, and input.getTimeStamp() > this.getNextTimeStamp(),
+   *                      then we attempt to inject silence to fill the gap. If false,
+   *                      we throw an exception if input is not contiguous to this object.
+   *
+   * @return Actual # of samples (per channel) copied.
+   *
+   * @throws InvalidArgument if null inputs, incomplete input audio, or numSamples < 0, or the timebases,
+   *                         sample rates, formats, or channel layouts are not the same.
+   * @throws InvalidArgument if input.getTimeStamp() < this.getNextTimeStamp()
+   * @throws OutOfBoundsException if injectSilence is false and input.getTimeStamp() > this.getNextTimeStamp().
+   */
+//  virtual int32_t push(MediaAudio* input, int32_t numSamples, bool injectSilence);
+
+  /**
+   * "Pops" up to numSamples samples from this object and "pushes" them into output.
+   *
+   * @param output The audio to copy to. May not be null. If no exception thrown, output will be
+   *               complete upon return.
+   * @param numSamples The maximum number of samples to copy. If 0, then we attempt to copy
+   *                   getNumSamples() to output.
+   *
+   * @return Actual # of samples (per channel) copied.
+   *
+   * @throws InvalidArgument if null output or numSamples < 0.
+   *
+   */
+//  virtual int32_t pop(MediaAudio* output, int32_t numSamples);
+
+#ifndef SWIG
+  virtual AVFrame* getCtx();
+  // Copies data from src into this context, first releasing any memory we have.
+  virtual void copy(AVFrame* src, bool complete);
+  virtual int64_t logMetadata(char *, size_t);
+#endif
 
 protected:
   MediaAudio();
   virtual
   ~MediaAudio();
+private:
+  static void
+  setBufferType(AudioFormat::Type format,
+      io::humble::ferry::Buffer* buffer);
+
+  AVFrame* mFrame;
+  bool     mComplete;
+
 };
 
 } /* namespace video */

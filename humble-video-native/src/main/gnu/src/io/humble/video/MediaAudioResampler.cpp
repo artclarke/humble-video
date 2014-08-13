@@ -27,7 +27,7 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/RefCounted.h>
 #include <io/humble/video/VideoExceptions.h>
-#include <io/humble/video/MediaAudioImpl.h>
+#include <io/humble/video/MediaAudio.h>
 #include "MediaAudioResampler.h"
 
 using namespace io::humble::ferry;
@@ -196,9 +196,7 @@ MediaAudioResampler::resample(MediaSampled* aOut, MediaSampled*aIn)
   return resampleAudio(out, in);
 }
 int32_t
-MediaAudioResampler::resampleAudio(MediaAudio* aOut, MediaAudio* aIn) {
-  MediaAudioImpl* out = dynamic_cast<MediaAudioImpl*>(aOut);
-  MediaAudioImpl* in = dynamic_cast<MediaAudioImpl*>(aIn);
+MediaAudioResampler::resampleAudio(MediaAudio* out, MediaAudio* in) {
 
   if (mState != STATE_OPENED)
     VS_THROW(HumbleRuntimeError("Must call open() on resampler before using"));

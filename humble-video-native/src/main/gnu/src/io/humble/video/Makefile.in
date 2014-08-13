@@ -101,16 +101,16 @@ am_libhumble_video_la_OBJECTS = Mingw64Fixes.lo VideoExceptions.lo \
 	AVBufferSupport.lo PixelFormat.lo KeyValueBag.lo \
 	KeyValueBagImpl.lo Property.lo PropertyImpl.lo Rational.lo \
 	RationalImpl.lo Codec.lo Media.lo MediaRaw.lo \
-	MediaResampler.lo MediaAudio.lo MediaAudioImpl.lo \
-	MediaAudioResampler.lo MediaPicture.lo MediaPictureImpl.lo \
-	MediaPictureResampler.lo MediaPictureResamplerImpl.lo \
-	MediaSubtitle.lo MediaSubtitleImpl.lo IndexEntry.lo \
-	IndexEntryImpl.lo MediaPacket.lo MediaPacketImpl.lo \
-	ContainerFormat.lo Configurable.lo Coder.lo Decoder.lo \
-	Encoder.lo ContainerStream.lo Container.lo DemuxerFormat.lo \
-	Muxer.lo MuxerStream.lo Demuxer.lo DemuxerImpl.lo \
-	DemuxerStream.lo MuxerFormat.lo FilterType.lo FilterGraph.lo \
-	Filter.lo FilterLink.lo FilterEndPoint.lo FilterSource.lo \
+	MediaResampler.lo MediaAudio.lo MediaAudioResampler.lo \
+	MediaPicture.lo MediaPictureImpl.lo MediaPictureResampler.lo \
+	MediaPictureResamplerImpl.lo MediaSubtitle.lo \
+	MediaSubtitleImpl.lo IndexEntry.lo IndexEntryImpl.lo \
+	MediaPacket.lo MediaPacketImpl.lo ContainerFormat.lo \
+	Configurable.lo Coder.lo Decoder.lo Encoder.lo \
+	ContainerStream.lo Container.lo DemuxerFormat.lo Muxer.lo \
+	MuxerStream.lo Demuxer.lo DemuxerImpl.lo DemuxerStream.lo \
+	MuxerFormat.lo FilterType.lo FilterGraph.lo Filter.lo \
+	FilterLink.lo FilterEndPoint.lo FilterSource.lo \
 	FilterAudioSource.lo FilterPictureSource.lo FilterSink.lo \
 	FilterAudioSink.lo FilterPictureSink.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
@@ -472,7 +472,6 @@ libhumble_video_la_SOURCES = \
   MediaRaw.cpp \
   MediaResampler.cpp \
   MediaAudio.cpp \
-  MediaAudioImpl.cpp \
   MediaAudioResampler.cpp \
   MediaPicture.cpp \
   MediaPictureImpl.cpp \
@@ -535,7 +534,6 @@ libhumble_video_la_HEADERS = \
   MediaRaw.h \
   MediaRaw.swg \
   MediaAudio.h \
-  MediaAudioImpl.h \
   MediaAudio.swg \
   MediaResampler.h \
   MediaAudioResampler.h \
@@ -688,7 +686,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Media.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudio.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudioImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudioResampler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacketImpl.Plo@am__quote@

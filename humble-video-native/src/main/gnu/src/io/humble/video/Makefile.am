@@ -27,7 +27,6 @@ libhumble_video_la_SOURCES= \
   MediaRaw.cpp \
   MediaResampler.cpp \
   MediaAudio.cpp \
-  MediaAudioImpl.cpp \
   MediaAudioResampler.cpp \
   MediaPicture.cpp \
   MediaPictureImpl.cpp \
@@ -90,7 +89,6 @@ libhumble_video_la_HEADERS= \
   MediaRaw.h \
   MediaRaw.swg \
   MediaAudio.h \
-  MediaAudioImpl.h \
   MediaAudio.swg \
   MediaResampler.h \
   MediaAudioResampler.h \

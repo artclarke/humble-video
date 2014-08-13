@@ -29,7 +29,7 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
 #include <io/humble/video/IndexEntryImpl.h>
-#include <io/humble/video/MediaAudioImpl.h>
+#include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaPictureImpl.h>
 #include <io/humble/video/MediaPacketImpl.h>
 #include <io/humble/video/MediaSubtitleImpl.h>
@@ -74,7 +74,7 @@ Decoder::prepareFrame(AVFrame* frame, int flags) {
 
   switch (getCodecType()) {
   case MediaDescriptor::MEDIA_AUDIO: {
-    MediaAudioImpl* audio = dynamic_cast<MediaAudioImpl*>(mCachedMedia.value());
+    MediaAudio* audio = dynamic_cast<MediaAudio*>(mCachedMedia.value());
     if (!audio ||
         audio->getSampleRate() != frame->sample_rate ||
         audio->getChannelLayout() != frame->channel_layout ||
@@ -115,9 +115,8 @@ Decoder::rebase(int64_t ts, MediaPacket* packet) {
   return dstTs->rescale(ts, srcTs.value());
 }
 int32_t
-Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
+Decoder::decodeAudio(MediaAudio* output, MediaPacket* aPacket,
     int32_t byteOffset) {
-  MediaAudioImpl* output = dynamic_cast<MediaAudioImpl*>(aOutput);
   MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(aPacket);
 
   if (getCodecType() != MediaDescriptor::MEDIA_AUDIO)
@@ -129,11 +128,11 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   if (STATE_OPENED != getState())
     VS_THROW(HumbleRuntimeError("Attempt to decodeAudio, but Decoder is not opened"));
 
-  if (!aOutput)
+  if (!output)
     VS_THROW(HumbleInvalidArgument("null audio passed to coder"));
 
   // let's check the audio parameters.
-  ensureAudioParamsMatch(aOutput);
+  ensureAudioParamsMatch(output);
 
   if (packet) {
     if (!packet->isComplete()) {
@@ -267,7 +266,7 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   char outDescr[256]; *outDescr = 0;
   char inDescr[256]; *inDescr = 0;
   if (aPacket) aPacket->logMetadata(inDescr, sizeof(inDescr));
-  if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+  if (output) output->logMetadata(outDescr, sizeof(outDescr));
   VS_LOG_TRACE("decodeAudio Decoder@%p[out:%s;in:%s;offset:%lld;decoded:%" PRIi64,
                this,
                outDescr,
