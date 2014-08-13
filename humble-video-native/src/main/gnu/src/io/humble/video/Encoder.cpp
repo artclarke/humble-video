@@ -193,6 +193,11 @@ Encoder::open(KeyValueBag * inputOptions, KeyValueBag* unsetOptions) {
   switch(codec->getType()) {
     case MediaDescriptor::MEDIA_AUDIO: {
       if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
+        int32_t frameSize = getFrameSize();
+        if (frameSize <= 0) {
+          setState(STATE_ERROR);
+          VS_THROW(HumbleRuntimeError("Codec requires fixed frame size, but does not specify frame size"));
+        }
         mAResampler = MediaAudioResampler::make(
             getChannelLayout(),
             getSampleRate(),
@@ -413,11 +418,21 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
             samples->getChannelLayout(), samples->getFormat());
     }
     if (mResampledAudio) {
+      // This clearly does not work -- it should be maintaining frame size but
+      // it is not. Need a good think on the right way to solve this.
       mAResampler->resample(mResampledAudio.value(), samples);
       if (mResampledAudio->isComplete())
         inputAudio = mResampledAudio.get();
       else
         inputAudio = 0;
+    }
+    // now a sanity check
+    if (!(!samples || !inputAudio || inputAudio->getNumSamples() == getFrameSize())) {
+      VS_THROW(HumbleRuntimeError::make("not flushing, but samples returned (%ld) are less than frame size (%ld)",
+                                        inputAudio->getNumSamples(),
+                                        getFrameSize()
+
+          ));
     }
   }
 
