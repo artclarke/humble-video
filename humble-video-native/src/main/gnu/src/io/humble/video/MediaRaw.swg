@@ -19,5 +19,7 @@
 
 %typemap (javacode) io::humble::video::MediaRaw,io::humble::video::MediaRaw*,io::humble::video::MediaRaw& %{
 %}
+%typemap (javacode) io::humble::video::MediaRaw,io::humble::video::MediaSampled*,io::humble::video::MediaSampled& %{
+%}
 
 %include <io/humble/video/MediaRaw.h>
