@@ -207,7 +207,7 @@ FilterGraphTest::testFilterVideo() {
         if (picture->isComplete()) {
           filterSource->addPicture(picture.value());
           // now pull pictures
-          while (filterSink->getPicture(filterPicture.value()) >= 0)
+          while (filterSink->getPicture(filterPicture.value()) >= 0 && filterPicture->isComplete())
             writePicture("FilterGraphTest_testFilterVideo", &frameNo,
                 filterPicture.value());
         }
@@ -226,12 +226,16 @@ FilterGraphTest::testFilterVideo() {
   // cached packets
   do {
     decoder->decodeVideo(picture.value(), 0, 0);
-    if (picture->isComplete()) {
+    if (picture->isComplete())
       filterSource->addPicture(picture.value());
-      // now pull pictures
-      while (filterSink->getPicture(filterPicture.value()) >= 0)
-        writePicture("FilterGraphTest_testFilterVideo", &frameNo,
-            filterPicture.value());
+    else
+      // signal EOF
+      filterSource->addPicture(0);
+
+    // now pull pictures
+    while (filterSink->getPicture(filterPicture.value()) >= 0 && filterPicture->isComplete()) {
+      writePicture("FilterGraphTest_testFilterVideo", &frameNo,
+                   filterPicture.value());
     }
   } while (picture->isComplete());
 
@@ -309,7 +313,9 @@ FilterGraphTest::testFilterAudio() {
       filteredAudio->getSampleRate(),
       filteredAudio->getChannelLayout(),
       filteredAudio->getFormat());
-  graph->open("[in]aphaser=decay=.99:delay=5[out]");
+  const int32_t frameSize = 1024;
+  graph->open("[in]aphaser=decay=.4:delay=5:speed=.1[out]");
+  fsink->setFrameSize(frameSize);
 
   int32_t numSamples = 0;
   while(source->read(packet.value()) >= 0) {
@@ -323,8 +329,10 @@ FilterGraphTest::testFilterAudio() {
         if (audio->isComplete()) {
           numSamples += audio->getNumSamples();
           fsource->addAudio(audio.value());
-          while(fsink->getAudio(filteredAudio.value()) >= 0)
+          while(fsink->getAudio(filteredAudio.value()) >= 0 && filteredAudio->isComplete()) {
+            TS_ASSERT_EQUALS(filteredAudio->getNumSamples(), frameSize);
             writeAudio(output, filteredAudio.value());
+          }
         }
         byteOffset += bytesRead;
       } while(byteOffset < packet->getSize());
@@ -340,11 +348,15 @@ FilterGraphTest::testFilterAudio() {
   // cached packets
   do {
     decoder->decodeAudio(audio.value(), 0, 0);
-    if (audio->isComplete()) {
+    if (audio->isComplete())
       fsource->addAudio(audio.value());
-      while(fsink->getAudio(filteredAudio.value()) >= 0)
+    else
+      // tell the source we're at EOF
+      fsource->addAudio(0);
+
+    while(fsink->getAudio(filteredAudio.value()) >= 0)
+      if (filteredAudio->isComplete())
         writeAudio(output, filteredAudio.value());
-    }
   } while (audio->isComplete());
 
   fclose(output);

@@ -44,6 +44,25 @@ FilterSink::FilterSink(FilterGraph* graph, AVFilterContext* ctx) :
 FilterSink::~FilterSink() {
 }
 
+void
+FilterSink::setFrameSize(int32_t size) {
+  AVFilterContext* ctx = getFilterCtx();
+  if (!ctx->inputs[0])
+    VS_THROW(HumbleInvalidArgument("Cannot setFrameSize until graph this is added to is opened"));
+
+  av_buffersink_set_frame_size(ctx, size);
+}
+
+int32_t
+FilterSink::getFrameSize() {
+  AVFilterContext* ctx = getFilterCtx();
+
+  // NOTE: This is peaking into the structure, and should
+  // be replaced if when a av_buffersink_get_frame_size method is
+  // implemented.
+  return ctx->inputs[0] ? ctx->inputs[0]->min_samples : 0;
+}
+
 int32_t
 FilterSink::get(MediaRaw* media)
 {
@@ -73,6 +92,10 @@ FilterSink::get(MediaRaw* media)
     // if we get here, we're complete
     media->setComplete(true);
   }
+  if (e == AVERROR(EAGAIN))
+    // set to 0 as the media incomplete status signals to caller they should retry.
+    e = 0;
+
   // and free the frame we made
   av_frame_unref(frame);
   av_frame_free(&frame);

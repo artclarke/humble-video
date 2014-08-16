@@ -38,6 +38,18 @@ namespace video {
  */
 class VS_API_HUMBLEVIDEO FilterSink : public FilterEndPoint
 {
+public:
+  /**
+   * Set the frame size of this sink. If set to non-zero then #getAudio(MediaAudio)
+   * will only every return exactly that number of samples.
+   */
+  virtual void setFrameSize(int32_t);
+
+  /**
+   * Get the frame size.
+   */
+  virtual int32_t getFrameSize();
+
 protected:
   int32_t get(MediaRaw*);
   FilterSink(FilterGraph* graph, AVFilterContext* ctx);

@@ -274,6 +274,10 @@ MediaAudioTest::testCopy() {
 
   TS_ASSERT_EQUALS(channels, audio->getNumDataPlanes());
 
+  /**
+   * First test where we copy the data; then test where
+   * we make an object by reference (not by copy).
+   */
   bool tests[] =
     { true, false };
   for (size_t i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
@@ -308,5 +312,73 @@ MediaAudioTest::testCopy() {
       }
     }
   }
-
 }
+
+void
+MediaAudioTest::testPushPop()
+{
+  const int32_t numSamples = 155; // I choose an odd number because HV will align up to 32
+  const int32_t sampleRate = 22050;
+  const int32_t channels = 15; // choose a large # of channels to make sure we expand the Frame
+  const AudioChannel::Layout layout = AudioChannel::CH_LAYOUT_UNKNOWN;
+  const AudioFormat::Type format = AudioFormat::SAMPLE_FMT_DBLP;
+
+  int32_t bufSize = AudioFormat::getBufferSizeNeeded(numSamples, channels,
+      format);
+  // test that there is rounding up
+  int32_t minSize = AudioFormat::getBytesPerSample(format) * numSamples
+      * channels;
+  TS_ASSERT_LESS_THAN(minSize, bufSize);
+
+  RefPointer<Buffer> src = Buffer::make(0, bufSize);
+  double* srcData = (double*) src->getBytes(0, bufSize);
+
+  // now, let's go nuts!
+  for (size_t i = 0; i < bufSize / sizeof(double); i++) {
+    srcData[i] = i;
+  }
+
+  RefPointer<MediaAudio> audio;
+  audio = MediaAudio::make(src.value(), numSamples, sampleRate, channels,
+      layout, format);
+  TS_ASSERT(audio);
+
+  TS_ASSERT_EQUALS(channels, audio->getNumDataPlanes());
+
+  bool tests[] =
+    { true, false };
+
+  for (size_t i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
+
+    // now let's make a copy
+    RefPointer<MediaAudio> copy = MediaAudio::make(audio.value(), tests[i]);
+
+    TS_ASSERT_EQUALS(copy->getMaxNumSamples(), audio->getMaxNumSamples());
+    TS_ASSERT_EQUALS(copy->getNumSamples(), audio->getNumSamples());
+    TS_ASSERT_EQUALS(copy->getChannels(), audio->getChannels());
+    TS_ASSERT_EQUALS(copy->getNumDataPlanes(), audio->getNumDataPlanes());
+    TS_ASSERT_EQUALS(copy->getChannelLayout(), audio->getChannelLayout());
+    TS_ASSERT_EQUALS(copy->getSampleRate(), audio->getSampleRate());
+    TS_ASSERT_EQUALS(copy->getFormat(), audio->getFormat());
+
+    for (int32_t j = 0; j < audio->getNumDataPlanes(); j++) {
+      RefPointer<Buffer> srcBuf = audio->getData(j);
+      RefPointer<Buffer> dstBuf = copy->getData(j);
+
+      int32_t planeSize = srcBuf->getBufferSize();
+      TS_ASSERT_EQUALS(planeSize, dstBuf->getBufferSize());
+
+      uint8_t* srcBytes = (uint8_t*) srcBuf->getBytes(0, planeSize);
+      uint8_t* dstBytes = (uint8_t*) dstBuf->getBytes(0, planeSize);
+      if (tests[i]) {
+        for (int32_t k = 0; k < planeSize; k++) {
+          // should be byte-by-byte the same
+          TS_ASSERT_EQUALS(srcBytes[k], dstBytes[k]);
+        }
+      } else {
+        TS_ASSERT_EQUALS(srcBytes, dstBytes);
+      }
+    }
+  }
+}
+

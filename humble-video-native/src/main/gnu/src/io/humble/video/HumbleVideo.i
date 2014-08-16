@@ -190,11 +190,11 @@ import io.humble.ferry.Buffer;
 %include <io/humble/video/MediaPictureResampler.swg>
 %include <io/humble/video/MediaAudioResampler.h>
 %include <io/humble/video/Codec.swg>
+%include <io/humble/video/Coder.swg>
 %include <io/humble/video/ContainerFormat.swg>
 %include <io/humble/video/MuxerFormat.swg>
 %include <io/humble/video/DemuxerFormat.swg>
 %include <io/humble/video/IndexEntry.swg>
-%include <io/humble/video/Coder.swg>
 %include <io/humble/video/Decoder.swg>
 %include <io/humble/video/Encoder.swg>
 %include <io/humble/video/ContainerStream.swg>

@@ -46,15 +46,15 @@ FilterSource::~FilterSource() {
 
 void
 FilterSource::add(MediaRaw* media) {
-  if (!media) {
-    VS_THROW(HumbleInvalidArgument("no media passed in"));
-  }
-  if (!media->isComplete()) {
-    VS_THROW(HumbleInvalidArgument("incomplete media passed in"));
-  }
   // ok, let's get to work
   AVFilterContext* ctx = getFilterCtx();
-  AVFrame* frame = media->getCtx();
+  AVFrame* frame = 0;
+  if (media) {
+    if (!media->isComplete()) {
+      VS_THROW(HumbleInvalidArgument("incomplete media passed in"));
+    }
+    frame = media->getCtx();
+  }
 
   int e = av_buffersrc_write_frame(ctx, frame);
   FfmpegException::check(e, "could not add frame to filter source: ");
