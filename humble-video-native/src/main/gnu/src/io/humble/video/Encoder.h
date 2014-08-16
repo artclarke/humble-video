@@ -31,7 +31,9 @@
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaSubtitle.h>
-#include <io/humble/video/MediaAudioResampler.h>
+#include <io/humble/video/FilterGraph.h>
+#include <io/humble/video/FilterAudioSource.h>
+#include <io/humble/video/FilterAudioSink.h>
 
 namespace io {
 namespace humble {
@@ -188,8 +190,10 @@ protected:
 private:
   // Used to ensure we have the right frame-size for codecs that
   // require fixed frame sizes on audio.
-  io::humble::ferry::RefPointer<MediaAudioResampler> mAResampler;
-  io::humble::ferry::RefPointer<MediaAudio> mResampledAudio;
+  io::humble::ferry::RefPointer<FilterGraph> mAudioGraph;
+  io::humble::ferry::RefPointer<FilterAudioSource> mAudioSource;
+  io::humble::ferry::RefPointer<FilterAudioSink> mAudioSink;
+  io::humble::ferry::RefPointer<MediaAudio> mFilteredAudio;
 
   int64_t mLastPtsEncoded;
   int64_t mNumDroppedFrames;

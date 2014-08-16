@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
+ * Copyright (c) 2014, Art Clarke.  All rights reserved.
  *  
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -13,7 +13,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
@@ -198,15 +198,31 @@ Encoder::open(KeyValueBag * inputOptions, KeyValueBag* unsetOptions) {
           setState(STATE_ERROR);
           VS_THROW(HumbleRuntimeError("Codec requires fixed frame size, but does not specify frame size"));
         }
-        mAResampler = MediaAudioResampler::make(
-            getChannelLayout(),
+        /*
+         * This codec requires a fixed frame size, and we cannot guarantee our callers
+         * will always send in the right audio. So we're going to set up a filter chain
+         * whose sole purpose is to get us audio from the input format into right format
+         * for this codec
+         *
+         * For future features, this imposes a overhead for users who are smart enough
+         * to align frame-sizes, and we should provide an option to make this optional. But
+         * a learning from the past is to assume the callers don't actually know to make
+         * correctly aligned frames.
+         */
+        mAudioGraph = FilterGraph::make();
+        mAudioSource = mAudioGraph->addAudioSource("in",
             getSampleRate(),
+            getChannelLayout(),
             getSampleFormat(),
-            getChannelLayout(),
+            0);
+        mAudioSink = mAudioGraph->addAudioSink("out",
             getSampleRate(),
-            getSampleFormat()
-            );
-        mAResampler->open();
+            getChannelLayout(),
+            getSampleFormat());
+        // a graph that passes through the audio unmodified.
+        mAudioGraph->open("[in]anull[out]");
+        // now, fix the output frame size.
+        mAudioSink->setFrameSize(frameSize);
       }
       VS_LOG_TRACE("open Encoder@%p[t=AUDIO;sr=%"PRId32";c:%"PRId32";cl:%"PRId32";f=%"PRId32";]",
                    this,
@@ -252,7 +268,7 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* aFrame) {
   bool dropFrame = false;
 
   // copy the frame so we can modify meta-data
-  MediaPicture* frame = aFrame ? MediaPicture::make(aFrame, false) : 0;
+  RefPointer<MediaPicture> frame = aFrame ? MediaPicture::make(aFrame, false) : 0;
 
   if (frame) {
 
@@ -264,7 +280,7 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* aFrame) {
       VS_THROW(HumbleInvalidArgument("Passed in media must have a valid time stamp"));
     }
 
-    ensurePictureParamsMatch(frame);
+    ensurePictureParamsMatch(frame.value());
 
     RefPointer<Rational> frameTb = frame->getTimeBase();
     /**
@@ -411,19 +427,20 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
   if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
     // this codec requires that the right number of audio samples
     // gets passed in each call.
-    if (!mResampledAudio) {
+    if (!mFilteredAudio) {
       if (samples)
-        mResampledAudio = MediaAudio::make(getFrameSize(),
+        mFilteredAudio = MediaAudio::make(getFrameSize(),
             samples->getSampleRate(), samples->getChannels(),
             samples->getChannelLayout(), samples->getFormat());
     }
-    if (mResampledAudio) {
-      // This clearly does not work -- it should be maintaining frame size but
-      // it is not. Need a good think on the right way to solve this.
-      mAResampler->resample(mResampledAudio.value(), samples);
-      if (mResampledAudio->isComplete())
-        inputAudio = mResampledAudio.get();
-      else
+    if (mFilteredAudio) {
+      // add the samples, or null if empty.
+      mAudioSource->addAudio(samples);
+      // pull the sink.
+      mAudioSink->getAudio(mFilteredAudio.value());
+      if (mFilteredAudio->isComplete()) {
+        inputAudio = mFilteredAudio.get();
+      } else
         inputAudio = 0;
     }
     // now a sanity check
