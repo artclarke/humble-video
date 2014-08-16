@@ -174,10 +174,17 @@ public:
    * Reads the next packet in the Demuxer into the Packet.  This method will
    * release any buffers currently held by this packet and allocate
    * new ones.
+   * <p>
+   * For non-blocking IO data sources, it is possible for this method
+   * to return as successful but with no complete packet. In that case
+   * the caller should retry again later (think EAGAIN) semantics.
+   * </p>
    *
    * @param  packet [In/Out] The packet the Demuxer will read into.
    *
    * @return 0 if successful, or <0 if not.
+   * @throws RuntimeException if an error occurs except for EOF (in which case <0 returned)
+   *         or EAGAIN (in which case 0 returned with an incomplete packet).
    */
   virtual int32_t
   read(MediaPacket *packet)=0;
