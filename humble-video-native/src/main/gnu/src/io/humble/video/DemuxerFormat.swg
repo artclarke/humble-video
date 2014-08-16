@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-Forward, Andrew "Art" Clarke
+ * Copyright (c) 2014-Forward, Andrew "Art" Clarke
  *
  * This file is part of Humble Video.
  * 
@@ -15,8 +15,6 @@
  * 
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
- *
- * DemuxerFormat.swg
  *
  *  Created on: Jun 29, 2013
  *      Author: aclarke
