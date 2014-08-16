@@ -39,6 +39,5 @@ public:
   void testCreationFromBufferPacked();
   void testCreationFromBufferPlanar();
   void testCopy();
-  void testPushPop();
 };
 #endif /* MEDIAAUDIOTEST_H_ */
