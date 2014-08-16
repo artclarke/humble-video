@@ -301,7 +301,7 @@ DemuxerImpl::read(MediaPacket* ipkt) {
         }
       }
 
-      pkt->setComplete(true, pkt->getSize());
+      pkt->setComplete(pkt->getSize()>0, pkt->getSize());
     }
     char descr[256];
     pkt->logMetadata(descr, sizeof(descr));
@@ -311,6 +311,12 @@ DemuxerImpl::read(MediaPacket* ipkt) {
                  (int64_t)retval);
   }
   VS_CHECK_INTERRUPT(true);
+  // If we do not have enoughd ata, set retval to 0 and return. The caller
+  // should know to call again given that 0 bytes returned with incomplete
+  // packet.
+  if (retval == AVERROR(EAGAIN))
+    retval = 0;
+
   if (retval < 0 && retval != AVERROR_EOF)
     // throw exception in this case
     FfmpegException::check(retval, "exception on read of: %s; ", getURL());
