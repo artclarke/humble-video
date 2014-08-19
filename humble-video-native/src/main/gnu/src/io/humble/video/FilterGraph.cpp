@@ -23,10 +23,6 @@
  *      Author: aclarke
  */
 
-extern "C" {
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
-}
 #include "FilterGraph.h"
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>

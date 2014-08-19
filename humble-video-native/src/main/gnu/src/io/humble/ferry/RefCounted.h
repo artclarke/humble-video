@@ -23,9 +23,6 @@
 // For size_t
 #include <new>
 
-// For int32_t
-#include <inttypes.h>
-
 // for std::bad_alloc
 #include <stdexcept>
 

@@ -382,10 +382,10 @@ MediaAudio::logMetadata(char* buffer, size_t len)
   if (getPts() == Global::NO_PTS) {
     snprintf(pts, sizeof(pts), "NONE");
   } else
-    snprintf(pts, sizeof(pts), "%lld", getPts());
+    snprintf(pts, sizeof(pts), "%" PRId64, getPts());
 
   return snprintf(buffer, len,
-                  "MediaAudio@%p:[pts:%s;tb:%lld/%lld;sr:%lld;ch:%lld;fo:%lld;co:%s;sam:%lld]",
+                  "MediaAudio@%p:[pts:%s;tb:%" PRId64 "/%" PRId64 ";sr:%" PRId64 ";ch:%" PRId64 ";fo:%" PRId64 ";co:%s;sam:%" PRId64 "]",
                   this,
                   pts,
                   (int64_t)(tb?tb->getNumerator():0),

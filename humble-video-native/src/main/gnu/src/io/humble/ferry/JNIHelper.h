@@ -21,7 +21,6 @@
 #define JNIHELPER_H_
 
 #include <list>
-#include <inttypes.h>
 
 #include <io/humble/ferry/Ferry.h>
 #include <io/humble/ferry/HumbleException.h>

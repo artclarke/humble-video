@@ -59,4 +59,13 @@ namespace humble {}
 #undef JNICALL
 #define JNICALL VS_API_CALL
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 #endif // HUMBLE_H_

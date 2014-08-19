@@ -22,7 +22,6 @@
 
 #include <io/humble/Humble.h>
 #include <io/humble/video/FfmpegIncludes.h>
-#include <inttypes.h>
 
 namespace io {
 namespace humble {

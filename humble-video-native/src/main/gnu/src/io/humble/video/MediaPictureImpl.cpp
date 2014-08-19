@@ -267,10 +267,10 @@ MediaPictureImpl::logMetadata(char* buffer, size_t len)
   if (getPts() == Global::NO_PTS) {
     snprintf(pts, sizeof(pts), "NONE");
   } else
-    snprintf(pts, sizeof(pts), "%lld", getPts());
+    snprintf(pts, sizeof(pts), "%" PRId64, getPts());
 
   return snprintf(buffer, len,
-                  "MediaPictureo@%p:[pts:%s;tb:%lld/%lld;w:%lld;h:%lld;fo:%lld;co:%s]",
+                  "MediaPictureo@%p:[pts:%s;tb:%" PRId64 "/%" PRId64 ";w:%" PRId64 ";h:%" PRId64 ";fo:%" PRId64 ";co:%s]",
                   this,
                   pts,
                   (int64_t)(tb?tb->getNumerator():0),

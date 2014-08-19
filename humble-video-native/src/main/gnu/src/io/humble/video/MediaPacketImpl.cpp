@@ -371,15 +371,15 @@ namespace io { namespace humble { namespace video {
     if (getPts() == Global::NO_PTS) {
       snprintf(pts, sizeof(pts), "NONE");
     } else
-      snprintf(pts, sizeof(pts), "%lld", getPts());
+      snprintf(pts, sizeof(pts), "%" PRId64 "", getPts());
     char dts[48];
     if (getDts() == Global::NO_PTS) {
       snprintf(dts, sizeof(dts), "NONE");
     } else
-      snprintf(dts, sizeof(dts), "%lld", getDts());
+      snprintf(dts, sizeof(dts), "%" PRId64 "", getDts());
 
     return snprintf(buffer, len,
-                    "MediaPacket@%p:[i:%lld;pts:%s;dts:%s;dur:%lld;tb:%lld/%lld;coder:%p;co:%s;key:%s;size:%lld]",
+                    "MediaPacket@%p:[i:%" PRId64 ";pts:%s;dts:%s;dur:%" PRId64 ";tb:%" PRId64 "/%" PRId64 ";coder:%p;co:%s;key:%s;size:%" PRId64 "]",
                     this,
                     (int64_t)getStreamIndex(),
                     pts,
