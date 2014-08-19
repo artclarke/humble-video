@@ -371,8 +371,8 @@ Muxer::logWrite(Muxer* muxer, MediaPacket* in, MediaPacket* out, int32_t retval)
     out->logMetadata(outDescr, sizeof(outDescr));
   VS_LOG_TRACE("write Muxer@%p[out:%s;in:%s;e:%"  PRIi64 "]",
                muxer,
-               outDescr?outDescr:"(null)",
-               inDescr?inDescr:"(null)",
+               out?outDescr:"(null)",
+               in?inDescr:"(null)",
                (int64_t)retval);
 #endif // VS_DEBUG
 }
