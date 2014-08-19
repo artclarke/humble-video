@@ -438,6 +438,20 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
       mAudioSource->addAudio(samples);
       // pull the sink.
       mAudioSink->getAudio(mFilteredAudio.value());
+
+#ifdef VS_DEBUG
+  {
+    char outDescr[256]; *outDescr = 0;
+    char inDescr[256]; *inDescr = 0;
+    if (inputAudio) inputAudio->logMetadata(inDescr, sizeof(inDescr));
+    if (mFilteredAudio) mFilteredAudio->logMetadata(outDescr, sizeof(outDescr));
+    VS_LOG_TRACE("encodeAudio filterAudio Encoder@%p[out:%s;in:%s];",
+                 this,
+                 mFilteredAudio ? outDescr : "(null)",
+                 inputAudio ? inDescr : "(null)");
+  }
+#endif
+
       if (mFilteredAudio->isComplete()) {
         inputAudio = mFilteredAudio.get();
       } else
@@ -453,39 +467,60 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
     }
   }
 
-  AVFrame* in = inputAudio ? inputAudio->getCtx() : 0;
-  AVPacket* out = output->getCtx();
+  // only encode if (a) we've been asked to flush or (b) we have complete
+  // audio, even if we had to filter it to get a minimum frame.
+  if (!samples || (inputAudio && inputAudio->isComplete())){
+    AVFrame* in = inputAudio ? inputAudio->getCtx() : 0;
+    AVPacket* out = output->getCtx();
 
-  int got_frame = 0;
-  int oldStreamIndex = output->getStreamIndex();
-  int e = 0;
-  if (!dropFrame)
-    avcodec_encode_audio2(getCodecCtx(), out, in, &got_frame);
-  // some codec erroneously set stream_index, but our encoders are always
-  // muxer independent. we fix that here.
-  output->setStreamIndex(oldStreamIndex);
-  if (got_frame) {
-    output->setCoder(this);
-    output->setTimeBase(coderTb.value());
-    output->setComplete(true, out->size);
-  } else {
-    output->setComplete(false, 0);
-  }
+    int got_frame = 0;
+    int oldStreamIndex = output->getStreamIndex();
+    int e = 0;
+    if (!dropFrame)
+      avcodec_encode_audio2(getCodecCtx(), out, in, &got_frame);
+    // some codec erroneously set stream_index, but our encoders are always
+    // muxer independent. we fix that here.
+    output->setStreamIndex(oldStreamIndex);
+    if (got_frame) {
+      output->setCoder(this);
+      output->setTimeBase(coderTb.value());
+      output->setComplete(true, out->size);
+    } else {
+      output->setComplete(false, 0);
+    }
 
 #ifdef VS_DEBUG
-  char outDescr[256]; *outDescr = 0;
-  char inDescr[256]; *inDescr = 0;
-  if (samples) samples->logMetadata(inDescr, sizeof(inDescr));
-  if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
-  VS_LOG_TRACE("encodeAudio Encoder@%p[out:%s;in:%s;encoded:%" PRIi64,
-               this,
-               outDescr,
-               inDescr,
-               (int64_t)e);
+    {
+      char outDescr[256]; *outDescr = 0;
+      char inDescr[256]; *inDescr = 0;
+      if (inputAudio) inputAudio->logMetadata(inDescr, sizeof(inDescr));
+      if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+      VS_LOG_TRACE("encodeAudio Encoder@%p[out:%s;in:%s;encoded:%" PRIi64 "]",
+                   this,
+                   aOutput ? outDescr : "(null)",
+                       inputAudio ? inDescr : "(null)",
+                           (int64_t)e);
+    }
 #endif
 
 
-  FfmpegException::check(e, "could not encode audio ");
+    FfmpegException::check(e, "could not encode audio ");
+  } else {
+#ifdef VS_DEBUG
+    {
+      char outDescr[256]; *outDescr = 0;
+      char inDescr[256]; *inDescr = 0;
+      if (inputAudio) inputAudio->logMetadata(inDescr, sizeof(inDescr));
+      if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+      VS_LOG_TRACE("encodeAudio Encoder@%p[out:%s;in:%s;message:not enough audio staged yet]",
+                   this,
+                   aOutput ? outDescr : "(null)",
+                       inputAudio ? inDescr : "(null)");
+    }
+#endif
+
+
+  }
 }
 
 } /* namespace video */
