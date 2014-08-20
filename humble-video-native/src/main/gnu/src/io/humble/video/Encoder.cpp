@@ -400,29 +400,6 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
   if (samples) {
     // make copy so we can modify meta-data
     inputAudio = MediaAudio::make(samples, false);
-    RefPointer<Rational> inputAudioTb = inputAudio->getTimeBase();
-    /**
-     * check time stamps and drop frames when needed if the time
-     * base of the input frame cannot be converted to the encoder
-     * time base without rounding.
-     *
-     */
-    int64_t inTs = coderTb->rescale(inputAudio->getTimeStamp(), inputAudioTb.value(), Rational::ROUND_DOWN);
-    if (mLastPtsEncoded != Global::NO_PTS) {
-      if (inTs <= mLastPtsEncoded) {
-        VS_LOG_DEBUG(
-            "Encoder@%p Dropping frame with timestamp %lld (if coder supports higher time-base use that instead)",
-            this,
-            inputAudio->getPts());
-        dropFrame = true;
-      }
-    }
-    if (!dropFrame) {
-        mLastPtsEncoded = inTs;
-        inputAudio->setTimeBase(coderTb.value());
-        // set the timestamp after the timbase as setTimeBase does a conversion.
-        inputAudio->setTimeStamp(inTs);
-    }
   }
   if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
     // this codec requires that the right number of audio samples
@@ -456,6 +433,31 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
         inputAudio = mFilteredAudio.get();
       } else
         inputAudio = 0;
+    }
+    if (inputAudio) {
+      RefPointer<Rational> inputAudioTb = inputAudio->getTimeBase();
+      /**
+       * check time stamps and drop frames when needed if the time
+       * base of the input frame cannot be converted to the encoder
+       * time base without rounding.
+       *
+       */
+      int64_t inTs = coderTb->rescale(inputAudio->getTimeStamp(), inputAudioTb.value(), Rational::ROUND_DOWN);
+      if (mLastPtsEncoded != Global::NO_PTS) {
+        if (inTs <= mLastPtsEncoded) {
+          VS_LOG_DEBUG(
+              "Encoder@%p Dropping frame with timestamp %lld (if coder supports higher time-base use that instead)",
+              this,
+              inputAudio->getPts());
+          dropFrame = true;
+        }
+      }
+      if (!dropFrame) {
+          mLastPtsEncoded = inTs;
+          inputAudio->setTimeBase(coderTb.value());
+          // set the timestamp after the timbase as setTimeBase does a conversion.
+          inputAudio->setTimeStamp(inTs);
+      }
     }
     // now a sanity check
     if (!(!samples || !inputAudio || inputAudio->getNumSamples() == getFrameSize())) {
