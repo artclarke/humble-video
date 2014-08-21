@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
@@ -31,7 +31,9 @@
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaSubtitle.h>
-#include <io/humble/video/MediaAudioResampler.h>
+#include <io/humble/video/FilterGraph.h>
+#include <io/humble/video/FilterAudioSource.h>
+#include <io/humble/video/FilterAudioSink.h>
 
 namespace io {
 namespace humble {
@@ -172,7 +174,7 @@ public:
    *
    */
   virtual void encode(MediaPacket * output,
-      Media* media);
+      MediaSampled* media);
 #if 0
 #ifndef SWIG
   virtual int32_t acquire();
@@ -181,14 +183,17 @@ public:
 #endif // 0
 
 protected:
+  virtual void checkOptionsBeforeOpen();
   Encoder(Codec*, AVCodecContext* src, bool copySrc);
   virtual
   ~Encoder();
 private:
   // Used to ensure we have the right frame-size for codecs that
   // require fixed frame sizes on audio.
-  io::humble::ferry::RefPointer<MediaAudioResampler> mAResampler;
-  io::humble::ferry::RefPointer<MediaAudio> mResampledAudio;
+  io::humble::ferry::RefPointer<FilterGraph> mAudioGraph;
+  io::humble::ferry::RefPointer<FilterAudioSource> mAudioSource;
+  io::humble::ferry::RefPointer<FilterAudioSink> mAudioSink;
+  io::humble::ferry::RefPointer<MediaAudio> mFilteredAudio;
 
   int64_t mLastPtsEncoded;
   int64_t mNumDroppedFrames;

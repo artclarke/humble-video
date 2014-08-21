@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
@@ -31,7 +31,7 @@
 #include "KeyValueBagImpl.h"
 #include "VideoExceptions.h"
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Demuxer);
 
 using namespace io::humble::video::customio;
 using namespace io::humble::ferry;
@@ -53,6 +53,7 @@ DemuxerImpl::DemuxerImpl() {
   mCtx->interrupt_callback.callback = Global::avioInterruptCB;
   mCtx->interrupt_callback.opaque = this;
   mState = STATE_INITED;
+  VS_LOG_TRACE("Created: %p");
 }
 
 DemuxerImpl::~DemuxerImpl() {
@@ -65,6 +66,7 @@ DemuxerImpl::~DemuxerImpl() {
   }
   if (mCtx)
     avformat_free_context(mCtx);
+  VS_LOG_TRACE("Destroyed: %p");
 }
 
 AVFormatContext*
@@ -169,6 +171,9 @@ DemuxerImpl::open(const char *url, DemuxerFormat* format,
     mState = STATE_ERROR;
     FfmpegException::check(retval, "Error opening url: %s; ", url);
   }
+  VS_LOG_TRACE("open Demuxer@%p[url:%s;]",
+               this,
+               this->getURL());
   if (queryMetaData)
     queryStreamMetaData();
   return;
@@ -274,35 +279,44 @@ DemuxerImpl::read(MediaPacket* ipkt) {
     while (retval == AVERROR(EAGAIN) &&
         (mReadRetryMax < 0 || numReads <= mReadRetryMax));
 
-    // and dump it's contents
-    VS_LOG_TRACE("read: %lld, %lld, %d, %d, %d, %lld, %lld: %p",
-        pkt->getDts(),
-        pkt->getPts(),
-        pkt->getFlags(),
-        pkt->getStreamIndex(),
-        pkt->getSize(),
-        pkt->getDuration(),
-        pkt->getPosition(),
-        packet->data);
-
     // and let's try to set the packet time base if known
     if (retval >= 0) {
       if (pkt->getStreamIndex() >= 0)
       {
-        RefPointer<DemuxerStream> stream = this->getStream(pkt->getStreamIndex());
+        // Get a Container Stream rather than a DemuxerStream; this avoids unnecessarily
+        // recreating all the demuxer streams, decoders and codecs.
+        Container::Stream* stream = ((Container*)this)->getStream(pkt->getStreamIndex());
         if (stream)
         {
-          RefPointer<Rational> streamBase = stream->getTimeBase();
+          // let's set the packet coder.
+          RefPointer<Coder> coder = stream->getCoder();
+          pkt->setCoder(coder.value());
+          AVStream* avStream = stream->getCtx();
+          RefPointer<Rational> streamBase = Rational::make(avStream->time_base.num,
+                                                           avStream->time_base.den);
           if (streamBase)
           {
             pkt->setTimeBase(streamBase.value());
           }
         }
       }
-      pkt->setComplete(true, pkt->getSize());
+
+      pkt->setComplete(pkt->getSize()>0, pkt->getSize());
     }
+    char descr[256];
+    pkt->logMetadata(descr, sizeof(descr));
+    VS_LOG_TRACE("read Demuxer@%p[p:%s;e:%"  PRIi64 "]",
+                 this,
+                 descr,
+                 (int64_t)retval);
   }
   VS_CHECK_INTERRUPT(true);
+  // If we do not have enoughd ata, set retval to 0 and return. The caller
+  // should know to call again given that 0 bytes returned with incomplete
+  // packet.
+  if (retval == AVERROR(EAGAIN))
+    retval = 0;
+
   if (retval < 0 && retval != AVERROR_EOF)
     // throw exception in this case
     FfmpegException::check(retval, "exception on read of: %s; ", getURL());

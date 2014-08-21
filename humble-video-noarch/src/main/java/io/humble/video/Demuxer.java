@@ -174,13 +174,6 @@ public class Demuxer extends Container {
  * <p>The caller must call #close() when done, but if not, the<br>
  * Demuxer will eventually close<br>
  * them later but warn to the logging system.<br>
- * </p><p>If the current thread is interrupted while this blocking method<br>
- * is running the method will return with a negative value.<br>
- * To check if the method exited because of an interruption<br>
- * pass the return value to Error#make(int) and then<br>
- * check Error#getType() to see if it is<br>
- * Error.Type#ERROR_INTERRUPTED.<br>
- * </p><br>
  * <br>
  * @param url The resource to open; The format of this string is any<br>
  *   url that FFMPEG supports (including additional protocols if added<br>
@@ -211,13 +204,6 @@ public class Demuxer extends Container {
 /**
  * Close the container.  open() must have been called first, or<br>
  * else an error is returned.<br>
- * <p>If the current thread is interrupted while this blocking method<br>
- * is running the method will return with a negative value.<br>
- * To check if the method exited because of an interruption<br>
- * pass the return value to Error#make(int) and then<br>
- * check Error#getType() to see if it is<br>
- * Error.Type#ERROR_INTERRUPTED.<br>
- * </p><br>
  * <p><br>
  * If this method exits because of an interruption,<br>
  * all resources will be closed anyway.<br>
@@ -242,17 +228,17 @@ public class Demuxer extends Container {
  * Reads the next packet in the Demuxer into the Packet.  This method will<br>
  * release any buffers currently held by this packet and allocate<br>
  * new ones.<br>
- * <p>If the current thread is interrupted while this blocking method<br>
- * is running the method will return with a negative value.<br>
- * To check if the method exited because of an interruption<br>
- * pass the return value to Error#make(int) and then<br>
- * check Error#getType() to see if it is<br>
- * Error.Type#ERROR_INTERRUPTED.<br>
+ * <p><br>
+ * For non-blocking IO data sources, it is possible for this method<br>
+ * to return as successful but with no complete packet. In that case<br>
+ * the caller should retry again later (think EAGAIN) semantics.<br>
  * </p><br>
  * <br>
  * @param packet [In/Out] The packet the Demuxer will read into.<br>
  * <br>
- * @return 0 if successful, or &lt;0 if not.
+ * @return 0 if successful, or &lt;0 if not.<br>
+ * @throws RuntimeException if an error occurs except for EOF (in which case &lt;0 returned)<br>
+ *         or EAGAIN (in which case 0 returned with an incomplete packet).
  */
   public int read(MediaPacket packet) throws java.lang.InterruptedException, java.io.IOException {
     return VideoJNI.Demuxer_read(swigCPtr, this, MediaPacket.getCPtr(packet), packet);
@@ -266,13 +252,7 @@ public class Demuxer extends Container {
  * read packets, but this method can be non-blocking potentially until end of container<br>
  * to get all meta data.  Take care when you call it.<br>
  * </p><p>After this method is called, other meta data methods like #getDuration() should<br>
- * work.</p> <p>If the current thread is interrupted while this blocking method<br>
- * is running the method will return with a negative value.<br>
- * To check if the method exited because of an interruption<br>
- * pass the return value to Error#make(int) and then<br>
- * check Error#getType() to see if it is<br>
- * Error.Type#ERROR_INTERRUPTED.<br>
- * </p>
+ * work.</p>
  */
   public void queryStreamMetaData() throws java.lang.InterruptedException, java.io.IOException {
     VideoJNI.Demuxer_queryStreamMetaData(swigCPtr, this);

@@ -312,7 +312,7 @@ public class MediaPacket extends MediaEncoded {
 /**
  * Get the container-specific index for the stream this packet is<br>
  * part of.<br>
- * @return Stream in container that this packet has data for.
+ * @return Stream in container that this packet has data for, or &lt;0 if unsure.
  */
   public int getStreamIndex() {
     return VideoJNI.MediaPacket_getStreamIndex(swigCPtr, this);
@@ -446,12 +446,10 @@ public class MediaPacket extends MediaEncoded {
  *   may allocate a larger payloadSize.<br>
  * </p><br>
  * @param payloadSize The (minimum) payloadSize of this packet in bytes. It is ok to<br>
- *   pass in 0 here, in which case the packet will later allocate memory if needed.<br>
- * <br>
- * @return &gt;= 0 if successful.  &lt; 0 if error.
+ *   pass in 0 here, in which case the packet will later allocate memory if needed.
  */
-  public int reset(int payloadSize) {
-    return VideoJNI.MediaPacket_reset(swigCPtr, this, payloadSize);
+  public void reset(int payloadSize) {
+    VideoJNI.MediaPacket_reset(swigCPtr, this, payloadSize);
   }
 
   public enum SideDataType {

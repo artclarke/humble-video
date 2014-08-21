@@ -1,21 +1,21 @@
-/*
- * Copyright (c) 2013-Forward, Andrew "Art" Clarke
+/*******************************************************************************
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
+ * This file is part of Humble-Video.
  *
- * This file is part of Humble Video.
- * 
- * Humble Video is free software: you can redistribute it and/or modify
+ * Humble-Video is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * Humble Video is distributed in the hope that it will be useful,
+ *
+ * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
- * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/ferry/Logger.h>
@@ -26,7 +26,7 @@
 #include <io/humble/video/Property.h>
 #include <io/humble/video/VideoExceptions.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.MediaPictureResampler);
 
 using namespace io::humble::ferry;
 
@@ -92,8 +92,21 @@ void
 MediaPictureResamplerImpl::open() {
   mState = STATE_OPENED;
 }
-void
-MediaPictureResamplerImpl :: resample(MediaPicture* pOutFrame, MediaPicture* pInFrame)
+
+int32_t
+MediaPictureResamplerImpl::resample(MediaSampled* aOut, MediaSampled* aIn)
+{
+  MediaPicture* out = dynamic_cast<MediaPicture*>(aOut);
+  MediaPicture* in  = dynamic_cast<MediaPicture*>(aIn);
+  if (aOut && !out)
+    VS_THROW(HumbleInvalidArgument("out must be a MediaPicture object"));
+  if (aIn && !in)
+    VS_THROW(HumbleInvalidArgument("in must be a MediaPicture object"));
+  return resamplePicture(out, in);
+}
+
+int32_t
+MediaPictureResamplerImpl :: resamplePicture(MediaPicture* pOutFrame, MediaPicture* pInFrame)
 {
   int32_t retval = -1;
   if (mState != STATE_OPENED) {
@@ -140,6 +153,7 @@ MediaPictureResamplerImpl :: resample(MediaPicture* pOutFrame, MediaPicture* pIn
   outFrame->setQuality(inFrame->getQuality());
   outFrame->setComplete(retval >= 0);
 
+  return retval;
 }
 
 MediaPictureResamplerImpl*

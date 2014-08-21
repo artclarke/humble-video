@@ -244,8 +244,8 @@ public class Encoder extends Coder {
  * media object do not align (e.g. if you pass in a MediaPicture but the<br>
  * CodecType is audio data).
  */
-  public void encode(MediaPacket output, Media media) {
-    VideoJNI.Encoder_encode(swigCPtr, this, MediaPacket.getCPtr(output), output, Media.getCPtr(media), media);
+  public void encode(MediaPacket output, MediaSampled media) {
+    VideoJNI.Encoder_encode(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaSampled.getCPtr(media), media);
   }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-Forward, Andrew "Art" Clarke
+ * Copyright (c) 2014-Forward, Andrew "Art" Clarke
  *
  * This file is part of Humble Video.
  * 

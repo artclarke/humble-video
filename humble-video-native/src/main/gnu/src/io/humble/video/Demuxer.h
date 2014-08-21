@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
@@ -121,13 +121,6 @@ public:
    * <p>The caller must call #close() when done, but if not, the
    * Demuxer will eventually close
    * them later but warn to the logging system.
-   * </p><p>If the current thread is interrupted while this blocking method
-   * is running the method will return with a negative value.
-   * To check if the method exited because of an interruption
-   * pass the return value to Error#make(int) and then
-   * check Error#getType() to see if it is
-   * Error.Type#ERROR_INTERRUPTED.
-   * </p>
    *
    * @param url The resource to open; The format of this string is any
    *   url that FFMPEG supports (including additional protocols if added
@@ -159,13 +152,6 @@ public:
   /**
    * Close the container.  open() must have been called first, or
    * else an error is returned.
-   * <p>If the current thread is interrupted while this blocking method
-   * is running the method will return with a negative value.
-   * To check if the method exited because of an interruption
-   * pass the return value to Error#make(int) and then
-   * check Error#getType() to see if it is
-   * Error.Type#ERROR_INTERRUPTED.
-   * </p>
    * <p>
    * If this method exits because of an interruption,
    * all resources will be closed anyway.
@@ -188,17 +174,17 @@ public:
    * Reads the next packet in the Demuxer into the Packet.  This method will
    * release any buffers currently held by this packet and allocate
    * new ones.
-   * <p>If the current thread is interrupted while this blocking method
-   * is running the method will return with a negative value.
-   * To check if the method exited because of an interruption
-   * pass the return value to Error#make(int) and then
-   * check Error#getType() to see if it is
-   * Error.Type#ERROR_INTERRUPTED.
+   * <p>
+   * For non-blocking IO data sources, it is possible for this method
+   * to return as successful but with no complete packet. In that case
+   * the caller should retry again later (think EAGAIN) semantics.
    * </p>
    *
    * @param  packet [In/Out] The packet the Demuxer will read into.
    *
    * @return 0 if successful, or <0 if not.
+   * @throws RuntimeException if an error occurs except for EOF (in which case <0 returned)
+   *         or EAGAIN (in which case 0 returned with an incomplete packet).
    */
   virtual int32_t
   read(MediaPacket *packet)=0;
@@ -211,13 +197,7 @@ public:
    * read packets, but this method can be non-blocking potentially until end of container
    * to get all meta data.  Take care when you call it.
    * </p><p>After this method is called, other meta data methods like #getDuration() should
-   * work.</p> <p>If the current thread is interrupted while this blocking method
-   * is running the method will return with a negative value.
-   * To check if the method exited because of an interruption
-   * pass the return value to Error#make(int) and then
-   * check Error#getType() to see if it is
-   * Error.Type#ERROR_INTERRUPTED.
-   * </p>
+   * work.</p>
    *
    */
   virtual void

@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
@@ -28,7 +28,7 @@
 #include <cstring>
 #include <stdexcept>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.MediaPacket);
 
 using namespace io::humble::ferry;
   
@@ -44,6 +44,8 @@ namespace io { namespace humble { namespace video {
     // initialize because ffmpeg doesn't
     mPacket->data = 0;
     mPacket->size = 0;
+    // set this to -1 if it's not set.
+    mPacket->stream_index = -1;
     mIsComplete = false;
   }
 
@@ -205,46 +207,49 @@ namespace io { namespace humble { namespace video {
   {
     RefPointer<MediaPacketImpl> retval;
     RefPointer<Rational> timeBase;
+    RefPointer<Coder> coder;
     if (!packet) {
       VS_THROW(HumbleInvalidArgument("no packet"));
     }
 
-      // use the nice copy method.
-      retval = make();
-      int32_t r = av_copy_packet(retval->mPacket, packet->mPacket);
-      FfmpegException::check(r, "could not copy packet ");
-      int32_t numBytes = packet->getSize();
-      if (copyData && numBytes > 0)
-      {
-        if (!retval || !retval->mPacket || !retval->mPacket->data) {
-          VS_THROW(HumbleBadAlloc());
-        }
-
-        // we don't just want to reference count the data -- we want
-        // to copy it. So we're going to create a new copy.
-        RefPointer<Buffer> copy = Buffer::make(retval.value(), numBytes + FF_INPUT_BUFFER_PADDING_SIZE);
-        uint8_t* data = (uint8_t*)copy->getBytes(0, numBytes);
-
-        // copy the data into our Buffer backed data
-        memcpy(data, packet->mPacket->data,
-            numBytes);
-
-        // now, release the reference currently in the packet
-        if (retval->mPacket->buf)
-          av_buffer_unref(&retval->mPacket->buf);
-        retval->mPacket->buf = AVBufferSupport::wrapBuffer(copy.value());
-        // and set the data member to the copy
-        retval->mPacket->data = retval->mPacket->buf->data;
-        retval->mPacket->size = numBytes;
-
+    // use the nice copy method.
+    retval = make();
+    int32_t r = av_copy_packet(retval->mPacket, packet->mPacket);
+    FfmpegException::check(r, "could not copy packet ");
+    int32_t numBytes = packet->getSize();
+    if (copyData && numBytes > 0)
+    {
+      if (!retval || !retval->mPacket || !retval->mPacket->data) {
+        VS_THROW(HumbleBadAlloc());
       }
-      // separate here to catch addRef()
-      timeBase = packet->getTimeBase();
-      retval->setTimeBase(timeBase.value());
 
-      retval->setComplete(retval->mPacket->size > 0,
-          retval->mPacket->size);
-    
+      // we don't just want to reference count the data -- we want
+      // to copy it. So we're going to create a new copy.
+      RefPointer<Buffer> copy = Buffer::make(retval.value(), numBytes + FF_INPUT_BUFFER_PADDING_SIZE);
+      uint8_t* data = (uint8_t*)copy->getBytes(0, numBytes);
+
+      // copy the data into our Buffer backed data
+      memcpy(data, packet->mPacket->data,
+             numBytes);
+
+      // now, release the reference currently in the packet
+      if (retval->mPacket->buf)
+        av_buffer_unref(&retval->mPacket->buf);
+      retval->mPacket->buf = AVBufferSupport::wrapBuffer(copy.value());
+      // and set the data member to the copy
+      retval->mPacket->data = retval->mPacket->buf->data;
+      retval->mPacket->size = numBytes;
+
+    }
+    // separate here to catch addRef()
+    timeBase = packet->getTimeBase();
+    retval->setTimeBase(timeBase.value());
+    coder = packet->getCoder();
+    retval->setCoder(coder.value());
+
+    retval->setComplete(retval->mPacket->size > 0,
+                        retval->mPacket->size);
+
     return retval.get();
   }
   
@@ -256,16 +261,21 @@ namespace io { namespace humble { namespace video {
   }
 
 
-  int32_t
+  void
   MediaPacketImpl::reset(int32_t payloadSize)
   {
+    int32_t e=-1;
     av_free_packet(mPacket);
     if (payloadSize > 0)
-      return av_new_packet(mPacket, payloadSize);
+      e = av_new_packet(mPacket, payloadSize);
     else {
       av_init_packet(mPacket);
-      return 0;
+      e = 0;
     }
+    FfmpegException::check(e, "Could not reset packet.");
+
+    // set this to -1 if it's not set.
+    mPacket->stream_index = -1;
   }
 
   void
@@ -345,6 +355,43 @@ namespace io { namespace humble { namespace video {
     if (!mPacket->side_data)
       throw HumbleRuntimeError("no data where data expected");
     return (MediaPacket::SideDataType)mPacket->side_data[n].type;
+  }
+  Coder*
+  MediaPacketImpl::getCoder() {
+    return mCoder.get();
+  }
+  void
+  MediaPacketImpl::setCoder(Coder* coder) {
+    mCoder.reset(coder, true);
+  }
+  int64_t
+  MediaPacketImpl::logMetadata(char* buffer, size_t len)
+  {
+    char pts[48];
+    if (getPts() == Global::NO_PTS) {
+      snprintf(pts, sizeof(pts), "NONE");
+    } else
+      snprintf(pts, sizeof(pts), "%" PRId64 "", getPts());
+    char dts[48];
+    if (getDts() == Global::NO_PTS) {
+      snprintf(dts, sizeof(dts), "NONE");
+    } else
+      snprintf(dts, sizeof(dts), "%" PRId64 "", getDts());
+
+    return snprintf(buffer, len,
+                    "MediaPacket@%p:[i:%" PRId64 ";pts:%s;dts:%s;dur:%" PRId64 ";tb:%" PRId64 "/%" PRId64 ";coder:%p;co:%s;key:%s;size:%" PRId64 "]",
+                    this,
+                    (int64_t)getStreamIndex(),
+                    pts,
+                    dts,
+                    (int64_t)getDuration(),
+                    (int64_t)(mTimeBase.value()?mTimeBase->getNumerator():0),
+                    (int64_t)(mTimeBase.value()?mTimeBase->getDenominator():0),
+                    mCoder.value(),
+                    isComplete()?"true":"false",
+                    isKey()?"true":"false",
+                    (int64_t)getSize()
+                    );
   }
 
 }}}

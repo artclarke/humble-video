@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
@@ -33,7 +33,7 @@
 #include "KeyValueBagImpl.h"
 #include "MediaPacketImpl.h"
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Muxer);
 
 using namespace io::humble::ferry;
 using namespace io::humble::video::customio;
@@ -96,6 +96,7 @@ Muxer::Muxer(MuxerFormat* format, const char* filename,
               filename, formatName));
     }
   }
+  VS_LOG_TRACE("Created: %p", this);
 }
 
 Muxer::~Muxer() {
@@ -112,6 +113,7 @@ Muxer::~Muxer() {
     }
     avformat_free_context(mCtx);
   }
+  VS_LOG_TRACE("Destroyed: %p", this);
 }
 
 Muxer*
@@ -234,6 +236,8 @@ Muxer::open(KeyValueBag *aInputOptions, KeyValueBag* aOutputOptions) {
   if (tmp) av_dict_free(&tmp);
 
   mState = STATE_OPENED;
+  // let's log the state of the world.
+  logOpen(this);
 }
 
 void
@@ -321,6 +325,16 @@ Muxer::addNewStream(Coder* aCoder) {
   stream->setCoder(coder.value());
 
   r.reset(this->getStream(avStream->index), false);
+
+
+  // let's log the state of the world.
+  VS_LOG_TRACE("addNewStream Muxer@%p[i:%"PRId32";c:%p;tb:%"PRId32"/%"PRId32"]",
+               this,
+               (int32_t)avStream->index,
+               coder.value(),
+               (int32_t)avStream->time_base.num,
+               (int32_t)avStream->time_base.den
+               );
   return r.get();
 }
 
@@ -338,6 +352,66 @@ Muxer::getStream(int32_t i) {
   return MuxerStream::make(this, i);
 }
 
+
+void
+Muxer::logWrite(Muxer* muxer, MediaPacket* in, MediaPacket* out, int32_t retval)
+{
+  // necessary to avoid a compiler warning in release mode since
+  // in that case, this is a NO_OP method.
+  (void) muxer;
+  (void) in;
+  (void) out;
+  (void) retval;
+#ifdef VS_DEBUG
+  char inDescr[256];
+  char outDescr[256];
+  if (in)
+    in->logMetadata(inDescr, sizeof(inDescr));
+  if (out)
+    out->logMetadata(outDescr, sizeof(outDescr));
+  VS_LOG_TRACE("write Muxer@%p[out:%s;in:%s;e:%"  PRIi64 "]",
+               muxer,
+               out?outDescr:"(null)",
+               in?inDescr:"(null)",
+               (int64_t)retval);
+#endif // VS_DEBUG
+}
+
+void
+Muxer::logOpen(Muxer* muxer) {
+  (void) muxer;
+#ifdef VS_DEBUG
+  // We only do this in debug mode. Because a muxer can have effectively
+  // an unlimited number of strings, we need to build our log up piece meal.
+
+  int32_t n = muxer->getNumStreams();
+
+  char msg[4096];
+  char* buf = msg;
+  size_t bufSize = sizeof(msg);
+  int32_t chars = snprintf(buf, bufSize, "open Muxer@%p[u:%s;n:%"PRId32";", muxer,
+                           muxer->getURL(),
+                           (int32_t)n);
+  buf += chars;
+  bufSize -= chars;
+
+  for(int i = 0; i < n; i++) {
+    Container::Stream* s = ((Container*)muxer)->getStream(i);
+    RefPointer<Coder> c = s->getCoder();
+    AVStream* avStream = s->getCtx();
+    chars = snprintf(buf, bufSize, "s@%"PRId32"[c:%p;tb:%"PRId32"/%"PRId32"];",
+           (int32_t)i,
+           c.value(),
+           (int32_t)avStream->time_base.num,
+           (int32_t)avStream->time_base.den
+    );
+    buf+= chars;
+    bufSize -= chars;
+  }
+  chars = snprintf(buf, bufSize, "]");
+  VS_LOG_TRACE(msg);
+#endif
+}
 
 bool
 Muxer::write(MediaPacket* aPacket, bool forceInterleave) {
@@ -361,11 +435,32 @@ Muxer::write(MediaPacket* aPacket, bool forceInterleave) {
     VS_THROW(HumbleRuntimeError("Cannot write empty packet"));
   }
 
-  // Get the stream for the packet
-  Container::Stream* stream = Container::getStream(packet->getStreamIndex());
-
   // we copy the metadata into a new packet, but not the actual data.
   RefPointer<MediaPacketImpl> outPacket = MediaPacketImpl::make(packet, false);
+
+  Container::Stream* stream=0;
+
+  int32_t index = outPacket->getStreamIndex();
+  if (index < 0) {
+    RefPointer<Coder> encoder = packet->getCoder();
+    for(int i = 0; i < numStreams; i++) {
+      stream = Container::getStream(i);
+      RefPointer<Coder> streamCoder = stream->getCoder();
+      Coder *a = encoder.value();
+      Coder *b = streamCoder.value();
+      if (b && a == b) {
+        // this is the one we actually care about.
+        outPacket->setStreamIndex(i);
+        break;
+      }
+      stream = 0;
+    }
+  } else {
+    stream = Container::getStream(index);
+  }
+  if (!stream) {
+    VS_THROW(HumbleRuntimeError("Could not find stream that corresponds to this packet. Did you add it?"));
+  }
 
   // then we adjust timestamps if necessary for this muxer.
   stampOutputPacket(stream, outPacket.value());
@@ -379,6 +474,7 @@ Muxer::write(MediaPacket* aPacket, bool forceInterleave) {
   else
     e = av_write_frame(getFormatCtx(), out);
   popCoders();
+  Muxer::logWrite(this, aPacket, outPacket.value(), e);
   FfmpegException::check(e, "Could not write packet to muxer ");
   if (e == 1)
     allDataFlushed = true;
@@ -393,12 +489,14 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
     VS_THROW(HumbleInvalidArgument("no packet specified"));
   }
 
-  //    VS_LOG_DEBUG("input:  duration: %lld; dts: %lld; pts: %lld;",
-  //        packet->getDuration(), packet->getDts(), packet->getPts());
+  // let's record these for posterity. We'll output it later.
+  RefPointer<MediaPacket> origPacket = MediaPacket::make(packet, false);
 
-  // Always just reset this; cheaper than checking if it's
-  // already set
-  packet->setStreamIndex(stream->getIndex());
+  if (packet->getStreamIndex() < 0)
+    packet->setStreamIndex(stream->getIndex());
+  else if (packet->getStreamIndex() != stream->getIndex())
+    VS_THROW(HumbleInvalidArgument::make("Packet with stream index %d unexpectedly passed to stream #%d",
+                                   packet->getStreamIndex(), stream->getIndex()));
 
   AVStream* avStream = stream->getCtx();
 
@@ -408,9 +506,6 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
     VS_THROW(HumbleRuntimeError("no timebases on either stream or packet"));
   }
   if (thisBase->compareTo(packetBase.value()) == 0) {
-    //      VS_LOG_DEBUG("Same timebase: %d/%d vs %d/%d",
-    //          thisBase->getNumerator(), thisBase->getDenominator(),
-    //          packetBase->getNumerator(), packetBase->getDenominator());
     // it's already got the right time values
     return;
   }
@@ -419,7 +514,8 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
   int64_t dts = packet->getDts();
   int64_t pts = packet->getPts();
 
-  if (duration >= 0) duration = thisBase->rescale(duration, packetBase.value(),
+  if (duration >= 0)
+    duration = thisBase->rescale(duration, packetBase.value(),
       Rational::ROUND_DOWN);
 
   if (pts != Global::NO_PTS) {
@@ -443,14 +539,10 @@ Muxer::stampOutputPacket(Container::Stream* stream, MediaPacket* packet) {
     stream->setLastDts(dts);
   }
 
-  //    VS_LOG_DEBUG("output: duration: %lld; dts: %lld; pts: %lld;",
-  //        duration, dts, pts);
   packet->setDuration(duration);
   packet->setPts(pts);
   packet->setDts(dts);
   packet->setTimeBase(thisBase.value());
-  //    VS_LOG_DEBUG("Reset timebase: %d/%d",
-  //        thisBase->getNumerator(), thisBase->getDenominator());
 }
 
 

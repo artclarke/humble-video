@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
@@ -30,7 +30,7 @@
 
 using namespace io::humble::ferry;
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Encoder);
 
 namespace io {
 namespace humble {
@@ -62,10 +62,11 @@ Encoder::Encoder(Codec* codec, AVCodecContext* src, bool copySrc) : Coder(codec,
   mNumDroppedFrames = 0;
   mLastPtsEncoded = Global::NO_PTS;
 
-  VS_LOG_TRACE("Created encoder");
+  VS_LOG_TRACE("Created: %p", this);
 }
 
 Encoder::~Encoder() {
+  VS_LOG_TRACE("Destroyed: %p", this);
 }
 
 Encoder*
@@ -125,28 +126,127 @@ Encoder::make(Codec* codec, AVCodecContext* src) {
 }
 
 void
-Encoder::open(KeyValueBag * inputOptions, KeyValueBag* unsetOptions) {
-  Coder::open(inputOptions, unsetOptions);
+Encoder::checkOptionsBeforeOpen() {
   // now check to see if we require an audio resampler.
   RefPointer<Codec> codec = getCodec();
-  if (codec->getType() == MediaDescriptor::MEDIA_AUDIO &&
-      !(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
-    // yes, we do. Let's create one. This looks odd, as it's converting
-    // the same params into the same params, but it's really just being
-    // used as an audio buffer for us.
-    mAResampler = MediaAudioResampler::make(
-        getChannelLayout(),
-        getSampleRate(),
-        getSampleFormat(),
-        getChannelLayout(),
-        getSampleRate(),
-        getSampleFormat()
-        );
-    mAResampler->open();
+  switch (codec->getType()) {
+    case MediaDescriptor::MEDIA_AUDIO: {
+      int32_t sampleRate = getSampleRate();
+      AudioChannel::Layout channelLayout = getChannelLayout();
+      AudioFormat::Type format = getSampleFormat();
+
+      // Only do this check if the codec reports more than 0 supported rates or formats.
+      int n = codec->getNumSupportedAudioSampleRates();
+      int i = 0;
+
+      for(i = 0; i < n; ++i) {
+        int32_t s = codec->getSupportedAudioSampleRate(i);
+        if (s == sampleRate)
+          break;
+      }
+      if (n > 0 && i == n) {
+        VS_THROW(HumbleInvalidArgument::make("Sample rate %ld not supported by encoder.",
+            (int32_t)sampleRate
+            ));
+      }
+
+      n = codec->getNumSupportedAudioChannelLayouts();
+      for(i = 0; i < n; ++i) {
+        AudioChannel::Layout c = codec->getSupportedAudioChannelLayout(i);
+        if (c == channelLayout)
+          break;
+      }
+      if (n > 0 && i == n) {
+        VS_THROW(HumbleInvalidArgument::make("Channel layout %ld not supported by encoder.",
+            (int32_t)channelLayout
+            ));
+      }
+
+      n = codec->getNumSupportedAudioFormats();
+      for(i = 0; i < n; i++) {
+        AudioFormat::Type f = codec->getSupportedAudioFormat(i);
+        if (f == format)
+          break;
+      }
+      if (n > 0 && i == n) {
+        VS_THROW(HumbleInvalidArgument::make("Audio format %ld not supported by encoder.",
+                    (int32_t)format
+                    ));
+      }
+    }
+    break;
+    case MediaDescriptor::MEDIA_VIDEO: {
+//      PixelFormat::Type format = getPixelFormat();
+//      RefPointer<Rational> tb = getTimeBase();
+
+    }
+    break;
+    default:
+      break;
   }
 }
 void
-Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
+Encoder::open(KeyValueBag * inputOptions, KeyValueBag* unsetOptions) {
+  RefPointer<Codec> codec = getCodec();
+
+  Coder::open(inputOptions, unsetOptions);
+  switch(codec->getType()) {
+    case MediaDescriptor::MEDIA_AUDIO: {
+      if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
+        int32_t frameSize = getFrameSize();
+        if (frameSize <= 0) {
+          setState(STATE_ERROR);
+          VS_THROW(HumbleRuntimeError("Codec requires fixed frame size, but does not specify frame size"));
+        }
+        /*
+         * This codec requires a fixed frame size, and we cannot guarantee our callers
+         * will always send in the right audio. So we're going to set up a filter chain
+         * whose sole purpose is to get us audio from the input format into right format
+         * for this codec
+         *
+         * For future features, this imposes a overhead for users who are smart enough
+         * to align frame-sizes, and we should provide an option to make this optional. But
+         * a learning from the past is to assume the callers don't actually know to make
+         * correctly aligned frames.
+         */
+        mAudioGraph = FilterGraph::make();
+        mAudioSource = mAudioGraph->addAudioSource("in",
+            getSampleRate(),
+            getChannelLayout(),
+            getSampleFormat(),
+            0);
+        mAudioSink = mAudioGraph->addAudioSink("out",
+            getSampleRate(),
+            getChannelLayout(),
+            getSampleFormat());
+        // a graph that passes through the audio unmodified.
+        mAudioGraph->open("[in]anull[out]");
+        // now, fix the output frame size.
+        mAudioSink->setFrameSize(frameSize);
+      }
+      VS_LOG_TRACE("open Encoder@%p[t=AUDIO;sr=%"PRId32";c:%"PRId32";cl:%"PRId32";f=%"PRId32";]",
+                   this,
+                   (int32_t)getSampleRate(),
+                   (int32_t)getChannels(),
+                   (int32_t)getChannelLayout(),
+                   (int32_t)getSampleFormat());
+
+    }
+    break;
+    case MediaDescriptor::MEDIA_VIDEO: {
+      VS_LOG_TRACE("open Encoder@%p[t=VIDEO;d=%"PRId32"x%"PRId32";f:%"PRId32";]",
+                   this,
+                   (int32_t)getWidth(),
+                   (int32_t)getHeight(),
+                   (int32_t)getPixelFormat());
+    }
+    break;
+    default:
+      break;
+  }
+}
+void
+Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* aFrame) {
   MediaPacketImpl* output = dynamic_cast<MediaPacketImpl*>(aOutput);
 
   if (getState() != STATE_OPENED) {
@@ -158,51 +258,58 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
   if (!output) {
     VS_THROW(HumbleInvalidArgument("output cannot be null"));
   }
-  // let's check the picture parameters.
-  ensurePictureParamsMatch(frame);
+  // now reset the packet so we allocate new memory (because encoders sometimes change packet sizes).
+  output->reset(0);
 
-  if (frame && !frame->isComplete()) {
-    VS_THROW(HumbleInvalidArgument("Can only pass complete media to encode"));
-  }
-
-  if (frame && frame->getPts() == Global::NO_PTS) {
-    VS_THROW(HumbleInvalidArgument("Passed in media must have a valid time stamp"));
-  }
-
-  /**
-   * Ah, this is naive. Here's what we actually need to do:
-   *
-   * 1) Copy the video frame into a new frame since some codecs will
-   * need byte aligned frames (and if the frame came from a Java user, we
-   * can't be guaranteed it'll be aligned on the right boundaries).
-   *
-   * 2) check time stamps and drop frames when needed if the time
-   * base of the input frame cannot be converted to the encoder
-   * time base without rounding.
-   *
-   */
-  AVFrame* in = frame ? frame->getCtx() : 0;
-  AVPacket* out = output->getCtx();
 
   RefPointer<Rational> coderTb = this->getTimeBase();
 
-  if (in) {
-    RefPointer<Rational> frameTb = frame->getTimeBase();
-    bool dropFrame = false;
+  // let's check the picture parameters.
+  bool dropFrame = false;
 
-    int64_t inTs = coderTb->rescale(in->pts, frameTb.value());
+  // copy the frame so we can modify meta-data
+  RefPointer<MediaPicture> frame = aFrame ? MediaPicture::make(aFrame, false) : 0;
+
+  if (frame) {
+
+    if (!frame->isComplete()) {
+      VS_THROW(HumbleInvalidArgument("Can only pass complete media to encode"));
+    }
+
+    if (frame->getPts() == Global::NO_PTS) {
+      VS_THROW(HumbleInvalidArgument("Passed in media must have a valid time stamp"));
+    }
+
+    ensurePictureParamsMatch(frame.value());
+
+    RefPointer<Rational> frameTb = frame->getTimeBase();
+    /**
+     * check time stamps and drop frames when needed if the time
+     * base of the input frame cannot be converted to the encoder
+     * time base without rounding.
+     *
+     */
+    int64_t inTs = coderTb->rescale(frame->getTimeStamp(), frameTb.value(), Rational::ROUND_DOWN);
     if (mLastPtsEncoded != Global::NO_PTS) {
-      if (inTs < mLastPtsEncoded) {
+      if (inTs <= mLastPtsEncoded) {
         VS_LOG_DEBUG(
-            "Dropping frame with timestamp %lld (if coder supports higher time-base use that instead)",
+            "Encoder@%p: Dropping frame with timestamp %lld (if coder supports higher time-base use that instead)",
+            this,
             frame->getPts());
         dropFrame = true;
       }
-    } else {
-      if (!dropFrame)
+    }
+    if (!dropFrame) {
         mLastPtsEncoded = inTs;
+        frame->setTimeBase(coderTb.value());
+        // set the timestamp after the timbase as setTimeBase does a conversion.
+        frame->setTimeStamp(inTs);
     }
   }
+
+
+  AVFrame* in = frame ? frame->getCtx() : 0;
+  AVPacket* out = output->getCtx();
   int got_frame = 0;
 
   // set the packet to be the max size if can be
@@ -212,28 +319,47 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* frame) {
   else
     out->size = 0;
 
-  int e = avcodec_encode_video2(getCodecCtx(), out, in, &got_frame);
+  int oldStreamIndex = output->getStreamIndex();
+  int e = 0;
+  if (!dropFrame)
+    e = avcodec_encode_video2(getCodecCtx(), out, in, &got_frame);
+  // some codec erroneously set stream_index, but our encoders are always
+  // muxer independent. we fix that here.
+  output->setStreamIndex(oldStreamIndex);
   if (got_frame) {
+    output->setCoder(this);
     output->setTimeBase(coderTb.value());
     output->setComplete(out->size > 0, out->size);
   }
+#ifdef VS_DEBUG
+  char outDescr[256]; *outDescr = 0;
+  char inDescr[256]; *inDescr = 0;
+  if (aFrame) aFrame->logMetadata(inDescr, sizeof(inDescr));
+  if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+  VS_LOG_TRACE("encodeVideo Encoder@%p[out:%s;in:%s;encoded:%" PRIi64,
+               this,
+               outDescr,
+               inDescr,
+               (int64_t)e);
+#endif
+
   FfmpegException::check(e, "could not encode video ");
 }
 
 void
-Encoder::encode(MediaPacket* output, Media* media) {
+Encoder::encode(MediaPacket* output, MediaSampled* media) {
   MediaDescriptor::Type type = getCodecType();
   switch(type) {
   case MediaDescriptor::MEDIA_AUDIO: {
     MediaAudio* audio = dynamic_cast<MediaAudio*>(media);
-    if (!audio)
+    if (!audio && media)
       VS_THROW(HumbleInvalidArgument("passed non-audio Media to an audio encoder"));
     encodeAudio(output, audio);
   }
   break;
   case MediaDescriptor::MEDIA_VIDEO: {
     MediaPicture* picture = dynamic_cast<MediaPicture*>(media);
-    if (!picture)
+    if (!picture && media)
       VS_THROW(HumbleInvalidArgument("passed non-video Media to an video encoder"));
     encodeVideo(output, picture);
   }
@@ -255,6 +381,9 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
   if (!output) {
     VS_THROW(HumbleInvalidArgument("output cannot be null"));
   }
+  // now reset the packet so we allocate new memory (because encoders sometimes change packet sizes).
+  output->reset(0);
+
   // let's check the audio parameters.
   ensureAudioParamsMatch(samples);
 
@@ -264,37 +393,136 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
 
   RefPointer<Codec> codec = getCodec();
   RefPointer<MediaAudio> inputAudio;
+  RefPointer<Rational> coderTb = this->getTimeBase();
 
-  inputAudio.reset(samples, true);
+  bool dropFrame = false;
+
+  if (samples) {
+    // make copy so we can modify meta-data
+    inputAudio = MediaAudio::make(samples, false);
+  }
   if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
     // this codec requires that the right number of audio samples
     // gets passed in each call.
-    if (!mResampledAudio) {
+    if (!mFilteredAudio) {
       if (samples)
-        mResampledAudio = MediaAudio::make(getFrameSize(),
+        mFilteredAudio = MediaAudio::make(getFrameSize(),
             samples->getSampleRate(), samples->getChannels(),
             samples->getChannelLayout(), samples->getFormat());
     }
-    if (mResampledAudio) {
-      mAResampler->resample(mResampledAudio.value(), samples);
-      inputAudio = mResampledAudio.get();
+    if (mFilteredAudio) {
+      // add the samples, or null if empty.
+      mAudioSource->addAudio(samples);
+      // pull the sink.
+      mAudioSink->getAudio(mFilteredAudio.value());
+
+#ifdef VS_DEBUG
+  {
+    char outDescr[256]; *outDescr = 0;
+    char inDescr[256]; *inDescr = 0;
+    if (inputAudio) inputAudio->logMetadata(inDescr, sizeof(inDescr));
+    if (mFilteredAudio) mFilteredAudio->logMetadata(outDescr, sizeof(outDescr));
+    VS_LOG_TRACE("encodeAudio filterAudio Encoder@%p[out:%s;in:%s];",
+                 this,
+                 mFilteredAudio ? outDescr : "(null)",
+                 inputAudio ? inDescr : "(null)");
+  }
+#endif
+
+      if (mFilteredAudio->isComplete()) {
+        inputAudio = mFilteredAudio.get();
+      } else
+        inputAudio = 0;
+    }
+    if (inputAudio) {
+      RefPointer<Rational> inputAudioTb = inputAudio->getTimeBase();
+      /**
+       * check time stamps and drop frames when needed if the time
+       * base of the input frame cannot be converted to the encoder
+       * time base without rounding.
+       *
+       */
+      int64_t inTs = coderTb->rescale(inputAudio->getTimeStamp(), inputAudioTb.value(), Rational::ROUND_DOWN);
+      if (mLastPtsEncoded != Global::NO_PTS) {
+        if (inTs <= mLastPtsEncoded) {
+          VS_LOG_DEBUG(
+              "Encoder@%p Dropping frame with timestamp %lld (if coder supports higher time-base use that instead)",
+              this,
+              inputAudio->getPts());
+          dropFrame = true;
+        }
+      }
+      if (!dropFrame) {
+          mLastPtsEncoded = inTs;
+          inputAudio->setTimeBase(coderTb.value());
+          // set the timestamp after the timbase as setTimeBase does a conversion.
+          inputAudio->setTimeStamp(inTs);
+      }
+    }
+    // now a sanity check
+    if (!(!samples || !inputAudio || inputAudio->getNumSamples() == getFrameSize())) {
+      VS_THROW(HumbleRuntimeError::make("not flushing, but samples returned (%ld) are less than frame size (%ld)",
+                                        inputAudio->getNumSamples(),
+                                        getFrameSize()
+
+          ));
     }
   }
-  RefPointer<Rational> coderTb = this->getTimeBase();
 
-  AVFrame* in = inputAudio ? inputAudio->getCtx() : 0;
-  AVPacket* out = output->getCtx();
+  // only encode if (a) we've been asked to flush or (b) we have complete
+  // audio, even if we had to filter it to get a minimum frame.
+  if (!samples || (inputAudio && inputAudio->isComplete())){
+    AVFrame* in = inputAudio ? inputAudio->getCtx() : 0;
+    AVPacket* out = output->getCtx();
 
-  int got_frame = 0;
-  int e = avcodec_encode_audio2(getCodecCtx(), out, in, &got_frame);
-  if (got_frame) {
-    output->setTimeBase(coderTb.value());
-    output->setComplete(true, out->size);
+    int got_frame = 0;
+    int oldStreamIndex = output->getStreamIndex();
+    int e = 0;
+    if (!dropFrame)
+      avcodec_encode_audio2(getCodecCtx(), out, in, &got_frame);
+    // some codec erroneously set stream_index, but our encoders are always
+    // muxer independent. we fix that here.
+    output->setStreamIndex(oldStreamIndex);
+    if (got_frame) {
+      output->setCoder(this);
+      output->setTimeBase(coderTb.value());
+      output->setComplete(true, out->size);
+    } else {
+      output->setComplete(false, 0);
+    }
+
+#ifdef VS_DEBUG
+    {
+      char outDescr[256]; *outDescr = 0;
+      char inDescr[256]; *inDescr = 0;
+      if (inputAudio) inputAudio->logMetadata(inDescr, sizeof(inDescr));
+      if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+      VS_LOG_TRACE("encodeAudio Encoder@%p[out:%s;in:%s;encoded:%" PRIi64 "]",
+                   this,
+                   aOutput ? outDescr : "(null)",
+                       inputAudio ? inDescr : "(null)",
+                           (int64_t)e);
+    }
+#endif
+
+
+    FfmpegException::check(e, "could not encode audio ");
   } else {
-    output->setComplete(false, 0);
-  }
+#ifdef VS_DEBUG
+    {
+      char outDescr[256]; *outDescr = 0;
+      char inDescr[256]; *inDescr = 0;
+      if (inputAudio) inputAudio->logMetadata(inDescr, sizeof(inDescr));
+      if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+      VS_LOG_TRACE("encodeAudio Encoder@%p[out:%s;in:%s;message:not enough audio staged yet]",
+                   this,
+                   aOutput ? outDescr : "(null)",
+                       inputAudio ? inDescr : "(null)");
+    }
+#endif
 
-  FfmpegException::check(e, "could not encode audio ");
+
+  }
 }
 
 } /* namespace video */

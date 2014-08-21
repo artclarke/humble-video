@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
@@ -65,7 +65,7 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
     virtual int64_t getDuration();
     virtual int64_t getPosition();
     virtual io::humble::ferry::Buffer* getData();
-    virtual int32_t reset(int32_t payloadSize);
+    virtual void reset(int32_t payloadSize);
     virtual bool isComplete();
     
     virtual void setKeyPacket(bool keyPacket);
@@ -84,6 +84,8 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
     virtual io::humble::ferry::Buffer* getSideData(int32_t n);
     virtual SideDataType getSideDataType(int32_t n);
 
+    virtual Coder* getCoder();
+    virtual void setCoder(Coder*);
 #ifndef SWIG
     AVPacket *getCtx() { return mPacket; }
     /*
@@ -94,6 +96,8 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
      */
     void wrapAVPacket(AVPacket* pkt);
     void wrapBuffer(io::humble::ferry::Buffer *buffer);
+  virtual int64_t logMetadata(char* buffer, size_t len);
+
 #endif // ! SWIG
 
   protected:
@@ -102,6 +106,7 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
   private:
     AVPacket* mPacket;
     io::humble::ferry::RefPointer<Rational> mTimeBase;
+    io::humble::ferry::RefPointer<Coder> mCoder;
     bool mIsComplete;
 
 };

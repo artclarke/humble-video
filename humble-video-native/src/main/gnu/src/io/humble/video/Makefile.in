@@ -100,9 +100,9 @@ libhumble_video_la_DEPENDENCIES =
 am_libhumble_video_la_OBJECTS = Mingw64Fixes.lo VideoExceptions.lo \
 	AVBufferSupport.lo PixelFormat.lo KeyValueBag.lo \
 	KeyValueBagImpl.lo Property.lo PropertyImpl.lo Rational.lo \
-	RationalImpl.lo Codec.lo Media.lo MediaRaw.lo MediaAudio.lo \
-	MediaAudioImpl.lo MediaAudioResampler.lo MediaPicture.lo \
-	MediaPictureImpl.lo MediaPictureResampler.lo \
+	RationalImpl.lo Codec.lo Media.lo MediaRaw.lo \
+	MediaResampler.lo MediaAudio.lo MediaAudioResampler.lo \
+	MediaPicture.lo MediaPictureImpl.lo MediaPictureResampler.lo \
 	MediaPictureResamplerImpl.lo MediaSubtitle.lo \
 	MediaSubtitleImpl.lo IndexEntry.lo IndexEntryImpl.lo \
 	MediaPacket.lo MediaPacketImpl.lo ContainerFormat.lo \
@@ -390,6 +390,7 @@ VS_LDFLAGS = @VS_LDFLAGS@
 VS_LIBGCC = @VS_LIBGCC@
 VS_LIBGCC_EH = @VS_LIBGCC_EH@
 VS_LIBSTDCXX = @VS_LIBSTDCXX@
+VS_MVN_HOST = @VS_MVN_HOST@
 VS_OS_WINDOWS = @VS_OS_WINDOWS@
 VS_PROJECT_NAME = @VS_PROJECT_NAME@
 VS_SWIG = @VS_SWIG@
@@ -469,8 +470,8 @@ libhumble_video_la_SOURCES = \
   Codec.cpp \
   Media.cpp \
   MediaRaw.cpp \
+  MediaResampler.cpp \
   MediaAudio.cpp \
-  MediaAudioImpl.cpp \
   MediaAudioResampler.cpp \
   MediaPicture.cpp \
   MediaPictureImpl.cpp \
@@ -533,8 +534,8 @@ libhumble_video_la_HEADERS = \
   MediaRaw.h \
   MediaRaw.swg \
   MediaAudio.h \
-  MediaAudioImpl.h \
   MediaAudio.swg \
+  MediaResampler.h \
   MediaAudioResampler.h \
   MediaPicture.h \
   MediaPictureImpl.h \
@@ -685,7 +686,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValueBagImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Media.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudio.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudioImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudioResampler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacketImpl.Plo@am__quote@
@@ -694,6 +694,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureResampler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureResamplerImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaRaw.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaResampler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaSubtitle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaSubtitleImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mingw64Fixes.Plo@am__quote@

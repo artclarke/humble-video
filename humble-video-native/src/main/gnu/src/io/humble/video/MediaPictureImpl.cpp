@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
@@ -32,7 +32,7 @@
 
 using namespace io::humble::ferry;
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.MediaPicture);
 
 namespace io {
 namespace humble {
@@ -184,6 +184,10 @@ MediaPictureImpl::make(MediaPictureImpl* src, bool copy) {
     retval->mComplete = src->mComplete;
     av_frame_ref(retval->mFrame, src->mFrame);
   }
+  // set the timebase
+  retval->setComplete(src->isComplete());
+  RefPointer<Rational> timeBase = src->getTimeBase();
+  retval->setTimeBase(timeBase.value());
   return retval.get();
 }
 void
@@ -254,6 +258,30 @@ MediaPictureImpl::getNumDataPlanes() {
       break;
   return i;
 }
+
+int64_t
+MediaPictureImpl::logMetadata(char* buffer, size_t len)
+{
+  RefPointer<Rational> tb = getTimeBase();
+  char pts[48];
+  if (getPts() == Global::NO_PTS) {
+    snprintf(pts, sizeof(pts), "NONE");
+  } else
+    snprintf(pts, sizeof(pts), "%" PRId64, getPts());
+
+  return snprintf(buffer, len,
+                  "MediaPictureo@%p:[pts:%s;tb:%" PRId64 "/%" PRId64 ";w:%" PRId64 ";h:%" PRId64 ";fo:%" PRId64 ";co:%s]",
+                  this,
+                  pts,
+                  (int64_t)(tb?tb->getNumerator():0),
+                  (int64_t)(tb?tb->getDenominator():0),
+                  (int64_t)getWidth(),
+                  (int64_t)getHeight(),
+                  (int64_t)getFormat(),
+                  isComplete()?"true":"false"
+                  );
+}
+
 
 } /* namespace video */
 } /* namespace humble */

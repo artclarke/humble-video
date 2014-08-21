@@ -12,7 +12,7 @@ import io.humble.ferry.*;
  * A MediaAudioResampler object resamples MediaAudio objects from<br>
  * one format/sample-rate/channel-layout to another.
  */
-public class MediaAudioResampler extends Configurable {
+public class MediaAudioResampler extends MediaResampler {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -201,8 +201,12 @@ public class MediaAudioResampler extends Configurable {
  * @throws RuntimeError if we get an error or InvalidArgument if the attributes of<br>
  *   in or out do not match what this resampler expected.
  */
-  public int resample(MediaAudio out, MediaAudio in) {
-    return VideoJNI.MediaAudioResampler_resample(swigCPtr, this, MediaAudio.getCPtr(out), out, MediaAudio.getCPtr(in), in);
+  public int resample(MediaSampled out, MediaSampled in) {
+    return VideoJNI.MediaAudioResampler_resample(swigCPtr, this, MediaSampled.getCPtr(out), out, MediaSampled.getCPtr(in), in);
+  }
+
+  public int resampleAudio(MediaAudio out, MediaAudio in) {
+    return VideoJNI.MediaAudioResampler_resampleAudio(swigCPtr, this, MediaAudio.getCPtr(out), out, MediaAudio.getCPtr(in), in);
   }
 
 /**
@@ -320,52 +324,8 @@ public class MediaAudioResampler extends Configurable {
     VideoJNI.MediaAudioResampler_setTimeBase(swigCPtr, this, Rational.getCPtr(rational), rational);
   }
 
-  public MediaAudioResampler.State getState() {
-    return MediaAudioResampler.State.swigToEnum(VideoJNI.MediaAudioResampler_getState(swigCPtr, this));
-  }
-
-  public enum State {
-    STATE_INITED,
-    STATE_OPENED,
-    STATE_ERROR,
-  ;
-
-    public final int swigValue() {
-      return swigValue;
-    }
-
-    public static State swigToEnum(int swigValue) {
-      State[] swigValues = State.class.getEnumConstants();
-      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
-        return swigValues[swigValue];
-      for (State swigEnum : swigValues)
-        if (swigEnum.swigValue == swigValue)
-          return swigEnum;
-      throw new IllegalArgumentException("No enum " + State.class + " with value " + swigValue);
-    }
-
-    @SuppressWarnings("unused")
-    private State() {
-      this.swigValue = SwigNext.next++;
-    }
-
-    @SuppressWarnings("unused")
-    private State(int swigValue) {
-      this.swigValue = swigValue;
-      SwigNext.next = swigValue+1;
-    }
-
-    @SuppressWarnings("unused")
-    private State(State swigEnum) {
-      this.swigValue = swigEnum.swigValue;
-      SwigNext.next = this.swigValue+1;
-    }
-
-    private final int swigValue;
-
-    private static class SwigNext {
-      private static int next = 0;
-    }
+  public MediaResampler.State getState() {
+    return MediaResampler.State.swigToEnum(VideoJNI.MediaAudioResampler_getState(swigCPtr, this));
   }
 
 }

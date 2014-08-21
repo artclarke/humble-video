@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
@@ -16,8 +16,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
+/*
+ * MediaResampler.cpp
+ *
+ *  Created on: Jul 26, 2014
+ *      Author: aclarke
+ */
 
-%typemap (javacode) io::humble::video::MediaSubtitle,io::humble::video::MediaSubtitle*,io::humble::video::MediaSubtitle& %{
-%}
+#include "MediaResampler.h"
 
-%include <io/humble/video/MediaSubtitle.h>
+namespace io {
+namespace humble {
+namespace video {
+
+MediaResampler::MediaResampler() {
+
+}
+
+MediaResampler::~MediaResampler() {
+}
+
+} /* namespace video */
+} /* namespace humble */
+} /* namespace io */

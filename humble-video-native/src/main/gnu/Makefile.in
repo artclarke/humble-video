@@ -104,7 +104,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/io/humble/ferry/config.h
 CONFIG_CLEAN_FILES = mk/Makefile.global mk/Makefile.dependencies \
-	mk/memcheck pom-${host}.xml
+	mk/memcheck pom.xml
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -324,6 +324,7 @@ VS_LDFLAGS = @VS_LDFLAGS@
 VS_LIBGCC = @VS_LIBGCC@
 VS_LIBGCC_EH = @VS_LIBGCC_EH@
 VS_LIBSTDCXX = @VS_LIBSTDCXX@
+VS_MVN_HOST = @VS_MVN_HOST@
 VS_OS_WINDOWS = @VS_OS_WINDOWS@
 VS_PROJECT_NAME = @VS_PROJECT_NAME@
 VS_SWIG = @VS_SWIG@
@@ -456,7 +457,7 @@ mk/Makefile.dependencies: $(top_builddir)/config.status $(top_srcdir)/mk/Makefil
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 mk/memcheck: $(top_builddir)/config.status $(top_srcdir)/mk/memcheck.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-pom-${host}.xml: $(top_builddir)/config.status $(top_srcdir)/mk/pom.xml.in
+pom.xml: $(top_builddir)/config.status $(top_srcdir)/mk/pom.xml.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
@@ -940,9 +941,9 @@ include $(abs_top_builddir)/mk/Makefile.global
 @DX_COND_doc_TRUE@	$(DX_ENV) $(DX_DOXYGEN) $(srcdir)/$(DX_CONFIG)
 
 install-exec-hook:
-	@$(MKDIR_P) $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${host}
-	@cp -f pom-@host@.xml $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${host}/pom.xml
-	@(cd $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${host} && mvn install)
+	@$(MKDIR_P) $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST}
+	@cp -f pom.xml $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST}/pom.xml
+	@(cd $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST} && mvn install)
 
 doc: doxygen-doc
 

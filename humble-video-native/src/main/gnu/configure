@@ -700,6 +700,7 @@ SWIG
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
+VS_MVN_HOST
 VS_DEBUG
 VS_DEBUG_FALSE
 VS_DEBUG_TRUE
@@ -17145,6 +17146,8 @@ $as_echo_n "checking whether to enable compiler optimizations... " >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_optimizations" >&5
 $as_echo "$enable_optimizations" >&6; }
 
+# default name we use for the Maven bundle
+VS_MVN_HOST=$host
  if  test "$x$enable_optimizations" = xno ; then
   VS_DEBUG_TRUE=
   VS_DEBUG_FALSE='#'
@@ -17156,7 +17159,11 @@ fi
 if test "x$enable_optimizations" = xno; then
   VS_DEBUG=1
 
+  # If debug, we have a separate MVN name
+  VS_MVN_HOST="$host-debug"
 fi
+# This will be used to build our MVN pom file.
+
 
 
 
@@ -20752,7 +20759,7 @@ esac
 
 ac_config_headers="$ac_config_headers src/io/humble/ferry/config.h:config.h.in"
 
-ac_config_files="$ac_config_files Makefile mk/Makefile.global mk/Makefile.dependencies mk/memcheck src/Makefile src/io/Makefile src/io/humble/Makefile src/io/humble/ferry/Makefile src/io/humble/ferry/Ferry.i src/io/humble/video/Makefile src/io/humble/video/customio/Makefile test/Makefile test/io/Makefile test/io/humble/Makefile test/io/humble/testutils/Makefile test/io/humble/ferry/Makefile test/io/humble/video/Makefile test/io/humble/video/customio/Makefile pom-${host}.xml:mk/pom.xml.in"
+ac_config_files="$ac_config_files Makefile mk/Makefile.global mk/Makefile.dependencies mk/memcheck src/Makefile src/io/Makefile src/io/humble/Makefile src/io/humble/ferry/Makefile src/io/humble/ferry/Ferry.i src/io/humble/video/Makefile src/io/humble/video/customio/Makefile test/Makefile test/io/Makefile test/io/humble/Makefile test/io/humble/testutils/Makefile test/io/humble/ferry/Makefile test/io/humble/video/Makefile test/io/humble/video/customio/Makefile pom.xml:mk/pom.xml.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -21981,7 +21988,7 @@ do
     "test/io/humble/ferry/Makefile") CONFIG_FILES="$CONFIG_FILES test/io/humble/ferry/Makefile" ;;
     "test/io/humble/video/Makefile") CONFIG_FILES="$CONFIG_FILES test/io/humble/video/Makefile" ;;
     "test/io/humble/video/customio/Makefile") CONFIG_FILES="$CONFIG_FILES test/io/humble/video/customio/Makefile" ;;
-    "pom-${host}.xml") CONFIG_FILES="$CONFIG_FILES pom-${host}.xml:mk/pom.xml.in" ;;
+    "pom.xml") CONFIG_FILES="$CONFIG_FILES pom.xml:mk/pom.xml.in" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
