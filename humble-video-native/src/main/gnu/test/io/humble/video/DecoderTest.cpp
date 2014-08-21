@@ -22,6 +22,8 @@
  *  Created on: Jul 28, 2013
  *      Author: aclarke
  */
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/LoggerStack.h>
 
 #include "DecoderTest.h"
 #include <io/humble/ferry/RefPointer.h>
@@ -30,6 +32,8 @@
 #include <io/humble/video/Demuxer.h>
 #include <io/humble/video/DemuxerStream.h>
 #include <io/humble/video/MediaAudio.h>
+
+VS_LOG_SETUP(VS_CPP_PACKAGE.DecoderTest);
 
 DecoderTest::DecoderTest() {
 }
@@ -336,4 +340,66 @@ DecoderTest::testOpenCloseMP4() {
     }
   }
   source->close();
+}
+void
+DecoderTest::testIssue27()
+{
+  const char* testURL="http://www.nasa.gov/multimedia/nasatv/NTV-Public-IPS.m3u8";
+  RefPointer<Demuxer> demuxer = Demuxer::make();
+
+  RefPointer<Decoder> decoder;
+  int32_t decoderIndex = -1;
+  try {
+    demuxer->open(testURL, 0, true, false, 0, 0);
+    demuxer->queryStreamMetaData();
+    int32_t n = demuxer->getNumStreams();
+    // loop through until we find our first video stream.
+    for(int32_t i = 0; i < n; ++i) {
+      RefPointer<DemuxerStream> stream = demuxer->getStream(i);
+      decoder = stream->getDecoder();
+      if (decoder->getCodecType() == MediaDescriptor::MEDIA_VIDEO) {
+        decoderIndex = i;
+        break;
+      }
+      decoder = 0;
+    }
+  } catch (std::exception & e) {
+    // if we catch an error, just return. that's not the focus of this test, and it will fail if the URL or network is down.
+    return;
+  }
+  if (!decoder.value())
+    return;
+
+  // now let's decode some number of frames.
+  int32_t frames = 150;
+  int32_t frameNo = 0;
+  RefPointer<MediaPacket> packet = MediaPacket::make();
+  RefPointer<MediaPicture> picture = MediaPicture::make(
+      decoder->getWidth(),
+      decoder->getHeight(),
+      decoder->getPixelFormat());
+
+  decoder->open(0, 0);
+  while(demuxer->read(packet.value()) >= 0 && frameNo < frames) {
+    // got a packet; now we try to decode it.
+    if (packet->getStreamIndex() == decoderIndex &&
+        packet->isComplete()) {
+      int32_t bytesRead = 0;
+      int32_t byteOffset=0;
+      do {
+        bytesRead = decoder->decodeVideo(picture.value(), packet.value(), byteOffset);
+        if (picture->isComplete()) {
+          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketDts());
+          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketPts());
+          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getTimeStamp());
+          VS_LOG_DEBUG("Writing frame: %"PRId32, frameNo);
+          writePicture("DecoderTest_testIssue27", &frameNo, picture.value());
+          ++frameNo;
+        }
+        byteOffset += bytesRead;
+      } while(byteOffset < packet->getSize());
+    }
+  }
+
+  demuxer->close();
 }

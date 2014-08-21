@@ -46,6 +46,7 @@ public:
   void testDecodeAudio();
   void testDecodeVideo();
   void testOpenCloseMP4();
+  void testIssue27();
 private:
   void writeAudio(FILE* output, MediaAudio* audio);
   void writePicture(const char* prefix, int32_t* frameNo, MediaPicture* picture);
