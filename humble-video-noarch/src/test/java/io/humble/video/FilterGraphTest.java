@@ -175,7 +175,7 @@ public class FilterGraphTest {
          bytesRead = decoder.decodeAudio(audio, packet, byteOffset);
          byteOffset += bytesRead;
          filterSource.addAudio(audio);
-         while(filterSink.getAudio(filteredAudio)>= 0)
+         while(filterSink.getAudio(filteredAudio)>= 0 && filteredAudio.isComplete())
          {         
            rawAudio = converter.toJavaAudio(rawAudio, filteredAudio);
            if (audioFrame != null) 
@@ -189,7 +189,7 @@ public class FilterGraphTest {
       bytesRead = decoder.decodeAudio(audio, null, 0);
       if (audio.isComplete()) {
         filterSource.addAudio(audio);
-        while(filterSink.getAudio(filteredAudio)>= 0)
+        while(filterSink.getAudio(filteredAudio)>= 0 && filteredAudio.isComplete())
         {         
           rawAudio = converter.toJavaAudio(rawAudio, filteredAudio);
           if (audioFrame != null) 
