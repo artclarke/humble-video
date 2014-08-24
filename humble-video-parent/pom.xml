@@ -30,7 +30,8 @@
   </license>
  </licenses>
  <scm>
-  <url>https://github.com/artclarke/humble-video-main</url>
+  <url>https://github.com/artclarke/humble-video</url>
+  <connection>scm:git:git://github.com/artclarke/humble-video.git</connection>
  </scm>
  <developers>
   <developer>
