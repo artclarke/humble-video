@@ -95,6 +95,9 @@
      <version>2.17</version>
      <configuration>
       <useSystemClassLoader>false</useSystemClassLoader>
+      <systemProperties>
+        <java.awt.headless>true</java.awt.headless>
+      </systemProperties>
       <forkCount>1</forkCount>
       <reuseForks>false</reuseForks>
       <workingDirectory>${basedir}/target/test-workingdir</workingDirectory>
