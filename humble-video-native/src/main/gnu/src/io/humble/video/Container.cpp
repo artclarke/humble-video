@@ -1,26 +1,21 @@
-/*
- * Copyright (c) 2013-Forward, Andrew "Art" Clarke
+/*******************************************************************************
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
+ * This file is part of Humble-Video.
  *
- * This file is part of Humble Video.
- * 
- * Humble Video is free software: you can redistribute it and/or modify
+ * Humble-Video is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * Humble Video is distributed in the hope that it will be useful,
+ *
+ * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
- * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Container.cpp
- *
- *  Created on: Jun 30, 2013
- *      Author: aclarke
- */
+ * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 
 #include "Container.h"
 #include "PropertyImpl.h"
@@ -30,7 +25,7 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/customio/URLProtocolHandler.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Container);
 
 using namespace io::humble::video::customio;
 using namespace io::humble::ferry;
@@ -40,6 +35,7 @@ namespace humble {
 namespace video {
 
 Container::Container() {
+  VS_LOG_TRACE("Created: %p");
 }
 
 Container::~Container() {
@@ -47,12 +43,12 @@ Container::~Container() {
   while(mStreams.size() > 0)
   {
     Stream* stream=mStreams.back();
+    mStreams.pop_back();
     if (stream) {
       delete stream;
     }
-    mStreams.pop_back();
   }
-
+  VS_LOG_TRACE("Destroyed: %p");
 }
 
 int
@@ -105,35 +101,19 @@ Container::Stream::Stream(Container* container, int32_t index) {
 }
 
 Container::Stream::~Stream() {
-
 }
 
 Coder*
 Container::Stream::getCoder() {
-  if (!mCoder) {
-    // we need to know the stream direction...
-    AVFormatContext* ctx = mContainer->getFormatCtx();
-    AVStream* stream = getCtx();
+  // we need to know the stream direction...
+  AVFormatContext* ctx = mContainer->getFormatCtx();
+  AVStream* stream = getCtx();
 
-    if (!ctx || !stream) {
-      VS_THROW(HumbleRuntimeError("could not get container context to find coder"));
-    }
-    if (!stream->codec) {
-      VS_THROW(HumbleRuntimeError("No codec set for stream"));
-    }
-    RefPointer<Codec> codec;
-
-    if (ctx->iformat) {
-      // make a copy of the decoder so we decouple it from the container
-      // completely
-      codec = Codec::findDecodingCodec((Codec::ID)stream->codec->codec_id);
-      if (!codec) {
-        VS_THROW(HumbleRuntimeError("could not find decoding codec"));
-      }
-      mCoder = Decoder::make(codec.value(), stream->codec, true);
-    } else {
+  if (!ctx || !stream) {
+    VS_THROW(HumbleRuntimeError("could not get container context to find coder"));
+  }
+  if (!mCoder && ctx->oformat) {
       VS_THROW(HumbleRuntimeError("Got null encoder on MuxerStream which should not be possible"));
-    }
   }
   return mCoder.get();
 }
@@ -168,13 +148,50 @@ Container::doSetupStreams() {
         // for audio, 1/sample-rate is a good timebase.
         avStream->time_base.num = 1;
         avStream->time_base.den = avStream->codec->sample_rate;
+        VS_LOG_DEBUG("No timebase set on audio stream %ld. Setting to 1/sample-rate (1/%ld)",
+                     (int32_t)i,
+                     (int32_t)avStream->time_base.den
+                     );
       } else if(goodTimebase) {
+        VS_LOG_DEBUG("No timebase set on stream %ld. Setting to (%ld/%ld)",
+                     (int32_t)i,
+                     (int32_t)goodTimebase->num,
+                     (int32_t)goodTimebase->den
+                     );
         avStream->time_base = *goodTimebase;
+      } else {
+        VS_LOG_WARN("No timebase set on stream %ld. And no good guess for what to set",
+                    (int32_t)i);
       }
     }
     // now let's initialize our stream object.
     Stream* stream = new Stream(this, i);
     mStreams.push_back(stream);
+    if (ctx->iformat) {
+      // if a input format, we try to set up the decoder objects here. Some streams
+      // will have no decoder objects available.
+      RefPointer<Codec> codec = Codec::findDecodingCodec((Codec::ID)avStream->codec->codec_id);
+      RefPointer<Coder> coder;
+      if (codec) {
+        // make a copy of the decoder so we decouple it from the container
+        // completely
+        coder = Decoder::make(codec.value(), avStream->codec, true);
+        stream->setCoder(coder.value());
+      } else {
+        VS_LOG_DEBUG("noDecoderAvailable Container@%p[i=%"PRId32";codec_id:%"PRId32"];",
+                     this,
+                     avStream->index,
+                     avStream->codec->codec_id);
+      }
+#ifdef VS_DEBUG
+      VS_LOG_TRACE("newStreamFound Container@%p[i=%"PRId32";c=%p;tb=%"PRId32"/%"PRId32";]",
+                   this,
+                   (int32_t)avStream->index,
+                   coder.value(),
+                   (int32_t)avStream->time_base.num,
+                   (int32_t)avStream->time_base.den);
+#endif
+    }
   }
 }
 

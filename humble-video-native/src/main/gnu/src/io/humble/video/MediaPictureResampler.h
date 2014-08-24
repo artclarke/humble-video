@@ -1,21 +1,21 @@
-/*
- * Copyright (c) 2013-Forward, Andrew "Art" Clarke
+/*******************************************************************************
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
+ * This file is part of Humble-Video.
  *
- * This file is part of Humble Video.
- * 
- * Humble Video is free software: you can redistribute it and/or modify
+ * Humble-Video is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * Humble Video is distributed in the hope that it will be useful,
+ *
+ * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
- * along with Humble Video.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 
 #ifndef MEDIAPICTURERESAMPLER_H_
 #define MEDIAPICTURERESAMPLER_H_
@@ -23,8 +23,9 @@
 #include <io/humble/ferry/RefCounted.h>
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/PixelFormat.h>
-#include <io/humble/video/Configurable.h>
+#include <io/humble/video/MediaResampler.h>
 #include <io/humble/video/MediaPicture.h>
+
 
 namespace io { namespace humble { namespace video
 {
@@ -33,7 +34,7 @@ namespace io { namespace humble { namespace video
  * Converts MediaPicture objects of a given width, height and format to a new
  * width, height or format.
  */
-class VS_API_HUMBLEVIDEO MediaPictureResampler : public io::humble::video::Configurable
+class VS_API_HUMBLEVIDEO MediaPictureResampler : public io::humble::video::MediaResampler
 {
 public:
   typedef enum Flag {
@@ -58,13 +59,6 @@ public:
     FLAG_BITEXACT = SWS_BITEXACT,
     FLAG_ERROR_DIFFUSION = SWS_ERROR_DIFFUSION,
   } Flag;
-
-  typedef enum State {
-    STATE_INITED,
-    STATE_OPENED,
-    STATE_ERROR
-  } State;
-  virtual State getState()=0;
 
   /** Get the width in pixels we expect on the input frame to the resampler.
    * @return The width we expect on the input frame to the resampler.
@@ -120,7 +114,11 @@ public:
    * @throws InvalidArgument if in our out does not match the parameters this
    *         resampler was set with.
    */
-  virtual void resample(MediaPicture *out, MediaPicture *in)=0;
+  virtual int32_t resample(MediaSampled *out, MediaSampled *in)=0;
+  /**
+   * A more precisely typed way to call #resample
+   */
+  virtual int32_t resamplePicture(MediaPicture *out, MediaPicture *in)=0;
 
   /**
    * Get a new picture resampler.

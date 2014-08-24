@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
@@ -23,6 +23,7 @@
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/Media.h>
+#include <io/humble/video/Coder.h>
 
 namespace io {
 namespace humble {
@@ -299,7 +300,7 @@ public:
   /**
    * Get the container-specific index for the stream this packet is
    * part of.
-   * @return Stream in container that this packet has data for.
+   * @return Stream in container that this packet has data for, or <0 if unsure.
    */
   virtual int32_t
   getStreamIndex()=0;
@@ -422,11 +423,24 @@ public:
    * </p>
    * @param payloadSize The (minimum) payloadSize of this packet in bytes. It is ok to
    *   pass in 0 here, in which case the packet will later allocate memory if needed.
-   *
-   * @return >= 0 if successful.  < 0 if error.
    */
-  virtual int32_t
+  virtual void
   reset(int32_t payloadSize)=0;
+
+#ifndef SWIG
+
+  // do not return this via SWIG. Instead we will need to make a helper
+  // method that casts this to a Decoder or an Encoder, and then casts
+  // it back up from Java.
+
+  /**
+   * Gets the Coder* that made this packet.
+   *
+   * @return the coder if known, or null if not.
+   */
+  virtual Coder*
+  getCoder()=0;
+#endif
 
 protected:
   MediaPacket();

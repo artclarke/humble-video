@@ -82,7 +82,9 @@ To cross-compile for linux and windows in addition to Mac OS X, run:
 
 ## Linux Build Notes
 
-You need to make sure the Chef recipes that are in `./Vagrantfile` get installed on your Linux box. I've only tested on Ubuntu 12.04 LTS, so that's all that suppored to build on.
+You need to make sure the Chef recipes that are in `./Vagrantfile` get installed on your Linux box. Those recipes are in the humble-video-chef project. 
+
+I've only tested on Ubuntu 12.04 LTS, so that's all that supported to build on, and it's a work in progress so hang tight..
 
 To build, once the chef recipes have run on a clean box, just run:
 

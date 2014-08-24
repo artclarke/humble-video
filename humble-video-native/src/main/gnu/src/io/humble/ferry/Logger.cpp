@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
@@ -62,7 +62,8 @@ static const char* vs_strrstr(const char* s1, const char* s2) {
 
 namespace io { namespace humble { namespace ferry {
   bool Logger :: mInitialized = false;
-  bool Logger :: mGlobalIsLogging[5] = { true, true, true, true, true };
+  // Default to TRACE not being logged, but it can be programatically turned on.
+  bool Logger :: mGlobalIsLogging[5] = { true, true, true, true, false };
   jclass Logger :: mClass = 0;
   jmethodID Logger :: mGetLoggerMethod = 0;
   jmethodID Logger :: mLogMethod = 0;
@@ -231,6 +232,7 @@ namespace io { namespace humble { namespace ferry {
         // can
         JNIHelper::sRegisterTerminationCallback(Logger::shutdownJavaBindings,
             logger);
+        logger->setPrintStackTrace(true);
     }
     return logger;
   }
@@ -294,7 +296,7 @@ namespace io { namespace humble { namespace ferry {
       break;
     case LEVEL_TRACE:
       levelStr = "TRACE ";
-      didLog = false;
+      didLog = true;
       break;
     }
     if (didLog && msg && *msg)

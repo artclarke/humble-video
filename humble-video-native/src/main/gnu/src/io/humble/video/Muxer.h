@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
@@ -118,9 +118,23 @@ public:
     return mState;
   }
 
+  /**
+   * Open the Muxer and write any headers.
+   *
+   * @param inputOptions muxer-specific options to set before opening the muxer. Can be null.
+   * @param outputOptions if non null, the passed in bag will be emptied, and the filled
+   *    with any options from inputOptions that could not be set on the muxer.
+   */
   virtual void
   open(KeyValueBag* inputOptions, KeyValueBag* outputOptions);
 
+  /**
+   * Close the muxer and write any trailers.
+   *
+   * Note: Calls MUST call this method -- it will not automatically be called
+   * when the object is finalized as some muxers struggle when you write trailers
+   * on a different thread (the finalizer thread) than the header was written on.
+   */
   virtual void
   close();
 
@@ -144,8 +158,7 @@ public:
    * Return the output buffer length.
    *
    * @return The input buffer length Humble Video told FFMPEG to assume.
-   *   0 means FFMPEG should choose it's own
-   *   size (and it'll probably be 32768).
+   *   0 means FFMPEG should choose it's own size (and it'll probably be 32768).
    */
   virtual int32_t
   getOutputBufferLength();
@@ -174,8 +187,7 @@ public:
   /**
    * Writes the given packet to the Muxer.
    *
-   * @param packet The packet to write. If null, it tells the muxer to flush any data queued up to
-   *   the underlying storage (disk, network, etc).
+   * @param packet The packet to write.
    * @param forceInterleave If true, this Muxer will ensure that all packets are interleaved across streams
    *   (i.e. monotonically increasing timestamps in the Muxer container). If false, then the caller
    *   is responsible for ensuring the interleaving is valid for the container. Note this method is faster
@@ -190,11 +202,26 @@ public:
   virtual bool
   write(MediaPacket* packet, bool forceInterleave);
 
+#if 0
+#ifndef SWIG
+  virtual int32_t acquire();
+  virtual int32_t release();
+#endif
+#endif
+
 protected:
   virtual AVFormatContext* getFormatCtx() { return mCtx; }
+  /**
+   * Function to log the write event as a trace
+   */
+  static void logWrite(Muxer* muxer, MediaPacket* in, MediaPacket* out, int32_t retval);
+  /**
+   * Log an open.
+   */
+  static void logOpen(Muxer*);
 
   /**
-   * Takes the packet given (in whatever timebase it was encoded with) and resets all timestamps
+   * Takes the packet given (in whatever time base it was encoded with) and resets all time stamps
    * to align with the stream in this container that it will be added to.
    *
    * @param packet The packet to stamp. Packet#setStreamIndex must have been called to avoid an error,

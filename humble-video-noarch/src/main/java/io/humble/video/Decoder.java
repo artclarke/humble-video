@@ -187,4 +187,27 @@ public class Decoder extends Coder {
     return VideoJNI.Decoder_decodeVideo(swigCPtr, this, MediaPicture.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
   }
 
+/**
+ * Decode this packet into output.  It will<br>
+ * try to fill up the media object, starting<br>
+ * from the byteOffset inside this packet.<br>
+ * <p><br>
+ * The caller is responsible for allocating the<br>
+ * correct underlying Media object.  This function will overwrite<br>
+ * any data in the samples object.<br>
+ * </p><br>
+ * @param output The Media we decode to. Caller must check if it is complete on return.<br>
+ * @param packet    The packet we're attempting to decode from.<br>
+ * @param byteOffset Where in the packet payload to start decoding<br>
+ * <br>
+ * @return number of bytes actually processed from the packet, or negative for error<br>
+ * <br>
+ * @throws InvalidArgument if the media type is not compatible with this decoder.<br>
+ * @see decodeVideo<br>
+ * @see decodeAudio
+ */
+  public int decode(MediaSampled output, MediaPacket packet, int byteOffset) {
+    return VideoJNI.Decoder_decode(swigCPtr, this, MediaSampled.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
+  }
+
 }

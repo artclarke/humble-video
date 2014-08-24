@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
@@ -29,12 +29,12 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
 #include <io/humble/video/IndexEntryImpl.h>
-#include <io/humble/video/MediaAudioImpl.h>
+#include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaPictureImpl.h>
 #include <io/humble/video/MediaPacketImpl.h>
 #include <io/humble/video/MediaSubtitleImpl.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Decoder);
 
 using namespace io::humble::ferry;
 
@@ -52,12 +52,12 @@ Decoder::Decoder(Codec* codec, AVCodecContext* src, bool copy) : Coder(codec, sr
   mSamplesSinceLastTimeStampDiscontinuity = 0;
   mAudioDiscontinuityStartingTimeStamp = Global::NO_PTS;
 
-  VS_LOG_TRACE("Created decoder");
+  VS_LOG_TRACE("Created: %p", this);
 }
 
 
 Decoder::~Decoder() {
-
+  VS_LOG_TRACE("Destroyed: %p", this);
 }
 
 void
@@ -74,7 +74,7 @@ Decoder::prepareFrame(AVFrame* frame, int flags) {
 
   switch (getCodecType()) {
   case MediaDescriptor::MEDIA_AUDIO: {
-    MediaAudioImpl* audio = dynamic_cast<MediaAudioImpl*>(mCachedMedia.value());
+    MediaAudio* audio = dynamic_cast<MediaAudio*>(mCachedMedia.value());
     if (!audio ||
         audio->getSampleRate() != frame->sample_rate ||
         audio->getChannelLayout() != frame->channel_layout ||
@@ -115,9 +115,8 @@ Decoder::rebase(int64_t ts, MediaPacket* packet) {
   return dstTs->rescale(ts, srcTs.value());
 }
 int32_t
-Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
+Decoder::decodeAudio(MediaAudio* output, MediaPacket* aPacket,
     int32_t byteOffset) {
-  MediaAudioImpl* output = dynamic_cast<MediaAudioImpl*>(aOutput);
   MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(aPacket);
 
   if (getCodecType() != MediaDescriptor::MEDIA_AUDIO)
@@ -129,11 +128,11 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   if (STATE_OPENED != getState())
     VS_THROW(HumbleRuntimeError("Attempt to decodeAudio, but Decoder is not opened"));
 
-  if (!aOutput)
+  if (!output)
     VS_THROW(HumbleInvalidArgument("null audio passed to coder"));
 
   // let's check the audio parameters.
-  ensureAudioParamsMatch(aOutput);
+  ensureAudioParamsMatch(output);
 
   if (packet) {
     if (!packet->isComplete()) {
@@ -217,14 +216,14 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
       // convert our calculated timestamp to the packet base and compare
       int64_t rebasedTs = packetBase ? packetBase->rescale(newPts, coderBase.value()) : newPts;
       int64_t delta = rebasedTs - packetTs;
-      VS_LOG_TRACE("packet: %lld; calculated: %lld; delta: %lld; tb (%d/%d); nextPts: %lld; samples: %lld",
-          packetTs,
-          rebasedTs,
-          delta,
-          packetBase->getNumerator(),
-          packetBase->getDenominator(),
-          newPts,
-          mSamplesSinceLastTimeStampDiscontinuity);
+//      VS_LOG_TRACE("packet: %lld; calculated: %lld; delta: %lld; tb (%d/%d); nextPts: %lld; samples: %lld",
+//          packetTs,
+//          rebasedTs,
+//          delta,
+//          packetBase->getNumerator(),
+//          packetBase->getDenominator(),
+//          newPts,
+//          mSamplesSinceLastTimeStampDiscontinuity);
       if (delta <= 1 && delta >= -1) {
         // within one tick; keep the original measure of discontinuity start
       } else {
@@ -262,6 +261,20 @@ Decoder::decodeAudio(MediaAudio* aOutput, MediaPacket* aPacket,
   mCachedMedia = 0;
   av_frame_unref(frame);
   av_freep(&frame);
+
+#ifdef VS_DEBUG
+  char outDescr[256]; *outDescr = 0;
+  char inDescr[256]; *inDescr = 0;
+  if (aPacket) aPacket->logMetadata(inDescr, sizeof(inDescr));
+  if (output) output->logMetadata(outDescr, sizeof(outDescr));
+  VS_LOG_TRACE("decodeAudio Decoder@%p[out:%s;in:%s;offset:%lld;decoded:%" PRIi64,
+               this,
+               outDescr,
+               inDescr,
+               (int64_t)byteOffset,
+               (int64_t)retval);
+#endif
+
   /** END DO NOT THROW EXCEPTIONS **/
   FfmpegException::check(retval, "Error while decoding ");
   return retval;
@@ -354,11 +367,47 @@ Decoder::decodeVideo(MediaPicture* aOutput, MediaPacket* aPacket,
   mCachedMedia = 0;
   av_frame_unref(frame);
   av_freep(&frame);
+
+#ifdef VS_DEBUG
+  char outDescr[256]; *outDescr = 0;
+  char inDescr[256]; *inDescr = 0;
+  if (aPacket) aPacket->logMetadata(inDescr, sizeof(inDescr));
+  if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+  VS_LOG_TRACE("decodeVideo Decoder@%p[out:%s;in:%s;offset:%lld;decoded:%" PRIi64,
+               this,
+               outDescr,
+               inDescr,
+               (int64_t)byteOffset,
+               (int64_t)retval);
+#endif
   /** END DO NOT THROW EXCEPTIONS **/
   FfmpegException::check(retval, "Error while decoding ");
   return retval;
 }
 
+int32_t
+Decoder::decode(MediaSampled* output, MediaPacket* packet, int32_t offset) {
+  MediaDescriptor::Type type = getCodecType();
+  switch(type) {
+  case MediaDescriptor::MEDIA_AUDIO: {
+    MediaAudio* audio = dynamic_cast<MediaAudio*>(output);
+    if (!audio && output)
+      VS_THROW(HumbleInvalidArgument("passed non-audio Media to an audio decoder"));
+    return decodeAudio(audio, packet, offset);
+  }
+  break;
+  case MediaDescriptor::MEDIA_VIDEO: {
+    MediaPicture* picture = dynamic_cast<MediaPicture*>(output);
+    if (!picture && output)
+      VS_THROW(HumbleInvalidArgument("passed non-video Media to an video decoder"));
+    return decodeVideo(picture, packet, offset);
+  }
+  break;
+  default:
+    VS_THROW(HumbleInvalidArgument("passed a media type that is not compatible with this decoder"));
+  }
+  return -1;
+}
 Decoder*
 Decoder::make(Codec* codec)
 {
@@ -385,7 +434,7 @@ Decoder::make(Coder* src)
     VS_THROW(HumbleRuntimeError("coder has no codec"));
   }
   if (!c->canDecode()) {
-    // this codec cannot encode, so we try to find a new codec that can
+    // this codec cannot decode, so we try to find a new codec that can
     // of the same type.
     Codec::ID id = c->getID();
     c = Codec::findDecodingCodec(id);

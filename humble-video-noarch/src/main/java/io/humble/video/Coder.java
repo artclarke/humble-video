@@ -243,8 +243,8 @@ public class Coder extends Configurable {
  * <br>
  * @param pixelFmt Pixel format to use.
  */
-  public void setPixelType(PixelFormat.Type pixelFmt) {
-    VideoJNI.Coder_setPixelType(swigCPtr, this, pixelFmt.swigValue());
+  public void setPixelFormat(PixelFormat.Type pixelFmt) {
+    VideoJNI.Coder_setPixelFormat(swigCPtr, this, pixelFmt.swigValue());
   }
 
 /**
@@ -371,6 +371,62 @@ public class Coder extends Configurable {
  */
   public int getFrameSize() {
     return VideoJNI.Coder_getFrameSize(swigCPtr, this);
+  }
+
+/**
+ * Get the 32-bit compliment of all flags.
+ */
+  public int getFlags() {
+    return VideoJNI.Coder_getFlags(swigCPtr, this);
+  }
+
+/**
+ * Check if a given flag is set.
+ */
+  public int getFlag(Coder.Flag flag) {
+    return VideoJNI.Coder_getFlag(swigCPtr, this, flag.swigValue());
+  }
+
+/**
+ * Get the 32-bit compliment of all flags 2 flags
+ */
+  public int getFlags2() {
+    return VideoJNI.Coder_getFlags2(swigCPtr, this);
+  }
+
+/**
+ * Check if a given flag2 flag is set.
+ */
+  public int getFlag2(Coder.Flag2 flag) {
+    return VideoJNI.Coder_getFlag2(swigCPtr, this, flag.swigValue());
+  }
+
+/**
+ * Set a new bitmask of all Flag values (bit xored together).
+ */
+  public void setFlags(int newVal) {
+    VideoJNI.Coder_setFlags(swigCPtr, this, newVal);
+  }
+
+/**
+ * Set a flag to true or false.
+ */
+  public void setFlag(Coder.Flag flag, boolean value) {
+    VideoJNI.Coder_setFlag(swigCPtr, this, flag.swigValue(), value);
+  }
+
+/**
+ * Set a new bitmask of all Flag2 values (bit xored together).
+ */
+  public void setFlags2(int newVal) {
+    VideoJNI.Coder_setFlags2(swigCPtr, this, newVal);
+  }
+
+/**
+ * Set a flag2 to true or false.
+ */
+  public void setFlag2(Coder.Flag2 flag, boolean value) {
+    VideoJNI.Coder_setFlag2(swigCPtr, this, flag.swigValue(), value);
   }
 
   /**

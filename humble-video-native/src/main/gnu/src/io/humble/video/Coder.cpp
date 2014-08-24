@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
@@ -30,7 +30,7 @@
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaPicture.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.Coder);
 
 namespace io {
 namespace humble {
@@ -47,6 +47,7 @@ Coder::Coder(Codec* codec, AVCodecContext* src, bool copySrc) {
     mCtx = avcodec_alloc_context3(codec->getCtx());
     if (!mCtx)
       throw HumbleRuntimeError("could not allocate coder context");
+    mCtx->codec = codec->getCtx();
   } else if (copySrc) {
     // create again for the copy
     mCtx = avcodec_alloc_context3(0);
@@ -67,11 +68,12 @@ Coder::Coder(Codec* codec, AVCodecContext* src, bool copySrc) {
 
   mState = STATE_INITED;
 
-  VS_LOG_TRACE("Created coder");
+  VS_LOG_TRACE("Created: %p", this);
 
 }
 
 Coder::~Coder() {
+  VS_LOG_TRACE("Destroyed: %p", this);
   (void) avcodec_close(mCtx);
   if (mCtx->extradata)
     av_freep(&mCtx->extradata);
@@ -90,14 +92,17 @@ Coder::open(KeyValueBag* inputOptions, KeyValueBag* aUnsetOptions) {
       av_dict_copy(&tmp, options->getDictionary(), 0);
     }
 
-    RefPointer<Codec> codec = getCodec();
-    retval = avcodec_open2(mCtx, codec->getCtx(), &tmp);
+    // first we're going to set options (and we'll set them again later)
+    retval = av_opt_set_dict(mCtx, &tmp);
+    FfmpegException::check(retval, "could not set options on coder");
 
-    if (retval < 0)
-    {
-      mState = STATE_ERROR;
-      throw HumbleRuntimeError("could not open codec");
-    }
+    // we check that the options passed in our valid
+    checkOptionsBeforeOpen();
+
+    RefPointer<Codec> codec = getCodec();
+    // we pass in the options again because codec-specific options can be set.
+    retval = avcodec_open2(mCtx, codec->getCtx(), &tmp);
+    FfmpegException::check(retval, "could not open codec");
     mState  = STATE_OPENED;
 
     if (aUnsetOptions)
@@ -105,14 +110,14 @@ Coder::open(KeyValueBag* inputOptions, KeyValueBag* aUnsetOptions) {
       KeyValueBagImpl* unsetOptions = dynamic_cast<KeyValueBagImpl*>(aUnsetOptions);
       unsetOptions->copy(tmp);
     }
-  } catch (std::exception & e) {
     if (tmp)
       av_dict_free(&tmp);
-    tmp = 0;
-    throw e;
+  } catch (...) {
+    mState = STATE_ERROR;
+    if (tmp)
+      av_dict_free(&tmp);
+    throw;
   }
-  if (tmp)
-    av_dict_free(&tmp);
 }
 
 
@@ -194,9 +199,76 @@ Coder::ensureAudioParamsMatch(MediaAudio* audio)
     VS_THROW(HumbleInvalidArgument("audio sample rate does not match what coder expects"));
 
   if (getSampleFormat() != audio->getFormat())
-    VS_THROW(HumbleInvalidArgument("audio sample format does not match what coder expects"));
+    VS_THROW(HumbleInvalidArgument::make("audio sample format does not match what coder expects: %d vs %d",
+        getSampleFormat(), audio->getFormat()));
 
 }
+
+int32_t
+Coder::getFlags()
+{
+  return mCtx->flags;
+}
+int32_t
+Coder::getFlag(Flag flag) {
+  return mCtx->flags & flag;
+}
+int32_t
+Coder::getFlags2()
+{
+  return mCtx->flags2;
+}
+int32_t
+Coder::getFlag2(Flag2 flag) {
+  return mCtx->flags2 & flag;
+}
+void
+Coder::setFlags(int32_t val)
+{
+  if (getState() != STATE_INITED)
+    VS_THROW(HumbleInvalidArgument("Cannot set flags after coder is opened"));
+
+  mCtx->flags = val;
+}
+void
+Coder::setFlag(Flag flag, bool value)
+{
+  if (getState() != STATE_INITED)
+    VS_THROW(HumbleInvalidArgument("Cannot set flags after coder is opened"));
+
+  if (value)
+  {
+    mCtx->flags |= flag;
+  }
+  else
+  {
+    mCtx->flags &= (~flag);
+  }
+}
+void
+Coder::setFlags2(int32_t val)
+{
+  if (getState() != STATE_INITED)
+    VS_THROW(HumbleInvalidArgument("Cannot set flags after coder is opened"));
+
+  mCtx->flags2 = val;
+}
+void
+Coder::setFlag2(Flag2 flag, bool value)
+{
+  if (getState() != STATE_INITED)
+    VS_THROW(HumbleInvalidArgument("Cannot set flags after coder is opened"));
+
+  if (value)
+  {
+    mCtx->flags2 |= flag;
+  }
+  else
+  {
+    mCtx->flags2 &= (~flag);
+  }
+}
+
 
 } /* namespace video */
 } /* namespace humble */

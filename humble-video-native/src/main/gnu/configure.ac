@@ -116,11 +116,17 @@ AC_ARG_ENABLE([optimizations],
 AC_MSG_CHECKING([whether to enable compiler optimizations])
 AC_MSG_RESULT([$enable_optimizations])
 
+# default name we use for the Maven bundle
+VS_MVN_HOST=$host
 AM_CONDITIONAL([VS_DEBUG], [ test "$x$enable_optimizations" = xno ])
 if test "x$enable_optimizations" = xno; then
   VS_DEBUG=1
   AC_SUBST([VS_DEBUG])
+  # If debug, we have a separate MVN name
+  VS_MVN_HOST="$host-debug"
 fi
+# This will be used to build our MVN pom file.
+AC_SUBST(VS_MVN_HOST)
 
 PKG_PROG_PKG_CONFIG
 AC_PATH_PROG([SWIG],[swig])
@@ -355,6 +361,14 @@ VS_FIND_STATIC_LIB([stdc++], [VS_LIBSTDCXX="-XCClinker ${VS_LIB}"], [VS_LIBSTDCX
 VS_FIND_STATIC_LIB([gcc], [VS_LIBGCC="-XCClinker ${VS_LIB}"], [VS_LIBGCC="-XCClinker -lgcc"])
 VS_FIND_STATIC_LIB([gcc_eh], [VS_LIBGCC_EH="-XCClinker ${VS_LIB}"], [VS_LIBGCC_EH="-XCClinker -lgcc_eh"])
 
+# For Xcode 5.1.1 don't attempt to do static linking with gcc with exception handling 
+case $host in
+  *darwin*)
+  VS_LIBGCC=
+  VS_LIBGCC_EH=
+  ;;
+esac
+
 AC_SUBST([VS_LIBSTDCXX])
 AC_SUBST([VS_LIBGCC])
 AC_SUBST([VS_LIBGCC_EH])
@@ -380,6 +394,6 @@ AC_CONFIG_FILES([Makefile
                  test/io/humble/ferry/Makefile
                  test/io/humble/video/Makefile
                  test/io/humble/video/customio/Makefile
-                 pom-${host}.xml:mk/pom.xml.in
+                 pom.xml:mk/pom.xml.in
                  ])
 AC_OUTPUT

@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
@@ -110,6 +110,29 @@ public:
    */
   virtual int32_t decodeVideo(MediaPicture * output,
       MediaPacket *packet, int32_t byteOffset);
+
+  /**
+   * Decode this packet into output.  It will
+   * try to fill up the media object, starting
+   * from the byteOffset inside this packet.
+   * <p>
+   * The caller is responsible for allocating the
+   * correct underlying Media object.  This function will overwrite
+   * any data in the samples object.
+   * </p>
+   * @param output The Media we decode to. Caller must check if it is complete on return.
+   * @param packet    The packet we're attempting to decode from.
+   * @param byteOffset Where in the packet payload to start decoding
+   *
+   * @return number of bytes actually processed from the packet, or negative for error
+   *
+   * @throws InvalidArgument if the media type is not compatible with this decoder.
+   * @see decodeVideo
+   * @see decodeAudio
+   */
+  virtual int32_t decode(MediaSampled * output,
+      MediaPacket *packet, int32_t byteOffset);
+
 
   /**
    * Decode this packet into output.

@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2013, Art Clarke.  All rights reserved.
- *  
+ * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
+ *   
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * Humble-Video is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
@@ -27,7 +27,7 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/RefCounted.h>
 #include <io/humble/video/VideoExceptions.h>
-#include <io/humble/video/MediaAudioImpl.h>
+#include <io/humble/video/MediaAudio.h>
 #include "MediaAudioResampler.h"
 
 using namespace io::humble::ferry;
@@ -36,7 +36,7 @@ namespace io {
 namespace humble {
 namespace video {
 
-VS_LOG_SETUP(VS_CPP_PACKAGE);
+VS_LOG_SETUP(VS_CPP_PACKAGE.MediaAudioResampler);
 
 MediaAudioResampler::MediaAudioResampler() {
   mCtx = swr_alloc();
@@ -84,7 +84,7 @@ MediaAudioResampler::make(AudioChannel::Layout outLayout, int32_t outSampleRate,
   // find the LCM of the input and output sample rates
   int64_t gcd = av_gcd(inSampleRate, outSampleRate);
   int64_t lcm = inSampleRate / gcd * outSampleRate;
-  if (lcm > INT32_MAX) {
+  if (lcm > LONG_MAX) {
     VS_LOG_INFO("LCM of input and output sample rates is greater than can be fit in a 32-bit value");
   }
   retval->mTimeBase = Rational::make(1, (int32_t)lcm);
@@ -185,9 +185,18 @@ MediaAudioResampler::setTimeBase(Rational* tb) {
 }
 
 int32_t
-MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
-  MediaAudioImpl* out = dynamic_cast<MediaAudioImpl*>(aOut);
-  MediaAudioImpl* in = dynamic_cast<MediaAudioImpl*>(aIn);
+MediaAudioResampler::resample(MediaSampled* aOut, MediaSampled*aIn)
+{
+  MediaAudio* out = dynamic_cast<MediaAudio*>(aOut);
+  MediaAudio*  in = dynamic_cast<MediaAudio*>(aIn);
+  if (aOut && !out)
+    VS_THROW(HumbleInvalidArgument("out must be a MediaAudio object"));
+  if (aIn && !in)
+    VS_THROW(HumbleInvalidArgument("out must be a MediaAudio object"));
+  return resampleAudio(out, in);
+}
+int32_t
+MediaAudioResampler::resampleAudio(MediaAudio* out, MediaAudio* in) {
 
   if (mState != STATE_OPENED)
     VS_THROW(HumbleRuntimeError("Must call open() on resampler before using"));
@@ -229,7 +238,7 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
   }
   // now convert the new PTS back to the right timebase
   outFrame->pts = Rational::rescale(
-      getNextPts(inputTs == Global::NO_PTS ? INT64_MIN : inputTs),
+      getNextPts(inputTs == Global::NO_PTS ? LONG_LONG_MIN : inputTs),
       mTimeBase->getNumerator(), mTimeBase->getDenominator(),
       1, getInputSampleRate() * getOutputSampleRate(),
       Rational::ROUND_DOWN);
@@ -247,6 +256,22 @@ MediaAudioResampler::resample(MediaAudio* aOut, MediaAudio* aIn) {
   }
   outFrame->nb_samples = retval;
   out->setComplete(retval > 0);
+#ifdef VS_DEBUG
+  {
+    char inDescr[256];
+    char outDescr[256];
+    if (in)
+      in->logMetadata(inDescr, sizeof(inDescr));
+    else
+      *inDescr = 0;
+    if (out)
+      out->logMetadata(outDescr, sizeof(outDescr));
+    else
+      *outDescr = 0;
+    VS_LOG_TRACE("resample MediaAudioResampler@%p[out:%s;in:%s;]", this, outDescr, inDescr);
+
+  }
+#endif
   return retval;
 
 }
