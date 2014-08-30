@@ -4,7 +4,7 @@
 
   <groupId>io.humble</groupId>
   <artifactId>@VS_PROJECT_NAME@-arch-@VS_MVN_HOST@</artifactId>
-  <version>@LIB_MAJOR_VERSION@.@LIB_MINOR_VERSION@-SNAPSHOT</version>
+  <version>@LIB_MAJOR_VERSION@.@LIB_MINOR_VERSION@.@LIB_PATCH_VERSION@-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>@VS_PROJECT_NAME@-arch-@VS_MVN_HOST@</name>
