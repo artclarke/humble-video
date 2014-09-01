@@ -5,7 +5,7 @@
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
     <version>0.1.1-SNAPSHOT</version>
-    <relativePath>../humble-video-parent/pom.xml</relativePath>
+    <relativePath/>
   </parent>
 
   <artifactId>humble-video-test</artifactId>

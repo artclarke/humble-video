@@ -80,6 +80,7 @@
           <version>2.5</version>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
           <version>1.5</version>
           <executions>
@@ -95,12 +96,13 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>2.2.1</version>
+          <version>2.3</version>
           <executions>
             <execution>
-              <id>package-sources</id>
+              <id>attach-sources</id>
+              <phase>verify</phase>
               <goals>
-                <goal>jar</goal>
+                <goal>jar-no-fork</goal>
               </goals>
             </execution>
           </executions>
@@ -111,8 +113,8 @@
           <version>2.9.1</version>
           <executions>
             <execution>
-              <id>package-javadocs</id>
-              <phase>package</phase>
+              <id>attach-javadocs</id>
+              <phase>verify</phase>
               <goals>
                 <goal>jar</goal>
               </goals>
@@ -178,6 +180,18 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.2.1</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

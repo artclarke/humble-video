@@ -9,7 +9,7 @@
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
     <version>0.1.1-SNAPSHOT</version>
-    <relativePath>./humble-video-parent/pom.xml</relativePath>
+    <relativePath/>
   </parent>
 
   <artifactId>humble-video-superproject</artifactId>
@@ -19,6 +19,7 @@
   <url>http://humble.io</url>
 
   <modules>
+    <module>humble-video-parent</module>
     <module>humble-video-captive</module>
     <module>humble-video-native</module>
     <module>humble-video-noarch</module>
@@ -32,10 +33,9 @@
     <profile>
       <!-- Only run with this profile on machines where all native artifacts
            have been compiled into the humble-video-stage directories -->
-      <id>ci</id>
+      <id>deploy</id>
       <modules>
-        <module>humble-video-captive</module>
-        <module>humble-video-native</module>
+        <module>humble-video-parent</module>
         <module>humble-video-stage</module>
         <module>humble-video-noarch</module>
         <module>humble-video-test</module>
