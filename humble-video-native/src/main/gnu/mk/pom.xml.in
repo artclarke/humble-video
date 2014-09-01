@@ -19,6 +19,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jarsigner.keystore>../../humble-video-parent/src/main/resources/development.keystore</jarsigner.keystore>
   </properties>
 
   <dependencies>
