@@ -8,6 +8,7 @@
   <url>http://www.humble.io</url>
 
   <properties>
+    <humble.version>0.2.0-SNAPSHOT</humble.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
     <humble.build.timestamp>${maven.build.timestamp}</humble.build.timestamp>
@@ -314,47 +315,47 @@
       <dependency>
         <groupId>io.humble</groupId>
         <artifactId>humble-video-noarch</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>${humble.version}</version>
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
         <artifactId>humble-video-arch-i686-apple-darwin12</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>${humble.version}</version>
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
         <artifactId>humble-video-arch-x86_64-apple-darwin12</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>${humble.version}</version>
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
         <artifactId>humble-video-arch-i686-pc-linux-gnu6</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>${humble.version}</version>
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
         <artifactId>humble-video-arch-x86_64-pc-linux-gnu6</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>${humble.version}</version>
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
         <artifactId>humble-video-arch-i686-w64-mingw32</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>${humble.version}</version>
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
         <artifactId>humble-video-arch-x86_64-w64-mingw32</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>${humble.version}</version>
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
         <artifactId>humble-video-arch-all</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>${humble.version}</version>
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
         <artifactId>humble-video-all</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>${humble.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
