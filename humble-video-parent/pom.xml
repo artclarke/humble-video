@@ -37,7 +37,6 @@
   <scm>
     <url>https://github.com/artclarke/humble-video</url>
     <connection>scm:git:git://github.com/artclarke/humble-video.git</connection>
-    <developerConnection>scm:git:git://github.com/artclarke/humble-video.git</developerConnection>
   </scm>
   <developers>
     <developer>

@@ -12,6 +12,10 @@
 
   <name>humble-video-superproject</name>
   <url>http://humble.io</url>
+  <scm>
+    <url>https://github.com/artclarke/humble-video</url>
+    <connection>scm:git:git://github.com/artclarke/humble-video.git</connection>
+  </scm>
 
   <profiles>
     <profile>
