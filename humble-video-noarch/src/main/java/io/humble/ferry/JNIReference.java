@@ -143,7 +143,7 @@ public final class JNIReference extends WeakReference<Object>
    * 
    * @return the manager
    */
-  static JNIMemoryManager getMgr()
+  public static JNIMemoryManager getMgr()
   {
     return JNIMemoryManager.getMgr();
   }
