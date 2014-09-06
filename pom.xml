@@ -5,7 +5,13 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <groupId>io.humble</groupId>
+  <parent>
+    <groupId>io.humble</groupId>
+    <artifactId>humble-video-parent</artifactId>
+    <version>0.1.1-SNAPSHOT</version>
+    <relativePath>./humble-video-parent/pom.xml</relativePath>
+  </parent>
+
   <version>0.1.1-SNAPSHOT</version>
   <artifactId>humble-video-superproject</artifactId>
   <packaging>pom</packaging>
