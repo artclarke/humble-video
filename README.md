@@ -1,3 +1,20 @@
+# How To Use In Your Code
+
+If using Maven, Humble is deployed to the Maven Central Repository. To include it in your project (note: this will include artifacts for all operating systems), add this to your pom.xml:
+```xml
+<project>
+  ...
+  <dependencies>
+    ...
+    <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-all</artifactId>
+      <version>0.1.1</version>
+    </dependency>
+  </dependencies>
+</project>
+```
+
 # Please read this BEFORE running 'mvn install'.
 
 Welcome to the Humble Video uber project.
