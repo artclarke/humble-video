@@ -148,22 +148,22 @@ Note: to do all of those (steps 4 through 8):
 
     vagrant up && mvn install && vagrant ssh --command "cd /vagrant && mvn install" && mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
 
+12. Check the OSS snapshot page to see if we got deployed correctly:
 
-Steps remaining:
- - remove the snapshot
-   - use the maven releases plugin. Don't forget the -parent/pom.xml dependencies.
-     - if just removing -snapshot, native code does not need to be rebuilt.
-     - do confirm humble-video-stage/../pom.xml has the -SNAPSHOT removed after the releases plugin
-   - Do re-run the build from the top though (even if it doesn't rebuild native code)
+    https://oss.sonatype.org/content/repositories/snapshots/io/humble/
 
-   - After testing, deploy to staging and review in OSS.
+13. Merge your changes back into Develop
 
- - Upgrade develop to next version
-   - Don't forget -captive/../configure.ac, -native/../configure.ac and parent/pom.xml dependencies
-   - Don't forget autorecon
+    git flow release finish v<version-number>
 
+14. Peg your develop tree to the next snapshot.
 
+    cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number>-SNAPSHOT
+    cd humble-video-noarch/src/main/gnu
+    <edit configure.ac to update version numbers in an editor of your choice>
+    autoreconf
 
+15. Done!
 
 Enjoy!
 
