@@ -128,16 +128,26 @@ All steps should be done from a OS X machine, and we'll build the other binaries
 
     vagrant ssh --command "cd /vagrant && mvn install 2>&1 | tee mvn-linux.out"
 
-8. If successful, you now have binaries for all supported OSes staged in the humble-video-stage directory. Well done. Now let's dest deploying a snapshot.
 
-    mvn -P\!build,deploy deply 2>&1 | tee mvn.out
+8. If successful, you now have binaries for all supported OSes staged in the humble-video-stage directory. Well done. Now let's test deploying a snapshot.
 
+    mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
+
+Note: to do all of those (steps 4 through 8):
+
+    vagrant up && mvn install && vagrant ssh --command "cd /vagrant && mvn install" && mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
+  
 9. If successful, it's time to PEG the snapshots to a specific release. Now things get hairy.
 
     cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number>
 
 10. Now, rebuild all Java Source
-    (cd humble-video-noarch && mvn clean)
+    (cd humble-video-noarch && mvn clean) && (cd humble-video-test && mvn clean)
+
+11. Do one last rebuild (you do not need to rebuild native sources) and deploy
+
+    vagrant up && mvn install && vagrant ssh --command "cd /vagrant && mvn install" && mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
+
 
 Steps remaining:
  - remove the snapshot
