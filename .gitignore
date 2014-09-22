@@ -22,7 +22,7 @@ libtool
 *_CXXRunner.cpp
 io.humble.*
 /.vagrant
-/humble-video-stage/humble-video-arch-*
+/humble-video-stage/humble-video-arch-*/target
 
 # Python generate byte code should not be checked in
 *.pyc
