@@ -1,36 +1,55 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <groupId>io.humble</groupId>
+  <parent>
+    <groupId>io.humble</groupId>
+    <artifactId>humble-video-parent</artifactId>
+    <version>0.1.1-SNAPSHOT</version>
+    <relativePath/>
+  </parent>
+
   <artifactId>humble-video-superproject</artifactId>
-  <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>humble-video-superproject</name>
   <url>http://humble.io</url>
 
-  <modules>
-    <module>
-      humble-video-captive
-    </module>
-    <module>
-      humble-video-native
-    </module>
-    <module>
-      humble-video-noarch
-    </module>
-    <module>
-      humble-video-test
-    </module>
-    <!-- Note: humble-video-all is NOT included because it will
-         only build on machines that have staged artifacts for
-         all required native code. See the humble-video-stage/pom.xml
-         file. -->
-  </modules>
-
+  <profiles>
+    <profile>
+      <id>build</id>
+      <!-- The build profile generates all the native code necessary for this platform,
+           and takes a very long time to run -->
+      <modules>
+        <module>humble-video-parent</module>
+        <module>humble-video-captive</module>
+        <module>humble-video-native</module>
+        <module>humble-video-noarch</module>
+        <module>humble-video-test</module>
+      </modules>
+      <activation>
+        <!-- activate when a file is missing, which should be always. This
+             allows this profile to be activated without user input, but
+             also lets me turn it off -->
+        <file>
+          <missing>target/file-is-never-generated</missing>
+        </file>
+      </activation>
+    </profile>
+    <profile>
+      <id>deploy</id>
+      <!-- The deploy profile assumes all assets have been built for all
+           platforms into humble-video-stage, and then runs through all
+           of them to deploy to Maven Central -->
+      <modules>
+        <module>humble-video-parent</module>
+        <module>humble-video-stage</module>
+        <module>humble-video-noarch</module>
+        <module>humble-video-all</module>
+      </modules> 
+    </profile>
+  </profiles>
 </project>

@@ -1,101 +1,100 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
- <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
- <parent>
-  <groupId>io.humble</groupId>
-  <artifactId>humble-video-parent</artifactId>
-  <version>0.1-SNAPSHOT</version>
-  <relativePath>../humble-video-parent/pom.xml</relativePath>
- </parent>
+  <parent>
+    <groupId>io.humble</groupId>
+    <artifactId>humble-video-parent</artifactId>
+    <version>0.1.1-SNAPSHOT</version>
+    <relativePath/>
+  </parent>
 
- <!-- This POM makes the humble-video-noarch artifact, but is actually part 
+  <!-- This POM makes the humble-video-noarch artifact, but is actually part 
   of the humble-video-main project because it also has the source code for 
   all our native code -->
  <artifactId>humble-video-noarch</artifactId>
+ <version>0.1.1-SNAPSHOT</version>
  <description>
-    This is the main Humble Video Java library. It contains no native code, but all Java runtime code.
-    It must be paired up with the correct humble-video-arch-*.jar library for your OS. For most
-    users, depending on humble-video-all will work better.
-  </description>
+   This is the main Humble Video Java library. It contains no native code, but all Java runtime code.
+   It must be paired up with the correct humble-video-arch-*.jar library for your OS. For most
+   users, depending on humble-video-all will work better.
+ </description>
  <packaging>jar</packaging>
  <dependencies>
-  <dependency>
-   <groupId>org.slf4j</groupId>
-   <artifactId>slf4j-api</artifactId>
-  </dependency>
-  <dependency>
-   <groupId>junit</groupId>
-   <artifactId>junit</artifactId>
-   <scope>test</scope>
-  </dependency>
-  <dependency>
-   <groupId>ch.qos.logback</groupId>
-   <artifactId>logback-classic</artifactId>
-   <scope>test</scope>
-  </dependency>
+   <dependency>
+     <groupId>org.slf4j</groupId>
+     <artifactId>slf4j-api</artifactId>
+   </dependency>
+   <dependency>
+     <groupId>junit</groupId>
+     <artifactId>junit</artifactId>
+     <scope>test</scope>
+   </dependency>
+   <dependency>
+     <groupId>ch.qos.logback</groupId>
+     <artifactId>logback-classic</artifactId>
+     <scope>test</scope>
+   </dependency>
  </dependencies>
  <profiles>
-  <profile>
-   <id>Windows</id>
-   <activation>
-    <os>
-     <family>Windows</family>
-    </os>
-   </activation>
-   <dependencies>
-    <dependency>
-     <groupId>io.humble</groupId>
-     <artifactId>humble-video-arch-i686-w64-mingw32</artifactId>
-     <scope>test</scope>
-    </dependency>
-    <dependency>
-     <groupId>io.humble</groupId>
-     <artifactId>humble-video-arch-x86_64-w64-mingw32</artifactId>
-     <scope>test</scope>
-    </dependency>
-   </dependencies>
-  </profile>
-  <profile>
-   <id>Mac</id>
-   <activation>
-    <os>
-     <family>Mac</family>
-    </os>
-   </activation>
-   <dependencies>
-    <dependency>
-     <groupId>io.humble</groupId>
-     <artifactId>humble-video-arch-i686-apple-darwin12</artifactId>
-     <scope>test</scope>
-    </dependency>
-    <dependency>
-     <groupId>io.humble</groupId>
-     <artifactId>humble-video-arch-x86_64-apple-darwin12</artifactId>
-     <scope>test</scope>
-    </dependency>
-   </dependencies>
-  </profile>
-  <profile>
-   <id>Linux</id>
-   <activation>
-    <os>
-     <family>Linux</family>
-    </os>
-   </activation>
-   <dependencies>
-    <dependency>
-     <groupId>io.humble</groupId>
-     <artifactId>humble-video-arch-i686-pc-linux-gnu6</artifactId>
-     <scope>test</scope>
-    </dependency>
-    <dependency>
-     <groupId>io.humble</groupId>
-     <artifactId>humble-video-arch-x86_64-pc-linux-gnu6</artifactId>
-     <scope>test</scope>
-    </dependency>
-   </dependencies>
-  </profile>
+   <profile>
+     <id>Windows</id>
+     <activation>
+       <os>
+         <family>Windows</family>
+       </os>
+     </activation>
+     <dependencies>
+       <dependency>
+         <groupId>io.humble</groupId>
+         <artifactId>humble-video-arch-i686-w64-mingw32</artifactId>
+         <scope>test</scope>
+       </dependency>
+       <dependency>
+         <groupId>io.humble</groupId>
+         <artifactId>humble-video-arch-x86_64-w64-mingw32</artifactId>
+         <scope>test</scope>
+       </dependency>
+     </dependencies>
+   </profile>
+   <profile>
+     <id>Mac</id>
+     <activation>
+       <os>
+         <family>Mac</family>
+       </os>
+     </activation>
+     <dependencies>
+       <dependency>
+         <groupId>io.humble</groupId>
+         <artifactId>humble-video-arch-i686-apple-darwin12</artifactId>
+         <scope>test</scope>
+       </dependency>
+       <dependency>
+         <groupId>io.humble</groupId>
+         <artifactId>humble-video-arch-x86_64-apple-darwin12</artifactId>
+         <scope>test</scope>
+       </dependency>
+     </dependencies>
+   </profile>
+   <profile>
+     <id>Linux</id>
+     <activation>
+       <os>
+         <family>Linux</family>
+       </os>
+     </activation>
+     <dependencies>
+       <dependency>
+         <groupId>io.humble</groupId>
+         <artifactId>humble-video-arch-i686-pc-linux-gnu6</artifactId>
+         <scope>test</scope>
+       </dependency>
+       <dependency>
+         <groupId>io.humble</groupId>
+         <artifactId>humble-video-arch-x86_64-pc-linux-gnu6</artifactId>
+         <scope>test</scope>
+       </dependency>
+     </dependencies>
+   </profile>
  </profiles>
-
 </project>

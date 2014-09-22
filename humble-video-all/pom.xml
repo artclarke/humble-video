@@ -5,8 +5,8 @@
   <parent>
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
-    <version>0.1-SNAPSHOT</version>
-    <relativePath>../humble-video-parent/pom.xml</relativePath>
+    <version>0.1.1-SNAPSHOT</version>
+    <relativePath/>
   </parent>
 
   <artifactId>humble-video-all</artifactId>
@@ -19,30 +19,37 @@
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch-i686-apple-darwin12</artifactId>
+      <version>0.1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch-x86_64-apple-darwin12</artifactId>
+      <version>0.1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch-i686-pc-linux-gnu6</artifactId>
+      <version>0.1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch-x86_64-pc-linux-gnu6</artifactId>
+      <version>0.1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch-i686-w64-mingw32</artifactId>
+      <version>0.1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch-x86_64-w64-mingw32</artifactId>
+      <version>0.1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-noarch</artifactId>
+      <version>0.1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

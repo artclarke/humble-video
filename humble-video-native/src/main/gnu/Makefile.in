@@ -277,6 +277,7 @@ LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LIB_MAJOR_VERSION = @LIB_MAJOR_VERSION@
 LIB_MINOR_VERSION = @LIB_MINOR_VERSION@
+LIB_PATCH_VERSION = @LIB_PATCH_VERSION@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
@@ -941,8 +942,9 @@ include $(abs_top_builddir)/mk/Makefile.global
 @DX_COND_doc_TRUE@	$(DX_ENV) $(DX_DOXYGEN) $(srcdir)/$(DX_CONFIG)
 
 install-exec-hook:
-	@$(MKDIR_P) $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST}
+	@$(MKDIR_P) $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST}/src/main/java/io/humble/video_native
 	@cp -f pom.xml $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST}/pom.xml
+	@cp -f $(abs_top_srcdir)/mk/Version.java $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST}/src/main/java/io/humble/video_native
 	@(cd $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST} && mvn install)
 
 doc: doxygen-doc
