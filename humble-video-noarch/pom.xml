@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.1</version>
     <relativePath>../humble-video-parent/pom.xml</relativePath>
   </parent>
 
@@ -12,7 +12,7 @@
   of the humble-video-main project because it also has the source code for 
   all our native code -->
  <artifactId>humble-video-noarch</artifactId>
- <version>0.1.1-SNAPSHOT</version>
+ <version>0.1.1</version>
  <description>
    This is the main Humble Video Java library. It contains no native code, but all Java runtime code.
    It must be paired up with the correct humble-video-arch-*.jar library for your OS. For most
