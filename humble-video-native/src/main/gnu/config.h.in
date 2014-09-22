@@ -105,6 +105,9 @@
 /* Minor version of library */
 #undef VS_LIB_MINOR_VERSION
 
+/* Patch version of library */
+#undef VS_LIB_PATCH_VERSION
+
 /* Name of library */
 #undef VS_PROJECT_NAME
 

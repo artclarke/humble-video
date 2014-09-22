@@ -17,10 +17,13 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-package io.humble.ferry;
+package io.humble.ferry_test;
 
 import static org.junit.Assert.*;
-
+import io.humble.ferry.JNIMemoryManager;
+import io.humble.ferry.JNIReference;
+import io.humble.ferry.RefCounted;
+import io.humble.ferry.RefCountedTester;
 import io.humble.ferry.JNIMemoryManager.MemoryModel;
 
 import java.util.Collection;

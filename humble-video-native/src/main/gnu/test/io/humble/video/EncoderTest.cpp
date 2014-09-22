@@ -54,6 +54,8 @@ EncoderTest::testCreation() {
 void
 EncoderTest::testEncodeVideo() {
   Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, true);
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_INFO, false);
 
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
   const int32_t maxPics = isMemCheck ? 10 : 500;
@@ -147,6 +149,8 @@ EncoderTest::testEncodeVideo() {
 void
 EncoderTest::testEncodeAudio() {
   Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, true);
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_INFO, false);
 
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
   const int32_t sampleRate = 44100;
@@ -374,6 +378,8 @@ EncoderTest::testTranscode()
   // enable trace logging
   Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, true);
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_INFO, false);
 
   TestData::Fixture* fixture;
   fixture=mFixtures.getFixture("testfile.flv");
