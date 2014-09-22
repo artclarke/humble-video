@@ -4,6 +4,7 @@
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
     <version>0.2.0-SNAPSHOT</version>
+    <relativePath>../humble-video-parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>humble-video-native</artifactId>
@@ -73,24 +74,6 @@
             </goals>
           </execution>
           <execution>
-            <id>exec-four</id>
-            <phase>test</phase>
-            <configuration>
-              <executable>bash</executable>
-              <arguments>
-                <argument>${project.basedir}/src/main/gnu/cross-make.sh</argument>
-                <argument>-j4</argument>
-                <argument>check</argument>
-              </arguments>
-              <workingDirectory>
-                ${project.basedir}/target/native
-              </workingDirectory>
-            </configuration>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-          </execution>
-          <execution>
             <id>exec-five</id>
             <phase>package</phase>
             <configuration>
@@ -111,4 +94,42 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>Run-Native-Tests</id>
+      <!-- only run tests if we're not skipping tests -->
+      <activation>
+        <property><name>!skipTests</name></property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.2.1</version>
+            <executions>
+              <execution>
+                <id>exec-four</id>
+                <phase>test</phase>
+                <configuration>
+                  <executable>bash</executable>
+                  <arguments>
+                    <argument>${project.basedir}/src/main/gnu/cross-make.sh</argument>
+                    <argument>-j4</argument>
+                    <argument>check</argument>
+                  </arguments>
+                  <workingDirectory>
+                    ${project.basedir}/target/native
+                  </workingDirectory>
+                </configuration>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

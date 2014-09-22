@@ -93,6 +93,105 @@ To build, once the chef recipes have run on a clean box, just run:
 ## Windows Build Notes
 Don't do it. It's not supported. Instead you have to cross-compile for Windows from a Linux box. Sorry.
 
+# Steps Required To Release.
+
+Release is a long process. The builds take hours on a 2012 MacBook Pro. You really want to be highly confident before you kick it off.
+
+That said, I've attempted to automate as much of it as possible. The biggest challenge is patience.
+
+All steps should be done from a OS X machine, and we'll build the other binaries in the Vagrant VM running on that OS X machine.
+
+1. Start a git flow release
+
+```bash
+git flow release start v<version-number>
+```
+
+2. Publish that release branch
+
+```bash
+git push origin release/v<version-number>
+```
+
+3. **Checkout a branch new copy of the repository -- no cheating**
+
+```bash
+git clone git@github.com:artclarke/humble-video.git humble-video-v<version-number>
+```
+
+4. Start up the VM that will build the linux/windows stuff.
+
+```bash
+cd humble-video-v<version-number>
+vagrant up
+```
+
+5. Wait a long time for it to download and provision itself (can be safely done in parallel with 6).
+
+6. Do a full Mac build and test (can be safely done in parallel with 5). Note that we have to build the native code 4 times for each operating system (x86_64 and i686 versions / debug and release versions), so this takes a long time.
+
+```bash
+mvn install 2>&1 | tee mvn.out
+```
+
+7. If both 5 and 6 completed successfully, build and run on Linux. This is the longest single step -- takes about 3 hours on my MacBook pro. Grab coffee.
+
+```bash
+vagrant ssh --command "cd /vagrant && mvn install 2>&1 | tee mvn-linux.out"
+```
+
+
+8. If successful, you now have binaries for all supported OSes staged in the humble-video-stage directory. Well done. Now let's test deploying a snapshot.
+
+```bash
+mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
+```
+
+Note: to do all of those (steps 4 through 8):
+
+```bash
+vagrant up && mvn install && vagrant ssh --command "cd /vagrant && mvn install" && mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
+```
+  
+9. If successful, it's time to PEG the snapshots to a specific release. Now things get hairy.
+
+```bash
+cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number>
+```
+
+10. Now, rebuild all Java Source
+
+```bash
+(cd humble-video-noarch && mvn clean) && (cd humble-video-test && mvn clean)
+```
+
+11. Do one last rebuild (you do not need to rebuild native sources) and deploy
+
+```bash
+vagrant up && mvn install && vagrant ssh --command "cd /vagrant && mvn install" && mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
+```
+
+12. Check the OSS snapshot page to see if we got deployed correctly:
+
+    https://oss.sonatype.org/content/repositories/snapshots/io/humble/
+
+13. Merge your changes back into Develop
+
+```bash
+git flow release finish v<version-number>
+```
+
+14. Peg your develop tree to the next snapshot.
+
+```bash
+cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number>-SNAPSHOT
+cd humble-video-noarch/src/main/gnu
+<edit configure.ac to update version numbers in an editor of your choice>
+autoreconf
+```
+
+15. Done!
+
 Enjoy!
 
 - Art

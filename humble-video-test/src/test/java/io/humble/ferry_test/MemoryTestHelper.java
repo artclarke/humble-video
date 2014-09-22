@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package io.humble.ferry;
+package io.humble.ferry_test;
+
+import io.humble.ferry.JNIMemoryManager;
 
 import java.util.LinkedList;
 

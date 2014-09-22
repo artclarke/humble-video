@@ -9,14 +9,19 @@
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
     <version>0.2.0-SNAPSHOT</version>
-    <relativePath />
+    <relativePath>./humble-video-parent/pom.xml</relativePath>
   </parent>
 
+  <version>0.2.0-SNAPSHOT</version>
   <artifactId>humble-video-superproject</artifactId>
   <packaging>pom</packaging>
 
   <name>humble-video-superproject</name>
   <url>http://humble.io</url>
+  <scm>
+    <url>https://github.com/artclarke/humble-video</url>
+    <connection>scm:git:git://github.com/artclarke/humble-video.git</connection>
+  </scm>
 
   <profiles>
     <profile>
