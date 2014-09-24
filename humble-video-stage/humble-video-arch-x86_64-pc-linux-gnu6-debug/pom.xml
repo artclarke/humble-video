@@ -9,9 +9,7 @@
     <relativePath>../../humble-video-parent/pom.xml</relativePath>
   </parent>
 
-  <groupId>io.humble</groupId>
   <artifactId>humble-video-arch-x86_64-pc-linux-gnu6-debug</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>humble-video-arch-x86_64-pc-linux-gnu6-debug</name>

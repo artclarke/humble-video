@@ -8,7 +8,6 @@
   </parent>
 
   <artifactId>humble-video-captive</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>humble-video-captive</name>
