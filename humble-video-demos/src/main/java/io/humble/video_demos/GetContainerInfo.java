@@ -20,8 +20,11 @@ package io.humble.video_demos;
 
 import java.io.IOException;
 
+import io.humble.video.Codec;
+import io.humble.video.Decoder;
 import io.humble.video.Demuxer;
 import io.humble.video.DemuxerFormat;
+import io.humble.video.DemuxerStream;
 import io.humble.video.Global;
 import io.humble.video.KeyValueBag;
 
@@ -53,11 +56,6 @@ public class GetContainerInfo {
     final Options options = new Options();
     options.addOption("h", "help", false, "displays help");
     options.addOption("v", "version", false, "version of this library");
-    options.addOption("c", "codecs", false, "information about available codecs");
-    options.addOption("f", "formats", false, "information about available formats");
-    options.addOption("r", "resamplers", false, "information about available resamplers");
-    options.addOption("l", "filters", false, "information about available filters");
-    options.addOption("a", "all", false, "information about everything!");
     
     final CommandLineParser parser = new org.apache.commons.cli.BasicParser();
     try {
@@ -71,12 +69,8 @@ public class GetContainerInfo {
         formatter.printHelp(GetContainerInfo.class.getCanonicalName() + " <filename>", options);
       } else {
         final String[] parsedArgs = cmd.getArgs();
-        if (parsedArgs != null && parsedArgs.length > 0)
-          for(String arg : parsedArgs) {
-            getInfo(arg, options);
-          }
-        else
-          getInfo(null, options);
+        for(String arg: parsedArgs)
+          getInfo(arg, options);
       }
     } catch (ParseException e) {
       System.err.println("Exception parsing command line: " + e.getLocalizedMessage());
@@ -94,21 +88,36 @@ public class GetContainerInfo {
    */
   private static void getInfo(String arg, Options options) throws InterruptedException, IOException {
     final Demuxer container = Demuxer.make();
-    if (arg != null) {
-      // attempt to open the container
-      container.open(arg, null, false, true, null, null);
-      final DemuxerFormat format = container.getFormat();
-      System.out.printf("URL: '%s' (%s: %s)\n", container.getURL(), format.getLongName(), format.getName());
-      // get metadata
-      final KeyValueBag metadata = container.getMetaData();
-      System.out.println("MetaData:");
+    // attempt to open the container. Notes that we assume no extra streams
+    // can be added, and that we should attempt to query StreamMetaData (false and true
+    // respectively).
+    container.open(arg, null, false, true, null, null);
+    final DemuxerFormat format = container.getFormat();
+    System.out.printf("URL: '%s' (%s: %s)\n", container.getURL(), format.getLongName(), format.getName());
+
+    // get metadata
+    KeyValueBag metadata = container.getMetaData();
+    System.out.println("MetaData:");
+    for(String key: metadata.getKeys())
+      System.out.printf("  %s: %s\n", key, metadata.getValue(key));
+
+    // print out some basics about the container
+    final String formattedDuration = formatTimeStamp(container.getDuration());
+    System.out.printf("Duration: %s, start: %f, bitrate: %d kb/s\n",
+        formattedDuration,
+        container.getStartTime() == Global.NO_PTS ? 0 : container.getStartTime() / 1000000.0,
+            container.getBitRate()/1000);
+    
+    // now, let's print out details on each stream.
+    int ns = container.getNumStreams();
+    for (int i = 0; i < ns; i++) {
+      DemuxerStream stream = container.getStream(i);
+      Decoder d = stream.getDecoder();
+      System.out.printf(" Stream #0.%1$d (%s): %s\n", i, d != null ? d.toString() : "unknown coder");
+      System.out.println("  Metadata:");
+      metadata = stream.getMetaData();
       for(String key: metadata.getKeys())
         System.out.printf("  %s: %s\n", key, metadata.getValue(key));
-      final String formattedDuration = formatTimeStamp(container.getDuration());
-      System.out.printf("Duration: %s, start: %f, bitrate: %d kb/s\n",
-          formattedDuration,
-          container.getStartTime() == Global.NO_PTS ? 0 : container.getStartTime() / 1000000.0,
-          container.getBitRate()/1000);
     }
   }
 
