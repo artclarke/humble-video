@@ -140,7 +140,7 @@ public class Demuxer extends Container {
  * Get the DemuxerFormat associated with this Demuxer<br>
  * or null if unknown.
  */
-  protected DemuxerFormat getFormat() {
+  public DemuxerFormat getFormat() {
     long cPtr = VideoJNI.Demuxer_getFormat(swigCPtr, this);
     return (cPtr == 0) ? null : new DemuxerFormat(cPtr, false);
   }

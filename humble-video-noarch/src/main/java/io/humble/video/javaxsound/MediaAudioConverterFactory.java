@@ -26,6 +26,12 @@ public class MediaAudioConverterFactory {
         protoAudio.getSampleRate(), protoAudio.getChannelLayout(), protoAudio.getFormat());
   }
 
+  /**
+   * A descriptor for the default java audio format we convert to, which is
+   * signed 16-bit 2-channel (stereo) audio samples at 22050 samples per second.
+   * The converter will convert any type of audio given to it into this format
+   * for playback with Java.
+   */
   public static final String DEFAULT_JAVA_AUDIO="HUMBLE-STEREO-S16-22050";
   
   /**

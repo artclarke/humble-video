@@ -20,11 +20,11 @@
  *      Author: aclarke
  */
 
-%javamethodmodifiers getNumSupportedCodecs "protected";
-%javamethodmodifiers getSupportedCodecId "protected";
-%javamethodmodifiers getSupportedCodecTag "protected";
-%javamethodmodifiers getNumFormats "protected";
-%javamethodmodifiers getFormat "protected"
+%javamethodmodifiers io::humble::video::DemuxerFormat::getNumSupportedCodecs "protected";
+%javamethodmodifiers io::humble::video::DemuxerFormat::getSupportedCodecId "protected";
+%javamethodmodifiers io::humble::video::DemuxerFormat::getSupportedCodecTag "protected";
+%javamethodmodifiers io::humble::video::DemuxerFormat::getNumFormats "protected";
+%javamethodmodifiers io::humble::video::DemuxerFormat::getFormat "protected"
 
 %typemap (javacode) io::humble::video::DemuxerFormat,io::humble::video::DemuxerFormat*,io::humble::video::DemuxerFormat& %{
   @Override

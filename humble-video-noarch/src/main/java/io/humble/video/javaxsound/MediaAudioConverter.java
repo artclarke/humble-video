@@ -23,12 +23,29 @@ public interface MediaAudioConverter {
    */
   public ByteBuffer toJavaAudio(ByteBuffer output, MediaAudio input);
 
+  /**
+   * The Humble {@link AudioFormat} this converter converts from.
+   * @return The {@link AudioFormat}.
+   */
   public AudioFormat.Type getMediaFormat();
 
+  /**
+   * The Humble {@link AudioChannel.Layout} this converter converts form.
+   * 
+   * @return The {@link AudioChannel.Layout}.
+   */
   public AudioChannel.Layout getMediaLayout();
 
+  /**
+   * The number of channels this converter assumes input audio has.
+   * @return The number of channels.
+   */
   public int getMediaChannels();
 
+  /**
+   * The sample rate this convert assumes input audio has.
+   * @return The sample rate.
+   */
   public int getMediaSampleRate();
 
   /**

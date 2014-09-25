@@ -153,7 +153,7 @@ public class Muxer extends Container {
  * Get the MuxerFormat associated with this Muxer<br>
  * or null if unknown.
  */
-  protected MuxerFormat getFormat() {
+  public MuxerFormat getFormat() {
     long cPtr = VideoJNI.Muxer_getFormat(swigCPtr, this);
     return (cPtr == 0) ? null : new MuxerFormat(cPtr, false);
   }
