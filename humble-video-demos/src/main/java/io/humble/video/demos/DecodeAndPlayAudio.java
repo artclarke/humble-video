@@ -118,6 +118,8 @@ public class DecodeAndPlayAudio {
       if (decoder != null && decoder.getCodecType() == MediaDescriptor.Type.MEDIA_AUDIO) {
         audioStreamId = i;
         audioDecoder = decoder;
+        // stop at the first one.
+        break;
       }
     }
     if (audioStreamId == -1)
@@ -146,7 +148,7 @@ public class DecodeAndPlayAudio {
      * this converts any audio format (represented in the samples object) into
      * a default audio format suitable for Java's speaker system (which will
      * be signed 16-bit audio, stereo (2-channels), resampled to 22,050 samples
-     * per second.
+     * per second).
      */
     
     final MediaAudioConverter converter =
