@@ -27,6 +27,7 @@ import io.humble.video.DemuxerStream;
 import io.humble.video.MediaAudio;
 import io.humble.video.MediaDescriptor;
 import io.humble.video.MediaPacket;
+import io.humble.video.Muxer;
 import io.humble.video.javaxsound.AudioFrame;
 import io.humble.video.javaxsound.MediaAudioConverter;
 import io.humble.video.javaxsound.MediaAudioConverterFactory;
@@ -39,51 +40,28 @@ import org.apache.commons.cli.ParseException;
 
 /**
  * Opens a media file, finds the first audio stream, and then plays it.
- * 
  * This is meant as a demonstration program to teach the use of the Humble API.
+ * <p>
+ * Concepts introduced:
+ * </p>
+ * <ul>
+ * <li>MediaPacket: An {@link MediaPacket} object can read from Media {@link Demuxer} objects and written {@link Muxer} objects, and represents encoded/compressed media-data.</li>
+ * <li>MediaAudio: {@link MediaAudio} objects represent uncompressed audio in Humble.</li>
+ * <li>Decoder: {@link Decoder} objects can be used to convert {@link MediaPacket} objects into uncompressed {@link MediaAudio} objects.
+ * <li>Decoding loops: This introduces the concept of reading {@link MediaPacket} objects from a {@link Demuxer} and then decoding them into raw data.
+ * </ul>
+ * 
+ * <p> 
+ * To run from maven, do:
+ * </p>
+ * <pre>
+ * mvn install exec:java -Dexec.mainClass="io.humble.video.demos.DecodeAndPlayAudio" -Dexec.args="filename.mp4"
+ * </pre>
  * 
  * @author aclarke
  *
  */
 public class DecodeAndPlayAudio {
-
-  /**
-   * Takes a media container (file) as the first argument, opens it,
-   * opens up the default audio device on your system, and plays back the audio.
-   *  
-   * To run from maven, do:
-   * <pre>
-   * mvn install exec:java -Dexec.mainClass="io.humble.video.demos.DecodeAndPlayAudio" -Dexec.args="filename.mp4"
-   * </pre>
-   * @param args Must contain one string which represents a filename
-   * @throws IOException 
-   * @throws InterruptedException 
-   */
-  public static void main(String[] args) throws InterruptedException, IOException
-  {
-    final Options options = new Options();
-    options.addOption("h", "help", false, "displays help");
-    options.addOption("v", "version", false, "version of this library");
-
-    final CommandLineParser parser = new org.apache.commons.cli.BasicParser();
-    try {
-      final CommandLine cmd = parser.parse(options, args);
-      if (cmd.hasOption("version")) {
-        // let's find what version of the library we're running
-        final String version = io.humble.video_native.Version.getVersionInfo();
-        System.out.println("Humble Version: " + version);
-      } else if (cmd.hasOption("help") || args.length == 0) {
-        final HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp(GetContainerInfo.class.getCanonicalName() + " <filename>", options);
-      } else {
-        final String[] parsedArgs = cmd.getArgs();
-        for(String arg: parsedArgs)
-          playSound(arg);
-      }
-    } catch (ParseException e) {
-      System.err.println("Exception parsing command line: " + e.getLocalizedMessage());
-    }
-  }
 
   /**
    * Opens a file, and plays the audio from it on the speakers.
@@ -223,4 +201,40 @@ public class DecodeAndPlayAudio {
     // similar with the demuxer, for the audio playback stuff, clean up after yourself.
     audioFrame.dispose();
   }
+  
+  /**
+   * Takes a media container (file) as the first argument, opens it,
+   * opens up the default audio device on your system, and plays back the audio.
+   *  
+   * @param args Must contain one string which represents a filename
+   * @throws IOException 
+   * @throws InterruptedException 
+   */
+  public static void main(String[] args) throws InterruptedException, IOException
+  {
+    final Options options = new Options();
+    options.addOption("h", "help", false, "displays help");
+    options.addOption("v", "version", false, "version of this library");
+
+    final CommandLineParser parser = new org.apache.commons.cli.BasicParser();
+    try {
+      final CommandLine cmd = parser.parse(options, args);
+      if (cmd.hasOption("version")) {
+        // let's find what version of the library we're running
+        final String version = io.humble.video_native.Version.getVersionInfo();
+        System.out.println("Humble Version: " + version);
+      } else if (cmd.hasOption("help") || args.length == 0) {
+        final HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp(GetContainerInfo.class.getCanonicalName() + " <filename>", options);
+      } else {
+        final String[] parsedArgs = cmd.getArgs();
+        for(String arg: parsedArgs)
+          playSound(arg);
+      }
+    } catch (ParseException e) {
+      System.err.println("Exception parsing command line: " + e.getLocalizedMessage());
+    }
+  }
+
+  
 }

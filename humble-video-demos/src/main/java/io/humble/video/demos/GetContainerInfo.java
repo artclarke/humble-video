@@ -20,6 +20,7 @@ package io.humble.video.demos;
 
 import java.io.IOException;
 
+import io.humble.video.Container;
 import io.humble.video.Decoder;
 import io.humble.video.Demuxer;
 import io.humble.video.DemuxerFormat;
@@ -35,57 +36,33 @@ import org.apache.commons.cli.ParseException;
 
 /**
  * Demo application that takes a Media file and displays the known meta-data about it.
+ * <p>
+ * Concepts introduced:
+ * </p>
+ * <ul>
+ * <li>Demuxers: An {@link Demuxer} object can read from Media {@link Container} objects.</li>
+ * <li>DemuxerStreams: {@link DemuxerStream} objects represent Streams of media information inside a {@link Container}.</li>
+ * <li>KeyValueBags: {@link KeyValueBag} objects are used throughout Humble to represent key-value meta-data stored inside different objects.</li>
+ * </ul>
+ * <p>
+ * To run from maven, do:
+ * </p>
+ * <pre>
+ * mvn install exec:java -Dexec.mainClass="io.humble.video.demos.GetContainerInfo" -Dexec.args="filename.mp4"
+ * </pre>
  * @author aclarke
  */
 public class GetContainerInfo {
-
-  /**
-   * Takes a media container (file) as the first argument, opens it,
-   * and tells you what's inside the container.
-   * 
-   * To run from maven, do:
-   * <pre>
-   * mvn install exec:java -Dexec.mainClass="io.humble.video.demos.GetContainerInfo" -Dexec.args="filename.mp4"
-   * </pre>
-   * @param args Must contain one string which represents a filename. If no arguments, then prints help.
-   * @throws IOException if file cannot be opened.
-   * @throws InterruptedException if process is interrupted while querying.
-   */
-  public static void main(String[] args) throws InterruptedException, IOException {
-    final Options options = new Options();
-    options.addOption("h", "help", false, "displays help");
-    options.addOption("v", "version", false, "version of this library");
-    
-    final CommandLineParser parser = new org.apache.commons.cli.BasicParser();
-    try {
-      final CommandLine cmd = parser.parse(options, args);
-      if (cmd.hasOption("version")) {
-        // let's find what version of the library we're running
-        final String version = io.humble.video_native.Version.getVersionInfo();
-        System.out.println("Humble Version: " + version);
-      } else if (cmd.hasOption("help") || args.length == 0) {
-        final HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp(GetContainerInfo.class.getCanonicalName() + " <filename>", options);
-      } else {
-        final String[] parsedArgs = cmd.getArgs();
-        for(String arg: parsedArgs)
-          getInfo(arg, options);
-      }
-    } catch (ParseException e) {
-      System.err.println("Exception parsing command line: " + e.getLocalizedMessage());
-    }
-  }
 
   /**
    * Parse information from a file, and also optionally print information about what
    * formats, containers and codecs fit into that file.
    * 
    * @param arg The file to open, or null if we just want generic options.
-   * @param options A set of command line options passed in.
    * @throws IOException if file cannot be opened.
    * @throws InterruptedException if process is interrupted while querying.
    */
-  private static void getInfo(String arg, Options options) throws InterruptedException, IOException {
+  private static void getInfo(String arg) throws InterruptedException, IOException {
     // In Humble, all objects have special contructors named 'make'.
     
     // A Demuxer opens up media containers, parses  and de-multiplexes the streams
@@ -158,4 +135,38 @@ public class GetContainerInfo {
     int subsecs = (int)((d - (hours*60*60.0 + mins*60.0 + secs))*100.0);
     return String.format("%1$02d:%2$02d:%3$02d.%4$02d", hours, mins, secs, subsecs);
   }
+  /**
+   * Takes a media container (file) as the first argument, opens it,
+   * and tells you what's inside the container.
+   * 
+   * @param args Must contain one string which represents a filename. If no arguments, then prints help.
+   * @throws IOException if file cannot be opened.
+   * @throws InterruptedException if process is interrupted while querying.
+   */
+  public static void main(String[] args) throws InterruptedException, IOException {
+    final Options options = new Options();
+    options.addOption("h", "help", false, "displays help");
+    options.addOption("v", "version", false, "version of this library");
+    
+    final CommandLineParser parser = new org.apache.commons.cli.BasicParser();
+    try {
+      final CommandLine cmd = parser.parse(options, args);
+      if (cmd.hasOption("version")) {
+        // let's find what version of the library we're running
+        final String version = io.humble.video_native.Version.getVersionInfo();
+        System.out.println("Humble Version: " + version);
+      } else if (cmd.hasOption("help") || args.length == 0) {
+        final HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp(GetContainerInfo.class.getCanonicalName() + " [<filename> ...]", options);
+      } else {
+        final String[] parsedArgs = cmd.getArgs();
+        for(String arg: parsedArgs)
+          getInfo(arg);
+      }
+    } catch (ParseException e) {
+      System.err.println("Exception parsing command line: " + e.getLocalizedMessage());
+    }
+  }
+
+
 }
