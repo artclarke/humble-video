@@ -13,8 +13,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Creates a connection to the Java Sound system, and allows
+ * convenient playback of the output form a {@link MediaAudioConverter}.
+ * <p>
+ * Caller must call {@link #dispose()} when done to drain the line and
+ * release resources.
+ * </p>
+ * <p>
  * This class has no Humble dependencies per-see, but does
  * playback audio that comes out of a converter.
+ * </p>
  * @author aclarke
  *
  */

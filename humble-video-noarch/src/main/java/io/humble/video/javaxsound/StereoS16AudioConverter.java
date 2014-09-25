@@ -8,6 +8,14 @@ import io.humble.video.AudioFormat;
 import io.humble.video.MediaAudio;
 import io.humble.video.MediaAudioResampler;
 
+/**
+ * Converts arbitrary Humble Audio into Signed 16-bit 2-channel (stereo) audio
+ * at 22050 sample-rate -- which is one of the few formats Java audio
+ * supports.
+ * 
+ * @author aclarke
+ *
+ */
 class StereoS16AudioConverter implements MediaAudioConverter {
   
   private final int mJavaSampleRate;
