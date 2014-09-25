@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package io.humble.video_demos;
+package io.humble.video.demos;
 
 import java.io.IOException;
 
@@ -45,7 +45,7 @@ public class GetContainerInfo {
    * 
    * To run from maven, do:
    * <pre>
-   * mvn install exec:java -Dexec.mainClass="io.humble.video_demos.GetContainerInfo" -Dexec.args="filename.mp4"
+   * mvn install exec:java -Dexec.mainClass="io.humble.video.demos.GetContainerInfo" -Dexec.args="filename.mp4"
    * </pre>
    * @param args Must contain one string which represents a filename. If no arguments, then prints help.
    * @throws IOException if file cannot be opened.

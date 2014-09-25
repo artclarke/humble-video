@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package io.humble.video_demos;
+package io.humble.video.demos;
+
+import io.humble.video.demos.GetContainerInfo;
 
 import java.io.File;
 import java.io.IOException;
