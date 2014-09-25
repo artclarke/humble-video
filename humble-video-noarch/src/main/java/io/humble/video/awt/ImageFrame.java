@@ -24,6 +24,7 @@ import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -32,6 +33,10 @@ import javax.swing.SwingUtilities;
 /**
  * Displays a {@link BufferedImage} in a {@link JFrame}. Helpful for
  * building quick and simple video players.
+ * 
+ * ImageFrame methods can be called from any thread, but all UI updating will get
+ * done on the main Swing UI thread. With the exception of the constructor,
+ * all public methods return without blocking on the UI thread.
  * 
  * @author aclarke
  *
@@ -59,10 +64,23 @@ public class ImageFrame extends JFrame
   {
     super();
     mOnscreenPicture = new ImageComponent();
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    getContentPane().add(mOnscreenPicture);
-    this.setVisible(true);
-    this.pack();
+    final ImageFrame thisClosure = this;
+    try {
+      SwingUtilities.invokeAndWait(new Runnable() {
+        
+        @Override
+        public void run() {
+          setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+          getContentPane().add(mOnscreenPicture);
+          thisClosure.setVisible(true);
+          thisClosure.pack();
+        }
+      });
+    } catch (InterruptedException e) {
+      throw new RuntimeException("The UI thread got interrupted; fail");
+    } catch (InvocationTargetException e) {
+      throw new RuntimeException("The UI thread could not execute our closure; fail");
+    }
   }
   
   public void setImage(final Image aImage)
