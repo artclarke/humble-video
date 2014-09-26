@@ -279,7 +279,7 @@ public class DecodeAndPlayVideo {
         System.out.println("Humble Version: " + version);
       } else if (cmd.hasOption("help") || args.length == 0) {
         final HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp(GetContainerInfo.class.getCanonicalName() + " <filename>", options);
+        formatter.printHelp(DecodeAndPlayVideo.class.getCanonicalName() + " <filename>", options);
       } else {
         final String[] parsedArgs = cmd.getArgs();
         for(String arg: parsedArgs)
