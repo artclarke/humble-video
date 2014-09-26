@@ -25,10 +25,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
 import java.util.Collections;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
 import java.awt.image.BufferedImage;
 
 /**
@@ -190,7 +188,33 @@ public class MediaPictureConverterFactory
   }
 
   /** 
-   * Create a converter which translates betewen {@link BufferedImage}
+   * Create a converter which translates between {@link BufferedImage}
+   * and {@link MediaPicture}.  This factory will attempt to
+   * create a converter which can perform the translation.  If no
+   * converter can be created, a descriptive {@link
+   * UnsupportedOperationException} is thrown.
+   *
+   * @param image a prototypical {@link BufferedImage} that is in the format you want to convert to/from.
+   * @param picture a prototypical {@link MediaPicture} in the format you want to convert to/from.
+   *
+   * @throws UnsupportedOperationException if the converter can not be
+   *         found
+   * @throws UnsupportedOperationException if the found converter can
+   *         not be properly initialized
+   */
+  public static MediaPictureConverter createConverter(
+      BufferedImage image,
+      MediaPicture picture)
+  {
+
+    if (image == null)
+      throw new IllegalArgumentException("cannot pass null image");
+    if (picture == null)
+      throw new IllegalArgumentException("cannot pass null picture");
+    return createConverter(image, picture.getFormat());
+  }
+  /** 
+   * Create a converter which translates between {@link BufferedImage}
    * and {@link MediaPicture} types. The {@link BufferedImage} type and
    * size are extracted from the passed in image.  This factory will
    * attempt to create a converter which can perform the translation.
@@ -201,7 +225,7 @@ public class MediaPictureConverterFactory
    * @param pictureType the picture type of the converter
    *
    * @throws UnsupportedOperationException if no converter for the
-   *         specifed BufferedImage type exists
+   *         specified BufferedImage type exists
    * @throws UnsupportedOperationException if the found converter can
    *         not be properly initialized
    * @throws IllegalArgumentException if the passed {@link
@@ -230,7 +254,7 @@ public class MediaPictureConverterFactory
   }
 
   /** 
-   * Create a converter which translates betewen {@link BufferedImage}
+   * Create a converter which translates between {@link BufferedImage}
    * and {@link MediaPicture} types.  This factory will attempt to
    * create a converter which can perform the translation.  If no
    * converter can be created, a descriptive {@link

@@ -109,7 +109,7 @@ class BgrConverter extends AMediaPictureConverter {
       imageBytes = ((DataBufferByte) imageBuffer).getData();
     }
 
-    // handel integer buffer case
+    // handle integer buffer case
 
     else if (imageBuffer instanceof DataBufferInt) {
       imageInts = ((DataBufferInt) imageBuffer).getData();
