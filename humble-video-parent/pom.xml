@@ -116,6 +116,24 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>2.9.1</version>
+          <configuration>
+            <show>public</show>
+            <public>true</public>
+            <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+            <docletArtifact>
+              <groupId>org.umlgraph</groupId>
+              <artifactId>umlgraph</artifactId>
+              <version>5.6.6</version>
+            </docletArtifact>
+            <additionalparam>-quiet -hide java.* -hide
+              org.eclipse.*
+              -collpackages java.util.* -postfixpackage
+              -nodefontsize 9
+              -nodefontpackagesize 7
+              -enumerations
+            </additionalparam>
+            <useStandardDocletOptions>true</useStandardDocletOptions>
+          </configuration>
           <executions>
             <execution>
               <id>attach-javadocs</id>
@@ -261,30 +279,6 @@
           </reportSet>
         </reportSets>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9</version>
-        <configuration>
-          <show>public</show>
-          <public>true</public>
-          <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
-          <docletArtifact>
-            <groupId>org.umlgraph</groupId>
-            <artifactId>umlgraph</artifactId>
-            <version>5.6</version>
-          </docletArtifact>
-          <additionalparam>-quiet -hide java.* -hide
-            org.eclipse.*
-            -collpackages java.util.* -postfixpackage
-            -nodefontsize 9
-            -nodefontpackagesize 7
-            -enumerations
-          </additionalparam>
-          <useStandardDocletOptions>true</useStandardDocletOptions>
-        </configuration>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
