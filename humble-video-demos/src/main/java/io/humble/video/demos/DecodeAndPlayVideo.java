@@ -222,16 +222,6 @@ public class DecodeAndPlayVideo {
 
   /**
    * Takes the video picture and displays it at the right time.
-   * @param streamStartTime
-   * @param picture
-   * @param converter
-   * @param image
-   * @param window
-   * @param systemStartTime
-   * @param systemTimeBase
-   * @param streamTimebase
-   * @return
-   * @throws InterruptedException
    */
   private static BufferedImage displayVideoAtCorrectTime(long streamStartTime,
       final MediaPicture picture, final MediaPictureConverter converter,

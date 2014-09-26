@@ -45,7 +45,7 @@ import io.humble.video.awt.MediaPictureConverter;
 import io.humble.video.awt.MediaPictureConverterFactory;
 
 /**
- * Opens a media file, finds the first video stream, and then plays it.
+ * Records the contents of your computer screen to a media file for the passed in duration.
  * This is meant as a demonstration program to teach the use of the Humble API.
  * <p>
  * Concepts introduced:
