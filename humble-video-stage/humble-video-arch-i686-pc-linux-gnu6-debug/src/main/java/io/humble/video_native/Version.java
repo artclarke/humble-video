@@ -33,16 +33,15 @@ public class Version {
    */
   public static String getVersionInfo() {
     final Class<?> c = Version.class;
-    final Package p = c.getPackage();
     final StringBuilder b = new StringBuilder();
+    final Package p = c.getPackage();
     
-    b.append("Package: " + p.getName() + ";");
-    b.append("Class: " + c.getName() + ";");
-    b.append("Specification Vendor: " + p.getSpecificationVendor() + ";");
-    b.append("Specification Title: " + p.getSpecificationTitle() + ";");
-    b.append("Specification Version: " + p.getSpecificationVersion() + ";");
-    b.append("Implementation Vendor: " + p.getImplementationVendor() + ";");
-    b.append("Implementation Title: " + p.getImplementationTitle() + ";");
+    b.append("Class: " + c.getCanonicalName() + "; ");
+    b.append("Specification Vendor: " + p.getSpecificationVendor() + "; ");
+    b.append("Specification Title: " + p.getSpecificationTitle() + "; ");
+    b.append("Specification Version: " + p.getSpecificationVersion() + "; ");
+    b.append("Implementation Vendor: " + p.getImplementationVendor() + "; ");
+    b.append("Implementation Title: " + p.getImplementationTitle() + "; ");
     b.append("Implementation Version: " + p.getImplementationVersion() + ";");
     
     return b.toString();
