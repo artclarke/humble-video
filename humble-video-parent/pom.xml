@@ -342,7 +342,32 @@
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-all</artifactId>
+        <artifactId>humble-video-arch-i686-apple-darwin12-debug</artifactId>
+        <version>${humble.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.humble</groupId>
+        <artifactId>humble-video-arch-x86_64-apple-darwin12-debug</artifactId>
+        <version>${humble.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.humble</groupId>
+        <artifactId>humble-video-arch-i686-pc-linux-gnu6-debug</artifactId>
+        <version>${humble.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.humble</groupId>
+        <artifactId>humble-video-arch-x86_64-pc-linux-gnu6-debug</artifactId>
+        <version>${humble.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.humble</groupId>
+        <artifactId>humble-video-arch-i686-w64-mingw32-debug</artifactId>
+        <version>${humble.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.humble</groupId>
+        <artifactId>humble-video-arch-x86_64-w64-mingw32-debug</artifactId>
         <version>${humble.version}</version>
       </dependency>
       <dependency>
