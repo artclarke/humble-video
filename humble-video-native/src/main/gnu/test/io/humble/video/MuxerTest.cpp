@@ -107,3 +107,46 @@ MuxerTest::testRemuxing() {
   muxer->close();
   demuxer->close();
 }
+void
+MuxerTest::testHLSRemuxing() {
+//  TS_SKIP("leak fixed but still need to determine right muxing strategy");
+  RefPointer<Muxer> muxer;
+
+  muxer = Muxer::make("MuxerTest_testHLSRemuxing", 0, "hls");
+  muxer->setProperty("start_number", 0LL);
+  muxer->setProperty("hls_time", 1LL);
+  muxer->setProperty("hls_list_size", 5LL);
+  muxer->setProperty("hls_wrap", 0LL);
+
+  //  TestData::Fixture* fixture=mFixtures.getFixture("testfile_h264_mp4a_tmcd.mov");
+  TestData::Fixture* fixture=mFixtures.getFixture("ucl_h264_aac.mp4");
+  TS_ASSERT(fixture);
+  char filepath[2048];
+  mFixtures.fillPath(fixture, filepath, sizeof(filepath));
+
+  RefPointer<Demuxer> demuxer = Demuxer::make();
+
+  demuxer->open(filepath, 0, false, true, 0, 0);
+
+  int32_t n = demuxer->getNumStreams();
+  for(int i = 0; i < n; i++) {
+    RefPointer<DemuxerStream> demuxerStream = demuxer->getStream(i);
+    RefPointer<Decoder> d = demuxerStream->getDecoder();
+    RefPointer<MuxerStream> muxerStream = muxer->addNewStream(d.value());
+  }
+  RefPointer<MediaPacket> packet = MediaPacket::make();
+
+  muxer->open(0, 0);
+  int32_t packetNo = 0;
+  bool isMemcheck = getenv("VS_TEST_MEMCHECK");
+  while(demuxer->read(packet.value()) >= 0) {
+    muxer->write(packet.value(), false);
+    ++packetNo;
+    if (isMemcheck && packetNo > 10) {
+      VS_LOG_DEBUG("Cutting short when running under valgrind");
+      break;
+    }
+  }
+  muxer->close();
+  demuxer->close();
+}

@@ -42,6 +42,7 @@ public:
   ~MuxerTest();
   void testCreation();
   void testRemuxing();
+  void testHLSRemuxing();
 private:
   TestData mFixtures;
 };
