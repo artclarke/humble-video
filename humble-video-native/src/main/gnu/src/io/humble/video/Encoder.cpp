@@ -223,6 +223,11 @@ Encoder::open(KeyValueBag * inputOptions, KeyValueBag* unsetOptions) {
         mAudioGraph->open("[in]anull[out]");
         // now, fix the output frame size.
         mAudioSink->setFrameSize(frameSize);
+
+        mFilteredAudio = MediaAudio::make(getFrameSize(),
+            getSampleRate(), getChannels(),
+            getChannelLayout(), getSampleFormat());
+
       }
       VS_LOG_TRACE("open Encoder@%p[t=AUDIO;sr=%"PRId32";c:%"PRId32";cl:%"PRId32";f=%"PRId32";]",
                    this,
@@ -249,7 +254,10 @@ void
 Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* aFrame) {
   MediaPacketImpl* output = dynamic_cast<MediaPacketImpl*>(aOutput);
 
-  if (getState() != STATE_OPENED) {
+  if (aFrame && getState() == STATE_FLUSHING) {
+    VS_THROW(HumbleRuntimeError("Cannot add data to an encoder after you passed in null; encoder is flushing"));
+  }
+  if (aFrame && getState() != STATE_OPENED) {
     VS_THROW(HumbleRuntimeError("Cannot encode with unopened encoder"));
   }
   if (getCodecType() != MediaDescriptor::MEDIA_VIDEO) {
@@ -305,6 +313,8 @@ Encoder::encodeVideo(MediaPacket* aOutput, MediaPicture* aFrame) {
         // set the timestamp after the timbase as setTimeBase does a conversion.
         frame->setTimeStamp(inTs);
     }
+  } else {
+    setState(STATE_FLUSHING);
   }
 
 
@@ -368,160 +378,213 @@ Encoder::encode(MediaPacket* output, MediaSampled* media) {
     VS_THROW(HumbleInvalidArgument("passed a media type that is not compatible with this encoder"));
   }
 }
+
+void
+Encoder::encodeAudioInternal (MediaPacket* aOutput, MediaAudio* samples)
+{
+  // make copy so we can modify meta-data
+  RefPointer<MediaAudio> inputAudio= samples ? MediaAudio::make(samples, false) : 0;
+
+  MediaPacketImpl* output = dynamic_cast<MediaPacketImpl*>(aOutput);
+  bool dropFrame = false;
+  RefPointer<Rational> coderTb = this->getTimeBase();
+  if (inputAudio)
+  {
+    RefPointer<Rational> inputAudioTb = inputAudio->getTimeBase ();
+    /**
+     * check time stamps and drop frames when needed if the time
+     * base of the input frame cannot be converted to the encoder
+     * time base without rounding.
+     *
+     */
+    int64_t inTs = coderTb->rescale (inputAudio->getTimeStamp (),
+                                     inputAudioTb.value (),
+                                     Rational::ROUND_DOWN);
+    if (mLastPtsEncoded != Global::NO_PTS)
+    {
+      if (inTs <= mLastPtsEncoded)
+      {
+        VS_LOG_DEBUG(
+            "Encoder@%p Dropping frame with timestamp %lld as it is <= last timestamp encoded %lld (if coder supports higher time-base use that instead). "
+            "Coder timebase: (%lld/%lld); Sample timebase: (%lld/%lld)",
+            this, inTs, mLastPtsEncoded,
+            coderTb->getNumerator(), coderTb->getDenominator(),
+            inputAudioTb->getNumerator(), inputAudioTb->getDenominator()
+            );
+        dropFrame = true;
+      }
+    }
+    if (!dropFrame)
+    {
+      mLastPtsEncoded = inTs;
+      inputAudio->setTimeBase (coderTb.value ());
+      // set the timestamp after the timbase as setTimeBase does a conversion.
+      inputAudio->setTimeStamp (inTs);
+    }
+  }
+  AVFrame* in = inputAudio ? inputAudio->getCtx () : 0;
+  AVPacket* out = output->getCtx ();
+  int got_frame = 0;
+  int oldStreamIndex = output->getStreamIndex ();
+  int e = 0;
+  if (!dropFrame)
+    e = avcodec_encode_audio2 (getCodecCtx (), out, in, &got_frame);
+
+  // some codec erroneously set stream_index, but our encoders are always
+  // muxer independent. we fix that here.
+  output->setStreamIndex (oldStreamIndex);
+  if (got_frame)
+  {
+    output->setCoder (this);
+    output->setTimeBase (coderTb.value ());
+    output->setComplete (true, out->size);
+  }
+  else
+  {
+    output->setComplete (false, 0);
+  }
+#ifdef VS_DEBUG
+  {
+    char outDescr[256]; *outDescr = 0;
+    char inDescr[256]; *inDescr = 0;
+    if (inputAudio) inputAudio->logMetadata(inDescr, sizeof(inDescr));
+    if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+    VS_LOG_TRACE("encodeAudio Encoder@%p[out:%s;in:%s;encoded:%" PRIi64 "]",
+                 this,
+                 aOutput ? outDescr : "(null)",
+                     inputAudio ? inDescr : "(null)",
+                         (int64_t)e);
+  }
+#endif
+
+  FfmpegException::check (e, "could not encode audio ");
+}
+
 void
 Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
   MediaPacketImpl* output = dynamic_cast<MediaPacketImpl*>(aOutput);
+  RefPointer<Codec> codec = getCodec();
+  bool cachingAudio = !(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE);
 
-  if (getState() != STATE_OPENED) {
-    VS_THROW(HumbleRuntimeError("Cannot encode with unopened encoder"));
-  }
   if (getCodecType() != MediaDescriptor::MEDIA_AUDIO) {
     VS_THROW(HumbleRuntimeError("Attempting to encode audio on non-audio encoder"));
   }
   if (!output) {
     VS_THROW(HumbleInvalidArgument("output cannot be null"));
   }
+  if (samples) {
+    if (!samples->isComplete()) {
+      VS_THROW(HumbleInvalidArgument("Can only pass complete media to encode"));
+    }
+    // let's check the audio parameters.
+    ensureAudioParamsMatch(samples);
+
+    switch(getState()) {
+      case STATE_OPENED:
+        if (cachingAudio)
+          // this codec requires that the right number of audio samples
+          // gets passed in each call.
+          mAudioSource->addAudio(samples);
+
+        break;
+      case STATE_FLUSHING:
+        VS_THROW(HumbleRuntimeError("Cannot add new data to an encoder once flushing has started."));
+        break;
+      default:
+        VS_THROW(HumbleRuntimeError("Attempt to pass data to encoder but encoder is not ready."));
+        break;
+    }
+  } else {
+    switch(getState()) {
+      case STATE_OPENED:
+        if (cachingAudio)
+          mAudioSource->addAudio(0); // tell the cache we're flushing.
+        setState(STATE_FLUSHING);
+        break;
+      case STATE_FLUSHING:
+        break;
+      default:
+        VS_THROW(HumbleRuntimeError("Attempt to flush encoder but encoder is not open."));
+        break;
+    }
+  }
+
   // now reset the packet so we allocate new memory (because encoders sometimes change packet sizes).
   output->reset(0);
 
-  // let's check the audio parameters.
-  ensureAudioParamsMatch(samples);
 
-  if (samples && !samples->isComplete()) {
-    VS_THROW(HumbleInvalidArgument("Can only pass complete media to encode"));
-  }
-
-  RefPointer<Codec> codec = getCodec();
-  RefPointer<MediaAudio> inputAudio;
-  RefPointer<Rational> coderTb = this->getTimeBase();
-
-  bool dropFrame = false;
-
-  if (samples) {
-    // make copy so we can modify meta-data
-    inputAudio = MediaAudio::make(samples, false);
-  }
-  if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
-    // this codec requires that the right number of audio samples
-    // gets passed in each call.
-    if (!mFilteredAudio) {
-      if (samples)
-        mFilteredAudio = MediaAudio::make(getFrameSize(),
-            samples->getSampleRate(), samples->getChannels(),
-            samples->getChannelLayout(), samples->getFormat());
-    }
-    if (mFilteredAudio) {
-      // add the samples, or null if empty.
-      mAudioSource->addAudio(samples);
-      // pull the sink.
-      mAudioSink->getAudio(mFilteredAudio.value());
+  switch(getState()) {
+    case STATE_OPENED:
+      if (cachingAudio) {
+        // pull the sink.
+        mAudioSink->getAudio(mFilteredAudio.value());
 
 #ifdef VS_DEBUG
-  {
-    char outDescr[256]; *outDescr = 0;
-    char inDescr[256]; *inDescr = 0;
-    if (inputAudio) inputAudio->logMetadata(inDescr, sizeof(inDescr));
-    if (mFilteredAudio) mFilteredAudio->logMetadata(outDescr, sizeof(outDescr));
-    VS_LOG_TRACE("encodeAudio filterAudio Encoder@%p[out:%s;in:%s];",
-                 this,
-                 mFilteredAudio ? outDescr : "(null)",
-                 inputAudio ? inDescr : "(null)");
-  }
-#endif
-
-      if (mFilteredAudio->isComplete()) {
-        inputAudio = mFilteredAudio.get();
-      } else
-        inputAudio = 0;
-    }
-    if (inputAudio) {
-      RefPointer<Rational> inputAudioTb = inputAudio->getTimeBase();
-      /**
-       * check time stamps and drop frames when needed if the time
-       * base of the input frame cannot be converted to the encoder
-       * time base without rounding.
-       *
-       */
-      int64_t inTs = coderTb->rescale(inputAudio->getTimeStamp(), inputAudioTb.value(), Rational::ROUND_DOWN);
-      if (mLastPtsEncoded != Global::NO_PTS) {
-        if (inTs <= mLastPtsEncoded) {
-          VS_LOG_DEBUG(
-              "Encoder@%p Dropping frame with timestamp %lld (if coder supports higher time-base use that instead)",
-              this,
-              inputAudio->getPts());
-          dropFrame = true;
+        {
+          char outDescr[256]; *outDescr = 0;
+          char inDescr[256]; *inDescr = 0;
+          if (samples) samples->logMetadata(inDescr, sizeof(inDescr));
+          if (mFilteredAudio) mFilteredAudio->logMetadata(outDescr, sizeof(outDescr));
+          VS_LOG_TRACE("encodeAudio filterAudio Encoder@%p[out:%s;in:%s];",
+                       this,
+                       mFilteredAudio ? outDescr : "(null)",
+                           samples ? inDescr : "(null)");
         }
-      }
-      if (!dropFrame) {
-          mLastPtsEncoded = inTs;
-          inputAudio->setTimeBase(coderTb.value());
-          // set the timestamp after the timbase as setTimeBase does a conversion.
-          inputAudio->setTimeStamp(inTs);
-      }
-    }
-    // now a sanity check
-    if (!(!samples || !inputAudio || inputAudio->getNumSamples() == getFrameSize())) {
-      VS_THROW(HumbleRuntimeError::make("not flushing, but samples returned (%ld) are less than frame size (%ld)",
-                                        inputAudio->getNumSamples(),
-                                        getFrameSize()
-
-          ));
-    }
-  }
-
-  // only encode if (a) we've been asked to flush or (b) we have complete
-  // audio, even if we had to filter it to get a minimum frame.
-  if (!samples || (inputAudio && inputAudio->isComplete())){
-    AVFrame* in = inputAudio ? inputAudio->getCtx() : 0;
-    AVPacket* out = output->getCtx();
-
-    int got_frame = 0;
-    int oldStreamIndex = output->getStreamIndex();
-    int e = 0;
-    if (!dropFrame)
-      avcodec_encode_audio2(getCodecCtx(), out, in, &got_frame);
-    // some codec erroneously set stream_index, but our encoders are always
-    // muxer independent. we fix that here.
-    output->setStreamIndex(oldStreamIndex);
-    if (got_frame) {
-      output->setCoder(this);
-      output->setTimeBase(coderTb.value());
-      output->setComplete(true, out->size);
-    } else {
-      output->setComplete(false, 0);
-    }
-
-#ifdef VS_DEBUG
-    {
-      char outDescr[256]; *outDescr = 0;
-      char inDescr[256]; *inDescr = 0;
-      if (inputAudio) inputAudio->logMetadata(inDescr, sizeof(inDescr));
-      if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
-      VS_LOG_TRACE("encodeAudio Encoder@%p[out:%s;in:%s;encoded:%" PRIi64 "]",
-                   this,
-                   aOutput ? outDescr : "(null)",
-                       inputAudio ? inDescr : "(null)",
-                           (int64_t)e);
-    }
 #endif
 
-
-    FfmpegException::check(e, "could not encode audio ");
-  } else {
+        if (mFilteredAudio->isComplete()) {
+          encodeAudioInternal(output, mFilteredAudio.value());
+        } else {
 #ifdef VS_DEBUG
-    {
-      char outDescr[256]; *outDescr = 0;
-      char inDescr[256]; *inDescr = 0;
-      if (inputAudio) inputAudio->logMetadata(inDescr, sizeof(inDescr));
-      if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
-      VS_LOG_TRACE("encodeAudio Encoder@%p[out:%s;in:%s;message:not enough audio staged yet]",
-                   this,
-                   aOutput ? outDescr : "(null)",
-                       inputAudio ? inDescr : "(null)");
-    }
+          {
+            char outDescr[256]; *outDescr = 0;
+            char inDescr[256]; *inDescr = 0;
+            if (samples) samples->logMetadata(inDescr, sizeof(inDescr));
+            if (aOutput) aOutput->logMetadata(outDescr, sizeof(outDescr));
+            VS_LOG_TRACE("encodeAudio Encoder@%p[out:%s;in:%s;message:not enough audio staged yet]",
+                         this,
+                         aOutput ? outDescr : "(null)",
+                             samples ? inDescr : "(null)");
+          }
+#endif
+        }
+      } else {
+        encodeAudioInternal(output, samples);
+      }
+      break;
+    case STATE_FLUSHING:
+      if (cachingAudio) {
+        // pull the sink in a loop to get all the audio out while we're making complete packets.
+        do {
+          mAudioSink->getAudio(mFilteredAudio.value());
+
+#ifdef VS_DEBUG
+          {
+            char outDescr[256]; *outDescr = 0;
+            char inDescr[256]; *inDescr = 0;
+            if (samples) samples->logMetadata(inDescr, sizeof(inDescr));
+            if (mFilteredAudio) mFilteredAudio->logMetadata(outDescr, sizeof(outDescr));
+            VS_LOG_TRACE("encodeAudio filterAudio Encoder@%p[out:%s;in:%s];",
+                         this,
+                         mFilteredAudio ? outDescr : "(null)",
+                             samples ? inDescr : "(null)");
+          }
 #endif
 
-
+          if (mFilteredAudio->isComplete()) {
+            encodeAudioInternal(output, mFilteredAudio.value());
+          } else {
+            // now done, so we tell the real encode to start flushing.
+            encodeAudioInternal(output, 0);
+          }
+        } while (mFilteredAudio->isComplete() && !output->isComplete());
+      } else {
+        encodeAudioInternal(output, samples);
+      }
+      break;
+    default:
+      VS_THROW(HumbleRuntimeError("Encoder in unknown and error state"));
+      break;
   }
 }
 

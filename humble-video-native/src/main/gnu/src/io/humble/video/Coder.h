@@ -57,6 +57,7 @@ public:
   typedef enum State {
     STATE_INITED,
     STATE_OPENED,
+    STATE_FLUSHING,
     STATE_ERROR,
   } State;
 
@@ -353,7 +354,7 @@ public:
 #endif
 
 protected:
-  virtual void setState(State state) { mState = state; }
+  virtual void setState(State state);
   /*
    * Override to make a more specific allocator for frames.
    */

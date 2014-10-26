@@ -31,6 +31,7 @@
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaAudioResampler.h>
+#include <libavutil/mathematics.h>
 #include "EncoderTest.h"
 
 using namespace io::humble::ferry;
@@ -53,7 +54,7 @@ EncoderTest::testCreation() {
 
 void
 EncoderTest::testEncodeVideo() {
-  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, true);
+  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, false);
   LoggerStack stack;
   stack.setGlobalLevel(Logger::LEVEL_INFO, false);
 
@@ -148,7 +149,7 @@ EncoderTest::testEncodeVideo() {
 
 void
 EncoderTest::testEncodeAudio() {
-  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, true);
+  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, false);
   LoggerStack stack;
   stack.setGlobalLevel(Logger::LEVEL_INFO, false);
 
@@ -376,7 +377,7 @@ void
 EncoderTest::testTranscode()
 {
   // enable trace logging
-  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, true);
+  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, false);
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
   LoggerStack stack;
   stack.setGlobalLevel(Logger::LEVEL_INFO, false);
@@ -578,4 +579,94 @@ EncoderTest::testTranscode()
   }
   source->close();
   muxer->close();
+}
+
+void
+EncoderTest::testRegression36() {
+  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, false);
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_DEBUG, false);
+
+  const int32_t sampleRate = 44100;
+  const int32_t numSamples = sampleRate; // this is important for the test -- we want to extract 1 second of audio
+  const AudioChannel::Layout channelLayout = AudioChannel::CH_LAYOUT_STEREO;
+  const int32_t channels = AudioChannel::getNumChannelsInLayout(channelLayout);
+  const AudioFormat::Type audioFormat = AudioFormat::SAMPLE_FMT_FLTP;
+  RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_MP3);
+  RefPointer<Encoder> encoder = Encoder::make(codec.value());
+
+  RefPointer<FilterGraph> graph = FilterGraph::make();
+
+  RefPointer<MediaAudio> audio = MediaAudio::make(numSamples, sampleRate, channels, channelLayout,
+      audioFormat);
+
+  // set the encoder properties we need
+  encoder->setSampleRate(audio->getSampleRate());
+  encoder->setSampleFormat(audio->getFormat());
+  encoder->setChannelLayout(audio->getChannelLayout());
+  encoder->setChannels(audio->getChannels());
+  encoder->setProperty("b", (int64_t)64000); // bitrate
+  RefPointer<Rational> tb = Rational::make(1,sampleRate);
+  encoder->setTimeBase(tb.value());
+
+  // create an output muxer
+  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_testRegression36.mp3", 0, 0);
+  RefPointer<MuxerFormat> format = muxer->getFormat();
+  if (format->getFlag(MuxerFormat::GLOBAL_HEADER))
+    encoder->setFlag(Encoder::FLAG_GLOBAL_HEADER, true);
+
+  // open the encoder
+  encoder->open(0, 0);
+
+  RefPointer<FilterAudioSink> fsink = graph->addAudioSink("out",
+                                                          audio->getSampleRate(),
+                                                          audio->getChannelLayout(),
+                                                          audio->getFormat());
+  // Generate a 220 Hz sine wave with a 880 Hz beep each second, for 10 seconds.
+  graph->open("sine=frequency=220:beep_factor=4:duration=11[out]");
+  fsink->setFrameSize(numSamples);
+
+  // add a stream for the encoded packets
+  {
+    RefPointer<MuxerStream> stream = muxer->addNewStream(encoder.value());
+  }
+
+  // and open the muxer
+  muxer->open(0, 0);
+
+  // now we're (in theory) ready to start writing data.
+  int32_t numCompletePackets = 0;
+  RefPointer<MediaPacket> packet;
+
+  // Get one audio packet that is larger than the frame-size.
+  fsink->getAudio(audio.value());
+  TS_ASSERT(audio->isComplete());
+  TS_ASSERT_EQUALS(audio->getNumSamples(), sampleRate);
+  audio->setTimeStamp(0);
+
+  // let's encode
+  packet = MediaPacket::make();
+  encoder->encodeAudio(packet.value(), audio.value());
+
+  // for MP3, the first time we call encodeAudio the encoder has
+  // to cache our data, and break it into frames, and then the ffmpeg encoder
+  // caches data for a while. So the first packet should not be complete.
+  TS_ASSERT(!packet->isComplete());
+  if (packet->isComplete()) {
+    muxer->write(packet.value(), false);
+  }
+
+  // now flush the encoder
+  do {
+    packet = MediaPacket::make();
+    encoder->encodeAudio(packet.value(), 0);
+    if (packet->isComplete()) {
+      muxer->write(packet.value(), false);
+      ++numCompletePackets;
+    }
+  } while (packet->isComplete());
+  muxer->close();
+
+  const int32_t numExpectedPackets = audio->getNumSamples() / encoder->getFrameSize();
+  TS_ASSERT(numCompletePackets >= numExpectedPackets);
 }

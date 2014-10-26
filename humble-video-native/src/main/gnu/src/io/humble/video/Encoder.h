@@ -188,6 +188,7 @@ protected:
   virtual
   ~Encoder();
 private:
+
   // Used to ensure we have the right frame-size for codecs that
   // require fixed frame sizes on audio.
   io::humble::ferry::RefPointer<FilterGraph> mAudioGraph;
@@ -197,6 +198,8 @@ private:
 
   int64_t mLastPtsEncoded;
   int64_t mNumDroppedFrames;
+
+  void encodeAudioInternal(MediaPacket* output, MediaAudio* inputAudio);
 };
 
 } /* namespace video */

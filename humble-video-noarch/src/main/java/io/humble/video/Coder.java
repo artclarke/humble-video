@@ -435,6 +435,7 @@ public class Coder extends Configurable {
   public enum State {
     STATE_INITED,
     STATE_OPENED,
+    STATE_FLUSHING,
     STATE_ERROR,
   ;
 

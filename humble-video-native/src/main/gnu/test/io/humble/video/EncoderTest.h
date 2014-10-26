@@ -51,6 +51,7 @@ public:
   void testEncodeAudio();
   void testEncodeInvalidParameters();
   void testTranscode();
+  void testRegression36();
 private:
   void decodeAndEncode(
       MediaPacket*,
