@@ -24,6 +24,7 @@
  */
 
 #include "Encoder.h"
+#include <libavutil/samplefmt.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/MediaPacketImpl.h>
@@ -169,9 +170,8 @@ Encoder::checkOptionsBeforeOpen() {
           break;
       }
       if (n > 0 && i == n) {
-        VS_THROW(HumbleInvalidArgument::make("Audio format %ld not supported by encoder.",
-                    (int32_t)format
-                    ));
+        VS_THROW(HumbleInvalidArgument::make("Audio format '%s' not supported by encoder.",
+                                             av_get_sample_fmt_name((enum AVSampleFormat)format)));
       }
     }
     break;
