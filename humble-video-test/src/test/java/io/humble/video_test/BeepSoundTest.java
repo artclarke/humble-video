@@ -38,6 +38,7 @@ import io.humble.video.MediaPacket;
 import io.humble.video.Muxer;
 import io.humble.video.Rational;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,7 +168,7 @@ public class BeepSoundTest {
     if(samples.getSampleRate() != encoder.getSampleRate()
         || samples.getFormat() != encoder.getSampleFormat()
         || samples.getChannelLayout() != encoder.getChannelLayout()) {
-      MediaAudioResampler resampler = MediaAudioResampler.make(
+      final MediaAudioResampler resampler = MediaAudioResampler.make(
           encoder.getChannelLayout(), encoder.getSampleRate(), encoder.getSampleFormat(),
           samples.getChannelLayout(), samples.getSampleRate(), samples.getFormat());
       resampler.open();
@@ -175,6 +176,7 @@ public class BeepSoundTest {
       resampler.resample(spl, samples);
       logger.info(spl.toString());
       logger.info("{}", spl.getNumSamples());
+      Assert.assertEquals(spl.getNumSamples(), samples.getNumSamples());
       samples = spl;
     }
     logger.info(samples.toString());
