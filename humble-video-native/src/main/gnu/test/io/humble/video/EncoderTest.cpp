@@ -666,7 +666,7 @@ void
 EncoderTest::testRegression36() {
   Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, false);
   LoggerStack stack;
-  stack.setGlobalLevel(Logger::LEVEL_TRACE, true);
+  stack.setGlobalLevel(Logger::LEVEL_INFO, false);
 
   {
     const int32_t sampleRate = 44100;
