@@ -582,91 +582,132 @@ EncoderTest::testTranscode()
 }
 
 void
-EncoderTest::testRegression36() {
-  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, false);
-  LoggerStack stack;
-  stack.setGlobalLevel(Logger::LEVEL_DEBUG, false);
-
-  const int32_t sampleRate = 44100;
-  const int32_t numSamples = sampleRate; // this is important for the test -- we want to extract 1 second of audio
-  const AudioChannel::Layout channelLayout = AudioChannel::CH_LAYOUT_STEREO;
-  const int32_t channels = AudioChannel::getNumChannelsInLayout(channelLayout);
-  const AudioFormat::Type audioFormat = AudioFormat::SAMPLE_FMT_FLTP;
-  RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_MP3);
-  RefPointer<Encoder> encoder = Encoder::make(codec.value());
-
-  RefPointer<FilterGraph> graph = FilterGraph::make();
-
-  RefPointer<MediaAudio> audio = MediaAudio::make(numSamples, sampleRate, channels, channelLayout,
-      audioFormat);
-
+EncoderTest::testRegression36Internal (const Codec::ID codecId,
+                                       const int32_t numSamples,
+                                       const int32_t sampleRate,
+                                       const int32_t channels,
+                                       const AudioChannel::Layout channelLayout,
+                                       const AudioFormat::Type audioFormat,
+                                       const int64_t bitRate,
+                                       const char* testOutputName)
+{
+  VS_LOG_DEBUG("Output filename: %s", testOutputName);
+  RefPointer<Codec> codec = Codec::findEncodingCodec (codecId);
+  RefPointer<Encoder> encoder = Encoder::make (codec.value ());
+  RefPointer<FilterGraph> graph = FilterGraph::make ();
+  RefPointer<MediaAudio> audio = MediaAudio::make (numSamples, sampleRate,
+                                                   channels, channelLayout,
+                                                   audioFormat);
   // set the encoder properties we need
-  encoder->setSampleRate(audio->getSampleRate());
-  encoder->setSampleFormat(audio->getFormat());
-  encoder->setChannelLayout(audio->getChannelLayout());
-  encoder->setChannels(audio->getChannels());
-  encoder->setProperty("b", (int64_t)64000); // bitrate
-  RefPointer<Rational> tb = Rational::make(1,sampleRate);
-  encoder->setTimeBase(tb.value());
-
+  encoder->setSampleRate (audio->getSampleRate ());
+  encoder->setSampleFormat (audio->getFormat ());
+  encoder->setChannelLayout (audio->getChannelLayout ());
+  encoder->setChannels (audio->getChannels ());
+  encoder->setProperty ("b", (int64_t) (bitRate));
+  RefPointer<Rational> tb = Rational::make (1, sampleRate);
+  encoder->setTimeBase (tb.value ());
   // create an output muxer
-  RefPointer<Muxer> muxer = Muxer::make("EncoderTest_testRegression36.mp3", 0, 0);
-  RefPointer<MuxerFormat> format = muxer->getFormat();
-  if (format->getFlag(MuxerFormat::GLOBAL_HEADER))
-    encoder->setFlag(Encoder::FLAG_GLOBAL_HEADER, true);
+  RefPointer<Muxer> muxer = Muxer::make (testOutputName, 0, 0);
+  RefPointer<MuxerFormat> format = muxer->getFormat ();
+  if (format->getFlag (MuxerFormat::GLOBAL_HEADER))
+    encoder->setFlag (Encoder::FLAG_GLOBAL_HEADER, true);
 
   // open the encoder
-  encoder->open(0, 0);
-
-  RefPointer<FilterAudioSink> fsink = graph->addAudioSink("out",
-                                                          audio->getSampleRate(),
-                                                          audio->getChannelLayout(),
-                                                          audio->getFormat());
+  encoder->open (0, 0);
+  RefPointer<FilterAudioSink> fsink = graph->addAudioSink (
+      "out", audio->getSampleRate (), audio->getChannelLayout (),
+      audio->getFormat ());
   // Generate a 220 Hz sine wave with a 880 Hz beep each second, for 10 seconds.
-  graph->open("sine=frequency=220:beep_factor=4:duration=11[out]");
-  fsink->setFrameSize(numSamples);
-
+  graph->open ("sine=frequency=220:beep_factor=4:duration=11[out]");
+  fsink->setFrameSize (numSamples);
   // add a stream for the encoded packets
   {
-    RefPointer<MuxerStream> stream = muxer->addNewStream(encoder.value());
-  }
-
-  // and open the muxer
-  muxer->open(0, 0);
-
+    RefPointer<MuxerStream> stream = muxer->addNewStream (encoder.value ());
+  }      // and open the muxer
+  muxer->open (0, 0);
   // now we're (in theory) ready to start writing data.
   int32_t numCompletePackets = 0;
   RefPointer<MediaPacket> packet;
-
   // Get one audio packet that is larger than the frame-size.
-  fsink->getAudio(audio.value());
-  TS_ASSERT(audio->isComplete());
-  TS_ASSERT_EQUALS(audio->getNumSamples(), sampleRate);
-  audio->setTimeStamp(0);
-
+  fsink->getAudio (audio.value ());
+  TS_ASSERT(audio->isComplete ());
+  TS_ASSERT_EQUALS(audio->getNumSamples (), sampleRate);
+  audio->setTimeStamp (0);
   // let's encode
-  packet = MediaPacket::make();
-  encoder->encodeAudio(packet.value(), audio.value());
-
-  // for MP3, the first time we call encodeAudio the encoder has
-  // to cache our data, and break it into frames, and then the ffmpeg encoder
-  // caches data for a while. So the first packet should not be complete.
-  TS_ASSERT(!packet->isComplete());
-  if (packet->isComplete()) {
-    muxer->write(packet.value(), false);
+  packet = MediaPacket::make ();
+  encoder->encodeAudio (packet.value (), audio.value ());
+  if (packet->isComplete ())
+  {
+    muxer->write (packet.value (), false);
   }
-
   // now flush the encoder
-  do {
-    packet = MediaPacket::make();
-    encoder->encodeAudio(packet.value(), 0);
-    if (packet->isComplete()) {
-      muxer->write(packet.value(), false);
+  do
+  {
+    packet = MediaPacket::make ();
+    encoder->encodeAudio (packet.value (), 0);
+    if (packet->isComplete ())
+    {
+      muxer->write (packet.value (), false);
       ++numCompletePackets;
     }
-  } while (packet->isComplete());
-  muxer->close();
+  }
+  while (packet->isComplete ());
+  muxer->close ();
+  if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
+    const int32_t numExpectedPackets = audio->getNumSamples()
+        / encoder->getFrameSize();
 
-  const int32_t numExpectedPackets = audio->getNumSamples() / encoder->getFrameSize();
-  TS_ASSERT(numCompletePackets >= numExpectedPackets);
+    VS_LOG_DEBUG("%ld vs %ld; framesize: %ld", numCompletePackets, numExpectedPackets, encoder->getFrameSize());
+    TS_ASSERT(numCompletePackets > 10);
+  }
+}
+
+void
+EncoderTest::testRegression36() {
+  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, false);
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_TRACE, true);
+
+  {
+    const int32_t sampleRate = 44100;
+    const int32_t numSamples = sampleRate; // this is important for the test -- we want to extract 1 second of audio
+    const AudioChannel::Layout channelLayout = AudioChannel::CH_LAYOUT_STEREO;
+    const int32_t channels = AudioChannel::getNumChannelsInLayout(channelLayout);
+    const AudioFormat::Type audioFormat = AudioFormat::SAMPLE_FMT_FLTP;
+    const char* testOutputName = "EncoderTest_testRegression36.mp3";
+    const Codec::ID codecId = Codec::CODEC_ID_MP3;
+    const int64_t bitRate = 64000;
+
+    testRegression36Internal (codecId, numSamples, sampleRate, channels,
+                              channelLayout, audioFormat, bitRate,
+                              testOutputName);
+  }
+  {
+    const int32_t sampleRate = 22050;
+    const int32_t numSamples = sampleRate; // this is important for the test -- we want to extract 1 second of audio
+    const AudioChannel::Layout channelLayout = AudioChannel::CH_LAYOUT_MONO;
+    const int32_t channels = AudioChannel::getNumChannelsInLayout(channelLayout);
+    const AudioFormat::Type audioFormat = AudioFormat::SAMPLE_FMT_FLTP;
+    const char* testOutputName = "EncoderTest_testRegression36.ogg";
+    const Codec::ID codecId = Codec::CODEC_ID_VORBIS;
+    const int64_t bitRate = 64000;
+
+    testRegression36Internal (codecId, numSamples, sampleRate, channels,
+                              channelLayout, audioFormat, bitRate,
+                              testOutputName);
+  }
+  {
+    const int32_t sampleRate = 22050;
+    const int32_t numSamples = sampleRate; // this is important for the test -- we want to extract 1 second of audio
+    const AudioChannel::Layout channelLayout = AudioChannel::CH_LAYOUT_MONO;
+    const int32_t channels = AudioChannel::getNumChannelsInLayout(channelLayout);
+    const AudioFormat::Type audioFormat = AudioFormat::SAMPLE_FMT_FLT;
+    const char* testOutputName = "EncoderTest_testRegression36.flv";
+    const Codec::ID codecId = Codec::CODEC_ID_NELLYMOSER;
+    const int64_t bitRate = 64000;
+
+    testRegression36Internal (codecId, numSamples, sampleRate, channels,
+                              channelLayout, audioFormat, bitRate,
+                              testOutputName);
+  }
 }
