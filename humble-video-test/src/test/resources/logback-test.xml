@@ -14,10 +14,11 @@
    </pattern>
   </encoder>
  </appender>
- <logger name="io.humble" level="info" />
- <logger name="org.ffmpeg" level="info" />
+ <logger name="io.humble" level="trace" />
+ <logger name="org.ffmpeg" level="debug" />
  <root>
-  <level value="warn" />
+  <level value="debug" />
   <appender-ref ref="FILE" />
+  <appender-ref ref="CONSOLE" />
  </root>
 </configuration>

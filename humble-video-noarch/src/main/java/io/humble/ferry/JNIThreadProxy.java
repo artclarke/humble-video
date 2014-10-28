@@ -116,7 +116,8 @@ public class JNIThreadProxy extends Thread
       // store it in thread local storage
       mThreads.set(retval);
     }
-    log.trace("currentThread: {}", retval.mThread);
+    // hot function; do not call logging.
+//    log.trace("currentThread: {}", retval.mThread);
     return retval;
   }
   
