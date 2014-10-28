@@ -555,6 +555,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
     case STATE_FLUSHING:
       if (cachingAudio) {
         // pull the sink in a loop to get all the audio out while we're making complete packets.
+        // this is a fix for issue: https://github.com/artclarke/humble-video/issues/36
         do {
           mAudioSink->getAudio(mFilteredAudio.value());
 
