@@ -1,13 +1,13 @@
 ;*****************************************************************************
 ;* pixel.asm: x86 pixel metrics
 ;*****************************************************************************
-;* Copyright (C) 2003-2013 x264 project
+;* Copyright (C) 2003-2014 x264 project
 ;*
 ;* Authors: Loren Merritt <lorenm@u.washington.edu>
 ;*          Holger Lubitz <holger@lubitz.org>
 ;*          Laurent Aimar <fenrir@via.ecp.fr>
 ;*          Alex Izvorski <aizvorksi@gmail.com>
-;*          Jason Garrett-Glaser <darkshikari@gmail.com>
+;*          Fiona Glaser <fiona@x264.com>
 ;*          Oskar Arvidsson <oskar@irock.se>
 ;*
 ;* This program is free software; you can redistribute it and/or modify
@@ -205,7 +205,7 @@ cglobal pixel_ssd_%1x%2, 4,7,6
     mov    r4d, %%n
 %endif
     pxor    m0, m0
-.loop
+.loop:
     mova    m1, [r0]
     mova    m2, [r0+offset0_1]
     mova    m3, [r0+offset0_2]
@@ -561,10 +561,15 @@ cglobal pixel_ssd_nv12_core, 6,7,7
     pshufhw     m0, m0, q3120
     pshufhw     m1, m1, q3120
 %endif
+%if cpuflag(xop)
+    pmadcswd    m2, m0, m0, m2
+    pmadcswd    m3, m1, m1, m3
+%else
     pmaddwd     m0, m0
     pmaddwd     m1, m1
     paddd       m2, m0
     paddd       m3, m1
+%endif
     add         r6, 2*mmsize
     jl .loopx
 %if mmsize == 32 ; avx2 may overread by 32 bytes, that has to be handled
@@ -657,10 +662,15 @@ cglobal pixel_ssd_nv12_core, 6,7
     por     m0, m1
     psrlw   m2, m0, 8
     pand    m0, m5
+%if cpuflag(xop)
+    pmadcswd m4, m2, m2, m4
+    pmadcswd m3, m0, m0, m3
+%else
     pmaddwd m2, m2
     pmaddwd m0, m0
-    paddd   m3, m0
     paddd   m4, m2
+    paddd   m3, m0
+%endif
     add     r6, mmsize
     jl .loopx
 %if mmsize == 32 ; avx2 may overread by 16 bytes, that has to be handled
@@ -694,6 +704,8 @@ SSD_NV12
 INIT_XMM sse2
 SSD_NV12
 INIT_XMM avx
+SSD_NV12
+INIT_XMM xop
 SSD_NV12
 INIT_YMM avx2
 SSD_NV12
@@ -1265,7 +1277,7 @@ VAR2_8x8_AVX2 16, 7
 ; clobber: m3..m7
 ; out: %1 = satd
 %macro SATD_4x4_MMX 3
-    %xdefine %%n n%1
+    %xdefine %%n nn%1
     %assign offset %2*SIZEOF_PIXEL
     LOAD_DIFF m4, m3, none, [r0+     offset], [r2+     offset]
     LOAD_DIFF m5, m3, none, [r0+  r1+offset], [r2+  r3+offset]
@@ -4677,7 +4689,8 @@ cglobal pixel_ssim_4x4x2_core, 4,4,8
 ;-----------------------------------------------------------------------------
 ; float pixel_ssim_end( int sum0[5][4], int sum1[5][4], int width )
 ;-----------------------------------------------------------------------------
-cglobal pixel_ssim_end4, 3,3,7
+cglobal pixel_ssim_end4, 2,3,7
+    mov      r2d, r2m
     movdqa    m0, [r0+ 0]
     movdqa    m1, [r0+16]
     movdqa    m2, [r0+32]

@@ -1,7 +1,7 @@
 /****************************************************************************
  * quant.S: arm quantization and level-run
  *****************************************************************************
- * Copyright (C) 2009-2013 x264 project
+ * Copyright (C) 2009-2014 x264 project
  *
  * Authors: David Conrad <lessen42@gmail.com>
  *
@@ -312,9 +312,23 @@ dequant_4x4_dc_rshift:
 
 // int coeff_last( int16_t *l )
 function x264_coeff_last4_arm
-    ldrd        r2,  [r0]
+    ldrd        r2,  r3,  [r0]
     subs        r0,  r3,  #0
     movne       r0,  #2
+    movne       r2,  r3
+    lsrs        r2,  r2,  #16
+    addne       r0,  r0,  #1
+    bx          lr
+.endfunc
+
+function x264_coeff_last8_arm
+    ldrd        r2,  r3,  [r0, #8]
+    orrs        ip,  r2,  r3
+    movne       r0,  #4
+    ldrdeq      r2,  r3,  [r0]
+    moveq       r0,  #0
+    tst         r3,  r3
+    addne       r0,  #2
     movne       r2,  r3
     lsrs        r2,  r2,  #16
     addne       r0,  r0,  #1
@@ -341,7 +355,7 @@ function x264_coeff_last\size\()_neon
 
     subs        r1,  ip,  r1,  lsr #2
     addge       r0,  r1,  #\size - 8
-    sublts      r0,  r3,  r0,  lsr #2
+    subslt      r0,  r3,  r0,  lsr #2
     movlt       r0,  #0
     bx          lr
 .endfunc
@@ -390,7 +404,7 @@ function x264_coeff_last64_neon
 
     subs        r1,  ip,  r1
     addge       r0,  r1,  #32
-    sublts      r0,  ip,  r0
+    subslt      r0,  ip,  r0
     movlt       r0,  #0
     bx          lr
 .endfunc

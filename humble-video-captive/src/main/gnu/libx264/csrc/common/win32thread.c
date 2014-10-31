@@ -1,7 +1,7 @@
 /*****************************************************************************
  * win32thread.c: windows threading
  *****************************************************************************
- * Copyright (C) 2010-2013 x264 project
+ * Copyright (C) 2010-2014 x264 project
  *
  * Authors: Steven Walters <kemuri9@gmail.com>
  *          Pegasys Inc. <http://www.pegasys-inc.com>
@@ -261,7 +261,7 @@ int x264_pthread_cond_wait( x264_pthread_cond_t *cond, x264_pthread_mutex_t *mut
 int x264_win32_threading_init( void )
 {
     /* find function pointers to API functions, if they exist */
-    HANDLE kernel_dll = GetModuleHandle( TEXT( "kernel32.dll" ) );
+    HANDLE kernel_dll = GetModuleHandleW( L"kernel32.dll" );
     thread_control.cond_init = (void*)GetProcAddress( kernel_dll, "InitializeConditionVariable" );
     if( thread_control.cond_init )
     {
@@ -288,7 +288,7 @@ int x264_pthread_num_processors_np( void )
      * On platforms that support processor grouping, use GetThreadGroupAffinity to get the current thread's affinity instead. */
 #if ARCH_X86_64
     /* find function pointers to API functions specific to x86_64 platforms, if they exist */
-    HANDLE kernel_dll = GetModuleHandle( TEXT( "kernel32.dll" ) );
+    HANDLE kernel_dll = GetModuleHandleW( L"kernel32.dll" );
     BOOL (*get_thread_affinity)( HANDLE thread, x264_group_affinity_t *group_affinity ) = (void*)GetProcAddress( kernel_dll, "GetThreadGroupAffinity" );
     if( get_thread_affinity )
     {

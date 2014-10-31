@@ -1,12 +1,12 @@
 /*****************************************************************************
  * deblock.c: deblocking
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
- *          Jason Garrett-Glaser <darkshikari@gmail.com>
- *          Henrik Gramner <hengar-6@student.ltu.se>
+ *          Fiona Glaser <fiona@x264.com>
+ *          Henrik Gramner <henrik@gramner.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -734,6 +734,9 @@ void x264_deblock_v_luma_neon  ( uint8_t *pix, intptr_t stride, int alpha, int b
 void x264_deblock_h_luma_neon  ( uint8_t *pix, intptr_t stride, int alpha, int beta, int8_t *tc0 );
 void x264_deblock_v_chroma_neon( uint8_t *pix, intptr_t stride, int alpha, int beta, int8_t *tc0 );
 void x264_deblock_h_chroma_neon( uint8_t *pix, intptr_t stride, int alpha, int beta, int8_t *tc0 );
+void x264_deblock_strength_neon( uint8_t nnz[X264_SCAN8_SIZE], int8_t ref[2][X264_SCAN8_LUMA_SIZE],
+                                 int16_t mv[2][X264_SCAN8_LUMA_SIZE][2], uint8_t bs[2][8][4],
+                                 int mvy_limit, int bframe );
 #endif
 
 void x264_deblock_init( int cpu, x264_deblock_function_t *pf, int b_mbaff )
@@ -842,6 +845,7 @@ void x264_deblock_init( int cpu, x264_deblock_function_t *pf, int b_mbaff )
         pf->deblock_luma[0] = x264_deblock_h_luma_neon;
         pf->deblock_chroma[1] = x264_deblock_v_chroma_neon;
         pf->deblock_h_chroma_420 = x264_deblock_h_chroma_neon;
+        pf->deblock_strength     = x264_deblock_strength_neon;
    }
 #endif
 #endif // !HIGH_BIT_DEPTH

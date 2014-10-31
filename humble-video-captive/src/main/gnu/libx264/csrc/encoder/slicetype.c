@@ -1,9 +1,9 @@
 /*****************************************************************************
  * slicetype.c: lookahead analysis
  *****************************************************************************
- * Copyright (C) 2005-2013 x264 project
+ * Copyright (C) 2005-2014 x264 project
  *
- * Authors: Jason Garrett-Glaser <darkshikari@gmail.com>
+ * Authors: Fiona Glaser <fiona@x264.com>
  *          Loren Merritt <lorenm@u.washington.edu>
  *          Dylan Yudaken <dyudaken@gmail.com>
  *
@@ -1022,9 +1022,12 @@ static int x264_slicetype_frame_cost_recalculate( x264_t *h, x264_frame_t **fram
     return i_score;
 }
 
+/* Trade off precision in mbtree for increased range */
+#define MBTREE_PRECISION 0.5f
+
 static void x264_macroblock_tree_finish( x264_t *h, x264_frame_t *frame, float average_duration, int ref0_distance )
 {
-    int fps_factor = round( CLIP_DURATION(average_duration) / CLIP_DURATION(frame->f_duration) * 256 );
+    int fps_factor = round( CLIP_DURATION(average_duration) / CLIP_DURATION(frame->f_duration) * 256 / MBTREE_PRECISION );
     float weightdelta = 0.0;
     if( ref0_distance && frame->f_weighted_cost_delta[ref0_distance-1] > 0 )
         weightdelta = (1.0 - frame->f_weighted_cost_delta[ref0_distance-1]);
@@ -1051,11 +1054,12 @@ static void x264_macroblock_tree_propagate( x264_t *h, x264_frame_t **frames, fl
     int i_bipred_weight = h->param.analyse.b_weighted_bipred ? 64 - (dist_scale_factor>>2) : 32;
     int16_t (*mvs[2])[2] = { frames[b]->lowres_mvs[0][b-p0-1], frames[b]->lowres_mvs[1][p1-b-1] };
     int bipred_weights[2] = {i_bipred_weight, 64 - i_bipred_weight};
-    int *buf = h->scratch_buffer;
+    int16_t *buf = h->scratch_buffer;
     uint16_t *propagate_cost = frames[b]->i_propagate_cost;
+    uint16_t *lowres_costs = frames[b]->lowres_costs[b-p0][p1-b];
 
     x264_emms();
-    float fps_factor = CLIP_DURATION(frames[b]->f_duration) / CLIP_DURATION(average_duration);
+    float fps_factor = CLIP_DURATION(frames[b]->f_duration) / (CLIP_DURATION(average_duration) * 256.0f) * MBTREE_PRECISION;
 
     /* For non-reffed frames the source costs are always zero, so just memset one row and re-use it. */
     if( !referenced )
@@ -1065,72 +1069,17 @@ static void x264_macroblock_tree_propagate( x264_t *h, x264_frame_t **frames, fl
     {
         int mb_index = h->mb.i_mb_y*h->mb.i_mb_stride;
         h->mc.mbtree_propagate_cost( buf, propagate_cost,
-            frames[b]->i_intra_cost+mb_index, frames[b]->lowres_costs[b-p0][p1-b]+mb_index,
+            frames[b]->i_intra_cost+mb_index, lowres_costs+mb_index,
             frames[b]->i_inv_qscale_factor+mb_index, &fps_factor, h->mb.i_mb_width );
         if( referenced )
             propagate_cost += h->mb.i_mb_width;
-        for( h->mb.i_mb_x = 0; h->mb.i_mb_x < h->mb.i_mb_width; h->mb.i_mb_x++, mb_index++ )
+
+        h->mc.mbtree_propagate_list( h, ref_costs[0], &mvs[0][mb_index], buf, &lowres_costs[mb_index],
+                                     bipred_weights[0], h->mb.i_mb_y, h->mb.i_mb_width, 0 );
+        if( b != p1 )
         {
-            int propagate_amount = buf[h->mb.i_mb_x];
-            /* Don't propagate for an intra block. */
-            if( propagate_amount > 0 )
-            {
-                /* Access width-2 bitfield. */
-                int lists_used = frames[b]->lowres_costs[b-p0][p1-b][mb_index] >> LOWRES_COST_SHIFT;
-                /* Follow the MVs to the previous frame(s). */
-                for( int list = 0; list < 2; list++ )
-                    if( (lists_used >> list)&1 )
-                    {
-#define CLIP_ADD(s,x) (s) = X264_MIN((s)+(x),(1<<16)-1)
-                        int listamount = propagate_amount;
-                        /* Apply bipred weighting. */
-                        if( lists_used == 3 )
-                            listamount = (listamount * bipred_weights[list] + 32) >> 6;
-
-                        /* Early termination for simple case of mv0. */
-                        if( !M32( mvs[list][mb_index] ) )
-                        {
-                            CLIP_ADD( ref_costs[list][mb_index], listamount );
-                            continue;
-                        }
-
-                        int x = mvs[list][mb_index][0];
-                        int y = mvs[list][mb_index][1];
-                        int mbx = (x>>5)+h->mb.i_mb_x;
-                        int mby = (y>>5)+h->mb.i_mb_y;
-                        int idx0 = mbx + mby * h->mb.i_mb_stride;
-                        int idx1 = idx0 + 1;
-                        int idx2 = idx0 + h->mb.i_mb_stride;
-                        int idx3 = idx0 + h->mb.i_mb_stride + 1;
-                        x &= 31;
-                        y &= 31;
-                        int idx0weight = (32-y)*(32-x);
-                        int idx1weight = (32-y)*x;
-                        int idx2weight = y*(32-x);
-                        int idx3weight = y*x;
-
-                        /* We could just clip the MVs, but pixels that lie outside the frame probably shouldn't
-                         * be counted. */
-                        if( mbx < h->mb.i_mb_width-1 && mby < h->mb.i_mb_height-1 && mbx >= 0 && mby >= 0 )
-                        {
-                            CLIP_ADD( ref_costs[list][idx0], (listamount*idx0weight+512)>>10 );
-                            CLIP_ADD( ref_costs[list][idx1], (listamount*idx1weight+512)>>10 );
-                            CLIP_ADD( ref_costs[list][idx2], (listamount*idx2weight+512)>>10 );
-                            CLIP_ADD( ref_costs[list][idx3], (listamount*idx3weight+512)>>10 );
-                        }
-                        else /* Check offsets individually */
-                        {
-                            if( mbx < h->mb.i_mb_width && mby < h->mb.i_mb_height && mbx >= 0 && mby >= 0 )
-                                CLIP_ADD( ref_costs[list][idx0], (listamount*idx0weight+512)>>10 );
-                            if( mbx+1 < h->mb.i_mb_width && mby < h->mb.i_mb_height && mbx+1 >= 0 && mby >= 0 )
-                                CLIP_ADD( ref_costs[list][idx1], (listamount*idx1weight+512)>>10 );
-                            if( mbx < h->mb.i_mb_width && mby+1 < h->mb.i_mb_height && mbx >= 0 && mby+1 >= 0 )
-                                CLIP_ADD( ref_costs[list][idx2], (listamount*idx2weight+512)>>10 );
-                            if( mbx+1 < h->mb.i_mb_width && mby+1 < h->mb.i_mb_height && mbx+1 >= 0 && mby+1 >= 0 )
-                                CLIP_ADD( ref_costs[list][idx3], (listamount*idx3weight+512)>>10 );
-                        }
-                    }
-            }
+            h->mc.mbtree_propagate_list( h, ref_costs[1], &mvs[1][mb_index], buf, &lowres_costs[mb_index],
+                                         bipred_weights[1], h->mb.i_mb_y, h->mb.i_mb_width, 1 );
         }
     }
 

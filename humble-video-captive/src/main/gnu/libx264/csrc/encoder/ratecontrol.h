@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ratecontrol.h: ratecontrol
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Loren Merritt <lorenm@u.washington.edu>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -43,6 +43,7 @@ int  x264_ratecontrol_new   ( x264_t * );
 void x264_ratecontrol_delete( x264_t * );
 
 void x264_ratecontrol_init_reconfigurable( x264_t *h, int b_init );
+int x264_encoder_reconfig_apply( x264_t *h, x264_param_t *param );
 
 void x264_adaptive_quant_frame( x264_t *h, x264_frame_t *frame, float *quant_offsets );
 int  x264_macroblock_tree_read( x264_t *h, x264_frame_t *frame, float *quant_offsets );
