@@ -21,7 +21,7 @@
 
 #include "avcodec.h"
 #include "get_bits.h"
-#include "dsputil.h"
+#include "bswapdsp.h"
 #include "internal.h"
 
 #define MAX_HUFF_CODES 16
@@ -36,8 +36,8 @@ typedef struct HuffCode {
 
 typedef struct MotionPixelsContext {
     AVCodecContext *avctx;
-    AVFrame frame;
-    DSPContext dsp;
+    AVFrame *frame;
+    BswapDSPContext bdsp;
     uint8_t *changes_map;
     int offset_bits_len;
     int codes_count, current_codes_count;
@@ -49,6 +49,19 @@ typedef struct MotionPixelsContext {
     uint8_t *bswapbuf;
     int bswapbuf_size;
 } MotionPixelsContext;
+
+static av_cold int mp_decode_end(AVCodecContext *avctx)
+{
+    MotionPixelsContext *mp = avctx->priv_data;
+
+    av_freep(&mp->changes_map);
+    av_freep(&mp->vpt);
+    av_freep(&mp->hpt);
+    av_freep(&mp->bswapbuf);
+    av_frame_free(&mp->frame);
+
+    return 0;
+}
 
 static av_cold int mp_decode_init(AVCodecContext *avctx)
 {
@@ -63,13 +76,25 @@ static av_cold int mp_decode_init(AVCodecContext *avctx)
 
     motionpixels_tableinit();
     mp->avctx = avctx;
-    ff_dsputil_init(&mp->dsp, avctx);
-    mp->changes_map = av_mallocz(avctx->width * h4);
+    ff_bswapdsp_init(&mp->bdsp);
+    mp->changes_map = av_mallocz_array(avctx->width, h4);
     mp->offset_bits_len = av_log2(avctx->width * avctx->height) + 1;
-    mp->vpt = av_mallocz(avctx->height * sizeof(YuvPixel));
-    mp->hpt = av_mallocz(h4 * w4 / 16 * sizeof(YuvPixel));
+    mp->vpt = av_mallocz_array(avctx->height, sizeof(YuvPixel));
+    mp->hpt = av_mallocz_array(h4 / 4, w4 / 4 * sizeof(YuvPixel));
+    if (!mp->changes_map || !mp->vpt || !mp->hpt) {
+        av_freep(&mp->changes_map);
+        av_freep(&mp->vpt);
+        av_freep(&mp->hpt);
+        return AVERROR(ENOMEM);
+    }
     avctx->pix_fmt = AV_PIX_FMT_RGB555;
-    avcodec_get_frame_defaults(&mp->frame);
+
+    mp->frame = av_frame_alloc();
+    if (!mp->frame) {
+        mp_decode_end(avctx);
+        return AVERROR(ENOMEM);
+    }
+
     return 0;
 }
 
@@ -90,14 +115,14 @@ static void mp_read_changes_map(MotionPixelsContext *mp, GetBitContext *gb, int 
             continue;
         w = FFMIN(w, mp->avctx->width  - x);
         h = FFMIN(h, mp->avctx->height - y);
-        pixels = (uint16_t *)&mp->frame.data[0][y * mp->frame.linesize[0] + x * 2];
+        pixels = (uint16_t *)&mp->frame->data[0][y * mp->frame->linesize[0] + x * 2];
         while (h--) {
             mp->changes_map[offset] = w;
             if (read_color)
                 for (i = 0; i < w; ++i)
                     pixels[i] = color;
             offset += mp->avctx->width;
-            pixels += mp->frame.linesize[0] / 2;
+            pixels += mp->frame->linesize[0] / 2;
         }
     }
 }
@@ -159,7 +184,7 @@ static YuvPixel mp_get_yuv_from_rgb(MotionPixelsContext *mp, int x, int y)
 {
     int color;
 
-    color = *(uint16_t *)&mp->frame.data[0][y * mp->frame.linesize[0] + x * 2];
+    color = *(uint16_t *)&mp->frame->data[0][y * mp->frame->linesize[0] + x * 2];
     return mp_rgb_yuv_table[color];
 }
 
@@ -168,7 +193,7 @@ static void mp_set_rgb_from_yuv(MotionPixelsContext *mp, int x, int y, const Yuv
     int color;
 
     color = mp_yuv_to_rgb(p->y, p->v, p->u, 1);
-    *(uint16_t *)&mp->frame.data[0][y * mp->frame.linesize[0] + x * 2] = color;
+    *(uint16_t *)&mp->frame->data[0][y * mp->frame->linesize[0] + x * 2] = color;
 }
 
 static int mp_get_vlc(MotionPixelsContext *mp, GetBitContext *gb)
@@ -265,17 +290,17 @@ static int mp_decode_frame(AVCodecContext *avctx,
     GetBitContext gb;
     int i, count1, count2, sz, ret;
 
-    if ((ret = ff_reget_buffer(avctx, &mp->frame)) < 0)
+    if ((ret = ff_reget_buffer(avctx, mp->frame)) < 0)
         return ret;
 
     /* le32 bitstream msb first */
-    av_fast_malloc(&mp->bswapbuf, &mp->bswapbuf_size, buf_size + FF_INPUT_BUFFER_PADDING_SIZE);
+    av_fast_padded_malloc(&mp->bswapbuf, &mp->bswapbuf_size, buf_size);
     if (!mp->bswapbuf)
         return AVERROR(ENOMEM);
-    mp->dsp.bswap_buf((uint32_t *)mp->bswapbuf, (const uint32_t *)buf, buf_size / 4);
+    mp->bdsp.bswap_buf((uint32_t *) mp->bswapbuf, (const uint32_t *) buf,
+                       buf_size / 4);
     if (buf_size & 3)
         memcpy(mp->bswapbuf + (buf_size & ~3), buf + (buf_size & ~3), buf_size & 3);
-    memset(mp->bswapbuf + buf_size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
     init_get_bits(&gb, mp->bswapbuf, buf_size * 8);
 
     memset(mp->changes_map, 0, avctx->width * avctx->height);
@@ -291,7 +316,7 @@ static int mp_decode_frame(AVCodecContext *avctx,
         goto end;
 
     if (mp->changes_map[0] == 0) {
-        *(uint16_t *)mp->frame.data[0] = get_bits(&gb, 15);
+        *(uint16_t *)mp->frame->data[0] = get_bits(&gb, 15);
         mp->changes_map[0] = 1;
     }
     if (mp_read_codes_table(mp, &gb) < 0)
@@ -311,27 +336,15 @@ static int mp_decode_frame(AVCodecContext *avctx,
     ff_free_vlc(&mp->vlc);
 
 end:
-    if ((ret = av_frame_ref(data, &mp->frame)) < 0)
+    if ((ret = av_frame_ref(data, mp->frame)) < 0)
         return ret;
     *got_frame       = 1;
     return buf_size;
 }
 
-static av_cold int mp_decode_end(AVCodecContext *avctx)
-{
-    MotionPixelsContext *mp = avctx->priv_data;
-
-    av_freep(&mp->changes_map);
-    av_freep(&mp->vpt);
-    av_freep(&mp->hpt);
-    av_freep(&mp->bswapbuf);
-    av_frame_unref(&mp->frame);
-
-    return 0;
-}
-
 AVCodec ff_motionpixels_decoder = {
     .name           = "motionpixels",
+    .long_name      = NULL_IF_CONFIG_SMALL("Motion Pixels video"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MOTIONPIXELS,
     .priv_data_size = sizeof(MotionPixelsContext),
@@ -339,5 +352,4 @@ AVCodec ff_motionpixels_decoder = {
     .close          = mp_decode_end,
     .decode         = mp_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Motion Pixels video"),
 };

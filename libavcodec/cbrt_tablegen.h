@@ -25,6 +25,7 @@
 
 #include <stdint.h>
 #include <math.h>
+#include "libavutil/attributes.h"
 
 #if CONFIG_HARDCODED_TABLES
 #define cbrt_tableinit()
@@ -32,16 +33,17 @@
 #else
 static uint32_t cbrt_tab[1 << 13];
 
-static void cbrt_tableinit(void)
+static av_cold void cbrt_tableinit(void)
 {
     if (!cbrt_tab[(1<<13) - 1]) {
         int i;
+        /* cbrtf() isn't available on all systems, so we use powf(). */
         for (i = 0; i < 1<<13; i++) {
             union {
                 float f;
                 uint32_t i;
             } f;
-            f.f = cbrtf(i) * i;
+            f.f = pow(i, 1.0 / 3.0) * i;
             cbrt_tab[i] = f.i;
         }
     }

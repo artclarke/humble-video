@@ -27,11 +27,12 @@
 #include "libavutil/bprint.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/opt.h"
-#include "libswresample/swresample.h" // only for SWR_CH_MAX
 #include "avfilter.h"
 #include "audio.h"
 #include "bufferqueue.h"
 #include "internal.h"
+
+#define SWR_CH_MAX 32
 
 typedef struct {
     const AVClass *class;
@@ -52,7 +53,7 @@ typedef struct {
 static const AVOption amerge_options[] = {
     { "inputs", "specify the number of inputs", OFFSET(nb_inputs),
       AV_OPT_TYPE_INT, { .i64 = 2 }, 2, SWR_CH_MAX, FLAGS },
-    {0}
+    { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(amerge);
@@ -259,7 +260,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
     outbuf->pts = inbuf[0]->pts == AV_NOPTS_VALUE ? AV_NOPTS_VALUE :
                   inbuf[0]->pts +
                   av_rescale_q(am->in[0].pos,
-                               (AVRational){ 1, ctx->inputs[0]->sample_rate },
+                               av_make_q(1, ctx->inputs[0]->sample_rate),
                                ctx->outputs[0]->time_base);
 
     outbuf->nb_samples     = nb_samples;
@@ -335,7 +336,7 @@ static const AVFilterPad amerge_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_af_amerge = {
+AVFilter ff_af_amerge = {
     .name          = "amerge",
     .description   = NULL_IF_CONFIG_SMALL("Merge two or more audio streams into "
                                           "a single multi-channel stream."),

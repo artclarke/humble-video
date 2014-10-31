@@ -43,7 +43,7 @@ static int mpl2_probe(AVProbeData *p)
         if (sscanf(ptr, "[%"SCNd64"][%"SCNd64"]%c", &start, &end, &c) != 3 &&
             sscanf(ptr, "[%"SCNd64"][]%c",          &start,       &c) != 2)
             return 0;
-        ptr += strcspn(ptr, "\r\n") + 1;
+        ptr += ff_subtitles_next_line(ptr);
         if (ptr >= ptr_end)
             return 0;
     }
@@ -83,7 +83,7 @@ static int mpl2_read_header(AVFormatContext *s)
     st->codec->codec_type = AVMEDIA_TYPE_SUBTITLE;
     st->codec->codec_id   = AV_CODEC_ID_MPL2;
 
-    while (!url_feof(s->pb)) {
+    while (!avio_feof(s->pb)) {
         char line[4096];
         char *p = line;
         const int64_t pos = avio_tell(s->pb);

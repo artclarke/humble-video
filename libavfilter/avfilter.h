@@ -35,6 +35,7 @@
 
 #include <stddef.h>
 
+#include "libavutil/attributes.h"
 #include "libavutil/avutil.h"
 #include "libavutil/dict.h"
 #include "libavutil/frame.h"
@@ -198,7 +199,7 @@ typedef struct AVFilterBufferRef {
  * Copy properties of src to dst, without copying the actual data
  */
 attribute_deprecated
-void avfilter_copy_buffer_ref_props(AVFilterBufferRef *dst, AVFilterBufferRef *src);
+void avfilter_copy_buffer_ref_props(AVFilterBufferRef *dst, const AVFilterBufferRef *src);
 
 /**
  * Add a new reference to a buffer.
@@ -384,6 +385,12 @@ struct AVFilterPad {
      */
     int needs_fifo;
 
+    /**
+     * The filter expects writable frames from its input link,
+     * duplicating data buffers if needed.
+     *
+     * input pads only.
+     */
     int needs_writable;
 };
 #endif
@@ -633,14 +640,14 @@ struct AVFilterContext {
     AVFilterPad   *input_pads;      ///< array of input pads
     AVFilterLink **inputs;          ///< array of pointers to input links
 #if FF_API_FOO_COUNT
-    unsigned input_count;           ///< @deprecated use nb_inputs
+    attribute_deprecated unsigned input_count; ///< @deprecated use nb_inputs
 #endif
     unsigned    nb_inputs;          ///< number of input pads
 
     AVFilterPad   *output_pads;     ///< array of output pads
     AVFilterLink **outputs;         ///< array of pointers to output links
 #if FF_API_FOO_COUNT
-    unsigned output_count;          ///< @deprecated use nb_outputs
+    attribute_deprecated unsigned output_count; ///< @deprecated use nb_outputs
 #endif
     unsigned    nb_outputs;         ///< number of output pads
 
@@ -661,7 +668,7 @@ struct AVFilterContext {
      * allowed threading types. I.e. a threading type needs to be set in both
      * to be allowed.
      *
-     * After the filter is initialzed, libavfilter sets this field to the
+     * After the filter is initialized, libavfilter sets this field to the
      * threading type that is actually used (0 for no multithreading).
      */
     int thread_type;
@@ -823,7 +830,7 @@ struct AVFilterLink {
 
     /**
      * True if the link is closed.
-     * If set, all attemps of start_frame, filter_frame or request_frame
+     * If set, all attempts of start_frame, filter_frame or request_frame
      * will fail with AVERROR_EOF, and if necessary the reference will be
      * destroyed.
      * If request_frame returns AVERROR_EOF, this flag is set on the
@@ -990,6 +997,9 @@ int avfilter_register(AVFilter *filter);
  * @return     the filter definition, if any matching one is registered.
  *             NULL if none found.
  */
+#if !FF_API_NOCONST_GET_NAME
+const
+#endif
 AVFilter *avfilter_get_by_name(const char *name);
 
 /**
@@ -1125,6 +1135,35 @@ const AVClass *avfilter_get_class(void);
 
 typedef struct AVFilterGraphInternal AVFilterGraphInternal;
 
+/**
+ * A function pointer passed to the @ref AVFilterGraph.execute callback to be
+ * executed multiple times, possibly in parallel.
+ *
+ * @param ctx the filter context the job belongs to
+ * @param arg an opaque parameter passed through from @ref
+ *            AVFilterGraph.execute
+ * @param jobnr the index of the job being executed
+ * @param nb_jobs the total number of jobs
+ *
+ * @return 0 on success, a negative AVERROR on error
+ */
+typedef int (avfilter_action_func)(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs);
+
+/**
+ * A function executing multiple jobs, possibly in parallel.
+ *
+ * @param ctx the filter context to which the jobs belong
+ * @param func the function to be called multiple times
+ * @param arg the argument to be passed to func
+ * @param ret a nb_jobs-sized array to be filled with return values from each
+ *            invocation of func
+ * @param nb_jobs the number of jobs to execute
+ *
+ * @return 0 on success, a negative AVERROR on error
+ */
+typedef int (avfilter_execute_func)(AVFilterContext *ctx, avfilter_action_func *func,
+                                    void *arg, int *ret, int nb_jobs);
+
 typedef struct AVFilterGraph {
     const AVClass *av_class;
 #if FF_API_FOO_COUNT
@@ -1168,6 +1207,27 @@ typedef struct AVFilterGraph {
      */
     AVFilterGraphInternal *internal;
 
+    /**
+     * Opaque user data. May be set by the caller to an arbitrary value, e.g. to
+     * be used from callbacks like @ref AVFilterGraph.execute.
+     * Libavfilter will not touch this field in any way.
+     */
+    void *opaque;
+
+    /**
+     * This callback may be set by the caller immediately after allocating the
+     * graph and before adding any filters to it, to provide a custom
+     * multithreading implementation.
+     *
+     * If set, filters with slice threading capability will call this callback
+     * to execute multiple jobs in parallel.
+     *
+     * If this field is left unset, libavfilter will use its internal
+     * implementation, which may or may not be multithreaded depending on the
+     * platform and build options.
+     */
+    avfilter_execute_func *execute;
+
     char *aresample_swr_opts; ///< swr options to use for the auto-inserted aresample filters, Access ONLY through AVOptions
 
     /**
@@ -1200,19 +1260,21 @@ AVFilterGraph *avfilter_graph_alloc(void);
  *
  * @return the context of the newly created filter instance (note that it is
  *         also retrievable directly through AVFilterGraph.filters or with
- *         avfilter_graph_get_filter()) on success or NULL or failure.
+ *         avfilter_graph_get_filter()) on success or NULL on failure.
  */
 AVFilterContext *avfilter_graph_alloc_filter(AVFilterGraph *graph,
                                              const AVFilter *filter,
                                              const char *name);
 
 /**
- * Get a filter instance with name name from graph.
+ * Get a filter instance identified by instance name from graph.
  *
+ * @param graph filter graph to search through.
+ * @param name filter instance name (should be unique in the graph).
  * @return the pointer to the found filter instance or NULL if it
  * cannot be found.
  */
-AVFilterContext *avfilter_graph_get_filter(AVFilterGraph *graph, char *name);
+AVFilterContext *avfilter_graph_get_filter(AVFilterGraph *graph, const char *name);
 
 #if FF_API_AVFILTER_OPEN
 /**
@@ -1241,7 +1303,7 @@ int avfilter_graph_add_filter(AVFilterGraph *graphctx, AVFilterContext *filter);
  * @return a negative AVERROR error code in case of failure, a non
  * negative value otherwise
  */
-int avfilter_graph_create_filter(AVFilterContext **filt_ctx, AVFilter *filt,
+int avfilter_graph_create_filter(AVFilterContext **filt_ctx, const AVFilter *filt,
                                  const char *name, const char *args, void *opaque,
                                  AVFilterGraph *graph_ctx);
 
@@ -1265,7 +1327,7 @@ enum {
  *
  * @param graphctx the filter graph
  * @param log_ctx context used for logging
- * @return 0 in case of success, a negative AVERROR code otherwise
+ * @return >= 0 in case of success, a negative AVERROR code otherwise
  */
 int avfilter_graph_config(AVFilterGraph *graphctx, void *log_ctx);
 
@@ -1311,7 +1373,7 @@ AVFilterInOut *avfilter_inout_alloc(void);
  */
 void avfilter_inout_free(AVFilterInOut **inout);
 
-#if HAVE_INCOMPATIBLE_LIBAV_ABI || !FF_API_OLD_GRAPH_PARSE
+#if AV_HAVE_INCOMPATIBLE_LIBAV_ABI || !FF_API_OLD_GRAPH_PARSE
 /**
  * Add a graph described by a string to a graph.
  *
@@ -1324,7 +1386,7 @@ void avfilter_inout_free(AVFilterInOut **inout);
  * outputs of the already existing filters, which are provided as
  * inputs to the parsed filters.
  *
- * @param graph   the filter graph where to link the parsed grap context
+ * @param graph   the filter graph where to link the parsed graph context
  * @param filters string to be parsed
  * @param inputs  linked list to the inputs of the graph
  * @param outputs linked list to the outputs of the graph
@@ -1422,7 +1484,7 @@ int avfilter_graph_send_command(AVFilterGraph *graph, const char *target, const 
  *               "all" sends to all filters
  *               otherwise it can be a filter or filter instance name
  *               which will send the command to all matching filters.
- * @param cmd    the command to sent, for handling simplicity all commands must be alphanummeric only
+ * @param cmd    the command to sent, for handling simplicity all commands must be alphanumeric only
  * @param arg    the argument for the command
  * @param ts     time at which the command should be sent to the filter
  *

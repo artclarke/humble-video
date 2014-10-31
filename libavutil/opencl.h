@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2012 Peng Gao <peng@multicorewareinc.com>
- * Copyright (C) 2012 Li   Cao <li@multicorewareinc.com>
- * Copyright (C) 2012 Wei  Gao <weigao@multicorewareinc.com>
+ * Copyright (C) 2012 Peng  Gao     <peng@multicorewareinc.com>
+ * Copyright (C) 2012 Li    Cao     <li@multicorewareinc.com>
+ * Copyright (C) 2012 Wei   Gao     <weigao@multicorewareinc.com>
+ * Copyright (C) 2013 Lenny Wang    <lwanghpc@gmail.com>
  *
  * This file is part of FFmpeg.
  *
@@ -37,7 +38,10 @@
 #else
 #include <OpenCL/cl.h>
 #endif
+#include <stdint.h>
 #include "dict.h"
+
+#include "libavutil/version.h"
 
 #define AV_OPENCL_KERNEL( ... )# __VA_ARGS__
 
@@ -65,11 +69,13 @@ typedef struct {
     AVOpenCLPlatformNode **platform_node;
 } AVOpenCLDeviceList;
 
+#if FF_API_OLD_OPENCL
 typedef struct {
     cl_command_queue command_queue;
     cl_kernel kernel;
     char kernel_name[AV_OPENCL_MAX_KERNEL_NAME_SIZE];
 } AVOpenCLKernelEnv;
+#endif
 
 typedef struct {
     cl_platform_id platform_id;
@@ -107,7 +113,6 @@ void av_opencl_free_device_list(AVOpenCLDeviceList **device_list);
  * av_opencl_init() operation.
  *
  * The currently accepted options are:
- * - build_options: set options to compile registered kernels code
  * - platform: set index of platform in device list
  * - device: set index of device in device list
  *
@@ -174,15 +179,15 @@ const char *av_opencl_errstr(cl_int status);
 int av_opencl_register_kernel_code(const char *kernel_code);
 
 /**
- * Initialize the run time OpenCL environment and compile the kernel
- * code registered with av_opencl_register_kernel_code().
+ * Initialize the run time OpenCL environment
  *
  * @param ext_opencl_env external OpenCL environment, created by an
  *                       application program, ignored if set to NULL
  * @return >=0 on success, a negative error code in case of failure
  */
- int av_opencl_init(AVOpenCLExternalEnv *ext_opencl_env);
+int av_opencl_init(AVOpenCLExternalEnv *ext_opencl_env);
 
+#if FF_API_OLD_OPENCL
 /**
  * Create kernel object in the specified kernel environment.
  *
@@ -190,8 +195,27 @@ int av_opencl_register_kernel_code(const char *kernel_code);
  *                         the environment used to run the kernel
  * @param kernel_name      kernel function name
  * @return >=0 on success, a negative error code in case of failure
+ * @deprecated, use clCreateKernel
  */
 int av_opencl_create_kernel(AVOpenCLKernelEnv *env, const char *kernel_name);
+#endif
+
+/**
+ * compile specific OpenCL kernel source
+ *
+ * @param program_name  pointer to a program name used for identification
+ * @param build_opts    pointer to a string that describes the preprocessor
+ *                      build options to be used for building the program
+ * @return a cl_program object
+ */
+cl_program av_opencl_compile(const char *program_name, const char* build_opts);
+
+/**
+ * get OpenCL command queue
+ *
+ * @return a cl_command_queue object
+ */
+cl_command_queue av_opencl_get_command_queue(void);
 
 /**
  * Create OpenCL buffer.
@@ -268,13 +292,16 @@ int av_opencl_buffer_read_image(uint8_t **dst_data, int *plane_size, int plane_n
  */
 void av_opencl_buffer_release(cl_mem *cl_buf);
 
+#if FF_API_OLD_OPENCL
 /**
  * Release kernel object.
  *
  * @param env kernel environment where the kernel object was created
  *            with av_opencl_create_kernel()
+ * @deprecated, use clReleaseKernel
  */
 void av_opencl_release_kernel(AVOpenCLKernelEnv *env);
+#endif
 
 /**
  * Release OpenCL environment.
@@ -283,5 +310,21 @@ void av_opencl_release_kernel(AVOpenCLKernelEnv *env);
  * kernels had been released with av_opencl_release_kernel().
  */
 void av_opencl_uninit(void);
+
+/**
+ * Benchmark an OpenCL device with a user defined callback function.  This function
+ * sets up an external OpenCL environment including context and command queue on
+ * the device then tears it down in the end.  The callback function should perform
+ * the rest of the work.
+ *
+ * @param device            pointer to the OpenCL device to be used
+ * @param platform          cl_platform_id handle to which the device belongs to
+ * @param benchmark         callback function to perform the benchmark, return a
+ *                          negative value in case of failure
+ * @return the score passed from the callback function, a negative error code in case
+ * of failure
+ */
+int64_t av_opencl_benchmark(AVOpenCLDeviceNode *device, cl_platform_id platform,
+                            int64_t (*benchmark)(AVOpenCLExternalEnv *ext_opencl_env));
 
 #endif /* LIBAVUTIL_OPENCL_H */

@@ -39,6 +39,8 @@
 #include "timer.h"
 #include "cpu.h"
 #include "dict.h"
+#include "pixfmt.h"
+#include "version.h"
 
 #if ARCH_X86
 #   include "x86/emms.h"
@@ -62,15 +64,42 @@
 #    define av_export
 #endif
 
+#if HAVE_PRAGMA_DEPRECATED
+#    if defined(__ICL) || defined (__INTEL_COMPILER)
+#        define FF_DISABLE_DEPRECATION_WARNINGS __pragma(warning(push)) __pragma(warning(disable:1478))
+#        define FF_ENABLE_DEPRECATION_WARNINGS  __pragma(warning(pop))
+#    elif defined(_MSC_VER)
+#        define FF_DISABLE_DEPRECATION_WARNINGS __pragma(warning(push)) __pragma(warning(disable:4996))
+#        define FF_ENABLE_DEPRECATION_WARNINGS  __pragma(warning(pop))
+#    else
+#        define FF_DISABLE_DEPRECATION_WARNINGS _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#        define FF_ENABLE_DEPRECATION_WARNINGS  _Pragma("GCC diagnostic warning \"-Wdeprecated-declarations\"")
+#    endif
+#else
+#    define FF_DISABLE_DEPRECATION_WARNINGS
+#    define FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+
 #ifndef INT_BIT
 #    define INT_BIT (CHAR_BIT * sizeof(int))
 #endif
 
 #define FF_MEMORY_POISON 0x2a
 
+#define MAKE_ACCESSORS(str, name, type, field) \
+    type av_##name##_get_##field(const str *s) { return s->field; } \
+    void av_##name##_set_##field(str *s, type v) { s->field = v; }
+
 // Some broken preprocessors need a second expansion
 // to be forced to tokenize __VA_ARGS__
 #define E1(x) x
+
+/* Check if the hard coded offset of a struct member still matches reality.
+ * Induce a compilation failure if not.
+ */
+#define AV_CHECK_OFFSET(s, m, o) struct check_##o {    \
+        int x_##o[offsetof(s, m) == o? 1: -1];         \
+    }
 
 #define LOCAL_ALIGNED_A(a, t, v, s, o, ...)             \
     uint8_t la_##v[sizeof(t s o) + (a)];                \
@@ -94,10 +123,16 @@
 #   define LOCAL_ALIGNED_16(t, v, ...) LOCAL_ALIGNED(16, t, v, __VA_ARGS__)
 #endif
 
+#if HAVE_LOCAL_ALIGNED_32
+#   define LOCAL_ALIGNED_32(t, v, ...) E1(LOCAL_ALIGNED_D(32, t, v, __VA_ARGS__,,))
+#else
+#   define LOCAL_ALIGNED_32(t, v, ...) LOCAL_ALIGNED(32, t, v, __VA_ARGS__)
+#endif
+
 #define FF_ALLOC_OR_GOTO(ctx, p, size, label)\
 {\
     p = av_malloc(size);\
-    if (p == NULL && (size) != 0) {\
+    if (!(p) && (size) != 0) {\
         av_log(ctx, AV_LOG_ERROR, "Cannot allocate memory.\n");\
         goto label;\
     }\
@@ -106,7 +141,25 @@
 #define FF_ALLOCZ_OR_GOTO(ctx, p, size, label)\
 {\
     p = av_mallocz(size);\
-    if (p == NULL && (size) != 0) {\
+    if (!(p) && (size) != 0) {\
+        av_log(ctx, AV_LOG_ERROR, "Cannot allocate memory.\n");\
+        goto label;\
+    }\
+}
+
+#define FF_ALLOC_ARRAY_OR_GOTO(ctx, p, nelem, elsize, label)\
+{\
+    p = av_malloc_array(nelem, elsize);\
+    if (!p) {\
+        av_log(ctx, AV_LOG_ERROR, "Cannot allocate memory.\n");\
+        goto label;\
+    }\
+}
+
+#define FF_ALLOCZ_ARRAY_OR_GOTO(ctx, p, nelem, elsize, label)\
+{\
+    p = av_mallocz_array(nelem, elsize);\
+    if (!p) {\
         av_log(ctx, AV_LOG_ERROR, "Cannot allocate memory.\n");\
         goto label;\
     }\
@@ -114,7 +167,7 @@
 
 #include "libm.h"
 
-#if defined(_MSC_VER) && !CONFIG_SHARED
+#if defined(_MSC_VER)
 #pragma comment(linker, "/include:"EXTERN_PREFIX"avpriv_strtod")
 #pragma comment(linker, "/include:"EXTERN_PREFIX"avpriv_snprintf")
 #endif
@@ -189,5 +242,25 @@ void avpriv_report_missing_feature(void *avc,
  */
 void avpriv_request_sample(void *avc,
                            const char *msg, ...) av_printf_format(2, 3);
+
+#if HAVE_LIBC_MSVCRT
+#define avpriv_open ff_open
+#define PTRDIFF_SPECIFIER "Id"
+#define SIZE_SPECIFIER "Iu"
+#else
+#define PTRDIFF_SPECIFIER "td"
+#define SIZE_SPECIFIER "zu"
+#endif
+
+/**
+ * A wrapper for open() setting O_CLOEXEC.
+ */
+int avpriv_open(const char *filename, int flags, ...);
+
+int avpriv_set_systematic_pal2(uint32_t pal[256], enum AVPixelFormat pix_fmt);
+
+#if FF_API_GET_CHANNEL_LAYOUT_COMPAT
+uint64_t ff_get_channel_layout(const char *name, int compat);
+#endif
 
 #endif /* AVUTIL_INTERNAL_H */

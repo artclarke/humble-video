@@ -60,7 +60,7 @@ typedef struct {
 
 typedef struct {
     AVCodecContext *avctx;
-    AVFrame picture;
+    const AVFrame *picture;
 
     int width, height; ///< image width and height
     uint8_t cbps[4]; ///< bits per sample in particular components
@@ -343,14 +343,14 @@ static int init_tiles(Jpeg2000EncoderContext *s)
     s->numXtiles = ff_jpeg2000_ceildiv(s->width, s->tile_width);
     s->numYtiles = ff_jpeg2000_ceildiv(s->height, s->tile_height);
 
-    s->tile = av_malloc(s->numXtiles * s->numYtiles * sizeof(Jpeg2000Tile));
+    s->tile = av_malloc_array(s->numXtiles, s->numYtiles * sizeof(Jpeg2000Tile));
     if (!s->tile)
         return AVERROR(ENOMEM);
     for (tileno = 0, tiley = 0; tiley < s->numYtiles; tiley++)
         for (tilex = 0; tilex < s->numXtiles; tilex++, tileno++){
             Jpeg2000Tile *tile = s->tile + tileno;
 
-            tile->comp = av_mallocz(s->ncomponents * sizeof(Jpeg2000Component));
+            tile->comp = av_mallocz_array(s->ncomponents, sizeof(Jpeg2000Component));
             if (!tile->comp)
                 return AVERROR(ENOMEM);
             for (compno = 0; compno < s->ncomponents; compno++){
@@ -390,18 +390,18 @@ static void copy_frame(Jpeg2000EncoderContext *s)
             for (compno = 0; compno < s->ncomponents; compno++){
                 Jpeg2000Component *comp = tile->comp + compno;
                 int *dst = comp->i_data;
-                line = s->picture.data[compno]
-                       + comp->coord[1][0] * s->picture.linesize[compno]
+                line = s->picture->data[compno]
+                       + comp->coord[1][0] * s->picture->linesize[compno]
                        + comp->coord[0][0];
                 for (y = comp->coord[1][0]; y < comp->coord[1][1]; y++){
                     uint8_t *ptr = line;
                     for (x = comp->coord[0][0]; x < comp->coord[0][1]; x++)
                         *dst++ = *ptr++ - (1 << 7);
-                    line += s->picture.linesize[compno];
+                    line += s->picture->linesize[compno];
                 }
             }
         } else{
-            line = s->picture.data[0] + tile->comp[0].coord[1][0] * s->picture.linesize[0]
+            line = s->picture->data[0] + tile->comp[0].coord[1][0] * s->picture->linesize[0]
                    + tile->comp[0].coord[0][0] * s->ncomponents;
 
             i = 0;
@@ -412,7 +412,7 @@ static void copy_frame(Jpeg2000EncoderContext *s)
                         tile->comp[compno].i_data[i] = *ptr++  - (1 << 7);
                     }
                 }
-                line += s->picture.linesize[0];
+                line += s->picture->linesize[0];
             }
         }
     }
@@ -927,10 +927,9 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     s->buf = s->buf_start = pkt->data;
     s->buf_end = pkt->data + pkt->size;
 
-    s->picture = *pict;
-    avctx->coded_frame= &s->picture;
+    s->picture = pict;
 
-    s->lambda = s->picture.quality * LAMBDA_SCALE;
+    s->lambda = s->picture->quality * LAMBDA_SCALE;
 
     copy_frame(s);
     reinit(s);
@@ -1038,6 +1037,7 @@ static int j2kenc_destroy(AVCodecContext *avctx)
 
 AVCodec ff_jpeg2000_encoder = {
     .name           = "jpeg2000",
+    .long_name      = NULL_IF_CONFIG_SMALL("JPEG 2000"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_JPEG2000,
     .priv_data_size = sizeof(Jpeg2000EncoderContext),
@@ -1045,7 +1045,6 @@ AVCodec ff_jpeg2000_encoder = {
     .encode2        = encode_frame,
     .close          = j2kenc_destroy,
     .capabilities   = CODEC_CAP_EXPERIMENTAL,
-    .long_name      = NULL_IF_CONFIG_SMALL("JPEG 2000"),
     .pix_fmts       = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_RGB24, AV_PIX_FMT_YUV444P, AV_PIX_FMT_GRAY8,
 /*      AV_PIX_FMT_YUV420P,

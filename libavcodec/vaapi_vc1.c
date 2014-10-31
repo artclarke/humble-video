@@ -169,7 +169,7 @@ static int vaapi_vc1_start_frame(AVCodecContext *avctx, av_unused const uint8_t 
     pic_param->sequence_fields.bits.psf                             = v->psf;
     pic_param->sequence_fields.bits.multires                        = v->multires;
     pic_param->sequence_fields.bits.overlap                         = v->overlap;
-    pic_param->sequence_fields.bits.syncmarker                      = s->resync_marker;
+    pic_param->sequence_fields.bits.syncmarker                      = v->resync_marker;
     pic_param->sequence_fields.bits.rangered                        = v->rangered;
     pic_param->sequence_fields.bits.max_b_frames                    = s->avctx->max_b_frames;
 #if VA_CHECK_VERSION(0,32,0)
@@ -258,10 +258,10 @@ static int vaapi_vc1_start_frame(AVCodecContext *avctx, av_unused const uint8_t 
 
     switch (s->pict_type) {
     case AV_PICTURE_TYPE_B:
-        pic_param->backward_reference_picture = ff_vaapi_get_surface_id(&s->next_picture);
+        pic_param->backward_reference_picture = ff_vaapi_get_surface_id(s->next_picture.f);
         // fall-through
     case AV_PICTURE_TYPE_P:
-        pic_param->forward_reference_picture = ff_vaapi_get_surface_id(&s->last_picture);
+        pic_param->forward_reference_picture = ff_vaapi_get_surface_id(s->last_picture.f);
         break;
     }
 

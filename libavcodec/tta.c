@@ -30,6 +30,7 @@
 #define BITSTREAM_READER_LE
 #include <limits.h>
 #include "ttadata.h"
+#include "ttadsp.h"
 #include "avcodec.h"
 #include "get_bits.h"
 #include "thread.h"
@@ -56,38 +57,8 @@ typedef struct TTAContext {
     uint8_t crc_pass[8];
     uint8_t *pass;
     TTAChannel *ch_ctx;
+    TTADSPContext dsp;
 } TTAContext;
-
-static inline void ttafilter_process(TTAFilter *c, int32_t *in)
-{
-    register int32_t *dl = c->dl, *qm = c->qm, *dx = c->dx, sum = c->round;
-
-    if (c->error < 0) {
-        qm[0] -= dx[0]; qm[1] -= dx[1]; qm[2] -= dx[2]; qm[3] -= dx[3];
-        qm[4] -= dx[4]; qm[5] -= dx[5]; qm[6] -= dx[6]; qm[7] -= dx[7];
-    } else if (c->error > 0) {
-        qm[0] += dx[0]; qm[1] += dx[1]; qm[2] += dx[2]; qm[3] += dx[3];
-        qm[4] += dx[4]; qm[5] += dx[5]; qm[6] += dx[6]; qm[7] += dx[7];
-    }
-
-    sum += dl[0] * qm[0] + dl[1] * qm[1] + dl[2] * qm[2] + dl[3] * qm[3] +
-           dl[4] * qm[4] + dl[5] * qm[5] + dl[6] * qm[6] + dl[7] * qm[7];
-
-    dx[0] = dx[1]; dx[1] = dx[2]; dx[2] = dx[3]; dx[3] = dx[4];
-    dl[0] = dl[1]; dl[1] = dl[2]; dl[2] = dl[3]; dl[3] = dl[4];
-
-    dx[4] = ((dl[4] >> 30) | 1);
-    dx[5] = ((dl[5] >> 30) | 2) & ~1;
-    dx[6] = ((dl[6] >> 30) | 2) & ~1;
-    dx[7] = ((dl[7] >> 30) | 4) & ~3;
-
-    c->error = *in;
-    *in += (sum >> c->shift);
-
-    dl[4] = -dl[5]; dl[5] = -dl[6];
-    dl[6] = *in - dl[7]; dl[7] = *in;
-    dl[5] += dl[6]; dl[4] += dl[5];
-}
 
 static const int64_t tta_channel_layouts[7] = {
     AV_CH_LAYOUT_STEREO,
@@ -133,12 +104,12 @@ static int allocate_buffers(AVCodecContext *avctx)
     TTAContext *s = avctx->priv_data;
 
     if (s->bps < 3) {
-        s->decode_buffer = av_mallocz(sizeof(int32_t)*s->frame_length*s->channels);
+        s->decode_buffer = av_mallocz_array(sizeof(int32_t)*s->frame_length, s->channels);
         if (!s->decode_buffer)
             return AVERROR(ENOMEM);
     } else
         s->decode_buffer = NULL;
-    s->ch_ctx = av_malloc(avctx->channels * sizeof(*s->ch_ctx));
+    s->ch_ctx = av_malloc_array(avctx->channels, sizeof(*s->ch_ctx));
     if (!s->ch_ctx) {
         av_freep(&s->decode_buffer);
         return AVERROR(ENOMEM);
@@ -160,7 +131,7 @@ static av_cold int tta_decode_init(AVCodecContext * avctx)
         return AVERROR_INVALIDDATA;
 
     s->crc_table = av_crc_get_table(AV_CRC_32_IEEE_LE);
-    init_get_bits(&gb, avctx->extradata, avctx->extradata_size * 8);
+    init_get_bits8(&gb, avctx->extradata, avctx->extradata_size);
     if (show_bits_long(&gb, 32) == AV_RL32("TTA1")) {
         /* signature */
         skip_bits_long(&gb, 32);
@@ -234,6 +205,8 @@ static av_cold int tta_decode_init(AVCodecContext * avctx)
         return AVERROR_INVALIDDATA;
     }
 
+    ff_ttadsp_init(&s->dsp);
+
     return allocate_buffers(avctx);
 }
 
@@ -251,7 +224,8 @@ static int tta_decode_frame(AVCodecContext *avctx, void *data,
     int32_t *p;
 
     if (avctx->err_recognition & AV_EF_CRCCHECK) {
-        if (buf_size < 4 || tta_check_crc(s, buf, buf_size - 4))
+        if (buf_size < 4 ||
+            (tta_check_crc(s, buf, buf_size - 4) && avctx->err_recognition & AV_EF_EXPLODE))
             return AVERROR_INVALIDDATA;
     }
 
@@ -334,10 +308,11 @@ static int tta_decode_frame(AVCodecContext *avctx, void *data,
         *p = 1 + ((value >> 1) ^ ((value & 1) - 1));
 
         // run hybrid filter
-        ttafilter_process(filter, p);
+        s->dsp.ttafilter_process_dec(filter->qm, filter->dx, filter->dl, &filter->error, p,
+                                     filter->shift, filter->round);
 
         // fixed order prediction
-#define PRED(x, k) (int32_t)((((uint64_t)x << k) - x) >> k)
+#define PRED(x, k) (int32_t)((((uint64_t)(x) << (k)) - (x)) >> (k))
         switch (s->bps) {
         case 1: *p += PRED(*predictor, 4); break;
         case 2:
@@ -442,6 +417,7 @@ static const AVClass tta_decoder_class = {
 
 AVCodec ff_tta_decoder = {
     .name           = "tta",
+    .long_name      = NULL_IF_CONFIG_SMALL("TTA (True Audio)"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_TTA,
     .priv_data_size = sizeof(TTAContext),
@@ -450,6 +426,5 @@ AVCodec ff_tta_decoder = {
     .decode         = tta_decode_frame,
     .init_thread_copy = ONLY_IF_THREADS_ENABLED(init_thread_copy),
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
-    .long_name      = NULL_IF_CONFIG_SMALL("TTA (True Audio)"),
     .priv_class     = &tta_decoder_class,
 };

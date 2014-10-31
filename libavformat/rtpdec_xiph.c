@@ -33,6 +33,7 @@
 #include "libavutil/base64.h"
 #include "libavcodec/bytestream.h"
 
+#include "internal.h"
 #include "rtpdec.h"
 #include "rtpdec_formats.h"
 
@@ -255,7 +256,7 @@ parse_packed_headers(const uint8_t * packed_headers,
 
     if (packed_headers_end - packed_headers < 9) {
         av_log(codec, AV_LOG_ERROR,
-               "Invalid %td byte packed header.",
+               "Invalid %"PTRDIFF_SPECIFIER" byte packed header.",
                packed_headers_end - packed_headers);
         return AVERROR_INVALIDDATA;
     }
@@ -277,7 +278,7 @@ parse_packed_headers(const uint8_t * packed_headers,
     if (packed_headers_end - packed_headers != length ||
         length1 > length || length2 > length - length1) {
         av_log(codec, AV_LOG_ERROR,
-               "Bad packed header lengths (%d,%d,%td,%d)\n", length1,
+               "Bad packed header lengths (%d,%d,%"PTRDIFF_SPECIFIER",%d)\n", length1,
                length2, packed_headers_end - packed_headers, length);
         return AVERROR_INVALIDDATA;
     }
@@ -288,11 +289,11 @@ parse_packed_headers(const uint8_t * packed_headers,
      * -- FF_INPUT_BUFFER_PADDING_SIZE required */
     extradata_alloc = length + length/255 + 3 + FF_INPUT_BUFFER_PADDING_SIZE;
 
-    ptr = codec->extradata = av_malloc(extradata_alloc);
-    if (!ptr) {
+    if (ff_alloc_extradata(codec, extradata_alloc)) {
         av_log(codec, AV_LOG_ERROR, "Out of memory\n");
         return AVERROR(ENOMEM);
     }
+    ptr = codec->extradata;
     *ptr++ = 2;
     ptr += av_xiphlacing(ptr, length1);
     ptr += av_xiphlacing(ptr, length2);
@@ -305,7 +306,8 @@ parse_packed_headers(const uint8_t * packed_headers,
     return 0;
 }
 
-static int xiph_parse_fmtp_pair(AVStream* stream,
+static int xiph_parse_fmtp_pair(AVFormatContext *s,
+                                AVStream* stream,
                                 PayloadContext *xiph_data,
                                 char *attr, char *value)
 {
@@ -320,7 +322,7 @@ static int xiph_parse_fmtp_pair(AVStream* stream,
         } else if (!strcmp(value, "YCbCr-4:4:4")) {
             codec->pix_fmt = AV_PIX_FMT_YUV444P;
         } else {
-            av_log(codec, AV_LOG_ERROR,
+            av_log(s, AV_LOG_ERROR,
                    "Unsupported pixel format %s\n", attr);
             return AVERROR_INVALIDDATA;
         }
@@ -359,12 +361,12 @@ static int xiph_parse_fmtp_pair(AVStream* stream,
                     (decoded_packet, decoded_packet + packet_size, codec,
                     xiph_data);
             } else {
-                av_log(codec, AV_LOG_ERROR,
+                av_log(s, AV_LOG_ERROR,
                        "Out of memory while decoding SDP configuration.\n");
                 result = AVERROR(ENOMEM);
             }
         } else {
-            av_log(codec, AV_LOG_ERROR, "Packet too large\n");
+            av_log(s, AV_LOG_ERROR, "Packet too large\n");
             result = AVERROR_INVALIDDATA;
         }
         av_free(decoded_packet);
@@ -381,7 +383,7 @@ static int xiph_parse_sdp_line(AVFormatContext *s, int st_index,
         return 0;
 
     if (av_strstart(line, "fmtp:", &p)) {
-        return ff_parse_fmtp(s->streams[st_index], data, p,
+        return ff_parse_fmtp(s, s->streams[st_index], data, p,
                              xiph_parse_fmtp_pair);
     }
 

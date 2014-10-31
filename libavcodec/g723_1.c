@@ -30,7 +30,6 @@
 #include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "avcodec.h"
-#include "internal.h"
 #include "get_bits.h"
 #include "acelp_vectors.h"
 #include "celp_filters.h"
@@ -1332,12 +1331,12 @@ static const AVClass g723_1dec_class = {
 
 AVCodec ff_g723_1_decoder = {
     .name           = "g723_1",
+    .long_name      = NULL_IF_CONFIG_SMALL("G.723.1"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_G723_1,
     .priv_data_size = sizeof(G723_1_Context),
     .init           = g723_1_decode_init,
     .decode         = g723_1_decode_frame,
-    .long_name      = NULL_IF_CONFIG_SMALL("G.723.1"),
     .capabilities   = CODEC_CAP_SUBFRAMES | CODEC_CAP_DR1,
     .priv_class     = &g723_1dec_class,
 };
@@ -2286,7 +2285,8 @@ static int pack_bitstream(G723_1_Context *p, unsigned char *frame, int size)
     if (p->cur_rate == RATE_6300) {
         info_bits = 0;
         put_bits(&pb, 2, info_bits);
-    }
+    }else
+        av_assert0(0);
 
     put_bits(&pb, 8, p->lsp_index[2]);
     put_bits(&pb, 8, p->lsp_index[1]);
@@ -2346,10 +2346,14 @@ static int g723_1_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
     int16_t weighted_lpc[LPC_ORDER * SUBFRAMES << 1];
     int16_t vector[FRAME_LEN + PITCH_MAX];
     int offset, ret;
-    int16_t *in = (const int16_t *)frame->data[0];
+    int16_t *in_orig = av_memdup(frame->data[0], frame->nb_samples * sizeof(int16_t));
+    int16_t *in = in_orig;
 
     HFParam hf[4];
     int i, j;
+
+    if (!in)
+        return AVERROR(ENOMEM);
 
     highpass_filter(in, &p->hpf_fir_mem, &p->hpf_iir_mem);
 
@@ -2456,6 +2460,8 @@ static int g723_1_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
         offset += LPC_ORDER;
     }
 
+    av_freep(&in_orig); in = NULL;
+
     if ((ret = ff_alloc_packet2(avctx, avpkt, 24)) < 0)
         return ret;
 
@@ -2466,12 +2472,12 @@ static int g723_1_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 
 AVCodec ff_g723_1_encoder = {
     .name           = "g723_1",
+    .long_name      = NULL_IF_CONFIG_SMALL("G.723.1"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_G723_1,
     .priv_data_size = sizeof(G723_1_Context),
     .init           = g723_1_encode_init,
     .encode2        = g723_1_encode_frame,
-    .long_name      = NULL_IF_CONFIG_SMALL("G.723.1"),
     .sample_fmts    = (const enum AVSampleFormat[]){AV_SAMPLE_FMT_S16,
                                                     AV_SAMPLE_FMT_NONE},
 };

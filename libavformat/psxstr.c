@@ -1,6 +1,6 @@
 /*
  * Sony Playstation (PSX) STR File Demuxer
- * Copyright (c) 2003 The ffmpeg Project
+ * Copyright (c) 2003 The FFmpeg Project
  *
  * This file is part of FFmpeg.
  *
@@ -30,6 +30,7 @@
  */
 
 #include "libavutil/channel_layout.h"
+#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
 #include "internal.h"
@@ -220,6 +221,7 @@ static int str_read_packet(AVFormatContext *s,
                     av_free_packet(pkt);
                     if (av_new_packet(pkt, sector_count*VIDEO_DATA_CHUNK_SIZE))
                         return AVERROR(EIO);
+                    memset(pkt->data, 0, sector_count*VIDEO_DATA_CHUNK_SIZE);
 
                     pkt->pos= avio_tell(pb) - RAW_CD_SECTOR_SIZE;
                     pkt->stream_index =
@@ -237,7 +239,9 @@ static int str_read_packet(AVFormatContext *s,
                     pkt->size= -1;
                     pkt->buf = NULL;
 #if FF_API_DESTRUCT_PACKET
+FF_DISABLE_DEPRECATION_WARNINGS
                     pkt->destruct = NULL;
+FF_ENABLE_DEPRECATION_WARNINGS
 #endif
                     return 0;
                 }
@@ -288,7 +292,7 @@ static int str_read_packet(AVFormatContext *s,
             break;
         }
 
-        if (url_feof(pb))
+        if (avio_feof(pb))
             return AVERROR(EIO);
     }
 }

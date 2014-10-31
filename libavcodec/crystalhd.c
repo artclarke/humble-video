@@ -77,7 +77,6 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include <libcrystalhd/bc_dts_types.h>
 #include <libcrystalhd/bc_dts_defs.h>
@@ -89,6 +88,10 @@
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/opt.h"
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 /** Timeout parameter passed to DtsProcOutput() in us */
 #define OUTPUT_PROC_TIMEOUT 50
@@ -419,7 +422,7 @@ static av_cold int init(AVCodecContext *avctx)
             int dummy_int;
 
             /* Back up the extradata so it can be restored at close time. */
-            priv->orig_extradata = av_malloc(avctx->extradata_size);
+            priv->orig_extradata = av_malloc(avctx->extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
             if (!priv->orig_extradata) {
                 av_log(avctx, AV_LOG_ERROR,
                        "Failed to allocate copy of extradata\n");
@@ -915,8 +918,8 @@ static int decode(AVCodecContext *avctx, void *data, int *got_frame, AVPacket *a
                 H264Context *h = priv->parser->priv_data;
 
                 index = av_parser_parse2(priv->parser, avctx, &pout, &psize,
-                                         in_data, len, avctx->pkt->pts,
-                                         avctx->pkt->dts, 0);
+                                         in_data, len, avctx->internal->pkt->pts,
+                                         avctx->internal->pkt->dts, 0);
                 if (index < 0) {
                     av_log(avctx, AV_LOG_WARNING,
                            "CrystalHD: Failed to parse h.264 packet to "
@@ -950,7 +953,7 @@ static int decode(AVCodecContext *avctx, void *data, int *got_frame, AVPacket *a
              * avoiding mangling so we need to build a mapping to values
              * we know will not be mangled.
              */
-            uint64_t pts = opaque_list_push(priv, avctx->pkt->pts, pic_type);
+            uint64_t pts = opaque_list_push(priv, avctx->internal->pkt->pts, pic_type);
             if (!pts) {
                 if (free_data) {
                     av_freep(&in_data);
@@ -1088,6 +1091,7 @@ static AVClass h264_class = {
 
 AVCodec ff_h264_crystalhd_decoder = {
     .name           = "h264_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_H264,
     .priv_data_size = sizeof(CHDContext),
@@ -1096,7 +1100,6 @@ AVCodec ff_h264_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &h264_class,
 };
@@ -1112,6 +1115,7 @@ static AVClass mpeg2_class = {
 
 AVCodec ff_mpeg2_crystalhd_decoder = {
     .name           = "mpeg2_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-2 Video (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MPEG2VIDEO,
     .priv_data_size = sizeof(CHDContext),
@@ -1120,7 +1124,6 @@ AVCodec ff_mpeg2_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-2 Video (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &mpeg2_class,
 };
@@ -1136,6 +1139,7 @@ static AVClass mpeg4_class = {
 
 AVCodec ff_mpeg4_crystalhd_decoder = {
     .name           = "mpeg4_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 Part 2 (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MPEG4,
     .priv_data_size = sizeof(CHDContext),
@@ -1144,7 +1148,6 @@ AVCodec ff_mpeg4_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 Part 2 (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &mpeg4_class,
 };
@@ -1160,6 +1163,7 @@ static AVClass msmpeg4_class = {
 
 AVCodec ff_msmpeg4_crystalhd_decoder = {
     .name           = "msmpeg4_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 Part 2 Microsoft variant version 3 (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MSMPEG4V3,
     .priv_data_size = sizeof(CHDContext),
@@ -1168,7 +1172,6 @@ AVCodec ff_msmpeg4_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY | CODEC_CAP_EXPERIMENTAL,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 Part 2 Microsoft variant version 3 (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &msmpeg4_class,
 };
@@ -1184,6 +1187,7 @@ static AVClass vc1_class = {
 
 AVCodec ff_vc1_crystalhd_decoder = {
     .name           = "vc1_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("SMPTE VC-1 (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_VC1,
     .priv_data_size = sizeof(CHDContext),
@@ -1192,7 +1196,6 @@ AVCodec ff_vc1_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("SMPTE VC-1 (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &vc1_class,
 };
@@ -1208,6 +1211,7 @@ static AVClass wmv3_class = {
 
 AVCodec ff_wmv3_crystalhd_decoder = {
     .name           = "wmv3_crystalhd",
+    .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 9 (CrystalHD acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_WMV3,
     .priv_data_size = sizeof(CHDContext),
@@ -1216,7 +1220,6 @@ AVCodec ff_wmv3_crystalhd_decoder = {
     .decode         = decode,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush          = flush,
-    .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 9 (CrystalHD acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]){AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE},
     .priv_class     = &wmv3_class,
 };

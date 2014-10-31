@@ -3,7 +3,7 @@
  * Copyright (c) 2002 Steve O'Hara-Smith
  * based on
  *           Linux video grab interface
- *           Copyright (c) 2000,2001 Gerard Lantau
+ *           Copyright (c) 2000, 2001 Fabrice Bellard
  * and
  *           simple_grab.c Copyright (c) 1999 Roger Hardiman
  *
@@ -25,6 +25,7 @@
  */
 
 #include "libavformat/internal.h"
+#include "libavutil/internal.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
 #include "libavutil/parseutils.h"
@@ -50,7 +51,7 @@
 #include <stdint.h>
 #include "avdevice.h"
 
-typedef struct {
+typedef struct VideoData {
     AVClass *class;
     int video_fd;
     int tuner_fd;
@@ -79,7 +80,7 @@ typedef struct {
 #define VIDEO_FORMAT NTSC
 #endif
 
-static int bktr_dev[] = { METEOR_DEV0, METEOR_DEV1, METEOR_DEV2,
+static const int bktr_dev[] = { METEOR_DEV0, METEOR_DEV1, METEOR_DEV2,
     METEOR_DEV3, METEOR_DEV_SVIDEO };
 
 uint8_t *video_buf;
@@ -135,11 +136,11 @@ static av_cold int bktr_init(const char *video_device, int width, int height,
     act.sa_handler = catchsignal;
     sigaction(SIGUSR1, &act, &old);
 
-    *tuner_fd = open("/dev/tuner0", O_RDONLY);
+    *tuner_fd = avpriv_open("/dev/tuner0", O_RDONLY);
     if (*tuner_fd < 0)
         av_log(NULL, AV_LOG_ERROR, "Warning. Tuner not opened, continuing: %s\n", strerror(errno));
 
-    *video_fd = open(video_device, O_RDONLY);
+    *video_fd = avpriv_open(video_device, O_RDONLY);
     if (*video_fd < 0) {
         av_log(NULL, AV_LOG_ERROR, "%s: %s\n", video_device, strerror(errno));
         return -1;
@@ -333,6 +334,7 @@ static const AVClass bktr_class = {
     .item_name  = av_default_item_name,
     .option     = options,
     .version    = LIBAVUTIL_VERSION_INT,
+    .category   = AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT,
 };
 
 AVInputFormat ff_bktr_demuxer = {

@@ -22,8 +22,9 @@
 #ifndef AVCODEC_SNOW_H
 #define AVCODEC_SNOW_H
 
-#include "dsputil.h"
 #include "hpeldsp.h"
+#include "me_cmp.h"
+#include "qpeldsp.h"
 #include "snow_dwt.h"
 
 #include "rangecoder.h"
@@ -109,17 +110,19 @@ typedef struct SnowContext{
     AVClass *class;
     AVCodecContext *avctx;
     RangeCoder c;
-    DSPContext dsp;
+    MECmpContext mecc;
     HpelDSPContext hdsp;
+    QpelDSPContext qdsp;
     VideoDSPContext vdsp;
     H264QpelContext h264qpel;
+    MpegvideoEncDSPContext mpvencdsp;
     SnowDWTContext dwt;
-    AVFrame new_picture;
-    AVFrame input_picture;              ///< new_picture with the internal linesizes
-    AVFrame current_picture;
-    AVFrame last_picture[MAX_REF_FRAMES];
+    const AVFrame *new_picture;
+    AVFrame *input_picture;              ///< new_picture with the internal linesizes
+    AVFrame *current_picture;
+    AVFrame *last_picture[MAX_REF_FRAMES];
     uint8_t *halfpel_plane[MAX_REF_FRAMES][4][4];
-    AVFrame mconly_picture;
+    AVFrame *mconly_picture;
 //     uint8_t q_context[16];
     uint8_t header_state[32];
     uint8_t block_state[128 + 32*128];
@@ -159,6 +162,7 @@ typedef struct SnowContext{
     int b_height;
     int block_max_depth;
     int last_block_max_depth;
+    int nb_planes;
     Plane plane[MAX_PLANES];
     BlockNode *block;
 #define ME_CACHE_SIZE 1024
@@ -226,9 +230,10 @@ void ff_snow_release_buffer(AVCodecContext *avctx);
 void ff_snow_reset_contexts(SnowContext *s);
 int ff_snow_alloc_blocks(SnowContext *s);
 int ff_snow_frame_start(SnowContext *s);
-void ff_snow_pred_block(SnowContext *s, uint8_t *dst, uint8_t *tmp, int stride,
+void ff_snow_pred_block(SnowContext *s, uint8_t *dst, uint8_t *tmp, ptrdiff_t stride,
                      int sx, int sy, int b_w, int b_h, BlockNode *block,
                      int plane_index, int w, int h);
+int ff_snow_get_buffer(SnowContext *s, AVFrame *frame);
 /* common inline functions */
 //XXX doublecheck all of them should stay inlined
 
@@ -317,7 +322,8 @@ static av_always_inline void add_yblock(SnowContext *s, int sliced, slice_buffer
         if(!sliced && !offset_dst)
             dst -= src_x;
         src_x=0;
-    }else if(src_x + b_w > w){
+    }
+    if(src_x + b_w > w){
         b_w = w - src_x;
     }
     if(src_y<0){
@@ -326,7 +332,8 @@ static av_always_inline void add_yblock(SnowContext *s, int sliced, slice_buffer
         if(!sliced && !offset_dst)
             dst -= src_y*dst_stride;
         src_y=0;
-    }else if(src_y + b_h> h){
+    }
+    if(src_y + b_h> h){
         b_h = h - src_y;
     }
 
@@ -414,8 +421,8 @@ static av_always_inline void predict_slice(SnowContext *s, IDWTELEM *buf, int pl
     int block_h    = plane_index ? block_size>>s->chroma_v_shift : block_size;
     const uint8_t *obmc  = plane_index ? ff_obmc_tab[s->block_max_depth+s->chroma_h_shift] : ff_obmc_tab[s->block_max_depth];
     const int obmc_stride= plane_index ? (2*block_size)>>s->chroma_h_shift : 2*block_size;
-    int ref_stride= s->current_picture.linesize[plane_index];
-    uint8_t *dst8= s->current_picture.data[plane_index];
+    int ref_stride= s->current_picture->linesize[plane_index];
+    uint8_t *dst8= s->current_picture->data[plane_index];
     int w= p->width;
     int h= p->height;
     av_assert2(s->chroma_h_shift == s->chroma_v_shift); // obmc params assume squares
@@ -652,7 +659,10 @@ static inline void unpack_coeffs(SnowContext *s, SubBand *b, SubBand * parent, i
                 if(v){
                     v= 2*(get_symbol2(&s->c, b->state[context + 2], context-4) + 1);
                     v+=get_rac(&s->c, &b->state[0][16 + 1 + 3 + ff_quant3bA[l&0xFF] + 3*ff_quant3bA[t&0xFF]]);
-
+                    if ((uint16_t)v != v) {
+                        av_log(s->avctx, AV_LOG_ERROR, "Coefficient damaged\n");
+                        v = 1;
+                    }
                     xc->x=x;
                     (xc++)->coeff= v;
                 }
@@ -662,6 +672,10 @@ static inline void unpack_coeffs(SnowContext *s, SubBand *b, SubBand * parent, i
                     else           run= INT_MAX;
                     v= 2*(get_symbol2(&s->c, b->state[0 + 2], 0-4) + 1);
                     v+=get_rac(&s->c, &b->state[0][16 + 1 + 3]);
+                    if ((uint16_t)v != v) {
+                        av_log(s->avctx, AV_LOG_ERROR, "Coefficient damaged\n");
+                        v = 1;
+                    }
 
                     xc->x=x;
                     (xc++)->coeff= v;

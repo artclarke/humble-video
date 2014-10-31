@@ -22,6 +22,7 @@
 * @todo better probing than extensions matching
 */
 
+#define MODPLUG_STATIC
 #include <libmodplug/modplug.h>
 #include "libavutil/avstring.h"
 #include "libavutil/eval.h"
@@ -59,7 +60,7 @@ typedef struct ModPlugContext {
     AVExpr *expr;         ///< parsed color eval expression
 } ModPlugContext;
 
-static const char *var_names[] = {
+static const char * const var_names[] = {
     "x", "y",
     "w", "h",
     "t",

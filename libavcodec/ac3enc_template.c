@@ -28,19 +28,22 @@
 
 #include <stdint.h>
 
+#include "libavutil/attributes.h"
 #include "libavutil/internal.h"
+
+#include "audiodsp.h"
+#include "internal.h"
+#include "ac3enc.h"
+#include "eac3enc.h"
 
 /* prototypes for static functions in ac3enc_fixed.c and ac3enc_float.c */
 
 static void scale_coefficients(AC3EncodeContext *s);
 
-static void apply_window(void *dsp, SampleType *output,
-                         const SampleType *input, const SampleType *window,
-                         unsigned int len);
-
 static int normalize_samples(AC3EncodeContext *s);
 
-static void clip_coefficients(DSPContext *dsp, CoefType *coef, unsigned int len);
+static void clip_coefficients(AudioDSPContext *adsp, CoefType *coef,
+                              unsigned int len);
 
 static CoefType calc_cpl_coord(CoefSumType energy_ch, CoefSumType energy_cpl);
 
@@ -54,7 +57,7 @@ int AC3_NAME(allocate_sample_buffers)(AC3EncodeContext *s)
 
     FF_ALLOC_OR_GOTO(s->avctx, s->windowed_samples, AC3_WINDOW_SIZE *
                      sizeof(*s->windowed_samples), alloc_fail);
-    FF_ALLOC_OR_GOTO(s->avctx, s->planar_samples, s->channels * sizeof(*s->planar_samples),
+    FF_ALLOC_ARRAY_OR_GOTO(s->avctx, s->planar_samples, s->channels, sizeof(*s->planar_samples),
                      alloc_fail);
     for (ch = 0; ch < s->channels; ch++) {
         FF_ALLOCZ_OR_GOTO(s->avctx, s->planar_samples[ch],
@@ -105,11 +108,11 @@ static void apply_mdct(AC3EncodeContext *s)
             const SampleType *input_samples = &s->planar_samples[ch][blk * AC3_BLOCK_SIZE];
 
 #if CONFIG_AC3ENC_FLOAT
-            apply_window(&s->fdsp, s->windowed_samples, input_samples,
-                         s->mdct_window, AC3_WINDOW_SIZE);
+            s->fdsp.vector_fmul(s->windowed_samples, input_samples,
+                                s->mdct_window, AC3_WINDOW_SIZE);
 #else
-            apply_window(&s->dsp, s->windowed_samples, input_samples,
-                         s->mdct_window, AC3_WINDOW_SIZE);
+            s->ac3dsp.apply_window_int16(s->windowed_samples, input_samples,
+                                         s->mdct_window, AC3_WINDOW_SIZE);
 #endif
 
             if (s->fixed_point)
@@ -164,7 +167,7 @@ static void apply_channel_coupling(AC3EncodeContext *s)
         }
 
         /* coefficients must be clipped in order to be encoded */
-        clip_coefficients(&s->dsp, cpl_coef, num_cpl_coefs);
+        clip_coefficients(&s->adsp, cpl_coef, num_cpl_coefs);
     }
 
     /* calculate energy in each band in coupling channel and each fbw channel */
@@ -260,7 +263,7 @@ static void apply_channel_coupling(AC3EncodeContext *s)
                 energy_cpl = energy[blk][CPL_CH][bnd];
                 energy_ch = energy[blk][ch][bnd];
                 blk1 = blk+1;
-                while (!s->blocks[blk1].new_cpl_coords[ch] && blk1 < s->num_blocks) {
+                while (blk1 < s->num_blocks && !s->blocks[blk1].new_cpl_coords[ch]) {
                     if (s->blocks[blk1].cpl_in_use) {
                         energy_cpl += energy[blk1][CPL_CH][bnd];
                         energy_ch += energy[blk1][ch][bnd];
@@ -361,7 +364,7 @@ static void compute_rematrixing_strategy(AC3EncodeContext *s)
         }
 
         for (bnd = 0; bnd < block->num_rematrixing_bands; bnd++) {
-            /* calculate calculate sum of squared coeffs for one band in one block */
+            /* calculate sum of squared coeffs for one band in one block */
             int start = ff_ac3_rematrix_band_tab[bnd];
             int end   = FFMIN(nb_coefs, ff_ac3_rematrix_band_tab[bnd+1]);
             CoefSumType sum[4];
@@ -407,7 +410,7 @@ int AC3_NAME(encode_frame)(AVCodecContext *avctx, AVPacket *avpkt,
     if (s->fixed_point)
         scale_coefficients(s);
 
-    clip_coefficients(&s->dsp, s->blocks[0].mdct_coef[1],
+    clip_coefficients(&s->adsp, s->blocks[0].mdct_coef[1],
                       AC3_MAX_COEFS * s->num_blocks * s->channels);
 
     s->cpl_on = s->cpl_enabled;

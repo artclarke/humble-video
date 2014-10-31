@@ -33,12 +33,19 @@ int ff_load_image(uint8_t *data[4], int linesize[4],
     int frame_decoded, ret = 0;
     AVPacket pkt;
 
+    av_init_packet(&pkt);
+
     av_register_all();
 
     iformat = av_find_input_format("image2");
     if ((ret = avformat_open_input(&format_ctx, filename, iformat, NULL)) < 0) {
         av_log(log_ctx, AV_LOG_ERROR,
                "Failed to open input file '%s'\n", filename);
+        return ret;
+    }
+
+    if ((ret = avformat_find_stream_info(format_ctx, NULL)) < 0) {
+        av_log(log_ctx, AV_LOG_ERROR, "Find stream info failed\n");
         return ret;
     }
 
@@ -55,7 +62,7 @@ int ff_load_image(uint8_t *data[4], int linesize[4],
         goto end;
     }
 
-    if (!(frame = avcodec_alloc_frame()) ) {
+    if (!(frame = av_frame_alloc()) ) {
         av_log(log_ctx, AV_LOG_ERROR, "Failed to alloc frame\n");
         ret = AVERROR(ENOMEM);
         goto end;
@@ -70,9 +77,10 @@ int ff_load_image(uint8_t *data[4], int linesize[4],
     ret = avcodec_decode_video2(codec_ctx, frame, &frame_decoded, &pkt);
     if (ret < 0 || !frame_decoded) {
         av_log(log_ctx, AV_LOG_ERROR, "Failed to decode image from file\n");
+        if (ret >= 0)
+            ret = -1;
         goto end;
     }
-    ret = 0;
 
     *w       = frame->width;
     *h       = frame->height;
@@ -85,6 +93,7 @@ int ff_load_image(uint8_t *data[4], int linesize[4],
     av_image_copy(data, linesize, (const uint8_t **)frame->data, frame->linesize, *pix_fmt, *w, *h);
 
 end:
+    av_free_packet(&pkt);
     avcodec_close(codec_ctx);
     avformat_close_input(&format_ctx);
     av_freep(&frame);

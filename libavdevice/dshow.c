@@ -53,7 +53,7 @@ struct dshow_ctx {
 
     int eof;
 
-    int64_t curbufsize;
+    int64_t curbufsize[2];
     unsigned int video_frame_num;
 
     IMediaControl *control;
@@ -89,10 +89,10 @@ static enum AVPixelFormat dshow_pixfmt(DWORD biCompression, WORD biBitCount)
             case 24:
                 return AV_PIX_FMT_BGR24;
             case 32:
-                return AV_PIX_FMT_RGB32;
+                return AV_PIX_FMT_0RGB32;
         }
     }
-    return avpriv_find_pix_fmt(ff_raw_pix_fmt_tags, biCompression); // all others
+    return avpriv_find_pix_fmt(avpriv_get_raw_pix_fmt_tags(), biCompression); // all others
 }
 
 static int
@@ -180,16 +180,16 @@ static char *dup_wchar_to_utf8(wchar_t *w)
     return s;
 }
 
-static int shall_we_drop(AVFormatContext *s)
+static int shall_we_drop(AVFormatContext *s, int index, enum dshowDeviceType devtype)
 {
     struct dshow_ctx *ctx = s->priv_data;
-    const uint8_t dropscore[] = {62, 75, 87, 100};
+    static const uint8_t dropscore[] = {62, 75, 87, 100};
     const int ndropscores = FF_ARRAY_ELEMS(dropscore);
-    unsigned int buffer_fullness = (ctx->curbufsize*100)/s->max_picture_buffer;
+    unsigned int buffer_fullness = (ctx->curbufsize[index]*100)/s->max_picture_buffer;
 
     if(dropscore[++ctx->video_frame_num%ndropscores] <= buffer_fullness) {
         av_log(s, AV_LOG_ERROR,
-              "real-time buffer %d%% full! frame dropped!\n", buffer_fullness);
+              "real-time buffer[%s] too full (%d%% of size: %d)! frame dropped!\n", ctx->device_name[devtype], buffer_fullness, s->max_picture_buffer);
         return 1;
     }
 
@@ -197,7 +197,7 @@ static int shall_we_drop(AVFormatContext *s)
 }
 
 static void
-callback(void *priv_data, int index, uint8_t *buf, int buf_size, int64_t time)
+callback(void *priv_data, int index, uint8_t *buf, int buf_size, int64_t time, enum dshowDeviceType devtype)
 {
     AVFormatContext *s = priv_data;
     struct dshow_ctx *ctx = s->priv_data;
@@ -207,7 +207,7 @@ callback(void *priv_data, int index, uint8_t *buf, int buf_size, int64_t time)
 
     WaitForSingleObject(ctx->mutex, INFINITE);
 
-    if(shall_we_drop(s))
+    if(shall_we_drop(s, index, devtype))
         goto fail;
 
     pktl_next = av_mallocz(sizeof(AVPacketList));
@@ -225,8 +225,7 @@ callback(void *priv_data, int index, uint8_t *buf, int buf_size, int64_t time)
 
     for(ppktl = &ctx->pktl ; *ppktl ; ppktl = &(*ppktl)->next);
     *ppktl = pktl_next;
-
-    ctx->curbufsize += buf_size;
+    ctx->curbufsize[index] += buf_size;
 
     SetEvent(ctx->event[1]);
     ReleaseMutex(ctx->mutex);
@@ -353,6 +352,7 @@ dshow_cycle_formats(AVFormatContext *avctx, enum dshowDeviceType devtype,
             VIDEO_STREAM_CONFIG_CAPS *vcaps = caps;
             BITMAPINFOHEADER *bih;
             int64_t *fr;
+            const AVCodecTag *const tags[] = { avformat_get_riff_video_tags(), NULL };
 #if DSHOWDEBUG
             ff_print_VIDEO_STREAM_CONFIG_CAPS(vcaps);
 #endif
@@ -370,7 +370,7 @@ dshow_cycle_formats(AVFormatContext *avctx, enum dshowDeviceType devtype,
             if (!pformat_set) {
                 enum AVPixelFormat pix_fmt = dshow_pixfmt(bih->biCompression, bih->biBitCount);
                 if (pix_fmt == AV_PIX_FMT_NONE) {
-                    enum AVCodecID codec_id = ff_codec_get_id(avformat_get_riff_video_tags(), bih->biCompression);
+                    enum AVCodecID codec_id = av_codec_get_id(tags, bih->biCompression);
                     AVCodec *codec = avcodec_find_decoder(codec_id);
                     if (codec_id == AV_CODEC_ID_NONE || !codec) {
                         av_log(avctx, AV_LOG_INFO, "  unknown compression type 0x%X", (int) bih->biCompression);
@@ -388,7 +388,7 @@ dshow_cycle_formats(AVFormatContext *avctx, enum dshowDeviceType devtype,
                 continue;
             }
             if (ctx->video_codec_id != AV_CODEC_ID_RAWVIDEO) {
-                if (ctx->video_codec_id != ff_codec_get_id(avformat_get_riff_video_tags(), bih->biCompression))
+                if (ctx->video_codec_id != av_codec_get_id(tags, bih->biCompression))
                     goto next;
             }
             if (ctx->pixel_format != AV_PIX_FMT_NONE &&
@@ -580,8 +580,9 @@ dshow_cycle_pins(AVFormatContext *avctx, enum dshowDeviceType devtype,
             }
         }
         if (devtype == AudioDevice && ctx->audio_buffer_size) {
-            if (dshow_set_audio_buffer_size(avctx, pin) < 0)
-                goto next;
+            if (dshow_set_audio_buffer_size(avctx, pin) < 0) {
+                av_log(avctx, AV_LOG_ERROR, "unable to set audio buffer size %d to pin, using pin anyway...", ctx->audio_buffer_size);
+            }
         }
 
         if (IPin_EnumMediaTypes(pin, &types) != S_OK)
@@ -773,13 +774,15 @@ dshow_add_device(AVFormatContext *avctx,
         codec->codec_type = AVMEDIA_TYPE_VIDEO;
         codec->width      = bih->biWidth;
         codec->height     = bih->biHeight;
+        codec->codec_tag  = bih->biCompression;
         codec->pix_fmt    = dshow_pixfmt(bih->biCompression, bih->biBitCount);
         if (bih->biCompression == MKTAG('H', 'D', 'Y', 'C')) {
             av_log(avctx, AV_LOG_DEBUG, "attempt to use full range for HDYC...\n");
             codec->color_range = AVCOL_RANGE_MPEG; // just in case it needs this...
         }
         if (codec->pix_fmt == AV_PIX_FMT_NONE) {
-            codec->codec_id = ff_codec_get_id(avformat_get_riff_video_tags(), bih->biCompression);
+            const AVCodecTag *const tags[] = { avformat_get_riff_video_tags(), NULL };
+            codec->codec_id = av_codec_get_id(tags, bih->biCompression);
             if (codec->codec_id == AV_CODEC_ID_NONE) {
                 av_log(avctx, AV_LOG_ERROR, "Unknown compression type. "
                                  "Please report type 0x%X.\n", (int) bih->biCompression);
@@ -943,7 +946,8 @@ static int dshow_read_header(AVFormatContext *avctx)
             goto error;
         }
     }
-
+    ctx->curbufsize[0] = 0;
+    ctx->curbufsize[1] = 0;
     ctx->mutex = CreateMutex(NULL, 0, NULL);
     if (!ctx->mutex) {
         av_log(avctx, AV_LOG_ERROR, "Could not create Mutex\n");
@@ -1037,7 +1041,7 @@ static int dshow_read_packet(AVFormatContext *s, AVPacket *pkt)
             *pkt = pktl->pkt;
             ctx->pktl = ctx->pktl->next;
             av_free(pktl);
-            ctx->curbufsize -= pkt->size;
+            ctx->curbufsize[pkt->stream_index] -= pkt->size;
         }
         ResetEvent(ctx->event[1]);
         ReleaseMutex(ctx->mutex);
@@ -1059,7 +1063,7 @@ static int dshow_read_packet(AVFormatContext *s, AVPacket *pkt)
 #define DEC AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
     { "video_size", "set video size given a string such as 640x480 or hd720.", OFFSET(requested_width), AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL}, 0, 0, DEC },
-    { "pixel_format", "set video pixel format", OFFSET(pixel_format), AV_OPT_TYPE_PIXEL_FMT, {.i64 = AV_PIX_FMT_NONE}, -1, AV_PIX_FMT_NB-1, DEC },
+    { "pixel_format", "set video pixel format", OFFSET(pixel_format), AV_OPT_TYPE_PIXEL_FMT, {.i64 = AV_PIX_FMT_NONE}, -1, INT_MAX, DEC },
     { "framerate", "set video frame rate", OFFSET(framerate), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC },
     { "sample_rate", "set audio sample rate", OFFSET(sample_rate), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, DEC },
     { "sample_size", "set audio sample size", OFFSET(sample_size), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 16, DEC },
@@ -1081,6 +1085,7 @@ static const AVClass dshow_class = {
     .item_name  = av_default_item_name,
     .option     = options,
     .version    = LIBAVUTIL_VERSION_INT,
+    .category   = AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT,
 };
 
 AVInputFormat ff_dshow_demuxer = {

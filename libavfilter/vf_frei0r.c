@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include "config.h"
 #include "libavutil/avstring.h"
+#include "libavutil/common.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 #include "libavutil/mathematics.h"
@@ -67,8 +68,7 @@ typedef struct Frei0rContext {
 
     char *dl_name;
     char *params;
-    char *size;
-    char *framerate;
+    AVRational framerate;
 
     /* only used by the source */
     int w, h;
@@ -81,7 +81,7 @@ static void *load_sym(AVFilterContext *ctx, const char *sym_name)
     Frei0rContext *s = ctx->priv;
     void *sym = dlsym(s->dl_handle, sym_name);
     if (!sym)
-        av_log(ctx, AV_LOG_ERROR, "Could not find symbol '%s' in loaded module\n", sym_name);
+        av_log(ctx, AV_LOG_ERROR, "Could not find symbol '%s' in loaded module.\n", sym_name);
     return sym;
 }
 
@@ -129,7 +129,7 @@ static int set_param(AVFilterContext *ctx, f0r_param_info_t info, int index, cha
     return 0;
 
 fail:
-    av_log(ctx, AV_LOG_ERROR, "Invalid value '%s' for parameter '%s'\n",
+    av_log(ctx, AV_LOG_ERROR, "Invalid value '%s' for parameter '%s'.\n",
            param, info.name);
     return AVERROR(EINVAL);
 }
@@ -152,7 +152,8 @@ static int set_params(AVFilterContext *ctx, const char *params)
         if (*params) {
             if (!(param = av_get_token(&params, "|")))
                 return AVERROR(ENOMEM);
-            params++;               /* skip ':' */
+            if (*params)
+                params++;               /* skip ':' */
             ret = set_param(ctx, info, i, param);
             av_free(param);
             if (ret < 0)
@@ -201,11 +202,11 @@ static int set_params(AVFilterContext *ctx, const char *params)
         default: /* F0R_PARAM_STRING */
             v = s;
             s->get_param_value(s->instance, v, i);
-            av_log(ctx, AV_LOG_DEBUG, "'%s'\n", s);
+            av_log(ctx, AV_LOG_DEBUG, "'%s'", s);
             break;
         }
 #endif
-        av_log(ctx, AV_LOG_VERBOSE, "\n");
+        av_log(ctx, AV_LOG_VERBOSE, ".\n");
     }
 
     return 0;
@@ -216,7 +217,7 @@ static int load_path(AVFilterContext *ctx, void **handle_ptr, const char *prefix
     char *path = av_asprintf("%s%s%s", prefix, name, SLIBSUF);
     if (!path)
         return AVERROR(ENOMEM);
-    av_log(ctx, AV_LOG_DEBUG, "Looking for frei0r effect in '%s'\n", path);
+    av_log(ctx, AV_LOG_DEBUG, "Looking for frei0r effect in '%s'.\n", path);
     *handle_ptr = dlopen(path, RTLD_NOW|RTLD_LOCAL);
     av_free(path);
     return 0;
@@ -231,6 +232,13 @@ static av_cold int frei0r_init(AVFilterContext *ctx,
     f0r_plugin_info_t *pi;
     char *path;
     int ret = 0;
+    int i;
+    static const char* const frei0r_pathlist[] = {
+        "/usr/local/lib/frei0r-1/",
+        "/usr/lib/frei0r-1/",
+        "/usr/local/lib64/frei0r-1/",
+        "/usr/lib64/frei0r-1/"
+    };
 
     if (!dl_name) {
         av_log(ctx, AV_LOG_ERROR, "No filter name provided.\n");
@@ -274,18 +282,13 @@ static av_cold int frei0r_init(AVFilterContext *ctx,
         if (ret < 0)
             return ret;
     }
-    if (!s->dl_handle) {
-        ret = load_path(ctx, &s->dl_handle, "/usr/local/lib/frei0r-1/", dl_name);
+    for (i = 0; !s->dl_handle && i < FF_ARRAY_ELEMS(frei0r_pathlist); i++) {
+        ret = load_path(ctx, &s->dl_handle, frei0r_pathlist[i], dl_name);
         if (ret < 0)
             return ret;
     }
     if (!s->dl_handle) {
-        ret = load_path(ctx, &s->dl_handle, "/usr/lib/frei0r-1/", dl_name);
-        if (ret < 0)
-            return ret;
-    }
-    if (!s->dl_handle) {
-        av_log(ctx, AV_LOG_ERROR, "Could not find module '%s'\n", dl_name);
+        av_log(ctx, AV_LOG_ERROR, "Could not find module '%s'.\n", dl_name);
         return AVERROR(EINVAL);
     }
 
@@ -301,7 +304,7 @@ static av_cold int frei0r_init(AVFilterContext *ctx,
         return AVERROR(EINVAL);
 
     if (f0r_init() < 0) {
-        av_log(ctx, AV_LOG_ERROR, "Could not init the frei0r module\n");
+        av_log(ctx, AV_LOG_ERROR, "Could not init the frei0r module.\n");
         return AVERROR(EINVAL);
     }
 
@@ -309,7 +312,7 @@ static av_cold int frei0r_init(AVFilterContext *ctx,
     pi = &s->plugin_info;
     if (pi->plugin_type != type) {
         av_log(ctx, AV_LOG_ERROR,
-               "Invalid type '%s' for the plugin\n",
+               "Invalid type '%s' for this plugin\n",
                pi->plugin_type == F0R_PLUGIN_TYPE_FILTER ? "filter" :
                pi->plugin_type == F0R_PLUGIN_TYPE_SOURCE ? "source" :
                pi->plugin_type == F0R_PLUGIN_TYPE_MIXER2 ? "mixer2" :
@@ -356,7 +359,7 @@ static int config_input_props(AVFilterLink *inlink)
     if (s->destruct && s->instance)
         s->destruct(s->instance);
     if (!(s->instance = s->construct(inlink->w, inlink->h))) {
-        av_log(ctx, AV_LOG_ERROR, "Impossible to load frei0r instance\n");
+        av_log(ctx, AV_LOG_ERROR, "Impossible to load frei0r instance.\n");
         return AVERROR(EINVAL);
     }
 
@@ -413,7 +416,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 static const AVOption frei0r_options[] = {
     { "filter_name",   NULL, OFFSET(dl_name), AV_OPT_TYPE_STRING, .flags = FLAGS },
     { "filter_params", NULL, OFFSET(params),  AV_OPT_TYPE_STRING, .flags = FLAGS },
-    { NULL },
+    { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(frei0r);
@@ -436,38 +439,24 @@ static const AVFilterPad avfilter_vf_frei0r_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_frei0r = {
-    .name      = "frei0r",
-    .description = NULL_IF_CONFIG_SMALL("Apply a frei0r effect."),
-
+AVFilter ff_vf_frei0r = {
+    .name          = "frei0r",
+    .description   = NULL_IF_CONFIG_SMALL("Apply a frei0r effect."),
     .query_formats = query_formats,
-    .init = filter_init,
-    .uninit = uninit,
-
-    .priv_size = sizeof(Frei0rContext),
-    .priv_class = &frei0r_class,
-
-    .inputs    = avfilter_vf_frei0r_inputs,
-
-    .outputs   = avfilter_vf_frei0r_outputs,
+    .init          = filter_init,
+    .uninit        = uninit,
+    .priv_size     = sizeof(Frei0rContext),
+    .priv_class    = &frei0r_class,
+    .inputs        = avfilter_vf_frei0r_inputs,
+    .outputs       = avfilter_vf_frei0r_outputs,
 };
 
 static av_cold int source_init(AVFilterContext *ctx)
 {
     Frei0rContext *s = ctx->priv;
-    AVRational frame_rate_q;
 
-    if (av_parse_video_size(&s->w, &s->h, s->size) < 0) {
-        av_log(ctx, AV_LOG_ERROR, "Invalid frame size: '%s'\n", s->size);
-        return AVERROR(EINVAL);
-    }
-
-    if (av_parse_video_rate(&frame_rate_q, s->framerate) < 0) {
-        av_log(ctx, AV_LOG_ERROR, "Invalid frame rate: '%s'\n", s->framerate);
-        return AVERROR(EINVAL);
-    }
-    s->time_base.num = frame_rate_q.den;
-    s->time_base.den = frame_rate_q.num;
+    s->time_base.num = s->framerate.den;
+    s->time_base.den = s->framerate.num;
 
     return frei0r_init(ctx, s->dl_name, F0R_PLUGIN_TYPE_SOURCE);
 }
@@ -487,7 +476,11 @@ static int source_config_props(AVFilterLink *outlink)
     if (s->destruct && s->instance)
         s->destruct(s->instance);
     if (!(s->instance = s->construct(outlink->w, outlink->h))) {
-        av_log(ctx, AV_LOG_ERROR, "Impossible to load frei0r instance\n");
+        av_log(ctx, AV_LOG_ERROR, "Impossible to load frei0r instance.\n");
+        return AVERROR(EINVAL);
+    }
+    if (!s->params) {
+        av_log(ctx, AV_LOG_ERROR, "frei0r filter parameters not set.\n");
         return AVERROR(EINVAL);
     }
 
@@ -512,8 +505,8 @@ static int source_request_frame(AVFilterLink *outlink)
 }
 
 static const AVOption frei0r_src_options[] = {
-    { "size",          "Dimensions of the generated video.", OFFSET(size),      AV_OPT_TYPE_STRING, { .str = "" },   .flags = FLAGS },
-    { "framerate",     NULL,                                 OFFSET(framerate), AV_OPT_TYPE_STRING, { .str = "25" }, .flags = FLAGS },
+    { "size",          "Dimensions of the generated video.", OFFSET(w),         AV_OPT_TYPE_IMAGE_SIZE, { .str = "320x240" }, .flags = FLAGS },
+    { "framerate",     NULL,                                 OFFSET(framerate), AV_OPT_TYPE_VIDEO_RATE, { .str = "25" }, .flags = FLAGS },
     { "filter_name",   NULL,                                 OFFSET(dl_name),   AV_OPT_TYPE_STRING,                  .flags = FLAGS },
     { "filter_params", NULL,                                 OFFSET(params),    AV_OPT_TYPE_STRING,                  .flags = FLAGS },
     { NULL },
@@ -531,18 +524,14 @@ static const AVFilterPad avfilter_vsrc_frei0r_src_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vsrc_frei0r_src = {
-    .name        = "frei0r_src",
-    .description = NULL_IF_CONFIG_SMALL("Generate a frei0r source."),
-
-    .priv_size = sizeof(Frei0rContext),
-    .priv_class = &frei0r_src_class,
-    .init      = source_init,
-    .uninit    = uninit,
-
+AVFilter ff_vsrc_frei0r_src = {
+    .name          = "frei0r_src",
+    .description   = NULL_IF_CONFIG_SMALL("Generate a frei0r source."),
+    .priv_size     = sizeof(Frei0rContext),
+    .priv_class    = &frei0r_src_class,
+    .init          = source_init,
+    .uninit        = uninit,
     .query_formats = query_formats,
-
-    .inputs    = NULL,
-
-    .outputs   = avfilter_vsrc_frei0r_src_outputs,
+    .inputs        = NULL,
+    .outputs       = avfilter_vsrc_frei0r_src_outputs,
 };

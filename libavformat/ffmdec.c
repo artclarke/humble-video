@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <stdint.h>
+
 #include "libavutil/intreadwrite.h"
 #include "libavutil/intfloat.h"
 #include "avformat.h"
@@ -61,7 +63,7 @@ static int ffm_resync(AVFormatContext *s, int state)
 {
     av_log(s, AV_LOG_ERROR, "resyncing\n");
     while (state != PACKET_ID) {
-        if (url_feof(s->pb)) {
+        if (avio_feof(s->pb)) {
             av_log(s, AV_LOG_ERROR, "cannot find FFM syncword\n");
             return -1;
         }
@@ -234,10 +236,16 @@ static int ffm2_read_header(AVFormatContext *s)
     AVStream *st;
     AVIOContext *pb = s->pb;
     AVCodecContext *codec;
+    int ret;
 
     ffm->packet_size = avio_rb32(pb);
-    if (ffm->packet_size != FFM_PACKET_SIZE)
+    if (ffm->packet_size != FFM_PACKET_SIZE) {
+        av_log(s, AV_LOG_ERROR, "Invalid packet size %d, expected size was %d\n",
+               ffm->packet_size, FFM_PACKET_SIZE);
+        ret = AVERROR_INVALIDDATA;
         goto fail;
+    }
+
     ffm->write_index = avio_rb64(pb);
     /* get also filesize */
     if (pb->seekable) {
@@ -248,7 +256,7 @@ static int ffm2_read_header(AVFormatContext *s)
         ffm->file_size = (UINT64_C(1) << 63) - 1;
     }
 
-    while(!url_feof(pb)) {
+    while(!avio_feof(pb)) {
         unsigned id = avio_rb32(pb);
         unsigned size = avio_rb32(pb);
         int64_t next = avio_tell(pb) + size;
@@ -264,8 +272,10 @@ static int ffm2_read_header(AVFormatContext *s)
             break;
         case MKBETAG('C', 'O', 'M', 'M'):
             st = avformat_new_stream(s, NULL);
-            if (!st)
+            if (!st) {
+                ret = AVERROR(ENOMEM);
                 goto fail;
+            }
 
             avpriv_set_pts_info(st, 64, 1, 1000000);
 
@@ -278,11 +288,8 @@ static int ffm2_read_header(AVFormatContext *s)
             codec->flags2 = avio_rb32(pb);
             codec->debug = avio_rb32(pb);
             if (codec->flags & CODEC_FLAG_GLOBAL_HEADER) {
-                codec->extradata_size = avio_rb32(pb);
-                codec->extradata = av_malloc(codec->extradata_size);
-                if (!codec->extradata)
+                if (ff_get_extradata(codec, pb, avio_rb32(pb)) < 0)
                     return AVERROR(ENOMEM);
-                avio_read(pb, codec->extradata, codec->extradata_size);
             }
             avio_seek(pb, next, SEEK_SET);
             id = avio_rb32(pb);
@@ -360,7 +367,7 @@ static int ffm2_read_header(AVFormatContext *s)
     return 0;
  fail:
     ffm_close(s);
-    return -1;
+    return ret;
 }
 
 static int ffm_read_header(AVFormatContext *s)
@@ -468,11 +475,8 @@ static int ffm_read_header(AVFormatContext *s)
             goto fail;
         }
         if (codec->flags & CODEC_FLAG_GLOBAL_HEADER) {
-            codec->extradata_size = avio_rb32(pb);
-            codec->extradata = av_malloc(codec->extradata_size);
-            if (!codec->extradata)
+            if (ff_get_extradata(codec, pb, avio_rb32(pb)) < 0)
                 return AVERROR(ENOMEM);
-            avio_read(pb, codec->extradata, codec->extradata_size);
         }
     }
 
@@ -514,7 +518,7 @@ static int ffm_read_packet(AVFormatContext *s, AVPacket *pkt)
             if (ffm_read_data(s, ffm->header+16, 4, 1) != 4)
                 return -1;
         ffm->read_state = READ_DATA;
-        /* fall thru */
+        /* fall through */
     case READ_DATA:
         size = AV_RB24(ffm->header + 2);
         if ((ret = ffm_is_avail_data(s, size)) < 0)

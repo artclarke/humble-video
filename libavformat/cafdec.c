@@ -25,6 +25,8 @@
  * Core Audio Format demuxer
  */
 
+#include <inttypes.h>
+
 #include "avformat.h"
 #include "internal.h"
 #include "isom.h"
@@ -107,10 +109,9 @@ static int read_kuki_chunk(AVFormatContext *s, int64_t size)
            The lavc AAC decoder requires the data from the codec specific
            description as extradata input. */
         int strt, skip;
-        MOVAtom atom;
 
         strt = avio_tell(pb);
-        ff_mov_read_esds(s, pb, atom);
+        ff_mov_read_esds(s, pb);
         skip = size - (avio_tell(pb) - strt);
         if (skip < 0 || !st->codec->extradata ||
             st->codec->codec_id != AV_CODEC_ID_AAC) {
@@ -130,8 +131,7 @@ static int read_kuki_chunk(AVFormatContext *s, int64_t size)
         }
         avio_read(pb, preamble, ALAC_PREAMBLE);
 
-        st->codec->extradata = av_mallocz(ALAC_HEADER + FF_INPUT_BUFFER_PADDING_SIZE);
-        if (!st->codec->extradata)
+        if (ff_alloc_extradata(st->codec, ALAC_HEADER))
             return AVERROR(ENOMEM);
 
         /* For the old style cookie, we skip 12 bytes, then read 36 bytes.
@@ -154,13 +154,9 @@ static int read_kuki_chunk(AVFormatContext *s, int64_t size)
             avio_read(pb, &st->codec->extradata[24], ALAC_NEW_KUKI - 12);
             avio_skip(pb, size - ALAC_NEW_KUKI);
         }
-        st->codec->extradata_size = ALAC_HEADER;
     } else {
-        st->codec->extradata = av_mallocz(size + FF_INPUT_BUFFER_PADDING_SIZE);
-        if (!st->codec->extradata)
+        if (ff_get_extradata(st->codec, pb, size) < 0)
             return AVERROR(ENOMEM);
-        avio_read(pb, st->codec->extradata, size);
-        st->codec->extradata_size = size;
     }
 
     return 0;
@@ -208,7 +204,7 @@ static void read_info_chunk(AVFormatContext *s, int64_t size)
     AVIOContext *pb = s->pb;
     unsigned int i;
     unsigned int nb_entries = avio_rb32(pb);
-    for (i = 0; i < nb_entries; i++) {
+    for (i = 0; i < nb_entries && !avio_feof(pb); i++) {
         char key[32];
         char value[1024];
         avio_get_str(pb, INT_MAX, key, sizeof(key));
@@ -244,7 +240,7 @@ static int read_header(AVFormatContext *s)
 
     /* parse each chunk */
     found_data = 0;
-    while (!url_feof(pb)) {
+    while (!avio_feof(pb)) {
 
         /* stop at data chunk if seeking is not supported or
            data chunk size is unknown */
@@ -254,7 +250,7 @@ static int read_header(AVFormatContext *s)
         tag  = avio_rb32(pb);
         size = avio_rb64(pb);
         pos  = avio_tell(pb);
-        if (url_feof(pb))
+        if (avio_feof(pb))
             break;
 
         switch (tag) {
@@ -290,7 +286,8 @@ static int read_header(AVFormatContext *s)
 
         default:
 #define _(x) ((x) >= ' ' ? (x) : ' ')
-            av_log(s, AV_LOG_WARNING, "skipping CAF chunk: %08X (%c%c%c%c), size %"PRId64"\n",
+            av_log(s, AV_LOG_WARNING,
+                   "skipping CAF chunk: %08"PRIX32" (%c%c%c%c), size %"PRId64"\n",
                 tag, _(tag>>24), _((tag>>16)&0xFF), _((tag>>8)&0xFF), _(tag&0xFF), size);
 #undef _
         case MKBETAG('f','r','e','e'):
@@ -341,7 +338,7 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
     int res, pkt_size = 0, pkt_frames = 0;
     int64_t left      = CAF_MAX_PKT_SIZE;
 
-    if (url_feof(pb))
+    if (avio_feof(pb))
         return AVERROR_EOF;
 
     /* don't read past end of data chunk */

@@ -37,11 +37,16 @@ static int mpsub_probe(AVProbeData *p)
     const char *ptr_end = p->buf + p->buf_size;
 
     while (ptr < ptr_end) {
+        int inc;
+
         if (!memcmp(ptr, "FORMAT=TIME", 11))
             return AVPROBE_SCORE_EXTENSION;
         if (!memcmp(ptr, "FORMAT=", 7))
             return AVPROBE_SCORE_EXTENSION / 3;
-        ptr += strcspn(ptr, "\n") + 1;
+        inc = ff_subtitles_next_line(ptr);
+        if (!inc)
+            break;
+        ptr += inc;
     }
     return 0;
 }
@@ -58,7 +63,7 @@ static int mpsub_read_header(AVFormatContext *s)
 
     av_bprint_init(&buf, 0, AV_BPRINT_SIZE_UNLIMITED);
 
-    while (!url_feof(s->pb)) {
+    while (!avio_feof(s->pb)) {
         char line[1024];
         float start, duration;
         int fps, len = ff_get_line(s->pb, line, sizeof(line));

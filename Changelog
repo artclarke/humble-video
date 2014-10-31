@@ -1,6 +1,184 @@
 Entries are sorted chronologically from oldest to youngest within each release,
 releases are sorted from youngest to oldest.
 
+version <next>:
+
+version 2.4.2:
+- avcodec/on2avc: Check number of channels
+- avcodec/hevc: fix chroma transform_add size
+- avcodec/h264: Check mode before considering mixed mode intra prediction
+- avformat/mpegts: use a padded buffer in read_sl_header()
+- avformat/mpegts: Check desc_len / get8() return code
+- avcodec/vorbisdec: Fix off by 1 error in ptns_to_read
+- sdp: add support for H.261
+- avcodec/svq3: Do not memcpy AVFrame
+- avcodec/smc: fix off by 1 error
+- avcodec/qpeg: fix off by 1 error in MV bounds check
+- avcodec/gifdec: factorize interleave end handling out
+- avcodec/cinepak: fix integer underflow
+- avcodec/pngdec: Check bits per pixel before setting monoblack pixel format
+- avcodec/pngdec: Calculate MPNG bytewidth more defensively
+- avcodec/tiff: more completely check bpp/bppcount
+- avcodec/mmvideo: Bounds check 2nd line of HHV Intra blocks
+- avcodec/h263dec: Fix decoding messenger.h263
+- avcodec/utils: Add case for jv to avcodec_align_dimensions2()
+- avcodec/mjpegdec: check bits per pixel for changes similar to dimensions
+- avcodec/jpeglsdec: Check run value more completely in ls_decode_line()
+- avformat/hlsenc: export inner muxer timebase
+- configure: add noexecstack to linker options if supported.
+- avcodec/ac3enc_template: fix out of array read
+- avutil/x86/cpu: fix cpuid sub-leaf selection
+- avformat/img2dec: enable generic seeking for image pipes
+- avformat/img2dec: initialize pkt->pos for image pipes
+- avformat/img2dec: pass error code and signal EOF
+- avformat/img2dec: fix error code at EOF for pipes
+- libavutil/opt: fix av_opt_set_channel_layout() to access correct memory address
+- tests/fate-run.sh: Cat .err file in case of error with V>0
+- avformat/riffenc: Filter out "BottomUp" in ff_put_bmp_header()
+- avcodec/webp: fix default palette color 0xff000000 -> 0x00000000
+- avcodec/asvenc: fix AAN scaling
+- Fix compile error on arm4/arm5 platform
+
+
+version 2.4.1:
+- swscale: Allow chroma samples to be above and to the left of luma samples
+- avcodec/libilbc: support for latest git of libilbc
+- avcodec/webp: treat out-of-bound palette index as translucent black
+- vf_deshake: rename Transform.vector to Transform.vec to avoid compiler confusion
+- apetag: Fix APE tag size check
+- tools/crypto_bench: fix build when AV_READ_TIME is unavailable
+
+
+version 2.4:
+- Icecast protocol
+- ported lenscorrection filter from frei0r filter
+- large optimizations in dctdnoiz to make it usable
+- ICY metadata are now requested by default with the HTTP protocol
+- support for using metadata in stream specifiers in fftools
+- LZMA compression support in TIFF decoder
+- support for H.261 RTP payload format (RFC 4587)
+- HEVC/H.265 RTP payload format (draft v6) depacketizer
+- added codecview filter to visualize information exported by some codecs
+- Matroska 3D support thorugh side data
+- HTML generation using texi2html is deprecated in favor of makeinfo/texi2any
+- silenceremove filter
+
+
+version 2.3:
+- AC3 fixed-point decoding
+- shuffleplanes filter
+- subfile protocol
+- Phantom Cine demuxer
+- replaygain data export
+- VP7 video decoder
+- Alias PIX image encoder and decoder
+- Improvements to the BRender PIX image decoder
+- Improvements to the XBM decoder
+- QTKit input device
+- improvements to OpenEXR image decoder
+- support decoding 16-bit RLE SGI images
+- GDI screen grabbing for Windows
+- alternative rendition support for HTTP Live Streaming
+- AVFoundation input device
+- Direct Stream Digital (DSD) decoder
+- Magic Lantern Video (MLV) demuxer
+- On2 AVC (Audio for Video) decoder
+- support for decoding through DXVA2 in ffmpeg
+- libbs2b-based stereo-to-binaural audio filter
+- libx264 reference frames count limiting depending on level
+- native Opus decoder
+- display matrix export and rotation API
+- WebVTT encoder
+- showcqt multimedia filter
+- zoompan filter
+- signalstats filter
+- hqx filter (hq2x, hq3x, hq4x)
+- flanger filter
+- Image format auto-detection
+- LRC demuxer and muxer
+- Samba protocol (via libsmbclient)
+- WebM DASH Manifest muxer
+- libfribidi support in drawtext
+
+
+version 2.2:
+
+- HNM version 4 demuxer and video decoder
+- Live HDS muxer
+- setsar/setdar filters now support variables in ratio expressions
+- elbg filter
+- string validation in ffprobe
+- support for decoding through VDPAU in ffmpeg (the -hwaccel option)
+- complete Voxware MetaSound decoder
+- remove mp3_header_compress bitstream filter
+- Windows resource files for shared libraries
+- aeval filter
+- stereoscopic 3d metadata handling
+- WebP encoding via libwebp
+- ATRAC3+ decoder
+- VP8 in Ogg demuxing
+- side & metadata support in NUT
+- framepack filter
+- XYZ12 rawvideo support in NUT
+- Exif metadata support in WebP decoder
+- OpenGL device
+- Use metadata_header_padding to control padding in ID3 tags (currently used in
+  MP3, AIFF, and OMA files), FLAC header, and the AVI "junk" block.
+- Mirillis FIC video decoder
+- Support DNx444
+- libx265 encoder
+- dejudder filter
+- Autodetect VDA like all other hardware accelerations
+- aliases and defaults for Ogg subtypes (opus, spx)
+
+
+version 2.1:
+
+- aecho filter
+- perspective filter ported from libmpcodecs
+- ffprobe -show_programs option
+- compand filter
+- RTMP seek support
+- when transcoding with ffmpeg (i.e. not streamcopying), -ss is now accurate
+  even when used as an input option. Previous behavior can be restored with
+  the -noaccurate_seek option.
+- ffmpeg -t option can now be used for inputs, to limit the duration of
+  data read from an input file
+- incomplete Voxware MetaSound decoder
+- read EXIF metadata from JPEG
+- DVB teletext decoder
+- phase filter ported from libmpcodecs
+- w3fdif filter
+- Opus support in Matroska
+- FFV1 version 1.3 is stable and no longer experimental
+- FFV1: YUVA(444,422,420) 9, 10 and 16 bit support
+- changed DTS stream id in lavf mpeg ps muxer from 0x8a to 0x88, to be
+  more consistent with other muxers.
+- adelay filter
+- pullup filter ported from libmpcodecs
+- ffprobe -read_intervals option
+- Lossless and alpha support for WebP decoder
+- Error Resilient AAC syntax (ER AAC LC) decoding
+- Low Delay AAC (ER AAC LD) decoding
+- mux chapters in ASF files
+- SFTP protocol (via libssh)
+- libx264: add ability to encode in YUVJ422P and YUVJ444P
+- Fraps: use BT.709 colorspace by default for yuv, as reference fraps decoder does
+- make decoding alpha optional for prores, ffv1 and vp6 by setting
+  the skip_alpha flag.
+- ladspa wrapper filter
+- native VP9 decoder
+- dpx parser
+- max_error_rate parameter in ffmpeg
+- PulseAudio output device
+- ReplayGain scanner
+- Enhanced Low Delay AAC (ER AAC ELD) decoding (no LD SBR support)
+- Linux framebuffer output device
+- HEVC decoder
+- raw HEVC, HEVC in MOV/MP4, HEVC in Matroska, HEVC in MPEG-TS demuxing
+- mergeplanes filter
+
+
 version 2.0:
 
 - curves filter
@@ -13,7 +191,7 @@ version 2.0:
 - 10% faster aac encoding on x86 and MIPS
 - sine audio filter source
 - WebP demuxing and decoding support
-- new ffmpeg options -filter_script and -filter_complex_script, which allow a
+- ffmpeg options -filter_script and -filter_complex_script, which allow a
   filtergraph description to be read from a file
 - OpenCL support
 - audio phaser filter
@@ -21,7 +199,7 @@ version 2.0:
 - libquvi demuxer
 - uniform options syntax across all filters
 - telecine filter
-- new interlace filter
+- interlace filter
 - smptehdbars source
 - inverse telecine filters (fieldmatch and decimate)
 - colorbalance filter
@@ -139,7 +317,7 @@ version 1.1:
 - JSON captions for TED talks decoding support
 - SOX Resampler support in libswresample
 - aselect filter
-- SGI RLE 8-bit decoder
+- SGI RLE 8-bit / Silicon Graphics RLE 8-bit video decoder
 - Silicon Graphics Motion Video Compressor 1 & 2 decoder
 - Silicon Graphics Movie demuxer
 - apad filter
@@ -183,7 +361,9 @@ version 1.0:
 - RTMPE protocol support
 - RTMPTE protocol support
 - showwaves and showspectrum filter
-- LucasArts SMUSH playback support
+- LucasArts SMUSH SANM playback support
+- LucasArts SMUSH VIMA audio decoder (ADPCM)
+- LucasArts SMUSH demuxer
 - SAMI, RealText and SubViewer demuxers and decoders
 - Heart Of Darkness PAF playback support
 - iec61883 device
@@ -307,6 +487,7 @@ version 0.10:
 - ffwavesynth decoder
 - aviocat tool
 - ffeval tool
+- support encoding and decoding 4-channel SGI images
 
 
 version 0.9:
@@ -607,7 +788,7 @@ version 0.6:
 - LPCM support in MPEG-TS (HDMV RID as found on Blu-ray disks)
 - WMA Pro decoder
 - Core Audio Format demuxer
-- Atrac1 decoder
+- ATRAC1 decoder
 - MD STUDIO audio demuxer
 - RF64 support in WAV demuxer
 - MPEG-4 Audio Lossless Coding (ALS) decoder
@@ -707,7 +888,7 @@ version 0.5:
 - MXF demuxer
 - VC-1/WMV3/WMV9 video decoder
 - MacIntel support
-- AVISynth support
+- AviSynth support
 - VMware video decoder
 - VP5 video decoder
 - VP6 video decoder
@@ -735,7 +916,7 @@ version 0.5:
 - Interplay C93 demuxer and video decoder
 - Bethsoft VID demuxer and video decoder
 - CRYO APC demuxer
-- Atrac3 decoder
+- ATRAC3 decoder
 - V.Flash PTX decoder
 - RoQ muxer, RoQ audio encoder
 - Renderware TXD demuxer and decoder

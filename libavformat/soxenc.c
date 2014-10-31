@@ -72,7 +72,7 @@ static int sox_write_header(AVFormatContext *s)
         avio_wb32(pb, comment_size);
     } else {
         av_log(s, AV_LOG_ERROR, "invalid codec; use pcm_s32le or pcm_s32be\n");
-        return -1;
+        return AVERROR(EINVAL);
     }
 
     if (comment_len)
@@ -118,4 +118,5 @@ AVOutputFormat ff_sox_muxer = {
     .write_header      = sox_write_header,
     .write_packet      = ff_raw_write_packet,
     .write_trailer     = sox_write_trailer,
+    .flags             = AVFMT_NOTIMESTAMPS,
 };

@@ -102,7 +102,7 @@ static int iec61883_callback(unsigned char *data, int length,
     DVPacket *packet;
     int ret;
 
-#ifdef THREADS
+#if THREADS
     pthread_mutex_lock(&dv->mutex);
 #endif
 
@@ -139,7 +139,7 @@ static int iec61883_callback(unsigned char *data, int length,
     ret = 0;
 
 exit:
-#ifdef THREADS
+#if THREADS
     pthread_cond_broadcast(&dv->cond);
     pthread_mutex_unlock(&dv->mutex);
 #endif
@@ -151,7 +151,7 @@ static void *iec61883_receive_task(void *opaque)
     struct iec61883_data *dv = (struct iec61883_data *)opaque;
     int result;
 
-#ifdef THREADS
+#if THREADS
     while (dv->thread_loop)
 #endif
     {
@@ -168,7 +168,7 @@ static void *iec61883_receive_task(void *opaque)
             raw1394_loop_iterate(dv->raw1394);
         } else if (dv->receiving) {
             av_log(NULL, AV_LOG_ERROR, "No more input data available\n");
-#ifdef THREADS
+#if THREADS
             pthread_mutex_lock(&dv->mutex);
             dv->eof = 1;
             pthread_cond_broadcast(&dv->cond);
@@ -216,8 +216,8 @@ static int iec61883_parse_queue_hdv(struct iec61883_data *dv, AVPacket *pkt)
 
     while (dv->queue_first) {
         packet = dv->queue_first;
-        size = ff_mpegts_parse_packet(dv->mpeg_demux, pkt, packet->buf,
-                                      packet->len);
+        size = avpriv_mpegts_parse_packet(dv->mpeg_demux, pkt, packet->buf,
+                                          packet->len);
         dv->queue_first = packet->next;
         av_free(packet->buf);
         av_free(packet);
@@ -356,7 +356,7 @@ static int iec61883_read_header(AVFormatContext *context)
 
         avformat_new_stream(context, NULL);
 
-        dv->mpeg_demux = ff_mpegts_parse_open(context);
+        dv->mpeg_demux = avpriv_mpegts_parse_open(context);
         if (!dv->mpeg_demux)
             goto fail;
 
@@ -413,7 +413,7 @@ static int iec61883_read_packet(AVFormatContext *context, AVPacket *pkt)
      * Try to parse frames from queue
      */
 
-#ifdef THREADS
+#if THREADS
     pthread_mutex_lock(&dv->mutex);
     while ((size = dv->parse_queue(dv, pkt)) == -1)
         if (!dv->eof)
@@ -447,7 +447,7 @@ static int iec61883_close(AVFormatContext *context)
     if (dv->type == IEC61883_HDV) {
         iec61883_mpeg2_recv_stop(dv->iec61883_mpeg2);
         iec61883_mpeg2_close(dv->iec61883_mpeg2);
-        ff_mpegts_parse_close(dv->mpeg_demux);
+        avpriv_mpegts_parse_close(dv->mpeg_demux);
     } else {
         iec61883_dv_fb_stop(dv->iec61883_dv);
         iec61883_dv_fb_close(dv->iec61883_dv);
@@ -483,6 +483,7 @@ static const AVClass iec61883_class = {
     .item_name  = av_default_item_name,
     .option     = options,
     .version    = LIBAVUTIL_VERSION_INT,
+    .category   = AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT,
 };
 
 AVInputFormat ff_iec61883_demuxer = {

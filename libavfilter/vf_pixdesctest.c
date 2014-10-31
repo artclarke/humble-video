@@ -29,7 +29,7 @@
 #include "internal.h"
 #include "video.h"
 
-typedef struct {
+typedef struct PixdescTestContext {
     const AVPixFmtDescriptor *pix_desc;
     uint16_t *line;
 } PixdescTestContext;
@@ -47,7 +47,7 @@ static int config_props(AVFilterLink *inlink)
     priv->pix_desc = av_pix_fmt_desc_get(inlink->format);
 
     av_freep(&priv->line);
-    if (!(priv->line = av_malloc(sizeof(*priv->line) * inlink->w)))
+    if (!(priv->line = av_malloc_array(sizeof(*priv->line), inlink->w)))
         return AVERROR(ENOMEM);
 
     return 0;
@@ -125,14 +125,11 @@ static const AVFilterPad avfilter_vf_pixdesctest_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_pixdesctest = {
+AVFilter ff_vf_pixdesctest = {
     .name        = "pixdesctest",
     .description = NULL_IF_CONFIG_SMALL("Test pixel format definitions."),
-
-    .priv_size = sizeof(PixdescTestContext),
-    .uninit    = uninit,
-
-    .inputs    = avfilter_vf_pixdesctest_inputs,
-
-    .outputs   = avfilter_vf_pixdesctest_outputs,
+    .priv_size   = sizeof(PixdescTestContext),
+    .uninit      = uninit,
+    .inputs      = avfilter_vf_pixdesctest_inputs,
+    .outputs     = avfilter_vf_pixdesctest_outputs,
 };
