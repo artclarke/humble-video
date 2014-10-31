@@ -12,53 +12,92 @@
 #define VP9_COMMON_VP9_ENTROPY_H_
 
 #include "vpx/vpx_integer.h"
-#include "vp9/common/vp9_treecoder.h"
-#include "vp9/common/vp9_blockd.h"
+
 #include "vp9/common/vp9_common.h"
+#include "vp9/common/vp9_prob.h"
+#include "vp9/common/vp9_scan.h"
 
-/* Coefficient token alphabet */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define ZERO_TOKEN              0       /* 0         Extra Bits 0+0 */
-#define ONE_TOKEN               1       /* 1         Extra Bits 0+1 */
-#define TWO_TOKEN               2       /* 2         Extra Bits 0+1 */
-#define THREE_TOKEN             3       /* 3         Extra Bits 0+1 */
-#define FOUR_TOKEN              4       /* 4         Extra Bits 0+1 */
-#define DCT_VAL_CATEGORY1       5       /* 5-6       Extra Bits 1+1 */
-#define DCT_VAL_CATEGORY2       6       /* 7-10      Extra Bits 2+1 */
-#define DCT_VAL_CATEGORY3       7       /* 11-18     Extra Bits 3+1 */
-#define DCT_VAL_CATEGORY4       8       /* 19-34     Extra Bits 4+1 */
-#define DCT_VAL_CATEGORY5       9       /* 35-66     Extra Bits 5+1 */
-#define DCT_VAL_CATEGORY6       10      /* 67+       Extra Bits 14+1 */
-#define DCT_EOB_TOKEN           11      /* EOB       Extra Bits 0+0 */
-#define MAX_ENTROPY_TOKENS      12
-#define ENTROPY_NODES           11
-#define EOSB_TOKEN              127     /* Not signalled, encoder only */
+#define DIFF_UPDATE_PROB 252
 
-#define INTER_MODE_CONTEXTS     7
+// Coefficient token alphabet
+#define ZERO_TOKEN      0   // 0     Extra Bits 0+0
+#define ONE_TOKEN       1   // 1     Extra Bits 0+1
+#define TWO_TOKEN       2   // 2     Extra Bits 0+1
+#define THREE_TOKEN     3   // 3     Extra Bits 0+1
+#define FOUR_TOKEN      4   // 4     Extra Bits 0+1
+#define CATEGORY1_TOKEN 5   // 5-6   Extra Bits 1+1
+#define CATEGORY2_TOKEN 6   // 7-10  Extra Bits 2+1
+#define CATEGORY3_TOKEN 7   // 11-18 Extra Bits 3+1
+#define CATEGORY4_TOKEN 8   // 19-34 Extra Bits 4+1
+#define CATEGORY5_TOKEN 9   // 35-66 Extra Bits 5+1
+#define CATEGORY6_TOKEN 10  // 67+   Extra Bits 14+1
+#define EOB_TOKEN       11  // EOB   Extra Bits 0+0
 
-extern const vp9_tree_index vp9_coef_tree[];
+#define ENTROPY_TOKENS 12
 
-#define DCT_EOB_MODEL_TOKEN     3      /* EOB       Extra Bits 0+0 */
+#define ENTROPY_NODES 11
+
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_pt_energy_class[ENTROPY_TOKENS]);
+
+#define CAT1_MIN_VAL    5
+#define CAT2_MIN_VAL    7
+#define CAT3_MIN_VAL   11
+#define CAT4_MIN_VAL   19
+#define CAT5_MIN_VAL   35
+#define CAT6_MIN_VAL   67
+
+// Extra bit probabilities.
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat1_prob[1]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat2_prob[2]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat3_prob[3]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat4_prob[4]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat5_prob[5]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat6_prob[14]);
+
+#if CONFIG_VP9_HIGHBITDEPTH
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat1_prob_high10[1]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat2_prob_high10[2]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat3_prob_high10[3]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat4_prob_high10[4]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat5_prob_high10[5]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat6_prob_high10[16]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat1_prob_high12[1]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat2_prob_high12[2]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat3_prob_high12[3]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat4_prob_high12[4]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat5_prob_high12[5]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_cat6_prob_high12[18]);
+#endif  // CONFIG_VP9_HIGHBITDEPTH
+
+#define EOB_MODEL_TOKEN 3
 extern const vp9_tree_index vp9_coefmodel_tree[];
 
-extern struct vp9_token vp9_coef_encodings[MAX_ENTROPY_TOKENS];
-
 typedef struct {
-  vp9_tree_p tree;
+  const vp9_tree_index *tree;
   const vp9_prob *prob;
   int len;
   int base_val;
 } vp9_extra_bit;
 
-extern const vp9_extra_bit vp9_extra_bits[12];    /* indexed by token value */
+// indexed by token value
+extern const vp9_extra_bit vp9_extra_bits[ENTROPY_TOKENS];
+#if CONFIG_VP9_HIGHBITDEPTH
+extern const vp9_extra_bit vp9_extra_bits_high10[ENTROPY_TOKENS];
+extern const vp9_extra_bit vp9_extra_bits_high12[ENTROPY_TOKENS];
+#endif  // CONFIG_VP9_HIGHBITDEPTH
 
-#define MAX_PROB                255
 #define DCT_MAX_VALUE           16384
+#if CONFIG_VP9_HIGHBITDEPTH
+#define DCT_MAX_VALUE_HIGH10    65536
+#define DCT_MAX_VALUE_HIGH12   262144
+#endif  // CONFIG_VP9_HIGHBITDEPTH
 
 /* Coefficients are predicted via a 3-dimensional probability table. */
 
-/* Outside dimension.  0 = Y with DC, 1 = UV */
-#define BLOCK_TYPES 2
 #define REF_TYPES 2  // intra=0, inter=1
 
 /* Middle dimension reflects the coefficient position within the transform. */
@@ -80,87 +119,28 @@ extern const vp9_extra_bit vp9_extra_bits[12];    /* indexed by token value */
    coefficient band (and since zigzag positions 0, 1, and 2 are in
    distinct bands). */
 
-#define PREV_COEF_CONTEXTS          6
+#define COEFF_CONTEXTS 6
+#define BAND_COEFF_CONTEXTS(band) ((band) == 0 ? 3 : COEFF_CONTEXTS)
 
 // #define ENTROPY_STATS
 
-typedef unsigned int vp9_coeff_count[REF_TYPES][COEF_BANDS][PREV_COEF_CONTEXTS]
-                                    [MAX_ENTROPY_TOKENS];
-typedef unsigned int vp9_coeff_stats[REF_TYPES][COEF_BANDS][PREV_COEF_CONTEXTS]
+typedef unsigned int vp9_coeff_count[REF_TYPES][COEF_BANDS][COEFF_CONTEXTS]
+                                    [ENTROPY_TOKENS];
+typedef unsigned int vp9_coeff_stats[REF_TYPES][COEF_BANDS][COEFF_CONTEXTS]
                                     [ENTROPY_NODES][2];
-typedef vp9_prob vp9_coeff_probs[REF_TYPES][COEF_BANDS][PREV_COEF_CONTEXTS]
-                                [ENTROPY_NODES];
 
 #define SUBEXP_PARAM                4   /* Subexponential code parameter */
 #define MODULUS_PARAM               13  /* Modulus parameter */
 
 struct VP9Common;
-void vp9_default_coef_probs(struct VP9Common *);
-extern DECLARE_ALIGNED(16, const int16_t, vp9_default_scan_4x4[16]);
+void vp9_default_coef_probs(struct VP9Common *cm);
+void vp9_adapt_coef_probs(struct VP9Common *cm);
 
-extern DECLARE_ALIGNED(16, const int16_t, vp9_col_scan_4x4[16]);
-extern DECLARE_ALIGNED(16, const int16_t, vp9_row_scan_4x4[16]);
-
-extern DECLARE_ALIGNED(16, const int16_t, vp9_default_scan_8x8[64]);
-
-extern DECLARE_ALIGNED(16, const int16_t, vp9_col_scan_8x8[64]);
-extern DECLARE_ALIGNED(16, const int16_t, vp9_row_scan_8x8[64]);
-
-extern DECLARE_ALIGNED(16, const int16_t, vp9_default_scan_16x16[256]);
-
-extern DECLARE_ALIGNED(16, const int16_t, vp9_col_scan_16x16[256]);
-extern DECLARE_ALIGNED(16, const int16_t, vp9_row_scan_16x16[256]);
-
-extern DECLARE_ALIGNED(16, const int16_t, vp9_default_scan_32x32[1024]);
-
-extern DECLARE_ALIGNED(16, int16_t, vp9_default_iscan_4x4[16]);
-
-extern DECLARE_ALIGNED(16, int16_t, vp9_col_iscan_4x4[16]);
-extern DECLARE_ALIGNED(16, int16_t, vp9_row_iscan_4x4[16]);
-
-extern DECLARE_ALIGNED(16, int16_t, vp9_default_iscan_8x8[64]);
-
-extern DECLARE_ALIGNED(16, int16_t, vp9_col_iscan_8x8[64]);
-extern DECLARE_ALIGNED(16, int16_t, vp9_row_iscan_8x8[64]);
-
-extern DECLARE_ALIGNED(16, int16_t, vp9_default_iscan_16x16[256]);
-
-extern DECLARE_ALIGNED(16, int16_t, vp9_col_iscan_16x16[256]);
-extern DECLARE_ALIGNED(16, int16_t, vp9_row_iscan_16x16[256]);
-
-extern DECLARE_ALIGNED(16, int16_t, vp9_default_iscan_32x32[1024]);
-
-#define MAX_NEIGHBORS 2
-
-extern DECLARE_ALIGNED(16, int16_t,
-                       vp9_default_scan_4x4_neighbors[17 * MAX_NEIGHBORS]);
-extern DECLARE_ALIGNED(16, int16_t,
-                       vp9_col_scan_4x4_neighbors[17 * MAX_NEIGHBORS]);
-extern DECLARE_ALIGNED(16, int16_t,
-                       vp9_row_scan_4x4_neighbors[17 * MAX_NEIGHBORS]);
-extern DECLARE_ALIGNED(16, int16_t,
-                       vp9_col_scan_8x8_neighbors[65 * MAX_NEIGHBORS]);
-extern DECLARE_ALIGNED(16, int16_t,
-                       vp9_row_scan_8x8_neighbors[65 * MAX_NEIGHBORS]);
-extern DECLARE_ALIGNED(16, int16_t,
-                       vp9_default_scan_8x8_neighbors[65 * MAX_NEIGHBORS]);
-extern DECLARE_ALIGNED(16, int16_t,
-                       vp9_col_scan_16x16_neighbors[257 * MAX_NEIGHBORS]);
-extern DECLARE_ALIGNED(16, int16_t,
-                       vp9_row_scan_16x16_neighbors[257 * MAX_NEIGHBORS]);
-extern DECLARE_ALIGNED(16, int16_t,
-                       vp9_default_scan_16x16_neighbors[257 * MAX_NEIGHBORS]);
-extern DECLARE_ALIGNED(16, int16_t,
-                       vp9_default_scan_32x32_neighbors[1025 * MAX_NEIGHBORS]);
-
-void vp9_coef_tree_initialize(void);
-void vp9_adapt_coef_probs(struct VP9Common *);
-
-static INLINE void reset_skip_context(MACROBLOCKD *xd, BLOCK_SIZE_TYPE bsize) {
+static INLINE void reset_skip_context(MACROBLOCKD *xd, BLOCK_SIZE bsize) {
   int i;
   for (i = 0; i < MAX_MB_PLANE; i++) {
     struct macroblockd_plane *const pd = &xd->plane[i];
-    const BLOCK_SIZE_TYPE plane_bsize = get_plane_block_size(bsize, pd);
+    const BLOCK_SIZE plane_bsize = get_plane_block_size(bsize, pd);
     vpx_memset(pd->above_context, 0, sizeof(ENTROPY_CONTEXT) *
                    num_4x4_blocks_wide_lookup[plane_bsize]);
     vpx_memset(pd->left_context, 0, sizeof(ENTROPY_CONTEXT) *
@@ -170,172 +150,82 @@ static INLINE void reset_skip_context(MACROBLOCKD *xd, BLOCK_SIZE_TYPE bsize) {
 
 // This is the index in the scan order beyond which all coefficients for
 // 8x8 transform and above are in the top band.
-// For 4x4 blocks the index is less but to keep things common the lookup
-// table for 4x4 is padded out to this index.
+// This macro is currently unused but may be used by certain implementations
 #define MAXBAND_INDEX 21
 
-extern const uint8_t vp9_coefband_trans_8x8plus[MAXBAND_INDEX + 1];
-extern const uint8_t vp9_coefband_trans_4x4[MAXBAND_INDEX + 1];
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_coefband_trans_8x8plus[1024]);
+DECLARE_ALIGNED(16, extern const uint8_t, vp9_coefband_trans_4x4[16]);
 
-
-static int get_coef_band(const uint8_t * band_translate, int coef_index) {
-  return (coef_index > MAXBAND_INDEX)
-    ? (COEF_BANDS-1) : band_translate[coef_index];
+static INLINE const uint8_t *get_band_translate(TX_SIZE tx_size) {
+  return tx_size == TX_4X4 ? vp9_coefband_trans_4x4
+                           : vp9_coefband_trans_8x8plus;
 }
-
-static INLINE int get_coef_context(const int16_t *neighbors,
-                                   uint8_t *token_cache,
-                                   int c) {
-  return (1 + token_cache[neighbors[MAX_NEIGHBORS * c + 0]] +
-          token_cache[neighbors[MAX_NEIGHBORS * c + 1]]) >> 1;
-}
-
-const int16_t *vp9_get_coef_neighbors_handle(const int16_t *scan);
-
 
 // 128 lists of probabilities are stored for the following ONE node probs:
 // 1, 3, 5, 7, ..., 253, 255
 // In between probabilities are interpolated linearly
 
-#define COEFPROB_MODELS             128
+#define COEFF_PROB_MODELS 256
 
 #define UNCONSTRAINED_NODES         3
 
 #define PIVOT_NODE                  2   // which node is pivot
 
+#define MODEL_NODES (ENTROPY_NODES - UNCONSTRAINED_NODES)
+extern const vp9_prob vp9_pareto8_full[COEFF_PROB_MODELS][MODEL_NODES];
+
 typedef vp9_prob vp9_coeff_probs_model[REF_TYPES][COEF_BANDS]
-                                      [PREV_COEF_CONTEXTS]
-                                      [UNCONSTRAINED_NODES];
+                                      [COEFF_CONTEXTS][UNCONSTRAINED_NODES];
 
 typedef unsigned int vp9_coeff_count_model[REF_TYPES][COEF_BANDS]
-                                          [PREV_COEF_CONTEXTS]
+                                          [COEFF_CONTEXTS]
                                           [UNCONSTRAINED_NODES + 1];
-typedef unsigned int vp9_coeff_stats_model[REF_TYPES][COEF_BANDS]
-                                          [PREV_COEF_CONTEXTS]
-                                          [UNCONSTRAINED_NODES][2];
 
 void vp9_model_to_full_probs(const vp9_prob *model, vp9_prob *full);
 
-static INLINE const int16_t* get_scan_4x4(TX_TYPE tx_type) {
-  switch (tx_type) {
-    case ADST_DCT:
-      return vp9_row_scan_4x4;
-    case DCT_ADST:
-      return vp9_col_scan_4x4;
+static INLINE int get_entropy_context(TX_SIZE tx_size, const ENTROPY_CONTEXT *a,
+                                      const ENTROPY_CONTEXT *l) {
+  ENTROPY_CONTEXT above_ec = 0, left_ec = 0;
+
+  switch (tx_size) {
+    case TX_4X4:
+      above_ec = a[0] != 0;
+      left_ec = l[0] != 0;
+      break;
+    case TX_8X8:
+      above_ec = !!*(const uint16_t *)a;
+      left_ec  = !!*(const uint16_t *)l;
+      break;
+    case TX_16X16:
+      above_ec = !!*(const uint32_t *)a;
+      left_ec  = !!*(const uint32_t *)l;
+      break;
+    case TX_32X32:
+      above_ec = !!*(const uint64_t *)a;
+      left_ec  = !!*(const uint64_t *)l;
+      break;
     default:
-      return vp9_default_scan_4x4;
+      assert(0 && "Invalid transform size.");
+      break;
+  }
+
+  return combine_entropy_contexts(above_ec, left_ec);
+}
+
+static INLINE const scan_order *get_scan(const MACROBLOCKD *xd, TX_SIZE tx_size,
+                                         PLANE_TYPE type, int block_idx) {
+  const MODE_INFO *const mi = xd->mi[0].src_mi;
+
+  if (is_inter_block(&mi->mbmi) || type != PLANE_TYPE_Y || xd->lossless) {
+    return &vp9_default_scan_orders[tx_size];
+  } else {
+    const PREDICTION_MODE mode = get_y_mode(mi, block_idx);
+    return &vp9_scan_orders[tx_size][intra_mode_to_tx_type_lookup[mode]];
   }
 }
 
-static INLINE void get_scan_nb_4x4(TX_TYPE tx_type,
-                                   const int16_t **scan, const int16_t **nb) {
-  switch (tx_type) {
-    case ADST_DCT:
-      *scan = vp9_row_scan_4x4;
-      *nb = vp9_row_scan_4x4_neighbors;
-      break;
-    case DCT_ADST:
-      *scan = vp9_col_scan_4x4;
-      *nb = vp9_col_scan_4x4_neighbors;
-      break;
-    default:
-      *scan = vp9_default_scan_4x4;
-      *nb = vp9_default_scan_4x4_neighbors;
-      break;
-  }
-}
-
-static INLINE const int16_t* get_iscan_4x4(TX_TYPE tx_type) {
-  switch (tx_type) {
-    case ADST_DCT:
-      return vp9_row_iscan_4x4;
-    case DCT_ADST:
-      return vp9_col_iscan_4x4;
-    default:
-      return vp9_default_iscan_4x4;
-  }
-}
-
-static INLINE const int16_t* get_scan_8x8(TX_TYPE tx_type) {
-  switch (tx_type) {
-    case ADST_DCT:
-      return vp9_row_scan_8x8;
-    case DCT_ADST:
-      return vp9_col_scan_8x8;
-    default:
-      return vp9_default_scan_8x8;
-  }
-}
-
-static INLINE void get_scan_nb_8x8(TX_TYPE tx_type,
-                                   const int16_t **scan, const int16_t **nb) {
-  switch (tx_type) {
-    case ADST_DCT:
-      *scan = vp9_row_scan_8x8;
-      *nb = vp9_row_scan_8x8_neighbors;
-      break;
-    case DCT_ADST:
-      *scan = vp9_col_scan_8x8;
-      *nb = vp9_col_scan_8x8_neighbors;
-      break;
-    default:
-      *scan = vp9_default_scan_8x8;
-      *nb = vp9_default_scan_8x8_neighbors;
-      break;
-  }
-}
-
-static INLINE const int16_t* get_iscan_8x8(TX_TYPE tx_type) {
-  switch (tx_type) {
-    case ADST_DCT:
-      return vp9_row_iscan_8x8;
-    case DCT_ADST:
-      return vp9_col_iscan_8x8;
-    default:
-      return vp9_default_iscan_8x8;
-  }
-}
-
-static INLINE const int16_t* get_scan_16x16(TX_TYPE tx_type) {
-  switch (tx_type) {
-    case ADST_DCT:
-      return vp9_row_scan_16x16;
-    case DCT_ADST:
-      return vp9_col_scan_16x16;
-    default:
-      return vp9_default_scan_16x16;
-  }
-}
-
-static INLINE void get_scan_nb_16x16(TX_TYPE tx_type,
-                                     const int16_t **scan, const int16_t **nb) {
-  switch (tx_type) {
-    case ADST_DCT:
-      *scan = vp9_row_scan_16x16;
-      *nb = vp9_row_scan_16x16_neighbors;
-      break;
-    case DCT_ADST:
-      *scan = vp9_col_scan_16x16;
-      *nb = vp9_col_scan_16x16_neighbors;
-      break;
-    default:
-      *scan = vp9_default_scan_16x16;
-      *nb = vp9_default_scan_16x16_neighbors;
-      break;
-  }
-}
-
-static INLINE const int16_t* get_iscan_16x16(TX_TYPE tx_type) {
-  switch (tx_type) {
-    case ADST_DCT:
-      return vp9_row_iscan_16x16;
-    case DCT_ADST:
-      return vp9_col_iscan_16x16;
-    default:
-      return vp9_default_iscan_16x16;
-  }
-}
-
-enum { VP9_COEF_UPDATE_PROB = 252 };
+#ifdef __cplusplus
+}  // extern "C"
+#endif
 
 #endif  // VP9_COMMON_VP9_ENTROPY_H_

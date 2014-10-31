@@ -18,7 +18,6 @@
 #include <assert.h>
 #include <stdio.h>
 #include <limits.h>
-#include "vp8/common/pragmas.h"
 #include "vpx/vpx_encoder.h"
 #include "vpx_mem/vpx_mem.h"
 #include "bitstream.h"
@@ -432,7 +431,7 @@ static void write_mv_ref
     assert(NEARESTMV <= m  &&  m <= SPLITMV);
 #endif
     vp8_write_token(w, vp8_mv_ref_tree, p,
-                    vp8_mv_ref_encoding_array - NEARESTMV + m);
+                    vp8_mv_ref_encoding_array + (m - NEARESTMV));
 }
 
 static void write_sub_mv_ref
@@ -444,7 +443,7 @@ static void write_sub_mv_ref
     assert(LEFT4X4 <= m  &&  m <= NEW4X4);
 #endif
     vp8_write_token(w, vp8_sub_mv_ref_tree, p,
-                    vp8_sub_mv_ref_encoding_array - LEFT4X4 + m);
+                    vp8_sub_mv_ref_encoding_array + (m - LEFT4X4));
 }
 
 static void write_mv
@@ -577,7 +576,7 @@ static void pack_inter_mode_mvs(VP8_COMP *const cpi)
              */
             xd->mb_to_left_edge = -((mb_col * 16) << 3);
             xd->mb_to_right_edge = ((pc->mb_cols - 1 - mb_col) * 16) << 3;
-            xd->mb_to_top_edge = -((mb_row * 16)) << 3;
+            xd->mb_to_top_edge = -((mb_row * 16) << 3);
             xd->mb_to_bottom_edge = ((pc->mb_rows - 1 - mb_row) * 16) << 3;
 
 #ifdef VP8_ENTROPY_STATS
@@ -1062,7 +1061,7 @@ int vp8_update_coef_context(VP8_COMP *cpi)
     if (cpi->common.frame_type == KEY_FRAME)
     {
         /* Reset to default counts/probabilities at key frames */
-        vp8_copy(cpi->coef_counts, default_coef_counts);
+        vp8_copy(cpi->mb.coef_counts, default_coef_counts);
     }
 
     if (cpi->oxcf.error_resilient_mode & VPX_ERROR_RESILIENT_PARTITIONS)

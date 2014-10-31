@@ -19,9 +19,11 @@ ifeq ($(target),)
         done
 all: .DEFAULT
 clean:: .DEFAULT
+exampletest: .DEFAULT
 install:: .DEFAULT
 test:: .DEFAULT
 testdata:: .DEFAULT
+utiltest: .DEFAULT
 
 
 # Note: md5sum is not installed on OS X, but openssl is. Openssl may not be
@@ -52,8 +54,6 @@ dist:
                 | sed -e 's/MD5(\(.*\))= \([0-9a-f]\{32\}\)/\2  \1/' \
                 > md5sums.txt;\
         fi
-
-
 endif
 
 ifneq ($(target),)
@@ -94,26 +94,50 @@ clean::
 	rm -f $(OBJS-yes) $(OBJS-yes:.o=.d) $(OBJS-yes:.asm.s.o=.asm.s)
 	rm -f $(CLEAN-OBJS)
 
+.PHONY: clean
+distclean: clean
+	if [ -z "$(target)" ]; then \
+      rm -f Makefile; \
+      rm -f config.log config.mk; \
+      rm -f vpx_config.[hc] vpx_config.asm; \
+    else \
+      rm -f $(target)-$(TOOLCHAIN).mk; \
+    fi
+
 .PHONY: dist
 dist:
+.PHONY: exampletest
+exampletest:
 .PHONY: install
 install::
 .PHONY: test
 test::
 .PHONY: testdata
 testdata::
+.PHONY: utiltest
+utiltest:
 
 # Add compiler flags for intrinsic files
+ifeq ($(TOOLCHAIN), x86-os2-gcc)
+STACKREALIGN=-mstackrealign
+else
+STACKREALIGN=
+endif
+
 $(BUILD_PFX)%_mmx.c.d: CFLAGS += -mmmx
 $(BUILD_PFX)%_mmx.c.o: CFLAGS += -mmmx
-$(BUILD_PFX)%_sse2.c.d: CFLAGS += -msse2
-$(BUILD_PFX)%_sse2.c.o: CFLAGS += -msse2
-$(BUILD_PFX)%_sse3.c.d: CFLAGS += -msse3
-$(BUILD_PFX)%_sse3.c.o: CFLAGS += -msse3
-$(BUILD_PFX)%_ssse3.c.d: CFLAGS += -mssse3
-$(BUILD_PFX)%_ssse3.c.o: CFLAGS += -mssse3
-$(BUILD_PFX)%_sse4.c.d: CFLAGS += -msse4.1
-$(BUILD_PFX)%_sse4.c.o: CFLAGS += -msse4.1
+$(BUILD_PFX)%_sse2.c.d: CFLAGS += -msse2 $(STACKREALIGN)
+$(BUILD_PFX)%_sse2.c.o: CFLAGS += -msse2 $(STACKREALIGN)
+$(BUILD_PFX)%_sse3.c.d: CFLAGS += -msse3 $(STACKREALIGN)
+$(BUILD_PFX)%_sse3.c.o: CFLAGS += -msse3 $(STACKREALIGN)
+$(BUILD_PFX)%_ssse3.c.d: CFLAGS += -mssse3 $(STACKREALIGN)
+$(BUILD_PFX)%_ssse3.c.o: CFLAGS += -mssse3 $(STACKREALIGN)
+$(BUILD_PFX)%_sse4.c.d: CFLAGS += -msse4.1 $(STACKREALIGN)
+$(BUILD_PFX)%_sse4.c.o: CFLAGS += -msse4.1 $(STACKREALIGN)
+$(BUILD_PFX)%_avx.c.d: CFLAGS += -mavx $(STACKREALIGN)
+$(BUILD_PFX)%_avx.c.o: CFLAGS += -mavx $(STACKREALIGN)
+$(BUILD_PFX)%_avx2.c.d: CFLAGS += -mavx2 $(STACKREALIGN)
+$(BUILD_PFX)%_avx2.c.o: CFLAGS += -mavx2 $(STACKREALIGN)
 
 $(BUILD_PFX)%.c.d: %.c
 	$(if $(quiet),@echo "    [DEP] $@")
@@ -130,6 +154,15 @@ $(BUILD_PFX)%.cc.d: %.cc
 	$(qexec)$(CXX) $(INTERNAL_CFLAGS) $(CXXFLAGS) -M $< | $(fmt_deps) > $@
 
 $(BUILD_PFX)%.cc.o: %.cc
+	$(if $(quiet),@echo "    [CXX] $@")
+	$(qexec)$(CXX) $(INTERNAL_CFLAGS) $(CXXFLAGS) -c -o $@ $<
+
+$(BUILD_PFX)%.cpp.d: %.cpp
+	$(if $(quiet),@echo "    [DEP] $@")
+	$(qexec)mkdir -p $(dir $@)
+	$(qexec)$(CXX) $(INTERNAL_CFLAGS) $(CXXFLAGS) -M $< | $(fmt_deps) > $@
+
+$(BUILD_PFX)%.cpp.o: %.cpp
 	$(if $(quiet),@echo "    [CXX] $@")
 	$(qexec)$(CXX) $(INTERNAL_CFLAGS) $(CXXFLAGS) -c -o $@ $<
 
@@ -169,13 +202,13 @@ $(BUILD_PFX)%.asm.s: %.asm
 # the copy implementation
 HAVE_GNU_STRIP := $(if $(CONFIG_DEBUG),,$(HAVE_GNU_STRIP))
 ifeq ($(HAVE_GNU_STRIP),yes)
-# Older binutils strip global sybols not needed for relocation processing
-# when given --strip-unneeded. Use nm and awk to identify globals and
-# keep them.
+# Older binutils strip global symbols not needed for relocation processing
+# when given --strip-unneeded. Using nm and awk to identify globals and
+# keep them caused command line length issues under mingw and segfaults in
+# test_libvpx were observed under OS/2: simply use --strip-debug.
 %.a: %_g.a
 	$(if $(quiet),@echo "    [STRIP] $@ < $<")
-	$(qexec)$(STRIP) --strip-unneeded \
-         `$(NM) $< | grep ' [A-TV-Z] ' | awk '{print "-K"$$3'}`\
+	$(qexec)$(STRIP) --strip-debug \
           -o $@ $<
 else
 %.a: %_g.a
@@ -204,7 +237,7 @@ cond_enabled=$(if $(filter yes,$($(1))), $(call enabled,$(2)))
 
 find_file1=$(word 1,$(wildcard $(subst //,/,$(addsuffix /$(1),$(2)))))
 find_file=$(foreach f,$(1),$(call find_file1,$(strip $(f)),$(strip $(2))) )
-obj_pats=.c=.c.o $(AS_SFX)=$(AS_SFX).o .cc=.cc.o
+obj_pats=.c=.c.o $(AS_SFX)=$(AS_SFX).o .cc=.cc.o .cpp=.cpp.o
 objs=$(addprefix $(BUILD_PFX),$(foreach p,$(obj_pats),$(filter %.o,$(1:$(p))) ))
 
 install_map_templates=$(eval $(call install_map_template,$(1),$(2)))
@@ -303,7 +336,10 @@ endef
 ifneq ($(target),)
 include $(SRC_PATH_BARE)/$(target:-$(TOOLCHAIN)=).mk
 endif
-ifeq ($(filter clean,$(MAKECMDGOALS)),)
+
+skip_deps := $(filter %clean,$(MAKECMDGOALS))
+skip_deps += $(findstring testdata,$(MAKECMDGOALS))
+ifeq ($(strip $(skip_deps)),)
   # Older versions of make don't like -include directives with no arguments
   ifneq ($(filter %.d,$(OBJS-yes:.o=.d)),)
     -include $(filter %.d,$(OBJS-yes:.o=.d))
@@ -386,7 +422,8 @@ ifneq ($(call enabled,DIST-SRCS),)
     DIST-SRCS-$(CONFIG_MSVS)  += build/make/gen_msvs_def.sh
     DIST-SRCS-$(CONFIG_MSVS)  += build/make/gen_msvs_proj.sh
     DIST-SRCS-$(CONFIG_MSVS)  += build/make/gen_msvs_sln.sh
-    DIST-SRCS-$(CONFIG_MSVS)  += build/x86-msvs/yasm.rules
+    DIST-SRCS-$(CONFIG_MSVS)  += build/make/gen_msvs_vcxproj.sh
+    DIST-SRCS-$(CONFIG_MSVS)  += build/make/msvs_common.sh
     DIST-SRCS-$(CONFIG_MSVS)  += build/x86-msvs/obj_int_extract.bat
     DIST-SRCS-$(CONFIG_MSVS)  += build/arm-msvs/obj_int_extract.bat
     DIST-SRCS-$(CONFIG_RVCT) += build/make/armlink_adapter.sh

@@ -13,17 +13,14 @@
 #include <limits.h>
 #include <stdio.h>
 
-extern "C" {
 #include "./vpx_config.h"
 #if CONFIG_VP8_ENCODER
 #include "./vp8_rtcd.h"
-//#include "vp8/common/blockd.h"
 #endif
 #if CONFIG_VP9_ENCODER
 #include "./vp9_rtcd.h"
 #endif
 #include "vpx_mem/vpx_mem.h"
-}
 
 #include "test/acm_random.h"
 #include "test/clear_system_state.h"
@@ -32,20 +29,28 @@ extern "C" {
 #include "third_party/googletest/src/include/gtest/gtest.h"
 
 
-typedef unsigned int (*sad_m_by_n_fn_t)(const unsigned char *source_ptr,
-                                        int source_stride,
-                                        const unsigned char *reference_ptr,
-                                        int reference_stride,
-                                        unsigned int max_sad);
-typedef std::tr1::tuple<int, int, sad_m_by_n_fn_t> sad_m_by_n_test_param_t;
+#if CONFIG_VP8_ENCODER
+typedef unsigned int (*SadMxNFunc)(const unsigned char *source_ptr,
+                                   int source_stride,
+                                   const unsigned char *reference_ptr,
+                                   int reference_stride,
+                                   unsigned int max_sad);
+typedef std::tr1::tuple<int, int, SadMxNFunc> SadMxNParam;
+#endif
+#if CONFIG_VP9_ENCODER
+typedef unsigned int (*SadMxNVp9Func)(const unsigned char *source_ptr,
+                                      int source_stride,
+                                      const unsigned char *reference_ptr,
+                                      int reference_stride);
+typedef std::tr1::tuple<int, int, SadMxNVp9Func> SadMxNVp9Param;
+#endif
 
-typedef void (*sad_n_by_n_by_4_fn_t)(const uint8_t *src_ptr,
-                                     int src_stride,
-                                     const unsigned char * const ref_ptr[],
-                                     int ref_stride,
-                                     unsigned int *sad_array);
-typedef std::tr1::tuple<int, int, sad_n_by_n_by_4_fn_t>
-        sad_n_by_n_by_4_test_param_t;
+typedef void (*SadMxNx4Func)(const uint8_t *src_ptr,
+                             int src_stride,
+                             const unsigned char *const ref_ptr[],
+                             int ref_stride,
+                             unsigned int *sad_array);
+typedef std::tr1::tuple<int, int, SadMxNx4Func> SadMxNx4Param;
 
 using libvpx_test::ACMRandom;
 
@@ -90,7 +95,7 @@ class SADTestBase : public ::testing::Test {
 
   // Sum of Absolute Differences. Given two blocks, calculate the absolute
   // difference between two pixels in the same relative location; accumulate.
-  unsigned int ReferenceSAD(unsigned int max_sad, int block_idx = 0) {
+  unsigned int ReferenceSAD(unsigned int max_sad, int block_idx) {
     unsigned int sad = 0;
     const uint8_t* const reference = GetReference(block_idx);
 
@@ -131,27 +136,55 @@ class SADTestBase : public ::testing::Test {
   ACMRandom rnd_;
 };
 
-class SADTest : public SADTestBase,
-    public ::testing::WithParamInterface<sad_m_by_n_test_param_t> {
+class SADx4Test
+    : public SADTestBase,
+      public ::testing::WithParamInterface<SadMxNx4Param> {
+ public:
+  SADx4Test() : SADTestBase(GET_PARAM(0), GET_PARAM(1)) {}
+
+ protected:
+  void SADs(unsigned int *results) {
+    const uint8_t* refs[] = {GetReference(0), GetReference(1),
+                             GetReference(2), GetReference(3)};
+
+    ASM_REGISTER_STATE_CHECK(GET_PARAM(2)(source_data_, source_stride_,
+                                          refs, reference_stride_,
+                                          results));
+  }
+
+  void CheckSADs() {
+    unsigned int reference_sad, exp_sad[4];
+
+    SADs(exp_sad);
+    for (int block = 0; block < 4; ++block) {
+      reference_sad = ReferenceSAD(UINT_MAX, block);
+
+      EXPECT_EQ(reference_sad, exp_sad[block]) << "block " << block;
+    }
+  }
+};
+
+#if CONFIG_VP8_ENCODER
+class SADTest
+    : public SADTestBase,
+      public ::testing::WithParamInterface<SadMxNParam> {
  public:
   SADTest() : SADTestBase(GET_PARAM(0), GET_PARAM(1)) {}
 
  protected:
-  unsigned int SAD(unsigned int max_sad, int block_idx = 0) {
+  unsigned int SAD(unsigned int max_sad, int block_idx) {
     unsigned int ret;
     const uint8_t* const reference = GetReference(block_idx);
 
-    REGISTER_STATE_CHECK(ret = GET_PARAM(2)(source_data_, source_stride_,
-                                            reference, reference_stride_,
-                                            max_sad));
+    ASM_REGISTER_STATE_CHECK(ret = GET_PARAM(2)(source_data_, source_stride_,
+                                                reference, reference_stride_,
+                                                max_sad));
     return ret;
   }
 
-  void CheckSad(unsigned int max_sad) {
-    unsigned int reference_sad, exp_sad;
-
-    reference_sad = ReferenceSAD(max_sad);
-    exp_sad = SAD(max_sad);
+  void CheckSAD(unsigned int max_sad) {
+    const unsigned int reference_sad = ReferenceSAD(max_sad, 0);
+    const unsigned int exp_sad = SAD(max_sad, 0);
 
     if (reference_sad <= max_sad) {
       ASSERT_EQ(exp_sad, reference_sad);
@@ -161,42 +194,130 @@ class SADTest : public SADTestBase,
     }
   }
 };
+#endif  // CONFIG_VP8_ENCODER
 
-class SADx4Test : public SADTestBase,
-    public ::testing::WithParamInterface<sad_n_by_n_by_4_test_param_t> {
+#if CONFIG_VP9_ENCODER
+class SADVP9Test
+    : public SADTestBase,
+      public ::testing::WithParamInterface<SadMxNVp9Param> {
  public:
-  SADx4Test() : SADTestBase(GET_PARAM(0), GET_PARAM(1)) {}
+  SADVP9Test() : SADTestBase(GET_PARAM(0), GET_PARAM(1)) {}
 
  protected:
-  void SADs(unsigned int *results) {
-    const uint8_t* refs[] = {GetReference(0), GetReference(1),
-                             GetReference(2), GetReference(3)};
+  unsigned int SAD(int block_idx) {
+    unsigned int ret;
+    const uint8_t* const reference = GetReference(block_idx);
 
-    REGISTER_STATE_CHECK(GET_PARAM(2)(source_data_, source_stride_,
-                                      refs, reference_stride_,
-                                      results));
+    ASM_REGISTER_STATE_CHECK(ret = GET_PARAM(2)(source_data_, source_stride_,
+                                                reference, reference_stride_));
+    return ret;
   }
 
-  void CheckSADs() {
-    unsigned int reference_sad, exp_sad[4];
+  void CheckSAD() {
+    const unsigned int reference_sad = ReferenceSAD(UINT_MAX, 0);
+    const unsigned int exp_sad = SAD(0);
 
-    SADs(exp_sad);
-    for (int block = 0; block < 4; block++) {
-      reference_sad = ReferenceSAD(UINT_MAX, block);
-
-      EXPECT_EQ(exp_sad[block], reference_sad) << "block " << block;
-    }
+    ASSERT_EQ(reference_sad, exp_sad);
   }
 };
+#endif  // CONFIG_VP9_ENCODER
 
 uint8_t* SADTestBase::source_data_ = NULL;
 uint8_t* SADTestBase::reference_data_ = NULL;
 
+#if CONFIG_VP8_ENCODER
 TEST_P(SADTest, MaxRef) {
   FillConstant(source_data_, source_stride_, 0);
   FillConstant(reference_data_, reference_stride_, 255);
-  CheckSad(UINT_MAX);
+  CheckSAD(UINT_MAX);
 }
+
+TEST_P(SADTest, MaxSrc) {
+  FillConstant(source_data_, source_stride_, 255);
+  FillConstant(reference_data_, reference_stride_, 0);
+  CheckSAD(UINT_MAX);
+}
+
+TEST_P(SADTest, ShortRef) {
+  int tmp_stride = reference_stride_;
+  reference_stride_ >>= 1;
+  FillRandom(source_data_, source_stride_);
+  FillRandom(reference_data_, reference_stride_);
+  CheckSAD(UINT_MAX);
+  reference_stride_ = tmp_stride;
+}
+
+TEST_P(SADTest, UnalignedRef) {
+  // The reference frame, but not the source frame, may be unaligned for
+  // certain types of searches.
+  const int tmp_stride = reference_stride_;
+  reference_stride_ -= 1;
+  FillRandom(source_data_, source_stride_);
+  FillRandom(reference_data_, reference_stride_);
+  CheckSAD(UINT_MAX);
+  reference_stride_ = tmp_stride;
+}
+
+TEST_P(SADTest, ShortSrc) {
+  const int tmp_stride = source_stride_;
+  source_stride_ >>= 1;
+  FillRandom(source_data_, source_stride_);
+  FillRandom(reference_data_, reference_stride_);
+  CheckSAD(UINT_MAX);
+  source_stride_ = tmp_stride;
+}
+
+TEST_P(SADTest, MaxSAD) {
+  // Verify that, when max_sad is set, the implementation does not return a
+  // value lower than the reference.
+  FillConstant(source_data_, source_stride_, 255);
+  FillConstant(reference_data_, reference_stride_, 0);
+  CheckSAD(128);
+}
+#endif  // CONFIG_VP8_ENCODER
+
+#if CONFIG_VP9_ENCODER
+TEST_P(SADVP9Test, MaxRef) {
+  FillConstant(source_data_, source_stride_, 0);
+  FillConstant(reference_data_, reference_stride_, 255);
+  CheckSAD();
+}
+
+TEST_P(SADVP9Test, MaxSrc) {
+  FillConstant(source_data_, source_stride_, 255);
+  FillConstant(reference_data_, reference_stride_, 0);
+  CheckSAD();
+}
+
+TEST_P(SADVP9Test, ShortRef) {
+  const int tmp_stride = reference_stride_;
+  reference_stride_ >>= 1;
+  FillRandom(source_data_, source_stride_);
+  FillRandom(reference_data_, reference_stride_);
+  CheckSAD();
+  reference_stride_ = tmp_stride;
+}
+
+TEST_P(SADVP9Test, UnalignedRef) {
+  // The reference frame, but not the source frame, may be unaligned for
+  // certain types of searches.
+  const int tmp_stride = reference_stride_;
+  reference_stride_ -= 1;
+  FillRandom(source_data_, source_stride_);
+  FillRandom(reference_data_, reference_stride_);
+  CheckSAD();
+  reference_stride_ = tmp_stride;
+}
+
+TEST_P(SADVP9Test, ShortSrc) {
+  const int tmp_stride = source_stride_;
+  source_stride_ >>= 1;
+  FillRandom(source_data_, source_stride_);
+  FillRandom(reference_data_, reference_stride_);
+  CheckSAD();
+  source_stride_ = tmp_stride;
+}
+#endif  // CONFIG_VP9_ENCODER
 
 TEST_P(SADx4Test, MaxRef) {
   FillConstant(source_data_, source_stride_, 0);
@@ -205,12 +326,6 @@ TEST_P(SADx4Test, MaxRef) {
   FillConstant(GetReference(2), reference_stride_, 255);
   FillConstant(GetReference(3), reference_stride_, 255);
   CheckSADs();
-}
-
-TEST_P(SADTest, MaxSrc) {
-  FillConstant(source_data_, source_stride_, 255);
-  FillConstant(reference_data_, reference_stride_, 0);
-  CheckSad(UINT_MAX);
 }
 
 TEST_P(SADx4Test, MaxSrc) {
@@ -222,15 +337,6 @@ TEST_P(SADx4Test, MaxSrc) {
   CheckSADs();
 }
 
-TEST_P(SADTest, ShortRef) {
-  int tmp_stride = reference_stride_;
-  reference_stride_ >>= 1;
-  FillRandom(source_data_, source_stride_);
-  FillRandom(reference_data_, reference_stride_);
-  CheckSad(UINT_MAX);
-  reference_stride_ = tmp_stride;
-}
-
 TEST_P(SADx4Test, ShortRef) {
   int tmp_stride = reference_stride_;
   reference_stride_ >>= 1;
@@ -240,17 +346,6 @@ TEST_P(SADx4Test, ShortRef) {
   FillRandom(GetReference(2), reference_stride_);
   FillRandom(GetReference(3), reference_stride_);
   CheckSADs();
-  reference_stride_ = tmp_stride;
-}
-
-TEST_P(SADTest, UnalignedRef) {
-  // The reference frame, but not the source frame, may be unaligned for
-  // certain types of searches.
-  int tmp_stride = reference_stride_;
-  reference_stride_ -= 1;
-  FillRandom(source_data_, source_stride_);
-  FillRandom(reference_data_, reference_stride_);
-  CheckSad(UINT_MAX);
   reference_stride_ = tmp_stride;
 }
 
@@ -268,15 +363,6 @@ TEST_P(SADx4Test, UnalignedRef) {
   reference_stride_ = tmp_stride;
 }
 
-TEST_P(SADTest, ShortSrc) {
-  int tmp_stride = source_stride_;
-  source_stride_ >>= 1;
-  FillRandom(source_data_, source_stride_);
-  FillRandom(reference_data_, reference_stride_);
-  CheckSad(UINT_MAX);
-  source_stride_ = tmp_stride;
-}
-
 TEST_P(SADx4Test, ShortSrc) {
   int tmp_stride = source_stride_;
   source_stride_ >>= 1;
@@ -289,43 +375,37 @@ TEST_P(SADx4Test, ShortSrc) {
   source_stride_ = tmp_stride;
 }
 
-TEST_P(SADTest, MaxSAD) {
-  // Verify that, when max_sad is set, the implementation does not return a
-  // value lower than the reference.
-  FillConstant(source_data_, source_stride_, 255);
-  FillConstant(reference_data_, reference_stride_, 0);
-  CheckSad(128);
-}
-
 using std::tr1::make_tuple;
 
+//------------------------------------------------------------------------------
+// C functions
 #if CONFIG_VP8_ENCODER
-const sad_m_by_n_fn_t sad_16x16_c = vp8_sad16x16_c;
-const sad_m_by_n_fn_t sad_8x16_c = vp8_sad8x16_c;
-const sad_m_by_n_fn_t sad_16x8_c = vp8_sad16x8_c;
-const sad_m_by_n_fn_t sad_8x8_c = vp8_sad8x8_c;
-const sad_m_by_n_fn_t sad_4x4_c = vp8_sad4x4_c;
-#endif
-#if CONFIG_VP9_ENCODER
-const sad_m_by_n_fn_t sad_64x64_c_vp9 = vp9_sad64x64_c;
-const sad_m_by_n_fn_t sad_32x32_c_vp9 = vp9_sad32x32_c;
-const sad_m_by_n_fn_t sad_16x16_c_vp9 = vp9_sad16x16_c;
-const sad_m_by_n_fn_t sad_8x16_c_vp9 = vp9_sad8x16_c;
-const sad_m_by_n_fn_t sad_16x8_c_vp9 = vp9_sad16x8_c;
-const sad_m_by_n_fn_t sad_8x8_c_vp9 = vp9_sad8x8_c;
-const sad_m_by_n_fn_t sad_8x4_c_vp9 = vp9_sad8x4_c;
-const sad_m_by_n_fn_t sad_4x8_c_vp9 = vp9_sad4x8_c;
-const sad_m_by_n_fn_t sad_4x4_c_vp9 = vp9_sad4x4_c;
-#endif
-const sad_m_by_n_test_param_t c_tests[] = {
-#if CONFIG_VP8_ENCODER
+const SadMxNFunc sad_16x16_c = vp8_sad16x16_c;
+const SadMxNFunc sad_8x16_c = vp8_sad8x16_c;
+const SadMxNFunc sad_16x8_c = vp8_sad16x8_c;
+const SadMxNFunc sad_8x8_c = vp8_sad8x8_c;
+const SadMxNFunc sad_4x4_c = vp8_sad4x4_c;
+const SadMxNParam c_tests[] = {
   make_tuple(16, 16, sad_16x16_c),
   make_tuple(8, 16, sad_8x16_c),
   make_tuple(16, 8, sad_16x8_c),
   make_tuple(8, 8, sad_8x8_c),
   make_tuple(4, 4, sad_4x4_c),
-#endif
+};
+INSTANTIATE_TEST_CASE_P(C, SADTest, ::testing::ValuesIn(c_tests));
+#endif  // CONFIG_VP8_ENCODER
+
 #if CONFIG_VP9_ENCODER
+const SadMxNVp9Func sad_64x64_c_vp9 = vp9_sad64x64_c;
+const SadMxNVp9Func sad_32x32_c_vp9 = vp9_sad32x32_c;
+const SadMxNVp9Func sad_16x16_c_vp9 = vp9_sad16x16_c;
+const SadMxNVp9Func sad_8x16_c_vp9 = vp9_sad8x16_c;
+const SadMxNVp9Func sad_16x8_c_vp9 = vp9_sad16x8_c;
+const SadMxNVp9Func sad_8x8_c_vp9 = vp9_sad8x8_c;
+const SadMxNVp9Func sad_8x4_c_vp9 = vp9_sad8x4_c;
+const SadMxNVp9Func sad_4x8_c_vp9 = vp9_sad4x8_c;
+const SadMxNVp9Func sad_4x4_c_vp9 = vp9_sad4x4_c;
+const SadMxNVp9Param c_vp9_tests[] = {
   make_tuple(64, 64, sad_64x64_c_vp9),
   make_tuple(32, 32, sad_32x32_c_vp9),
   make_tuple(16, 16, sad_16x16_c_vp9),
@@ -335,24 +415,22 @@ const sad_m_by_n_test_param_t c_tests[] = {
   make_tuple(8, 4, sad_8x4_c_vp9),
   make_tuple(4, 8, sad_4x8_c_vp9),
   make_tuple(4, 4, sad_4x4_c_vp9),
-#endif
 };
-INSTANTIATE_TEST_CASE_P(C, SADTest, ::testing::ValuesIn(c_tests));
+INSTANTIATE_TEST_CASE_P(C, SADVP9Test, ::testing::ValuesIn(c_vp9_tests));
 
-#if CONFIG_VP9_ENCODER
-const sad_n_by_n_by_4_fn_t sad_64x64x4d_c = vp9_sad64x64x4d_c;
-const sad_n_by_n_by_4_fn_t sad_64x32x4d_c = vp9_sad64x32x4d_c;
-const sad_n_by_n_by_4_fn_t sad_32x64x4d_c = vp9_sad32x64x4d_c;
-const sad_n_by_n_by_4_fn_t sad_32x32x4d_c = vp9_sad32x32x4d_c;
-const sad_n_by_n_by_4_fn_t sad_32x16x4d_c = vp9_sad32x16x4d_c;
-const sad_n_by_n_by_4_fn_t sad_16x32x4d_c = vp9_sad16x32x4d_c;
-const sad_n_by_n_by_4_fn_t sad_16x16x4d_c = vp9_sad16x16x4d_c;
-const sad_n_by_n_by_4_fn_t sad_16x8x4d_c = vp9_sad16x8x4d_c;
-const sad_n_by_n_by_4_fn_t sad_8x16x4d_c = vp9_sad8x16x4d_c;
-const sad_n_by_n_by_4_fn_t sad_8x8x4d_c = vp9_sad8x8x4d_c;
-const sad_n_by_n_by_4_fn_t sad_8x4x4d_c = vp9_sad8x4x4d_c;
-const sad_n_by_n_by_4_fn_t sad_4x8x4d_c = vp9_sad4x8x4d_c;
-const sad_n_by_n_by_4_fn_t sad_4x4x4d_c = vp9_sad4x4x4d_c;
+const SadMxNx4Func sad_64x64x4d_c = vp9_sad64x64x4d_c;
+const SadMxNx4Func sad_64x32x4d_c = vp9_sad64x32x4d_c;
+const SadMxNx4Func sad_32x64x4d_c = vp9_sad32x64x4d_c;
+const SadMxNx4Func sad_32x32x4d_c = vp9_sad32x32x4d_c;
+const SadMxNx4Func sad_32x16x4d_c = vp9_sad32x16x4d_c;
+const SadMxNx4Func sad_16x32x4d_c = vp9_sad16x32x4d_c;
+const SadMxNx4Func sad_16x16x4d_c = vp9_sad16x16x4d_c;
+const SadMxNx4Func sad_16x8x4d_c = vp9_sad16x8x4d_c;
+const SadMxNx4Func sad_8x16x4d_c = vp9_sad8x16x4d_c;
+const SadMxNx4Func sad_8x8x4d_c = vp9_sad8x8x4d_c;
+const SadMxNx4Func sad_8x4x4d_c = vp9_sad8x4x4d_c;
+const SadMxNx4Func sad_4x8x4d_c = vp9_sad4x8x4d_c;
+const SadMxNx4Func sad_4x4x4d_c = vp9_sad4x4x4d_c;
 INSTANTIATE_TEST_CASE_P(C, SADx4Test, ::testing::Values(
                         make_tuple(64, 64, sad_64x64x4d_c),
                         make_tuple(64, 32, sad_64x32x4d_c),
@@ -367,116 +445,117 @@ INSTANTIATE_TEST_CASE_P(C, SADx4Test, ::testing::Values(
                         make_tuple(8, 4, sad_8x4x4d_c),
                         make_tuple(4, 8, sad_4x8x4d_c),
                         make_tuple(4, 4, sad_4x4x4d_c)));
-#endif
+#endif  // CONFIG_VP9_ENCODER
 
-// ARM tests
+//------------------------------------------------------------------------------
+// ARM functions
 #if HAVE_MEDIA
-const sad_m_by_n_fn_t sad_16x16_armv6 = vp8_sad16x16_armv6;
+#if CONFIG_VP8_ENCODER
+const SadMxNFunc sad_16x16_armv6 = vp8_sad16x16_armv6;
 INSTANTIATE_TEST_CASE_P(MEDIA, SADTest, ::testing::Values(
                         make_tuple(16, 16, sad_16x16_armv6)));
+#endif  // CONFIG_VP8_ENCODER
+#endif  // HAVE_MEDIA
 
-#endif
 #if HAVE_NEON
-const sad_m_by_n_fn_t sad_16x16_neon = vp8_sad16x16_neon;
-const sad_m_by_n_fn_t sad_8x16_neon = vp8_sad8x16_neon;
-const sad_m_by_n_fn_t sad_16x8_neon = vp8_sad16x8_neon;
-const sad_m_by_n_fn_t sad_8x8_neon = vp8_sad8x8_neon;
-const sad_m_by_n_fn_t sad_4x4_neon = vp8_sad4x4_neon;
+#if CONFIG_VP8_ENCODER
+const SadMxNFunc sad_16x16_neon = vp8_sad16x16_neon;
+const SadMxNFunc sad_8x16_neon = vp8_sad8x16_neon;
+const SadMxNFunc sad_16x8_neon = vp8_sad16x8_neon;
+const SadMxNFunc sad_8x8_neon = vp8_sad8x8_neon;
+const SadMxNFunc sad_4x4_neon = vp8_sad4x4_neon;
 INSTANTIATE_TEST_CASE_P(NEON, SADTest, ::testing::Values(
                         make_tuple(16, 16, sad_16x16_neon),
                         make_tuple(8, 16, sad_8x16_neon),
                         make_tuple(16, 8, sad_16x8_neon),
                         make_tuple(8, 8, sad_8x8_neon),
                         make_tuple(4, 4, sad_4x4_neon)));
-#endif
+#endif  // CONFIG_VP8_ENCODER
+#if CONFIG_VP9_ENCODER
+const SadMxNVp9Func sad_64x64_neon_vp9 = vp9_sad64x64_neon;
+const SadMxNVp9Func sad_32x32_neon_vp9 = vp9_sad32x32_neon;
+const SadMxNVp9Func sad_16x16_neon_vp9 = vp9_sad16x16_neon;
+const SadMxNVp9Func sad_8x8_neon_vp9 = vp9_sad8x8_neon;
+const SadMxNVp9Param neon_vp9_tests[] = {
+  make_tuple(64, 64, sad_64x64_neon_vp9),
+  make_tuple(32, 32, sad_32x32_neon_vp9),
+  make_tuple(16, 16, sad_16x16_neon_vp9),
+  make_tuple(8, 8, sad_8x8_neon_vp9),
+};
+INSTANTIATE_TEST_CASE_P(NEON, SADVP9Test, ::testing::ValuesIn(neon_vp9_tests));
+#endif  // CONFIG_VP9_ENCODER
+#endif  // HAVE_NEON
 
-// X86 tests
+//------------------------------------------------------------------------------
+// x86 functions
 #if HAVE_MMX
 #if CONFIG_VP8_ENCODER
-const sad_m_by_n_fn_t sad_16x16_mmx = vp8_sad16x16_mmx;
-const sad_m_by_n_fn_t sad_8x16_mmx = vp8_sad8x16_mmx;
-const sad_m_by_n_fn_t sad_16x8_mmx = vp8_sad16x8_mmx;
-const sad_m_by_n_fn_t sad_8x8_mmx = vp8_sad8x8_mmx;
-const sad_m_by_n_fn_t sad_4x4_mmx = vp8_sad4x4_mmx;
-#endif
-#if CONFIG_VP9_ENCODER
-const sad_m_by_n_fn_t sad_16x16_mmx_vp9 = vp9_sad16x16_mmx;
-const sad_m_by_n_fn_t sad_8x16_mmx_vp9 = vp9_sad8x16_mmx;
-const sad_m_by_n_fn_t sad_16x8_mmx_vp9 = vp9_sad16x8_mmx;
-const sad_m_by_n_fn_t sad_8x8_mmx_vp9 = vp9_sad8x8_mmx;
-const sad_m_by_n_fn_t sad_4x4_mmx_vp9 = vp9_sad4x4_mmx;
-#endif
-
-const sad_m_by_n_test_param_t mmx_tests[] = {
-#if CONFIG_VP8_ENCODER
+const SadMxNFunc sad_16x16_mmx = vp8_sad16x16_mmx;
+const SadMxNFunc sad_8x16_mmx = vp8_sad8x16_mmx;
+const SadMxNFunc sad_16x8_mmx = vp8_sad16x8_mmx;
+const SadMxNFunc sad_8x8_mmx = vp8_sad8x8_mmx;
+const SadMxNFunc sad_4x4_mmx = vp8_sad4x4_mmx;
+const SadMxNParam mmx_tests[] = {
   make_tuple(16, 16, sad_16x16_mmx),
   make_tuple(8, 16, sad_8x16_mmx),
   make_tuple(16, 8, sad_16x8_mmx),
   make_tuple(8, 8, sad_8x8_mmx),
   make_tuple(4, 4, sad_4x4_mmx),
-#endif
-#if CONFIG_VP9_ENCODER
-  make_tuple(16, 16, sad_16x16_mmx_vp9),
-  make_tuple(8, 16, sad_8x16_mmx_vp9),
-  make_tuple(16, 8, sad_16x8_mmx_vp9),
-  make_tuple(8, 8, sad_8x8_mmx_vp9),
-  make_tuple(4, 4, sad_4x4_mmx_vp9),
-#endif
 };
 INSTANTIATE_TEST_CASE_P(MMX, SADTest, ::testing::ValuesIn(mmx_tests));
-#endif
+#endif  // CONFIG_VP8_ENCODER
+
+#endif  // HAVE_MMX
 
 #if HAVE_SSE
 #if CONFIG_VP9_ENCODER
 #if CONFIG_USE_X86INC
-const sad_m_by_n_fn_t sad_4x4_sse_vp9 = vp9_sad4x4_sse;
-const sad_m_by_n_fn_t sad_4x8_sse_vp9 = vp9_sad4x8_sse;
-INSTANTIATE_TEST_CASE_P(SSE, SADTest, ::testing::Values(
+const SadMxNVp9Func sad_4x4_sse_vp9 = vp9_sad4x4_sse;
+const SadMxNVp9Func sad_4x8_sse_vp9 = vp9_sad4x8_sse;
+INSTANTIATE_TEST_CASE_P(SSE, SADVP9Test, ::testing::Values(
                         make_tuple(4, 4, sad_4x4_sse_vp9),
                         make_tuple(4, 8, sad_4x8_sse_vp9)));
 
-const sad_n_by_n_by_4_fn_t sad_4x8x4d_sse = vp9_sad4x8x4d_sse;
-const sad_n_by_n_by_4_fn_t sad_4x4x4d_sse = vp9_sad4x4x4d_sse;
+const SadMxNx4Func sad_4x8x4d_sse = vp9_sad4x8x4d_sse;
+const SadMxNx4Func sad_4x4x4d_sse = vp9_sad4x4x4d_sse;
 INSTANTIATE_TEST_CASE_P(SSE, SADx4Test, ::testing::Values(
                         make_tuple(4, 8, sad_4x8x4d_sse),
                         make_tuple(4, 4, sad_4x4x4d_sse)));
-#endif
-#endif
-#endif
+#endif  // CONFIG_USE_X86INC
+#endif  // CONFIG_VP9_ENCODER
+#endif  // HAVE_SSE
 
 #if HAVE_SSE2
 #if CONFIG_VP8_ENCODER
-const sad_m_by_n_fn_t sad_16x16_wmt = vp8_sad16x16_wmt;
-const sad_m_by_n_fn_t sad_8x16_wmt = vp8_sad8x16_wmt;
-const sad_m_by_n_fn_t sad_16x8_wmt = vp8_sad16x8_wmt;
-const sad_m_by_n_fn_t sad_8x8_wmt = vp8_sad8x8_wmt;
-const sad_m_by_n_fn_t sad_4x4_wmt = vp8_sad4x4_wmt;
-#endif
-#if CONFIG_VP9_ENCODER
-#if CONFIG_USE_X86INC
-const sad_m_by_n_fn_t sad_64x64_sse2_vp9 = vp9_sad64x64_sse2;
-const sad_m_by_n_fn_t sad_64x32_sse2_vp9 = vp9_sad64x32_sse2;
-const sad_m_by_n_fn_t sad_32x64_sse2_vp9 = vp9_sad32x64_sse2;
-const sad_m_by_n_fn_t sad_32x32_sse2_vp9 = vp9_sad32x32_sse2;
-const sad_m_by_n_fn_t sad_32x16_sse2_vp9 = vp9_sad32x16_sse2;
-const sad_m_by_n_fn_t sad_16x32_sse2_vp9 = vp9_sad16x32_sse2;
-const sad_m_by_n_fn_t sad_16x16_sse2_vp9 = vp9_sad16x16_sse2;
-const sad_m_by_n_fn_t sad_16x8_sse2_vp9 = vp9_sad16x8_sse2;
-const sad_m_by_n_fn_t sad_8x16_sse2_vp9 = vp9_sad8x16_sse2;
-const sad_m_by_n_fn_t sad_8x8_sse2_vp9 = vp9_sad8x8_sse2;
-const sad_m_by_n_fn_t sad_8x4_sse2_vp9 = vp9_sad8x4_sse2;
-#endif
-#endif
-const sad_m_by_n_test_param_t sse2_tests[] = {
-#if CONFIG_VP8_ENCODER
+const SadMxNFunc sad_16x16_wmt = vp8_sad16x16_wmt;
+const SadMxNFunc sad_8x16_wmt = vp8_sad8x16_wmt;
+const SadMxNFunc sad_16x8_wmt = vp8_sad16x8_wmt;
+const SadMxNFunc sad_8x8_wmt = vp8_sad8x8_wmt;
+const SadMxNFunc sad_4x4_wmt = vp8_sad4x4_wmt;
+const SadMxNParam sse2_tests[] = {
   make_tuple(16, 16, sad_16x16_wmt),
   make_tuple(8, 16, sad_8x16_wmt),
   make_tuple(16, 8, sad_16x8_wmt),
   make_tuple(8, 8, sad_8x8_wmt),
   make_tuple(4, 4, sad_4x4_wmt),
-#endif
+};
+INSTANTIATE_TEST_CASE_P(SSE2, SADTest, ::testing::ValuesIn(sse2_tests));
+#endif  // CONFIG_VP8_ENCODER
+
 #if CONFIG_VP9_ENCODER
 #if CONFIG_USE_X86INC
+const SadMxNVp9Func sad_64x64_sse2_vp9 = vp9_sad64x64_sse2;
+const SadMxNVp9Func sad_64x32_sse2_vp9 = vp9_sad64x32_sse2;
+const SadMxNVp9Func sad_32x64_sse2_vp9 = vp9_sad32x64_sse2;
+const SadMxNVp9Func sad_32x32_sse2_vp9 = vp9_sad32x32_sse2;
+const SadMxNVp9Func sad_32x16_sse2_vp9 = vp9_sad32x16_sse2;
+const SadMxNVp9Func sad_16x32_sse2_vp9 = vp9_sad16x32_sse2;
+const SadMxNVp9Func sad_16x16_sse2_vp9 = vp9_sad16x16_sse2;
+const SadMxNVp9Func sad_16x8_sse2_vp9 = vp9_sad16x8_sse2;
+const SadMxNVp9Func sad_8x16_sse2_vp9 = vp9_sad8x16_sse2;
+const SadMxNVp9Func sad_8x8_sse2_vp9 = vp9_sad8x8_sse2;
+const SadMxNVp9Func sad_8x4_sse2_vp9 = vp9_sad8x4_sse2;
+const SadMxNVp9Param sse2_vp9_tests[] = {
   make_tuple(64, 64, sad_64x64_sse2_vp9),
   make_tuple(64, 32, sad_64x32_sse2_vp9),
   make_tuple(32, 64, sad_32x64_sse2_vp9),
@@ -488,24 +567,20 @@ const sad_m_by_n_test_param_t sse2_tests[] = {
   make_tuple(8, 16, sad_8x16_sse2_vp9),
   make_tuple(8, 8, sad_8x8_sse2_vp9),
   make_tuple(8, 4, sad_8x4_sse2_vp9),
-#endif
-#endif
 };
-INSTANTIATE_TEST_CASE_P(SSE2, SADTest, ::testing::ValuesIn(sse2_tests));
+INSTANTIATE_TEST_CASE_P(SSE2, SADVP9Test, ::testing::ValuesIn(sse2_vp9_tests));
 
-#if CONFIG_VP9_ENCODER
-#if CONFIG_USE_X86INC
-const sad_n_by_n_by_4_fn_t sad_64x64x4d_sse2 = vp9_sad64x64x4d_sse2;
-const sad_n_by_n_by_4_fn_t sad_64x32x4d_sse2 = vp9_sad64x32x4d_sse2;
-const sad_n_by_n_by_4_fn_t sad_32x64x4d_sse2 = vp9_sad32x64x4d_sse2;
-const sad_n_by_n_by_4_fn_t sad_32x32x4d_sse2 = vp9_sad32x32x4d_sse2;
-const sad_n_by_n_by_4_fn_t sad_32x16x4d_sse2 = vp9_sad32x16x4d_sse2;
-const sad_n_by_n_by_4_fn_t sad_16x32x4d_sse2 = vp9_sad16x32x4d_sse2;
-const sad_n_by_n_by_4_fn_t sad_16x16x4d_sse2 = vp9_sad16x16x4d_sse2;
-const sad_n_by_n_by_4_fn_t sad_16x8x4d_sse2 = vp9_sad16x8x4d_sse2;
-const sad_n_by_n_by_4_fn_t sad_8x16x4d_sse2 = vp9_sad8x16x4d_sse2;
-const sad_n_by_n_by_4_fn_t sad_8x8x4d_sse2 = vp9_sad8x8x4d_sse2;
-const sad_n_by_n_by_4_fn_t sad_8x4x4d_sse2 = vp9_sad8x4x4d_sse2;
+const SadMxNx4Func sad_64x64x4d_sse2 = vp9_sad64x64x4d_sse2;
+const SadMxNx4Func sad_64x32x4d_sse2 = vp9_sad64x32x4d_sse2;
+const SadMxNx4Func sad_32x64x4d_sse2 = vp9_sad32x64x4d_sse2;
+const SadMxNx4Func sad_32x32x4d_sse2 = vp9_sad32x32x4d_sse2;
+const SadMxNx4Func sad_32x16x4d_sse2 = vp9_sad32x16x4d_sse2;
+const SadMxNx4Func sad_16x32x4d_sse2 = vp9_sad16x32x4d_sse2;
+const SadMxNx4Func sad_16x16x4d_sse2 = vp9_sad16x16x4d_sse2;
+const SadMxNx4Func sad_16x8x4d_sse2 = vp9_sad16x8x4d_sse2;
+const SadMxNx4Func sad_8x16x4d_sse2 = vp9_sad8x16x4d_sse2;
+const SadMxNx4Func sad_8x8x4d_sse2 = vp9_sad8x8x4d_sse2;
+const SadMxNx4Func sad_8x4x4d_sse2 = vp9_sad8x4x4d_sse2;
 INSTANTIATE_TEST_CASE_P(SSE2, SADx4Test, ::testing::Values(
                         make_tuple(64, 64, sad_64x64x4d_sse2),
                         make_tuple(64, 32, sad_64x32x4d_sse2),
@@ -518,32 +593,58 @@ INSTANTIATE_TEST_CASE_P(SSE2, SADx4Test, ::testing::Values(
                         make_tuple(8, 16, sad_8x16x4d_sse2),
                         make_tuple(8, 8, sad_8x8x4d_sse2),
                         make_tuple(8, 4, sad_8x4x4d_sse2)));
-#endif
-#endif
-#endif
+#endif  // CONFIG_USE_X86INC
+#endif  // CONFIG_VP9_ENCODER
+#endif  // HAVE_SSE2
 
 #if HAVE_SSE3
 #if CONFIG_VP8_ENCODER
-const sad_n_by_n_by_4_fn_t sad_16x16x4d_sse3 = vp8_sad16x16x4d_sse3;
-const sad_n_by_n_by_4_fn_t sad_16x8x4d_sse3 = vp8_sad16x8x4d_sse3;
-const sad_n_by_n_by_4_fn_t sad_8x16x4d_sse3 = vp8_sad8x16x4d_sse3;
-const sad_n_by_n_by_4_fn_t sad_8x8x4d_sse3 = vp8_sad8x8x4d_sse3;
-const sad_n_by_n_by_4_fn_t sad_4x4x4d_sse3 = vp8_sad4x4x4d_sse3;
+const SadMxNx4Func sad_16x16x4d_sse3 = vp8_sad16x16x4d_sse3;
+const SadMxNx4Func sad_16x8x4d_sse3 = vp8_sad16x8x4d_sse3;
+const SadMxNx4Func sad_8x16x4d_sse3 = vp8_sad8x16x4d_sse3;
+const SadMxNx4Func sad_8x8x4d_sse3 = vp8_sad8x8x4d_sse3;
+const SadMxNx4Func sad_4x4x4d_sse3 = vp8_sad4x4x4d_sse3;
 INSTANTIATE_TEST_CASE_P(SSE3, SADx4Test, ::testing::Values(
                         make_tuple(16, 16, sad_16x16x4d_sse3),
                         make_tuple(16, 8, sad_16x8x4d_sse3),
                         make_tuple(8, 16, sad_8x16x4d_sse3),
                         make_tuple(8, 8, sad_8x8x4d_sse3),
                         make_tuple(4, 4, sad_4x4x4d_sse3)));
-#endif
-#endif
+#endif  // CONFIG_VP8_ENCODER
+#endif  // HAVE_SSE3
 
 #if HAVE_SSSE3
 #if CONFIG_USE_X86INC
-const sad_m_by_n_fn_t sad_16x16_sse3 = vp8_sad16x16_sse3;
+#if CONFIG_VP8_ENCODER
+const SadMxNFunc sad_16x16_sse3 = vp8_sad16x16_sse3;
 INSTANTIATE_TEST_CASE_P(SSE3, SADTest, ::testing::Values(
                         make_tuple(16, 16, sad_16x16_sse3)));
-#endif
-#endif
+#endif  // CONFIG_VP8_ENCODER
+#endif  // CONFIG_USE_X86INC
+#endif  // HAVE_SSSE3
+
+#if HAVE_AVX2
+#if CONFIG_VP9_ENCODER
+const SadMxNVp9Func sad_64x64_avx2_vp9 = vp9_sad64x64_avx2;
+const SadMxNVp9Func sad_64x32_avx2_vp9 = vp9_sad64x32_avx2;
+const SadMxNVp9Func sad_32x64_avx2_vp9 = vp9_sad32x64_avx2;
+const SadMxNVp9Func sad_32x32_avx2_vp9 = vp9_sad32x32_avx2;
+const SadMxNVp9Func sad_32x16_avx2_vp9 = vp9_sad32x16_avx2;
+const SadMxNVp9Param avx2_vp9_tests[] = {
+  make_tuple(64, 64, sad_64x64_avx2_vp9),
+  make_tuple(64, 32, sad_64x32_avx2_vp9),
+  make_tuple(32, 64, sad_32x64_avx2_vp9),
+  make_tuple(32, 32, sad_32x32_avx2_vp9),
+  make_tuple(32, 16, sad_32x16_avx2_vp9),
+};
+INSTANTIATE_TEST_CASE_P(AVX2, SADVP9Test, ::testing::ValuesIn(avx2_vp9_tests));
+
+const SadMxNx4Func sad_64x64x4d_avx2 = vp9_sad64x64x4d_avx2;
+const SadMxNx4Func sad_32x32x4d_avx2 = vp9_sad32x32x4d_avx2;
+INSTANTIATE_TEST_CASE_P(AVX2, SADx4Test, ::testing::Values(
+                        make_tuple(32, 32, sad_32x32x4d_avx2),
+                        make_tuple(64, 64, sad_64x64x4d_avx2)));
+#endif  // CONFIG_VP9_ENCODER
+#endif  // HAVE_AVX2
 
 }  // namespace

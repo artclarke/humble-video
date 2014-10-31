@@ -10,9 +10,44 @@
  *  Based on code from the OggTheora software codec source code,
  *  Copyright (C) 2002-2010 The Xiph.Org Foundation and contributors.
  */
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "vpx/vpx_integer.h"
 #include "y4minput.h"
+
+// Reads 'size' bytes from 'file' into 'buf' with some fault tolerance.
+// Returns true on success.
+static int file_read(void *buf, size_t size, FILE *file) {
+  const int kMaxRetries = 5;
+  int retry_count = 0;
+  int file_error;
+  size_t len = 0;
+  do {
+    const size_t n = fread((uint8_t*)buf + len, 1, size - len, file);
+    len += n;
+    file_error = ferror(file);
+    if (file_error) {
+      if (errno == EINTR || errno == EAGAIN) {
+        clearerr(file);
+        continue;
+      } else {
+        fprintf(stderr, "Error reading file: %u of %u bytes read, %d: %s\n",
+                (uint32_t)len, (uint32_t)size, errno, strerror(errno));
+        return 0;
+      }
+    }
+  } while (!feof(file) && len < size && ++retry_count < kMaxRetries);
+
+  if (!feof(file) && len != size) {
+    fprintf(stderr, "Error reading file: %u of %u bytes read,"
+                    " error: %d, retries: %d, %d: %s\n",
+            (uint32_t)len, (uint32_t)size, file_error, retry_count,
+            errno, strerror(errno));
+  }
+  return len == size;
+}
 
 static int y4m_parse_tags(y4m_input *_y4m, char *_tags) {
   int   got_w;
@@ -648,6 +683,7 @@ static void y4m_convert_444_420jpeg(y4m_input *_y4m, unsigned char *_dst,
 static void y4m_convert_mono_420jpeg(y4m_input *_y4m, unsigned char *_dst,
                                      unsigned char *_aux) {
   int c_sz;
+  (void)_aux;
   _dst += _y4m->pic_w * _y4m->pic_h;
   c_sz = ((_y4m->pic_w + _y4m->dst_c_dec_h - 1) / _y4m->dst_c_dec_h) *
          ((_y4m->pic_h + _y4m->dst_c_dec_v - 1) / _y4m->dst_c_dec_v);
@@ -657,11 +693,14 @@ static void y4m_convert_mono_420jpeg(y4m_input *_y4m, unsigned char *_dst,
 /*No conversion function needed.*/
 static void y4m_convert_null(y4m_input *_y4m, unsigned char *_dst,
                              unsigned char *_aux) {
+  (void)_y4m;
+  (void)_dst;
+  (void)_aux;
 }
 
 int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
                    int only_420) {
-  char buffer[80];
+  char buffer[80] = {0};
   int  ret;
   int  i;
   /*Read until newline, or 80 cols, whichever happens first.*/
@@ -670,8 +709,7 @@ int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
       buffer[i] = *_skip++;
       _nskip--;
     } else {
-      ret = (int)fread(buffer + i, 1, 1, _fin);
-      if (ret < 1)return -1;
+      if (!file_read(buffer + i, 1, _fin)) return -1;
     }
     if (buffer[i] == '\n')break;
   }
@@ -703,15 +741,52 @@ int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
     return -1;
   }
   _y4m->vpx_fmt = VPX_IMG_FMT_I420;
-  _y4m->vpx_bps = 12;
+  _y4m->bps = 12;
+  _y4m->bit_depth = 8;
   if (strcmp(_y4m->chroma_type, "420") == 0 ||
       strcmp(_y4m->chroma_type, "420jpeg") == 0) {
     _y4m->src_c_dec_h = _y4m->dst_c_dec_h = _y4m->src_c_dec_v = _y4m->dst_c_dec_v = 2;
     _y4m->dst_buf_read_sz = _y4m->pic_w * _y4m->pic_h
                             + 2 * ((_y4m->pic_w + 1) / 2) * ((_y4m->pic_h + 1) / 2);
-    /*Natively supported: no conversion required.*/
+    /* Natively supported: no conversion required. */
     _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 0;
     _y4m->convert = y4m_convert_null;
+  } else if (strcmp(_y4m->chroma_type, "420p10") == 0) {
+    _y4m->src_c_dec_h = 2;
+    _y4m->dst_c_dec_h = 2;
+    _y4m->src_c_dec_v = 2;
+    _y4m->dst_c_dec_v = 2;
+    _y4m->dst_buf_read_sz = 2 * (_y4m->pic_w * _y4m->pic_h +
+                                 2 * ((_y4m->pic_w + 1) / 2) *
+                                 ((_y4m->pic_h + 1) / 2));
+    /* Natively supported: no conversion required. */
+    _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 0;
+    _y4m->convert = y4m_convert_null;
+    _y4m->bit_depth = 10;
+    _y4m->bps = 15;
+    _y4m->vpx_fmt = VPX_IMG_FMT_I42016;
+    if (only_420) {
+      fprintf(stderr, "Unsupported conversion from 420p10 to 420jpeg\n");
+      return -1;
+    }
+  } else if (strcmp(_y4m->chroma_type, "420p12") == 0) {
+    _y4m->src_c_dec_h = 2;
+    _y4m->dst_c_dec_h = 2;
+    _y4m->src_c_dec_v = 2;
+    _y4m->dst_c_dec_v = 2;
+    _y4m->dst_buf_read_sz = 2 * (_y4m->pic_w * _y4m->pic_h +
+                                 2 * ((_y4m->pic_w + 1) / 2) *
+                                 ((_y4m->pic_h + 1) / 2));
+    /* Natively supported: no conversion required. */
+    _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 0;
+    _y4m->convert = y4m_convert_null;
+    _y4m->bit_depth = 12;
+    _y4m->bps = 18;
+    _y4m->vpx_fmt = VPX_IMG_FMT_I42016;
+    if (only_420) {
+      fprintf(stderr, "Unsupported conversion from 420p12 to 420jpeg\n");
+      return -1;
+    }
   } else if (strcmp(_y4m->chroma_type, "420mpeg2") == 0) {
     _y4m->src_c_dec_h = _y4m->dst_c_dec_h = _y4m->src_c_dec_v = _y4m->dst_c_dec_v = 2;
     _y4m->dst_buf_read_sz = _y4m->pic_w * _y4m->pic_h;
@@ -752,7 +827,7 @@ int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
       _y4m->convert = y4m_convert_422_420jpeg;
     } else {
       _y4m->vpx_fmt = VPX_IMG_FMT_I422;
-      _y4m->vpx_bps = 16;
+      _y4m->bps = 16;
       _y4m->dst_c_dec_h = _y4m->src_c_dec_h;
       _y4m->dst_c_dec_v = _y4m->src_c_dec_v;
       _y4m->dst_buf_read_sz = _y4m->pic_w * _y4m->pic_h
@@ -760,7 +835,39 @@ int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
       /*Natively supported: no conversion required.*/
       _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 0;
       _y4m->convert = y4m_convert_null;
-      }
+    }
+  } else if (strcmp(_y4m->chroma_type, "422p10") == 0) {
+    _y4m->src_c_dec_h = 2;
+    _y4m->src_c_dec_v = 1;
+    _y4m->vpx_fmt = VPX_IMG_FMT_I42216;
+    _y4m->bps = 20;
+    _y4m->bit_depth = 10;
+    _y4m->dst_c_dec_h = _y4m->src_c_dec_h;
+    _y4m->dst_c_dec_v = _y4m->src_c_dec_v;
+    _y4m->dst_buf_read_sz = 2 * (_y4m->pic_w * _y4m->pic_h +
+                                 2 * ((_y4m->pic_w + 1) / 2) * _y4m->pic_h);
+    _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 0;
+    _y4m->convert = y4m_convert_null;
+    if (only_420) {
+      fprintf(stderr, "Unsupported conversion from 422p10 to 420jpeg\n");
+      return -1;
+    }
+  } else if (strcmp(_y4m->chroma_type, "422p12") == 0) {
+    _y4m->src_c_dec_h = 2;
+    _y4m->src_c_dec_v = 1;
+    _y4m->vpx_fmt = VPX_IMG_FMT_I42216;
+    _y4m->bps = 24;
+    _y4m->bit_depth = 12;
+    _y4m->dst_c_dec_h = _y4m->src_c_dec_h;
+    _y4m->dst_c_dec_v = _y4m->src_c_dec_v;
+    _y4m->dst_buf_read_sz = 2 * (_y4m->pic_w * _y4m->pic_h +
+                                 2 * ((_y4m->pic_w + 1) / 2) * _y4m->pic_h);
+    _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 0;
+    _y4m->convert = y4m_convert_null;
+    if (only_420) {
+      fprintf(stderr, "Unsupported conversion from 422p12 to 420jpeg\n");
+      return -1;
+    }
   } else if (strcmp(_y4m->chroma_type, "411") == 0) {
     _y4m->src_c_dec_h = 4;
     _y4m->dst_c_dec_h = 2;
@@ -789,13 +896,43 @@ int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
       _y4m->convert = y4m_convert_444_420jpeg;
     } else {
       _y4m->vpx_fmt = VPX_IMG_FMT_I444;
-      _y4m->vpx_bps = 24;
+      _y4m->bps = 24;
       _y4m->dst_c_dec_h = _y4m->src_c_dec_h;
       _y4m->dst_c_dec_v = _y4m->src_c_dec_v;
       _y4m->dst_buf_read_sz = 3 * _y4m->pic_w * _y4m->pic_h;
       /*Natively supported: no conversion required.*/
       _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 0;
       _y4m->convert = y4m_convert_null;
+    }
+  } else if (strcmp(_y4m->chroma_type, "444p10") == 0) {
+    _y4m->src_c_dec_h = 1;
+    _y4m->src_c_dec_v = 1;
+    _y4m->vpx_fmt = VPX_IMG_FMT_I44416;
+    _y4m->bps = 30;
+    _y4m->bit_depth = 10;
+    _y4m->dst_c_dec_h = _y4m->src_c_dec_h;
+    _y4m->dst_c_dec_v = _y4m->src_c_dec_v;
+    _y4m->dst_buf_read_sz = 2 * 3 * _y4m->pic_w * _y4m->pic_h;
+    _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 0;
+    _y4m->convert = y4m_convert_null;
+    if (only_420) {
+      fprintf(stderr, "Unsupported conversion from 444p10 to 420jpeg\n");
+      return -1;
+    }
+  } else if (strcmp(_y4m->chroma_type, "444p12") == 0) {
+    _y4m->src_c_dec_h = 1;
+    _y4m->src_c_dec_v = 1;
+    _y4m->vpx_fmt = VPX_IMG_FMT_I44416;
+    _y4m->bps = 36;
+    _y4m->bit_depth = 12;
+    _y4m->dst_c_dec_h = _y4m->src_c_dec_h;
+    _y4m->dst_c_dec_v = _y4m->src_c_dec_v;
+    _y4m->dst_buf_read_sz = 2 * 3 * _y4m->pic_w * _y4m->pic_h;
+    _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 0;
+    _y4m->convert = y4m_convert_null;
+    if (only_420) {
+      fprintf(stderr, "Unsupported conversion from 444p12 to 420jpeg\n");
+      return -1;
     }
   } else if (strcmp(_y4m->chroma_type, "444alpha") == 0) {
     _y4m->src_c_dec_h = 1;
@@ -813,7 +950,7 @@ int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
       _y4m->convert = y4m_convert_444_420jpeg;
     } else {
       _y4m->vpx_fmt = VPX_IMG_FMT_444A;
-      _y4m->vpx_bps = 32;
+      _y4m->bps = 32;
       _y4m->dst_c_dec_h = _y4m->src_c_dec_h;
       _y4m->dst_c_dec_v = _y4m->src_c_dec_v;
       _y4m->dst_buf_read_sz = 4 * _y4m->pic_w * _y4m->pic_h;
@@ -837,8 +974,13 @@ int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
   _y4m->dst_buf_sz = _y4m->pic_w * _y4m->pic_h
                      + 2 * ((_y4m->pic_w + _y4m->dst_c_dec_h - 1) / _y4m->dst_c_dec_h) *
                      ((_y4m->pic_h + _y4m->dst_c_dec_v - 1) / _y4m->dst_c_dec_v);
-  _y4m->dst_buf = (unsigned char *)malloc(_y4m->dst_buf_sz);
-  _y4m->aux_buf = (unsigned char *)malloc(_y4m->aux_buf_sz);
+  if (_y4m->bit_depth == 8)
+    _y4m->dst_buf = (unsigned char *)malloc(_y4m->dst_buf_sz);
+  else
+    _y4m->dst_buf = (unsigned char *)malloc(2 * _y4m->dst_buf_sz);
+
+  if (_y4m->aux_buf_sz > 0)
+    _y4m->aux_buf = (unsigned char *)malloc(_y4m->aux_buf_sz);
   return 0;
 }
 
@@ -853,10 +995,9 @@ int y4m_input_fetch_frame(y4m_input *_y4m, FILE *_fin, vpx_image_t *_img) {
   int  c_w;
   int  c_h;
   int  c_sz;
-  int  ret;
+  int  bytes_per_sample = _y4m->bit_depth > 8 ? 2 : 1;
   /*Read and skip the frame header.*/
-  ret = (int)fread(frame, 1, 6, _fin);
-  if (ret < 6)return 0;
+  if (!file_read(frame, 6, _fin)) return 0;
   if (memcmp(frame, "FRAME", 5)) {
     fprintf(stderr, "Loss of framing in Y4M input data\n");
     return -1;
@@ -864,19 +1005,19 @@ int y4m_input_fetch_frame(y4m_input *_y4m, FILE *_fin, vpx_image_t *_img) {
   if (frame[5] != '\n') {
     char c;
     int  j;
-    for (j = 0; j < 79 && fread(&c, 1, 1, _fin) && c != '\n'; j++);
+    for (j = 0; j < 79 && file_read(&c, 1, _fin) && c != '\n'; j++) {}
     if (j == 79) {
       fprintf(stderr, "Error parsing Y4M frame header\n");
       return -1;
     }
   }
   /*Read the frame data that needs no conversion.*/
-  if (fread(_y4m->dst_buf, 1, _y4m->dst_buf_read_sz, _fin) != _y4m->dst_buf_read_sz) {
+  if (!file_read(_y4m->dst_buf, _y4m->dst_buf_read_sz, _fin)) {
     fprintf(stderr, "Error reading Y4M frame data.\n");
     return -1;
   }
   /*Read the frame data that does need conversion.*/
-  if (fread(_y4m->aux_buf, 1, _y4m->aux_buf_read_sz, _fin) != _y4m->aux_buf_read_sz) {
+  if (!file_read(_y4m->aux_buf, _y4m->aux_buf_read_sz, _fin)) {
     fprintf(stderr, "Error reading Y4M frame data.\n");
     return -1;
   }
@@ -892,18 +1033,20 @@ int y4m_input_fetch_frame(y4m_input *_y4m, FILE *_fin, vpx_image_t *_img) {
   _img->h = _img->d_h = _y4m->pic_h;
   _img->x_chroma_shift = _y4m->dst_c_dec_h >> 1;
   _img->y_chroma_shift = _y4m->dst_c_dec_v >> 1;
-  _img->bps = _y4m->vpx_bps;
+  _img->bps = _y4m->bps;
 
   /*Set up the buffer pointers.*/
-  pic_sz = _y4m->pic_w * _y4m->pic_h;
+  pic_sz = _y4m->pic_w * _y4m->pic_h * bytes_per_sample;
   c_w = (_y4m->pic_w + _y4m->dst_c_dec_h - 1) / _y4m->dst_c_dec_h;
+  c_w *= bytes_per_sample;
   c_h = (_y4m->pic_h + _y4m->dst_c_dec_v - 1) / _y4m->dst_c_dec_v;
   c_sz = c_w * c_h;
-  _img->stride[PLANE_Y] = _img->stride[PLANE_ALPHA] = _y4m->pic_w;
-  _img->stride[PLANE_U] = _img->stride[PLANE_V] = c_w;
-  _img->planes[PLANE_Y] = _y4m->dst_buf;
-  _img->planes[PLANE_U] = _y4m->dst_buf + pic_sz;
-  _img->planes[PLANE_V] = _y4m->dst_buf + pic_sz + c_sz;
-  _img->planes[PLANE_ALPHA] = _y4m->dst_buf + pic_sz + 2 * c_sz;
+  _img->stride[VPX_PLANE_Y] = _img->stride[VPX_PLANE_ALPHA] =
+      _y4m->pic_w * bytes_per_sample;
+  _img->stride[VPX_PLANE_U] = _img->stride[VPX_PLANE_V] = c_w;
+  _img->planes[VPX_PLANE_Y] = _y4m->dst_buf;
+  _img->planes[VPX_PLANE_U] = _y4m->dst_buf + pic_sz;
+  _img->planes[VPX_PLANE_V] = _y4m->dst_buf + pic_sz + c_sz;
+  _img->planes[VPX_PLANE_ALPHA] = _y4m->dst_buf + pic_sz + 2 * c_sz;
   return 1;
 }
