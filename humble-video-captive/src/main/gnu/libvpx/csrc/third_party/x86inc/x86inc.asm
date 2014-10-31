@@ -97,21 +97,91 @@
     %endif
 %endmacro
 
-%if WIN64
-    %define PIC
-%elifidn __OUTPUT_FORMAT__,macho64
-    %define PIC
-%elif ARCH_X86_64 == 0
-; x86_32 doesn't require PIC.
-; Some distros prefer shared objects to be PIC, but nothing breaks if
-; the code contains a few textrels, so we'll skip that complexity.
-    %undef PIC
-%elif CONFIG_PIC
-    %define PIC
+; PIC macros are copied from vpx_ports/x86_abi_support.asm. The "define PIC"
+; from original code is added in for 64bit.
+%ifidn __OUTPUT_FORMAT__,elf32
+%define ABI_IS_32BIT 1
+%elifidn __OUTPUT_FORMAT__,macho32
+%define ABI_IS_32BIT 1
+%elifidn __OUTPUT_FORMAT__,win32
+%define ABI_IS_32BIT 1
+%elifidn __OUTPUT_FORMAT__,aout
+%define ABI_IS_32BIT 1
+%else
+%define ABI_IS_32BIT 0
 %endif
+
+%if ABI_IS_32BIT
+  %if CONFIG_PIC=1
+  %ifidn __OUTPUT_FORMAT__,elf32
+    %define GET_GOT_SAVE_ARG 1
+    %define WRT_PLT wrt ..plt
+    %macro GET_GOT 1
+      extern _GLOBAL_OFFSET_TABLE_
+      push %1
+      call %%get_got
+      %%sub_offset:
+      jmp %%exitGG
+      %%get_got:
+      mov %1, [esp]
+      add %1, _GLOBAL_OFFSET_TABLE_ + $$ - %%sub_offset wrt ..gotpc
+      ret
+      %%exitGG:
+      %undef GLOBAL
+      %define GLOBAL(x) x + %1 wrt ..gotoff
+      %undef RESTORE_GOT
+      %define RESTORE_GOT pop %1
+    %endmacro
+  %elifidn __OUTPUT_FORMAT__,macho32
+    %define GET_GOT_SAVE_ARG 1
+    %macro GET_GOT 1
+      push %1
+      call %%get_got
+      %%get_got:
+      pop  %1
+      %undef GLOBAL
+      %define GLOBAL(x) x + %1 - %%get_got
+      %undef RESTORE_GOT
+      %define RESTORE_GOT pop %1
+    %endmacro
+  %endif
+  %endif
+
+  %if ARCH_X86_64 == 0
+    %undef PIC
+  %endif
+
+%else
+  %macro GET_GOT 1
+  %endmacro
+  %define GLOBAL(x) rel x
+  %define WRT_PLT wrt ..plt
+
+  %if WIN64
+    %define PIC
+  %elifidn __OUTPUT_FORMAT__,macho64
+    %define PIC
+  %elif CONFIG_PIC
+    %define PIC
+  %endif
+%endif
+
+%ifnmacro GET_GOT
+    %macro GET_GOT 1
+    %endmacro
+    %define GLOBAL(x) x
+%endif
+%ifndef RESTORE_GOT
+%define RESTORE_GOT
+%endif
+%ifndef WRT_PLT
+%define WRT_PLT
+%endif
+
 %ifdef PIC
     default rel
 %endif
+; Done with PIC macros
 
 ; Always use long nops (reduces 0x90 spam in disassembly on x86_32)
 %ifndef __NASM_VER__
@@ -164,10 +234,10 @@ ALIGNMODE k7
         %define r%1mp %2
     %elif ARCH_X86_64 ; memory
         %define r%1m [rsp + stack_offset + %6]
-        %define r%1mp qword r %+ %1m
+        %define r%1mp qword r %+ %1 %+ m
     %else
         %define r%1m [esp + stack_offset + %6]
-        %define r%1mp dword r %+ %1m
+        %define r%1mp dword r %+ %1 %+ m
     %endif
     %define r%1  %2
 %endmacro
@@ -324,6 +394,23 @@ DECLARE_REG_TMP_SIZE 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
     %xdefine stack_offset %%stack_offset
     %assign n_arg_names %0
 %endmacro
+
+%if ARCH_X86_64
+%macro ALLOC_STACK 2  ; stack_size, num_regs
+  %assign %%stack_aligment ((mmsize + 15) & ~15)
+  %assign stack_size_padded %1
+
+  %assign %%reg_num (%2 - 1)
+  %xdefine rsp_tmp r %+ %%reg_num
+  mov  rsp_tmp, rsp
+  sub  rsp, stack_size_padded
+  and  rsp, ~(%%stack_aligment - 1)
+%endmacro
+
+%macro RESTORE_STACK 0  ; reset rsp register
+  mov  rsp, rsp_tmp
+%endmacro
+%endif
 
 %if WIN64 ; Windows x64 ;=================================================
 
@@ -522,12 +609,20 @@ DECLARE_ARG 7, 8, 9, 10, 11, 12, 13, 14
         CAT_XDEFINE cglobaled_, %1, 1
     %endif
     %xdefine current_function %1
-    %ifidn __OUTPUT_FORMAT__,elf
-        global %1:function hidden
-    %elifidn __OUTPUT_FORMAT__,elf32
-        global %1:function hidden
-    %elifidn __OUTPUT_FORMAT__,elf64
-        global %1:function hidden
+    %ifdef CHROMIUM
+        %ifidn __OUTPUT_FORMAT__,elf
+            global %1:function hidden
+        %elifidn __OUTPUT_FORMAT__,elf32
+            global %1:function hidden
+        %elifidn __OUTPUT_FORMAT__,elf64
+            global %1:function hidden
+        %elifidn __OUTPUT_FORMAT__,macho32
+            global %1:private_extern
+        %elifidn __OUTPUT_FORMAT__,macho64
+            global %1:private_extern
+        %else
+            global %1
+        %endif
     %else
         global %1
     %endif

@@ -17,6 +17,13 @@
 #
 # Usage: cat inputfile | perl ads2gas_apple.pl > outputfile
 #
+
+my $chromium = 0;
+
+foreach my $arg (@ARGV) {
+    $chromium = 1 if ($arg eq "-chromium");
+}
+
 print "@ This file was created from a .asm file\n";
 print "@  using the ads2gas_apple.pl script.\n\n";
 print "\t.set WIDE_REFERENCE, 0\n";
@@ -47,7 +54,7 @@ while (<STDIN>)
     s/@/,:/g;
 
     # Comment character
-    s/;/@/g;
+    s/;/ @/g;
 
     # Hexadecimal constants prefaced by 0x
     s/#&/#0x/g;
@@ -68,16 +75,16 @@ while (<STDIN>)
     s/:SHR:/ >> /g;
 
     # Convert ELSE to .else
-    s/ELSE/.else/g;
+    s/\bELSE\b/.else/g;
 
     # Convert ENDIF to .endif
-    s/ENDIF/.endif/g;
+    s/\bENDIF\b/.endif/g;
 
     # Convert ELSEIF to .elseif
-    s/ELSEIF/.elseif/g;
+    s/\bELSEIF\b/.elseif/g;
 
     # Convert LTORG to .ltorg
-    s/LTORG/.ltorg/g;
+    s/\bLTORG\b/.ltorg/g;
 
     # Convert IF :DEF:to .if
     # gcc doesn't have the ability to do a conditional
@@ -157,7 +164,7 @@ while (<STDIN>)
     s/^([a-zA-Z_0-9\$]+)/$1:/ if !/EQU/;
 
     # ALIGN directive
-    s/ALIGN/.balign/g;
+    s/\bALIGN\b/.balign/g;
 
     # Strip ARM
     s/\sARM/@ ARM/g;
@@ -177,7 +184,7 @@ while (<STDIN>)
     s/(.*)EQU(.*)/.set $1, $2/;
 
     # Begin macro definition
-    if (/MACRO/)
+    if (/\bMACRO\b/)
     {
         # Process next line down, which will be the macro definition
         $_ = <STDIN>;
@@ -188,7 +195,7 @@ while (<STDIN>)
         $trimmed =~ s/,//g;
 
         # string to array
-        @incoming_array = split(/ /, $trimmed);
+        @incoming_array = split(/\s+/, $trimmed);
 
         print ".macro @incoming_array[0]\n";
 
@@ -208,7 +215,21 @@ while (<STDIN>)
 
     # For macros, use \ to reference formal params
 #   s/\$/\\/g;                  # End macro definition
-    s/MEND/.endm/;              # No need to tell it where to stop assembling
+    s/\bMEND\b/.endm/;              # No need to tell it where to stop assembling
     next if /^\s*END\s*$/;
+
+    # Clang used by Chromium differs slightly from clang in XCode in what it
+    # will accept in the assembly.
+    if ($chromium) {
+        s/qsubaddx/qsax/i;
+        s/qaddsubx/qasx/i;
+        s/ldrneb/ldrbne/i;
+        s/ldrneh/ldrhne/i;
+        s/(vqshrun\.s16 .*, \#)0$/${1}8/i;
+
+        # http://llvm.org/bugs/show_bug.cgi?id=16022
+        s/\.include/#include/;
+    }
+
     print;
 }

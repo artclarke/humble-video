@@ -11,13 +11,30 @@
 #ifndef VP9_COMMON_VP9_TILE_COMMON_H_
 #define VP9_COMMON_VP9_TILE_COMMON_H_
 
-#include "vp9/common/vp9_onyxc_int.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void vp9_get_tile_col_offsets(VP9_COMMON *cm, int tile_col_idx);
+struct VP9Common;
 
-void vp9_get_tile_row_offsets(VP9_COMMON *cm, int tile_row_idx);
+typedef struct TileInfo {
+  int mi_row_start, mi_row_end;
+  int mi_col_start, mi_col_end;
+} TileInfo;
+
+// initializes 'tile->mi_(row|col)_(start|end)' for (row, col) based on
+// 'cm->log2_tile_(rows|cols)' & 'cm->mi_(rows|cols)'
+void vp9_tile_init(TileInfo *tile, const struct VP9Common *cm,
+                   int row, int col);
+
+void vp9_tile_set_row(TileInfo *tile, const struct VP9Common *cm, int row);
+void vp9_tile_set_col(TileInfo *tile, const struct VP9Common *cm, int col);
 
 void vp9_get_tile_n_bits(int mi_cols,
                          int *min_log2_tile_cols, int *max_log2_tile_cols);
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif
 
 #endif  // VP9_COMMON_VP9_TILE_COMMON_H_

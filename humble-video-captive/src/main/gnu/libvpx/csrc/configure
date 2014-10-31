@@ -24,25 +24,31 @@ Advanced options:
   ${toggle_examples}              examples
   ${toggle_docs}                  documentation
   ${toggle_unit_tests}            unit tests
+  ${toggle_decode_perf_tests}     build decoder perf tests with unit tests
+  ${toggle_encode_perf_tests}     build encoder perf tests with unit tests
   --libc=PATH                     path to alternate libc
+  --size-limit=WxH                max size to allow in the decoder
   --as={yasm|nasm|auto}           use specified assembler [auto, yasm preferred]
-  --sdk-path=PATH                 path to root of sdk (iOS, android builds only)
+  --sdk-path=PATH                 path to root of sdk (android builds only)
   ${toggle_fast_unaligned}        don't use unaligned accesses, even when
                                   supported by hardware [auto]
   ${toggle_codec_srcs}            in/exclude codec library source code
   ${toggle_debug_libs}            in/exclude debug version of libraries
-  ${toggle_md5}                   support for output of checksum data
   ${toggle_static_msvcrt}         use static MSVCRT (VS builds only)
   ${toggle_vp8}                   VP8 codec support
   ${toggle_vp9}                   VP9 codec support
   ${toggle_internal_stats}        output of encoder internal stats for debug, if supported (encoders)
   ${toggle_mem_tracker}           track memory usage
   ${toggle_postproc}              postprocessing
+  ${toggle_vp9_postproc}          vp9 specific postprocessing
   ${toggle_multithread}           multithreaded encoding and decoding
   ${toggle_spatial_resampling}    spatial sampling (scaling) support
   ${toggle_realtime_only}         enable this option while building for real-time encoding
   ${toggle_onthefly_bitpacking}   enable on-the-fly bitpacking in real-time encoding
   ${toggle_error_concealment}     enable this option to get a decoder which is able to conceal losses
+  ${toggle_coefficient_range_checking}
+                                  enable decoder to check if intermediate
+                                  transform coefficients are in valid range
   ${toggle_runtime_cpu_detect}    runtime cpu detection
   ${toggle_shared}                shared library support
   ${toggle_static}                static library support
@@ -50,6 +56,8 @@ Advanced options:
   ${toggle_postproc_visualizer}   macro block / block level visualizers
   ${toggle_multi_res_encoding}    enable multiple-resolution encoding
   ${toggle_temporal_denoising}    enable temporal denoising and disable the spatial denoiser
+  ${toggle_webm_io}               enable input from and output to WebM container
+  ${toggle_libyuv}                enable libyuv
 
 Codecs:
   Codecs can be selectively enabled or disabled individually, or by family:
@@ -62,10 +70,10 @@ Codecs:
 EOF
 #restore editor state '
 
-    local family;
-    local last_family;
-    local c;
-    local str;
+    family="";
+    last_family="";
+    c="";
+    str="";
     for c in ${CODECS}; do
         family=${c%_*}
         if [ "${family}" != "${last_family}" ]; then
@@ -93,13 +101,17 @@ all_platforms="${all_platforms} armv6-darwin-gcc"
 all_platforms="${all_platforms} armv6-linux-rvct"
 all_platforms="${all_platforms} armv6-linux-gcc"
 all_platforms="${all_platforms} armv6-none-rvct"
+all_platforms="${all_platforms} arm64-darwin-gcc"
 all_platforms="${all_platforms} armv7-android-gcc"   #neon Cortex-A8
 all_platforms="${all_platforms} armv7-darwin-gcc"    #neon Cortex-A8
 all_platforms="${all_platforms} armv7-linux-rvct"    #neon Cortex-A8
 all_platforms="${all_platforms} armv7-linux-gcc"     #neon Cortex-A8
 all_platforms="${all_platforms} armv7-none-rvct"     #neon Cortex-A8
 all_platforms="${all_platforms} armv7-win32-vs11"
+all_platforms="${all_platforms} armv7-win32-vs12"
+all_platforms="${all_platforms} armv7s-darwin-gcc"
 all_platforms="${all_platforms} mips32-linux-gcc"
+all_platforms="${all_platforms} mips64-linux-gcc"
 all_platforms="${all_platforms} ppc32-darwin8-gcc"
 all_platforms="${all_platforms} ppc32-darwin9-gcc"
 all_platforms="${all_platforms} ppc32-linux-gcc"
@@ -116,6 +128,7 @@ all_platforms="${all_platforms} x86-darwin10-gcc"
 all_platforms="${all_platforms} x86-darwin11-gcc"
 all_platforms="${all_platforms} x86-darwin12-gcc"
 all_platforms="${all_platforms} x86-darwin13-gcc"
+all_platforms="${all_platforms} x86-iphonesimulator-gcc"
 all_platforms="${all_platforms} x86-linux-gcc"
 all_platforms="${all_platforms} x86-linux-icc"
 all_platforms="${all_platforms} x86-os2-gcc"
@@ -126,11 +139,13 @@ all_platforms="${all_platforms} x86-win32-vs8"
 all_platforms="${all_platforms} x86-win32-vs9"
 all_platforms="${all_platforms} x86-win32-vs10"
 all_platforms="${all_platforms} x86-win32-vs11"
+all_platforms="${all_platforms} x86-win32-vs12"
 all_platforms="${all_platforms} x86_64-darwin9-gcc"
 all_platforms="${all_platforms} x86_64-darwin10-gcc"
 all_platforms="${all_platforms} x86_64-darwin11-gcc"
 all_platforms="${all_platforms} x86_64-darwin12-gcc"
 all_platforms="${all_platforms} x86_64-darwin13-gcc"
+all_platforms="${all_platforms} x86_64-iphonesimulator-gcc"
 all_platforms="${all_platforms} x86_64-linux-gcc"
 all_platforms="${all_platforms} x86_64-linux-icc"
 all_platforms="${all_platforms} x86_64-solaris-gcc"
@@ -139,6 +154,7 @@ all_platforms="${all_platforms} x86_64-win64-vs8"
 all_platforms="${all_platforms} x86_64-win64-vs9"
 all_platforms="${all_platforms} x86_64-win64-vs10"
 all_platforms="${all_platforms} x86_64-win64-vs11"
+all_platforms="${all_platforms} x86_64-win64-vs12"
 all_platforms="${all_platforms} universal-darwin8-gcc"
 all_platforms="${all_platforms} universal-darwin9-gcc"
 all_platforms="${all_platforms} universal-darwin10-gcc"
@@ -153,8 +169,20 @@ all_targets="libs examples docs"
 
 # all targets available are enabled, by default.
 for t in ${all_targets}; do
-    [ -f ${source_path}/${t}.mk ] && enable_feature ${t}
+    [ -f "${source_path}/${t}.mk" ] && enable_feature ${t}
 done
+
+if ! perl --version >/dev/null; then
+    die "Perl is required to build"
+fi
+
+
+if [ "`cd \"${source_path}\" && pwd`" != "`pwd`" ]; then
+  # test to see if source_path already configured
+  if [ -f "${source_path}/vpx_config.h" ]; then
+    die "source directory already configured; run 'make distclean' there first"
+  fi
+fi
 
 # check installed doxygen version
 doxy_version=$(doxygen --version 2>/dev/null)
@@ -172,40 +200,39 @@ fi
 # install everything except the sources, by default. sources will have
 # to be enabled when doing dist builds, since that's no longer a common
 # case.
-enabled doxygen && php -v >/dev/null 2>&1 && enable_feature install_docs
+enabled doxygen && enable_feature install_docs
 enable_feature install_bins
 enable_feature install_libs
 
 enable_feature static
 enable_feature optimizations
 enable_feature fast_unaligned #allow unaligned accesses, if supported by hw
-enable_feature md5
 enable_feature spatial_resampling
 enable_feature multithread
 enable_feature os_support
 enable_feature temporal_denoising
 
-[ -d ${source_path}/../include ] && enable_feature alt_tree_layout
+[ -d "${source_path}/../include" ] && enable_feature alt_tree_layout
 for d in vp8 vp9; do
-    [ -d ${source_path}/${d} ] && disable_feature alt_tree_layout;
+    [ -d "${source_path}/${d}" ] && disable_feature alt_tree_layout;
 done
 
 if ! enabled alt_tree_layout; then
 # development environment
-[ -d ${source_path}/vp8 ] && CODECS="${CODECS} vp8_encoder vp8_decoder"
-[ -d ${source_path}/vp9 ] && CODECS="${CODECS} vp9_encoder vp9_decoder"
+[ -d "${source_path}/vp8" ] && CODECS="${CODECS} vp8_encoder vp8_decoder"
+[ -d "${source_path}/vp9" ] && CODECS="${CODECS} vp9_encoder vp9_decoder"
 else
 # customer environment
-[ -f ${source_path}/../include/vpx/vp8cx.h ] && CODECS="${CODECS} vp8_encoder"
-[ -f ${source_path}/../include/vpx/vp8dx.h ] && CODECS="${CODECS} vp8_decoder"
-[ -f ${source_path}/../include/vpx/vp9cx.h ] && CODECS="${CODECS} vp9_encoder"
-[ -f ${source_path}/../include/vpx/vp9dx.h ] && CODECS="${CODECS} vp9_decoder"
-[ -f ${source_path}/../include/vpx/vp8cx.h ] || disable_feature vp8_encoder
-[ -f ${source_path}/../include/vpx/vp8dx.h ] || disable_feature vp8_decoder
-[ -f ${source_path}/../include/vpx/vp9cx.h ] || disable_feature vp9_encoder
-[ -f ${source_path}/../include/vpx/vp9dx.h ] || disable_feature vp9_decoder
+[ -f "${source_path}/../include/vpx/vp8cx.h" ] && CODECS="${CODECS} vp8_encoder"
+[ -f "${source_path}/../include/vpx/vp8dx.h" ] && CODECS="${CODECS} vp8_decoder"
+[ -f "${source_path}/../include/vpx/vp9cx.h" ] && CODECS="${CODECS} vp9_encoder"
+[ -f "${source_path}/../include/vpx/vp9dx.h" ] && CODECS="${CODECS} vp9_decoder"
+[ -f "${source_path}/../include/vpx/vp8cx.h" ] || disable_feature vp8_encoder
+[ -f "${source_path}/../include/vpx/vp8dx.h" ] || disable_feature vp8_decoder
+[ -f "${source_path}/../include/vpx/vp9cx.h" ] || disable_feature vp9_encoder
+[ -f "${source_path}/../include/vpx/vp9dx.h" ] || disable_feature vp9_decoder
 
-[ -f ${source_path}/../lib/*/*mt.lib ] && soft_enable static_msvcrt
+[ -f "${source_path}/../lib/*/*mt.lib" ] && soft_enable static_msvcrt
 fi
 
 CODECS="$(echo ${CODECS} | tr ' ' '\n')"
@@ -223,9 +250,12 @@ ARCH_EXT_LIST="
     edsp
     media
     neon
+    neon_asm
 
     mips32
     dspr2
+
+    mips64
 
     mmx
     sse
@@ -233,6 +263,8 @@ ARCH_EXT_LIST="
     sse3
     ssse3
     sse4_1
+    avx
+    avx2
 
     altivec
 "
@@ -246,10 +278,10 @@ HAVE_LIST="
     unistd_h
 "
 EXPERIMENT_LIST="
-    oneshotq
-    multiple_arf
-    non420
-    alpha
+    spatial_svc
+    vp9_temporal_denoising
+    fp_mb_stats
+    emulate_hardware
 "
 CONFIG_LIST="
     external_build
@@ -273,12 +305,12 @@ CONFIG_LIST="
     mem_manager
     mem_tracker
     mem_checks
-    md5
 
     dequant_tokens
     dc_recon
     runtime_cpu_detect
     postproc
+    vp9_postproc
     multithread
     internal_stats
     ${CODECS}
@@ -296,10 +328,16 @@ CONFIG_LIST="
     postproc_visualizer
     os_support
     unit_tests
+    webm_io
+    libyuv
+    decode_perf_tests
+    encode_perf_tests
     multi_res_encoding
     temporal_denoising
+    coefficient_range_checking
+    vp9_highbitdepth
     experimental
-    decrypt
+    size_limit
     ${EXPERIMENT_LIST}
 "
 CMDLINE_SELECT="
@@ -325,14 +363,15 @@ CMDLINE_SELECT="
     docs
     libc
     as
+    size_limit
     fast_unaligned
     codec_srcs
     debug_libs
-    md5
 
     dequant_tokens
     dc_recon
     postproc
+    vp9_postproc
     multithread
     internal_stats
     ${CODECS}
@@ -348,10 +387,15 @@ CMDLINE_SELECT="
     small
     postproc_visualizer
     unit_tests
+    webm_io
+    libyuv
+    decode_perf_tests
+    encode_perf_tests
     multi_res_encoding
     temporal_denoising
+    coefficient_range_checking
+    vp9_highbitdepth
     experimental
-    decrypt
 "
 
 process_cmdline() {
@@ -378,7 +422,7 @@ process_cmdline() {
 }
 
 post_process_cmdline() {
-    local c
+    c=""
 
     # If the codec family is disabled, disable all components of that family.
     # If the codec family is enabled, enable all components of that family.
@@ -419,14 +463,14 @@ process_targets() {
     fi
 
     # The write_common_config (config.mk) logic is deferred until after the
-    # recursive calls to configure complete, becuase we want our universal
+    # recursive calls to configure complete, because we want our universal
     # targets to be executed last.
     write_common_config_targets
     enabled universal && echo "FAT_ARCHS=${fat_bin_archs}" >> config.mk
 
     # Calculate the default distribution name, based on the enabled features
-    local cf
-    local DIST_DIR=vpx
+    cf=""
+    DIST_DIR=vpx
     for cf in $CODEC_FAMILIES; do
         if enabled ${cf}_encoder && enabled ${cf}_decoder; then
             DIST_DIR="${DIST_DIR}-${cf}"
@@ -438,7 +482,7 @@ process_targets() {
     done
     enabled debug_libs && DIST_DIR="${DIST_DIR}-debug"
     enabled codec_srcs && DIST_DIR="${DIST_DIR}-src"
-    ! enabled postproc && DIST_DIR="${DIST_DIR}-nopost"
+    ! enabled postproc && ! enabled vp9_postproc && DIST_DIR="${DIST_DIR}-nopost"
     ! enabled multithread && DIST_DIR="${DIST_DIR}-nomt"
     ! enabled install_docs && DIST_DIR="${DIST_DIR}-nodocs"
     DIST_DIR="${DIST_DIR}-${tgt_isa}-${tgt_os}"
@@ -448,7 +492,7 @@ process_targets() {
           ;;
     esac
     if [ -f "${source_path}/build/make/version.sh" ]; then
-        local ver=`"$source_path/build/make/version.sh" --bare $source_path`
+        ver=`"$source_path/build/make/version.sh" --bare "$source_path"`
         DIST_DIR="${DIST_DIR}-${ver}"
         VERSION_STRING=${ver}
         ver=${ver%%-*}
@@ -482,7 +526,7 @@ EOF
     # Write makefiles for all enabled targets
     #
     for tgt in libs examples docs solution; do
-        local tgt_fn="$tgt-$toolchain.mk"
+        tgt_fn="$tgt-$toolchain.mk"
 
         if enabled $tgt; then
             echo "Creating makefiles for ${toolchain} ${tgt}"
@@ -521,7 +565,7 @@ process_detect() {
                     true;
                 ;;
                 *)
-                    local result=false
+                    result=false
                     for d in "$@"; do
                         [ -f "${d##-I}/$header" ] && result=true && break
                     done
@@ -570,7 +614,7 @@ process_toolchain() {
     # Handle universal binaries for this architecture
     case $toolchain in
         universal-darwin*)
-            local darwin_ver=${tgt_os##darwin}
+            darwin_ver=${tgt_os##darwin}
 
             # Snow Leopard (10.6/darwin10) dropped support for PPC
             # Include PPC support for all prior versions
@@ -605,7 +649,12 @@ process_toolchain() {
         check_add_cflags -Wuninitialized
         check_add_cflags -Wunused-variable
         case ${CC} in
-          *clang*) ;;
+          *clang*)
+              # libvpx and/or clang have issues with aliasing:
+              # https://code.google.com/p/webm/issues/detail?id=603
+              # work around them until they are fixed
+              check_add_cflags -fno-strict-aliasing
+          ;;
           *) check_add_cflags -Wunused-but-set-variable ;;
         esac
         enabled extra_warnings || check_add_cflags -Wno-unused-function
@@ -647,6 +696,10 @@ process_toolchain() {
         enable_feature dc_recon
     fi
 
+    if enabled internal_stats; then
+        enable_feature vp9_postproc
+    fi
+
     # Enable the postbuild target if building for visual studio.
     case "$tgt_cc" in
         vs*) enable_feature msvs
@@ -657,9 +710,10 @@ process_toolchain() {
                  VCPROJ_SFX=vcproj
                  gen_vcproj_cmd=${source_path}/build/make/gen_msvs_proj.sh
                  ;;
-             10|11)
+             10|11|12)
                  VCPROJ_SFX=vcxproj
                  gen_vcproj_cmd=${source_path}/build/make/gen_msvs_vcxproj.sh
+                 enabled werror && gen_vcproj_cmd="${gen_vcproj_cmd} --enable-werror"
                  ;;
              esac
              all_targets="${all_targets} solution"
@@ -678,13 +732,21 @@ process_toolchain() {
     case "$toolchain" in
         *-vs*)
             soft_enable unit_tests
+            soft_enable webm_io
+            soft_enable libyuv
         ;;
         *-android-*)
+            soft_enable webm_io
+            soft_enable libyuv
             # GTestLog must be modified to use Android logging utilities.
         ;;
         *-darwin-*)
             # iOS/ARM builds do not work with gtest. This does not match
             # x86 targets.
+        ;;
+        *-iphonesimulator-*)
+            soft_enable webm_io
+            soft_enable libyuv
         ;;
         *-win*)
             # Some mingw toolchains don't have pthread available by default.
@@ -693,13 +755,27 @@ process_toolchain() {
             check_cxx "$@" <<EOF && soft_enable unit_tests
 int z;
 EOF
+            check_cxx "$@" <<EOF && soft_enable webm_io
+int z;
+EOF
+            check_cxx "$@" <<EOF && soft_enable libyuv
+int z;
+EOF
         ;;
         *)
             enabled pthread_h && check_cxx "$@" <<EOF && soft_enable unit_tests
 int z;
 EOF
+            check_cxx "$@" <<EOF && soft_enable webm_io
+int z;
+EOF
+            check_cxx "$@" <<EOF && soft_enable libyuv
+int z;
+EOF
         ;;
     esac
+    # libwebm needs to be linked with C++ standard library
+    enabled webm_io && LD=${CXX}
 }
 
 
