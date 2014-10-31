@@ -8,6 +8,6 @@ Description: RTMP implementation
 Version: @VERSION@
 Requires: @CRYPTO_REQ@
 URL: http://rtmpdump.mplayerhq.hu
-Libs: -L${libdir} -lrtmp -lz
+Libs: -L${libdir} -lrtmp -lz @PUBLIC_LIBS@
 Libs.private: @PRIVATE_LIBS@
 Cflags: -I${incdir}
