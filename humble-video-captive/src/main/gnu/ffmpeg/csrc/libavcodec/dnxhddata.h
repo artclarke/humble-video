@@ -42,11 +42,11 @@ typedef struct CIDEntry {
     const uint8_t *ac_flags;
     const uint16_t *run_codes;
     const uint8_t *run_bits, *run;
-    int bit_rates[5]; ///< Helpher to choose variants, rounded to nearest 5Mb/s
+    int bit_rates[5]; ///< Helper to choose variants, rounded to nearest 5Mb/s
     AVRational frame_rates[5];
 } CIDEntry;
 
-extern av_export const CIDEntry ff_dnxhd_cid_table[];
+extern const CIDEntry ff_dnxhd_cid_table[];
 
 int ff_dnxhd_get_cid_table(int cid);
 int ff_dnxhd_find_cid(AVCodecContext *avctx, int bit_depth);

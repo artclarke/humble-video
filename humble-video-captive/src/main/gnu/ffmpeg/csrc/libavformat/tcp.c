@@ -44,8 +44,8 @@ typedef struct TCPContext {
 #define E AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
 {"listen", "listen on port instead of connecting", OFFSET(listen), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 1, D|E },
-{"timeout", "timeout of socket i/o operations", OFFSET(rw_timeout), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, D|E },
-{"listen_timeout", "connection awaiting timeout", OFFSET(listen_timeout), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, D|E },
+{"timeout", "set timeout of socket I/O operations", OFFSET(rw_timeout), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, D|E },
+{"listen_timeout", "set connection awaiting timeout", OFFSET(listen_timeout), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, D|E },
 {NULL}
 };
 
@@ -79,8 +79,13 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
     }
     p = strchr(uri, '?');
     if (p) {
-        if (av_find_info_tag(buf, sizeof(buf), "listen", p))
-            s->listen = 1;
+        if (av_find_info_tag(buf, sizeof(buf), "listen", p)) {
+            char *endptr = NULL;
+            s->listen = strtol(buf, &endptr, 10);
+            /* assume if no digits were found it is a request to enable it */
+            if (buf == endptr)
+                s->listen = 1;
+        }
         if (av_find_info_tag(buf, sizeof(buf), "timeout", p)) {
             s->rw_timeout = strtol(buf, NULL, 10);
         }
@@ -111,7 +116,9 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
     cur_ai = ai;
 
  restart:
-    fd = socket(cur_ai->ai_family, cur_ai->ai_socktype, cur_ai->ai_protocol);
+    fd = ff_socket(cur_ai->ai_family,
+                   cur_ai->ai_socktype,
+                   cur_ai->ai_protocol);
     if (fd < 0) {
         ret = ff_neterrno();
         goto fail;
@@ -125,7 +132,7 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
         }
     } else {
         if ((ret = ff_listen_connect(fd, cur_ai->ai_addr, cur_ai->ai_addrlen,
-                                     s->open_timeout / 1000, h)) < 0) {
+                                     s->open_timeout / 1000, h, !!cur_ai->ai_next)) < 0) {
 
             if (ret == AVERROR_EXIT)
                 goto fail1;
@@ -179,7 +186,7 @@ static int tcp_write(URLContext *h, const uint8_t *buf, int size)
         if (ret)
             return ret;
     }
-    ret = send(s->fd, buf, size, 0);
+    ret = send(s->fd, buf, size, MSG_NOSIGNAL);
     return ret < 0 ? ff_neterrno() : ret;
 }
 

@@ -1,5 +1,5 @@
 /*
- * MMX optimized MP3 decoding functions
+ * SIMD-optimized MP3 decoding functions
  * Copyright (c) 2010 Vitor Sessak
  *
  * This file is part of FFmpeg.
@@ -30,7 +30,9 @@
 static void imdct36_blocks_ ## CPU(float *out, float *buf, float *in, int count, int switch_point, int block_type);\
 void ff_imdct36_float_ ## CPU(float *out, float *buf, float *in, float *win);
 
+#if ARCH_X86_32
 DECL(sse)
+#endif
 DECL(sse2)
 DECL(sse3)
 DECL(ssse3)
@@ -43,7 +45,7 @@ void ff_four_imdct36_float_avx(float *out, float *buf, float *in, float *win,
 
 DECLARE_ALIGNED(16, static float, mdct_win_sse)[2][4][4*40];
 
-#if HAVE_SSE2_INLINE
+#if HAVE_6REGS && HAVE_SSE_INLINE
 
 #define MACS(rt, ra, rb) rt+=(ra)*(rb)
 #define MLSS(rt, ra, rb) rt-=(ra)*(rb)
@@ -187,7 +189,7 @@ static void apply_window_mp3(float *in, float *win, int *unused, float *out,
     *out = sum;
 }
 
-#endif /* HAVE_SSE2_INLINE */
+#endif /* HAVE_6REGS && HAVE_SSE_INLINE */
 
 #if HAVE_YASM
 #define DECL_IMDCT_BLOCKS(CPU1, CPU2)                                       \
@@ -223,7 +225,9 @@ static void imdct36_blocks_ ## CPU1(float *out, float *buf, float *in,      \
 }
 
 #if HAVE_SSE
+#if ARCH_X86_32
 DECL_IMDCT_BLOCKS(sse,sse)
+#endif
 DECL_IMDCT_BLOCKS(sse2,sse)
 DECL_IMDCT_BLOCKS(sse3,sse)
 DECL_IMDCT_BLOCKS(ssse3,sse)
@@ -235,7 +239,7 @@ DECL_IMDCT_BLOCKS(avx,avx)
 
 av_cold void ff_mpadsp_init_x86(MPADSPContext *s)
 {
-    int mm_flags = av_get_cpu_flags();
+    int cpu_flags = av_get_cpu_flags();
 
     int i, j;
     for (j = 0; j < 4; j++) {
@@ -251,23 +255,33 @@ av_cold void ff_mpadsp_init_x86(MPADSPContext *s)
         }
     }
 
-#if HAVE_SSE2_INLINE
-    if (mm_flags & AV_CPU_FLAG_SSE2) {
+#if HAVE_6REGS && HAVE_SSE_INLINE
+    if (INLINE_SSE(cpu_flags)) {
         s->apply_window_float = apply_window_mp3;
     }
-#endif /* HAVE_SSE2_INLINE */
+#endif /* HAVE_SSE_INLINE */
 
 #if HAVE_YASM
-    if (EXTERNAL_AVX(mm_flags)) {
-        s->imdct36_blocks_float = imdct36_blocks_avx;
-    } else if (EXTERNAL_SSSE3(mm_flags)) {
-        s->imdct36_blocks_float = imdct36_blocks_ssse3;
-    } else if (EXTERNAL_SSE3(mm_flags)) {
-        s->imdct36_blocks_float = imdct36_blocks_sse3;
-    } else if (EXTERNAL_SSE2(mm_flags)) {
-        s->imdct36_blocks_float = imdct36_blocks_sse2;
-    } else if (EXTERNAL_SSE(mm_flags)) {
+#if HAVE_SSE
+#if ARCH_X86_32
+    if (EXTERNAL_SSE(cpu_flags)) {
         s->imdct36_blocks_float = imdct36_blocks_sse;
     }
+#endif
+    if (EXTERNAL_SSE2(cpu_flags)) {
+        s->imdct36_blocks_float = imdct36_blocks_sse2;
+    }
+    if (EXTERNAL_SSE3(cpu_flags)) {
+        s->imdct36_blocks_float = imdct36_blocks_sse3;
+    }
+    if (EXTERNAL_SSSE3(cpu_flags)) {
+        s->imdct36_blocks_float = imdct36_blocks_ssse3;
+    }
+#endif
+#if HAVE_AVX_EXTERNAL
+    if (EXTERNAL_AVX(cpu_flags)) {
+        s->imdct36_blocks_float = imdct36_blocks_avx;
+    }
+#endif
 #endif /* HAVE_YASM */
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2003 The ffmpeg Project
+ * Copyright (c) 2001-2003 The FFmpeg Project
  *
  * first version by Francois Revol (revol@free.fr)
  * fringe ADPCM codecs (e.g., DK3, DK4, Westwood)
@@ -332,7 +332,7 @@ static void adpcm_compress_trellis(AVCodecContext *avctx,
                     uint8_t *h;\
                     dec_sample = av_clip_int16(dec_sample);\
                     d = sample - dec_sample;\
-                    ssd = nodes[j]->ssd + d*d;\
+                    ssd = nodes[j]->ssd + d*(unsigned)d;\
                     /* Check for wraparound, skip such samples completely. \
                      * Note, changing ssd to a 64 bit variable would be \
                      * simpler, avoiding this check, but it's slower on \
@@ -509,7 +509,7 @@ static int adpcm_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 
         /* stereo: 4 bytes (8 samples) for left, 4 bytes for right */
         if (avctx->trellis > 0) {
-            FF_ALLOC_OR_GOTO(avctx, buf, avctx->channels * blocks * 8, error);
+            FF_ALLOC_ARRAY_OR_GOTO(avctx, buf, avctx->channels, blocks * 8, error);
             for (ch = 0; ch < avctx->channels; ch++) {
                 adpcm_compress_trellis(avctx, &samples_p[ch][1],
                                        buf + ch * blocks * 8, &c->status[ch],
@@ -549,10 +549,11 @@ static int adpcm_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
             put_bits(&pb, 7,  status->step_index);
             if (avctx->trellis > 0) {
                 uint8_t buf[64];
-                adpcm_compress_trellis(avctx, &samples_p[ch][1], buf, status,
+                adpcm_compress_trellis(avctx, &samples_p[ch][0], buf, status,
                                        64, 1);
                 for (i = 0; i < 64; i++)
                     put_bits(&pb, 4, buf[i ^ 1]);
+                status->prev_sample = status->predictor;
             } else {
                 for (i = 0; i < 64; i += 2) {
                     int t1, t2;
@@ -708,6 +709,7 @@ static const enum AVSampleFormat sample_fmts_p[] = {
 #define ADPCM_ENCODER(id_, name_, sample_fmts_, long_name_) \
 AVCodec ff_ ## name_ ## _encoder = {                        \
     .name           = #name_,                               \
+    .long_name      = NULL_IF_CONFIG_SMALL(long_name_),     \
     .type           = AVMEDIA_TYPE_AUDIO,                   \
     .id             = id_,                                  \
     .priv_data_size = sizeof(ADPCMEncodeContext),           \
@@ -715,7 +717,6 @@ AVCodec ff_ ## name_ ## _encoder = {                        \
     .encode2        = adpcm_encode_frame,                   \
     .close          = adpcm_encode_close,                   \
     .sample_fmts    = sample_fmts_,                         \
-    .long_name      = NULL_IF_CONFIG_SMALL(long_name_),     \
 }
 
 ADPCM_ENCODER(AV_CODEC_ID_ADPCM_IMA_QT,  adpcm_ima_qt,  sample_fmts_p, "ADPCM IMA QuickTime");

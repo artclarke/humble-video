@@ -76,15 +76,15 @@ static int cpia_decode_frame(AVCodecContext *avctx,
 
     // currently unsupported properties
     if (header[17] == SUBSAMPLE_422) {
-        av_log(avctx, AV_LOG_ERROR, "Unsupported subsample!\n");
+        avpriv_report_missing_feature(avctx, "4:2:2 subsampling");
         return AVERROR_PATCHWELCOME;
     }
     if (header[18] == YUVORDER_UYVY) {
-        av_log(avctx, AV_LOG_ERROR, "Unsupported YUV byte order!\n");
+        avpriv_report_missing_feature(avctx, "YUV byte order UYVY");
         return AVERROR_PATCHWELCOME;
     }
     if (header[29] == DECIMATION_ENAB) {
-        av_log(avctx, AV_LOG_ERROR, "Decimation unsupported!\n");
+        avpriv_report_missing_feature(avctx, "Decimation");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -114,7 +114,7 @@ static int cpia_decode_frame(AVCodecContext *avctx,
 
         if (src_size < linelength) {
             av_frame_set_decode_error_flags(frame, FF_DECODE_ERROR_INVALID_BITSTREAM);
-            av_log(avctx, AV_LOG_WARNING, "Frame ended enexpectedly!\n");
+            av_log(avctx, AV_LOG_WARNING, "Frame ended unexpectedly!\n");
             break;
         }
         if (src[linelength - 1] != EOL) {
@@ -222,6 +222,7 @@ static av_cold int cpia_decode_end(AVCodecContext *avctx)
 
 AVCodec ff_cpia_decoder = {
     .name           = "cpia",
+    .long_name      = NULL_IF_CONFIG_SMALL("CPiA video format"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_CPIA,
     .priv_data_size = sizeof(CpiaContext),
@@ -229,5 +230,4 @@ AVCodec ff_cpia_decoder = {
     .close          = cpia_decode_end,
     .decode         = cpia_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("CPiA video format"),
 };

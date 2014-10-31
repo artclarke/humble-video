@@ -27,15 +27,19 @@
  */
 
 #include "avcodec.h"
+#include "blockdsp.h"
+#include "bswapdsp.h"
 #include "get_bits.h"
 #include "aandcttab.h"
 #include "eaidct.h"
+#include "idctdsp.h"
 #include "internal.h"
 #include "mpeg12.h"
 #include "mpegvideo.h"
 
 typedef struct TqiContext {
     MpegEncContext s;
+    BswapDSPContext bsdsp;
     void *bitstream_buf;
     unsigned int bitstream_buf_size;
     DECLARE_ALIGNED(16, int16_t, block)[6][64];
@@ -46,9 +50,11 @@ static av_cold int tqi_decode_init(AVCodecContext *avctx)
     TqiContext *t = avctx->priv_data;
     MpegEncContext *s = &t->s;
     s->avctx = avctx;
-    ff_dsputil_init(&s->dsp, avctx);
-    ff_init_scantable_permutation(s->dsp.idct_permutation, FF_NO_IDCT_PERM);
-    ff_init_scantable(s->dsp.idct_permutation, &s->intra_scantable, ff_zigzag_direct);
+    ff_blockdsp_init(&s->bdsp, avctx);
+    ff_bswapdsp_init(&t->bsdsp);
+    ff_idctdsp_init(&s->idsp, avctx);
+    ff_init_scantable_permutation(s->idsp.idct_permutation, FF_IDCT_PERM_NONE);
+    ff_init_scantable(s->idsp.idct_permutation, &s->intra_scantable, ff_zigzag_direct);
     s->qscale = 1;
     avctx->time_base = (AVRational){1, 15};
     avctx->pix_fmt = AV_PIX_FMT_YUV420P;
@@ -59,7 +65,7 @@ static av_cold int tqi_decode_init(AVCodecContext *avctx)
 static int tqi_decode_mb(MpegEncContext *s, int16_t (*block)[64])
 {
     int n;
-    s->dsp.clear_blocks(block[0]);
+    s->bdsp.clear_blocks(block[0]);
     for (n=0; n<6; n++)
         if (ff_mpeg1_decode_block_intra(s, block[n], n) < 0)
             return -1;
@@ -111,8 +117,9 @@ static int tqi_decode_frame(AVCodecContext *avctx,
     tqi_calculate_qtable(s, buf[4]);
     buf += 8;
 
-    if (s->avctx->width!=s->width || s->avctx->height!=s->height)
-        avcodec_set_dimensions(s->avctx, s->width, s->height);
+    ret = ff_set_dimensions(s->avctx, s->width, s->height);
+    if (ret < 0)
+        return ret;
 
     if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
@@ -121,7 +128,8 @@ static int tqi_decode_frame(AVCodecContext *avctx,
                           buf_end - buf);
     if (!t->bitstream_buf)
         return AVERROR(ENOMEM);
-    s->dsp.bswap_buf(t->bitstream_buf, (const uint32_t*)buf, (buf_end-buf)/4);
+    t->bsdsp.bswap_buf(t->bitstream_buf, (const uint32_t *) buf,
+                       (buf_end - buf) / 4);
     init_get_bits(&s->gb, t->bitstream_buf, 8*(buf_end-buf));
 
     s->last_dc[0] = s->last_dc[1] = s->last_dc[2] = 0;
@@ -147,6 +155,7 @@ static av_cold int tqi_decode_end(AVCodecContext *avctx)
 
 AVCodec ff_eatqi_decoder = {
     .name           = "eatqi",
+    .long_name      = NULL_IF_CONFIG_SMALL("Electronic Arts TQI Video"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_TQI,
     .priv_data_size = sizeof(TqiContext),
@@ -154,5 +163,4 @@ AVCodec ff_eatqi_decoder = {
     .close          = tqi_decode_end,
     .decode         = tqi_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Electronic Arts TQI Video"),
 };

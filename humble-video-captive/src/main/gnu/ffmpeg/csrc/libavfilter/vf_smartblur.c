@@ -201,7 +201,7 @@ static void blur(uint8_t       *dst, const int dst_linesize,
                     if (diff > 2 * threshold)
                         dst[x + y * dst_linesize] = orig;
                     else if (diff > threshold)
-                        /* add 'diff' and substract 'threshold' from 'filtered' */
+                        /* add 'diff' and subtract 'threshold' from 'filtered' */
                         dst[x + y * dst_linesize] = orig - threshold;
                 } else {
                     if (-diff > 2 * threshold)
@@ -223,13 +223,13 @@ static void blur(uint8_t       *dst, const int dst_linesize,
                     if (diff <= -threshold)
                         dst[x + y * dst_linesize] = orig;
                     else if (diff <= -2 * threshold)
-                        /* substract 'diff' and 'threshold' from 'orig' */
+                        /* subtract 'diff' and 'threshold' from 'orig' */
                         dst[x + y * dst_linesize] = filtered - threshold;
                 } else {
                     if (diff >= threshold)
                         dst[x + y * dst_linesize] = orig;
                     else if (diff >= 2 * threshold)
-                        /* add 'threshold' and substract 'diff' from 'orig' */
+                        /* add 'threshold' and subtract 'diff' from 'orig' */
                         dst[x + y * dst_linesize] = filtered + threshold;
                 }
             }
@@ -290,12 +290,10 @@ static const AVFilterPad smartblur_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_smartblur = {
-    .name        = "smartblur",
-    .description = NULL_IF_CONFIG_SMALL("Blur the input video without impacting the outlines."),
-
-    .priv_size = sizeof(SmartblurContext),
-
+AVFilter ff_vf_smartblur = {
+    .name          = "smartblur",
+    .description   = NULL_IF_CONFIG_SMALL("Blur the input video without impacting the outlines."),
+    .priv_size     = sizeof(SmartblurContext),
     .init          = init,
     .uninit        = uninit,
     .query_formats = query_formats,

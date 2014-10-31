@@ -26,7 +26,6 @@
 #include "libavutil/dict.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/time.h"
-#include "libavutil/dict.h"
 #include "internal.h"
 #include "network.h"
 #include "os_support.h"
@@ -135,13 +134,14 @@ static int sap_write_header(AVFormatContext *s)
         freeaddrinfo(ai);
     }
 
-    contexts = av_mallocz(sizeof(AVFormatContext*) * s->nb_streams);
+    contexts = av_mallocz_array(s->nb_streams, sizeof(AVFormatContext*));
     if (!contexts) {
         ret = AVERROR(ENOMEM);
         goto fail;
     }
 
-    s->start_time_realtime = av_gettime();
+    if (s->start_time_realtime == 0  ||  s->start_time_realtime == AV_NOPTS_VALUE)
+        s->start_time_realtime = av_gettime();
     for (i = 0; i < s->nb_streams; i++) {
         URLContext *fd;
 
@@ -158,6 +158,7 @@ static int sap_write_header(AVFormatContext *s)
         if (ret < 0)
             goto fail;
         s->streams[i]->priv_data = contexts[i];
+        s->streams[i]->time_base = contexts[i]->streams[0]->time_base;
         av_strlcpy(contexts[i]->filename, url, sizeof(contexts[i]->filename));
     }
 
@@ -245,7 +246,7 @@ static int sap_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     AVFormatContext *rtpctx;
     struct SAPState *sap = s->priv_data;
-    int64_t now = av_gettime();
+    int64_t now = av_gettime_relative();
 
     if (!sap->last_time || now - sap->last_time > 5000000) {
         int ret = ffurl_write(sap->ann_fd, sap->ann, sap->ann_size);
@@ -255,7 +256,7 @@ static int sap_write_packet(AVFormatContext *s, AVPacket *pkt)
         sap->last_time = now;
     }
     rtpctx = s->streams[pkt->stream_index]->priv_data;
-    return ff_write_chained(rtpctx, 0, pkt, s);
+    return ff_write_chained(rtpctx, 0, pkt, s, 0);
 }
 
 AVOutputFormat ff_sap_muxer = {

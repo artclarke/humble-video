@@ -29,7 +29,6 @@
 #include "libavutil/lfg.h"
 #include "avcodec.h"
 #include "get_bits.h"
-#include "dsputil.h"
 #include "internal.h"
 #include "mpegaudiodsp.h"
 
@@ -119,7 +118,6 @@ static av_cold int mpc8_decode_init(AVCodecContext * avctx)
     }
     memset(c->oldDSCF, 0, sizeof(c->oldDSCF));
     av_lfg_init(&c->rnd, 0xDEADBEEF);
-    ff_dsputil_init(&c->dsp, avctx);
     ff_mpadsp_init(&c->mpadsp);
 
     ff_mpc_init();
@@ -435,6 +433,7 @@ static av_cold void mpc8_decode_flush(AVCodecContext *avctx)
 
 AVCodec ff_mpc8_decoder = {
     .name           = "mpc8",
+    .long_name      = NULL_IF_CONFIG_SMALL("Musepack SV8"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_MUSEPACK8,
     .priv_data_size = sizeof(MPCContext),
@@ -442,7 +441,6 @@ AVCodec ff_mpc8_decoder = {
     .decode         = mpc8_decode_frame,
     .flush          = mpc8_decode_flush,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Musepack SV8"),
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_NONE },
 };

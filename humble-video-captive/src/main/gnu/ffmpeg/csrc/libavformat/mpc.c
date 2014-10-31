@@ -95,9 +95,8 @@ static int mpc_read_header(AVFormatContext *s)
     st->codec->channel_layout = AV_CH_LAYOUT_STEREO;
     st->codec->bits_per_coded_sample = 16;
 
-    st->codec->extradata_size = 16;
-    st->codec->extradata = av_mallocz(st->codec->extradata_size+FF_INPUT_BUFFER_PADDING_SIZE);
-    avio_read(s->pb, st->codec->extradata, 16);
+    if (ff_get_extradata(st->codec, s->pb, 16) < 0)
+        return AVERROR(ENOMEM);
     st->codec->sample_rate = mpc_rate[st->codec->extradata[2] & 3];
     avpriv_set_pts_info(st, 32, MPC_FRAMESIZE, st->codec->sample_rate);
     /* scan for seekpoints */
@@ -153,7 +152,7 @@ static int mpc_read_packet(AVFormatContext *s, AVPacket *pkt)
     }
     c->curbits = (curbits + size2) & 0x1F;
 
-    if ((ret = av_new_packet(pkt, size)) < 0)
+    if ((ret = av_new_packet(pkt, size + 4)) < 0)
         return ret;
 
     pkt->data[0] = curbits;

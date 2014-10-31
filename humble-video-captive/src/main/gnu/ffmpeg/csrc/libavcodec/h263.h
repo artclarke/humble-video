@@ -26,6 +26,10 @@
 #include "mpegvideo.h"
 #include "rl.h"
 
+#if !FF_API_ASPECT_EXTENDED
+#define FF_ASPECT_EXTENDED 15
+#endif
+
 // The defines below define the number of bits that are read at once for
 // reading vlc values. Changing these may improve speed and data cache needs
 // be aware though that decreasing them may need the number of stages that is
@@ -52,6 +56,10 @@ extern const uint8_t ff_h263_mbtype_b_tab[15][2];
 extern VLC ff_h263_intra_MCBPC_vlc;
 extern VLC ff_h263_inter_MCBPC_vlc;
 extern VLC ff_h263_cbpy_vlc;
+
+extern const uint16_t ff_inter_vlc[103][2];
+extern const int8_t ff_inter_level[102];
+extern const int8_t ff_inter_run[102];
 
 extern RLTable ff_h263_rl_inter;
 
@@ -112,7 +120,6 @@ int av_const h263_get_picture_format(int width, int height);
 
 void ff_clean_h263_qscales(MpegEncContext *s);
 int ff_h263_resync(MpegEncContext *s);
-const uint8_t *ff_h263_find_resync_marker(MpegEncContext *s, const uint8_t *p, const uint8_t *end);
 int ff_h263_get_gob_height(MpegEncContext *s);
 void ff_h263_encode_motion(MpegEncContext * s, int val, int f_code);
 
@@ -189,7 +196,7 @@ static inline int get_p_cbp(MpegEncContext * s,
         for (i = 0; i < 6; i++) {
             if (s->block_last_index[i] >= 0 && ((cbp >> (5 - i))&1)==0 ){
                 s->block_last_index[i]= -1;
-                s->dsp.clear_block(s->block[i]);
+                s->bdsp.clear_block(s->block[i]);
             }
         }
     }else{

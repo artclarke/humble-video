@@ -25,7 +25,7 @@
 
 static av_cold int avui_encode_init(AVCodecContext *avctx)
 {
-    avctx->coded_frame = avcodec_alloc_frame();
+    avctx->coded_frame = av_frame_alloc();
 
     if (avctx->width != 720 || avctx->height != 486 && avctx->height != 576) {
         av_log(avctx, AV_LOG_ERROR, "Only 720x486 and 720x576 are supported.\n");
@@ -52,7 +52,7 @@ static av_cold int avui_encode_init(AVCodecContext *avctx)
 static int avui_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                              const AVFrame *pic, int *got_packet)
 {
-    uint8_t *dst, *src = pic->data[0];
+    uint8_t *dst;
     int i, j, skip, ret, size, interlaced;
 
     interlaced = avctx->field_order > AV_FIELD_PROGRESSIVE;
@@ -74,6 +74,7 @@ static int avui_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
 
     for (i = 0; i <= interlaced; i++) {
+        uint8_t *src;
         if (interlaced && avctx->height == 486) {
             src = pic->data[0] + (1 - i) * pic->linesize[0];
         } else {
@@ -101,6 +102,7 @@ static av_cold int avui_encode_close(AVCodecContext *avctx)
 
 AVCodec ff_avui_encoder = {
     .name         = "avui",
+    .long_name    = NULL_IF_CONFIG_SMALL("Avid Meridien Uncompressed"),
     .type         = AVMEDIA_TYPE_VIDEO,
     .id           = AV_CODEC_ID_AVUI,
     .init         = avui_encode_init,
@@ -108,5 +110,4 @@ AVCodec ff_avui_encoder = {
     .close        = avui_encode_close,
     .capabilities = CODEC_CAP_EXPERIMENTAL,
     .pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_UYVY422, AV_PIX_FMT_NONE },
-    .long_name    = NULL_IF_CONFIG_SMALL("Avid Meridien Uncompressed"),
 };

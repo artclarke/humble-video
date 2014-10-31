@@ -22,6 +22,7 @@
 
 #include "avcodec.h"
 #include "internal.h"
+#include "mathops.h"
 #include "put_bits.h"
 
 #define AES3_HEADER_LEN 4
@@ -163,12 +164,12 @@ static int s302m_encode2_frame(AVCodecContext *avctx, AVPacket *avpkt,
 
 AVCodec ff_s302m_encoder = {
     .name                  = "s302m",
+    .long_name             = NULL_IF_CONFIG_SMALL("SMPTE 302M"),
     .type                  = AVMEDIA_TYPE_AUDIO,
-    .id                    = CODEC_ID_S302M,
+    .id                    = AV_CODEC_ID_S302M,
     .priv_data_size        = sizeof(S302MEncContext),
     .init                  = s302m_encode_init,
     .encode2               = s302m_encode2_frame,
-    .long_name             = NULL_IF_CONFIG_SMALL("SMPTE 302M"),
     .sample_fmts           = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32,
                                                             AV_SAMPLE_FMT_S16,
                                                             AV_SAMPLE_FMT_NONE },

@@ -34,6 +34,7 @@
 #include "h263.h"
 #include "h263data.h"
 #include "mathops.h"
+#include "mpegutils.h"
 #include "unary.h"
 #include "flv.h"
 #include "mpeg4video.h"
@@ -152,8 +153,8 @@ void ff_h263_loop_filter(MpegEncContext * s){
     */
     if (!IS_SKIP(s->current_picture.mb_type[xy])) {
         qp_c= s->qscale;
-        s->dsp.h263_v_loop_filter(dest_y+8*linesize  , linesize, qp_c);
-        s->dsp.h263_v_loop_filter(dest_y+8*linesize+8, linesize, qp_c);
+        s->h263dsp.h263_v_loop_filter(dest_y + 8 * linesize,     linesize, qp_c);
+        s->h263dsp.h263_v_loop_filter(dest_y + 8 * linesize + 8, linesize, qp_c);
     }else
         qp_c= 0;
 
@@ -172,15 +173,15 @@ void ff_h263_loop_filter(MpegEncContext * s){
 
         if(qp_tc){
             const int chroma_qp= s->chroma_qscale_table[qp_tc];
-            s->dsp.h263_v_loop_filter(dest_y  ,   linesize, qp_tc);
-            s->dsp.h263_v_loop_filter(dest_y+8,   linesize, qp_tc);
+            s->h263dsp.h263_v_loop_filter(dest_y,     linesize, qp_tc);
+            s->h263dsp.h263_v_loop_filter(dest_y + 8, linesize, qp_tc);
 
-            s->dsp.h263_v_loop_filter(dest_cb , uvlinesize, chroma_qp);
-            s->dsp.h263_v_loop_filter(dest_cr , uvlinesize, chroma_qp);
+            s->h263dsp.h263_v_loop_filter(dest_cb, uvlinesize, chroma_qp);
+            s->h263dsp.h263_v_loop_filter(dest_cr, uvlinesize, chroma_qp);
         }
 
         if(qp_tt)
-            s->dsp.h263_h_loop_filter(dest_y-8*linesize+8  ,   linesize, qp_tt);
+            s->h263dsp.h263_h_loop_filter(dest_y - 8 * linesize + 8, linesize, qp_tt);
 
         if(s->mb_x){
             if (qp_tt || IS_SKIP(s->current_picture.mb_type[xy - 1 - s->mb_stride]))
@@ -190,17 +191,17 @@ void ff_h263_loop_filter(MpegEncContext * s){
 
             if(qp_dt){
                 const int chroma_qp= s->chroma_qscale_table[qp_dt];
-                s->dsp.h263_h_loop_filter(dest_y -8*linesize  ,   linesize, qp_dt);
-                s->dsp.h263_h_loop_filter(dest_cb-8*uvlinesize, uvlinesize, chroma_qp);
-                s->dsp.h263_h_loop_filter(dest_cr-8*uvlinesize, uvlinesize, chroma_qp);
+                s->h263dsp.h263_h_loop_filter(dest_y  - 8 * linesize,   linesize,   qp_dt);
+                s->h263dsp.h263_h_loop_filter(dest_cb - 8 * uvlinesize, uvlinesize, chroma_qp);
+                s->h263dsp.h263_h_loop_filter(dest_cr - 8 * uvlinesize, uvlinesize, chroma_qp);
             }
         }
     }
 
     if(qp_c){
-        s->dsp.h263_h_loop_filter(dest_y +8,   linesize, qp_c);
+        s->h263dsp.h263_h_loop_filter(dest_y + 8, linesize, qp_c);
         if(s->mb_y + 1 == s->mb_height)
-            s->dsp.h263_h_loop_filter(dest_y+8*linesize+8,   linesize, qp_c);
+            s->h263dsp.h263_h_loop_filter(dest_y + 8 * linesize + 8, linesize, qp_c);
     }
 
     if(s->mb_x){
@@ -211,12 +212,12 @@ void ff_h263_loop_filter(MpegEncContext * s){
             qp_lc = s->current_picture.qscale_table[xy - 1];
 
         if(qp_lc){
-            s->dsp.h263_h_loop_filter(dest_y,   linesize, qp_lc);
+            s->h263dsp.h263_h_loop_filter(dest_y, linesize, qp_lc);
             if(s->mb_y + 1 == s->mb_height){
                 const int chroma_qp= s->chroma_qscale_table[qp_lc];
-                s->dsp.h263_h_loop_filter(dest_y +8*  linesize,   linesize, qp_lc);
-                s->dsp.h263_h_loop_filter(dest_cb             , uvlinesize, chroma_qp);
-                s->dsp.h263_h_loop_filter(dest_cr             , uvlinesize, chroma_qp);
+                s->h263dsp.h263_h_loop_filter(dest_y + 8 * linesize, linesize, qp_lc);
+                s->h263dsp.h263_h_loop_filter(dest_cb, uvlinesize, chroma_qp);
+                s->h263dsp.h263_h_loop_filter(dest_cr, uvlinesize, chroma_qp);
             }
         }
     }
@@ -266,7 +267,7 @@ void ff_h263_pred_acdc(MpegEncContext * s, int16_t *block, int n)
             if (a != 1024) {
                 ac_val -= 16;
                 for(i=1;i<8;i++) {
-                    block[s->dsp.idct_permutation[i<<3]] += ac_val[i];
+                    block[s->idsp.idct_permutation[i << 3]] += ac_val[i];
                 }
                 pred_dc = a;
             }
@@ -275,7 +276,7 @@ void ff_h263_pred_acdc(MpegEncContext * s, int16_t *block, int n)
             if (c != 1024) {
                 ac_val -= 16 * wrap;
                 for(i=1;i<8;i++) {
-                    block[s->dsp.idct_permutation[i   ]] += ac_val[i + 8];
+                    block[s->idsp.idct_permutation[i]] += ac_val[i + 8];
                 }
                 pred_dc = c;
             }
@@ -303,10 +304,10 @@ void ff_h263_pred_acdc(MpegEncContext * s, int16_t *block, int n)
 
     /* left copy */
     for(i=1;i<8;i++)
-        ac_val1[i    ] = block[s->dsp.idct_permutation[i<<3]];
+        ac_val1[i]     = block[s->idsp.idct_permutation[i << 3]];
     /* top copy */
     for(i=1;i<8;i++)
-        ac_val1[8 + i] = block[s->dsp.idct_permutation[i   ]];
+        ac_val1[8 + i] = block[s->idsp.idct_permutation[i]];
 }
 
 int16_t *ff_h263_pred_motion(MpegEncContext * s, int block, int dir,

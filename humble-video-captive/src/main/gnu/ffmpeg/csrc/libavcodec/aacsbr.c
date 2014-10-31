@@ -30,6 +30,7 @@
 #include "sbr.h"
 #include "aacsbr.h"
 #include "aacsbrdata.h"
+#include "aacsbr_tablegen.h"
 #include "fft.h"
 #include "aacps.h"
 #include "sbrdsp.h"
@@ -95,7 +96,6 @@ static void aacsbr_func_ptr_init(AACSBRContext *c);
 
 av_cold void ff_aac_sbr_init(void)
 {
-    int n;
     static const struct {
         const void *sbr_codes, *sbr_bits;
         const unsigned int table_size, elem_size;
@@ -124,13 +124,7 @@ av_cold void ff_aac_sbr_init(void)
     SBR_INIT_VLC_STATIC(8, 592);
     SBR_INIT_VLC_STATIC(9, 512);
 
-    for (n = 1; n < 320; n++)
-        sbr_qmf_window_us[320 + n] = sbr_qmf_window_us[320 - n];
-    sbr_qmf_window_us[384] = -sbr_qmf_window_us[384];
-    sbr_qmf_window_us[512] = -sbr_qmf_window_us[512];
-
-    for (n = 0; n < 320; n++)
-        sbr_qmf_window_ds[n] = sbr_qmf_window_us[2*n];
+    aacsbr_tableinit();
 
     ff_ps_init();
 }
@@ -932,6 +926,7 @@ static void read_sbr_extension(AACContext *ac, SpectralBandReplication *sbr,
         } else {
 #if 1
             *num_bits_left -= ff_ps_read_data(ac->avctx, gb, &sbr->ps, *num_bits_left);
+            ac->avctx->profile = FF_PROFILE_AAC_HE_V2;
 #else
             avpriv_report_missing_feature(ac->avctx, "Parametric Stereo");
             skip_bits_long(gb, *num_bits_left); // bs_fill_bits
@@ -1701,12 +1696,18 @@ void ff_sbr_apply(AACContext *ac, SpectralBandReplication *sbr, int id_aac,
         sbr_qmf_analysis(&ac->fdsp, &sbr->mdct_ana, &sbr->dsp, ch ? R : L, sbr->data[ch].analysis_filterbank_samples,
                          (float*)sbr->qmf_filter_scratch,
                          sbr->data[ch].W, sbr->data[ch].Ypos);
-        sbr->c.sbr_lf_gen(ac, sbr, sbr->X_low, sbr->data[ch].W, sbr->data[ch].Ypos);
+        sbr->c.sbr_lf_gen(ac, sbr, sbr->X_low,
+                          (const float (*)[32][32][2]) sbr->data[ch].W,
+                          sbr->data[ch].Ypos);
         sbr->data[ch].Ypos ^= 1;
         if (sbr->start) {
-            sbr->c.sbr_hf_inverse_filter(&sbr->dsp, sbr->alpha0, sbr->alpha1, sbr->X_low, sbr->k[0]);
+            sbr->c.sbr_hf_inverse_filter(&sbr->dsp, sbr->alpha0, sbr->alpha1,
+                                         (const float (*)[40][2]) sbr->X_low, sbr->k[0]);
             sbr_chirp(sbr, &sbr->data[ch]);
-            sbr_hf_gen(ac, sbr, sbr->X_high, sbr->X_low, sbr->alpha0, sbr->alpha1,
+            sbr_hf_gen(ac, sbr, sbr->X_high,
+                       (const float (*)[40][2]) sbr->X_low,
+                       (const float (*)[2]) sbr->alpha0,
+                       (const float (*)[2]) sbr->alpha1,
                        sbr->data[ch].bw_array, sbr->data[ch].t_env,
                        sbr->data[ch].bs_num_env);
 
@@ -1716,16 +1717,17 @@ void ff_sbr_apply(AACContext *ac, SpectralBandReplication *sbr, int id_aac,
                 sbr_env_estimate(sbr->e_curr, sbr->X_high, sbr, &sbr->data[ch]);
                 sbr_gain_calc(ac, sbr, &sbr->data[ch], sbr->data[ch].e_a);
                 sbr->c.sbr_hf_assemble(sbr->data[ch].Y[sbr->data[ch].Ypos],
-                                sbr->X_high, sbr, &sbr->data[ch],
+                                (const float (*)[40][2]) sbr->X_high,
+                                sbr, &sbr->data[ch],
                                 sbr->data[ch].e_a);
             }
         }
 
         /* synthesis */
         sbr->c.sbr_x_gen(sbr, sbr->X[ch],
-                  sbr->data[ch].Y[1-sbr->data[ch].Ypos],
-                  sbr->data[ch].Y[  sbr->data[ch].Ypos],
-                  sbr->X_low, ch);
+                  (const float (*)[64][2]) sbr->data[ch].Y[1-sbr->data[ch].Ypos],
+                  (const float (*)[64][2]) sbr->data[ch].Y[  sbr->data[ch].Ypos],
+                  (const float (*)[40][2]) sbr->X_low, ch);
     }
 
     if (ac->oc[1].m4ac.ps == 1) {

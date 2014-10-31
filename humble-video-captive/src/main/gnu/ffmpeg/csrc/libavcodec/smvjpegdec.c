@@ -153,8 +153,11 @@ static int smvjpeg_decode_frame(AVCodecContext *avctx, void *data, int *data_siz
 
     /* We shouldn't get here if frames_per_jpeg <= 0 because this was rejected
        in init */
-    avcodec_set_dimensions(avctx, mjpeg_data->width,
-        mjpeg_data->height / s->frames_per_jpeg);
+    ret = ff_set_dimensions(avctx, mjpeg_data->width, mjpeg_data->height / s->frames_per_jpeg);
+    if (ret < 0) {
+        av_log(s, AV_LOG_ERROR, "Failed to set dimensions\n");
+        return ret;
+    }
 
     if (*data_size) {
         s->picture[1]->extended_data = NULL;
@@ -177,13 +180,14 @@ static av_cold int smvjpeg_decode_end(AVCodecContext *avctx)
 {
     SMVJpegDecodeContext *s = avctx->priv_data;
     MJpegDecodeContext *jpg = &s->jpg;
+    int ret;
 
     jpg->picture_ptr = NULL;
     av_frame_free(&s->picture[0]);
     av_frame_free(&s->picture[1]);
-    ff_codec_close_recursive(s->avctx);
+    ret = avcodec_close(s->avctx);
     av_freep(&s->avctx);
-    return 0;
+    return ret;
 }
 
 static const AVClass smvjpegdec_class = {
@@ -194,12 +198,12 @@ static const AVClass smvjpegdec_class = {
 
 AVCodec ff_smvjpeg_decoder = {
     .name           = "smvjpeg",
+    .long_name      = NULL_IF_CONFIG_SMALL("SMV JPEG"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_SMVJPEG,
     .priv_data_size = sizeof(SMVJpegDecodeContext),
     .init           = smvjpeg_decode_init,
     .close          = smvjpeg_decode_end,
     .decode         = smvjpeg_decode_frame,
-    .long_name      = NULL_IF_CONFIG_SMALL("SMV JPEG"),
     .priv_class     = &smvjpegdec_class,
 };

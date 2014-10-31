@@ -1,20 +1,20 @@
 /*
  * Copyright (c) 2012 Justin Ruggles <justin.ruggles@gmail.com>
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -46,6 +46,14 @@ static void calc_ptr_alignment(AudioData *a)
             min_align = cur_align;
     }
     a->ptr_align = min_align;
+}
+
+int ff_sample_fmt_is_planar(enum AVSampleFormat sample_fmt, int channels)
+{
+    if (channels == 1)
+        return 1;
+    else
+        return av_sample_fmt_is_planar(sample_fmt);
 }
 
 int ff_audio_data_set_channels(AudioData *a, int channels)
@@ -81,7 +89,7 @@ int ff_audio_data_init(AudioData *a, uint8_t **src, int plane_size, int channels
         av_log(a, AV_LOG_ERROR, "invalid sample format\n");
         return AVERROR(EINVAL);
     }
-    a->is_planar = av_sample_fmt_is_planar(sample_fmt);
+    a->is_planar = ff_sample_fmt_is_planar(sample_fmt, channels);
     a->planes    = a->is_planar ? channels : 1;
     a->stride    = a->sample_size * (a->is_planar ? 1 : channels);
 
@@ -125,7 +133,7 @@ AudioData *ff_audio_data_alloc(int channels, int nb_samples,
         av_free(a);
         return NULL;
     }
-    a->is_planar = av_sample_fmt_is_planar(sample_fmt);
+    a->is_planar = ff_sample_fmt_is_planar(sample_fmt, channels);
     a->planes    = a->is_planar ? channels : 1;
     a->stride    = a->sample_size * (a->is_planar ? 1 : channels);
 

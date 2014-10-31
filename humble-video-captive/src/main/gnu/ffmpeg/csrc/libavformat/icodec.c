@@ -45,7 +45,7 @@ typedef struct {
 static int probe(AVProbeData *p)
 {
     if (AV_RL16(p->buf) == 0 && AV_RL16(p->buf + 2) == 1 && AV_RL16(p->buf + 4))
-        return AVPROBE_SCORE_MAX / 3;
+        return AVPROBE_SCORE_MAX / 4;
     return 0;
 }
 
@@ -58,7 +58,7 @@ static int read_header(AVFormatContext *s)
     avio_skip(pb, 4);
     ico->nb_images = avio_rl16(pb);
 
-    ico->images = av_malloc(ico->nb_images * sizeof(IcoImage));
+    ico->images = av_malloc_array(ico->nb_images, sizeof(IcoImage));
     if (!ico->images)
         return AVERROR(ENOMEM);
 

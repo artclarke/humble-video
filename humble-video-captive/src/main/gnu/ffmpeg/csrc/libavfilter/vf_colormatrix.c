@@ -17,7 +17,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /**
@@ -37,7 +37,7 @@
 #include "libavutil/pixdesc.h"
 #include "libavutil/avstring.h"
 
-#define NS(n) n < 0 ? (int)(n*65536.0-0.5+DBL_EPSILON) : (int)(n*65536.0+0.5)
+#define NS(n) ((n) < 0 ? (int)((n)*65536.0-0.5+DBL_EPSILON) : (int)((n)*65536.0+0.5))
 #define CB(n) av_clip_uint8(n)
 
 static const double yuv_coeff[4][3][3] = {
@@ -158,14 +158,14 @@ static void calc_coefficients(AVFilterContext *ctx)
     }
 }
 
-static const char *color_modes[] = {"bt709", "fcc", "bt601", "smpte240m"};
+static const char * const color_modes[] = {"bt709", "fcc", "bt601", "smpte240m"};
 
 static av_cold int init(AVFilterContext *ctx)
 {
     ColorMatrixContext *color = ctx->priv;
 
-    if (color->source == COLOR_MODE_NONE || color->dest == COLOR_MODE_NONE) {
-        av_log(ctx, AV_LOG_ERROR, "Unspecified source or destination color space\n");
+    if (color->dest == COLOR_MODE_NONE) {
+        av_log(ctx, AV_LOG_ERROR, "Unspecified destination color space\n");
         return AVERROR(EINVAL);
     }
 
@@ -173,10 +173,6 @@ static av_cold int init(AVFilterContext *ctx)
         av_log(ctx, AV_LOG_ERROR, "Source and destination color space must not be identical\n");
         return AVERROR(EINVAL);
     }
-
-    color->mode = color->source * 4 + color->dest;
-
-    calc_coefficients(ctx);
 
     return 0;
 }
@@ -346,6 +342,33 @@ static int filter_frame(AVFilterLink *link, AVFrame *in)
     }
     av_frame_copy_props(out, in);
 
+    if (color->source == COLOR_MODE_NONE) {
+        enum AVColorSpace cs = av_frame_get_colorspace(in);
+        enum ColorMode source;
+
+        switch(cs) {
+        case AVCOL_SPC_BT709     : source = COLOR_MODE_BT709     ; break;
+        case AVCOL_SPC_FCC       : source = COLOR_MODE_FCC       ; break;
+        case AVCOL_SPC_SMPTE240M : source = COLOR_MODE_SMPTE240M ; break;
+        case AVCOL_SPC_BT470BG   : source = COLOR_MODE_BT601     ; break;
+        default :
+            av_log(ctx, AV_LOG_ERROR, "Input frame does not specify a supported colorspace, and none has been specified as source either\n");
+            av_frame_free(&out);
+            return AVERROR(EINVAL);
+        }
+        color->mode = source * 4 + color->dest;
+    } else
+        color->mode = color->source * 4 + color->dest;
+
+    switch(color->dest) {
+    case COLOR_MODE_BT709    : av_frame_set_colorspace(out, AVCOL_SPC_BT709)    ; break;
+    case COLOR_MODE_FCC      : av_frame_set_colorspace(out, AVCOL_SPC_FCC)      ; break;
+    case COLOR_MODE_SMPTE240M: av_frame_set_colorspace(out, AVCOL_SPC_SMPTE240M); break;
+    case COLOR_MODE_BT601    : av_frame_set_colorspace(out, AVCOL_SPC_BT470BG)  ; break;
+    }
+
+    calc_coefficients(ctx);
+
     if (in->format == AV_PIX_FMT_YUV422P)
         process_frame_yuv422p(color, out, in);
     else if (in->format == AV_PIX_FMT_YUV420P)
@@ -359,10 +382,10 @@ static int filter_frame(AVFilterLink *link, AVFrame *in)
 
 static const AVFilterPad colormatrix_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_VIDEO,
-        .config_props     = config_input,
-        .filter_frame     = filter_frame,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = config_input,
+        .filter_frame = filter_frame,
     },
     { NULL }
 };
@@ -375,10 +398,9 @@ static const AVFilterPad colormatrix_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_colormatrix = {
+AVFilter ff_vf_colormatrix = {
     .name          = "colormatrix",
     .description   = NULL_IF_CONFIG_SMALL("Convert color matrix."),
-
     .priv_size     = sizeof(ColorMatrixContext),
     .init          = init,
     .query_formats = query_formats,

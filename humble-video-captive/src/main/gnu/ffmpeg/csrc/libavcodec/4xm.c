@@ -24,12 +24,16 @@
  * 4XM codec.
  */
 
+#include <inttypes.h>
+
 #include "libavutil/avassert.h"
 #include "libavutil/frame.h"
+#include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
+#include "blockdsp.h"
+#include "bswapdsp.h"
 #include "bytestream.h"
-#include "dsputil.h"
 #include "get_bits.h"
 #include "internal.h"
 
@@ -130,8 +134,10 @@ typedef struct CFrameBuffer {
 
 typedef struct FourXContext {
     AVCodecContext *avctx;
-    DSPContext dsp;
-    AVFrame *current_picture, *last_picture;
+    BlockDSPContext bdsp;
+    BswapDSPContext bbdsp;
+    uint16_t *frame_buffer;
+    uint16_t *last_frame_buffer;
     GetBitContext pre_gb;          ///< ac/dc prefix
     GetBitContext gb;
     GetByteContext g;
@@ -341,7 +347,7 @@ static int decode_p_block(FourXContext *f, uint16_t *dst, uint16_t *src,
     int code        = get_vlc2(&f->gb,
                                block_type_vlc[1 - (f->version > 1)][index].table,
                                BLOCK_TYPE_VLC_BITS, 1);
-    uint16_t *start = (uint16_t *)f->last_picture->data[0];
+    uint16_t *start = f->last_frame_buffer;
     uint16_t *end   = start + stride * (f->avctx->height - h + 1) - (1 << log2w);
     int ret;
     int scale   = 1;
@@ -414,29 +420,18 @@ static int decode_p_block(FourXContext *f, uint16_t *dst, uint16_t *src,
     return 0;
 }
 
-static int decode_p_frame(FourXContext *f, AVFrame *frame,
-                          const uint8_t *buf, int length)
+static int decode_p_frame(FourXContext *f, const uint8_t *buf, int length)
 {
     int x, y;
     const int width  = f->avctx->width;
     const int height = f->avctx->height;
-    uint16_t *dst    = (uint16_t *)frame->data[0];
-    const int stride =             frame->linesize[0] >> 1;
+    uint16_t *dst    = f->frame_buffer;
     uint16_t *src;
     unsigned int bitstream_size, bytestream_size, wordstream_size, extra,
                  bytestream_offset, wordstream_offset;
     int ret;
 
-    if (!f->last_picture->data[0]) {
-        if ((ret = ff_get_buffer(f->avctx, f->last_picture,
-                                 AV_GET_BUFFER_FLAG_REF)) < 0) {
-            return ret;
-        }
-        for (y=0; y<f->avctx->height; y++)
-            memset(f->last_picture->data[0] + y*f->last_picture->linesize[0], 0, 2*f->avctx->width);
-    }
-
-    src = (uint16_t *)f->last_picture->data[0];
+    src = f->last_frame_buffer;
 
     if (f->version > 1) {
         extra           = 20;
@@ -461,14 +456,12 @@ static int decode_p_frame(FourXContext *f, AVFrame *frame,
         return AVERROR_INVALIDDATA;
     }
 
-    av_fast_malloc(&f->bitstream_buffer, &f->bitstream_buffer_size,
-                   bitstream_size + FF_INPUT_BUFFER_PADDING_SIZE);
+    av_fast_padded_malloc(&f->bitstream_buffer, &f->bitstream_buffer_size,
+                          bitstream_size);
     if (!f->bitstream_buffer)
         return AVERROR(ENOMEM);
-    f->dsp.bswap_buf(f->bitstream_buffer, (const uint32_t*)(buf + extra),
-                     bitstream_size / 4);
-    memset((uint8_t*)f->bitstream_buffer + bitstream_size,
-           0, FF_INPUT_BUFFER_PADDING_SIZE);
+    f->bbdsp.bswap_buf(f->bitstream_buffer, (const uint32_t *) (buf + extra),
+                       bitstream_size / 4);
     init_get_bits(&f->gb, f->bitstream_buffer, 8 * bitstream_size);
 
     wordstream_offset = extra + bitstream_size;
@@ -478,14 +471,14 @@ static int decode_p_frame(FourXContext *f, AVFrame *frame,
     bytestream2_init(&f->g, buf + bytestream_offset,
                      length - bytestream_offset);
 
-    init_mv(f, frame->linesize[0]);
+    init_mv(f, width * 2);
 
     for (y = 0; y < height; y += 8) {
         for (x = 0; x < width; x += 8)
-            if ((ret = decode_p_block(f, dst + x, src + x, 3, 3, stride)) < 0)
+            if ((ret = decode_p_block(f, dst + x, src + x, 3, 3, width)) < 0)
                 return ret;
-        src += 8 * stride;
-        dst += 8 * stride;
+        src += 8 * width;
+        dst += 8 * width;
     }
 
     return 0;
@@ -550,12 +543,12 @@ static int decode_i_block(FourXContext *f, int16_t *block)
     return 0;
 }
 
-static inline void idct_put(FourXContext *f, AVFrame *frame, int x, int y)
+static inline void idct_put(FourXContext *f, int x, int y)
 {
     int16_t (*block)[64] = f->block;
-    int stride           = frame->linesize[0] >> 1;
+    int stride           = f->avctx->width;
     int i;
-    uint16_t *dst = ((uint16_t*)frame->data[0]) + y * stride + x;
+    uint16_t *dst = f->frame_buffer + y * stride + x;
 
     for (i = 0; i < 4; i++) {
         block[i][0] += 0x80 * 8 * 8;
@@ -601,7 +594,7 @@ static int decode_i_mb(FourXContext *f)
     int ret;
     int i;
 
-    f->dsp.clear_blocks(f->block[0]);
+    f->bdsp.clear_blocks(f->block[0]);
 
     for (i = 0; i < 6; i++)
         if ((ret = decode_i_block(f, f->block[i])) < 0)
@@ -715,14 +708,13 @@ static int mix(int c0, int c1)
     return red / 3 * 1024 + green / 3 * 32 + blue / 3;
 }
 
-static int decode_i2_frame(FourXContext *f, AVFrame *frame, const uint8_t *buf, int length)
+static int decode_i2_frame(FourXContext *f, const uint8_t *buf, int length)
 {
     int x, y, x2, y2;
     const int width  = f->avctx->width;
     const int height = f->avctx->height;
     const int mbs    = (FFALIGN(width, 16) >> 4) * (FFALIGN(height, 16) >> 4);
-    uint16_t *dst    = (uint16_t*)frame->data[0];
-    const int stride =            frame->linesize[0]>>1;
+    uint16_t *dst    = f->frame_buffer;
     const uint8_t *buf_end = buf + length;
     GetByteContext g3;
 
@@ -753,18 +745,18 @@ static int decode_i2_frame(FourXContext *f, AVFrame *frame, const uint8_t *buf, 
             for (y2 = 0; y2 < 16; y2++) {
                 for (x2 = 0; x2 < 16; x2++) {
                     int index = 2 * (x2 >> 2) + 8 * (y2 >> 2);
-                    dst[y2 * stride + x2] = color[(bits >> index) & 3];
+                    dst[y2 * width + x2] = color[(bits >> index) & 3];
                 }
             }
             dst += 16;
         }
-        dst += 16 * stride - x;
+        dst += 16 * width - x;
     }
 
     return 0;
 }
 
-static int decode_i_frame(FourXContext *f, AVFrame *frame, const uint8_t *buf, int length)
+static int decode_i_frame(FourXContext *f, const uint8_t *buf, int length)
 {
     int x, y, ret;
     const int width  = f->avctx->width;
@@ -803,14 +795,12 @@ static int decode_i_frame(FourXContext *f, AVFrame *frame, const uint8_t *buf, i
 
     prestream_size = length + buf - prestream;
 
-    av_fast_malloc(&f->bitstream_buffer, &f->bitstream_buffer_size,
-                   prestream_size + FF_INPUT_BUFFER_PADDING_SIZE);
+    av_fast_padded_malloc(&f->bitstream_buffer, &f->bitstream_buffer_size,
+                          prestream_size);
     if (!f->bitstream_buffer)
         return AVERROR(ENOMEM);
-    f->dsp.bswap_buf(f->bitstream_buffer, (const uint32_t*)prestream,
-                     prestream_size / 4);
-    memset((uint8_t*)f->bitstream_buffer + prestream_size,
-           0, FF_INPUT_BUFFER_PADDING_SIZE);
+    f->bbdsp.bswap_buf(f->bitstream_buffer, (const uint32_t *) prestream,
+                       prestream_size / 4);
     init_get_bits(&f->pre_gb, f->bitstream_buffer, 8 * prestream_size);
 
     f->last_dc = 0 * 128 * 8 * 8;
@@ -820,7 +810,7 @@ static int decode_i_frame(FourXContext *f, AVFrame *frame, const uint8_t *buf, i
             if ((ret = decode_i_mb(f)) < 0)
                 return ret;
 
-            idct_put(f, frame, x, y);
+            idct_put(f, x, y);
         }
     }
 
@@ -842,8 +832,10 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     if (buf_size < 20)
         return AVERROR_INVALIDDATA;
 
+    av_assert0(avctx->width % 16 == 0 && avctx->height % 16 == 0);
+
     if (buf_size < AV_RL32(buf + 4) + 8) {
-        av_log(f->avctx, AV_LOG_ERROR, "size mismatch %d %d\n",
+        av_log(f->avctx, AV_LOG_ERROR, "size mismatch %d %"PRIu32"\n",
                buf_size, AV_RL32(buf + 4));
         return AVERROR_INVALIDDATA;
     }
@@ -921,29 +913,24 @@ static int decode_frame(AVCodecContext *avctx, void *data,
         frame_size = buf_size - 12;
     }
 
-    FFSWAP(AVFrame*, f->current_picture, f->last_picture);
-
-    // alternatively we would have to use our own buffer management
-    avctx->flags |= CODEC_FLAG_EMU_EDGE;
-
-    if ((ret = ff_reget_buffer(avctx, f->current_picture)) < 0)
+    if ((ret = ff_get_buffer(avctx, picture, 0)) < 0)
         return ret;
 
     if (frame_4cc == AV_RL32("ifr2")) {
-        f->current_picture->pict_type = AV_PICTURE_TYPE_I;
-        if ((ret = decode_i2_frame(f, f->current_picture, buf - 4, frame_size + 4)) < 0) {
+        picture->pict_type = AV_PICTURE_TYPE_I;
+        if ((ret = decode_i2_frame(f, buf - 4, frame_size + 4)) < 0) {
             av_log(f->avctx, AV_LOG_ERROR, "decode i2 frame failed\n");
             return ret;
         }
     } else if (frame_4cc == AV_RL32("ifrm")) {
-        f->current_picture->pict_type = AV_PICTURE_TYPE_I;
-        if ((ret = decode_i_frame(f, f->current_picture, buf, frame_size)) < 0) {
+        picture->pict_type = AV_PICTURE_TYPE_I;
+        if ((ret = decode_i_frame(f, buf, frame_size)) < 0) {
             av_log(f->avctx, AV_LOG_ERROR, "decode i frame failed\n");
             return ret;
         }
     } else if (frame_4cc == AV_RL32("pfrm") || frame_4cc == AV_RL32("pfr2")) {
-        f->current_picture->pict_type = AV_PICTURE_TYPE_P;
-        if ((ret = decode_p_frame(f, f->current_picture, buf, frame_size)) < 0) {
+        picture->pict_type = AV_PICTURE_TYPE_P;
+        if ((ret = decode_p_frame(f, buf, frame_size)) < 0) {
             av_log(f->avctx, AV_LOG_ERROR, "decode p frame failed\n");
             return ret;
         }
@@ -955,10 +942,13 @@ static int decode_frame(AVCodecContext *avctx, void *data,
                buf_size);
     }
 
-    f->current_picture->key_frame = f->current_picture->pict_type == AV_PICTURE_TYPE_I;
+    picture->key_frame = picture->pict_type == AV_PICTURE_TYPE_I;
 
-    if ((ret = av_frame_ref(picture, f->current_picture)) < 0)
-        return ret;
+    av_image_copy_plane(picture->data[0], picture->linesize[0],
+                        (const uint8_t*)f->frame_buffer,  avctx->width * 2,
+                        avctx->width * 2, avctx->height);
+    FFSWAP(uint16_t *, f->frame_buffer, f->last_frame_buffer);
+
     *got_frame = 1;
 
     emms_c();
@@ -966,9 +956,28 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     return buf_size;
 }
 
+static av_cold int decode_end(AVCodecContext *avctx)
+{
+    FourXContext * const f = avctx->priv_data;
+    int i;
+
+    av_freep(&f->frame_buffer);
+    av_freep(&f->last_frame_buffer);
+    av_freep(&f->bitstream_buffer);
+    f->bitstream_buffer_size = 0;
+    for (i = 0; i < CFRAME_BUFFER_COUNT; i++) {
+        av_freep(&f->cfrm[i].data);
+        f->cfrm[i].allocated_size = 0;
+    }
+    ff_free_vlc(&f->pre_vlc);
+
+    return 0;
+}
+
 static av_cold int decode_init(AVCodecContext *avctx)
 {
     FourXContext * const f = avctx->priv_data;
+    int ret;
 
     if (avctx->extradata_size != 4 || !avctx->extradata) {
         av_log(avctx, AV_LOG_ERROR, "extradata wrong or missing\n");
@@ -979,8 +988,20 @@ static av_cold int decode_init(AVCodecContext *avctx)
         return AVERROR_INVALIDDATA;
     }
 
+    ret = av_image_check_size(avctx->width, avctx->height, 0, avctx);
+    if (ret < 0)
+        return ret;
+
+    f->frame_buffer      = av_mallocz(avctx->width * avctx->height * 2);
+    f->last_frame_buffer = av_mallocz(avctx->width * avctx->height * 2);
+    if (!f->frame_buffer || !f->last_frame_buffer) {
+        decode_end(avctx);
+        return AVERROR(ENOMEM);
+    }
+
     f->version = AV_RL32(avctx->extradata) >> 16;
-    ff_dsputil_init(&f->dsp, avctx);
+    ff_blockdsp_init(&f->bdsp, avctx);
+    ff_bswapdsp_init(&f->bbdsp);
     f->avctx = avctx;
     init_vlcs(f);
 
@@ -989,35 +1010,12 @@ static av_cold int decode_init(AVCodecContext *avctx)
     else
         avctx->pix_fmt = AV_PIX_FMT_BGR555;
 
-    f->current_picture = av_frame_alloc();
-    f->last_picture    = av_frame_alloc();
-    if (!f->current_picture  || !f->last_picture)
-        return AVERROR(ENOMEM);
-
-    return 0;
-}
-
-
-static av_cold int decode_end(AVCodecContext *avctx)
-{
-    FourXContext * const f = avctx->priv_data;
-    int i;
-
-    av_freep(&f->bitstream_buffer);
-    f->bitstream_buffer_size = 0;
-    for (i = 0; i < CFRAME_BUFFER_COUNT; i++) {
-        av_freep(&f->cfrm[i].data);
-        f->cfrm[i].allocated_size = 0;
-    }
-    ff_free_vlc(&f->pre_vlc);
-    av_frame_free(&f->current_picture);
-    av_frame_free(&f->last_picture);
-
     return 0;
 }
 
 AVCodec ff_fourxm_decoder = {
     .name           = "4xm",
+    .long_name      = NULL_IF_CONFIG_SMALL("4X Movie"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_4XM,
     .priv_data_size = sizeof(FourXContext),
@@ -1025,5 +1023,4 @@ AVCodec ff_fourxm_decoder = {
     .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("4X Movie"),
 };

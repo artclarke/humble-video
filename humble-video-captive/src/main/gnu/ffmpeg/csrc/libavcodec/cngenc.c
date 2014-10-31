@@ -56,8 +56,8 @@ static av_cold int cng_encode_init(AVCodecContext *avctx)
     p->order = 10;
     if ((ret = ff_lpc_init(&p->lpc, avctx->frame_size, p->order, FF_LPC_TYPE_LEVINSON)) < 0)
         return ret;
-    p->samples32 = av_malloc(avctx->frame_size * sizeof(*p->samples32));
-    p->ref_coef = av_malloc(p->order * sizeof(*p->ref_coef));
+    p->samples32 = av_malloc_array(avctx->frame_size, sizeof(*p->samples32));
+    p->ref_coef = av_malloc_array(p->order, sizeof(*p->ref_coef));
     if (!p->samples32 || !p->ref_coef) {
         cng_encode_close(avctx);
         return AVERROR(ENOMEM);
@@ -104,13 +104,13 @@ static int cng_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 
 AVCodec ff_comfortnoise_encoder = {
     .name           = "comfortnoise",
+    .long_name      = NULL_IF_CONFIG_SMALL("RFC 3389 comfort noise generator"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_COMFORT_NOISE,
     .priv_data_size = sizeof(CNGContext),
     .init           = cng_encode_init,
     .encode2        = cng_encode_frame,
     .close          = cng_encode_close,
-    .long_name      = NULL_IF_CONFIG_SMALL("RFC 3389 comfort noise generator"),
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
                                                      AV_SAMPLE_FMT_NONE },
 };

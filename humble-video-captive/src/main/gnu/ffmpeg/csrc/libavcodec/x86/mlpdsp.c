@@ -20,11 +20,13 @@
  */
 
 #include "libavutil/attributes.h"
+#include "libavutil/cpu.h"
 #include "libavutil/x86/asm.h"
+#include "libavutil/x86/cpu.h"
 #include "libavcodec/mlpdsp.h"
 #include "libavcodec/mlp.h"
 
-#if HAVE_7REGS && HAVE_INLINE_ASM
+#if HAVE_7REGS && HAVE_INLINE_ASM && HAVE_INLINE_ASM_NONLOCAL_LABELS
 
 extern char ff_mlp_firorder_8;
 extern char ff_mlp_firorder_7;
@@ -42,12 +44,12 @@ extern char ff_mlp_iirorder_2;
 extern char ff_mlp_iirorder_1;
 extern char ff_mlp_iirorder_0;
 
-static const void *firtable[9] = { &ff_mlp_firorder_0, &ff_mlp_firorder_1,
+static const void * const firtable[9] = { &ff_mlp_firorder_0, &ff_mlp_firorder_1,
                                    &ff_mlp_firorder_2, &ff_mlp_firorder_3,
                                    &ff_mlp_firorder_4, &ff_mlp_firorder_5,
                                    &ff_mlp_firorder_6, &ff_mlp_firorder_7,
                                    &ff_mlp_firorder_8 };
-static const void *iirtable[5] = { &ff_mlp_iirorder_0, &ff_mlp_iirorder_1,
+static const void * const iirtable[5] = { &ff_mlp_iirorder_0, &ff_mlp_iirorder_1,
                                    &ff_mlp_iirorder_2, &ff_mlp_iirorder_3,
                                    &ff_mlp_iirorder_4 };
 
@@ -176,7 +178,9 @@ static void mlp_filter_channel_x86(int32_t *state, const int32_t *coeff,
 
 av_cold void ff_mlpdsp_init_x86(MLPDSPContext *c)
 {
-#if HAVE_7REGS && HAVE_INLINE_ASM
-    c->mlp_filter_channel = mlp_filter_channel_x86;
+#if HAVE_7REGS && HAVE_INLINE_ASM && HAVE_INLINE_ASM_NONLOCAL_LABELS
+    int cpu_flags = av_get_cpu_flags();
+    if (INLINE_MMX(cpu_flags))
+        c->mlp_filter_channel = mlp_filter_channel_x86;
 #endif
 }

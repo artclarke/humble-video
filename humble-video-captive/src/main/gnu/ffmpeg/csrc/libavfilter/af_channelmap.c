@@ -74,7 +74,7 @@ static const AVOption channelmap_options[] = {
           OFFSET(mapping_str),        AV_OPT_TYPE_STRING, .flags = A|F },
     { "channel_layout", "Output channel layout.",
           OFFSET(channel_layout_str), AV_OPT_TYPE_STRING, .flags = A|F },
-    { NULL },
+    { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(channelmap);
@@ -184,7 +184,7 @@ static av_cold int channelmap_init(AVFilterContext *ctx)
             s->map[i].out_channel_idx = i;
             break;
         case MAP_ONE_STR:
-            if (!get_channel(&mapping, &in_ch, separator)) {
+            if (get_channel(&mapping, &in_ch, separator) < 0) {
                 av_log(ctx, AV_LOG_ERROR, err);
                 return AVERROR(EINVAL);
             }
@@ -312,7 +312,7 @@ static int channelmap_filter_frame(AVFilterLink *inlink, AVFrame *buf)
     if (nch_out > nch_in) {
         if (nch_out > FF_ARRAY_ELEMS(buf->data)) {
             uint8_t **new_extended_data =
-                av_mallocz(nch_out * sizeof(*buf->extended_data));
+                av_mallocz_array(nch_out, sizeof(*buf->extended_data));
             if (!new_extended_data) {
                 av_frame_free(&buf);
                 return AVERROR(ENOMEM);
@@ -337,6 +337,8 @@ static int channelmap_filter_frame(AVFilterLink *inlink, AVFrame *buf)
     if (buf->data != buf->extended_data)
         memcpy(buf->data, buf->extended_data,
            FFMIN(FF_ARRAY_ELEMS(buf->data), nch_out) * sizeof(buf->data[0]));
+
+    buf->channel_layout = outlink->channel_layout;
 
     return ff_filter_frame(outlink, buf);
 }
@@ -397,14 +399,13 @@ static const AVFilterPad avfilter_af_channelmap_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_af_channelmap = {
+AVFilter ff_af_channelmap = {
     .name          = "channelmap",
     .description   = NULL_IF_CONFIG_SMALL("Remap audio channels."),
     .init          = channelmap_init,
     .query_formats = channelmap_query_formats,
     .priv_size     = sizeof(ChannelMapContext),
     .priv_class    = &channelmap_class,
-
     .inputs        = avfilter_af_channelmap_inputs,
     .outputs       = avfilter_af_channelmap_outputs,
 };

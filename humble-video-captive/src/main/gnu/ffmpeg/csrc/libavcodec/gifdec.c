@@ -64,7 +64,6 @@ typedef struct GifState {
     int stored_bg_color;
 
     GetByteContext gb;
-    /* LZW compatible decoder */
     LZWState *lzw;
 
     /* aux buffers */
@@ -130,7 +129,7 @@ static void gif_copy_img_rect(const uint32_t *src, uint32_t *dst,
 
 static int gif_read_image(GifState *s, AVFrame *frame)
 {
-    int left, top, width, height, bits_per_pixel, code_size, flags;
+    int left, top, width, height, bits_per_pixel, code_size, flags, pw;
     int is_interleaved, has_local_palette, y, pass, y1, linesize, pal_size;
     uint32_t *ptr, *pal, *px, *pr, *ptr1;
     int ret;
@@ -140,11 +139,11 @@ static int gif_read_image(GifState *s, AVFrame *frame)
     if (bytestream2_get_bytes_left(&s->gb) < 9)
         return AVERROR_INVALIDDATA;
 
-    left = bytestream2_get_le16u(&s->gb);
-    top = bytestream2_get_le16u(&s->gb);
-    width = bytestream2_get_le16u(&s->gb);
+    left   = bytestream2_get_le16u(&s->gb);
+    top    = bytestream2_get_le16u(&s->gb);
+    width  = bytestream2_get_le16u(&s->gb);
     height = bytestream2_get_le16u(&s->gb);
-    flags = bytestream2_get_byteu(&s->gb);
+    flags  = bytestream2_get_byteu(&s->gb);
     is_interleaved = flags & 0x40;
     has_local_palette = flags & 0x80;
     bits_per_pixel = (flags & 0x07) + 1;
@@ -180,11 +179,28 @@ static int gif_read_image(GifState *s, AVFrame *frame)
     }
 
     /* verify that all the image is inside the screen dimensions */
-    if (left + width > s->screen_width ||
-        top + height > s->screen_height)
+    if (!width || width > s->screen_width || left >= s->screen_width) {
+        av_log(s->avctx, AV_LOG_ERROR, "Invalid image width.\n");
         return AVERROR_INVALIDDATA;
-    if (width <= 0 || height <= 0)
+    }
+    if (!height || height > s->screen_height || top >= s->screen_height) {
+        av_log(s->avctx, AV_LOG_ERROR, "Invalid image height.\n");
         return AVERROR_INVALIDDATA;
+    }
+    if (left + width > s->screen_width) {
+        /* width must be kept around to avoid lzw vs line desync */
+        pw = s->screen_width - left;
+        av_log(s->avctx, AV_LOG_WARNING, "Image too wide by %d, truncating.\n",
+               left + width - s->screen_width);
+    } else {
+        pw = width;
+    }
+    if (top + height > s->screen_height) {
+        /* we don't care about the extra invisible lines */
+        av_log(s->avctx, AV_LOG_WARNING, "Image too high by %d, truncating.\n",
+               top + height - s->screen_height);
+        height = s->screen_height - top;
+    }
 
     /* process disposal method */
     if (s->gce_prev_disposal == GCE_DISPOSAL_BACKGROUND) {
@@ -198,7 +214,7 @@ static int gif_read_image(GifState *s, AVFrame *frame)
 
     if (s->gce_disposal != GCE_DISPOSAL_NONE) {
         s->gce_l = left;  s->gce_t = top;
-        s->gce_w = width; s->gce_h = height;
+        s->gce_w = pw;    s->gce_h = height;
 
         if (s->gce_disposal == GCE_DISPOSAL_BACKGROUND) {
             if (s->transparent_color_index >= 0)
@@ -211,7 +227,7 @@ static int gif_read_image(GifState *s, AVFrame *frame)
                 return AVERROR(ENOMEM);
 
             gif_copy_img_rect((uint32_t *)frame->data[0], s->stored_img,
-                frame->linesize[0] / sizeof(uint32_t), left, top, width, height);
+                frame->linesize[0] / sizeof(uint32_t), left, top, pw, height);
         }
     }
 
@@ -234,10 +250,14 @@ static int gif_read_image(GifState *s, AVFrame *frame)
     pass = 0;
     y1 = 0;
     for (y = 0; y < height; y++) {
-        if (ff_lzw_decode(s->lzw, s->idx_line, width) == 0)
+        int count = ff_lzw_decode(s->lzw, s->idx_line, width);
+        if (count != width) {
+            if (count)
+                av_log(s->avctx, AV_LOG_ERROR, "LZW decode failed\n");
             goto decode_tail;
+        }
 
-        pr = ptr + width;
+        pr = ptr + pw;
 
         for (px = ptr, idx = s->idx_line; px < pr; px++, idx++) {
             if (*idx != s->transparent_color_index)
@@ -251,25 +271,20 @@ static int gif_read_image(GifState *s, AVFrame *frame)
             case 1:
                 y1 += 8;
                 ptr += linesize * 8;
-                if (y1 >= height) {
-                    y1 = pass ? 2 : 4;
-                    ptr = ptr1 + linesize * y1;
-                    pass++;
-                }
                 break;
             case 2:
                 y1 += 4;
                 ptr += linesize * 4;
-                if (y1 >= height) {
-                    y1 = 1;
-                    ptr = ptr1 + linesize;
-                    pass++;
-                }
                 break;
             case 3:
                 y1 += 2;
                 ptr += linesize * 2;
                 break;
+            }
+            while (y1 >= height) {
+                y1 = 4 >> pass;
+                ptr = ptr1 + linesize * y1;
+                pass++;
             }
         } else {
             ptr += linesize;
@@ -298,7 +313,7 @@ static int gif_read_extension(GifState *s)
         return AVERROR_INVALIDDATA;
 
     ext_code = bytestream2_get_byteu(&s->gb);
-    ext_len = bytestream2_get_byteu(&s->gb);
+    ext_len  = bytestream2_get_byteu(&s->gb);
 
     av_dlog(s->avctx, "ext_code=0x%x len=%d\n", ext_code, ext_len);
 
@@ -312,7 +327,7 @@ static int gif_read_extension(GifState *s)
         if (bytestream2_get_bytes_left(&s->gb) < 5)
             return AVERROR_INVALIDDATA;
 
-        gce_flags = bytestream2_get_byteu(&s->gb);
+        gce_flags    = bytestream2_get_byteu(&s->gb);
         bytestream2_skipu(&s->gb, 2);    // delay during which the frame is shown
         gce_transparent_index = bytestream2_get_byteu(&s->gb);
         if (gce_flags & 0x01)
@@ -366,7 +381,7 @@ static int gif_read_header1(GifState *s)
 
     /* read screen header */
     s->transparent_color_index = -1;
-    s->screen_width = bytestream2_get_le16u(&s->gb);
+    s->screen_width  = bytestream2_get_le16u(&s->gb);
     s->screen_height = bytestream2_get_le16u(&s->gb);
 
     v = bytestream2_get_byteu(&s->gb);
@@ -400,7 +415,7 @@ static int gif_read_header1(GifState *s)
 
 static int gif_parse_next_image(GifState *s, AVFrame *frame)
 {
-    while (bytestream2_get_bytes_left(&s->gb)) {
+    while (bytestream2_get_bytes_left(&s->gb) > 0) {
         int code = bytestream2_get_byte(&s->gb);
         int ret;
 
@@ -463,9 +478,8 @@ static int gif_decode_frame(AVCodecContext *avctx, void *data, int *got_frame, A
         if ((ret = gif_read_header1(s)) < 0)
             return ret;
 
-        if ((ret = av_image_check_size(s->screen_width, s->screen_height, 0, avctx)) < 0)
+        if ((ret = ff_set_dimensions(avctx, s->screen_width, s->screen_height)) < 0)
             return ret;
-        avcodec_set_dimensions(avctx, s->screen_width, s->screen_height);
 
         av_frame_unref(s->frame);
         if ((ret = ff_get_buffer(avctx, s->frame, 0)) < 0)
@@ -499,7 +513,7 @@ static int gif_decode_frame(AVCodecContext *avctx, void *data, int *got_frame, A
         return ret;
     *got_frame = 1;
 
-    return avpkt->size;
+    return bytestream2_tell(&s->gb);
 }
 
 static av_cold int gif_decode_close(AVCodecContext *avctx)
@@ -532,6 +546,7 @@ static const AVClass decoder_class = {
 
 AVCodec ff_gif_decoder = {
     .name           = "gif",
+    .long_name      = NULL_IF_CONFIG_SMALL("GIF (Graphics Interchange Format)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_GIF,
     .priv_data_size = sizeof(GifState),
@@ -539,6 +554,5 @@ AVCodec ff_gif_decoder = {
     .close          = gif_decode_close,
     .decode         = gif_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("GIF (Graphics Interchange Format)"),
     .priv_class     = &decoder_class,
 };

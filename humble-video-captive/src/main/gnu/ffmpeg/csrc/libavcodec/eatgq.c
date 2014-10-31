@@ -32,7 +32,7 @@
 #define BITSTREAM_READER_LE
 #include "get_bits.h"
 #include "bytestream.h"
-#include "dsputil.h"
+#include "idctdsp.h"
 #include "aandcttab.h"
 #include "eaidct.h"
 #include "internal.h"
@@ -51,7 +51,7 @@ static av_cold int tgq_decode_init(AVCodecContext *avctx)
     TgqContext *s = avctx->priv_data;
     uint8_t idct_permutation[64];
     s->avctx = avctx;
-    ff_init_scantable_permutation(idct_permutation, FF_NO_IDCT_PERM);
+    ff_init_scantable_permutation(idct_permutation, FF_IDCT_PERM_NONE);
     ff_init_scantable(idct_permutation, &s->scantable, ff_zigzag_direct);
     avctx->time_base = (AVRational){1, 15};
     avctx->pix_fmt   = AV_PIX_FMT_YUV420P;
@@ -157,7 +157,7 @@ static int tgq_decode_mb(TgqContext *s, AVFrame *frame, int mb_y, int mb_x)
     mode = bytestream2_get_byte(&s->gb);
     if (mode > 12) {
         GetBitContext gb;
-        init_get_bits(&gb, s->gb.buffer, FFMIN(bytestream2_get_bytes_left(&s->gb), mode) * 8);
+        init_get_bits8(&gb, s->gb.buffer, FFMIN(bytestream2_get_bytes_left(&s->gb), mode));
         for (i = 0; i < 6; i++)
             tgq_decode_block(s, s->block[i], &gb);
         tgq_idct_put_mb(s, s->block, frame, mb_x, mb_y);
@@ -219,9 +219,10 @@ static int tgq_decode_frame(AVCodecContext *avctx,
         s->height = bytestream2_get_le16u(&s->gb);
     }
 
-    if (s->avctx->width!=s->width || s->avctx->height!=s->height) {
-        avcodec_set_dimensions(s->avctx, s->width, s->height);
-    }
+    ret = ff_set_dimensions(s->avctx, s->width, s->height);
+    if (ret < 0)
+        return ret;
+
     tgq_calculate_qtable(s, bytestream2_get_byteu(&s->gb));
     bytestream2_skip(&s->gb, 3);
 
@@ -242,11 +243,11 @@ static int tgq_decode_frame(AVCodecContext *avctx,
 
 AVCodec ff_eatgq_decoder = {
     .name           = "eatgq",
+    .long_name      = NULL_IF_CONFIG_SMALL("Electronic Arts TGQ video"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_TGQ,
     .priv_data_size = sizeof(TgqContext),
     .init           = tgq_decode_init,
     .decode         = tgq_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Electronic Arts TGQ video"),
 };

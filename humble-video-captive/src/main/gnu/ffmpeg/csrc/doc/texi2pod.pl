@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#!/usr/bin/env perl
 
 #   Copyright (C) 1999, 2000, 2001 Free Software Foundation, Inc.
 
@@ -282,6 +282,14 @@ INF: while(<$inf>) {
         $_ = "\n=over 4\n";
     };
 
+    /^\@(multitable)\s+{.*/ and do {
+        push @endwstack, $endw;
+        push @icstack, $ic;
+        $endw = $1;
+        $ic = "";
+        $_ = "\n=over 4\n";
+    };
+
     /^\@((?:small)?example|display)/ and do {
         push @endwstack, $endw;
         $endw = $1;
@@ -298,10 +306,10 @@ INF: while(<$inf>) {
 
     /^\@tab\s+(.*\S)\s*$/ and $endw eq "multitable" and do {
         my $columns = $1;
-        $columns =~ s/\@tab/ : /;
+        $columns =~ s/\@tab//;
 
-        $_ = " : ". $columns;
-        $chapter =~ s/\n+\s+$//;
+        $_ = $columns;
+        $chapter =~ s/$//;
     };
 
     /^\@itemx?\s*(.+)?$/ and do {
@@ -323,6 +331,9 @@ $inf = pop @instack;
 }
 
 die "No filename or title\n" unless defined $fn && defined $tl;
+
+# always use utf8
+print "=encoding utf8\n\n";
 
 $chapters{NAME} = "$fn \- $tl\n";
 $chapters{FOOTNOTES} .= "=back\n" if exists $chapters{FOOTNOTES};
@@ -377,8 +388,8 @@ sub postprocess
     s/\(?\@xref\{(?:[^\}]*)\}(?:[^.<]|(?:<[^<>]*>))*\.\)?//g;
     s/\s+\(\@pxref\{(?:[^\}]*)\}\)//g;
     s/;\s+\@pxref\{(?:[^\}]*)\}//g;
-    s/\@ref\{(?:[^,\}]*,)(?:[^,\}]*,)([^,\}]*).*\}/$1/g;
-    s/\@ref\{([^\}]*)\}/$1/g;
+    s/\@ref\{(?:[^,\}]*,)(?:[^,\}]*,)([^,\}]*).*\}/B<$1>/g;
+    s/\@ref\{([^\}]*)\}/B<$1>/g;
     s/\@noindent\s*//g;
     s/\@refill//g;
     s/\@gol//g;

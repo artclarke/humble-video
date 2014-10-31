@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <stdint.h>
+
 #include "seek.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/mem.h"
@@ -278,7 +280,7 @@ int64_t ff_gen_syncpoint_search(AVFormatContext *s,
     }
 
     // Initialize syncpoint structures for each stream.
-    sync = av_malloc(s->nb_streams * sizeof(AVSyncPoint));
+    sync = av_malloc_array(s->nb_streams, sizeof(AVSyncPoint));
     if (!sync)
         // cannot allocate helper structure
         return -1;
@@ -400,7 +402,7 @@ AVParserState *ff_store_parser_state(AVFormatContext *s)
     if (!state)
         return NULL;
 
-    state->stream_states = av_malloc(sizeof(AVParserStreamState) * s->nb_streams);
+    state->stream_states = av_malloc_array(s->nb_streams, sizeof(AVParserStreamState));
     if (!state->stream_states) {
         av_free(state);
         return NULL;
@@ -428,13 +430,11 @@ AVParserState *ff_store_parser_state(AVFormatContext *s)
         ss->parser        = st->parser;
         ss->last_IP_pts   = st->last_IP_pts;
         ss->cur_dts       = st->cur_dts;
-        ss->reference_dts = st->reference_dts;
         ss->probe_packets = st->probe_packets;
 
         st->parser        = NULL;
         st->last_IP_pts   = AV_NOPTS_VALUE;
         st->cur_dts       = AV_NOPTS_VALUE;
-        st->reference_dts = AV_NOPTS_VALUE;
         st->probe_packets = MAX_PROBE_PACKETS;
     }
 
@@ -467,7 +467,6 @@ void ff_restore_parser_state(AVFormatContext *s, AVParserState *state)
         st->parser        = ss->parser;
         st->last_IP_pts   = ss->last_IP_pts;
         st->cur_dts       = ss->cur_dts;
-        st->reference_dts = ss->reference_dts;
         st->probe_packets = ss->probe_packets;
     }
 
