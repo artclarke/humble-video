@@ -1,7 +1,7 @@
 /*****************************************************************************
  * opencl.c: OpenCL initialization and kernel compilation
  *****************************************************************************
- * Copyright (C) 2012-2013 x264 project
+ * Copyright (C) 2012-2014 x264 project
  *
  * Authors: Steve Borho <sborho@multicorewareinc.com>
  *          Anton Mitrofanov <BugMaster@narod.ru>
@@ -28,7 +28,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#define ocl_open LoadLibrary( "OpenCL" )
+#define ocl_open LoadLibraryW( L"OpenCL" )
 #define ocl_close FreeLibrary
 #define ocl_address GetProcAddress
 #else
@@ -122,7 +122,7 @@ static int x264_detect_switchable_graphics( void );
 static cl_program x264_opencl_cache_load( x264_t *h, const char *dev_name, const char *dev_vendor, const char *driver_version )
 {
     /* try to load cached program binary */
-    FILE *fp = fopen( h->param.psz_clbin_file, "rb" );
+    FILE *fp = x264_fopen( h->param.psz_clbin_file, "rb" );
     if( !fp )
         return NULL;
 
@@ -135,7 +135,8 @@ static cl_program x264_opencl_cache_load( x264_t *h, const char *dev_name, const
     rewind( fp );
     CHECKED_MALLOC( binary, size );
 
-    fread( binary, 1, size, fp );
+    if ( fread( binary, 1, size, fp ) != size )
+        goto fail;
     const uint8_t *ptr = (const uint8_t*)binary;
 
 #define CHECK_STRING( STR )\
@@ -169,7 +170,7 @@ fail:
  * is also saved in the cache file so we do not reuse stale binaries */
 static void x264_opencl_cache_save( x264_t *h, cl_program program, const char *dev_name, const char *dev_vendor, const char *driver_version )
 {
-    FILE *fp = fopen( h->param.psz_clbin_file, "wb" );
+    FILE *fp = x264_fopen( h->param.psz_clbin_file, "wb" );
     if( !fp )
     {
         x264_log( h, X264_LOG_INFO, "OpenCL: unable to open clbin file for write\n" );
@@ -304,7 +305,7 @@ static cl_program x264_opencl_compile( x264_t *h )
         goto fail;
     }
 
-    FILE *log_file = fopen( "x264_kernel_build_log.txt", "w" );
+    FILE *log_file = x264_fopen( "x264_kernel_build_log.txt", "w" );
     if( !log_file )
     {
         x264_log( h, X264_LOG_WARNING, "OpenCL: Compilation failed, unable to create file x264_kernel_build_log.txt\n" );
@@ -672,9 +673,9 @@ static int x264_detect_switchable_graphics( void )
     int ret = 0;
 
 #ifdef _WIN32
-    hDLL = LoadLibrary( "atiadlxx.dll" );
+    hDLL = LoadLibraryW( L"atiadlxx.dll" );
     if( !hDLL )
-        hDLL = LoadLibrary( "atiadlxy.dll" );
+        hDLL = LoadLibraryW( L"atiadlxy.dll" );
 #else
     hDLL = dlopen( "libatiadlxx.so", RTLD_LAZY|RTLD_GLOBAL );
 #endif

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * thread.c: threaded input
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -88,7 +88,11 @@ static int read_frame( cli_pic_t *p_pic, hnd_t handle, int i_frame )
     if( h->next_frame == i_frame )
         XCHG( cli_pic_t, *p_pic, h->pic );
     else
+    {
+        if( h->next_frame >= 0 )
+            thread_input.release_frame( &h->pic, handle );
         ret |= h->input.read_frame( p_pic, h->p_handle, i_frame );
+    }
 
     if( !h->frame_total || i_frame+1 < h->frame_total )
     {

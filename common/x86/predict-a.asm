@@ -1,11 +1,11 @@
 ;*****************************************************************************
 ;* predict-a.asm: x86 intra prediction
 ;*****************************************************************************
-;* Copyright (C) 2005-2013 x264 project
+;* Copyright (C) 2005-2014 x264 project
 ;*
 ;* Authors: Loren Merritt <lorenm@u.washington.edu>
 ;*          Holger Lubitz <holger@lubitz.org>
-;*          Jason Garrett-Glaser <darkshikari@gmail.com>
+;*          Fiona Glaser <fiona@x264.com>
 ;*          Henrik Gramner <henrik@gramner.com>
 ;*
 ;* This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,6 @@
 
 SECTION_RODATA 32
 
-pw_0to15:    dw 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 pw_43210123: times 2 dw -3, -2, -1, 0, 1, 2, 3, 4
 pw_m3:       times 16 dw -3
 pw_m7:       times 16 dw -7
@@ -56,6 +55,7 @@ cextern pw_8
 cextern pw_16
 cextern pw_00ff
 cextern pw_pixel_max
+cextern pw_0to15
 
 %macro STORE8 1
     mova [r0+0*FDEC_STRIDEB], %1

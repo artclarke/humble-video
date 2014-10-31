@@ -1,7 +1,7 @@
 /*****************************************************************************
  * matroska_ebml.c: matroska muxer utilities
  *****************************************************************************
- * Copyright (C) 2005-2013 x264 project
+ * Copyright (C) 2005-2014 x264 project
  *
  * Authors: Mike Matsnev <mike@haali.su>
  *
@@ -74,10 +74,9 @@ static mk_context *mk_create_context( mk_writer *w, mk_context *parent, unsigned
     }
     else
     {
-        c = malloc( sizeof(*c) );
+        c = calloc( 1, sizeof(mk_context) );
         if( !c )
             return NULL;
-        memset( c, 0, sizeof(*c) );
     }
 
     c->parent = parent;
@@ -291,11 +290,9 @@ static int mk_write_float( mk_context *c, unsigned id, float f )
 
 mk_writer *mk_create_writer( const char *filename )
 {
-    mk_writer *w = malloc( sizeof(*w) );
+    mk_writer *w = calloc( 1, sizeof(mk_writer) );
     if( !w )
         return NULL;
-
-    memset( w, 0, sizeof(*w) );
 
     w->root = mk_create_context( w, NULL, 0 );
     if( !w->root )
@@ -307,7 +304,7 @@ mk_writer *mk_create_writer( const char *filename )
     if( !strcmp( filename, "-" ) )
         w->fp = stdout;
     else
-        w->fp = fopen( filename, "wb" );
+        w->fp = x264_fopen( filename, "wb" );
     if( !w->fp )
     {
         mk_destroy_contexts( w );
@@ -320,13 +317,15 @@ mk_writer *mk_create_writer( const char *filename )
     return w;
 }
 
+static const uint8_t mk_stereo_modes[6] = {5,9,7,1,3,13};
+
 int mk_write_header( mk_writer *w, const char *writing_app,
                      const char *codec_id,
                      const void *codec_private, unsigned codec_private_size,
                      int64_t default_frame_duration,
                      int64_t timescale,
                      unsigned width, unsigned height,
-                     unsigned d_width, unsigned d_height, int display_size_units )
+                     unsigned d_width, unsigned d_height, int display_size_units, int stereo_mode )
 {
     mk_context  *c, *ti, *v;
 
@@ -382,6 +381,8 @@ int mk_write_header( mk_writer *w, const char *writing_app,
     CHECK( mk_write_uint( v, 0x54b2, display_size_units ) );
     CHECK( mk_write_uint( v, 0x54b0, d_width ) );
     CHECK( mk_write_uint( v, 0x54ba, d_height ) );
+    if( stereo_mode >= 0 && stereo_mode <= 5 )
+        CHECK( mk_write_uint( v, 0x53b8, mk_stereo_modes[stereo_mode] ) );
     CHECK( mk_close_context( v, 0 ) );
 
     CHECK( mk_close_context( ti, 0 ) );

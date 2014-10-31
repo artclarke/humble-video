@@ -1,7 +1,7 @@
 ;*****************************************************************************
 ;* sad16-a.asm: x86 high depth sad functions
 ;*****************************************************************************
-;* Copyright (C) 2010-2013 x264 project
+;* Copyright (C) 2010-2014 x264 project
 ;*
 ;* Authors: Oskar Arvidsson <oskar@irock.se>
 ;*          Henrik Gramner <henrik@gramner.com>
@@ -519,6 +519,19 @@ SAD_X 4, 16,  8
 SAD_X 4,  8, 16
 SAD_X 4,  8,  8
 SAD_X 4,  8,  4
+INIT_XMM xop
+%define XMM_REGS 7
+SAD_X 3, 16, 16
+SAD_X 3, 16,  8
+SAD_X 3,  8, 16
+SAD_X 3,  8,  8
+SAD_X 3,  8,  4
+%define XMM_REGS 9
+SAD_X 4, 16, 16
+SAD_X 4, 16,  8
+SAD_X 4,  8, 16
+SAD_X 4,  8,  8
+SAD_X 4,  8,  4
 INIT_YMM avx2
 %define XMM_REGS 7
 SAD_X 3, 16, 16
@@ -533,7 +546,12 @@ SAD_X 4, 16,  8
 
 %macro INTRA_SAD_X3_4x4 0
 cglobal intra_sad_x3_4x4, 3,3,7
+%if cpuflag(ssse3)
     movddup   m0, [r1-1*FDEC_STRIDEB]
+%else
+    movq      m0, [r1-1*FDEC_STRIDEB]
+    punpcklqdq m0, m0
+%endif
     movq      m1, [r0+0*FENC_STRIDEB]
     movq      m2, [r0+2*FENC_STRIDEB]
     pshuflw   m6, m0, q1032

@@ -1,10 +1,10 @@
 ;*****************************************************************************
 ;* deblock-a.asm: x86 deblocking
 ;*****************************************************************************
-;* Copyright (C) 2005-2013 x264 project
+;* Copyright (C) 2005-2014 x264 project
 ;*
 ;* Authors: Loren Merritt <lorenm@u.washington.edu>
-;*          Jason Garrett-Glaser <darkshikari@gmail.com>
+;*          Fiona Glaser <fiona@x264.com>
 ;*          Oskar Arvidsson <oskar@irock.se>
 ;*
 ;* This program is free software; you can redistribute it and/or modify
@@ -621,7 +621,7 @@ cglobal deblock_v_luma_intra, 4,7,16
     mov     r6, 2
     mova    m0, [pw_2]
     LOAD_AB aa, bb, r2d, r3d
-.loop
+.loop:
     mova    p2, [r4+r1]
     mova    p1, [r4+2*r1]
     mova    p0, [r4+r5]
@@ -671,7 +671,7 @@ cglobal deblock_h_luma_intra, 4,7,16
     add     r4, r0     ; pix+4*stride
     mov     r6, 2
     mova    m0, [pw_2]
-.loop
+.loop:
     movu    q3, [r0-8]
     movu    q2, [r0+r1-8]
     movu    q1, [r0+r1*2-8]
@@ -804,35 +804,6 @@ DEBLOCK_LUMA_INTRA
 %define PASS8ROWS(base, base3, stride, stride3, offset) \
     PASS8ROWS(base+offset, base3+offset, stride, stride3)
 
-; in: 8 rows of 4 bytes in %4..%11
-; out: 4 rows of 8 bytes in m0..m3
-%macro TRANSPOSE4x8_LOAD 11
-    movh       m0, %4
-    movh       m2, %5
-    movh       m1, %6
-    movh       m3, %7
-    punpckl%1  m0, m2
-    punpckl%1  m1, m3
-    mova       m2, m0
-    punpckl%2  m0, m1
-    punpckh%2  m2, m1
-
-    movh       m4, %8
-    movh       m6, %9
-    movh       m5, %10
-    movh       m7, %11
-    punpckl%1  m4, m6
-    punpckl%1  m5, m7
-    mova       m6, m4
-    punpckl%2  m4, m5
-    punpckh%2  m6, m5
-
-    punpckh%3  m1, m0, m4
-    punpckh%3  m3, m2, m6
-    punpckl%3  m0, m4
-    punpckl%3  m2, m6
-%endmacro
-
 ; in: 4 rows of 8 bytes in m0..m3
 ; out: 8 rows of 4 bytes in %1..%8
 %macro TRANSPOSE8x4B_STORE 8
@@ -844,24 +815,24 @@ DEBLOCK_LUMA_INTRA
     punpcklbw  m2, m3
     punpcklwd  m1, m0, m2
     punpckhwd  m0, m2
-    movh       %1, m1
+    movd       %1, m1
     punpckhdq  m1, m1
-    movh       %2, m1
-    movh       %3, m0
+    movd       %2, m1
+    movd       %3, m0
     punpckhdq  m0, m0
-    movh       %4, m0
+    movd       %4, m0
 
     punpckhdq  m3, m3
     punpcklbw  m4, m5
     punpcklbw  m6, m3
     punpcklwd  m5, m4, m6
     punpckhwd  m4, m6
-    movh       %5, m5
+    movd       %5, m5
     punpckhdq  m5, m5
-    movh       %6, m5
-    movh       %7, m4
+    movd       %6, m5
+    movd       %7, m4
     punpckhdq  m4, m4
-    movh       %8, m4
+    movd       %8, m4
 %endmacro
 
 ; in: 8 rows of 4 bytes in %9..%10
@@ -877,34 +848,94 @@ DEBLOCK_LUMA_INTRA
     pextrd %8, %10, 3
 %endmacro
 
-%macro TRANSPOSE4x8B_LOAD 8
-    TRANSPOSE4x8_LOAD bw, wd, dq, %1, %2, %3, %4, %5, %6, %7, %8
-%endmacro
-
-%macro TRANSPOSE4x8W_LOAD 8
-%if mmsize==16
-    TRANSPOSE4x8_LOAD wd, dq, qdq, %1, %2, %3, %4, %5, %6, %7, %8
-%else
+; in: 4 rows of 4 words in %1..%4
+; out: 4 rows of 4 word in m0..m3
+; clobbers: m4
+%macro TRANSPOSE4x4W_LOAD 4-8
+%if mmsize==8
     SWAP  1, 4, 2, 3
-    mova  m0, [t5]
-    mova  m1, [t5+r1]
-    mova  m2, [t5+r1*2]
-    mova  m3, [t5+t6]
+    movq  m0, %1
+    movq  m1, %2
+    movq  m2, %3
+    movq  m3, %4
     TRANSPOSE4x4W 0, 1, 2, 3, 4
+%else
+    movq       m0, %1
+    movq       m2, %2
+    movq       m1, %3
+    movq       m3, %4
+    punpcklwd  m0, m2
+    punpcklwd  m1, m3
+    mova       m2, m0
+    punpckldq  m0, m1
+    punpckhdq  m2, m1
+    movhlps    m1, m0
+    movhlps    m3, m2
 %endif
 %endmacro
 
-%macro TRANSPOSE8x2W_STORE 8
+; in: 2 rows of 4 words in m1..m2
+; out: 4 rows of 2 words in %1..%4
+; clobbers: m0, m1
+%macro TRANSPOSE4x2W_STORE 4-8
+%if mmsize==8
     punpckhwd  m0, m1, m2
     punpcklwd  m1, m2
-%if mmsize==8
+%else
+    punpcklwd  m1, m2
+    movhlps    m0, m1
+%endif
     movd       %3, m0
     movd       %1, m1
     psrlq      m1, 32
     psrlq      m0, 32
     movd       %2, m1
     movd       %4, m0
+%endmacro
+
+; in: 4/8 rows of 4 words in %1..%8
+; out: 4 rows of 4/8 word in m0..m3
+; clobbers: m4, m5, m6, m7
+%macro TRANSPOSE4x8W_LOAD 8
+%if mmsize==8
+    TRANSPOSE4x4W_LOAD %1, %2, %3, %4
 %else
+    movq       m0, %1
+    movq       m2, %2
+    movq       m1, %3
+    movq       m3, %4
+    punpcklwd  m0, m2
+    punpcklwd  m1, m3
+    mova       m2, m0
+    punpckldq  m0, m1
+    punpckhdq  m2, m1
+
+    movq       m4, %5
+    movq       m6, %6
+    movq       m5, %7
+    movq       m7, %8
+    punpcklwd  m4, m6
+    punpcklwd  m5, m7
+    mova       m6, m4
+    punpckldq  m4, m5
+    punpckhdq  m6, m5
+
+    punpckhqdq m1, m0, m4
+    punpckhqdq m3, m2, m6
+    punpcklqdq m0, m4
+    punpcklqdq m2, m6
+%endif
+%endmacro
+
+; in: 2 rows of 4/8 words in m1..m2
+; out: 4/8 rows of 2 words in %1..%8
+; clobbers: m0, m1
+%macro TRANSPOSE8x2W_STORE 8
+%if mmsize==8
+    TRANSPOSE4x2W_STORE %1, %2, %3, %4
+%else
+    punpckhwd  m0, m1, m2
+    punpcklwd  m1, m2
     movd       %5, m0
     movd       %1, m1
     psrldq     m1, 4
@@ -1118,7 +1149,7 @@ DEBLOCK_LUMA_INTRA
 %endif
     mova     m6, [pb_1]
     psubusb  m4, m6              ; alpha - 1
-    psubusb  m5, m6              ; alpha - 2
+    psubusb  m5, m6              ; beta - 1
 %if %0>2
     mova     %3, m4
 %endif
@@ -1361,19 +1392,18 @@ cglobal deblock_%1_luma, 5,5,8,2*%2
 ;-----------------------------------------------------------------------------
 ; void deblock_h_luma( uint8_t *pix, intptr_t stride, int alpha, int beta, int8_t *tc0 )
 ;-----------------------------------------------------------------------------
-
 %if cpuflag(avx)
 INIT_XMM cpuname
 %else
 INIT_MMX cpuname
 %endif
-cglobal deblock_h_luma, 0,5,8,0x60+HAVE_ALIGNED_STACK*12
-    mov    r0, r0mp
+cglobal deblock_h_luma, 1,5,8,0x60+12
     mov    r3, r1m
     lea    r4, [r3*3]
     sub    r0, 4
     lea    r1, [r0+r4]
-    %define pix_tmp esp+12*HAVE_ALIGNED_STACK
+    %define pix_tmp esp+12
+    ; esp is intentionally misaligned to make it aligned after pushing the arguments for deblock_%1_luma.
 
     ; transpose 6x16 -> tmp space
     TRANSPOSE6x8_MEM  PASS8ROWS(r0, r1, r3, r4), pix_tmp
@@ -2098,17 +2128,14 @@ DEBLOCK_CHROMA
 ;-----------------------------------------------------------------------------
 %macro DEBLOCK_H_CHROMA_420_MBAFF 0
 cglobal deblock_h_chroma_mbaff, 5,7,8
-    sub    r0, 4
-    lea    t6, [r1*3]
-    mov    t5, r0
-    add    r0, t6
-    TRANSPOSE4x8W_LOAD PASS8ROWS(t5, r0, r1, t6)
+    CHROMA_H_START
+    TRANSPOSE4x4W_LOAD PASS8ROWS(t5, r0, r1, t6)
     LOAD_MASK  r2d, r3d
     movd       m6, [r4] ; tc0
     punpcklbw  m6, m6
     pand       m7, m6
     DEBLOCK_P0_Q0
-    TRANSPOSE8x2W_STORE PASS8ROWS(t5, r0, r1, t6, 2)
+    TRANSPOSE4x2W_STORE PASS8ROWS(t5, r0, r1, t6, 2)
     RET
 %endmacro
 
@@ -2249,9 +2276,9 @@ DEBLOCK_CHROMA_INTRA
 INIT_MMX mmx2
 cglobal deblock_h_chroma_intra_mbaff, 4,6,8
     CHROMA_H_START
-    TRANSPOSE4x8W_LOAD  PASS8ROWS(t5, r0, r1, t6)
+    TRANSPOSE4x4W_LOAD  PASS8ROWS(t5, r0, r1, t6)
     call chroma_intra_body
-    TRANSPOSE8x2W_STORE PASS8ROWS(t5, r0, r1, t6, 2)
+    TRANSPOSE4x2W_STORE PASS8ROWS(t5, r0, r1, t6, 2)
     RET
 %endif ; !HIGH_BIT_DEPTH
 

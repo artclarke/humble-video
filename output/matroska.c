@@ -1,7 +1,7 @@
 /*****************************************************************************
  * matroska.c: matroska muxer
  *****************************************************************************
- * Copyright (C) 2005-2013 x264 project
+ * Copyright (C) 2005-2014 x264 project
  *
  * Authors: Mike Matsnev <mike@haali.su>
  *
@@ -33,6 +33,7 @@ typedef struct
     int width, height, d_width, d_height;
 
     int display_size_units;
+    int stereo_mode;
 
     int64_t frame_duration;
 
@@ -44,15 +45,10 @@ typedef struct
 
 static int open_file( char *psz_filename, hnd_t *p_handle, cli_output_opt_t *opt )
 {
-    mkv_hnd_t *p_mkv;
-
     *p_handle = NULL;
-
-    p_mkv  = malloc( sizeof(*p_mkv) );
+    mkv_hnd_t *p_mkv = calloc( 1, sizeof(mkv_hnd_t) );
     if( !p_mkv )
         return -1;
-
-    memset( p_mkv, 0, sizeof(*p_mkv) );
 
     p_mkv->w = mk_create_writer( psz_filename );
     if( !p_mkv->w )
@@ -84,6 +80,7 @@ static int set_param( hnd_t handle, x264_param_t *p_param )
     p_mkv->width = p_mkv->d_width = p_param->i_width;
     p_mkv->height = p_mkv->d_height = p_param->i_height;
     p_mkv->display_size_units = DS_PIXELS;
+    p_mkv->stereo_mode = p_param->i_frame_packing;
 
     if( p_param->vui.i_sar_width && p_param->vui.i_sar_height
         && p_param->vui.i_sar_width != p_param->vui.i_sar_height )
@@ -152,7 +149,7 @@ static int write_headers( hnd_t handle, x264_nal_t *p_nal )
     ret = mk_write_header( p_mkv->w, "x264" X264_VERSION, "V_MPEG4/ISO/AVC",
                            avcC, avcC_len, p_mkv->frame_duration, 50000,
                            p_mkv->width, p_mkv->height,
-                           p_mkv->d_width, p_mkv->d_height, p_mkv->display_size_units );
+                           p_mkv->d_width, p_mkv->d_height, p_mkv->display_size_units, p_mkv->stereo_mode );
     if( ret < 0 )
         return ret;
 

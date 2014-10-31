@@ -1,7 +1,7 @@
 /*****************************************************************************
  * flv.c: flv muxer
  *****************************************************************************
- * Copyright (C) 2009-2013 x264 project
+ * Copyright (C) 2009-2014 x264 project
  *
  * Authors: Kieran Kunhya <kieran@kunhya.com>
  *
@@ -75,11 +75,10 @@ static int write_header( flv_buffer *c )
 
 static int open_file( char *psz_filename, hnd_t *p_handle, cli_output_opt_t *opt )
 {
-    flv_hnd_t *p_flv = malloc( sizeof(*p_flv) );
     *p_handle = NULL;
+    flv_hnd_t *p_flv = calloc( 1, sizeof(flv_hnd_t) );
     if( !p_flv )
         return -1;
-    memset( p_flv, 0, sizeof(*p_flv) );
 
     p_flv->b_dts_compress = opt->use_dts_compress;
 

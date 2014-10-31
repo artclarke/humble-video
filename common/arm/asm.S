@@ -1,7 +1,7 @@
 /*****************************************************************************
  * asm.S: arm utility macros
  *****************************************************************************
- * Copyright (C) 2008-2013 x264 project
+ * Copyright (C) 2008-2014 x264 project
  *
  * Authors: Mans Rullgard <mans@mansr.com>
  *          David Conrad <lessen42@gmail.com>
@@ -26,6 +26,8 @@
 
 #include "config.h"
 
+.syntax unified
+
 #ifdef PREFIX
 #   define EXTERN_ASM _
 #else
@@ -38,32 +40,38 @@
 #   define ELF @
 #endif
 
-        .macro require8, val=1
+.macro require8, val=1
 ELF     .eabi_attribute 24, \val
-        .endm
+.endm
 
-        .macro preserve8, val=1
+.macro preserve8, val=1
 ELF     .eabi_attribute 25, \val
-        .endm
+.endm
 
-        .macro function name
-        .global EXTERN_ASM\name
+.macro function name, export=1
         .align  2
+.if \export == 1
+        .global EXTERN_ASM\name
+ELF     .hidden EXTERN_ASM\name
+ELF     .type   EXTERN_ASM\name, %function
+        .func   EXTERN_ASM\name
 EXTERN_ASM\name:
+.else
 ELF     .hidden \name
 ELF     .type   \name, %function
         .func   \name
 \name:
-        .endm
+.endif
+.endm
 
-        .macro movrel rd, val
+.macro movrel rd, val
 #if HAVE_ARMV6T2 && !defined(PIC)
         movw            \rd, #:lower16:\val
         movt            \rd, #:upper16:\val
 #else
         ldr             \rd, =\val
 #endif
-        .endm
+.endm
 
 .macro movconst rd, val
 #if HAVE_ARMV6T2
@@ -75,6 +83,10 @@ ELF     .type   \name, %function
     ldr         \rd, =\val
 #endif
 .endm
+
+#define GLUE(a, b) a ## b
+#define JOIN(a, b) GLUE(a, b)
+#define X(s) JOIN(EXTERN_ASM, s)
 
 #define FENC_STRIDE 16
 #define FDEC_STRIDE 32

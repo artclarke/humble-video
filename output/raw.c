@@ -1,7 +1,7 @@
 /*****************************************************************************
  * raw.c: raw muxer
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -30,7 +30,7 @@ static int open_file( char *psz_filename, hnd_t *p_handle, cli_output_opt_t *opt
 {
     if( !strcmp( psz_filename, "-" ) )
         *p_handle = stdout;
-    else if( !(*p_handle = fopen( psz_filename, "w+b" )) )
+    else if( !(*p_handle = x264_fopen( psz_filename, "w+b" )) )
         return -1;
 
     return 0;
