@@ -25,6 +25,16 @@ AC_DEFINE(LIB_MAJOR_VERSION, [LIB_MAJOR_VERSION], [Major version of library])
 AC_DEFINE(LIB_MINOR_VERSION, [LIB_MINOR_VERSION], [Minor version of library])
 CRYPTO_REQ=libssl,libcrypto
 AC_SUBST([CRYPTO_REQ])
+PUBLIC_LIBS=
+AC_SUBST([PUBLIC_LIBS])
+
+PRIVATE_LIBS=
+case $host_os in
+  *mingw*|*cygwin*)
+  PRIVATE_LIBS=-lws2_32 -lwinmm -lgdi32
+  ;;
+esac
+AC_SUBST([PRIVATE_LIBS])
 
 # Checks for programs.
 AC_PROG_CXX

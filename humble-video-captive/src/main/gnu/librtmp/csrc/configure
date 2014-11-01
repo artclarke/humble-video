@@ -617,7 +617,6 @@ ac_func_list=
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
-PRIVATE_LIBS
 POW_LIB
 LIBOBJS
 OPENSSL_LIBS
@@ -652,6 +651,8 @@ CPP
 ac_ct_CXX
 CXXFLAGS
 CXX
+PRIVATE_LIBS
+PUBLIC_LIBS
 CRYPTO_REQ
 LIB_MINOR_VERSION
 LIB_MAJOR_VERSION
@@ -4360,6 +4361,16 @@ $as_echo "#define LIB_MAJOR_VERSION LIB_MAJOR_VERSION" >>confdefs.h
 $as_echo "#define LIB_MINOR_VERSION LIB_MINOR_VERSION" >>confdefs.h
 
 CRYPTO_REQ=libssl,libcrypto
+
+PUBLIC_LIBS=
+
+
+PRIVATE_LIBS=
+case $host_os in
+  *mingw*|*cygwin*)
+  PRIVATE_LIBS=-lws2_32 -lwinmm -lgdi32
+  ;;
+esac
 
 
 # Checks for programs.
