@@ -127,6 +127,7 @@ int MAIN(int argc, char **argv)
 #endif
 	char *hmac_key=NULL;
 	char *mac_name=NULL;
+	int non_fips_allow = 0;
 	STACK_OF(OPENSSL_STRING) *sigopts = NULL, *macopts = NULL;
 
 	apps_startup();
@@ -215,6 +216,10 @@ int MAIN(int argc, char **argv)
 			out_bin = 1;
 		else if (strcmp(*argv,"-d") == 0)
 			debug=1;
+		else if (!strcmp(*argv,"-fips-fingerprint"))
+			hmac_key = "etaonrishdlcupfm";
+		else if (strcmp(*argv,"-non-fips-allow") == 0)
+			non_fips_allow=1;
 		else if (!strcmp(*argv,"-hmac"))
 			{
 			if (--argc < 1)
@@ -395,6 +400,13 @@ int MAIN(int argc, char **argv)
 			goto end;
 		}
 
+	if (non_fips_allow)
+		{
+		EVP_MD_CTX *md_ctx;
+		BIO_get_md_ctx(bmd,&md_ctx);
+		EVP_MD_CTX_set_flags(md_ctx, EVP_MD_CTX_FLAG_NON_FIPS_ALLOW);
+		}
+
 	if (hmac_key)
 		{
 		sigkey = EVP_PKEY_new_mac_key(EVP_PKEY_HMAC, e,
@@ -415,9 +427,9 @@ int MAIN(int argc, char **argv)
 			goto end;
 			}
 		if (do_verify)
-			r = EVP_DigestVerifyInit(mctx, &pctx, md, e, sigkey);
+			r = EVP_DigestVerifyInit(mctx, &pctx, md, NULL, sigkey);
 		else
-			r = EVP_DigestSignInit(mctx, &pctx, md, e, sigkey);
+			r = EVP_DigestSignInit(mctx, &pctx, md, NULL, sigkey);
 		if (!r)
 			{
 			BIO_printf(bio_err, "Error setting context\n");

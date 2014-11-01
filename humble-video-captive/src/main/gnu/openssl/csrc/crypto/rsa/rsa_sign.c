@@ -77,6 +77,14 @@ int RSA_sign(int type, const unsigned char *m, unsigned int m_len,
 	const unsigned char *s = NULL;
 	X509_ALGOR algor;
 	ASN1_OCTET_STRING digest;
+#ifdef OPENSSL_FIPS
+	if (FIPS_mode() && !(rsa->meth->flags & RSA_FLAG_FIPS_METHOD)
+			&& !(rsa->flags & RSA_FLAG_NON_FIPS_ALLOW))
+		{
+		RSAerr(RSA_F_RSA_SIGN, RSA_R_NON_FIPS_RSA_METHOD);
+		return 0;
+		}
+#endif
 	if((rsa->flags & RSA_FLAG_SIGN_VER) && rsa->meth->rsa_sign)
 		{
 		return rsa->meth->rsa_sign(type, m, m_len,
@@ -143,6 +151,25 @@ int RSA_sign(int type, const unsigned char *m, unsigned int m_len,
 	return(ret);
 	}
 
+/*
+ * Check DigestInfo structure does not contain extraneous data by reencoding
+ * using DER and checking encoding against original. 
+ */
+static int rsa_check_digestinfo(X509_SIG *sig, const unsigned char *dinfo, int dinfolen)
+	{
+	unsigned char *der = NULL;
+	int derlen;
+	int ret = 0;
+	derlen = i2d_X509_SIG(sig, &der);
+	if (derlen <= 0)
+		return 0;
+	if (derlen == dinfolen && !memcmp(dinfo, der, derlen))
+		ret = 1;
+	OPENSSL_cleanse(der, derlen);
+	OPENSSL_free(der);
+	return ret;
+	}
+
 int int_rsa_verify(int dtype, const unsigned char *m,
 			  unsigned int m_len,
 			  unsigned char *rm, size_t *prm_len,
@@ -152,6 +179,15 @@ int int_rsa_verify(int dtype, const unsigned char *m,
 	int i,ret=0,sigtype;
 	unsigned char *s;
 	X509_SIG *sig=NULL;
+
+#ifdef OPENSSL_FIPS
+	if (FIPS_mode() && !(rsa->meth->flags & RSA_FLAG_FIPS_METHOD)
+			&& !(rsa->flags & RSA_FLAG_NON_FIPS_ALLOW))
+		{
+		RSAerr(RSA_F_INT_RSA_VERIFY, RSA_R_NON_FIPS_RSA_METHOD);
+		return 0;
+		}
+#endif
 
 	if (siglen != (unsigned int)RSA_size(rsa))
 		{
@@ -182,6 +218,22 @@ int int_rsa_verify(int dtype, const unsigned char *m,
 	i=RSA_public_decrypt((int)siglen,sigbuf,s,rsa,RSA_PKCS1_PADDING);
 
 	if (i <= 0) goto err;
+	/* Oddball MDC2 case: signature can be OCTET STRING.
+	 * check for correct tag and length octets.
+	 */
+	if (dtype == NID_mdc2 && i == 18 && s[0] == 0x04 && s[1] == 0x10)
+		{
+		if (rm)
+			{
+			memcpy(rm, s + 2, 16);
+			*prm_len = 16;
+			ret = 1;
+			}
+		else if(memcmp(m, s + 2, 16))
+			RSAerr(RSA_F_INT_RSA_VERIFY,RSA_R_BAD_SIGNATURE);
+		else
+			ret = 1;
+		}
 
 	/* Special case: SSL signature */
 	if(dtype == NID_md5_sha1) {
@@ -195,7 +247,7 @@ int int_rsa_verify(int dtype, const unsigned char *m,
 		if (sig == NULL) goto err;
 
 		/* Excess data can be used to create forgeries */
-		if(p != s+i)
+		if(p != s+i || !rsa_check_digestinfo(sig, s, i))
 			{
 			RSAerr(RSA_F_INT_RSA_VERIFY,RSA_R_BAD_SIGNATURE);
 			goto err;
