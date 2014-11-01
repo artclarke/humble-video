@@ -2,11 +2,11 @@
 # Process this file with autoconf to produce a configure script.
 
 m4_define([MLIB_MAJOR_VERSION], [2])
-m4_define([MLIB_MINOR_VERSION], [2])
+m4_define([MLIB_MINOR_VERSION], [4])
 AC_PREREQ(2.63b)
 AC_INIT([librtmp],[MLIB_MAJOR_VERSION.MLIB_MINOR_VERSION],[info@humble.io])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([-Wall -Werror no-dependencies nostdinc tar-pax 1.10.2 ])
+AM_INIT_AUTOMAKE([-Wall -Werror no-dependencies nostdinc tar-pax subdir-objects 1.10.2 ])
 AM_PROG_AR
 AM_SILENT_RULES([yes])
 AC_CANONICAL_BUILD
@@ -39,6 +39,7 @@ LT_PREREQ([2.2.7b])
 LT_INIT([disable-fast-install win32-dll])
 
 # Checks for libraries.
+PKG_CHECK_MODULES([ZLIB], [zlib >= 1 ])
 PKG_CHECK_MODULES([OPENSSL], [openssl >= 1 ])
 AC_CHECK_HEADERS([windows.h])
 AC_CHECK_HEADERS([mmsystem.h], [], [], [
