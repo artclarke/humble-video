@@ -153,6 +153,13 @@ case $host in
   ;;
   *darwin*)
   HOST_TYPE=Mac
+  VS_CFLAGS+="-Wno-error=unused-command-line-argument "
+  VS_LDFLAGS+="-Wno-error=unused-command-line-argument "
+  case $host_cpu in
+     *i?86*)
+     VS_LDFLAGS+="-Wl,-read_only_relocs -Wl,suppress "
+     ;;
+  esac
   ;;
   *linux*)
   HOST_TYPE=Linux
