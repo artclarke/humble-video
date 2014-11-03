@@ -43,7 +43,8 @@ case $HOST_OS in
     # Rather than expensively detect the compiler version, I'm going to hard-code
     # darwin builds for now to debug (no assembly) and wait for a compiler or ffmpeg
     # fix
-    VS_DEBUG=1
+#    VS_DEBUG=1
+  FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-pthreads"
   ;;
 esac
 if [ "@VS_CROSS_COMPILE@" = "1" ]; then
