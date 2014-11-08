@@ -7,6 +7,7 @@ AC_PREREQ(2.63b)
 AC_INIT([librtmp],[MLIB_MAJOR_VERSION.MLIB_MINOR_VERSION],[info@humble.io])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror no-dependencies nostdinc tar-pax subdir-objects 1.10.2 ])
+
 AM_PROG_AR
 AM_SILENT_RULES([yes])
 AC_CANONICAL_BUILD
@@ -36,17 +37,21 @@ case $host_os in
 esac
 AC_SUBST([PRIVATE_LIBS])
 
+LT_PREREQ([2.2.7b])
+LT_INIT([disable-fast-install win32-dll disable-shared dlopen])
+PKG_PROG_PKG_CONFIG
+
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-
-LT_PREREQ([2.2.7b])
-LT_INIT([disable-fast-install win32-dll])
+#AC_LIBTOOL_DLOPEN
+#AC_PROG_LIBTOOL
 
 # Checks for libraries.
 PKG_CHECK_MODULES([ZLIB], [zlib >= 1 ])
