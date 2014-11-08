@@ -639,6 +639,7 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 POW_LIB
 LIBOBJS
+CRYPTO_LIBS
 OPENSSL_LIBS
 OPENSSL_CFLAGS
 ZLIB_LIBS
@@ -1412,7 +1413,7 @@ Optional Features:
   --disable-silent-rules  verbose build output (undo: "make V=0")
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=no]
-  --enable-shared[=PKGS]  build shared libraries [default=no]
+  --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
 
@@ -8113,7 +8114,14 @@ test -z "$OBJDUMP" && OBJDUMP=objdump
 
 
 
-# Check whether --enable-shared was given.
+
+
+
+        enable_dlopen=no
+
+
+
+            # Check whether --enable-shared was given.
 if test "${enable_shared+set}" = set; then :
   enableval=$enable_shared; p=${PACKAGE-default}
     case $enableval in
@@ -8133,16 +8141,11 @@ if test "${enable_shared+set}" = set; then :
       ;;
     esac
 else
-  enable_shared=no
+  enable_shared=yes
 fi
 
 
 
-
-
-
-
-enable_dlopen=yes
 
 
 
@@ -16579,8 +16582,6 @@ $as_echo "no" >&6; }
   SET_MAKE="MAKE=${MAKE-make}"
 fi
 
-#AC_LIBTOOL_DLOPEN
-#AC_PROG_LIBTOOL
 
 # Checks for libraries.
 
@@ -16765,6 +16766,7 @@ else
 $as_echo "yes" >&6; }
 
 fi
+#PKG_CHECK_MODULES([CRYPTO], [crypto >= 1 ])
 for ac_header in windows.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "windows.h" "ac_cv_header_windows_h" "$ac_includes_default"
@@ -16875,6 +16877,48 @@ _ACEOF
   LIBS="-lpthread $LIBS"
 
 fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlopen in -ldl" >&5
+$as_echo_n "checking for dlopen in -ldl... " >&6; }
+if ${ac_cv_lib_dl_dlopen+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ldl  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dlopen ();
+int
+main ()
+{
+return dlopen ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_dl_dlopen=yes
+else
+  ac_cv_lib_dl_dlopen=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_dl_dlopen" >&5
+$as_echo "$ac_cv_lib_dl_dlopen" >&6; }
+if test "x$ac_cv_lib_dl_dlopen" = xyes; then :
+  CRYPTO_LIBS="-ldl"
+fi
+
+
 
 
 # Checks for header files.
