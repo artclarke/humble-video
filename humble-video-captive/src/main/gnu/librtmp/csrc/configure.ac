@@ -38,7 +38,7 @@ esac
 AC_SUBST([PRIVATE_LIBS])
 
 LT_PREREQ([2.2.7b])
-LT_INIT([disable-fast-install win32-dll disable-shared dlopen])
+LT_INIT([disable-fast-install win32-dll])
 PKG_PROG_PKG_CONFIG
 
 # Checks for programs.
@@ -50,12 +50,11 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-#AC_LIBTOOL_DLOPEN
-#AC_PROG_LIBTOOL
 
 # Checks for libraries.
 PKG_CHECK_MODULES([ZLIB], [zlib >= 1 ])
 PKG_CHECK_MODULES([OPENSSL], [openssl >= 1 ])
+#PKG_CHECK_MODULES([CRYPTO], [crypto >= 1 ])
 AC_CHECK_HEADERS([windows.h])
 AC_CHECK_HEADERS([mmsystem.h], [], [], [
 #ifdef HAVE_WINDOWS_H
@@ -84,6 +83,9 @@ AC_TRY_LINK(
 ]
 )
 AC_CHECK_LIB([pthread], [pthread_create])
+AC_CHECK_LIB([dl], [dlopen], [CRYPTO_LIBS="-ldl"])
+AC_SUBST([CRYPTO_LIBS])
+
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/param.h sys/socket.h unistd.h])

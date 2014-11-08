@@ -5,25 +5,25 @@ bin_PROGRAMS = rtmpdump rtmpgw rtmpsrv rtmpsuck
 rtmpdump_SOURCES = \
   src/rtmpdump.c
 
-rtmpdump_LDADD = librtmp.la $(OPENSSL_LIBS) $(ZLIB_LIBS)
+rtmpdump_LDADD = librtmp.la $(OPENSSL_LIBS) $(CRYPTO_LIBS) $(ZLIB_LIBS)
 
 rtmpgw_SOURCES = \
  src/rtmpgw.c \
  src/thread.c
 
-rtmpgw_LDADD = librtmp.la $(OPENSSL_LIBS) $(ZLIB_LIBS)
+rtmpgw_LDADD = librtmp.la $(OPENSSL_LIBS) $(CRYPTO_LIBS) $(ZLIB_LIBS)
 
 rtmpsrv_SOURCES =  \
   src/rtmpsrv.c \
   src/thread.c
 
-rtmpsrv_LDADD = librtmp.la $(OPENSSL_LIBS) $(ZLIB_LIBS)
+rtmpsrv_LDADD = librtmp.la $(OPENSSL_LIBS) $(CRYPTO_LIBS) $(ZLIB_LIBS)
 
 rtmpsuck_SOURCES = \
   src/rtmpsuck.c \
   src/thread.c
 
-rtmpsuck_LDADD = librtmp.la $(OPENSSL_LIBS) $(ZLIB_LIBS)
+rtmpsuck_LDADD = librtmp.la $(OPENSSL_LIBS) $(CRYPTO_LIBS) $(ZLIB_LIBS)
 
 noinst_HEADERS = src/thread.h
 
@@ -35,7 +35,7 @@ AM_CFLAGS+=-DUSE_OPENSSL
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = librtmp.pc
 
-librtmp_la_LIBADD= $(OPENSSL_LIBS) $(ZLIB_LIBS)
+librtmp_la_LIBADD= $(OPENSSL_LIBS) $(CRYPTO_LIBS) $(ZLIB_LIBS)
 librtmp_la_LDFLAGS=-version-number @LIB_MAJOR_VERSION@:@LIB_MINOR_VERSION@
 
 librtmp_la_SOURCES= \
