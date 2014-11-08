@@ -14,7 +14,8 @@ else
 fi
 
 
-PKG_CONFIG_PATH="@libdir@/pkgconfig" \
+export PKG_CONFIG_PATH="@libdir@/pkgconfig"
+
 CC="@CC@" \
 CFLAGS="-O2 -I@includedir@ @CFLAGS@" \
 LD="@LD@" \
