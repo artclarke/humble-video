@@ -134,8 +134,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(librtmp_ladir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-librtmp_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+librtmp_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_librtmp_la_OBJECTS = src/librtmp/amf.lo src/librtmp/log.lo \
 	src/librtmp/rtmp.lo src/librtmp/hashswf.lo \
@@ -152,19 +151,19 @@ PROGRAMS = $(bin_PROGRAMS)
 am_rtmpdump_OBJECTS = src/rtmpdump.$(OBJEXT)
 rtmpdump_OBJECTS = $(am_rtmpdump_OBJECTS)
 rtmpdump_DEPENDENCIES = librtmp.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1)
 am_rtmpgw_OBJECTS = src/rtmpgw.$(OBJEXT) src/thread.$(OBJEXT)
 rtmpgw_OBJECTS = $(am_rtmpgw_OBJECTS)
 rtmpgw_DEPENDENCIES = librtmp.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1)
 am_rtmpsrv_OBJECTS = src/rtmpsrv.$(OBJEXT) src/thread.$(OBJEXT)
 rtmpsrv_OBJECTS = $(am_rtmpsrv_OBJECTS)
 rtmpsrv_DEPENDENCIES = librtmp.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1)
 am_rtmpsuck_OBJECTS = src/rtmpsuck.$(OBJEXT) src/thread.$(OBJEXT)
 rtmpsuck_OBJECTS = $(am_rtmpsuck_OBJECTS)
 rtmpsuck_DEPENDENCIES = librtmp.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -261,7 +260,6 @@ CC = @CC@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
-CRYPTO_LIBS = @CRYPTO_LIBS@
 CRYPTO_REQ = @CRYPTO_REQ@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
