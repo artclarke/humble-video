@@ -26,16 +26,6 @@ AC_DEFINE(LIB_MAJOR_VERSION, [LIB_MAJOR_VERSION], [Major version of library])
 AC_DEFINE(LIB_MINOR_VERSION, [LIB_MINOR_VERSION], [Minor version of library])
 CRYPTO_REQ=libssl,libcrypto
 AC_SUBST([CRYPTO_REQ])
-PUBLIC_LIBS=
-AC_SUBST([PUBLIC_LIBS])
-
-PRIVATE_LIBS=
-case $host_os in
-  *mingw*|*cygwin*)
-  PRIVATE_LIBS=-lws2_32 -lwinmm -lgdi32
-  ;;
-esac
-AC_SUBST([PRIVATE_LIBS])
 
 LT_PREREQ([2.2.7b])
 LT_INIT([disable-fast-install win32-dll])
@@ -83,9 +73,6 @@ AC_TRY_LINK(
 ]
 )
 AC_CHECK_LIB([pthread], [pthread_create])
-AC_CHECK_LIB([dl], [dlopen], [CRYPTO_LIBS="-ldl"])
-AC_SUBST([CRYPTO_LIBS])
-
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/param.h sys/socket.h unistd.h])
@@ -112,6 +99,9 @@ AC_CHECK_FUNCS([gethostbyname inet_ntoa memchr memset select socket strcasecmp s
 
 PRIVATE_LIBS="${LIBS}"
 AC_SUBST([PRIVATE_LIBS])
+PUBLIC_LIBS="${LIBS}"
+AC_SUBST([PUBLIC_LIBS])
+
 
 AC_CONFIG_FILES([Makefile
 librtmp.pc:src/librtmp/librtmp.pc.in])
