@@ -163,7 +163,7 @@ case $host in
   ;;
   *linux*)
   HOST_TYPE=Linux
-  VS_LDFLAGS+="-Wl,-Bsymbolic"
+  VS_LDFLAGS+="-Wl,-Bsymbolic "
   ;;
   *)
   HOST_TYPE=Linux
@@ -331,6 +331,8 @@ AC_FUNC_MALLOC
 # Check for 64-bit stdio; not available on windows
 AC_FUNC_FSEEKO
 AC_CHECK_FUNCS([memmove memset])
+
+AC_CHECK_LIB(rt,clock_gettime,[VS_LDFLAGS+="-lrt "])
 
 AC_LANG_WERROR
 AC_MSG_CHECKING([if you're now hunting rabbits as well]) #'
