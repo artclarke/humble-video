@@ -44,34 +44,13 @@ AC_PROG_MAKE_SET
 # Checks for libraries.
 PKG_CHECK_MODULES([ZLIB], [zlib >= 1 ])
 PKG_CHECK_MODULES([OPENSSL], [openssl >= 1 ])
-#PKG_CHECK_MODULES([CRYPTO], [crypto >= 1 ])
+
 AC_CHECK_HEADERS([windows.h])
 AC_CHECK_HEADERS([mmsystem.h], [], [], [
 #ifdef HAVE_WINDOWS_H
 #include <windows.h>
 #endif
 ])
-AC_MSG_CHECKING([for timeGetTime in -lwinmm])
-RTMP_CACHED_LIBS="${LIBS}"
-LIBS="-lwinmm ${LIBS}"
-AC_TRY_LINK(
-[
-#ifdef HAVE_WINDOWS_H
-#include <windows.h>
-#endif
-#ifdef HAVE_MMSYSTEM_H
-#include <mmsystem.h>
-#endif
-],
-[ (void) timeGetTime(); ],
-[ 
-  AC_MSG_RESULT([yes])
-],
-[
- AC_MSG_RESULT([no])
- LIBS="${RTMP_CACHED_LIBS}"
-]
-)
 AC_CHECK_LIB([pthread], [pthread_create])
 
 # Checks for header files.
@@ -99,7 +78,7 @@ AC_CHECK_FUNCS([gethostbyname inet_ntoa memchr memset select socket strcasecmp s
 
 case $host_os in
   *mingw*|*cygwin*)
-  LIBS+=" -lws2_32 -lwinmm -lgdi32"
+  LIBS+="-lssl -lcrypto -lz -lws2_32 -lwinmm -lgdi32"
   ;;
 esac
 PRIVATE_LIBS="${LIBS}"
