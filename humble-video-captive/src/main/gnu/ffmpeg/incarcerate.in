@@ -23,6 +23,7 @@ FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-cflags=-I@includedir@"
 FFMPEG_OPTIONS="$FFMPEG_OPTIONS --extra-ldflags=-L@libdir@"
 # Set up a place where pkg-config looks for installed packages
 export PKG_CONFIG_PATH="@libdir@/pkgconfig"
+FFMPEG_OPTIONS="$FFMPEG_OPTIONS --pkg-config-flags=--static"
 
 FFMPEG_OPTIONS="$FFMPEG_OPTIONS --disable-shared"
 FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-pic"
