@@ -16755,7 +16755,7 @@ else
 $as_echo "yes" >&6; }
 
 fi
-#PKG_CHECK_MODULES([CRYPTO], [crypto >= 1 ])
+
 for ac_header in windows.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "windows.h" "ac_cv_header_windows_h" "$ac_includes_default"
@@ -16785,43 +16785,6 @@ fi
 
 done
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for timeGetTime in -lwinmm" >&5
-$as_echo_n "checking for timeGetTime in -lwinmm... " >&6; }
-RTMP_CACHED_LIBS="${LIBS}"
-LIBS="-lwinmm ${LIBS}"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#ifdef HAVE_WINDOWS_H
-#include <windows.h>
-#endif
-#ifdef HAVE_MMSYSTEM_H
-#include <mmsystem.h>
-#endif
-
-int
-main ()
-{
- (void) timeGetTime();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-else
-
- { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
- LIBS="${RTMP_CACHED_LIBS}"
-
-
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for pthread_create in -lpthread" >&5
 $as_echo_n "checking for pthread_create in -lpthread... " >&6; }
 if ${ac_cv_lib_pthread_pthread_create+:} false; then :
@@ -17956,7 +17919,7 @@ done
 
 case $host_os in
   *mingw*|*cygwin*)
-  LIBS+=" -lws2_32 -lwinmm -lgdi32"
+  LIBS+="-lssl -lcrypto -lz -lws2_32 -lwinmm -lgdi32"
   ;;
 esac
 PRIVATE_LIBS="${LIBS}"
