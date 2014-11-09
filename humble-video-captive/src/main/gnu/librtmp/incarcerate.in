@@ -15,6 +15,7 @@ fi
 
 
 export PKG_CONFIG_PATH="@libdir@/pkgconfig"
+export PKG_CONFIG="pkg-config --static"
 
 CC="@CC@" \
 CFLAGS="-O2 -I@includedir@ @CFLAGS@" \
