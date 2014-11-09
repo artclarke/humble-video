@@ -97,6 +97,11 @@ AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([gethostbyname inet_ntoa memchr memset select socket strcasecmp strchr strdup strerror strncasecmp strrchr strstr strtol])
 
+case $host_os in
+  *mingw*|*cygwin*)
+  LIBS+=" -lws2_32 -lwinmm -lgdi32"
+  ;;
+esac
 PRIVATE_LIBS="${LIBS}"
 AC_SUBST([PRIVATE_LIBS])
 PUBLIC_LIBS="${LIBS}"
