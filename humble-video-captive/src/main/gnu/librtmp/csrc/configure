@@ -17954,6 +17954,11 @@ fi
 done
 
 
+case $host_os in
+  *mingw*|*cygwin*)
+  LIBS+=" -lws2_32 -lwinmm -lgdi32"
+  ;;
+esac
 PRIVATE_LIBS="${LIBS}"
 
 PUBLIC_LIBS="${LIBS}"
