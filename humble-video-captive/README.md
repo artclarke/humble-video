@@ -3,7 +3,7 @@ The `humble-video-captive` directory contains all the native libraries that Humb
 In humble-video, we compile versions of every library as a static library, and then the
 `humble-video-native` directory creates a shared library that links against those static libraries. The process involved copying (or git subtreeing) the relevant source code into the captive directory, and then 'incarcerating' them with Humble-specific build scripts.
 
-The dependency tree is complicated, but looks like this (liboil and spandsp are not included in the AGPL version):
+The dependency tree is complicated, but looks like this:
 ```
 
   libz
