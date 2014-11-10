@@ -1,7 +1,7 @@
 /*****************************************************************************
  * common.c: misc common functions
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Loren Merritt <lorenm@u.washington.edu>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -31,6 +31,9 @@
 
 #if HAVE_MALLOC_H
 #include <malloc.h>
+#endif
+#if HAVE_THP
+#include <sys/mman.h>
 #endif
 
 const int x264_bit_depth = BIT_DEPTH;
@@ -668,6 +671,8 @@ int x264_param_parse( x264_param_t *p, const char *name, const char *value )
     }
     OPT("bluray-compat")
         p->b_bluray_compat = atobool(value);
+    OPT("avcintra-class")
+        p->i_avcintra_class = atoi(value);
     OPT("sar")
     {
         b_error = ( 2 != sscanf( value, "%d:%d", &p->vui.i_sar_width, &p->vui.i_sar_height ) &&
@@ -876,10 +881,6 @@ int x264_param_parse( x264_param_t *p, const char *name, const char *value )
     }
     OPT("log")
         p->i_log_level = atoi(value);
-#if HAVE_VISUALIZE
-    OPT("visualize")
-        p->b_visualize = atobool(value);
-#endif
     OPT("dump-yuv")
         p->psz_dump_yuv = strdup(value);
     OPT2("analyse", "partitions")
@@ -1031,6 +1032,8 @@ int x264_param_parse( x264_param_t *p, const char *name, const char *value )
         p->b_vfr_input = !atobool(value);
     OPT("nal-hrd")
         b_error |= parse_enum( value, x264_nal_hrd_names, &p->i_nal_hrd );
+    OPT("filler")
+        p->rc.b_filler = atobool(value);
     OPT("pic-struct")
         p->b_pic_struct = atobool(value);
     OPT("fake-interlaced")
@@ -1099,7 +1102,7 @@ static void x264_log_default( void *p_unused, int i_level, const char *psz_fmt, 
             break;
     }
     fprintf( stderr, "x264 [%s]: ", psz_prefix );
-    vfprintf( stderr, psz_fmt, arg );
+    x264_vfprintf( stderr, psz_fmt, arg );
 }
 
 /****************************************************************************
@@ -1141,7 +1144,7 @@ int x264_picture_alloc( x264_picture_t *pic, int i_csp, int i_width, int i_heigh
     };
 
     int csp = i_csp & X264_CSP_MASK;
-    if( csp <= X264_CSP_NONE || csp >= X264_CSP_MAX )
+    if( csp <= X264_CSP_NONE || csp >= X264_CSP_MAX || csp == X264_CSP_V210 )
         return -1;
     x264_picture_init( pic );
     pic->img.i_csp = i_csp;
@@ -1183,7 +1186,25 @@ void *x264_malloc( int i_size )
 {
     uint8_t *align_buf = NULL;
 #if HAVE_MALLOC_H
-    align_buf = memalign( NATIVE_ALIGN, i_size );
+#if HAVE_THP
+#define HUGE_PAGE_SIZE 2*1024*1024
+#define HUGE_PAGE_THRESHOLD HUGE_PAGE_SIZE*7/8 /* FIXME: Is this optimal? */
+    /* Attempt to allocate huge pages to reduce TLB misses. */
+    if( i_size >= HUGE_PAGE_THRESHOLD )
+    {
+        align_buf = memalign( HUGE_PAGE_SIZE, i_size );
+        if( align_buf )
+        {
+            /* Round up to the next huge page boundary if we are close enough. */
+            size_t madv_size = (i_size + HUGE_PAGE_SIZE - HUGE_PAGE_THRESHOLD) & ~(HUGE_PAGE_SIZE-1);
+            madvise( align_buf, madv_size, MADV_HUGEPAGE );
+        }
+    }
+    else
+#undef HUGE_PAGE_SIZE
+#undef HUGE_PAGE_THRESHOLD
+#endif
+        align_buf = memalign( NATIVE_ALIGN, i_size );
 #else
     uint8_t *buf = malloc( i_size + (NATIVE_ALIGN-1) + sizeof(void **) );
     if( buf )
@@ -1246,7 +1267,7 @@ char *x264_slurp_file( const char *filename )
     int b_error = 0;
     size_t i_size;
     char *buf;
-    FILE *fh = fopen( filename, "rb" );
+    FILE *fh = x264_fopen( filename, "rb" );
     if( !fh )
         return NULL;
     b_error |= fseek( fh, 0, SEEK_END ) < 0;
@@ -1383,7 +1404,7 @@ char *x264_param2string( x264_param_t *p, int b_res )
         s += sprintf( s, " qp=%d", p->rc.i_qp_constant );
 
     if( p->rc.i_vbv_buffer_size )
-        s += sprintf( s, " nal_hrd=%s", x264_nal_hrd_names[p->i_nal_hrd] );
+        s += sprintf( s, " nal_hrd=%s filler=%d", x264_nal_hrd_names[p->i_nal_hrd], p->rc.b_filler );
     if( p->crop_rect.i_left | p->crop_rect.i_top | p->crop_rect.i_right | p->crop_rect.i_bottom )
         s += sprintf( s, " crop_rect=%u,%u,%u,%u", p->crop_rect.i_left, p->crop_rect.i_top,
                                                    p->crop_rect.i_right, p->crop_rect.i_bottom );

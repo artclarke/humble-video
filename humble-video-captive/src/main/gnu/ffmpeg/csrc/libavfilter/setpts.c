@@ -24,6 +24,8 @@
  * video presentation timestamp (PTS) modification filter
  */
 
+#include <inttypes.h>
+
 #include "libavutil/eval.h"
 #include "libavutil/internal.h"
 #include "libavutil/mathematics.h"
@@ -82,7 +84,7 @@ enum var_name {
     VAR_VARS_NB
 };
 
-typedef struct {
+typedef struct SetPTSContext {
     const AVClass *class;
     char *expr_str;
     AVExpr *expr;
@@ -175,24 +177,24 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     d = av_expr_eval(setpts->expr, setpts->var_values, NULL);
     frame->pts = D2TS(d);
 
-    av_log(inlink->dst, AV_LOG_DEBUG,
-           "N:%"PRId64" PTS:%s T:%f POS:%s",
-           (int64_t)setpts->var_values[VAR_N],
-           d2istr(setpts->var_values[VAR_PTS]),
-           setpts->var_values[VAR_T],
-           d2istr(setpts->var_values[VAR_POS]));
+    av_dlog(inlink->dst,
+            "N:%"PRId64" PTS:%s T:%f POS:%s",
+            (int64_t)setpts->var_values[VAR_N],
+            d2istr(setpts->var_values[VAR_PTS]),
+            setpts->var_values[VAR_T],
+            d2istr(setpts->var_values[VAR_POS]));
     switch (inlink->type) {
     case AVMEDIA_TYPE_VIDEO:
-        av_log(inlink->dst, AV_LOG_DEBUG, " INTERLACED:%"PRId64,
-               (int64_t)setpts->var_values[VAR_INTERLACED]);
+        av_dlog(inlink->dst, " INTERLACED:%"PRId64,
+                (int64_t)setpts->var_values[VAR_INTERLACED]);
         break;
     case AVMEDIA_TYPE_AUDIO:
-        av_log(inlink->dst, AV_LOG_DEBUG, " NB_SAMPLES:%"PRId64" NB_CONSUMED_SAMPLES:%"PRId64,
-               (int64_t)setpts->var_values[VAR_NB_SAMPLES],
-               (int64_t)setpts->var_values[VAR_NB_CONSUMED_SAMPLES]);
+        av_dlog(inlink->dst, " NB_SAMPLES:%"PRId64" NB_CONSUMED_SAMPLES:%"PRId64,
+                (int64_t)setpts->var_values[VAR_NB_SAMPLES],
+                (int64_t)setpts->var_values[VAR_NB_CONSUMED_SAMPLES]);
         break;
     }
-    av_log(inlink->dst, AV_LOG_DEBUG, " -> PTS:%s T:%f\n", d2istr(d), TS2T(d, inlink->time_base));
+    av_dlog(inlink->dst, " -> PTS:%s T:%f\n", d2istr(d), TS2T(d, inlink->time_base));
 
     if (inlink->type == AVMEDIA_TYPE_VIDEO) {
         setpts->var_values[VAR_N] += 1.0;
@@ -221,7 +223,7 @@ static av_cold void uninit(AVFilterContext *ctx)
 #define FLAGS AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_FILTERING_PARAM
 static const AVOption options[] = {
     { "expr", "Expression determining the frame timestamp", OFFSET(expr_str), AV_OPT_TYPE_STRING, { .str = "PTS" }, .flags = FLAGS },
-    { NULL },
+    { NULL }
 };
 
 #if CONFIG_SETPTS_FILTER
@@ -230,11 +232,10 @@ AVFILTER_DEFINE_CLASS(setpts);
 
 static const AVFilterPad avfilter_vf_setpts_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_VIDEO,
-        .get_video_buffer = ff_null_get_video_buffer,
-        .config_props     = config_input,
-        .filter_frame     = filter_frame,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = config_input,
+        .filter_frame = filter_frame,
     },
     { NULL }
 };
@@ -247,7 +248,7 @@ static const AVFilterPad avfilter_vf_setpts_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_setpts = {
+AVFilter ff_vf_setpts = {
     .name      = "setpts",
     .description = NULL_IF_CONFIG_SMALL("Set PTS for the output video frame."),
     .init      = init,
@@ -268,11 +269,10 @@ AVFILTER_DEFINE_CLASS(asetpts);
 
 static const AVFilterPad asetpts_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_AUDIO,
-        .get_audio_buffer = ff_null_get_audio_buffer,
-        .config_props     = config_input,
-        .filter_frame     = filter_frame,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_AUDIO,
+        .config_props = config_input,
+        .filter_frame = filter_frame,
     },
     { NULL }
 };
@@ -285,7 +285,7 @@ static const AVFilterPad asetpts_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_af_asetpts = {
+AVFilter ff_af_asetpts = {
     .name        = "asetpts",
     .description = NULL_IF_CONFIG_SMALL("Set PTS for the output audio frame."),
     .init        = init,

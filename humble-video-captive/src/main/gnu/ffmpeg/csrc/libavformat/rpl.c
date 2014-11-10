@@ -19,11 +19,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <inttypes.h>
+#include <stdlib.h>
+
 #include "libavutil/avstring.h"
 #include "libavutil/dict.h"
 #include "avformat.h"
 #include "internal.h"
-#include <stdlib.h>
 
 #define RPL_SIGNATURE "ARMovie\x0A"
 #define RPL_SIGNATURE_SIZE 8
@@ -58,7 +60,7 @@ static int read_line(AVIOContext * pb, char* line, int bufsize)
             break;
         if (b == '\n') {
             line[i] = '\0';
-            return url_feof(pb) ? -1 : 0;
+            return avio_feof(pb) ? -1 : 0;
         }
         line[i] = b;
     }
@@ -168,9 +170,8 @@ static int rpl_read_header(AVFormatContext *s)
             vst->codec->codec_id = AV_CODEC_ID_ESCAPE130;
             break;
         default:
-            av_log(s, AV_LOG_WARNING,
-                   "RPL video format %i not supported yet!\n",
-                   vst->codec->codec_tag);
+            avpriv_report_missing_feature(s, "Video format %i",
+                                          vst->codec->codec_tag);
             vst->codec->codec_id = AV_CODEC_ID_NONE;
     }
 
@@ -220,11 +221,9 @@ static int rpl_read_header(AVFormatContext *s)
                 }
                 break;
         }
-        if (ast->codec->codec_id == AV_CODEC_ID_NONE) {
-            av_log(s, AV_LOG_WARNING,
-                   "RPL audio format %i not supported yet!\n",
-                   audio_format);
-        }
+        if (ast->codec->codec_id == AV_CODEC_ID_NONE)
+            avpriv_request_sample(s, "Audio format %"PRId32,
+                                  audio_format);
         avpriv_set_pts_info(ast, 32, 1, ast->codec->bit_rate);
     } else {
         for (i = 0; i < 3; i++)
@@ -256,8 +255,10 @@ static int rpl_read_header(AVFormatContext *s)
         int64_t offset, video_size, audio_size;
         error |= read_line(pb, line, sizeof(line));
         if (3 != sscanf(line, "%"SCNd64" , %"SCNd64" ; %"SCNd64,
-                        &offset, &video_size, &audio_size))
+                        &offset, &video_size, &audio_size)) {
             error = -1;
+            continue;
+        }
         av_add_index_entry(vst, offset, i * rpl->frames_per_chunk,
                            video_size, rpl->frames_per_chunk, 0);
         if (ast)

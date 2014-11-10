@@ -1,6 +1,6 @@
 /*
  * 4X Technologies .4xm File Demuxer (no muxer)
- * Copyright (c) 2003  The ffmpeg Project
+ * Copyright (c) 2003  The FFmpeg Project
  *
  * This file is part of FFmpeg.
  *
@@ -110,8 +110,11 @@ static int parse_vtrk(AVFormatContext *s,
 
     st->codec->codec_type     = AVMEDIA_TYPE_VIDEO;
     st->codec->codec_id       = AV_CODEC_ID_4XM;
+
+    st->codec->extradata      = av_mallocz(4 + FF_INPUT_BUFFER_PADDING_SIZE);
+    if (!st->codec->extradata)
+        return AVERROR(ENOMEM);
     st->codec->extradata_size = 4;
-    st->codec->extradata      = av_malloc(4);
     AV_WL32(st->codec->extradata, AV_RL32(buf + 16));
     st->codec->width  = AV_RL32(buf + 36);
     st->codec->height = AV_RL32(buf + 40);
@@ -135,6 +138,7 @@ static int parse_strk(AVFormatContext *s,
         av_log(s, AV_LOG_ERROR, "current_track too large\n");
         return AVERROR_INVALIDDATA;
     }
+
     if (track + 1 > fourxm->track_count) {
         if (av_reallocp_array(&fourxm->tracks, track + 1, sizeof(AudioTrack)))
             return AVERROR(ENOMEM);
@@ -150,7 +154,7 @@ static int parse_strk(AVFormatContext *s,
 
     if (fourxm->tracks[track].channels    <= 0 ||
         fourxm->tracks[track].sample_rate <= 0 ||
-        fourxm->tracks[track].bits        < 0) {
+        fourxm->tracks[track].bits        <= 0) {
         av_log(s, AV_LOG_ERROR, "audio header invalid\n");
         return AVERROR_INVALIDDATA;
     }
@@ -289,7 +293,7 @@ static int fourxm_read_packet(AVFormatContext *s,
             return ret;
         fourcc_tag = AV_RL32(&header[0]);
         size       = AV_RL32(&header[4]);
-        if (url_feof(pb))
+        if (avio_feof(pb))
             return AVERROR(EIO);
         switch (fourcc_tag) {
         case LIST_TAG:
@@ -318,8 +322,10 @@ static int fourxm_read_packet(AVFormatContext *s,
 
             if (ret < 0) {
                 av_free_packet(pkt);
-            } else
+            } else {
                 packet_read = 1;
+                av_shrink_packet(pkt, ret + 8);
+            }
             break;
 
         case snd__TAG:

@@ -567,6 +567,8 @@ int ASN1_STRING_to_UTF8(unsigned char **out, ASN1_STRING *in)
 	if(mbflag == -1) return -1;
 	mbflag |= MBSTRING_FLAG;
 	stmp.data = NULL;
+	stmp.length = 0;
+	stmp.flags = 0;
 	ret = ASN1_mbstring_copy(&str, in->data, in->length, mbflag, B_ASN1_UTF8STRING);
 	if(ret < 0) return ret;
 	*out = stmp.data;

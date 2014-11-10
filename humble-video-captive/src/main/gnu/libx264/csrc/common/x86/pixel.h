@@ -1,11 +1,11 @@
 /*****************************************************************************
  * pixel.h: x86 pixel metrics
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
- *          Jason Garrett-Glaser <darkshikari@gmail.com>
+ *          Fiona Glaser <fiona@x264.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@ DECL_X4( sad, mmx2 )
 DECL_X4( sad, sse2 )
 DECL_X4( sad, sse3 )
 DECL_X4( sad, ssse3 )
+DECL_X4( sad, xop )
 DECL_X4( sad, avx )
 DECL_X4( sad, avx2 )
 DECL_X1( ssd, mmx )
@@ -151,6 +152,9 @@ void x264_pixel_ssd_nv12_core_sse2( pixel *pixuv1, intptr_t stride1,
                                     pixel *pixuv2, intptr_t stride2, int width,
                                     int height, uint64_t *ssd_u, uint64_t *ssd_v );
 void x264_pixel_ssd_nv12_core_avx ( pixel *pixuv1, intptr_t stride1,
+                                    pixel *pixuv2, intptr_t stride2, int width,
+                                    int height, uint64_t *ssd_u, uint64_t *ssd_v );
+void x264_pixel_ssd_nv12_core_xop ( pixel *pixuv1, intptr_t stride1,
                                     pixel *pixuv2, intptr_t stride2, int width,
                                     int height, uint64_t *ssd_u, uint64_t *ssd_v );
 void x264_pixel_ssd_nv12_core_avx2( pixel *pixuv1, intptr_t stride1,

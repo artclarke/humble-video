@@ -26,8 +26,8 @@
  * w32threads to pthreads wrapper
  */
 
-#ifndef LIBAV_W32PTHREADS_H
-#define LIBAV_W32PTHREADS_H
+#ifndef FFMPEG_COMPAT_W32PTHREADS_H
+#define FFMPEG_COMPAT_W32PTHREADS_H
 
 /* Build up a pthread-like API using underlying Windows API. Have only static
  * methods so as to not conflict with a potentially linked in pthread-win32
@@ -39,6 +39,7 @@
 #include <windows.h>
 #include <process.h>
 
+#include "libavutil/attributes.h"
 #include "libavutil/common.h"
 #include "libavutil/internal.h"
 #include "libavutil/mem.h"
@@ -62,21 +63,40 @@ typedef struct pthread_cond_t {
 } pthread_cond_t;
 
 /* function pointers to conditional variable API on windows 6.0+ kernels */
+#if _WIN32_WINNT < 0x0600
 static void (WINAPI *cond_broadcast)(pthread_cond_t *cond);
 static void (WINAPI *cond_init)(pthread_cond_t *cond);
 static void (WINAPI *cond_signal)(pthread_cond_t *cond);
 static BOOL (WINAPI *cond_wait)(pthread_cond_t *cond, pthread_mutex_t *mutex,
                                 DWORD milliseconds);
+#else
+#define cond_init      InitializeConditionVariable
+#define cond_broadcast WakeAllConditionVariable
+#define cond_signal    WakeConditionVariable
+#define cond_wait      SleepConditionVariableCS
 
-static unsigned __stdcall attribute_align_arg win32thread_worker(void *arg)
+#define CreateEvent(a, reset, init, name)                   \
+    CreateEventEx(a, name,                                  \
+                  (reset ? CREATE_EVENT_MANUAL_RESET : 0) | \
+                  (init ? CREATE_EVENT_INITIAL_SET : 0),    \
+                  EVENT_ALL_ACCESS)
+// CreateSemaphoreExA seems to be desktop-only, but as long as we don't
+// use named semaphores, it doesn't matter if we use the W version.
+#define CreateSemaphore(a, b, c, d) \
+    CreateSemaphoreExW(a, b, c, d, 0, SEMAPHORE_ALL_ACCESS)
+#define InitializeCriticalSection(x) InitializeCriticalSectionEx(x, 0, 0)
+#define WaitForSingleObject(a, b) WaitForSingleObjectEx(a, b, FALSE)
+#endif
+
+static av_unused unsigned __stdcall attribute_align_arg win32thread_worker(void *arg)
 {
     pthread_t *h = arg;
     h->ret = h->func(h->arg);
     return 0;
 }
 
-static int pthread_create(pthread_t *thread, const void *unused_attr,
-                          void *(*start_routine)(void*), void *arg)
+static av_unused int pthread_create(pthread_t *thread, const void *unused_attr,
+                                    void *(*start_routine)(void*), void *arg)
 {
     thread->func   = start_routine;
     thread->arg    = arg;
@@ -85,7 +105,7 @@ static int pthread_create(pthread_t *thread, const void *unused_attr,
     return !thread->handle;
 }
 
-static void pthread_join(pthread_t thread, void **value_ptr)
+static av_unused void pthread_join(pthread_t thread, void **value_ptr)
 {
     DWORD ret = WaitForSingleObject(thread.handle, INFINITE);
     if (ret != WAIT_OBJECT_0)
@@ -127,31 +147,32 @@ typedef struct  win32_cond_t {
     volatile int is_broadcast;
 } win32_cond_t;
 
-static void pthread_cond_init(pthread_cond_t *cond, const void *unused_attr)
+static av_unused int pthread_cond_init(pthread_cond_t *cond, const void *unused_attr)
 {
     win32_cond_t *win32_cond = NULL;
     if (cond_init) {
         cond_init(cond);
-        return;
+        return 0;
     }
 
     /* non native condition variables */
     win32_cond = av_mallocz(sizeof(win32_cond_t));
     if (!win32_cond)
-        return;
+        return ENOMEM;
     cond->ptr = win32_cond;
     win32_cond->semaphore = CreateSemaphore(NULL, 0, 0x7fffffff, NULL);
     if (!win32_cond->semaphore)
-        return;
+        return ENOMEM;
     win32_cond->waiters_done = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (!win32_cond->waiters_done)
-        return;
+        return ENOMEM;
 
     pthread_mutex_init(&win32_cond->mtx_waiter_count, NULL);
     pthread_mutex_init(&win32_cond->mtx_broadcast, NULL);
+    return 0;
 }
 
-static void pthread_cond_destroy(pthread_cond_t *cond)
+static av_unused void pthread_cond_destroy(pthread_cond_t *cond)
 {
     win32_cond_t *win32_cond = cond->ptr;
     /* native condition variables do not destroy */
@@ -167,7 +188,7 @@ static void pthread_cond_destroy(pthread_cond_t *cond)
     cond->ptr = NULL;
 }
 
-static void pthread_cond_broadcast(pthread_cond_t *cond)
+static av_unused void pthread_cond_broadcast(pthread_cond_t *cond)
 {
     win32_cond_t *win32_cond = cond->ptr;
     int have_waiter;
@@ -198,7 +219,7 @@ static void pthread_cond_broadcast(pthread_cond_t *cond)
     pthread_mutex_unlock(&win32_cond->mtx_broadcast);
 }
 
-static int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
+static av_unused int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
     win32_cond_t *win32_cond = cond->ptr;
     int last_waiter;
@@ -230,7 +251,7 @@ static int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
     return pthread_mutex_lock(mutex);
 }
 
-static void pthread_cond_signal(pthread_cond_t *cond)
+static av_unused void pthread_cond_signal(pthread_cond_t *cond)
 {
     win32_cond_t *win32_cond = cond->ptr;
     int have_waiter;
@@ -255,7 +276,7 @@ static void pthread_cond_signal(pthread_cond_t *cond)
     pthread_mutex_unlock(&win32_cond->mtx_broadcast);
 }
 
-static void w32thread_init(void)
+static av_unused void w32thread_init(void)
 {
 #if _WIN32_WINNT < 0x0600
     HANDLE kernel_dll = GetModuleHandle(TEXT("kernel32.dll"));
@@ -268,13 +289,8 @@ static void w32thread_init(void)
         (void*)GetProcAddress(kernel_dll, "WakeConditionVariable");
     cond_wait      =
         (void*)GetProcAddress(kernel_dll, "SleepConditionVariableCS");
-#else
-    cond_init      = InitializeConditionVariable;
-    cond_broadcast = WakeAllConditionVariable;
-    cond_signal    = WakeConditionVariable;
-    cond_wait      = SleepConditionVariableCS;
 #endif
 
 }
 
-#endif /* LIBAV_W32PTHREADS_H */
+#endif /* FFMPEG_COMPAT_W32PTHREADS_H */

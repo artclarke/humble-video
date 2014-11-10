@@ -26,8 +26,8 @@
 
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
+#include "libavutil/pixelutils.h"
 #include "libavutil/timestamp.h"
-#include "libavcodec/dsputil.h"
 #include "avfilter.h"
 #include "internal.h"
 #include "formats.h"
@@ -48,8 +48,7 @@ typedef struct {
 
     int hsub, vsub;                ///< chroma subsampling values
     AVFrame *ref;                  ///< reference picture
-    DSPContext dspctx;             ///< context providing optimized diff routines
-    AVCodecContext *avctx;         ///< codec context required for the DSPContext
+    av_pixelutils_sad_fn sad;      ///< sum of absolute difference function
 } DecimateContext;
 
 #define OFFSET(x) offsetof(DecimateContext, x)
@@ -70,24 +69,21 @@ AVFILTER_DEFINE_CLASS(mpdecimate);
  * Return 1 if the two planes are different, 0 otherwise.
  */
 static int diff_planes(AVFilterContext *ctx,
-                       uint8_t *cur, uint8_t *ref, int linesize,
+                       uint8_t *cur, int cur_linesize,
+                       uint8_t *ref, int ref_linesize,
                        int w, int h)
 {
     DecimateContext *decimate = ctx->priv;
-    DSPContext *dspctx = &decimate->dspctx;
 
     int x, y;
     int d, c = 0;
     int t = (w/16)*(h/16)*decimate->frac;
-    int16_t block[8*8];
 
     /* compute difference for blocks of 8x8 bytes */
     for (y = 0; y < h-7; y += 4) {
         for (x = 8; x < w-7; x += 4) {
-            dspctx->diff_pixels(block,
-                                cur+x+y*linesize,
-                                ref+x+y*linesize, linesize);
-            d = dspctx->sum_abs_dctelem(block);
+            d = decimate->sad(cur + y*cur_linesize + x, cur_linesize,
+                              ref + y*ref_linesize + x, ref_linesize);
             if (d > decimate->hi)
                 return 1;
             if (d > decimate->lo) {
@@ -121,7 +117,8 @@ static int decimate_frame(AVFilterContext *ctx,
         int vsub = plane == 1 || plane == 2 ? decimate->vsub : 0;
         int hsub = plane == 1 || plane == 2 ? decimate->hsub : 0;
         if (diff_planes(ctx,
-                        cur->data[plane], ref->data[plane], ref->linesize[plane],
+                        cur->data[plane], cur->linesize[plane],
+                        ref->data[plane], ref->linesize[plane],
                         FF_CEIL_RSHIFT(ref->width,  hsub),
                         FF_CEIL_RSHIFT(ref->height, vsub)))
             return 0;
@@ -134,13 +131,12 @@ static av_cold int init(AVFilterContext *ctx)
 {
     DecimateContext *decimate = ctx->priv;
 
+    decimate->sad = av_pixelutils_get_sad_fn(3, 3, 0, decimate); // 8x8, not aligned on blocksize
+    if (!decimate->sad)
+        return AVERROR(EINVAL);
+
     av_log(ctx, AV_LOG_VERBOSE, "max_drop_count:%d hi:%d lo:%d frac:%f\n",
            decimate->max_drop_count, decimate->hi, decimate->lo, decimate->frac);
-
-    decimate->avctx = avcodec_alloc_context3(NULL);
-    if (!decimate->avctx)
-        return AVERROR(ENOMEM);
-    avpriv_dsputil_init(&decimate->dspctx, decimate->avctx);
 
     return 0;
 }
@@ -149,10 +145,6 @@ static av_cold void uninit(AVFilterContext *ctx)
 {
     DecimateContext *decimate = ctx->priv;
     av_frame_free(&decimate->ref);
-    if (decimate->avctx) {
-        avcodec_close(decimate->avctx);
-        av_freep(&decimate->avctx);
-    }
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -227,11 +219,10 @@ static int request_frame(AVFilterLink *outlink)
 
 static const AVFilterPad mpdecimate_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_VIDEO,
-        .get_video_buffer = ff_null_get_video_buffer,
-        .config_props     = config_input,
-        .filter_frame     = filter_frame,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = config_input,
+        .filter_frame = filter_frame,
     },
     { NULL }
 };
@@ -245,15 +236,14 @@ static const AVFilterPad mpdecimate_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_mpdecimate = {
-    .name        = "mpdecimate",
-    .description = NULL_IF_CONFIG_SMALL("Remove near-duplicate frames."),
-    .init        = init,
-    .uninit      = uninit,
-
-    .priv_size = sizeof(DecimateContext),
+AVFilter ff_vf_mpdecimate = {
+    .name          = "mpdecimate",
+    .description   = NULL_IF_CONFIG_SMALL("Remove near-duplicate frames."),
+    .init          = init,
+    .uninit        = uninit,
+    .priv_size     = sizeof(DecimateContext),
+    .priv_class    = &mpdecimate_class,
     .query_formats = query_formats,
     .inputs        = mpdecimate_inputs,
     .outputs       = mpdecimate_outputs,
-    .priv_class    = &mpdecimate_class,
 };

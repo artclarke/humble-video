@@ -1,12 +1,12 @@
 /*****************************************************************************
  * quant.c: quantization and level-run
  *****************************************************************************
- * Copyright (C) 2005-2013 x264 project
+ * Copyright (C) 2005-2014 x264 project
  *
  * Authors: Loren Merritt <lorenm@u.washington.edu>
- *          Jason Garrett-Glaser <darkshikari@gmail.com>
+ *          Fiona Glaser <fiona@x264.com>
  *          Christian Heine <sennindemokrit@gmx.net>
- *          Henrik Gramner <hengar-6@student.ltu.se>
+ *          Henrik Gramner <henrik@gramner.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -725,7 +725,10 @@ void x264_quant_init( x264_t *h, int cpu, x264_quant_function_t *pf )
 
 #if HAVE_ARMV6
     if( cpu&X264_CPU_ARMV6 )
+    {
         pf->coeff_last4 = x264_coeff_last4_arm;
+        pf->coeff_last8 = x264_coeff_last8_arm;
+    }
 
     if( cpu&X264_CPU_NEON )
     {

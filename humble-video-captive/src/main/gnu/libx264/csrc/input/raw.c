@@ -1,7 +1,7 @@
 /*****************************************************************************
  * raw.c: raw input
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -55,8 +55,11 @@ static int open_file( char *psz_filename, hnd_t *p_handle, video_info_t *info, c
     FAIL_IF_ERROR( !info->width || !info->height, "raw input requires a resolution.\n" )
     if( opt->colorspace )
     {
-        for( info->csp = X264_CSP_CLI_MAX-1; x264_cli_csps[info->csp].name && strcasecmp( x264_cli_csps[info->csp].name, opt->colorspace ); )
-            info->csp--;
+        for( info->csp = X264_CSP_CLI_MAX-1; info->csp > X264_CSP_NONE; info->csp-- )
+        {
+            if( x264_cli_csps[info->csp].name && !strcasecmp( x264_cli_csps[info->csp].name, opt->colorspace ) )
+                break;
+        }
         FAIL_IF_ERROR( info->csp == X264_CSP_NONE, "unsupported colorspace `%s'\n", opt->colorspace );
     }
     else /* default */
@@ -70,7 +73,7 @@ static int open_file( char *psz_filename, hnd_t *p_handle, video_info_t *info, c
     if( !strcmp( psz_filename, "-" ) )
         h->fh = stdin;
     else
-        h->fh = fopen( psz_filename, "rb" );
+        h->fh = x264_fopen( psz_filename, "rb" );
     if( h->fh == NULL )
         return -1;
 
@@ -99,14 +102,14 @@ static int open_file( char *psz_filename, hnd_t *p_handle, video_info_t *info, c
     return 0;
 }
 
-static int read_frame_internal( cli_pic_t *pic, raw_hnd_t *h )
+static int read_frame_internal( cli_pic_t *pic, raw_hnd_t *h, int bit_depth_uc )
 {
     int error = 0;
     int pixel_depth = x264_cli_csp_depth_factor( pic->img.csp );
     for( int i = 0; i < pic->img.planes && !error; i++ )
     {
         error |= fread( pic->img.plane[i], pixel_depth, h->plane_size[i], h->fh ) != h->plane_size[i];
-        if( h->bit_depth & 7 )
+        if( bit_depth_uc )
         {
             /* upconvert non 16bit high depth planes to 16bit using the same
              * algorithm as used in the depth filter. */
@@ -131,13 +134,13 @@ static int read_frame( cli_pic_t *pic, hnd_t handle, int i_frame )
         else
             while( i_frame > h->next_frame )
             {
-                if( read_frame_internal( pic, h ) )
+                if( read_frame_internal( pic, h, 0 ) )
                     return -1;
                 h->next_frame++;
             }
     }
 
-    if( read_frame_internal( pic, h ) )
+    if( read_frame_internal( pic, h, h->bit_depth & 7 ) )
         return -1;
 
     h->next_frame = i_frame+1;

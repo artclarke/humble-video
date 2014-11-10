@@ -24,6 +24,20 @@ If not, then you should install a different compiler that has no
 hard-coded path to gas. In the worst case pass @code{--disable-asm}
 to configure.
 
+@section Advanced linking configuration
+
+If you compiled FFmpeg libraries statically and you want to use them to
+build your own shared library, you may need to force PIC support (with
+@code{--enable-pic} during FFmpeg configure) and add the following option
+to your project LDFLAGS:
+
+@example
+-Wl,-Bsymbolic
+@end example
+
+If your target platform requires position independent binaries, you should
+pass the correct linking flag (e.g. @code{-pie}) to @code{--extra-ldexeflags}.
+
 @section BSD
 
 BSD make will not build FFmpeg, you need to install and use GNU Make
@@ -51,14 +65,15 @@ The toolchain provided with Xcode is sufficient to build the basic
 unacelerated code.
 
 Mac OS X on PowerPC or ARM (iPhone) requires a preprocessor from
-@url{http://github.com/yuvi/gas-preprocessor} to build the optimized
-assembler functions. Just download the Perl script and put it somewhere
+@url{https://github.com/FFmpeg/gas-preprocessor} or
+@url{https://github.com/yuvi/gas-preprocessor}(currently outdated) to build the optimized
+assembly functions. Put the Perl script somewhere
 in your PATH, FFmpeg's configure will pick it up automatically.
 
 Mac OS X on amd64 and x86 requires @command{yasm} to build most of the
-optimized assembler functions. @uref{http://www.finkproject.org/, Fink},
+optimized assembly functions. @uref{http://www.finkproject.org/, Fink},
 @uref{http://www.gentoo.org/proj/en/gentoo-alt/prefix/bootstrap-macos.xml, Gentoo Prefix},
-@uref{http://mxcl.github.com/homebrew/, Homebrew}
+@uref{https://mxcl.github.com/homebrew/, Homebrew}
 or @uref{http://www.macports.org, MacPorts} can easily provide it.
 
 
@@ -108,14 +123,16 @@ libavformat) as DLLs.
 
 @section Microsoft Visual C++ or Intel C++ Compiler for Windows
 
-FFmpeg can be built with MSVC or ICL using a C99-to-C89 conversion utility and
-wrapper. For ICL, only the wrapper is used, since ICL supports C99.
+FFmpeg can be built with MSVC 2012 or earlier using a C99-to-C89 conversion utility
+and wrapper, or with MSVC 2013 and ICL natively.
 
 You will need the following prerequisites:
 
 @itemize
-@item @uref{http://download.videolan.org/pub/contrib/c99-to-c89/, C99-to-C89 Converter & Wrapper}
+@item @uref{https://github.com/libav/c99-to-c89/, C99-to-C89 Converter & Wrapper}
+(if using MSVC 2012 or earlier)
 @item @uref{http://code.google.com/p/msinttypes/, msinttypes}
+(if using MSVC 2012 or earlier)
 @item @uref{http://www.mingw.org/, MSYS}
 @item @uref{http://yasm.tortall.net/, YASM}
 @item @uref{http://gnuwin32.sourceforge.net/packages/bc.htm, bc for Windows} if
@@ -125,14 +142,16 @@ you want to run @uref{fate.html, FATE}.
 To set up a proper environment in MSYS, you need to run @code{msys.bat} from
 the Visual Studio or Intel Compiler command prompt.
 
-Place @code{makedef}, @code{c99wrap.exe}, @code{c99conv.exe}, and @code{yasm.exe}
-somewhere in your @code{PATH}.
+Place @code{yasm.exe} somewhere in your @code{PATH}. If using MSVC 2012 or
+earlier, place @code{c99wrap.exe} and @code{c99conv.exe} somewhere in your
+@code{PATH} as well.
 
-Next, make sure @code{inttypes.h} and any other headers and libs you want to use
-are located in a spot that the compiler can see. Do so by modifying the @code{LIB}
-and @code{INCLUDE} environment variables to include the @strong{Windows} paths to
-these directories. Alternatively, you can try and use the
-@code{--extra-cflags}/@code{--extra-ldflags} configure options.
+Next, make sure any other headers and libs you want to use, such as zlib, are
+located in a spot that the compiler can see. Do so by modifying the @code{LIB}
+and @code{INCLUDE} environment variables to include the @strong{Windows-style}
+paths to these directories. Alternatively, you can try and use the
+@code{--extra-cflags}/@code{--extra-ldflags} configure options. If using MSVC
+2012 or earlier, place @code{inttypes.h} somewhere the compiler can see too.
 
 Finally, run:
 
@@ -182,7 +201,9 @@ can see.
 @itemize
 @item Visual Studio 2010 Pro and Express
 @item Visual Studio 2012 Pro and Express
+@item Visual Studio 2013 Pro and Express
 @item Intel Composer XE 2013
+@item Intel Composer XE 2013 SP1
 @end itemize
 Anything else is not officially supported.
 
@@ -257,7 +278,7 @@ llrint() in its C library.
 Install your Cygwin with all the "Base" packages, plus the
 following "Devel" ones:
 @example
-binutils, gcc4-core, make, git, mingw-runtime, texi2html
+binutils, gcc4-core, make, git, mingw-runtime, texinfo
 @end example
 
 In order to run FATE you will also need the following "Utils" packages:

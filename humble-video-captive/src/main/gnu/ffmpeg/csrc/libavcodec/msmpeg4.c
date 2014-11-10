@@ -28,7 +28,7 @@
  */
 
 #include "avcodec.h"
-#include "dsputil.h"
+#include "idctdsp.h"
 #include "mpegvideo.h"
 #include "msmpeg4.h"
 #include "libavutil/x86/asm.h"
@@ -138,10 +138,10 @@ av_cold void ff_msmpeg4_common_init(MpegEncContext *s)
 
 
     if(s->msmpeg4_version>=4){
-        ff_init_scantable(s->dsp.idct_permutation, &s->intra_scantable  , ff_wmv1_scantable[1]);
-        ff_init_scantable(s->dsp.idct_permutation, &s->intra_h_scantable, ff_wmv1_scantable[2]);
-        ff_init_scantable(s->dsp.idct_permutation, &s->intra_v_scantable, ff_wmv1_scantable[3]);
-        ff_init_scantable(s->dsp.idct_permutation, &s->inter_scantable  , ff_wmv1_scantable[0]);
+        ff_init_scantable(s->idsp.idct_permutation, &s->intra_scantable,   ff_wmv1_scantable[1]);
+        ff_init_scantable(s->idsp.idct_permutation, &s->intra_h_scantable, ff_wmv1_scantable[2]);
+        ff_init_scantable(s->idsp.idct_permutation, &s->intra_v_scantable, ff_wmv1_scantable[3]);
+        ff_init_scantable(s->idsp.idct_permutation, &s->inter_scantable,   ff_wmv1_scantable[0]);
     }
     //Note the default tables are set in common_init in mpegvideo.c
 
@@ -240,10 +240,7 @@ int ff_msmpeg4_pred_dc(MpegEncContext *s, int n,
         : "%eax", "%edx"
     );
 #else
-    /* #elif ARCH_ALPHA */
-    /* Divisions are extremely costly on Alpha; optimize the most
-       common case. But they are costly everywhere...
-     */
+    /* Divisions are costly everywhere; optimize the most common case. */
     if (scale == 8) {
         a = (a + (8 >> 1)) / 8;
         b = (b + (8 >> 1)) / 8;
@@ -279,10 +276,10 @@ int ff_msmpeg4_pred_dc(MpegEncContext *s, int n,
                 int bs = 8 >> s->avctx->lowres;
                 if(n<4){
                     wrap= s->linesize;
-                    dest= s->current_picture.f.data[0] + (((n >> 1) + 2*s->mb_y) * bs*  wrap ) + ((n & 1) + 2*s->mb_x) * bs;
+                    dest= s->current_picture.f->data[0] + (((n >> 1) + 2*s->mb_y) * bs*  wrap ) + ((n & 1) + 2*s->mb_x) * bs;
                 }else{
                     wrap= s->uvlinesize;
-                    dest= s->current_picture.f.data[n - 3] + (s->mb_y * bs * wrap) + s->mb_x * bs;
+                    dest= s->current_picture.f->data[n - 3] + (s->mb_y * bs * wrap) + s->mb_x * bs;
                 }
                 if(s->mb_x==0) a= (1024 + (scale>>1))/scale;
                 else           a= get_dc(dest-bs, wrap, scale*8>>(2*s->avctx->lowres), bs);

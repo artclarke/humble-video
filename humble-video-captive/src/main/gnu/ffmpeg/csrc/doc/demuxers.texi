@@ -1,7 +1,7 @@
 @chapter Demuxers
 @c man begin DEMUXERS
 
-Demuxers are configured elements in FFmpeg which allow to read the
+Demuxers are configured elements in FFmpeg that can read the
 multimedia streams from a particular type of file.
 
 When you configure your FFmpeg build, all the supported demuxers
@@ -28,6 +28,17 @@ the discard flags on AVStreams (by pressing 'a' or 'v' in ffplay),
 the caller can decide which variant streams to actually receive.
 The total bitrate of the variant that the stream belongs to is
 available in a metadata key named "variant_bitrate".
+
+@section asf
+
+Advanced Systems Format demuxer.
+
+This demuxer is used to demux ASF files and MMS network streams.
+
+@table @option
+@item -no_resync_search @var{bool}
+Do not try to resynchronize by looking for a certain optional start code.
+@end table
 
 @anchor{concat}
 @section concat
@@ -63,7 +74,7 @@ following directive is recognized:
 Path to a file to read; special characters and spaces must be escaped with
 backslash or single quotes.
 
-All subsequent directives apply to that file.
+All subsequent file-related directives apply to that file.
 
 @item @code{ffconcat version 1.0}
 Identify the script type and version. It also sets the @option{safe} option
@@ -80,6 +91,22 @@ file is not available or accurate.
 
 If the duration is set for all files, then it is possible to seek in the
 whole concatenated video.
+
+@item @code{stream}
+Introduce a stream in the virtual file.
+All subsequent stream-related directives apply to the last introduced
+stream.
+Some streams properties must be set in order to allow identifying the
+matching streams in the subfiles.
+If no streams are defined in the script, the streams from the first file are
+copied.
+
+@item @code{exact_stream_id @var{id}}
+Set the id of the stream.
+If this directive is given, the string with the corresponding id in the
+subfiles will be used.
+This is especially useful for MPEG-PS (VOB) files, where the order of the
+streams is not reliable.
 
 @end table
 
@@ -101,6 +128,25 @@ If set to 0, any file name is accepted.
 The default is -1, it is equivalent to 1 if the format was automatically
 probed and 0 otherwise.
 
+@item auto_convert
+If set to 1, try to perform automatic conversions on packet data to make the
+streams concatenable.
+
+Currently, the only conversion is adding the h264_mp4toannexb bitstream
+filter to H.264 streams in MP4 format. This is necessary in particular if
+there are resolution changes.
+
+@end table
+
+@section flv
+
+Adobe Flash Video Format demuxer.
+
+This demuxer is used to demux FLV files and RTMP network streams.
+
+@table @option
+@item -flv_metadata @var{bool}
+Allocate the streams according to the onMetaData array content.
 @end table
 
 @section libgme
@@ -127,6 +173,40 @@ See @url{http://quvi.sourceforge.net/} for more information.
 
 FFmpeg needs to be built with @code{--enable-libquvi} for this demuxer to be
 enabled.
+
+@section gif
+
+Animated GIF demuxer.
+
+It accepts the following options:
+
+@table @option
+@item min_delay
+Set the minimum valid delay between frames in hundredths of seconds.
+Range is 0 to 6000. Default value is 2.
+
+@item default_delay
+Set the default delay between frames in hundredths of seconds.
+Range is 0 to 6000. Default value is 10.
+
+@item ignore_loop
+GIF files can contain information to loop a certain number of times (or
+infinitely). If @option{ignore_loop} is set to 1, then the loop setting
+from the input will be ignored and looping will not occur. If set to 0,
+then looping will occur and will cycle the number of times according to
+the GIF. Default value is 1.
+@end table
+
+For example, with the overlay filter, place an infinitely looping GIF
+over another video:
+@example
+ffmpeg -i input.mp4 -ignore_loop 0 -i input.gif -filter_complex overlay=shortest=1 out.mkv
+@end example
+
+Note that in the above example the shortest option for overlay filter is
+used to end the output video at the length of the shortest input file,
+which in this case is @file{input.mp4} as the GIF in this example loops
+infinitely.
 
 @section image2
 
@@ -227,6 +307,8 @@ is 5.
 If set to 1, will set frame timestamp to modification time of image file. Note
 that monotonity of timestamps is not provided: images go in the same order as
 without this option. Default value is 0.
+If set to 2, will set frame timestamp to the modification time of the image file in
+nanosecond precision.
 @item video_size
 Set the video size of the images to read. If not specified the video
 size is guessed from the first image file in the sequence.
@@ -240,28 +322,41 @@ Use @command{ffmpeg} for creating a video from the images in the file
 sequence @file{img-001.jpeg}, @file{img-002.jpeg}, ..., assuming an
 input frame rate of 10 frames per second:
 @example
-ffmpeg -i 'img-%03d.jpeg' -r 10 out.mkv
+ffmpeg -framerate 10 -i 'img-%03d.jpeg' out.mkv
 @end example
 
 @item
 As above, but start by reading from a file with index 100 in the sequence:
 @example
-ffmpeg -start_number 100 -i 'img-%03d.jpeg' -r 10 out.mkv
+ffmpeg -framerate 10 -start_number 100 -i 'img-%03d.jpeg' out.mkv
 @end example
 
 @item
 Read images matching the "*.png" glob pattern , that is all the files
 terminating with the ".png" suffix:
 @example
-ffmpeg -pattern_type glob -i "*.png" -r 10 out.mkv
+ffmpeg -framerate 10 -pattern_type glob -i "*.png" out.mkv
 @end example
 @end itemize
+
+@section mpegts
+
+MPEG-2 transport stream demuxer.
+
+@table @option
+
+@item fix_teletext_pts
+Overrides teletext packet PTS and DTS values with the timestamps calculated
+from the PCR of the first program which the teletext stream is part of and is
+not discarded. Default value is 1, set this option to 0 if you want your
+teletext packet PTS and DTS values untouched.
+@end table
 
 @section rawvideo
 
 Raw video demuxer.
 
-This demuxer allows to read raw video data. Since there is no header
+This demuxer allows one to read raw video data. Since there is no header
 specifying the assumed video parameters, the user must specify them
 in order to be able to decode the data correctly.
 

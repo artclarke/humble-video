@@ -20,11 +20,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/avassert.h"
+#include <inttypes.h>
+
 #include "avcodec.h"
 #include "bytestream.h"
 #include "internal.h"
 
+#include "libavutil/avassert.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/mem.h"
 
@@ -369,7 +371,8 @@ static int dfa_decode_frame(AVCodecContext *avctx,
                 return AVERROR_INVALIDDATA;
             }
         } else {
-            av_log(avctx, AV_LOG_WARNING, "Ignoring unknown chunk type %d\n",
+            av_log(avctx, AV_LOG_WARNING,
+                   "Ignoring unknown chunk type %"PRIu32"\n",
                    chunk_type);
         }
         buf += chunk_size;
@@ -408,6 +411,7 @@ static av_cold int dfa_decode_end(AVCodecContext *avctx)
 
 AVCodec ff_dfa_decoder = {
     .name           = "dfa",
+    .long_name      = NULL_IF_CONFIG_SMALL("Chronomaster DFA"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_DFA,
     .priv_data_size = sizeof(DfaContext),
@@ -415,5 +419,4 @@ AVCodec ff_dfa_decoder = {
     .close          = dfa_decode_end,
     .decode         = dfa_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Chronomaster DFA"),
 };

@@ -6,19 +6,19 @@
 ;*
 ;* This file is part of FFmpeg.
 ;*
-;* FFmpeg is free software; you can redistribute it and/or modify
-;* it under the terms of the GNU General Public License as published by
-;* the Free Software Foundation; either version 2 of the License, or
-;* (at your option) any later version.
+;* FFmpeg is free software; you can redistribute it and/or
+;* modify it under the terms of the GNU Lesser General Public
+;* License as published by the Free Software Foundation; either
+;* version 2.1 of the License, or (at your option) any later version.
 ;*
 ;* FFmpeg is distributed in the hope that it will be useful,
 ;* but WITHOUT ANY WARRANTY; without even the implied warranty of
-;* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;* GNU General Public License for more details.
+;* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;* Lesser General Public License for more details.
 ;*
-;* You should have received a copy of the GNU General Public License along
-;* with FFmpeg; if not, write to the Free Software Foundation, Inc.,
-;* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+;* You should have received a copy of the GNU Lesser General Public
+;* License along with FFmpeg; if not, write to the Free Software
+;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
 %include "libavutil/x86/x86util.asm"
@@ -39,11 +39,7 @@ SECTION .text
     pavgb     m5, m3
     pand      m4, [pb_1]
     psubusb   m5, m4
-%if mmsize == 16
-    psrldq    m5, 1
-%else
-    psrlq     m5, 8
-%endif
+    RSHIFT    m5, 1
     punpcklbw m5, m7
     mova      m4, m2
     psubusb   m2, m3
@@ -51,13 +47,8 @@ SECTION .text
     pmaxub    m2, m3
     mova      m3, m2
     mova      m4, m2
-%if mmsize == 16
-    psrldq    m3, 1
-    psrldq    m4, 2
-%else
-    psrlq     m3, 8
-    psrlq     m4, 16
-%endif
+    RSHIFT    m3, 1
+    RSHIFT    m4, 2
     punpcklbw m2, m7
     punpcklbw m3, m7
     punpcklbw m4, m7

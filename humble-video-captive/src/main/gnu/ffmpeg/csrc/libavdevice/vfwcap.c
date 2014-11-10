@@ -27,11 +27,10 @@
 #include <vfw.h>
 #include "avdevice.h"
 
-/* Defines for VFW missing from MinGW.
- * Remove this when MinGW incorporates them. */
-#define HWND_MESSAGE                ((HWND)-3)
-
-/* End of missing MinGW defines */
+/* Some obsolete versions of MinGW32 before 4.0.0 lack this. */
+#ifndef HWND_MESSAGE
+#define HWND_MESSAGE ((HWND) -3)
+#endif
 
 struct vfw_ctx {
     const AVClass *class;
@@ -155,7 +154,7 @@ static void dump_bih(AVFormatContext *s, BITMAPINFOHEADER *bih)
 static int shall_we_drop(AVFormatContext *s)
 {
     struct vfw_ctx *ctx = s->priv_data;
-    const uint8_t dropscore[] = {62, 75, 87, 100};
+    static const uint8_t dropscore[] = {62, 75, 87, 100};
     const int ndropscores = FF_ARRAY_ELEMS(dropscore);
     unsigned int buffer_fullness = (ctx->curbufsize*100)/s->max_picture_buffer;
 
@@ -228,7 +227,7 @@ static int vfw_read_close(AVFormatContext *s)
     pktl = ctx->pktl;
     while (pktl) {
         AVPacketList *next = pktl->next;
-        av_destruct_packet(&pktl->pkt);
+        av_free_packet(&pktl->pkt);
         av_free(pktl);
         pktl = next;
     }
@@ -469,6 +468,7 @@ static const AVClass vfw_class = {
     .item_name  = av_default_item_name,
     .option     = options,
     .version    = LIBAVUTIL_VERSION_INT,
+    .category   = AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT
 };
 
 AVInputFormat ff_vfwcap_demuxer = {

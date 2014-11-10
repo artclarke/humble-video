@@ -1,12 +1,12 @@
 /*****************************************************************************
  * macroblock.c: macroblock encoding
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
- *          Jason Garrett-Glaser <darkshikari@gmail.com>
- *          Henrik Gramner <hengar-6@student.ltu.se>
+ *          Fiona Glaser <fiona@x264.com>
+ *          Henrik Gramner <henrik@gramner.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -157,10 +157,7 @@ static void x264_mb_encode_i16x16( x264_t *h, int p, int i_qp )
         return;
     }
 
-    M32( &h->mb.cache.non_zero_count[x264_scan8[ 0+p*16]] ) = 0;
-    M32( &h->mb.cache.non_zero_count[x264_scan8[ 2+p*16]] ) = 0;
-    M32( &h->mb.cache.non_zero_count[x264_scan8[ 8+p*16]] ) = 0;
-    M32( &h->mb.cache.non_zero_count[x264_scan8[10+p*16]] ) = 0;
+    CLEAR_16x16_NNZ( p );
 
     h->dctf.sub16x16_dct( dct4x4, p_src, p_dst );
 

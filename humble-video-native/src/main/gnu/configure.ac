@@ -153,10 +153,17 @@ case $host in
   ;;
   *darwin*)
   HOST_TYPE=Mac
+  VS_CFLAGS+="-Wno-error=unused-command-line-argument "
+  VS_LDFLAGS+="-Wno-error=unused-command-line-argument "
+  case $host_cpu in
+     *i?86*)
+     VS_LDFLAGS+="-Wl,-read_only_relocs -Wl,suppress "
+     ;;
+  esac
   ;;
   *linux*)
   HOST_TYPE=Linux
-  VS_LDFLAGS+="-Wl,-Bsymbolic"
+  VS_LDFLAGS+="-Wl,-Bsymbolic "
   ;;
   *)
   HOST_TYPE=Linux
@@ -324,6 +331,8 @@ AC_FUNC_MALLOC
 # Check for 64-bit stdio; not available on windows
 AC_FUNC_FSEEKO
 AC_CHECK_FUNCS([memmove memset])
+
+AC_CHECK_LIB(rt,clock_gettime,[VS_LDFLAGS+="-lrt "])
 
 AC_LANG_WERROR
 AC_MSG_CHECKING([if you're now hunting rabbits as well]) #'

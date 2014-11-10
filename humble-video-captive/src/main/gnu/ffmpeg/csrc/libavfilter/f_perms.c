@@ -72,7 +72,7 @@ static av_cold int init(AVFilterContext *ctx)
 }
 
 enum perm                        {  RO,   RW  };
-static const char *perm_str[2] = { "RO", "RW" };
+static const char * const perm_str[2] = { "RO", "RW" };
 
 static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
 {
@@ -133,7 +133,7 @@ static const AVFilterPad aperms_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_af_aperms = {
+AVFilter ff_af_aperms = {
     .name        = "aperms",
     .description = NULL_IF_CONFIG_SMALL("Set permissions for the output audio frame."),
     .init        = init,
@@ -166,7 +166,7 @@ static const AVFilterPad perms_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_perms = {
+AVFilter ff_vf_perms = {
     .name        = "perms",
     .description = NULL_IF_CONFIG_SMALL("Set permissions for the output video frame."),
     .init        = init,

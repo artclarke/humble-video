@@ -57,6 +57,10 @@ Enable RTP MP4A-LATM payload.
 Reduce the latency introduced by optional buffering
 @end table
 
+@item seek2any @var{integer} (@emph{input})
+Allow seeking to non-keyframes on demuxer level when supported if set to 1.
+Default is 0.
+
 @item analyzeduration @var{integer} (@emph{input})
 Specify how many microseconds are analyzed to probe the input. A
 higher value will allow to detect more accurate information, but will
@@ -121,26 +125,88 @@ Consider things that a sane encoder should not do as an error.
 Use wallclock as timestamps.
 
 @item avoid_negative_ts @var{integer} (@emph{output})
-Shift timestamps to make them non-negative. A value of 1 enables shifting,
-a value of 0 disables it, the default value of -1 enables shifting
-when required by the target format.
+
+Possible values:
+@table @samp
+@item make_non_negative
+Shift timestamps to make them non-negative.
+Also note that this affects only leading negative timestamps, and not
+non-monotonic negative timestamps.
+@item make_zero
+Shift timestamps so that the first timestamp is 0.
+@item auto (default)
+Enables shifting when required by the target format.
+@item disabled
+Disables shifting of timestamp.
+@end table
 
 When shifting is enabled, all output timestamps are shifted by the
 same amount. Audio, video, and subtitles desynching and relative
 timestamp differences are preserved compared to how they would have
 been without shifting.
 
-Also note that this affects only leading negative timestamps, and not
-non-monotonic negative timestamps.
+@item skip_initial_bytes @var{integer} (@emph{input})
+Set number of bytes to skip before reading header and frames if set to 1.
+Default is 0.
+
+@item correct_ts_overflow @var{integer} (@emph{input})
+Correct single timestamp overflows if set to 1. Default is 1.
 
 @item flush_packets @var{integer} (@emph{output})
 Flush the underlying I/O stream after each packet. Default 1 enables it, and
 has the effect of reducing the latency; 0 disables it and may slightly
 increase performance in some cases.
+
+@item output_ts_offset @var{offset} (@emph{output})
+Set the output time offset.
+
+@var{offset} must be a time duration specification,
+see @ref{time duration syntax,,the Time duration section in the ffmpeg-utils(1) manual,ffmpeg-utils}.
+
+The offset is added by the muxer to the output timestamps.
+
+Specifying a positive offset means that the corresponding streams are
+delayed bt the time duration specified in @var{offset}. Default value
+is @code{0} (meaning that no offset is applied).
 @end table
 
 @c man end FORMAT OPTIONS
 
+@anchor{Format stream specifiers}
+@section Format stream specifiers
+
+Format stream specifiers allow selection of one or more streams that
+match specific properties.
+
+Possible forms of stream specifiers are:
+@table @option
+@item @var{stream_index}
+Matches the stream with this index.
+
+@item @var{stream_type}[:@var{stream_index}]
+@var{stream_type} is one of following: 'v' for video, 'a' for audio,
+'s' for subtitle, 'd' for data, and 't' for attachments. If
+@var{stream_index} is given, then it matches the stream number
+@var{stream_index} of this type. Otherwise, it matches all streams of
+this type.
+
+@item p:@var{program_id}[:@var{stream_index}]
+If @var{stream_index} is given, then it matches the stream with number
+@var{stream_index} in the program with the id
+@var{program_id}. Otherwise, it matches all streams in the program.
+
+@item #@var{stream_id}
+Matches the stream by a format-specific ID.
+@end table
+
+The exact semantics of stream specifiers is defined by the
+@code{avformat_match_stream_specifier()} function declared in the
+@file{libavformat/avformat.h} header.
+
+@ifclear config-writeonly
 @include demuxers.texi
+@end ifclear
+@ifclear config-readonly
 @include muxers.texi
+@end ifclear
 @include metadata.texi

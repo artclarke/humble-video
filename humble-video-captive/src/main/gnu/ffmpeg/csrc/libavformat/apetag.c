@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <inttypes.h>
+
 #include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
 #include "avformat.h"
@@ -53,8 +55,10 @@ static int ape_tag_read_field(AVFormatContext *s)
         av_log(s, AV_LOG_WARNING, "Invalid APE tag key '%s'.\n", key);
         return -1;
     }
-    if (size >= UINT_MAX)
-        return -1;
+    if (size > INT32_MAX - FF_INPUT_BUFFER_PADDING_SIZE) {
+        av_log(s, AV_LOG_ERROR, "APE tag size too large.\n");
+        return AVERROR_INVALIDDATA;
+    }
     if (flags & APE_TAG_FLAG_IS_BINARY) {
         uint8_t filename[1024];
         enum AVCodecID id;
@@ -88,14 +92,8 @@ static int ape_tag_read_field(AVFormatContext *s)
             st->attached_pic.stream_index = st->index;
             st->attached_pic.flags       |= AV_PKT_FLAG_KEY;
         } else {
-            st->codec->extradata = av_malloc(size + FF_INPUT_BUFFER_PADDING_SIZE);
-            if (!st->codec->extradata)
+            if (ff_get_extradata(st->codec, s->pb, size) < 0)
                 return AVERROR(ENOMEM);
-            if (avio_read(pb, st->codec->extradata, size) != size) {
-                av_freep(&st->codec->extradata);
-                return AVERROR(EIO);
-            }
-            st->codec->extradata_size = size;
             st->codec->codec_type = AVMEDIA_TYPE_ATTACHMENT;
         }
     } else {
@@ -145,14 +143,14 @@ int64_t ff_ape_parse_tag(AVFormatContext *s)
     }
 
     if (tag_bytes > file_size - APE_TAG_FOOTER_BYTES) {
-        av_log(s, AV_LOG_ERROR, "Invalid tag size %u.\n", tag_bytes);
+        av_log(s, AV_LOG_ERROR, "Invalid tag size %"PRIu32".\n", tag_bytes);
         return 0;
     }
     tag_start = file_size - tag_bytes - APE_TAG_FOOTER_BYTES;
 
     fields = avio_rl32(pb);    /* number of fields */
     if (fields > 65536) {
-        av_log(s, AV_LOG_ERROR, "Too many tag fields (%d)\n", fields);
+        av_log(s, AV_LOG_ERROR, "Too many tag fields (%"PRIu32")\n", fields);
         return 0;
     }
 

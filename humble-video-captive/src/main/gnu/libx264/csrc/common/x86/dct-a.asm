@@ -1,13 +1,13 @@
 ;*****************************************************************************
 ;* dct-a.asm: x86 transform and zigzag
 ;*****************************************************************************
-;* Copyright (C) 2003-2013 x264 project
+;* Copyright (C) 2003-2014 x264 project
 ;*
 ;* Authors: Holger Lubitz <holger@lubitz.org>
 ;*          Loren Merritt <lorenm@u.washington.edu>
 ;*          Laurent Aimar <fenrir@via.ecp.fr>
 ;*          Min Chen <chenm001.163.com>
-;*          Jason Garrett-Glaser <darkshikari@gmail.com>
+;*          Fiona Glaser <fiona@x264.com>
 ;*
 ;* This program is free software; you can redistribute it and/or modify
 ;* it under the terms of the GNU General Public License as published by
@@ -675,7 +675,7 @@ cglobal add16x16_idct_dc, 2,3,8
     mova        m6, [pw_pixel_max]
     mova        m7, [pd_32]
     pxor        m5, m5
-.loop
+.loop:
     mova        m3, [r1]
     paddd       m3, m7
     psrad       m3, 6         ; dc0   0 dc1   0 dc2   0 dc3   0

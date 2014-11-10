@@ -26,26 +26,28 @@ const uint8_t test_key[16] = {
   0x89, 0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef, 0xf0
 };
 
-void encrypt_buffer(const uint8_t *src, uint8_t *dst, int size, int offset = 0) {
-  for (int i = 0; i < size; ++i) {
+void encrypt_buffer(const uint8_t *src, uint8_t *dst, size_t size,
+                    ptrdiff_t offset) {
+  for (size_t i = 0; i < size; ++i) {
     dst[i] = src[i] ^ test_key[(offset + i) & 15];
   }
 }
 
 void test_decrypt_cb(void *decrypt_state, const uint8_t *input,
                      uint8_t *output, int count) {
-  encrypt_buffer(input, output, count, input - (uint8_t *)decrypt_state);
+  encrypt_buffer(input, output, count,
+                 input - reinterpret_cast<uint8_t *>(decrypt_state));
 }
 
-} // namespace
+}  // namespace
 
 namespace libvpx_test {
 
-TEST(TestDecrypt, DecryptWorks) {
+TEST(TestDecrypt, DecryptWorksVp8) {
   libvpx_test::IVFVideoSource video("vp80-00-comprehensive-001.ivf");
   video.Init();
 
-  vpx_codec_dec_cfg_t dec_cfg = {0};
+  vpx_codec_dec_cfg_t dec_cfg = vpx_codec_dec_cfg_t();
   VP8Decoder decoder(dec_cfg, 0);
 
   video.Begin();
@@ -57,14 +59,12 @@ TEST(TestDecrypt, DecryptWorks) {
   // decrypt frame
   video.Next();
 
-#if CONFIG_DECRYPT
   std::vector<uint8_t> encrypted(video.frame_size());
-  encrypt_buffer(video.cxdata(), &encrypted[0], video.frame_size());
-  vp8_decrypt_init di = { test_decrypt_cb, &encrypted[0] };
-  decoder.Control(VP8D_SET_DECRYPTOR, &di);
-#endif  // CONFIG_DECRYPT
+  encrypt_buffer(video.cxdata(), &encrypted[0], video.frame_size(), 0);
+  vpx_decrypt_init di = { test_decrypt_cb, &encrypted[0] };
+  decoder.Control(VPXD_SET_DECRYPTOR, &di);
 
-  res = decoder.DecodeFrame(video.cxdata(), video.frame_size());
+  res = decoder.DecodeFrame(&encrypted[0], encrypted.size());
   ASSERT_EQ(VPX_CODEC_OK, res) << decoder.DecodeError();
 }
 

@@ -26,15 +26,15 @@
 
 typedef struct ThpDemuxContext {
     int              version;
-    int              first_frame;
-    int              first_framesz;
-    int              last_frame;
+    unsigned         first_frame;
+    unsigned         first_framesz;
+    unsigned         last_frame;
     int              compoff;
-    int              framecnt;
+    unsigned         framecnt;
     AVRational       fps;
-    int              frame;
-    int              next_frame;
-    int              next_framesz;
+    unsigned         frame;
+    int64_t          next_frame;
+    unsigned         next_framesz;
     int              video_stream_index;
     int              audio_stream_index;
     int              compcount;
@@ -47,11 +47,16 @@ typedef struct ThpDemuxContext {
 
 static int thp_probe(AVProbeData *p)
 {
+    double d;
     /* check file header */
-    if (AV_RL32(p->buf) == MKTAG('T', 'H', 'P', '\0'))
-        return AVPROBE_SCORE_MAX;
-    else
+    if (AV_RL32(p->buf) != MKTAG('T', 'H', 'P', '\0'))
         return 0;
+
+    d = av_int2float(AV_RB32(p->buf + 16));
+    if (d < 0.1 || d > 1000 || isnan(d))
+        return AVPROBE_SCORE_MAX/4;
+
+    return AVPROBE_SCORE_MAX;
 }
 
 static int thp_read_header(AVFormatContext *s)
@@ -93,7 +98,7 @@ static int thp_read_header(AVFormatContext *s)
 
     for (i = 0; i < thp->compcount; i++) {
         if (thp->components[i] == 0) {
-            if (thp->vst != 0)
+            if (thp->vst)
                 break;
 
             /* Video component.  */
@@ -109,7 +114,6 @@ static int thp_read_header(AVFormatContext *s)
             st->codec->codec_tag = 0;  /* no fourcc */
             st->codec->width = avio_rb32(pb);
             st->codec->height = avio_rb32(pb);
-            st->codec->sample_rate = av_q2d(thp->fps);
             st->nb_frames =
             st->duration = thp->framecnt;
             thp->vst = st;
@@ -158,7 +162,7 @@ static int thp_read_packet(AVFormatContext *s,
         avio_seek(pb, thp->next_frame, SEEK_SET);
 
         /* Locate the next frame and read out its size.  */
-        thp->next_frame += thp->next_framesz;
+        thp->next_frame += FFMAX(thp->next_framesz, 1);
         thp->next_framesz = avio_rb32(pb);
 
                         avio_rb32(pb); /* Previous total size.  */

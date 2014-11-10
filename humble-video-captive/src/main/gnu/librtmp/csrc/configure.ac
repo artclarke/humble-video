@@ -2,11 +2,12 @@
 # Process this file with autoconf to produce a configure script.
 
 m4_define([MLIB_MAJOR_VERSION], [2])
-m4_define([MLIB_MINOR_VERSION], [2])
+m4_define([MLIB_MINOR_VERSION], [4])
 AC_PREREQ(2.63b)
 AC_INIT([librtmp],[MLIB_MAJOR_VERSION.MLIB_MINOR_VERSION],[info@humble.io])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([-Wall -Werror no-dependencies nostdinc tar-pax 1.10.2 ])
+AM_INIT_AUTOMAKE([-Wall -Werror no-dependencies nostdinc tar-pax subdir-objects 1.10.2 ])
+
 AM_PROG_AR
 AM_SILENT_RULES([yes])
 AC_CANONICAL_BUILD
@@ -26,47 +27,30 @@ AC_DEFINE(LIB_MINOR_VERSION, [LIB_MINOR_VERSION], [Minor version of library])
 CRYPTO_REQ=libssl,libcrypto
 AC_SUBST([CRYPTO_REQ])
 
+LT_PREREQ([2.2.7b])
+LT_INIT([disable-fast-install win32-dll])
+PKG_PROG_PKG_CONFIG
+
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
-LT_PREREQ([2.2.7b])
-LT_INIT([disable-fast-install win32-dll])
-
 # Checks for libraries.
+PKG_CHECK_MODULES([ZLIB], [zlib >= 1 ])
 PKG_CHECK_MODULES([OPENSSL], [openssl >= 1 ])
+
 AC_CHECK_HEADERS([windows.h])
 AC_CHECK_HEADERS([mmsystem.h], [], [], [
 #ifdef HAVE_WINDOWS_H
 #include <windows.h>
 #endif
 ])
-AC_MSG_CHECKING([for timeGetTime in -lwinmm])
-RTMP_CACHED_LIBS="${LIBS}"
-LIBS="-lwinmm ${LIBS}"
-AC_TRY_LINK(
-[
-#ifdef HAVE_WINDOWS_H
-#include <windows.h>
-#endif
-#ifdef HAVE_MMSYSTEM_H
-#include <mmsystem.h>
-#endif
-],
-[ (void) timeGetTime(); ],
-[ 
-  AC_MSG_RESULT([yes])
-],
-[
- AC_MSG_RESULT([no])
- LIBS="${RTMP_CACHED_LIBS}"
-]
-)
 AC_CHECK_LIB([pthread], [pthread_create])
 
 # Checks for header files.
@@ -92,8 +76,16 @@ AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([gethostbyname inet_ntoa memchr memset select socket strcasecmp strchr strdup strerror strncasecmp strrchr strstr strtol])
 
+case $host_os in
+  *mingw*|*cygwin*)
+  LIBS+="-lssl -lcrypto -lz -lws2_32 -lwinmm -lgdi32"
+  ;;
+esac
 PRIVATE_LIBS="${LIBS}"
 AC_SUBST([PRIVATE_LIBS])
+PUBLIC_LIBS="${LIBS}"
+AC_SUBST([PUBLIC_LIBS])
+
 
 AC_CONFIG_FILES([Makefile
 librtmp.pc:src/librtmp/librtmp.pc.in])

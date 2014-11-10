@@ -32,7 +32,7 @@ foreach (@ARGV)
 	push(@files,$_);
 	$str="\t{FUNC_TYPE_GENERAL,\"$_\",${_}_main},\n";
 	if (($_ =~ /^s_/) || ($_ =~ /^ciphers$/))
-		{ print "#if !defined(OPENSSL_NO_SOCK) && !(defined(OPENSSL_NO_SSL2) && defined(OPENSSL_NO_SSL3))\n${str}#endif\n"; } 
+		{ print "#if !defined(OPENSSL_NO_SOCK)\n${str}#endif\n"; } 
 	elsif ( ($_ =~ /^speed$/))
 		{ print "#ifndef OPENSSL_NO_SPEED\n${str}#endif\n"; }
 	elsif ( ($_ =~ /^engine$/))
@@ -51,6 +51,8 @@ foreach (@ARGV)
 		{ print "#ifndef OPENSSL_NO_CMS\n${str}#endif\n"; }
 	elsif ( ($_ =~ /^ocsp$/))
 		{ print "#ifndef OPENSSL_NO_OCSP\n${str}#endif\n"; }
+	elsif ( ($_ =~ /^srp$/))
+		{ print "#ifndef OPENSSL_NO_SRP\n${str}#endif\n"; }
 	else
 		{ print $str; }
 	}

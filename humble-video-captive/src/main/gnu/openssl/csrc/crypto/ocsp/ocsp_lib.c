@@ -124,7 +124,8 @@ OCSP_CERTID *OCSP_cert_id_new(const EVP_MD *dgst,
 	if (!(ASN1_OCTET_STRING_set(cid->issuerNameHash, md, i))) goto err;
 
 	/* Calculate the issuerKey hash, excluding tag and length */
-	EVP_Digest(issuerKey->data, issuerKey->length, md, &i, dgst, NULL);
+	if (!EVP_Digest(issuerKey->data, issuerKey->length, md, &i, dgst, NULL))
+		goto err;
 
 	if (!(ASN1_OCTET_STRING_set(cid->issuerKeyHash, md, i))) goto err;
 
@@ -221,8 +222,19 @@ int OCSP_parse_url(char *url, char **phost, char **pport, char **ppath, int *pss
 
 	if (!*ppath) goto mem_err;
 
+	p = host;
+	if(host[0] == '[')
+		{
+		/* ipv6 literal */
+		host++;
+		p = strchr(host, ']');
+		if(!p) goto parse_err;
+		*p = '\0';
+		p++;
+		}
+
 	/* Look for optional ':' for port number */
-	if ((p = strchr(host, ':')))
+	if ((p = strchr(p, ':')))
 		{
 		*p = 0;
 		port = p + 1;

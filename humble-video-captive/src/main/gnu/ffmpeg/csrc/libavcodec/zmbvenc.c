@@ -44,6 +44,7 @@
  */
 typedef struct ZmbvEncContext {
     AVCodecContext *avctx;
+
     int range;
     uint8_t *comp_buf, *work_buf;
     uint8_t pal[768];
@@ -119,7 +120,7 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                         const AVFrame *pict, int *got_packet)
 {
     ZmbvEncContext * const c = avctx->priv_data;
-    AVFrame * const p = (AVFrame *)pict;
+    const AVFrame * const p = pict;
     uint8_t *src, *prev, *buf;
     uint32_t *palptr;
     int keyframe, chpal;
@@ -132,8 +133,8 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     c->curfrm++;
     if(c->curfrm == c->keyint)
         c->curfrm = 0;
-    p->pict_type= keyframe ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
-    p->key_frame= keyframe;
+    avctx->coded_frame->pict_type = keyframe ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
+    avctx->coded_frame->key_frame = keyframe;
     chpal = !keyframe && memcmp(p->data[1], c->pal2, 1024);
 
     palptr = (uint32_t*)p->data[1];
@@ -248,6 +249,20 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     return 0;
 }
 
+static av_cold int encode_end(AVCodecContext *avctx)
+{
+    ZmbvEncContext * const c = avctx->priv_data;
+
+    av_freep(&c->comp_buf);
+    av_freep(&c->work_buf);
+
+    deflateEnd(&c->zstream);
+    av_freep(&c->prev);
+
+    av_frame_free(&avctx->coded_frame);
+
+    return 0;
+}
 
 /**
  * Init zmbv encoder
@@ -281,7 +296,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
     memset(&c->zstream, 0, sizeof(z_stream));
     c->comp_size = avctx->width * avctx->height + 1024 +
         ((avctx->width + ZMBV_BLOCK - 1) / ZMBV_BLOCK) * ((avctx->height + ZMBV_BLOCK - 1) / ZMBV_BLOCK) * 2 + 4;
-    if ((c->work_buf = av_malloc(c->comp_size)) == NULL) {
+    if (!(c->work_buf = av_malloc(c->comp_size))) {
         av_log(avctx, AV_LOG_ERROR, "Can't allocate work buffer.\n");
         return AVERROR(ENOMEM);
     }
@@ -290,12 +305,12 @@ static av_cold int encode_init(AVCodecContext *avctx)
                            ((c->comp_size + 63) >> 6) + 11;
 
     /* Allocate compression buffer */
-    if ((c->comp_buf = av_malloc(c->comp_size)) == NULL) {
+    if (!(c->comp_buf = av_malloc(c->comp_size))) {
         av_log(avctx, AV_LOG_ERROR, "Can't allocate compression buffer.\n");
         return AVERROR(ENOMEM);
     }
     c->pstride = FFALIGN(avctx->width, 16);
-    if ((c->prev = av_malloc(c->pstride * avctx->height)) == NULL) {
+    if (!(c->prev = av_malloc(c->pstride * avctx->height))) {
         av_log(avctx, AV_LOG_ERROR, "Can't allocate picture.\n");
         return AVERROR(ENOMEM);
     }
@@ -309,29 +324,18 @@ static av_cold int encode_init(AVCodecContext *avctx)
         return -1;
     }
 
-    return 0;
-}
-
-
-
-/**
- * Uninit zmbv encoder
- */
-static av_cold int encode_end(AVCodecContext *avctx)
-{
-    ZmbvEncContext * const c = avctx->priv_data;
-
-    av_freep(&c->comp_buf);
-    av_freep(&c->work_buf);
-
-    deflateEnd(&c->zstream);
-    av_freep(&c->prev);
+    avctx->coded_frame = av_frame_alloc();
+    if (!avctx->coded_frame) {
+        encode_end(avctx);
+        return AVERROR(ENOMEM);
+    }
 
     return 0;
 }
 
 AVCodec ff_zmbv_encoder = {
     .name           = "zmbv",
+    .long_name      = NULL_IF_CONFIG_SMALL("Zip Motion Blocks Video"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_ZMBV,
     .priv_data_size = sizeof(ZmbvEncContext),
@@ -339,5 +343,4 @@ AVCodec ff_zmbv_encoder = {
     .encode2        = encode_frame,
     .close          = encode_end,
     .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_PAL8, AV_PIX_FMT_NONE },
-    .long_name      = NULL_IF_CONFIG_SMALL("Zip Motion Blocks Video"),
 };

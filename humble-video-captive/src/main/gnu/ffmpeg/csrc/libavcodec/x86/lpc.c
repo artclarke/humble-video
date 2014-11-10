@@ -1,5 +1,5 @@
 /*
- * MMX optimized LPC DSP utils
+ * SIMD-optimized LPC functions
  * Copyright (c) 2007 Loren Merritt
  *
  * This file is part of FFmpeg.
@@ -19,10 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/x86/asm.h"
 #include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
 #include "libavutil/mem.h"
+#include "libavutil/x86/asm.h"
+#include "libavutil/x86/cpu.h"
 #include "libavcodec/lpc.h"
 
 DECLARE_ASM_CONST(16, double, pd_1)[2] = { 1.0, 1.0 };
@@ -71,6 +72,7 @@ static void lpc_apply_welch_window_sse2(const int32_t *data, int len,
         "3:                                    \n\t"
         :"+&r"(i), "+&r"(j)
         :"r"(w_data+n2), "r"(data+n2), "m"(c), "r"(len)
+         NAMED_CONSTRAINTS_ARRAY_ADD(pd_1,pd_2)
          XMM_CLOBBERS_ONLY("%xmm0", "%xmm1", "%xmm2", "%xmm3",
                                     "%xmm5", "%xmm6", "%xmm7")
     );
@@ -115,6 +117,7 @@ static void lpc_compute_autocorr_sse2(const double *data, int len, int lag,
                 "movsd     %%xmm2, 16(%1)           \n\t"
                 :"+&r"(i)
                 :"r"(autoc+j), "r"(data+len), "r"(data+len-j)
+                 NAMED_CONSTRAINTS_ARRAY_ADD(pd_1)
                 :"memory"
             );
         } else {
@@ -138,6 +141,7 @@ static void lpc_compute_autocorr_sse2(const double *data, int len, int lag,
                 "movsd     %%xmm1, %2               \n\t"
                 :"+&r"(i), "=m"(autoc[j]), "=m"(autoc[j+1])
                 :"r"(data+len), "r"(data+len-j)
+                 NAMED_CONSTRAINTS_ARRAY_ADD(pd_1)
             );
         }
     }
@@ -148,9 +152,9 @@ static void lpc_compute_autocorr_sse2(const double *data, int len, int lag,
 av_cold void ff_lpc_init_x86(LPCContext *c)
 {
 #if HAVE_SSE2_INLINE
-    int mm_flags = av_get_cpu_flags();
+    int cpu_flags = av_get_cpu_flags();
 
-    if (mm_flags & (AV_CPU_FLAG_SSE2|AV_CPU_FLAG_SSE2SLOW)) {
+    if (HAVE_SSE2_INLINE && cpu_flags & (AV_CPU_FLAG_SSE2 | AV_CPU_FLAG_SSE2SLOW)) {
         c->lpc_apply_welch_window = lpc_apply_welch_window_sse2;
         c->lpc_compute_autocorr   = lpc_compute_autocorr_sse2;
     }

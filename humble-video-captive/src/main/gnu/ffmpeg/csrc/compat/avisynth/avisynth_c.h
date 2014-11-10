@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA, or visit
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+// MA 02110-1301 USA, or visit
 // http://www.gnu.org/copyleft/gpl.html .
 //
 // As a special exception, I give you permission to link to the
@@ -804,7 +805,7 @@ struct AVS_Library {
 
 AVSC_INLINE AVS_Library * avs_load_library() {
   AVS_Library *library = (AVS_Library *)malloc(sizeof(AVS_Library));
-  if (library == NULL)
+  if (!library)
     return NULL;
   library->handle = LoadLibrary("avisynth");
   if (library->handle == NULL)
@@ -869,7 +870,7 @@ fail:
 }
 
 AVSC_INLINE void avs_free_library(AVS_Library *library) {
-  if (library == NULL)
+  if (!library)
     return;
   FreeLibrary(library->handle);
   free(library);

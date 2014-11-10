@@ -128,6 +128,9 @@ public:
     FLAG2_CHUNKS = CODEC_FLAG2_CHUNKS,
     /** Show all frames before the first keyframe */
     FLAG2_SHOW_ALL = CODEC_FLAG2_SHOW_ALL,
+    /** Export motion vectors through frame side data */
+    FLAG2_EXPORT_MVS = CODEC_FLAG2_EXPORT_MVS,
+
   } Flag2;
 
   /**

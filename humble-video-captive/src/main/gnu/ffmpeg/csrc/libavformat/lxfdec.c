@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <inttypes.h>
+
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/bytestream.h"
 #include "avformat.h"
@@ -90,7 +92,7 @@ static int sync(AVFormatContext *s, uint8_t *header)
         return ret < 0 ? ret : AVERROR_EOF;
 
     while (memcmp(buf, LXF_IDENT, LXF_IDENT_LENGTH)) {
-        if (url_feof(s->pb))
+        if (avio_feof(s->pb))
             return AVERROR_EOF;
 
         memmove(buf, &buf[1], LXF_IDENT_LENGTH-1);
@@ -115,7 +117,7 @@ static int get_packet_header(AVFormatContext *s)
     uint32_t version, audio_format, header_size, channels, tmp;
     AVStream *st;
     uint8_t header[LXF_MAX_PACKET_HEADER_SIZE];
-    const uint8_t *p;
+    const uint8_t *p = header + LXF_IDENT_LENGTH;
 
     //find and read the ident
     if ((ret = sync(s, header)) < 0)
@@ -125,24 +127,23 @@ static int get_packet_header(AVFormatContext *s)
     if (ret != 8)
         return ret < 0 ? ret : AVERROR_EOF;
 
-    p = header + LXF_IDENT_LENGTH;
     version     = bytestream_get_le32(&p);
     header_size = bytestream_get_le32(&p);
     if (version > 1)
-        avpriv_request_sample(s, "format version %i", version);
+        avpriv_request_sample(s, "Unknown format version %"PRIu32"\n", version);
+
     if (header_size < (version ? 72 : 60) ||
         header_size > LXF_MAX_PACKET_HEADER_SIZE ||
         (header_size & 3)) {
-        av_log(s, AV_LOG_ERROR, "Invalid header size 0x%x\n", header_size);
+        av_log(s, AV_LOG_ERROR, "Invalid header size 0x%"PRIx32"\n", header_size);
         return AVERROR_INVALIDDATA;
     }
 
     //read the rest of the packet header
     if ((ret = avio_read(pb, header + (p - header),
                           header_size - (p - header))) !=
-                          header_size - (p - header)) {
+                          header_size - (p - header))
         return ret < 0 ? ret : AVERROR_EOF;
-    }
 
     if (check_checksum(header, header_size))
         av_log(s, AV_LOG_ERROR, "checksum error\n");
@@ -162,15 +163,18 @@ static int get_packet_header(AVFormatContext *s)
         break;
     case 1:
         //audio
-        if (!s->streams || !(st = s->streams[1])) {
+        if (s->nb_streams < 2) {
             av_log(s, AV_LOG_INFO, "got audio packet, but no audio stream present\n");
             break;
         }
 
-        if (version == 0) p += 8;
+        if (version == 0)
+            p += 8;
         audio_format = bytestream_get_le32(&p);
         channels     = bytestream_get_le32(&p);
         track_size   = bytestream_get_le32(&p);
+
+        st = s->streams[1];
 
         //set codec based on specified audio bitdepth
         //we only support tightly packed 16-, 20-, 24- and 32-bit PCM at the moment
@@ -257,6 +261,7 @@ static int lxf_read_header(AVFormatContext *s)
     st->codec->bit_rate   = 1000000 * ((video_params >> 14) & 0xFF);
     st->codec->codec_tag  = video_params & 0xF;
     st->codec->codec_id   = ff_codec_get_id(lxf_tags, st->codec->codec_tag);
+    st->need_parsing      = AVSTREAM_PARSE_HEADERS;
 
     av_log(s, AV_LOG_DEBUG, "record: %x = %i-%02i-%02i\n",
            record_date, 1900 + (record_date & 0x7F), (record_date >> 7) & 0xF,
@@ -289,7 +294,6 @@ static int lxf_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
     LXFDemuxContext *lxf = s->priv_data;
     AVIOContext   *pb  = s->pb;
-    AVStream *ast = NULL;
     uint32_t stream;
     int ret, ret2;
 
@@ -299,11 +303,12 @@ static int lxf_read_packet(AVFormatContext *s, AVPacket *pkt)
     stream = lxf->packet_type;
 
     if (stream > 1) {
-        av_log(s, AV_LOG_WARNING, "got packet with illegal stream index %u\n", stream);
+        av_log(s, AV_LOG_WARNING,
+               "got packet with illegal stream index %"PRIu32"\n", stream);
         return AVERROR(EAGAIN);
     }
 
-    if (stream == 1 && !(ast = s->streams[1])) {
+    if (stream == 1 && s->nb_streams < 2) {
         av_log(s, AV_LOG_ERROR, "got audio packet without having an audio stream\n");
         return AVERROR_INVALIDDATA;
     }
@@ -318,7 +323,7 @@ static int lxf_read_packet(AVFormatContext *s, AVPacket *pkt)
 
     pkt->stream_index = stream;
 
-    if (!ast) {
+    if (!stream) {
         //picture type (0 = closed I, 1 = open I, 2 = P, 3 = B)
         if (((lxf->video_format >> 22) & 0x3) < 2)
             pkt->flags |= AV_PKT_FLAG_KEY;

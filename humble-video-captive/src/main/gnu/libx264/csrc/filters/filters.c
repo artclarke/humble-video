@@ -1,7 +1,7 @@
 /*****************************************************************************
  * filters.c: common filter functions
  *****************************************************************************
- * Copyright (C) 2010-2013 x264 project
+ * Copyright (C) 2010-2014 x264 project
  *
  * Authors: Diogo Franco <diogomfranco@gmail.com>
  *          Steven Walters <kemuri9@gmail.com>
@@ -38,13 +38,13 @@ char **x264_split_string( char *string, char *sep, int limit )
     if( sep_count == 0 )
     {
         if( string[0] == '\0' )
-            return calloc( 1, sizeof( char** ) );
-        char **ret = calloc( 2, sizeof( char** ) );
+            return calloc( 1, sizeof( char* ) );
+        char **ret = calloc( 2, sizeof( char* ) );
         ret[0] = strdup( string );
         return ret;
     }
 
-    char **split = calloc( ( limit > 0 ? limit : sep_count ) + 2, sizeof(char**) );
+    char **split = calloc( ( limit > 0 ? limit : sep_count ) + 2, sizeof(char*) );
     int i = 0;
     char *str = strdup( string );
     assert( str );
@@ -104,7 +104,7 @@ char **x264_split_options( const char *opt_str, const char *options[] )
     while( options[options_count] != NULL )
         ++options_count;
 
-    char **opts = calloc( split_count * 2 + 2, sizeof( char ** ) );
+    char **opts = calloc( split_count * 2 + 2, sizeof( char * ) );
     char **arg = NULL;
     int opt = 0, found_named = 0, invalid = 0;
     for( int i = 0; split[i] != NULL; i++, invalid = 0 )

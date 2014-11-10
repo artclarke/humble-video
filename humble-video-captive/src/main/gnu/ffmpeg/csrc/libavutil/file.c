@@ -18,6 +18,7 @@
 
 #include "config.h"
 #include "file.h"
+#include "internal.h"
 #include "log.h"
 #include "mem.h"
 #include <fcntl.h>
@@ -49,7 +50,7 @@ int av_file_map(const char *filename, uint8_t **bufptr, size_t *size,
                 int log_offset, void *log_ctx)
 {
     FileLogContext file_log_ctx = { &file_log_ctx_class, log_offset, log_ctx };
-    int err, fd = open(filename, O_RDONLY);
+    int err, fd = avpriv_open(filename, O_RDONLY);
     struct stat st;
     av_unused void *ptr;
     off_t off_size;
@@ -136,9 +137,10 @@ void av_file_unmap(uint8_t *bufptr, size_t size)
 #endif
 }
 
-int av_tempfile(const char *prefix, char **filename, int log_offset, void *log_ctx) {
+int av_tempfile(const char *prefix, char **filename, int log_offset, void *log_ctx)
+{
     FileLogContext file_log_ctx = { &file_log_ctx_class, log_offset, log_ctx };
-    int fd=-1;
+    int fd = -1;
 #if !HAVE_MKSTEMP
     void *ptr= tempnam(NULL, prefix);
     if(!ptr)
@@ -148,10 +150,10 @@ int av_tempfile(const char *prefix, char **filename, int log_offset, void *log_c
     free(ptr);
 #else
     size_t len = strlen(prefix) + 12; /* room for "/tmp/" and "XXXXXX\0" */
-    *filename = av_malloc(len);
+    *filename  = av_malloc(len);
 #endif
     /* -----common section-----*/
-    if (*filename == NULL) {
+    if (!*filename) {
         av_log(&file_log_ctx, AV_LOG_ERROR, "ff_tempfile: Cannot allocate file name\n");
         return AVERROR(ENOMEM);
     }

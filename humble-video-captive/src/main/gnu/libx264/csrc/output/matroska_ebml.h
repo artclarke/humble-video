@@ -1,7 +1,7 @@
 /*****************************************************************************
  * matroska_ebml.h: matroska muxer utilities
  *****************************************************************************
- * Copyright (C) 2005-2013 x264 project
+ * Copyright (C) 2005-2014 x264 project
  *
  * Authors: Mike Matsnev <mike@haali.su>
  *
@@ -42,7 +42,7 @@ int mk_write_header( mk_writer *w, const char *writing_app,
                      int64_t default_frame_duration,
                      int64_t timescale,
                      unsigned width, unsigned height,
-                     unsigned d_width, unsigned d_height, int display_size_units );
+                     unsigned d_width, unsigned d_height, int display_size_units, int stereo_mode );
 
 int mk_start_frame( mk_writer *w );
 int mk_add_frame_data( mk_writer *w, const void *data, unsigned size );

@@ -28,6 +28,7 @@
  * @see http://www.w3.org/Graphics/GIF/spec-gif89a.txt
  */
 
+#define BITSTREAM_WRITER_LE
 #include "libavutil/opt.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
@@ -36,7 +37,6 @@
 #include "lzw.h"
 #include "gif.h"
 
-#define BITSTREAM_WRITER_LE
 #include "put_bits.h"
 
 typedef struct {
@@ -168,7 +168,7 @@ static int gif_image_write_image(AVCodecContext *avctx,
 
     bytestream_put_byte(bytestream, 0x08);
 
-    ff_lzw_encode_init(s->lzw, s->buf, width * height,
+    ff_lzw_encode_init(s->lzw, s->buf, 2 * width * height,
                        12, FF_LZW_GIF, put_bits);
 
     ptr = buf + y_start*linesize + x_start;
@@ -216,6 +216,13 @@ static av_cold int gif_encode_init(AVCodecContext *avctx)
         return AVERROR(EINVAL);
     }
 
+    avctx->coded_frame = av_frame_alloc();
+    if (!avctx->coded_frame)
+        return AVERROR(ENOMEM);
+
+    avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
+    avctx->coded_frame->key_frame = 1;
+
     s->lzw = av_mallocz(ff_lzw_encode_state_size);
     s->buf = av_malloc(avctx->width*avctx->height*2);
     s->tmpl = av_malloc(avctx->width);
@@ -232,7 +239,6 @@ static int gif_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                             const AVFrame *pict, int *got_packet)
 {
     GIFContext *s = avctx->priv_data;
-    AVFrame *const p = (AVFrame *)pict;
     uint8_t *outbuf_ptr, *end;
     const uint32_t *palette = NULL;
     int ret;
@@ -242,15 +248,12 @@ static int gif_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     outbuf_ptr = pkt->data;
     end        = pkt->data + pkt->size;
 
-    p->pict_type = AV_PICTURE_TYPE_I;
-    p->key_frame = 1;
-
     if (avctx->pix_fmt == AV_PIX_FMT_PAL8) {
         uint8_t *pal_exdata = av_packet_new_side_data(pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
         if (!pal_exdata)
             return AVERROR(ENOMEM);
-        memcpy(pal_exdata, p->data[1], AVPALETTE_SIZE);
-        palette = (uint32_t*)p->data[1];
+        memcpy(pal_exdata, pict->data[1], AVPALETTE_SIZE);
+        palette = (uint32_t*)pict->data[1];
     }
 
     gif_image_write_image(avctx, &outbuf_ptr, end, palette,
@@ -275,6 +278,8 @@ static int gif_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 static int gif_encode_close(AVCodecContext *avctx)
 {
     GIFContext *s = avctx->priv_data;
+
+    av_frame_free(&avctx->coded_frame);
 
     av_freep(&s->lzw);
     av_freep(&s->buf);
@@ -301,6 +306,7 @@ static const AVClass gif_class = {
 
 AVCodec ff_gif_encoder = {
     .name           = "gif",
+    .long_name      = NULL_IF_CONFIG_SMALL("GIF (Graphics Interchange Format)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_GIF,
     .priv_data_size = sizeof(GIFContext),
@@ -311,6 +317,5 @@ AVCodec ff_gif_encoder = {
         AV_PIX_FMT_RGB8, AV_PIX_FMT_BGR8, AV_PIX_FMT_RGB4_BYTE, AV_PIX_FMT_BGR4_BYTE,
         AV_PIX_FMT_GRAY8, AV_PIX_FMT_PAL8, AV_PIX_FMT_NONE
     },
-    .long_name      = NULL_IF_CONFIG_SMALL("GIF (Graphics Interchange Format)"),
     .priv_class     = &gif_class,
 };

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * lavf.c: libavformat input
  *****************************************************************************
- * Copyright (C) 2009-2013 x264 project
+ * Copyright (C) 2009-2014 x264 project
  *
  * Authors: Mike Gurlitz <mike.gurlitz@gmail.com>
  *          Steven Walters <kemuri9@gmail.com>
@@ -53,9 +53,9 @@ static int handle_jpeg( int csp, int *fullrange )
 {
     switch( csp )
     {
-        case PIX_FMT_YUVJ420P: *fullrange = 1; return PIX_FMT_YUV420P;
-        case PIX_FMT_YUVJ422P: *fullrange = 1; return PIX_FMT_YUV422P;
-        case PIX_FMT_YUVJ444P: *fullrange = 1; return PIX_FMT_YUV444P;
+        case AV_PIX_FMT_YUVJ420P: *fullrange = 1; return AV_PIX_FMT_YUV420P;
+        case AV_PIX_FMT_YUVJ422P: *fullrange = 1; return AV_PIX_FMT_YUV422P;
+        case AV_PIX_FMT_YUVJ444P: *fullrange = 1; return AV_PIX_FMT_YUV444P;
         default:                               return csp;
     }
 }
@@ -162,7 +162,7 @@ static int open_file( char *psz_filename, hnd_t *p_handle, video_info_t *info, c
     if( opt->resolution )
     {
         av_dict_set( &options, "video_size", opt->resolution, 0 );
-        const char *csp = opt->colorspace ? opt->colorspace : av_get_pix_fmt_name( PIX_FMT_YUV420P );
+        const char *csp = opt->colorspace ? opt->colorspace : av_get_pix_fmt_name( AV_PIX_FMT_YUV420P );
         av_dict_set( &options, "pixel_format", csp, 0 );
     }
 
@@ -210,7 +210,7 @@ static int open_file( char *psz_filename, hnd_t *p_handle, video_info_t *info, c
 
     /* avisynth stores rgb data vertically flipped. */
     if( !strcasecmp( get_filename_extension( psz_filename ), "avs" ) &&
-        (c->pix_fmt == PIX_FMT_BGRA || c->pix_fmt == PIX_FMT_BGR24) )
+        (c->pix_fmt == AV_PIX_FMT_BGRA || c->pix_fmt == AV_PIX_FMT_BGR24) )
         info->csp |= X264_CSP_VFLIP;
 
     *p_handle = h;

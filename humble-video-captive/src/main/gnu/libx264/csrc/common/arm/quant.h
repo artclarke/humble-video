@@ -1,7 +1,7 @@
 /*****************************************************************************
  * quant.h: arm quantization and level-run
  *****************************************************************************
- * Copyright (C) 2005-2013 x264 project
+ * Copyright (C) 2005-2014 x264 project
  *
  * Authors: David Conrad <lessen42@gmail.com>
  *
@@ -39,6 +39,7 @@ void x264_dequant_4x4_neon( int16_t dct[16], int dequant_mf[6][16], int i_qp );
 void x264_dequant_8x8_neon( int16_t dct[64], int dequant_mf[6][64], int i_qp );
 
 int x264_coeff_last4_arm( int16_t * );
+int x264_coeff_last8_arm( int16_t * );
 int x264_coeff_last15_neon( int16_t * );
 int x264_coeff_last16_neon( int16_t * );
 int x264_coeff_last64_neon( int16_t * );

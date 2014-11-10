@@ -26,6 +26,7 @@
 #include "libavutil/common.h"
 #include "libavutil/eval.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/internal.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/rational.h"
@@ -35,7 +36,6 @@
 #include "avfilter.h"
 #include "formats.h"
 #include "internal.h"
-#include "audio.h"
 
 static int ff_filter_frame_framed(AVFilterLink *link, AVFrame *frame);
 
@@ -93,16 +93,25 @@ void ff_command_queue_pop(AVFilterContext *filter)
     av_free(c);
 }
 
-void ff_insert_pad(unsigned idx, unsigned *count, size_t padidx_off,
+int ff_insert_pad(unsigned idx, unsigned *count, size_t padidx_off,
                    AVFilterPad **pads, AVFilterLink ***links,
                    AVFilterPad *newpad)
 {
+    AVFilterLink **newlinks;
+    AVFilterPad *newpads;
     unsigned i;
 
     idx = FFMIN(idx, *count);
 
-    *pads  = av_realloc(*pads,  sizeof(AVFilterPad)   * (*count + 1));
-    *links = av_realloc(*links, sizeof(AVFilterLink*) * (*count + 1));
+    newpads  = av_realloc_array(*pads,  *count + 1, sizeof(AVFilterPad));
+    newlinks = av_realloc_array(*links, *count + 1, sizeof(AVFilterLink*));
+    if (newpads)
+        *pads  = newpads;
+    if (newlinks)
+        *links = newlinks;
+    if (!newpads || !newlinks)
+        return AVERROR(ENOMEM);
+
     memmove(*pads  + idx + 1, *pads  + idx, sizeof(AVFilterPad)   * (*count - idx));
     memmove(*links + idx + 1, *links + idx, sizeof(AVFilterLink*) * (*count - idx));
     memcpy(*pads + idx, newpad, sizeof(AVFilterPad));
@@ -110,8 +119,10 @@ void ff_insert_pad(unsigned idx, unsigned *count, size_t padidx_off,
 
     (*count)++;
     for (i = idx + 1; i < *count; i++)
-        if (*links[i])
-            (*(unsigned *)((uint8_t *) *links[i] + padidx_off))++;
+        if ((*links)[i])
+            (*(unsigned *)((uint8_t *) (*links)[i] + padidx_off))++;
+
+    return 0;
 }
 
 int avfilter_link(AVFilterContext *src, unsigned srcpad,
@@ -284,7 +295,7 @@ int avfilter_config_links(AVFilterContext *filter)
 
             if ((config_link = link->dstpad->config_props))
                 if ((ret = config_link(link)) < 0) {
-                    av_log(link->src, AV_LOG_ERROR,
+                    av_log(link->dst, AV_LOG_ERROR,
                            "Failed to configure input pad on %s\n",
                            link->dst->name);
                     return ret;
@@ -426,7 +437,15 @@ void ff_update_link_current_pts(AVFilterLink *link, int64_t pts)
 int avfilter_process_command(AVFilterContext *filter, const char *cmd, const char *arg, char *res, int res_len, int flags)
 {
     if(!strcmp(cmd, "ping")){
+        char local_res[256] = {0};
+
+        if (!res) {
+            res = local_res;
+            res_len = sizeof(local_res);
+        }
         av_strlcatf(res, res_len, "pong from:%s %s\n", filter->filter->name, filter->name);
+        if (res == local_res)
+            av_log(filter, AV_LOG_INFO, "%s", res);
         return 0;
     }else if(!strcmp(cmd, "enable")) {
         return set_enable_expr(filter, arg);
@@ -437,7 +456,11 @@ int avfilter_process_command(AVFilterContext *filter, const char *cmd, const cha
 }
 
 static AVFilter *first_filter;
+static AVFilter **last_filter = &first_filter;
 
+#if !FF_API_NOCONST_GET_NAME
+const
+#endif
 AVFilter *avfilter_get_by_name(const char *name)
 {
     const AVFilter *f = NULL;
@@ -454,7 +477,7 @@ AVFilter *avfilter_get_by_name(const char *name)
 
 int avfilter_register(AVFilter *filter)
 {
-    AVFilter **f = &first_filter;
+    AVFilter **f = last_filter;
     int i;
 
     /* the filter must select generic or internal exclusively */
@@ -468,8 +491,9 @@ int avfilter_register(AVFilter *filter)
 
     filter->next = NULL;
 
-    while(avpriv_atomic_ptr_cas((void * volatile *)f, NULL, filter))
+    while(*f || avpriv_atomic_ptr_cas((void * volatile *)f, NULL, filter))
         f = &(*f)->next;
+    last_filter = &filter->next;
 
     return 0;
 }
@@ -539,7 +563,7 @@ static const AVClass *filter_child_class_next(const AVClass *prev)
 
 #define OFFSET(x) offsetof(AVFilterContext, x)
 #define FLAGS AV_OPT_FLAG_FILTERING_PARAM
-static const AVOption options[] = {
+static const AVOption avfilter_options[] = {
     { "thread_type", "Allowed thread types", OFFSET(thread_type), AV_OPT_TYPE_FLAGS,
         { .i64 = AVFILTER_THREAD_SLICE }, 0, INT_MAX, FLAGS, "thread_type" },
         { "slice", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = AVFILTER_THREAD_SLICE }, .unit = "thread_type" },
@@ -554,10 +578,10 @@ static const AVClass avfilter_class = {
     .category   = AV_CLASS_CATEGORY_FILTER,
     .child_next = filter_child_next,
     .child_class_next = filter_child_class_next,
-    .option           = options,
+    .option           = avfilter_options,
 };
 
-static int default_execute(AVFilterContext *ctx, action_func *func, void *arg,
+static int default_execute(AVFilterContext *ctx, avfilter_action_func *func, void *arg,
                            int *ret, int nb_jobs)
 {
     int i;
@@ -603,28 +627,30 @@ AVFilterContext *ff_filter_alloc(const AVFilter *filter, const char *inst_name)
 
     ret->nb_inputs = avfilter_pad_count(filter->inputs);
     if (ret->nb_inputs ) {
-        ret->input_pads   = av_malloc(sizeof(AVFilterPad) * ret->nb_inputs);
+        ret->input_pads   = av_malloc_array(ret->nb_inputs, sizeof(AVFilterPad));
         if (!ret->input_pads)
             goto err;
         memcpy(ret->input_pads, filter->inputs, sizeof(AVFilterPad) * ret->nb_inputs);
-        ret->inputs       = av_mallocz(sizeof(AVFilterLink*) * ret->nb_inputs);
+        ret->inputs       = av_mallocz_array(ret->nb_inputs, sizeof(AVFilterLink*));
         if (!ret->inputs)
             goto err;
     }
 
     ret->nb_outputs = avfilter_pad_count(filter->outputs);
     if (ret->nb_outputs) {
-        ret->output_pads  = av_malloc(sizeof(AVFilterPad) * ret->nb_outputs);
+        ret->output_pads  = av_malloc_array(ret->nb_outputs, sizeof(AVFilterPad));
         if (!ret->output_pads)
             goto err;
         memcpy(ret->output_pads, filter->outputs, sizeof(AVFilterPad) * ret->nb_outputs);
-        ret->outputs      = av_mallocz(sizeof(AVFilterLink*) * ret->nb_outputs);
+        ret->outputs      = av_mallocz_array(ret->nb_outputs, sizeof(AVFilterLink*));
         if (!ret->outputs)
             goto err;
     }
 #if FF_API_FOO_COUNT
+FF_DISABLE_DEPRECATION_WARNINGS
     ret->output_count = ret->nb_outputs;
     ret->input_count  = ret->nb_inputs;
+FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 
     return ret;
@@ -973,7 +999,7 @@ static int ff_filter_frame_framed(AVFilterLink *link, AVFrame *frame)
     int (*filter_frame)(AVFilterLink *, AVFrame *);
     AVFilterContext *dstctx = link->dst;
     AVFilterPad *dst = link->dstpad;
-    AVFrame *out;
+    AVFrame *out = NULL;
     int ret;
     AVFilterCommand *cmd= link->dst->command_queue;
     int64_t pts;
@@ -998,13 +1024,18 @@ static int ff_filter_frame_framed(AVFilterLink *link, AVFrame *frame)
         case AVMEDIA_TYPE_AUDIO:
             out = ff_get_audio_buffer(link, frame->nb_samples);
             break;
-        default: return AVERROR(EINVAL);
+        default:
+            ret = AVERROR(EINVAL);
+            goto fail;
         }
         if (!out) {
-            av_frame_free(&frame);
-            return AVERROR(ENOMEM);
+            ret = AVERROR(ENOMEM);
+            goto fail;
         }
-        av_frame_copy_props(out, frame);
+
+        ret = av_frame_copy_props(out, frame);
+        if (ret < 0)
+            goto fail;
 
         switch (link->type) {
         case AVMEDIA_TYPE_VIDEO:
@@ -1017,7 +1048,9 @@ static int ff_filter_frame_framed(AVFilterLink *link, AVFrame *frame)
                             av_get_channel_layout_nb_channels(frame->channel_layout),
                             frame->format);
             break;
-        default: return AVERROR(EINVAL);
+        default:
+            ret = AVERROR(EINVAL);
+            goto fail;
         }
 
         av_frame_free(&frame);
@@ -1040,7 +1073,7 @@ static int ff_filter_frame_framed(AVFilterLink *link, AVFrame *frame)
         dstctx->var_values[VAR_T] = pts == AV_NOPTS_VALUE ? NAN : pts * av_q2d(link->time_base);
         dstctx->var_values[VAR_POS] = pos == -1 ? NAN : pos;
 
-        dstctx->is_disabled = !av_expr_eval(dstctx->enable, dstctx->var_values, NULL);
+        dstctx->is_disabled = fabs(av_expr_eval(dstctx->enable, dstctx->var_values, NULL)) < 0.5;
         if (dstctx->is_disabled &&
             (dstctx->filter->flags & AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC))
             filter_frame = default_filter_frame;
@@ -1049,6 +1082,11 @@ static int ff_filter_frame_framed(AVFilterLink *link, AVFrame *frame)
     link->frame_count++;
     link->frame_requested = 0;
     ff_update_link_current_pts(link, pts);
+    return ret;
+
+fail:
+    av_frame_free(&out);
+    av_frame_free(&frame);
     return ret;
 }
 
@@ -1071,8 +1109,9 @@ static int ff_filter_frame_needs_framing(AVFilterLink *link, AVFrame *frame)
                 return 0;
             }
             av_frame_copy_props(pbuf, frame);
-            pbuf->pts = frame->pts +
-                        av_rescale_q(inpos, samples_tb, link->time_base);
+            pbuf->pts = frame->pts;
+            if (pbuf->pts != AV_NOPTS_VALUE)
+                pbuf->pts += av_rescale_q(inpos, samples_tb, link->time_base);
             pbuf->nb_samples = 0;
         }
         nb_samples = FFMIN(insamples,

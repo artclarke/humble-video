@@ -1,7 +1,7 @@
 ;*****************************************************************************
 ;* x86util.asm: x86 utility macros
 ;*****************************************************************************
-;* Copyright (C) 2008-2013 x264 project
+;* Copyright (C) 2008-2014 x264 project
 ;*
 ;* Authors: Holger Lubitz <holger@lubitz.org>
 ;*          Loren Merritt <lorenm@u.washington.edu>
@@ -298,11 +298,16 @@
     paddd   %1, %2
 %endif
 %if mmsize >= 16
+%if cpuflag(xop) && sizeof%1 == 16
+    vphadddq %1, %1
+%endif
     movhlps %2, %1
     paddd   %1, %2
 %endif
+%if notcpuflag(xop) || sizeof%1 != 16
     PSHUFLW %2, %1, q0032
     paddd   %1, %2
+%endif
 %undef %1
 %undef %2
 %endmacro

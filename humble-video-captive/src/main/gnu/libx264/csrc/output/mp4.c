@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mp4.c: mp4 muxer
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -27,13 +27,8 @@
 #include "output.h"
 #include <gpac/isomedia.h>
 
-#if HAVE_GF_MALLOC
-#undef malloc
-#undef free
-#undef realloc
-#define malloc gf_malloc
-#define free gf_free
-#define realloc gf_realloc
+#ifdef _WIN32
+#include <windows.h>
 #endif
 
 typedef struct
@@ -170,20 +165,25 @@ static int close_file( hnd_t handle, int64_t largest_pts, int64_t second_largest
 
 static int open_file( char *psz_filename, hnd_t *p_handle, cli_output_opt_t *opt )
 {
-    mp4_hnd_t *p_mp4;
-
     *p_handle = NULL;
-    FILE *fh = fopen( psz_filename, "w" );
+    FILE *fh = x264_fopen( psz_filename, "w" );
     if( !fh )
         return -1;
     FAIL_IF_ERR( !x264_is_regular_file( fh ), "mp4", "MP4 output is incompatible with non-regular file `%s'\n", psz_filename )
     fclose( fh );
 
-    if( !(p_mp4 = malloc( sizeof(mp4_hnd_t) )) )
+    mp4_hnd_t *p_mp4 = calloc( 1, sizeof(mp4_hnd_t) );
+    if( !p_mp4 )
         return -1;
 
-    memset( p_mp4, 0, sizeof(mp4_hnd_t) );
+#ifdef _WIN32
+    /* GPAC doesn't support Unicode filenames. */
+    char ansi_filename[MAX_PATH];
+    FAIL_IF_ERR( !x264_ansi_filename( psz_filename, ansi_filename, MAX_PATH, 1 ), "mp4", "invalid ansi filename\n" )
+    p_mp4->p_file = gf_isom_open( ansi_filename, GF_ISOM_OPEN_WRITE, NULL );
+#else
     p_mp4->p_file = gf_isom_open( psz_filename, GF_ISOM_OPEN_WRITE, NULL );
+#endif
 
     p_mp4->b_dts_compress = opt->use_dts_compress;
 
