@@ -14,6 +14,7 @@ libhumble_video_la_LIBADD= $(VS_PKG_LIBRARIES)
 libhumble_video_la_SOURCES= \
   Mingw64Fixes.c \
   VideoExceptions.cpp \
+  BitStreamFilter.cpp \
   AVBufferSupport.cpp \
   PixelFormat.cpp \
   KeyValueBag.cpp \
@@ -72,6 +73,7 @@ libhumble_video_ladir=$(includedir)/$(VS_CPP_PATH)
 libhumble_video_la_HEADERS= \
   HumbleVideo.h \
   VideoExceptions.h \
+  BitStreamFilter.h \
   AVBufferSupport.h \
   Codec.h \
   Codec.swg \

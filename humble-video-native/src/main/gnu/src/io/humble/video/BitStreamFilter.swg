@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
- *
+ * Copyright (c) 2014, Art Clarke.  All rights reserved.
+ *  
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
@@ -16,30 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-/*
- * BitStreamFilter.cpp
- *
- *  Created on: Sep 28, 2014
- *      Author: aclarke
- */
 
-#include "BitStreamFilter.h"
+%typemap (javacode) io::humble::video::BitStreamFilterType,io::humble::video::BitStreamFilterType*,io::humble::video::BitStreamFilterType& %{
+%}
 
-namespace io { namespace humble { namespace video {
+%typemap (javacode) io::humble::video::BitStreamFilter,io::humble::video::BitStreamFilter*,io::humble::video::BitStreamFilter& %{
+%}
 
-  BitStreamFilter::~BitStreamFilter ()
-  {
-    if (mCtx)
-      av_bitstream_filter_close(mCtx);
-    mCtx = 0;
-  }
-  BitStreamFilter::BitStreamFilter (BitStreamFilterType *type, Coder* coder)
-  {
-    (void) type;
-    (void) coder;
-    mCtx = 0;
-  }
-
-} /* namespace video */
-} /* namespace humble */
-} /* namespace io */
+%include <io/humble/video/BitStreamFilter.h>

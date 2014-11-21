@@ -1440,6 +1440,18 @@ public class VideoJNI {
   public final static native int FilterSink_getFrameSize(long jarg1, FilterSink jarg1_);
   public final static native int FilterAudioSink_getAudio(long jarg1, FilterAudioSink jarg1_, long jarg2, MediaAudio jarg2_);
   public final static native int FilterPictureSink_getPicture(long jarg1, FilterPictureSink jarg1_, long jarg2, MediaPicture jarg2_);
+  public final static native String BitStreamFilterType_getName(long jarg1, BitStreamFilterType jarg1_);
+  public final static native int BitStreamFilterType_getNumBitStreamFilterTypes();
+  public final static native long BitStreamFilterType_getBitStreamFilterType__SWIG_0(int jarg1);
+  public final static native long BitStreamFilterType_getBitStreamFilterType__SWIG_1(String jarg1);
+  public final static native long BitStreamFilter_make__SWIG_0(String jarg1, long jarg2, Coder jarg2_);
+  public final static native long BitStreamFilter_make__SWIG_1(String jarg1);
+  public final static native long BitStreamFilter_make__SWIG_2(long jarg1, BitStreamFilterType jarg1_, long jarg2, Coder jarg2_);
+  public final static native long BitStreamFilter_make__SWIG_3(long jarg1, BitStreamFilterType jarg1_);
+  public final static native int BitStreamFilter_filter__SWIG_0(long jarg1, BitStreamFilter jarg1_, long jarg2, Buffer jarg2_, long jarg3, Buffer jarg3_, int jarg4, String jarg5, boolean jarg6);
+  public final static native void BitStreamFilter_filter__SWIG_1(long jarg1, BitStreamFilter jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaPacket jarg3_, String jarg4);
+  public final static native long BitStreamFilter_getType(long jarg1, BitStreamFilter jarg1_);
+  public final static native String BitStreamFilter_getName(long jarg1, BitStreamFilter jarg1_);
   public final static native long PixelFormat_SWIGUpcast(long jarg1);
   public final static native long PixelComponentDescriptor_SWIGUpcast(long jarg1);
   public final static native long PixelFormatDescriptor_SWIGUpcast(long jarg1);
@@ -1490,4 +1502,6 @@ public class VideoJNI {
   public final static native long FilterSink_SWIGUpcast(long jarg1);
   public final static native long FilterAudioSink_SWIGUpcast(long jarg1);
   public final static native long FilterPictureSink_SWIGUpcast(long jarg1);
+  public final static native long BitStreamFilterType_SWIGUpcast(long jarg1);
+  public final static native long BitStreamFilter_SWIGUpcast(long jarg1);
 }

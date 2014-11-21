@@ -36,6 +36,7 @@
 
 
 namespace io { namespace humble { namespace video {
+
   /**
    * A descriptor for the different kinds of BitStreamFilterTypes supported within Humble.
    *
@@ -43,30 +44,25 @@ namespace io { namespace humble { namespace video {
    */
   class BitStreamFilterType : public io::humble::ferry::RefCounted
   {
-  protected:
-    BitStreamFilterType(AVBitStreamFilter*ctx) : mCtx(ctx) {}
   public:
-    virtual ~BitStreamFilterType() {}
-
     virtual const char* getName() { return mCtx->name; }
     static int32_t getNumBitStreamFilterTypes();
     static BitStreamFilterType* getBitStreamFilterType(int32_t i);
     static BitStreamFilterType* getBitStreamFilterType(const char* name);
   private:
+    virtual ~BitStreamFilterType() {}
+
+    BitStreamFilterType(AVBitStreamFilter*ctx) : mCtx(ctx) {}
     AVBitStreamFilter* mCtx;
   };
 
   /**
-   * Takes a bit stream (in either a {@link io.humble.ferry.Buffer} object or
-   * a {@link io.humble.video.MediaPacket} object) and filters bytes passed
+   * Takes a bit stream and filters bytes passed
    * in to add, remove, or modify the bit-stream.
-   *
    *
    */
   class BitStreamFilter : public io::humble::ferry::RefCounted
   {
-    VS_JNIUTILS_REFCOUNTED_OBJECT_PRIVATE_MAKE(BitStreamFilter)
-
   public:
     static BitStreamFilter* make(const char* filtername, Coder* coder=0);
     static BitStreamFilter* make(BitStreamFilterType* type, Coder* coder=0);
@@ -77,14 +73,13 @@ namespace io { namespace humble { namespace video {
            const char* args,
            bool isKey);
     virtual void filter(MediaPacket* output, MediaPacket* input, const char* args);
+
     virtual BitStreamFilterType* getType() { return mType.get(); }
     virtual const char* getName() { return mType->getName(); }
 
-    virtual ~BitStreamFilter ();
-
-  protected:
-    BitStreamFilter (BitStreamFilterType *type, Coder* coder);
   private:
+    virtual ~BitStreamFilter ();
+    BitStreamFilter (BitStreamFilterType *type, Coder* coder);
     AVBitStreamFilterContext* mCtx;
     io::humble::ferry::RefPointer<BitStreamFilterType> mType;
     io::humble::ferry::RefPointer<Coder> mCoder;
