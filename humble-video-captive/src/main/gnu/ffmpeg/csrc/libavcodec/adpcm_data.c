@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2003 The ffmpeg Project
+ * Copyright (c) 2001-2003 The FFmpeg Project
  *
  * This file is part of FFmpeg.
  *
@@ -47,7 +47,7 @@ static const int8_t adpcm_index_table5[32] = {
     -1, -1, -1, -1, -1, -1, -1, -1, 1, 2, 4, 6, 8, 10, 13, 16,
 };
 
-const int8_t const *ff_adpcm_index_tables[4] = {
+const int8_t * const ff_adpcm_index_tables[4] = {
     &adpcm_index_table2[0],
     &adpcm_index_table3[0],
     &ff_adpcm_index_table[0],

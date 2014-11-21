@@ -41,9 +41,9 @@ typedef struct RCEntry {
 
 typedef struct DNXHDEncContext {
     AVClass *class;
+    BlockDSPContext bdsp;
     MpegEncContext m; ///< Used for quantization dsp functions
 
-    AVFrame frame;
     int cid;
     const CIDEntry *cid_table;
     uint8_t *msip; ///< Macroblock Scan Indexes Payload
@@ -90,7 +90,8 @@ typedef struct DNXHDEncContext {
     RCCMPEntry *mb_cmp;
     RCEntry   (*mb_rc)[8160];
 
-    void (*get_pixels_8x4_sym)(int16_t * /*align 16*/, const uint8_t *, int);
+    void (*get_pixels_8x4_sym)(int16_t * /* align 16 */,
+                               const uint8_t *, ptrdiff_t);
 } DNXHDEncContext;
 
 void ff_dnxhdenc_init_x86(DNXHDEncContext *ctx);

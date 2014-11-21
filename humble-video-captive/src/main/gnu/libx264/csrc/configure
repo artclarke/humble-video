@@ -30,7 +30,6 @@ Configuration options:
   --disable-thread         disable multithreaded encoding
   --enable-win32thread     use win32threads (windows only)
   --disable-interlaced     disable interlaced encoding support
-  --enable-visualize       enable visualization (X11 only)
   --bit-depth=BIT_DEPTH    set output bit depth (8-10) [8]
   --chroma-format=FORMAT   output chroma format (420, 422, 444, all) [all]
 
@@ -52,6 +51,7 @@ External library support:
   --disable-lavf           disable libavformat support
   --disable-ffms           disable ffmpegsource support
   --disable-gpac           disable gpac support
+  --disable-lsmash         disable lsmash support
 
 EOF
 exit 1
@@ -73,32 +73,36 @@ log_msg() {
     echo "$1" >> config.log
 }
 
-intel_cflags() {
-    # Intel Compiler issues an incredibly large number of warnings on any warning level,
+cc_cflags() {
+    # several non gcc compilers issue an incredibly large number of warnings on any warning level,
     # suppress them by disabling all warnings rather than having to use #pragmas to disable most of them
     for arg in $*; do
         [ $arg = -ffast-math ] && arg=
         [[ "$arg" = -falign-loops* ]] && arg=
         [ "$arg" = -fno-tree-vectorize ] && arg=
         [ "$arg" = -Wshadow ] && arg=
+        [ "$arg" = -Wno-maybe-uninitialized ] && arg=
         [[ "$arg" = -mpreferred-stack-boundary* ]] && arg=
         [[ "$arg" = -l* ]] && arg=
         [[ "$arg" = -L* ]] && arg=
-        if [ $compiler = ICL ]; then
+        if [ $compiler_style = MS ]; then
             [ "$arg" = -Wall ] && arg=-W0
+            [ "$arg" = -Werror ] && arg="-W3 -WX"
             [ "$arg" = -g ] && arg=-Z7
             [ "$arg" = -fomit-frame-pointer ] && arg=
             [ "$arg" = -s ] && arg=
             [ "$arg" = -fPIC ] && arg=
         else
             [ "$arg" = -Wall ] && arg=-w0
+            [ "$arg" = -Werror ] && arg="-w3 -Werror"
         fi
+        [ $compiler = CL -a "$arg" = -O3 ] && arg=-O2
 
         [ -n "$arg" ] && echo -n "$arg "
     done
 }
 
-icl_ldflags() {
+cl_ldflags() {
     for arg in $*; do
         arg=${arg/LIBPATH/libpath}
         [ ${arg#-libpath:} == $arg -a ${arg#-l} != $arg ] && arg=${arg#-l}.lib
@@ -106,6 +110,10 @@ icl_ldflags() {
         [ $arg = -Wl,--large-address-aware ] && arg=-largeaddressaware
         [ $arg = -s ] && arg=
         [ "$arg" = -Wl,-Bsymbolic ] && arg=
+        [ "$arg" = -fno-tree-vectorize ] && arg=
+        [ "$arg" = -Werror ] && arg=
+        [ "$arg" = -Wshadow ] && arg=
+        [ "$arg" = -Wmaybe-uninitialized ] && arg=
 
         arg=${arg/pthreadGC/pthreadVC}
         [ "$arg" = avifil32.lib ] && arg=vfw32.lib
@@ -135,9 +143,9 @@ cc_check() {
     fi
     rm -f conftest.c
     [ -n "$1" ] && echo "#include <$1>" > conftest.c
-    echo "int main () { $3 return 0; }" >> conftest.c
-    if [ $compiler = ICL ]; then
-        cc_cmd="$CC conftest.c $(intel_cflags $CFLAGS $2) -link $(icl_ldflags $2 $LDFLAGSCLI $LDFLAGS)"
+    echo "int main (void) { $3 return 0; }" >> conftest.c
+    if [ $compiler_style = MS ]; then
+        cc_cmd="$CC conftest.c $(cc_cflags $CFLAGS $2) -link $(cl_ldflags $2 $LDFLAGSCLI $LDFLAGS)"
     else
         cc_cmd="$CC conftest.c $CFLAGS $2 $LDFLAGSCLI $LDFLAGS -o conftest"
     fi
@@ -165,8 +173,12 @@ cpp_check() {
     rm -f conftest.c
     [ -n "$1" ] && echo "#include <$1>" > conftest.c
     echo -e "#if !($3) \n#error $4 \n#endif " >> conftest.c
-
-    if $CC conftest.c $CFLAGS $2 -E -o conftest >conftest.log 2>&1; then
+    if [ $compiler_style = MS ]; then
+        cpp_cmd="$CC conftest.c $(cc_cflags $CFLAGS $2) -P"
+    else
+        cpp_cmd="$CC conftest.c $CFLAGS $2 -E -o conftest"
+    fi
+    if $cpp_cmd >conftest.log 2>&1; then
         res=$?
         log_ok
     else
@@ -208,10 +220,10 @@ as_check() {
 rc_check() {
     log_check "whether $RC works"
     echo "$1" > conftest.rc
-    if [ $compiler = ICL ]; then
-        rc_cmd="$RC $RCFLAGS -foconftest.o conftest.rc"
-    else
+    if [ $compiler = GNU ]; then
         rc_cmd="$RC $RCFLAGS -o conftest.o conftest.rc"
+    else
+        rc_cmd="$RC $RCFLAGS -foconftest.o conftest.rc"
     fi
     if $rc_cmd >conftest.log 2>&1; then
         res=$?
@@ -264,6 +276,8 @@ avs="auto"
 lavf="auto"
 ffms="auto"
 gpac="auto"
+lsmash="auto"
+mp4="no"
 gpl="yes"
 thread="auto"
 swscale="auto"
@@ -273,10 +287,10 @@ debug="no"
 gprof="no"
 strip="no"
 pic="no"
-vis="no"
 bit_depth="8"
 chroma_format="all"
 compiler="GNU"
+compiler_style="GNU"
 opencl="yes"
 
 CFLAGS="$CFLAGS -Wall -I. -I\$(SRCPATH)"
@@ -290,7 +304,8 @@ cross_prefix=""
 EXE=""
 
 # list of all preprocessor HAVE values we can define
-CONFIG_HAVE="MALLOC_H ALTIVEC ALTIVEC_H MMX ARMV6 ARMV6T2 NEON BEOSTHREAD POSIXTHREAD WIN32THREAD THREAD LOG2F VISUALIZE SWSCALE LAVF FFMS GPAC GF_MALLOC AVS GPL VECTOREXT INTERLACED CPU_COUNT OPENCL"
+CONFIG_HAVE="MALLOC_H ALTIVEC ALTIVEC_H MMX ARMV6 ARMV6T2 NEON BEOSTHREAD POSIXTHREAD WIN32THREAD THREAD LOG2F SWSCALE \
+             LAVF FFMS GPAC AVS GPL VECTOREXT INTERLACED CPU_COUNT OPENCL THP LSMASH X86_INLINE_ASM"
 
 # parse options
 
@@ -342,6 +357,9 @@ for opt do
         --disable-gpac)
             gpac="no"
             ;;
+        --disable-lsmash)
+            lsmash="no"
+            ;;
         --disable-gpl)
             gpl="no"
             ;;
@@ -379,9 +397,6 @@ for opt do
             ;;
         --enable-pic)
             pic="yes"
-            ;;
-        --enable-visualize)
-            vis="yes"
             ;;
         --host=*)
             host="$optarg"
@@ -423,6 +438,7 @@ CC="${CC-${cross_prefix}gcc}"
 AR="${AR-${cross_prefix}ar}"
 RANLIB="${RANLIB-${cross_prefix}ranlib}"
 STRIP="${STRIP-${cross_prefix}strip}"
+INSTALL="${INSTALL-install}"
 
 if [ "x$host" = x ]; then
     host=`${SRCPATH}/config.guess`
@@ -436,23 +452,35 @@ host="${host#*-}"
 host_vendor="${host%%-*}"
 host_os="${host#*-}"
 
-# test for use of Intel Compiler
+# test for use of compilers that require specific handling
+cc_base=`basename "$CC"`
+QPRE="-"
 if [[ $host_os = mingw* || $host_os = cygwin* ]]; then
-    if [[ `basename "$CC"` = icl* ]]; then
+    if [[ "$cc_base" = icl || "$cc_base" = icl.* ]]; then
         # Windows Intel Compiler creates dependency generation with absolute Windows paths, Cygwin's make does not support Windows paths.
         [[ $host_os = cygwin* ]] && die "Windows Intel Compiler support requires MSYS"
         compiler=ICL
+        compiler_style=MS
         CFLAGS="$CFLAGS -Qstd=c99 -nologo -Qms0 -DHAVE_STRING_H -I\$(SRCPATH)/extras"
         QPRE="-Q"
         `$CC 2>&1 | grep -q IA-32` && host_cpu=i486
         `$CC 2>&1 | grep -q "Intel(R) 64"` && host_cpu=x86_64
         cpp_check "" "" "_MSC_VER >= 1400" || die "Windows Intel Compiler support requires Visual Studio 2005 or newer"
+    elif [[ "$cc_base" = cl || "$cc_base" = cl.* ]]; then
+        # Standard Microsoft Visual Studio
+        # Dependency creation includes absolute windows paths, Cygwin's make does not support Windows paths.
+        [[ $host_os = cygwin* ]] && die "Microsoft Visual Studio support requires MSYS"
+        compiler=CL
+        compiler_style=MS
+        CFLAGS="$CFLAGS -nologo -DHAVE_STRING_H -I\$(SRCPATH)/extras"
+        `$CC 2>&1 | grep -q 'for x86'` && host_cpu=i486
+        `$CC 2>&1 | grep -q 'for x64'` && host_cpu=x86_64
+        cpp_check '' '' '_MSC_VER > 1800 || (_MSC_VER == 1800 && _MSC_FULL_VER >= 180030324)' || die "Microsoft Visual Studio support requires Visual Studio 2013 Update 2 or newer"
     fi
 else
-    if [[ `basename "$CC"` = icc* ]]; then
+    if [[ "$cc_base" = icc || "$cc_base" = icc.* ]]; then
         AR="xiar"
         compiler=ICC
-        QPRE="-"
     fi
 fi
 
@@ -504,12 +532,13 @@ case $host_os in
             CFLAGS="$CFLAGS -mno-cygwin"
             LDFLAGS="$LDFLAGS -mno-cygwin"
         fi
-        if cpp_check "" "" "defined(__CYGWIN32__)" ; then
+        if cpp_check "" "" "defined(__CYGWIN__)" ; then
             define HAVE_MALLOC_H
             SYS="CYGWIN"
         else
             SYS="WINDOWS"
             DEVNULL="NUL"
+            LDFLAGSCLI="$LDFLAGSCLI -lshell32"
             RC="${RC-${cross_prefix}windres}"
         fi
         ;;
@@ -517,7 +546,8 @@ case $host_os in
         SYS="WINDOWS"
         EXE=".exe"
         DEVNULL="NUL"
-        [ $compiler = ICL ] && RC="${RC-rc}" || RC="${RC-${cross_prefix}windres}"
+        LDFLAGSCLI="$LDFLAGSCLI -lshell32"
+        [ $compiler = GNU ] && RC="${RC-${cross_prefix}windres}" || RC="${RC-rc}"
         ;;
     sunos*|solaris*)
         SYS="SunOS"
@@ -527,6 +557,15 @@ case $host_os in
             LDFLAGS="$LDFLAGS /usr/lib/64/values-xpg6.o"
         else
             LDFLAGS="$LDFLAGS /usr/lib/values-xpg6.o"
+        fi
+        if test -x /usr/ucb/install ; then
+            INSTALL=/usr/ucb/install
+        elif test -x /usr/bin/ginstall ; then
+            # OpenSolaris
+            INSTALL=/usr/bin/ginstall
+        elif test -x /usr/gnu/bin/install ; then
+            # OpenSolaris
+            INSTALL=/usr/gnu/bin/install
         fi
         HAVE_GETOPT_LONG=0
         ;;
@@ -544,12 +583,12 @@ esac
 
 LDFLAGS="$LDFLAGS $libm"
 
-aligned_stack=1
+stack_alignment=16
 case $host_cpu in
     i*86)
         ARCH="X86"
         AS="yasm"
-        ASFLAGS="$ASFLAGS -O2"
+        ASFLAGS="$ASFLAGS -O2 -DARCH_X86_64=0 -I\$(SRCPATH)/common/x86/"
         if [ $compiler = GNU ]; then
             if [[ "$asm" == auto && "$CFLAGS" != *-march* ]]; then
                 CFLAGS="$CFLAGS -march=i686"
@@ -559,21 +598,21 @@ case $host_cpu in
             fi
             CFLAGS="-m32 $CFLAGS"
             LDFLAGS="-m32 $LDFLAGS"
-        else
+        elif [ $compiler = ICC ]; then
             # icc on linux has various degrees of mod16 stack support
             if [ $SYS = LINUX ]; then
                 # < 11 is completely incapable of keeping a mod16 stack
                 if cpp_check "" "" "__INTEL_COMPILER < 1100" ; then
-                    define BROKEN_STACK_ALIGNMENT
-                    aligned_stack=0
+                    stack_alignment=4
                 # 11 <= x < 12 is capable of keeping a mod16 stack, but defaults to not doing so.
                 elif cpp_check "" "" "__INTEL_COMPILER < 1200" ; then
                     CFLAGS="$CFLAGS -falign-stack=assume-16-byte"
                 fi
                 # >= 12 defaults to a mod16 stack
             fi
-            # icl on windows has no mod16 stack support
-            [ $SYS = WINDOWS ] && define BROKEN_STACK_ALIGNMENT && aligned_stack=0
+        else # ICL/CL
+            # always a mod4 stack
+            stack_alignment=4
         fi
         if [ "$SYS" = MACOSX ]; then
             ASFLAGS="$ASFLAGS -f macho -DPREFIX"
@@ -589,6 +628,7 @@ case $host_cpu in
     x86_64)
         ARCH="X86_64"
         AS="yasm"
+        ASFLAGS="$ASFLAGS -DARCH_X86_64=1 -I\$(SRCPATH)/common/x86/"
         [ $compiler = GNU ] && CFLAGS="-m64 $CFLAGS" && LDFLAGS="-m64 $LDFLAGS"
         if [ "$SYS" = MACOSX ]; then
             ASFLAGS="$ASFLAGS -f macho64 -m amd64 -DPIC -DPREFIX"
@@ -596,7 +636,7 @@ case $host_cpu in
                 CFLAGS="$CFLAGS -arch x86_64"
                 LDFLAGS="$LDFLAGS -arch x86_64"
             fi
-        elif [ "$SYS" = WINDOWS ]; then
+        elif [ "$SYS" = WINDOWS -o "$SYS" = CYGWIN ]; then
             ASFLAGS="$ASFLAGS -f win32 -m amd64"
             # only the GNU toolchain is inconsistent in prefixing function names with _
             [ $compiler = GNU ] && cc_check "" "-S" && grep -q "_main:" conftest && ASFLAGS="$ASFLAGS -DPREFIX"
@@ -621,19 +661,6 @@ case $host_cpu in
         ;;
     sparc)
         ARCH="SPARC"
-        case $(uname -m) in
-            sun4u|sun4v)
-                if [ $asm = auto ]; then
-                    ARCH="UltraSPARC"
-                    if ! echo $CFLAGS | grep -Eq '\-mcpu' ; then
-                        CFLAGS="$CFLAGS -mcpu=ultrasparc"
-                        LDFLAGS="$LDFLAGS -mcpu=ultrasparc"
-                    fi
-                    AS="${AS-${cross_prefix}as}"
-                    ASFLAGS="$ASFLAGS -xarch=v8plusa"
-                fi
-                ;;
-        esac
         ;;
     mips|mipsel|mips64|mips64el)
         ARCH="MIPS"
@@ -668,7 +695,6 @@ case $host_cpu in
         ARCH="$(echo $host_cpu | tr a-z A-Z)"
         ;;
 esac
-ASFLAGS="$ASFLAGS -DHAVE_ALIGNED_STACK=${aligned_stack}"
 
 if [ $SYS = WINDOWS ]; then
     if ! rc_check "0 RCDATA {0}" ; then
@@ -690,7 +716,7 @@ log_msg ""
 
 cc_check || die "No working C compiler found."
 
-if [ $compiler != ICL ]; then
+if [ $compiler_style = GNU ]; then
     if cc_check '' -std=gnu99 'for( int i = 0; i < 9; i++ );' ; then
         CFLAGS="$CFLAGS -std=gnu99"
     elif cc_check '' -std=c99 'for( int i = 0; i < 9; i++ );' ; then
@@ -700,7 +726,7 @@ if [ $compiler != ICL ]; then
     fi
 fi
 
-if [ $shared = yes -a \( $ARCH = "X86_64" -o $ARCH = "PPC" -o $ARCH = "ALPHA" -o $ARCH = "ARM" -o $ARCH = "IA64" -o $ARCH = "PARISC" -o $ARCH = "MIPS" \) ] ; then
+if [ $shared = yes -a \( $ARCH = "X86_64" -o $ARCH = "PPC" -o $ARCH = "ALPHA" -o $ARCH = "ARM" -o $ARCH = "IA64" -o $ARCH = "PARISC" -o $ARCH = "MIPS" -o $ARCH = "AARCH64" \) ] ; then
     pic="yes"
 fi
 
@@ -712,18 +738,12 @@ if [ $asm = auto -a \( $ARCH = X86 -o $ARCH = X86_64 \) ] ; then
         echo "If you really want to compile without asm, configure with --disable-asm."
         exit 1
     fi
-    if ! cc_check '' '' '__asm__("pabsw %xmm0, %xmm0");' ; then
-        VER=`(${cross_prefix}as --version || echo no gnu as) 2>/dev/null | head -n 1`
-        echo "Found $VER"
-        echo "Minimum version is binutils-2.17"
-        echo "Your compiler can't handle inline SSSE3 asm."
-        echo "If you really want to compile without asm, configure with --disable-asm."
-        exit 1
-    fi
+    cc_check '' '' '__asm__("pabsw %xmm0, %xmm0");' && define HAVE_X86_INLINE_ASM
+    ASFLAGS="$ASFLAGS -Worphan-labels"
     define HAVE_MMX
-    if cc_check '' -mpreferred-stack-boundary=5 ; then
+    if [ $compiler = GNU ] && cc_check '' -mpreferred-stack-boundary=5 ; then
         CFLAGS="$CFLAGS -mpreferred-stack-boundary=5"
-        define HAVE_32B_STACK_ALIGNMENT
+        stack_alignment=32
     fi
 fi
 
@@ -748,7 +768,10 @@ fi
 define ARCH_$ARCH
 define SYS_$SYS
 
-# skip endianness check for Intel Compiler, as all supported platforms are little. the -ipo flag will also cause the check to fail
+define STACK_ALIGNMENT $stack_alignment
+ASFLAGS="$ASFLAGS -DSTACK_ALIGNMENT=$stack_alignment"
+
+# skip endianness check for Intel Compiler and MSVS, as all supported platforms are little. each have flags that will cause the check to fail as well
 if [ $compiler = GNU ]; then
     echo "int i[2] = {0x42494745,0}; double f[2] = {0x1.0656e6469616ep+102,0};" > conftest.c
     $CC $CFLAGS conftest.c -c -o conftest.o 2>/dev/null || die "endian test failed"
@@ -793,10 +816,15 @@ if [ "$thread" = "auto" ]; then
             fi
             ;;
         QNX)
-            cc_check pthread.h -lc && thread="posix" && libpthread="-lc"
+            cc_check pthread.h -lc "pthread_create(0,0,0,0);" && thread="posix" && libpthread="-lc"
             ;;
         *)
-            cc_check pthread.h -lpthread && thread="posix" && libpthread="-lpthread"
+            if cc_check pthread.h -lpthread "pthread_create(0,0,0,0);" ; then
+               thread="posix"
+               libpthread="-lpthread"
+            else
+                cc_check pthread.h "" "pthread_create(0,0,0,0);" && thread="posix" && libpthread=""
+            fi
             ;;
     esac
 fi
@@ -821,16 +849,8 @@ if cc_check "math.h" "-Werror" "return log2f(2);" ; then
     define HAVE_LOG2F
 fi
 
-if [ "$vis" = "yes" ] ; then
-    save_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS -I/usr/X11R6/include"
-    if cc_check "X11/Xlib.h" "-L/usr/X11R6/lib -lX11" "XOpenDisplay(0);" ; then
-        LDFLAGS="-L/usr/X11R6/lib -lX11 $LDFLAGS"
-        define HAVE_VISUALIZE
-    else
-        vis="no"
-        CFLAGS="$save_CFLAGS"
-   fi
+if [ "$SYS" = "LINUX" -a \( "$ARCH" = "X86" -o "$ARCH" = "X86_64" \) ] && cc_check "sys/mman.h" "" "MADV_HUGEPAGE;" ; then
+    define HAVE_THP
 fi
 
 if [ "$swscale" = "auto" ] ; then
@@ -842,10 +862,10 @@ if [ "$swscale" = "auto" ] ; then
     [ -z "$SWSCALE_LIBS" ] && SWSCALE_LIBS="-lswscale -lavutil"
 
     if cc_check "libswscale/swscale.h" "$SWSCALE_CFLAGS $SWSCALE_LIBS" "sws_init_context(0,0,0);" ; then
-        if cpp_check "libavutil/pixdesc.h" "$SWSCALE_CFLAGS $SWSCALE_LIBS" "defined(PIX_FMT_RGB)" ; then
+        if cpp_check "libavutil/pixdesc.h" "$SWSCALE_CFLAGS $SWSCALE_LIBS" "defined(AV_PIX_FMT_FLAG_RGB)" ; then
             swscale="yes"
         else
-            echo "Warning: PIX_FMT_RGB is missing from libavutil, update for swscale support"
+            echo "Warning: AV_PIX_FMT_FLAG_RGB is missing from libavutil, update for swscale support"
         fi
     fi
 fi
@@ -858,7 +878,7 @@ if [ "$lavf" = "auto" ] ; then
     fi
     if [ -z "$LAVF_LIBS" -a -z "$LAVF_CFLAGS" ]; then
         LAVF_LIBS="-lavformat"
-        for lib in -lpostproc -lavcodec -lavcore -lswscale -lavutil -lm -lz -lbz2 $libpthread -lavifil32; do
+        for lib in -lpostproc -lavcodec -lswscale -lavutil -lm -lz -lbz2 $libpthread -lavifil32 -lws2_32; do
             cc_check "" $lib && LAVF_LIBS="$LAVF_LIBS $lib"
         done
     fi
@@ -916,11 +936,30 @@ if [ "$swscale" = "yes" ]; then
     fi
 fi
 
-if [ "$gpac" = "auto" ] ; then
+if [ "$lsmash" = "auto" ] ; then
+    lsmash="no"
+    if ${cross_prefix}pkg-config --exists liblsmash 2>/dev/null; then
+        LSMASH_LIBS="$LSMASH_LIBS $(${cross_prefix}pkg-config --libs liblsmash)"
+        LSMASH_CFLAGS="$LSMASH_CFLAGS $(${cross_prefix}pkg-config --cflags liblsmash)"
+    fi
+    [ -z "$LSMASH_LIBS" ] && LSMASH_LIBS="-llsmash"
+
+    if cc_check lsmash.h "$LSMASH_CFLAGS $LSMASH_LIBS" ; then
+        if cpp_check lsmash.h "$LSMASH_CFLAGS" "LSMASH_VERSION_MAJOR > 1 || (LSMASH_VERSION_MAJOR == 1 && LSMASH_VERSION_MINOR >= 5)" ; then
+            lsmash="yes"
+        else
+            echo "Warning: lsmash is too old, update to rev.895 or later"
+        fi
+    fi
+fi
+
+if [ "$gpac" = "auto" -a "$lsmash" != "yes" ] ; then
     gpac="no"
-    cc_check "" -lz && GPAC_LIBS="-lgpac_static -lz" || GPAC_LIBS="-lgpac_static"
+    GPAC_LIBS="-lgpac_static"
+    cc_check "" -lz && GPAC_LIBS="$GPAC_LIBS -lz"
     if [ "$SYS" = "WINDOWS" ] ; then
-        GPAC_LIBS="$GPAC_LIBS -lwinmm"
+        cc_check "" -lws2_32 && GPAC_LIBS="$GPAC_LIBS -lws2_32"
+        cc_check "" -lwinmm && GPAC_LIBS="$GPAC_LIBS -lwinmm"
     fi
     if cc_check gpac/isomedia.h "$GPAC_LIBS" ; then
         if cc_check gpac/isomedia.h "$GPAC_LIBS" "gf_isom_set_pixel_aspect_ratio(0,0,0,0,0);" ; then
@@ -930,18 +969,22 @@ if [ "$gpac" = "auto" ] ; then
         fi
     fi
 fi
-if [ "$gpac" = "yes" ] ; then
+
+if [ "$lsmash" = "yes" ] ; then
+    mp4="lsmash"
+    LDFLAGSCLI="$LSMASH_LIBS $LDFLAGSCLI"
+    CFLAGS="$CFLAGS $LSMASH_CFLAGS"
+    define HAVE_LSMASH
+elif [ "$gpac" = "yes" ] ; then
+    mp4="gpac"
     define HAVE_GPAC
-    if cc_check gpac/isomedia.h "-Werror $GPAC_LIBS" "void *p; p = gf_malloc(1); gf_free(p);" ; then
-        define HAVE_GF_MALLOC
-    fi
     LDFLAGSCLI="$GPAC_LIBS $LDFLAGSCLI"
 fi
 
 if [ "$avs" = "auto" ] ; then
     avs="no"
     # cygwin can use avisynth if it can use LoadLibrary
-    if [ $SYS = WINDOWS ] || ([ $SYS = CYGWIN ] && cc_check windows.h "" "LoadLibrary(0);") ; then
+    if [ $SYS = WINDOWS ] || ([ $SYS = CYGWIN ] && cc_check windows.h "" "LoadLibraryW(0);") ; then
         avs="avisynth"
         define HAVE_AVS
         define USE_AVXSYNTH 0
@@ -970,16 +1013,11 @@ if [ "$debug" != "yes" -a "$gprof" != "yes" ]; then
 fi
 
 if [ "$strip" = "yes" ]; then
-    CFLAGS="$CFLAGS -s"
     LDFLAGS="$LDFLAGS -s"
 fi
 
 if [ "$debug" = "yes" ]; then
     CFLAGS="-O1 -g $CFLAGS"
-elif [ $ARCH = ARM ]; then
-    # arm-gcc-4.2 produces incorrect output with -ffast-math
-    # and it doesn't save any speed anyway on 4.4, so disable it
-    CFLAGS="-O3 -fno-fast-math $CFLAGS"
 else
     CFLAGS="-O3 -ffast-math $CFLAGS"
 fi
@@ -1008,6 +1046,10 @@ if cc_check '' -Wshadow ; then
     CFLAGS="-Wshadow $CFLAGS"
 fi
 
+if cc_check '' -Wmaybe-uninitialized ; then
+    CFLAGS="-Wno-maybe-uninitialized $CFLAGS"
+fi
+
 if [ "$bit_depth" -gt "8" ]; then
     define HIGH_BIT_DEPTH
     ASFLAGS="$ASFLAGS -DHIGH_BIT_DEPTH=1"
@@ -1029,17 +1071,8 @@ ASFLAGS="$ASFLAGS -DBIT_DEPTH=$bit_depth"
 libdl=""
 if [ "$opencl" = "yes" ]; then
     opencl="no"
-    log_check "for perl"
-    output=$(perl -v)
-    if [ "$output" = "" ]; then
-        log_fail
-        echo 'OpenCL support requires perl to compile.'
-        echo 'use --disable-opencl to compile without OpenCL.'
-        exit 1
-    fi
-    log_ok
     # cygwin can use opencl if it can use LoadLibrary
-    if [ $SYS = WINDOWS ] || ([ $SYS = CYGWIN ] && cc_check windows.h "" "LoadLibrary(0);") ; then
+    if [ $SYS = WINDOWS ] || ([ $SYS = CYGWIN ] && cc_check windows.h "" "LoadLibraryW(0);") ; then
         opencl="yes"
         define HAVE_OPENCL
     elif [ "$SYS" = "LINUX" -o "$SYS" = "MACOSX" ] ; then
@@ -1055,17 +1088,18 @@ for var in $CONFIG_HAVE; do
     grep -q "HAVE_$var 1" config.h || define HAVE_$var 0
 done
 
-if [ $compiler = ICL ]; then
-    AR="xilib -nologo -out:"
-    DEPMM=-QMM
-    DEPMT=-QMT
+DEPMM="${QPRE}MM"
+DEPMT="${QPRE}MT"
+if [ $compiler_style = MS ]; then
+    AR="lib -nologo -out:"
+    LD="link -out:"
+    [ $compiler = ICL ] && AR="xi$AR" && LD="xi$LD"
     HAVE_GETOPT_LONG=0
-    LD="xilink -out:"
-    LDFLAGS="-nologo -incremental:no $(icl_ldflags $LDFLAGS)"
-    LDFLAGSCLI="$(icl_ldflags $LDFLAGSCLI)"
+    LDFLAGS="-nologo -incremental:no $(cl_ldflags $LDFLAGS)"
+    LDFLAGSCLI="$(cl_ldflags $LDFLAGSCLI)"
     LIBX264=libx264.lib
     RANLIB=
-    [ -n "$RC" ] && RCFLAGS="$RCFLAGS -I. -I\$(SRCPATH)/extras -fo"
+    [ -n "$RC" ] && RCFLAGS="$RCFLAGS -nologo -I. -I\$(SRCPATH)/extras -fo"
     STRIP=
     if [ $debug = yes ]; then
         LDFLAGS="-debug $LDFLAGS"
@@ -1073,27 +1107,37 @@ if [ $compiler = ICL ]; then
     else
         CFLAGS="-DNDEBUG $CFLAGS"
     fi
-else
+else # gcc/icc
+    DEPMM="$DEPMM -g0"
     AR="$AR rc "
-    DEPMM="-MM -g0"
-    DEPMT="-MT"
     LD="$CC -o "
     LIBX264=libx264.a
     [ -n "$RC" ] && RCFLAGS="$RCFLAGS -I. -o "
 fi
-if [ $compiler = GNU ]; then
-    PROF_GEN_CC="-fprofile-generate"
-    PROF_GEN_LD="-fprofile-generate"
-    PROF_USE_CC="-fprofile-use"
-    PROF_USE_LD="-fprofile-use"
-else
-    CFLAGS="$(intel_cflags $CFLAGS)"
+[ $compiler != GNU ] && CFLAGS="$(cc_cflags $CFLAGS)"
+if [ $compiler = ICC -o $compiler = ICL ]; then
     # icc does not define __SSE__ until SSE2 optimization and icl never defines it or _M_IX86_FP
     [ \( $ARCH = X86_64 -o $ARCH = X86 \) -a $asm = yes ] && ! cpp_check "" "" "defined(__SSE__)" && define __SSE__
     PROF_GEN_CC="${QPRE}prof-gen ${QPRE}prof-dir."
     PROF_GEN_LD=
     PROF_USE_CC="${QPRE}prof-use ${QPRE}prof-dir."
     PROF_USE_LD=
+elif [ $compiler = CL ]; then
+    # Visual Studio
+    # _M_IX86_FP is only defined on x86
+    [ $ARCH = X86 ] && cpp_check '' '' '_M_IX86_FP >= 1' && define __SSE__
+    [ $ARCH = X86_64 ] && define __SSE__
+    # As long as the cli application can't link against the dll, the dll can not be pgo'd.
+    # pgds are link flag specific and the -dll flag for creating the dll makes it unshareable with the cli
+    PROF_GEN_CC="-GL"
+    PROF_GEN_LD="-LTCG:PGINSTRUMENT"
+    PROF_USE_CC="-GL"
+    PROF_USE_LD="-LTCG:PGOPTIMIZE"
+else
+    PROF_GEN_CC="-fprofile-generate"
+    PROF_GEN_LD="-fprofile-generate"
+    PROF_USE_CC="-fprofile-use"
+    PROF_USE_LD="-fprofile-use"
 fi
 
 rm -f conftest*
@@ -1122,6 +1166,8 @@ ARCH=$ARCH
 SYS=$SYS
 CC=$CC
 CFLAGS=$CFLAGS
+COMPILER=$compiler
+COMPILER_STYLE=$compiler_style
 DEPMM=$DEPMM
 DEPMT=$DEPMT
 LD=$LD
@@ -1130,6 +1176,7 @@ LIBX264=$LIBX264
 AR=$AR
 RANLIB=$RANLIB
 STRIP=$STRIP
+INSTALL=$INSTALL
 AS=$AS
 ASFLAGS=$ASFLAGS
 RC=$RC
@@ -1144,7 +1191,7 @@ PROF_USE_LD=$PROF_USE_LD
 HAVE_OPENCL=$opencl
 EOF
 
-if [ $compiler = ICL ]; then
+if [ $compiler_style = MS ]; then
     echo '%.o: %.c' >> config.mak
     echo '	$(CC) $(CFLAGS) -c -Fo$@ $<' >> config.mak
 fi
@@ -1158,7 +1205,7 @@ if [ "$shared" = "yes" ]; then
     API=$(grep '#define X264_BUILD' < ${SRCPATH}/x264.h | cut -f 3 -d ' ')
     if [ "$SYS" = "WINDOWS" -o "$SYS" = "CYGWIN" ]; then
         echo "SONAME=libx264-$API.dll" >> config.mak
-        if [ $compiler = ICL ]; then
+        if [ $compiler_style = MS ]; then
             echo 'IMPLIBNAME=libx264.dll.lib' >> config.mak
             # GNU ld on windows defaults to exporting all global functions if there are no explicit __declspec(dllexport) declarations
             # MSVC link does not act similarly, so it is required to make an export definition out of x264.h and use it at link time
@@ -1220,8 +1267,8 @@ includedir=$includedir
 Name: x264
 Description: H.264 (MPEG4 AVC) encoder library
 Version: $(grep POINTVER < x264_config.h | sed -e 's/.* "//; s/".*//')
-Libs: -L$libdir -lx264
-Libs.private: $libpthread $libm $libdl
+Libs: -L$libdir -lx264 $([ "$shared" = "yes" ] || echo $libpthread $libm $libdl)
+Libs.private: $([ "$shared" = "yes" ] && echo $libpthread $libm $libdl)
 Cflags: -I$includedir
 EOF
 
@@ -1242,7 +1289,7 @@ interlaced:    $interlaced
 avs:           $avs
 lavf:          $lavf
 ffms:          $ffms
-gpac:          $gpac
+mp4:           $mp4
 gpl:           $gpl
 thread:        $thread
 opencl:        $opencl
@@ -1251,7 +1298,6 @@ debug:         $debug
 gprof:         $gprof
 strip:         $strip
 PIC:           $pic
-visualize:     $vis
 bit depth:     $bit_depth
 chroma format: $chroma_format
 EOF
@@ -1262,7 +1308,7 @@ cat conftest.log
 rm conftest.log
 
 [ "$SRCPATH" != "." ] && ln -sf ${SRCPATH}/Makefile ./Makefile
-mkdir -p common/{arm,ppc,sparc,x86} encoder extras filters/video input output tools
+mkdir -p common/{arm,ppc,x86} encoder extras filters/video input output tools
 
 echo
 echo "You can run 'make' or 'make fprofiled' now."

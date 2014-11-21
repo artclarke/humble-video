@@ -26,14 +26,21 @@
 void ff_vector_fmul_vfp(float *dst, const float *src0, const float *src1,
                         int len);
 
+void ff_vector_fmul_window_vfp(float *dst, const float *src0,
+                               const float *src1, const float *win, int len);
+
 void ff_vector_fmul_reverse_vfp(float *dst, const float *src0,
                                 const float *src1, int len);
 
-av_cold void ff_float_dsp_init_vfp(AVFloatDSPContext *fdsp)
-{
-    int cpu_flags = av_get_cpu_flags();
+void ff_butterflies_float_vfp(float *restrict v1, float *restrict v2, int len);
 
-    if (!have_vfpv3(cpu_flags))
+av_cold void ff_float_dsp_init_vfp(AVFloatDSPContext *fdsp, int cpu_flags)
+{
+    if (!have_vfpv3(cpu_flags)) {
         fdsp->vector_fmul = ff_vector_fmul_vfp;
+        fdsp->vector_fmul_window = ff_vector_fmul_window_vfp;
+    }
     fdsp->vector_fmul_reverse = ff_vector_fmul_reverse_vfp;
+    if (!have_vfpv3(cpu_flags))
+        fdsp->butterflies_float = ff_butterflies_float_vfp;
 }

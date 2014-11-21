@@ -116,7 +116,7 @@ static int bfi_read_packet(AVFormatContext * s, AVPacket * pkt)
     BFIContext *bfi = s->priv_data;
     AVIOContext *pb = s->pb;
     int ret, audio_offset, video_offset, chunk_size, audio_size = 0;
-    if (bfi->nframes == 0 || url_feof(pb)) {
+    if (bfi->nframes == 0 || avio_feof(pb)) {
         return AVERROR_EOF;
     }
 
@@ -124,7 +124,7 @@ static int bfi_read_packet(AVFormatContext * s, AVPacket * pkt)
     if (!bfi->avflag) {
         uint32_t state = 0;
         while(state != MKTAG('S','A','V','I')){
-            if (url_feof(pb))
+            if (avio_feof(pb))
                 return AVERROR(EIO);
             state = 256*state + avio_r8(pb);
         }
@@ -136,6 +136,10 @@ static int bfi_read_packet(AVFormatContext * s, AVPacket * pkt)
         video_offset    = avio_rl32(pb);
         audio_size      = video_offset - audio_offset;
         bfi->video_size = chunk_size - video_offset;
+        if (audio_size < 0 || bfi->video_size < 0) {
+            av_log(s, AV_LOG_ERROR, "Invalid audio/video offsets or chunk size\n");
+            return AVERROR_INVALIDDATA;
+        }
 
         //Tossing an audio packet at the audio decoder.
         ret = av_get_packet(pb, pkt, audio_size);
@@ -144,9 +148,7 @@ static int bfi_read_packet(AVFormatContext * s, AVPacket * pkt)
 
         pkt->pts          = bfi->audio_frame;
         bfi->audio_frame += ret;
-    }
-
-    else {
+    } else if (bfi->video_size > 0) {
 
         //Tossing a video packet at the video decoder.
         ret = av_get_packet(pb, pkt, bfi->video_size);
@@ -154,10 +156,13 @@ static int bfi_read_packet(AVFormatContext * s, AVPacket * pkt)
             return ret;
 
         pkt->pts          = bfi->video_frame;
-        bfi->video_frame += bfi->video_size ? ret / bfi->video_size : 1;
+        bfi->video_frame += ret / bfi->video_size;
 
         /* One less frame to read. A cursory decrement. */
         bfi->nframes--;
+    } else {
+        /* Empty video packet */
+        ret = AVERROR(EAGAIN);
     }
 
     bfi->avflag       = !bfi->avflag;

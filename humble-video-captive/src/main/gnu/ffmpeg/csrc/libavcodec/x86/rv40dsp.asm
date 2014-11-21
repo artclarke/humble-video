@@ -1,23 +1,23 @@
 ;******************************************************************************
 ;* MMX/SSE2-optimized functions for the RV40 decoder
 ;* Copyright (c) 2010 Ronald S. Bultje <rsbultje@gmail.com>
-;* Copyright (c) 2010 Jason Garrett-Glaser <darkshikari@gmail.com>
+;* Copyright (c) 2010 Fiona Glaser <fiona@x264.com>
 ;* Copyright (C) 2012 Christophe Gisquet <christophe.gisquet@gmail.com>
 ;*
-;* This file is part of Libav.
+;* This file is part of FFmpeg.
 ;*
-;* Libav is free software; you can redistribute it and/or
+;* FFmpeg is free software; you can redistribute it and/or
 ;* modify it under the terms of the GNU Lesser General Public
 ;* License as published by the Free Software Foundation; either
 ;* version 2.1 of the License, or (at your option) any later version.
 ;*
-;* Libav is distributed in the hope that it will be useful,
+;* FFmpeg is distributed in the hope that it will be useful,
 ;* but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ;* Lesser General Public License for more details.
 ;*
 ;* You should have received a copy of the GNU Lesser General Public
-;* License along with Libav; if not, write to the Free Software
+;* License along with FFmpeg; if not, write to the Free Software
 ;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
@@ -77,9 +77,9 @@ SECTION .text
 ;-----------------------------------------------------------------------------
 ; subpel MC functions:
 ;
-; void [put|rv40]_rv40_qpel_[h|v]_<opt>(uint8_t *dst, int deststride,
-;                                       uint8_t *src, int srcstride,
-;                                       int len, int m);
+; void ff_[put|rv40]_rv40_qpel_[h|v]_<opt>(uint8_t *dst, int deststride,
+;                                          uint8_t *src, int srcstride,
+;                                          int len, int m);
 ;----------------------------------------------------------------------
 %macro LOAD  2
 %if WIN64
@@ -98,11 +98,7 @@ SECTION .text
 %endif
     packuswb  %1, %1
 %ifidn %3, avg
-%if cpuflag(3dnow)
-    pavgusb   %1, %2
-%else
-    pavgb     %1, %2
-%endif
+    PAVGB     %1, %2
 %endif
     movh  [dstq], %1
 %endmacro
@@ -442,7 +438,7 @@ FILTER_SSSE3  avg
 
 %endmacro
 
-; rv40_weight_func_%1(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w1, int w2, int stride)
+; void ff_rv40_weight_func_%1(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w1, int w2, int stride)
 ; %1=size  %2=num of xmm regs
 ; The weights are FP0.14 notation of fractions depending on pts.
 ; For timebases without rounding error (i.e. PAL), the fractions

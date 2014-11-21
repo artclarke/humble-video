@@ -222,6 +222,17 @@ static const uint8_t dnxhd_1252_chroma_weight[] = {
     114, 128, 125, 129, 134, 125, 116, 116,
 };
 
+static const uint8_t dnxhd_1256_chroma_weight[] = {
+     0, 32, 32, 32, 32, 32, 32, 33,
+    32, 32, 32, 32, 32, 32, 32, 34,
+    32, 32, 32, 32, 32, 32, 33, 37,
+    32, 32, 32, 32, 32, 32, 36, 39,
+    32, 32, 32, 32, 32, 34, 39, 44,
+    32, 37, 32, 32, 35, 40, 43, 49,
+    32, 33, 36, 36, 40, 43, 50, 60,
+    34, 37, 39, 44, 51, 56, 61, 70,
+};
+
 static const uint8_t dnxhd_1237_dc_codes[12] = {
     0, 12, 13, 1, 2, 3, 4, 5, 14, 30, 62, 63,
 };
@@ -1026,6 +1037,14 @@ const CIDEntry ff_dnxhd_cid_table[] = {
       dnxhd_1237_run_codes, dnxhd_1237_run_bits, dnxhd_1237_run,
       { 36, 36, 45, 75, 90 },
       { { 24000, 1001 }, { 25, 1 }, { 30000, 1001 }, { 50, 1 }, { 60000, 1001 } } },
+    { 1256, 1920, 1080, 0, 1835008, 1835008, 6, 10, 4,
+      dnxhd_1235_luma_weight, dnxhd_1256_chroma_weight,
+      dnxhd_1235_1241_dc_codes, dnxhd_1235_1241_dc_bits,
+      dnxhd_1235_1241_ac_codes, dnxhd_1235_1241_ac_bits, dnxhd_1235_1241_ac_level,
+      dnxhd_1235_1241_ac_flags,
+      dnxhd_1235_1238_1241_run_codes, dnxhd_1235_1238_1241_run_bits, dnxhd_1235_1241_run,
+      { 350, 390, 440, 730, 880 },
+      { { 24000, 1001 }, { 25, 1 }, { 30000, 1001 }, { 50, 1 }, { 60000, 1001 } } },
 };
 
 int ff_dnxhd_get_cid_table(int cid)
@@ -1048,7 +1067,7 @@ int avpriv_dnxhd_get_frame_size(int cid)
 int ff_dnxhd_find_cid(AVCodecContext *avctx, int bit_depth)
 {
     int i, j;
-    int mbs = avctx->bit_rate/1000000;
+    int mbs = avctx->bit_rate / 1000000;
     if (!mbs)
         return 0;
     for (i = 0; i < FF_ARRAY_ELEMS(ff_dnxhd_cid_table); i++) {

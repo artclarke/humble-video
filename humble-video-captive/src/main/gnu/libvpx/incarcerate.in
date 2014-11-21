@@ -28,7 +28,6 @@ if [ "@VS_CROSS_COMPILE@" = "1" -o "${HOST_TYPE}" = "Mac" ]; then
         VPX_HOST=x86_64-darwin10-gcc
         ;;
         *)
-        VPX_OPTIONS="$VPX_OPTIONS --disable-mmx --disable-sse --disable-sse2 --disable-sse3 --disable-ssse3 --disable-sse4_1"
         VPX_HOST=x86-darwin10-gcc
         ;;
       esac

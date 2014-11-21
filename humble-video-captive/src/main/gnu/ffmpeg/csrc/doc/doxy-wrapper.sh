@@ -2,13 +2,12 @@
 
 SRC_PATH="${1}"
 DOXYFILE="${2}"
+DOXYGEN="${3}"
 
-shift 2
+shift 3
 
-doxygen - <<EOF
+$DOXYGEN - <<EOF
 @INCLUDE        = ${DOXYFILE}
 INPUT           = $@
-HTML_HEADER     = ${SRC_PATH}/doc/doxy/header.html
-HTML_FOOTER     = ${SRC_PATH}/doc/doxy/footer.html
-HTML_STYLESHEET = ${SRC_PATH}/doc/doxy/doxy_stylesheet.css
+EXAMPLE_PATH    = ${SRC_PATH}/doc/examples
 EOF

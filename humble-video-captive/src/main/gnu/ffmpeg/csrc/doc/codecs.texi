@@ -1,3 +1,4 @@
+@anchor{codec-options}
 @chapter Codec Options
 @c man begin CODEC OPTIONS
 
@@ -82,9 +83,6 @@ Apply interlaced motion estimation.
 @item cgop
 Use closed gop.
 @end table
-
-@item sub_id @var{integer}
-Deprecated, currently unused.
 
 @item me_method @var{integer} (@emph{encoding,video})
 Set motion estimation method.
@@ -174,7 +172,13 @@ Set max video quantizer scale (VBR). Must be included between -1 and
 Set max difference between the quantizer scale (VBR).
 
 @item bf @var{integer} (@emph{encoding,video})
-Set max number of B frames.
+Set max number of B frames between non-B-frames.
+
+Must be an integer between -1 and 16. 0 means that B-frames are
+disabled. If a value of -1 is used, it will choose an automatic value
+depending on the encoder.
+
+Default value is 0.
 
 @item b_qfactor @var{float} (@emph{encoding,video})
 Set qp factor between P and B frames.
@@ -281,6 +285,11 @@ detect bitstream specification deviations
 detect improper bitstream length
 @item explode
 abort decoding on minor error detection
+@item ignore_err
+ignore decoding errors, and continue decoding.
+This is useful if you want to analyze the content of a video and thus want
+everything to be decoded no matter what. This option will not result in a video
+that is pleasing to watch in case of errors.
 @item careful
 consider things that violate the spec and have not been seen in the wild as errors
 @item compliant
@@ -385,9 +394,8 @@ Possible values:
 
 @item simplemmx
 
-@item libmpeg2mmx
-
-@item mmi
+@item simpleauto
+Automatically pick a IDCT compatible with the simple one
 
 @item arm
 
@@ -404,10 +412,6 @@ Possible values:
 @item simpleneon
 
 @item simplealpha
-
-@item h264
-
-@item vp3
 
 @item ipp
 
@@ -428,6 +432,8 @@ Possible values:
 iterative motion vector (MV) search (slow)
 @item deblock
 use strong deblock filter for damaged MBs
+@item favor_inter
+favor predicting from the previous frame instead of the current
 @end table
 
 @item bits_per_coded_sample @var{integer}
@@ -491,6 +497,8 @@ threading operations
 
 @item vismv @var{integer} (@emph{decoding,video})
 Visualize motion vectors (MVs).
+
+This option is deprecated, see the codecview filter instead.
 
 Possible values:
 @table @samp
@@ -771,26 +779,29 @@ Set noise reduction.
 Set number of bits which should be loaded into the rc buffer before
 decoding starts.
 
-@item inter_threshold @var{integer} (@emph{encoding,video})
-
 @item flags2 @var{flags} (@emph{decoding/encoding,audio,video})
 
 Possible values:
 @table @samp
 @item fast
-allow non spec compliant speedup tricks
+Allow non spec compliant speedup tricks.
 @item sgop
-Deprecated, use mpegvideo private options instead
+Deprecated, use mpegvideo private options instead.
 @item noout
-skip bitstream encoding
+Skip bitstream encoding.
+@item ignorecrop
+Ignore cropping information from sps.
 @item local_header
-place global headers at every keyframe instead of in extradata
+Place global headers at every keyframe instead of in extradata.
 @item chunks
-Frame data might be split into multiple chunks
+Frame data might be split into multiple chunks.
 @item showall
-Show all frames before the first keyframe
+Show all frames before the first keyframe.
 @item skiprd
-Deprecated, use mpegvideo private options instead
+Deprecated, use mpegvideo private options instead.
+@item export_mvs
+Export motion vectors into frame side-data (see @code{AV_FRAME_DATA_MOTION_VECTORS})
+for codecs that support it. See also @file{doc/examples/export_mvs.c}.
 @end table
 
 @item error @var{integer} (@emph{encoding,video})
@@ -846,6 +857,10 @@ Possible values:
 
 @item aac_eld
 
+@item mpeg2_aac_low
+
+@item mpeg2_aac_he
+
 @item dts
 
 @item dts_es
@@ -877,6 +892,9 @@ Set frame skip factor.
 
 @item skip_exp @var{integer} (@emph{encoding,video})
 Set frame skip exponent.
+Negative values behave identical to the corresponding positive ones, except
+that the score is normalized.
+Positive values exist primarily for compatibility reasons and are not so useful.
 
 @item skipcmp @var{integer} (@emph{encoding,video})
 Set frame skip compare function.
@@ -1022,15 +1040,26 @@ Set the log level offset.
 Number of slices, used in parallelized encoding.
 
 @item thread_type @var{flags} (@emph{decoding/encoding,video})
-Select multithreading type.
+Select which multithreading methods to use.
+
+Use of @samp{frame} will increase decoding delay by one frame per
+thread, so clients which cannot provide future frames should not use
+it.
 
 Possible values:
 @table @samp
 @item slice
+Decode more than one part of a single frame at once.
+
+Multithreading using slices works only when the video was encoded with
+slices.
 
 @item frame
-
+Decode more than one frame at once.
 @end table
+
+Default value is @samp{slice+frame}.
+
 @item audio_service_type @var{integer} (@emph{encoding,audio})
 Set audio service type.
 
@@ -1064,9 +1093,34 @@ Set sample format audio decoders should prefer. Default value is
 
 @item sub_charenc @var{encoding} (@emph{decoding,subtitles})
 Set the input subtitles character encoding.
+
+@item field_order  @var{field_order} (@emph{video})
+Set/override the field order of the video.
+Possible values:
+@table @samp
+@item progressive
+Progressive video
+@item tt
+Interlaced video, top field coded and displayed first
+@item bb
+Interlaced video, bottom field coded and displayed first
+@item tb
+Interlaced video, top coded first, bottom displayed first
+@item bt
+Interlaced video, bottom coded first, top displayed first
+@end table
+
+@item skip_alpha @var{integer} (@emph{decoding,video})
+Set to 1 to disable processing alpha (transparency). This works like the
+@samp{gray} flag in the @option{flags} option which skips chroma information
+instead of alpha. Default is 0.
 @end table
 
 @c man end CODEC OPTIONS
 
+@ifclear config-writeonly
 @include decoders.texi
+@end ifclear
+@ifclear config-readonly
 @include encoders.texi
+@end ifclear

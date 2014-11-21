@@ -50,27 +50,79 @@
 int ff_jpegls_decode_lse(MJpegDecodeContext *s)
 {
     int id;
+    int tid, wt, maxtab, i, j;
 
-    skip_bits(&s->gb, 16);  /* length: FIXME: verify field validity */
+    int len = get_bits(&s->gb, 16);
     id = get_bits(&s->gb, 8);
 
     switch (id) {
     case 1:
+        if (len < 13)
+            return AVERROR_INVALIDDATA;
+
         s->maxval = get_bits(&s->gb, 16);
         s->t1     = get_bits(&s->gb, 16);
         s->t2     = get_bits(&s->gb, 16);
         s->t3     = get_bits(&s->gb, 16);
         s->reset  = get_bits(&s->gb, 16);
 
+        if(s->avctx->debug & FF_DEBUG_PICT_INFO) {
+            av_log(s->avctx, AV_LOG_DEBUG, "Coding parameters maxval:%d T1:%d T2:%d T3:%d reset:%d\n",
+                   s->maxval, s->t1, s->t2, s->t3, s->reset);
+        }
+
 //        ff_jpegls_reset_coding_parameters(s, 0);
         //FIXME quant table?
         break;
     case 2:
+        s->palette_index = 0;
     case 3:
-        av_log(s->avctx, AV_LOG_ERROR, "palette not supported\n");
-        return AVERROR(ENOSYS);
+        tid= get_bits(&s->gb, 8);
+        wt = get_bits(&s->gb, 8);
+
+        if (len < 5)
+            return AVERROR_INVALIDDATA;
+
+        if (wt < 1 || wt > MAX_COMPONENTS) {
+            avpriv_request_sample(s->avctx, "wt %d", wt);
+            return AVERROR_PATCHWELCOME;
+        }
+
+        if (!s->maxval)
+            maxtab = 255;
+        else if ((5 + wt*(s->maxval+1)) < 65535)
+            maxtab = s->maxval;
+        else
+            maxtab = 65530/wt - 1;
+
+        if(s->avctx->debug & FF_DEBUG_PICT_INFO) {
+            av_log(s->avctx, AV_LOG_DEBUG, "LSE palette %d tid:%d wt:%d maxtab:%d\n", id, tid, wt, maxtab);
+        }
+        if (maxtab >= 256) {
+            avpriv_request_sample(s->avctx, ">8bit palette");
+            return AVERROR_PATCHWELCOME;
+        }
+        maxtab = FFMIN(maxtab, (len - 5) / wt + s->palette_index);
+
+        if (s->palette_index > maxtab)
+            return AVERROR_INVALIDDATA;
+
+        if ((s->avctx->pix_fmt == AV_PIX_FMT_GRAY8 || s->avctx->pix_fmt == AV_PIX_FMT_PAL8) &&
+            (s->picture_ptr->format == AV_PIX_FMT_GRAY8 || s->picture_ptr->format == AV_PIX_FMT_PAL8)) {
+            uint32_t *pal = (uint32_t *)s->picture_ptr->data[1];
+            s->picture_ptr->format =
+            s->avctx->pix_fmt = AV_PIX_FMT_PAL8;
+            for (i=s->palette_index; i<=maxtab; i++) {
+                pal[i] = 0;
+                for (j=0; j<wt; j++) {
+                    pal[i] |= get_bits(&s->gb, 8) << (8*(wt-j-1));
+                }
+            }
+            s->palette_index = i;
+        }
+        break;
     case 4:
-        av_log(s->avctx, AV_LOG_ERROR, "oversize image not supported\n");
+        avpriv_request_sample(s->avctx, "oversize image");
         return AVERROR(ENOSYS);
     default:
         av_log(s->avctx, AV_LOG_ERROR, "invalid id %d\n", id);
@@ -148,6 +200,8 @@ static inline int ls_get_code_runterm(GetBitContext *gb, JLSState *state,
         ret = ret >> 1;
     }
 
+    if(FFABS(ret) > 0xFFFF)
+        return -0x10000;
     /* update state */
     state->A[Q] += FFABS(ret) - RItype;
     ret         *= state->twonear;
@@ -215,6 +269,11 @@ static inline void ls_decode_line(JLSState *state, MJpegDecodeContext *s,
                 x += stride;
             }
 
+            if (x >= w) {
+                av_log(NULL, AV_LOG_ERROR, "run overflow\n");
+                return;
+            }
+
             /* decode run termination value */
             Rb     = R(last, x);
             RItype = (FFABS(Ra - Rb) <= state->near) ? 1 : 0;
@@ -279,9 +338,9 @@ int ff_jpegls_decode_picture(MJpegDecodeContext *s, int near,
     JLSState *state;
     int off = 0, stride = 1, width, shift, ret = 0;
 
-    zero = av_mallocz(s->picture.linesize[0]);
+    zero = av_mallocz(s->picture_ptr->linesize[0]);
     last = zero;
-    cur  = s->picture.data[0];
+    cur  = s->picture_ptr->data[0];
 
     state = av_mallocz(sizeof(JLSState));
     /* initialize JPEG-LS state from JPEG parameters */
@@ -328,7 +387,7 @@ int ff_jpegls_decode_picture(MJpegDecodeContext *s, int near,
                 t = *((uint16_t *)last);
             }
             last = cur;
-            cur += s->picture.linesize[0];
+            cur += s->picture_ptr->linesize[0];
 
             if (s->restart_interval && !--s->restart_count) {
                 align_get_bits(&s->gb);
@@ -339,7 +398,7 @@ int ff_jpegls_decode_picture(MJpegDecodeContext *s, int near,
         int j;
         int Rc[3] = { 0, 0, 0 };
         stride = (s->nb_components > 1) ? 3 : 1;
-        memset(cur, 0, s->picture.linesize[0]);
+        memset(cur, 0, s->picture_ptr->linesize[0]);
         width = s->width * stride;
         for (i = 0; i < s->height; i++) {
             for (j = 0; j < stride; j++) {
@@ -353,12 +412,59 @@ int ff_jpegls_decode_picture(MJpegDecodeContext *s, int near,
                 }
             }
             last = cur;
-            cur += s->picture.linesize[0];
+            cur += s->picture_ptr->linesize[0];
         }
     } else if (ilv == 2) { /* sample interleaving */
         avpriv_report_missing_feature(s->avctx, "Sample interleaved images");
         ret = AVERROR_PATCHWELCOME;
         goto end;
+    }
+
+    if (s->xfrm && s->nb_components == 3) {
+        int x, w;
+
+        w = s->width * s->nb_components;
+
+        if (s->bits <= 8) {
+            uint8_t *src = s->picture_ptr->data[0];
+
+            for (i = 0; i < s->height; i++) {
+                switch(s->xfrm) {
+                case 1:
+                    for (x = off; x < w; x += 3) {
+                        src[x  ] += src[x+1] + 128;
+                        src[x+2] += src[x+1] + 128;
+                    }
+                    break;
+                case 2:
+                    for (x = off; x < w; x += 3) {
+                        src[x  ] += src[x+1] + 128;
+                        src[x+2] += ((src[x  ] + src[x+1])>>1) + 128;
+                    }
+                    break;
+                case 3:
+                    for (x = off; x < w; x += 3) {
+                        int g = src[x+0] - ((src[x+2]+src[x+1])>>2) + 64;
+                        src[x+0] = src[x+2] + g + 128;
+                        src[x+2] = src[x+1] + g + 128;
+                        src[x+1] = g;
+                    }
+                    break;
+                case 4:
+                    for (x = off; x < w; x += 3) {
+                        int r    = src[x+0] - ((                       359 * (src[x+2]-128) + 490) >> 8);
+                        int g    = src[x+0] - (( 88 * (src[x+1]-128) - 183 * (src[x+2]-128) +  30) >> 8);
+                        int b    = src[x+0] + ((454 * (src[x+1]-128)                        + 574) >> 8);
+                        src[x+0] = av_clip_uint8(r);
+                        src[x+1] = av_clip_uint8(g);
+                        src[x+2] = av_clip_uint8(b);
+                    }
+                    break;
+                }
+                src += s->picture_ptr->linesize[0];
+            }
+        }else
+            avpriv_report_missing_feature(s->avctx, "16bit xfrm");
     }
 
     if (shift) { /* we need to do point transform or normalize samples */
@@ -367,20 +473,20 @@ int ff_jpegls_decode_picture(MJpegDecodeContext *s, int near,
         w = s->width * s->nb_components;
 
         if (s->bits <= 8) {
-            uint8_t *src = s->picture.data[0];
+            uint8_t *src = s->picture_ptr->data[0];
 
             for (i = 0; i < s->height; i++) {
                 for (x = off; x < w; x += stride)
                     src[x] <<= shift;
-                src += s->picture.linesize[0];
+                src += s->picture_ptr->linesize[0];
             }
         } else {
-            uint16_t *src = (uint16_t *)s->picture.data[0];
+            uint16_t *src = (uint16_t *)s->picture_ptr->data[0];
 
             for (i = 0; i < s->height; i++) {
                 for (x = 0; x < w; x++)
                     src[x] <<= shift;
-                src += s->picture.linesize[0] / 2;
+                src += s->picture_ptr->linesize[0] / 2;
             }
         }
     }

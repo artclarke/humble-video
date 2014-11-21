@@ -80,7 +80,7 @@ MediaPacketTest::testCopyPacket() {
   // let's get access to the data
 
   RefPointer<Buffer> data = packet->getData();
-  TS_ASSERT_EQUALS(size+16, data->getBufferSize());
+  TS_ASSERT_EQUALS(size+32, data->getBufferSize());
   TS_ASSERT_EQUALS(size, packet->getSize());
   uint8_t* raw = (uint8_t*) data->getBytes(0, size);
   for (int i = 0; i < size; i++)
@@ -107,7 +107,7 @@ MediaPacketTest::testCopyPacket() {
 
     RefPointer<Buffer> buf = newPacket->getData();
     TS_ASSERT_EQUALS(size, newPacket->getSize());
-    TS_ASSERT_EQUALS(size+16, buf->getBufferSize());
+    TS_ASSERT_EQUALS(size+32, buf->getBufferSize());
     uint8_t* d = (uint8_t*) buf->getBytes(0, size);
     if (!tests[i]) {
       TS_ASSERT_EQUALS(d, raw);

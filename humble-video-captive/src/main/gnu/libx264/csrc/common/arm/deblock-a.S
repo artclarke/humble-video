@@ -1,7 +1,7 @@
 /*****************************************************************************
  * deblock.S: arm deblocking
  *****************************************************************************
- * Copyright (C) 2009-2013 x264 project
+ * Copyright (C) 2009-2014 x264 project
  *
  * Authors: Mans Rullgard <mans@mansr.com>
  *
@@ -302,5 +302,111 @@ function x264_deblock_h_chroma_neon
     vst1.8          {d1},  [r0], r1
     vst1.8          {d3},  [r0], r1
 
+    bx              lr
+.endfunc
+
+function x264_deblock_strength_neon
+    ldr             ip,  [sp]
+    vmov.i8         q8,  #0
+    lsl             ip,  ip,  #8
+    add             r3,  r3,  #32
+    sub             ip,  ip,  #(1<<8)-3
+    vmov.i8         q9,  #0
+    vdup.16         q10, ip
+    ldr             ip,  [sp, #4]
+
+lists:
+    @ load bytes ref
+    vld1.8          {d31}, [r1]!
+    add             r2,  r2,  #16
+    vld1.8          {q1},  [r1]!
+    vmov.i8         q0,  #0
+    vld1.8          {q2},  [r1]!
+    vext.8          q3,  q0,  q1,  #15
+    vext.8          q0,  q0,  q2,  #15
+    vuzp.32         q1,  q2
+    vuzp.32         q3,  q0
+    vext.8          q1,  q15, q2,  #12
+
+    veor            q0,  q0,  q2
+    veor            q1,  q1,  q2
+    vorr            q8,  q8,  q0
+    vorr            q9,  q9,  q1
+
+    vld1.16         {q11}, [r2,:128]!   @ mv + 0x10
+    vld1.16         {q3},  [r2,:128]!   @ mv + 0x20
+    vld1.16         {q12}, [r2,:128]!   @ mv + 0x30
+    vld1.16         {q2},  [r2,:128]!   @ mv + 0x40
+    vld1.16         {q13}, [r2,:128]!   @ mv + 0x50
+    vext.8          q3,  q3,  q12, #12
+    vext.8          q2,  q2,  q13, #12
+    vabd.s16        q0,  q12, q3
+    vld1.16         {q3},  [r2,:128]!   @ mv + 0x60
+    vabd.s16        q1,  q13, q2
+    vld1.16         {q14}, [r2,:128]!   @ mv + 0x70
+    vqmovn.u16      d0,  q0
+    vld1.16         {q2},  [r2,:128]!   @ mv + 0x80
+    vld1.16         {q15}, [r2,:128]!   @ mv + 0x90
+    vqmovn.u16      d1,  q1
+    vext.8          q3,  q3,  q14, #12
+    vext.8          q2,  q2,  q15, #12
+    vabd.s16        q3,  q14, q3
+    vabd.s16        q2,  q15, q2
+    vqmovn.u16      d2,  q3
+    vqmovn.u16      d3,  q2
+
+    vqsub.u8        q0,  q0,  q10
+    vqsub.u8        q1,  q1,  q10
+    vqmovn.u16      d0,  q0
+    vqmovn.u16      d1,  q1
+
+    vabd.s16        q1,  q12, q13
+    vorr            q8,  q8,  q0
+
+    vabd.s16        q0,  q11, q12
+    vabd.s16        q2,  q13, q14
+    vabd.s16        q3,  q14, q15
+    vqmovn.u16      d0,  q0
+    vqmovn.u16      d1,  q1
+    vqmovn.u16      d2,  q2
+    vqmovn.u16      d3,  q3
+
+    vqsub.u8        q0,  q0,  q10
+    vqsub.u8        q1,  q1,  q10
+    vqmovn.u16      d0,  q0
+    vqmovn.u16      d1,  q1
+    subs            ip,  ip,  #1
+    vorr            q9,  q9,  q0
+    beq             lists
+
+    mov             ip,  #-32
+    @ load bytes nnz
+    vld1.8          {d31}, [r0]!
+    vld1.8          {q1},  [r0]!
+    vmov.i8         q0,  #0
+    vld1.8          {q2},  [r0]
+    vext.8          q3,  q0,  q1,  #15
+    vext.8          q0,  q0,  q2,  #15
+    vuzp.32         q1,  q2
+    vuzp.32         q3,  q0
+    vext.8          q1,  q15, q2,  #12
+
+    vorr            q0,  q0,  q2
+    vorr            q1,  q1,  q2
+    vmov.u8         q10, #1
+    vmin.u8         q0,  q0,  q10
+    vmin.u8         q1,  q1,  q10
+    vmin.u8         q8,  q8,  q10       @ mv ? 1 : 0
+    vmin.u8         q9,  q9,  q10
+    vadd.u8         q0,  q0,  q0        @ nnz ? 2 : 0
+    vadd.u8         q1,  q1,  q1
+    vmax.u8         q8,  q8,  q0
+    vmax.u8         q9,  q9,  q1
+    vzip.16         d16, d17
+    vst1.8          {q9}, [r3,:128], ip @ bs[1]
+    vtrn.8          d16, d17
+    vtrn.32         d16, d17
+
+    vst1.8          {q8}, [r3,:128]     @ bs[0]
     bx              lr
 .endfunc

@@ -81,6 +81,20 @@ Coder::~Coder() {
 }
 
 void
+Coder::setState(State state) {
+  const char* descrs[4];
+  descrs[STATE_INITED] = "STATE_INITED";
+  descrs[STATE_OPENED] = "STATE_OPENED";
+  descrs[STATE_FLUSHING] = "STATE_FLUSHING";
+  descrs[STATE_ERROR] = "STATE_ERROR";
+  VS_LOG_DEBUG("setState Coder@%p[%s -> %s]",
+               this,
+               descrs[mState],
+               descrs[state]);
+  mState = state;
+}
+
+void
 Coder::open(KeyValueBag* inputOptions, KeyValueBag* aUnsetOptions) {
   int32_t retval = -1;
   AVDictionary* tmp=0;
@@ -103,7 +117,7 @@ Coder::open(KeyValueBag* inputOptions, KeyValueBag* aUnsetOptions) {
     // we pass in the options again because codec-specific options can be set.
     retval = avcodec_open2(mCtx, codec->getCtx(), &tmp);
     FfmpegException::check(retval, "could not open codec");
-    mState  = STATE_OPENED;
+    setState(STATE_OPENED);
 
     if (aUnsetOptions)
     {
@@ -113,7 +127,7 @@ Coder::open(KeyValueBag* inputOptions, KeyValueBag* aUnsetOptions) {
     if (tmp)
       av_dict_free(&tmp);
   } catch (...) {
-    mState = STATE_ERROR;
+    setState(STATE_ERROR);
     if (tmp)
       av_dict_free(&tmp);
     throw;

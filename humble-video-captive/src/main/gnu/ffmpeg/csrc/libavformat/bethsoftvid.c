@@ -61,6 +61,9 @@ static int vid_probe(AVProbeData *p)
     if (AV_RL32(p->buf) != MKTAG('V', 'I', 'D', 0))
         return 0;
 
+    if (p->buf[4] != 2)
+        return AVPROBE_SCORE_MAX / 4;
+
     return AVPROBE_SCORE_MAX;
 }
 
@@ -210,7 +213,7 @@ static int vid_read_packet(AVFormatContext *s,
     int audio_length;
     int ret_value;
 
-    if(vid->is_finished || url_feof(pb))
+    if(vid->is_finished || avio_feof(pb))
         return AVERROR_EOF;
 
     block_type = avio_r8(pb);

@@ -9,8 +9,8 @@
  */
 
 
-#ifndef __VPX_MEM_INTRNL_H__
-#define __VPX_MEM_INTRNL_H__
+#ifndef VPX_MEM_INCLUDE_VPX_MEM_INTRNL_H_
+#define VPX_MEM_INCLUDE_VPX_MEM_INTRNL_H_
 #include "./vpx_config.h"
 
 #ifndef CONFIG_MEM_MANAGER
@@ -50,12 +50,8 @@ vpx_memcpy, _memset, and _memmove*/
 calls to vpx_* functions other
 than vpx_memalign*/
 # else
-#  define DEFAULT_ALIGNMENT        1
+#  define DEFAULT_ALIGNMENT        (2 * sizeof(void*))  /* NOLINT */
 # endif
-#endif
-
-#if DEFAULT_ALIGNMENT < 1
-# error "DEFAULT_ALIGNMENT must be >= 1!"
 #endif
 
 #if CONFIG_MEM_TRACKER
@@ -96,4 +92,4 @@ this should be a multiple of 4*/
 /*returns an addr aligned to the byte boundary specified by align*/
 #define align_addr(addr,align) (void*)(((size_t)(addr) + ((align) - 1)) & (size_t)-(align))
 
-#endif /*__VPX_MEM_INTRNL_H__*/
+#endif  // VPX_MEM_INCLUDE_VPX_MEM_INTRNL_H_

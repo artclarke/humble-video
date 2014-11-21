@@ -73,7 +73,7 @@ static int query_formats(AVFilterContext *ctx)
     AVFilterFormats *formats = NULL;
     int fmt;
 
-    for (fmt = 0; fmt < AV_PIX_FMT_NB; fmt++) {
+    for (fmt = 0; av_pix_fmt_desc_get(fmt); fmt++) {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
         if (is_planar_yuv(desc))
             ff_add_format(&formats, fmt);
@@ -101,10 +101,9 @@ static const AVFilterPad swapuv_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_swapuv = {
-    .name      = "swapuv",
-    .description = NULL_IF_CONFIG_SMALL("Swap U and V components."),
-    .priv_size = 0,
+AVFilter ff_vf_swapuv = {
+    .name          = "swapuv",
+    .description   = NULL_IF_CONFIG_SMALL("Swap U and V components."),
     .query_formats = query_formats,
     .inputs        = swapuv_inputs,
     .outputs       = swapuv_outputs,

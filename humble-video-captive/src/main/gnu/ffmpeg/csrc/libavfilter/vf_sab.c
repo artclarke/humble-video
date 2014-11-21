@@ -180,7 +180,7 @@ static int open_filter_param(FilterParam *f, int width, int height, unsigned int
     vec = sws_getGaussianVec(f->radius, f->quality);
     f->dist_width    = vec->length;
     f->dist_linesize = FFALIGN(vec->length, 8);
-    f->dist_coeff    = av_malloc(f->dist_width * f->dist_linesize * sizeof(*f->dist_coeff));
+    f->dist_coeff    = av_malloc_array(f->dist_width, f->dist_linesize * sizeof(*f->dist_coeff));
     if (!f->dist_coeff) {
         sws_freeVec(vec);
         return AVERROR(ENOMEM);
@@ -325,7 +325,7 @@ static const AVFilterPad sab_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_sab = {
+AVFilter ff_vf_sab = {
     .name          = "sab",
     .description   = NULL_IF_CONFIG_SMALL("Apply shape adaptive blur."),
     .priv_size     = sizeof(SabContext),

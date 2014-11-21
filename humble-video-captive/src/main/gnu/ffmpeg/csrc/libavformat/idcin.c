@@ -1,6 +1,6 @@
 /*
  * id Quake II CIN File Demuxer
- * Copyright (c) 2003 The ffmpeg Project
+ * Copyright (c) 2003 The FFmpeg Project
  *
  * This file is part of FFmpeg.
  *
@@ -94,6 +94,8 @@ typedef struct IdcinDemuxContext {
 static int idcin_probe(AVProbeData *p)
 {
     unsigned int number, sample_rate;
+    unsigned int w, h;
+    int i;
 
     /*
      * This is what you could call a "probabilistic" file check: id CIN
@@ -108,17 +110,17 @@ static int idcin_probe(AVProbeData *p)
 
     /* check we have enough data to do all checks, otherwise the
        0-padding may cause a wrong recognition */
-    if (p->buf_size < 20)
+    if (p->buf_size < 20 + HUFFMAN_TABLE_SIZE + 12)
         return 0;
 
     /* check the video width */
-    number = AV_RL32(&p->buf[0]);
-    if ((number == 0) || (number > 1024))
+    w = AV_RL32(&p->buf[0]);
+    if ((w == 0) || (w > 1024))
        return 0;
 
     /* check the video height */
-    number = AV_RL32(&p->buf[4]);
-    if ((number == 0) || (number > 1024))
+    h = AV_RL32(&p->buf[4]);
+    if ((h == 0) || (h > 1024))
        return 0;
 
     /* check the audio sample rate */
@@ -135,6 +137,13 @@ static int idcin_probe(AVProbeData *p)
     number = AV_RL32(&p->buf[16]);
     if (number > 2 || sample_rate && !number)
         return 0;
+
+    i = 20 + HUFFMAN_TABLE_SIZE;
+    if (AV_RL32(&p->buf[i]) == 1)
+        i += 768;
+
+    if (i+12 > p->buf_size || AV_RL32(&p->buf[i+8]) != w*h)
+        return 1;
 
     /* return half certainty since this check is a bit sketchy */
     return AVPROBE_SCORE_EXTENSION;
@@ -196,17 +205,8 @@ static int idcin_read_header(AVFormatContext *s)
     st->codec->height = height;
 
     /* load up the Huffman tables into extradata */
-    st->codec->extradata = av_malloc(HUFFMAN_TABLE_SIZE);
-    if (!st->codec->extradata)
-        return AVERROR(ENOMEM);
-    st->codec->extradata_size = HUFFMAN_TABLE_SIZE;
-    ret = avio_read(pb, st->codec->extradata, HUFFMAN_TABLE_SIZE);
-    if (ret < 0) {
+    if ((ret = ff_get_extradata(st->codec, pb, HUFFMAN_TABLE_SIZE)) < 0)
         return ret;
-    } else if (ret != HUFFMAN_TABLE_SIZE) {
-        av_log(s, AV_LOG_ERROR, "incomplete header\n");
-        return AVERROR(EIO);
-    }
 
     if (idcin->audio_present) {
         idcin->audio_present = 1;
@@ -262,7 +262,7 @@ static int idcin_read_packet(AVFormatContext *s,
     unsigned char palette_buffer[768];
     uint32_t palette[256];
 
-    if (url_feof(s->pb))
+    if (avio_feof(s->pb))
         return s->pb->error ? s->pb->error : AVERROR_EOF;
 
     if (idcin->next_chunk_is_video) {

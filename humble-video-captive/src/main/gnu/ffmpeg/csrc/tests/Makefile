@@ -1,8 +1,11 @@
 FFSERVER_REFFILE = $(SRC_PATH)/tests/ffserver.regression.ref
 
+THREADS = 1
 VREF = tests/vsynth1/00.pgm
 AREF = tests/data/asynth1.sw
 
+FATEW = 34
+FATEH = 34
 
 $(AREF): CMP=
 
@@ -28,12 +31,19 @@ tests/data/vsynth1.yuv: tests/videogen$(HOSTEXESUF) | tests/data
 	$(M)$< $@
 
 tests/data/vsynth2.yuv: tests/rotozoom$(HOSTEXESUF) | tests/data
-	$(M)$< $(SRC_PATH)/tests/lena.pnm $@
+	$(M)$< $(SAMPLES)/lena.pnm $@
 
-tests/data/ffprobe-test.nut: ffmpeg$(EXESUF) | tests/data
+tests/data/vsynth3.yuv: tests/videogen$(HOSTEXESUF) | tests/data
+	$(M)$< $@ $(FATEW) $(FATEH)
+
+tests/test.ffmeta: TAG = COPY
+tests/test.ffmeta:
+	$(M)cp -f $(SRC_PATH)/tests/test.ffmeta $(TARGET_PATH)/tests/test.ffmeta
+
+tests/data/ffprobe-test.nut: ffmpeg$(EXESUF) | tests/data tests/test.ffmeta
 	$(M)$(TARGET_EXEC) ./$< \
         -f lavfi -i "aevalsrc=sin(400*PI*2*t):d=0.125[out0]; testsrc=d=0.125[out1]; testsrc=s=100x100:d=0.125[out2]" \
-        -f ffmetadata -i $(SRC_PATH)/tests/test.ffmeta \
+        -f ffmetadata -i $(TARGET_PATH)/tests/test.ffmeta \
         -flags +bitexact -map 0:0 -map 0:1 -map 0:2 -map_metadata 1 \
         -map_metadata:s:0 1:s:0 -map_metadata:s:1 1:s:1 \
         -vcodec rawvideo -acodec pcm_s16le \
@@ -45,7 +55,12 @@ tests/data/filtergraphs/%: TAG = COPY
 tests/data/filtergraphs/%: $(SRC_PATH)/tests/filtergraphs/% | tests/data/filtergraphs
 	$(M)cp $< $@
 
+RUNNING_FATE := $(filter check fate%,$(filter-out fate-rsync,$(MAKECMDGOALS)))
+
+# Check sanity of dependencies when running FATE tests.
+ifneq (,$(RUNNING_FATE))
 CHKCFG  = $(if $($(1))$(!$(1)),$($(1)), $(error No such config: $(1)))
+endif
 
 ALLYES  = $(strip $(call XYES, $(1)))
 XYES    = $(if $(strip $(1)),                                           \
@@ -65,9 +80,11 @@ ENCMUX  = $(call ALLYES, $(1:%=%_ENCODER) $(2)_MUXER)
 
 DEMMUX  = $(call ALLYES, $(1)_DEMUXER $(2)_MUXER)
 
-FILTERDEMDEC       = $(call ALLYES, $(1)_FILTER $(2)_DEMUXER $(3)_DECODER)
-FILTERDEMDECMUX    = $(call ALLYES, $(1)_FILTER $(2)_DEMUXER $(3)_DECODER $(4)_MUXER)
-FILTERDEMDECENCMUX = $(call ALLYES, $(1)_FILTER $(2)_DEMUXER $(3)_DECODER $(4)_ENCODER $(5)_MUXER)
+FILTERDEMDEC       = $(call ALLYES, $(1:%=%_FILTER) $(2)_DEMUXER $(3)_DECODER)
+FILTERDEMDECMUX    = $(call ALLYES, $(1:%=%_FILTER) $(2)_DEMUXER $(3)_DECODER $(4)_MUXER)
+FILTERDEMDECENCMUX = $(call ALLYES, $(1:%=%_FILTER) $(2)_DEMUXER $(3)_DECODER $(4)_ENCODER $(5)_MUXER)
+
+PARSERDEMDEC       = $(call ALLYES, $(1)_PARSER $(2)_DEMUXER $(3)_DECODER)
 
 include $(SRC_PATH)/tests/fate/acodec.mak
 include $(SRC_PATH)/tests/fate/vcodec.mak
@@ -90,6 +107,7 @@ include $(SRC_PATH)/tests/fate/demux.mak
 include $(SRC_PATH)/tests/fate/dfa.mak
 include $(SRC_PATH)/tests/fate/dpcm.mak
 include $(SRC_PATH)/tests/fate/ea.mak
+include $(SRC_PATH)/tests/fate/exif.mak
 include $(SRC_PATH)/tests/fate/ffmpeg.mak
 include $(SRC_PATH)/tests/fate/ffprobe.mak
 include $(SRC_PATH)/tests/fate/filter-audio.mak
@@ -98,17 +116,22 @@ include $(SRC_PATH)/tests/fate/flac.mak
 include $(SRC_PATH)/tests/fate/fft.mak
 include $(SRC_PATH)/tests/fate/gif.mak
 include $(SRC_PATH)/tests/fate/h264.mak
+include $(SRC_PATH)/tests/fate/hevc.mak
 include $(SRC_PATH)/tests/fate/image.mak
 include $(SRC_PATH)/tests/fate/indeo.mak
 include $(SRC_PATH)/tests/fate/libavcodec.mak
+include $(SRC_PATH)/tests/fate/libavdevice.mak
 include $(SRC_PATH)/tests/fate/libavformat.mak
+include $(SRC_PATH)/tests/fate/libavresample.mak
 include $(SRC_PATH)/tests/fate/libavutil.mak
+include $(SRC_PATH)/tests/fate/libswresample.mak
 include $(SRC_PATH)/tests/fate/lossless-audio.mak
 include $(SRC_PATH)/tests/fate/lossless-video.mak
 include $(SRC_PATH)/tests/fate/microsoft.mak
 include $(SRC_PATH)/tests/fate/monkeysaudio.mak
 include $(SRC_PATH)/tests/fate/mp3.mak
 include $(SRC_PATH)/tests/fate/mpc.mak
+include $(SRC_PATH)/tests/fate/opus.mak
 include $(SRC_PATH)/tests/fate/pcm.mak
 include $(SRC_PATH)/tests/fate/probe.mak
 include $(SRC_PATH)/tests/fate/prores.mak
@@ -125,6 +148,7 @@ include $(SRC_PATH)/tests/fate/vpx.mak
 include $(SRC_PATH)/tests/fate/vqf.mak
 include $(SRC_PATH)/tests/fate/wavpack.mak
 include $(SRC_PATH)/tests/fate/wma.mak
+include $(SRC_PATH)/tests/fate/xvid.mak
 
 FATE_FFMPEG += $(FATE_FFMPEG-yes) $(FATE_AVCONV) $(FATE_AVCONV-yes)
 FATE-$(CONFIG_FFMPEG) += $(FATE_FFMPEG)
@@ -166,7 +190,7 @@ fate:: $(FATE)
 
 $(FATE) $(FATE_TESTS-no): $(FATE_UTILS:%=tests/%$(HOSTEXESUF))
 	@echo "TEST    $(@:fate-%=%)"
-	$(Q)$(SRC_PATH)/tests/fate-run.sh $@ "$(SAMPLES)" "$(TARGET_EXEC)" "$(TARGET_PATH)" '$(CMD)' '$(CMP)' '$(REF)' '$(FUZZ)' '$(THREADS)' '$(THREAD_TYPE)' '$(CPUFLAGS)' '$(CMP_SHIFT)' '$(CMP_TARGET)' '$(SIZE_TOLERANCE)' '$(CMP_UNIT)' '$(GEN)'
+	$(Q)$(SRC_PATH)/tests/fate-run.sh $@ "$(TARGET_SAMPLES)" "$(TARGET_EXEC)" "$(TARGET_PATH)" '$(CMD)' '$(CMP)' '$(REF)' '$(FUZZ)' '$(THREADS)' '$(THREAD_TYPE)' '$(CPUFLAGS)' '$(CMP_SHIFT)' '$(CMP_TARGET)' '$(SIZE_TOLERANCE)' '$(CMP_UNIT)' '$(GEN)'
 
 fate-list:
 	@printf '%s\n' $(sort $(FATE))
@@ -192,6 +216,7 @@ testclean:
 	$(RM) -r tests/vsynth1 tests/data tools/lavfi-showfiltfmts$(EXESUF)
 	$(RM) $(CLEANSUFFIXES:%=tests/%)
 	$(RM) $(TESTTOOLS:%=tests/%$(HOSTEXESUF))
+	$(RM) tests/pixfmts.mak
 
 -include $(wildcard tests/*.d)
 

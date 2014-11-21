@@ -51,6 +51,7 @@ public:
   void testEncodeAudio();
   void testEncodeInvalidParameters();
   void testTranscode();
+  void testRegression36();
 private:
   void decodeAndEncode(
       MediaPacket*,
@@ -71,6 +72,13 @@ private:
       );
 
   void encodeAndMux(MediaSampled*, Muxer*, Encoder*);
+  void
+  testRegression36Internal (const Codec::ID codecId, const int32_t numSamples,
+                            const int32_t sampleRate, const int32_t channels,
+                            const AudioChannel::Layout channelLayout,
+                            const AudioFormat::Type audioFormat,
+                            const int64_t bitRate, const char* testOutputName);
+
   TestData mFixtures;
 
 };

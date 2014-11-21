@@ -16,7 +16,7 @@ ENC_OPTS="$ENC_OPTS -metadata title=lavftest"
 do_lavf_fate()
 {
     file=${outfile}lavf.$1
-    input="${samples}/$2"
+    input="${target_samples}/$2"
     do_avconv $file $DEC_OPTS -i "$input" $ENC_OPTS -vcodec copy -acodec copy
     do_avconv_crc $file $DEC_OPTS -i $target_path/$file $3
 }
@@ -64,11 +64,11 @@ do_audio_only()
 }
 
 if [ -n "$do_avi" ] ; then
-do_lavf avi "" "-acodec mp2 -ab 64k"
+do_lavf avi "" "-acodec mp2 -ar 44100 -ab 64k"
 fi
 
 if [ -n "$do_asf" ] ; then
-do_lavf asf "" "-acodec mp2 -ab 64k" "-r 25"
+do_lavf asf "" "-acodec mp2 -ar 44100 -ab 64k" "-r 25"
 fi
 
 if [ -n "$do_rm" ] ; then
@@ -79,7 +79,7 @@ do_avconv $file $DEC_OPTS -f image2 -vcodec pgmyuv -i $raw_src $DEC_OPTS -ar 441
 fi
 
 if [ -n "$do_mpg" ] ; then
-do_lavf_timecode mpg "-ab 64k"
+do_lavf_timecode mpg "-ab 64k -ar 44100"
 fi
 
 if [ -n "$do_mxf" ] ; then
@@ -91,7 +91,7 @@ do_lavf mxf_d10 "-ar 48000 -ac 2" "-r 25 -vf scale=720:576,pad=720:608:0:32 -vco
 fi
 
 if [ -n "$do_ts" ] ; then
-do_lavf ts "" "-ab 64k -mpegts_transport_stream_id 42"
+do_lavf ts "" "-ab 64k -mpegts_transport_stream_id 42 -ar 44100"
 fi
 
 if [ -n "$do_swf" ] ; then
@@ -99,7 +99,7 @@ do_lavf swf "" "-an"
 fi
 
 if [ -n "$do_ffm" ] ; then
-do_lavf ffm
+do_lavf ffm "" "-ar 44100"
 fi
 
 if [ -n "$do_flm" ] ; then
@@ -133,13 +133,13 @@ do_lavf gxf "-ar 48000" "-r 25 -s pal -ac 1"
 fi
 
 if [ -n "$do_nut" ] ; then
-do_lavf nut "" "-acodec mp2 -ab 64k"
+do_lavf nut "" "-acodec mp2 -ab 64k -ar 44100"
 fi
 
 if [ -n "$do_mkv" ] ; then
 do_lavf mkv "" "-acodec mp2 -ab 64k -vcodec mpeg4 \
  -attach ${raw_src%/*}/00.pgm -metadata:s:t mimetype=image/x-portable-greymap"
-do_lavf mkv "" "-acodec mp2 -ab 64k -vcodec mpeg4"
+do_lavf mkv "" "-acodec mp2 -ab 64k -vcodec mpeg4 -ar 44100"
 fi
 
 if [ -n "$do_mp3" ] ; then
@@ -235,8 +235,8 @@ if [ -n "$do_pam" ] ; then
 do_image_formats pam
 do_image_formats pam "-pix_fmt rgba"
 do_image_formats pam "-pix_fmt gray"
-do_image_formats pam "-pix_fmt gray16be"
-do_image_formats pam "-pix_fmt rgb48be"
+do_image_formats pam "-pix_fmt gray16be" "-pix_fmt gray16be"
+do_image_formats pam "-pix_fmt rgb48be" "-pix_fmt rgb48be"
 do_image_formats pam "-pix_fmt monob"
 fi
 
@@ -247,7 +247,7 @@ fi
 if [ -n "$do_dpx" ] ; then
 do_image_formats dpx
 do_image_formats dpx "-pix_fmt gbrp10le" "-pix_fmt gbrp10le"
-do_image_formats dpx "-pix_fmt gbrp12le"
+do_image_formats dpx "-pix_fmt gbrp12le" "-pix_fmt gbrp12le"
 do_image_formats dpx "-pix_fmt rgb48le"
 do_image_formats dpx "-pix_fmt rgb48le -bits_per_raw_sample 10" "-pix_fmt rgb48le"
 do_image_formats dpx "-pix_fmt rgba64le"
@@ -272,6 +272,15 @@ fi
 
 if [ -n "$do_wav" ] ; then
 do_audio_only wav
+fi
+
+if [ -n "$do_wav_peak" ] ; then
+do_audio_only peak.wav "" "-write_peak on"
+fi
+
+if [ -n "$do_wav_peak_only" ] ; then
+file=${outfile}lavf.peak_only.wav
+do_avconv $file $DEC_OPTS -ar 44100 -f s16le -i $pcm_src $ENC_OPTS -t 1 -qscale 10 -write_peak only
 fi
 
 if [ -n "$do_alaw" ] ; then
@@ -303,7 +312,7 @@ do_audio_only s16.voc "-ac 2" "-acodec pcm_s16le"
 fi
 
 if [ -n "$do_ogg" ] ; then
-do_audio_only ogg
+do_audio_only ogg "" "-c:a flac"
 fi
 
 if [ -n "$do_rso" ] ; then

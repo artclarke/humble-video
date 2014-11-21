@@ -1,6 +1,6 @@
 /*
  * Wing Commander III Movie (.mve) File Demuxer
- * Copyright (c) 2003 The ffmpeg Project
+ * Copyright (c) 2003 The FFmpeg Project
  *
  * This file is part of FFmpeg.
  *
@@ -27,6 +27,7 @@
  *   http://www.pcisys.net/~melanson/codecs/
  */
 
+#include "libavutil/avstring.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
@@ -158,7 +159,7 @@ static int wc3_read_header(AVFormatContext *s)
         fourcc_tag = avio_rl32(pb);
         /* chunk sizes are 16-bit aligned */
         size = (avio_rb32(pb) + 1) & (~1);
-        if (url_feof(pb))
+        if (avio_feof(pb))
             return AVERROR(EIO);
 
     } while (fourcc_tag != BRCH_TAG);
@@ -210,7 +211,7 @@ static int wc3_read_packet(AVFormatContext *s,
         fourcc_tag = avio_rl32(pb);
         /* chunk sizes are 16-bit aligned */
         size = (avio_rb32(pb) + 1) & (~1);
-        if (url_feof(pb))
+        if (avio_feof(pb))
             return AVERROR(EIO);
 
         switch (fourcc_tag) {
@@ -249,10 +250,16 @@ static int wc3_read_packet(AVFormatContext *s,
             else {
                 int i = 0;
                 av_log (s, AV_LOG_DEBUG, "Subtitle time!\n");
+                if (i >= size || av_strnlen(&text[i + 1], size - i - 1) >= size - i - 1)
+                    return AVERROR_INVALIDDATA;
                 av_log (s, AV_LOG_DEBUG, "  inglish: %s\n", &text[i + 1]);
                 i += text[i] + 1;
+                if (i >= size || av_strnlen(&text[i + 1], size - i - 1) >= size - i - 1)
+                    return AVERROR_INVALIDDATA;
                 av_log (s, AV_LOG_DEBUG, "  doytsch: %s\n", &text[i + 1]);
                 i += text[i] + 1;
+                if (i >= size || av_strnlen(&text[i + 1], size - i - 1) >= size - i - 1)
+                    return AVERROR_INVALIDDATA;
                 av_log (s, AV_LOG_DEBUG, "  fronsay: %s\n", &text[i + 1]);
             }
 #endif

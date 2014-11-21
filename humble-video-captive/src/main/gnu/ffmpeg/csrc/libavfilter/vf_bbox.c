@@ -61,8 +61,7 @@ static int query_formats(AVFilterContext *ctx)
 }
 
 #define SET_META(key, value) \
-    snprintf(buf, sizeof(buf), "%d", value);  \
-    av_dict_set(metadata, key, buf, 0);
+    av_dict_set_int(metadata, key, value, 0);
 
 static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
 {
@@ -70,7 +69,6 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     BBoxContext *bbox = ctx->priv;
     FFBoundingBox box;
     int has_bbox, w, h;
-    char buf[32];
 
     has_bbox =
         ff_calculate_bounding_box(&box,
@@ -107,9 +105,9 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
 
 static const AVFilterPad bbox_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_VIDEO,
-        .filter_frame     = filter_frame,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .filter_frame = filter_frame,
     },
     { NULL }
 };
@@ -122,7 +120,7 @@ static const AVFilterPad bbox_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_bbox = {
+AVFilter ff_vf_bbox = {
     .name          = "bbox",
     .description   = NULL_IF_CONFIG_SMALL("Compute bounding box for each frame."),
     .priv_size     = sizeof(BBoxContext),

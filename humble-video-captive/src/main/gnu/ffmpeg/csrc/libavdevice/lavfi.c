@@ -115,23 +115,23 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
     }
 
     if (lavfi->graph_filename) {
-        uint8_t *file_buf, *graph_buf;
-        size_t file_bufsize;
-        ret = av_file_map(lavfi->graph_filename,
-                          &file_buf, &file_bufsize, 0, avctx);
+        AVBPrint graph_file_pb;
+        AVIOContext *avio = NULL;
+        ret = avio_open(&avio, lavfi->graph_filename, AVIO_FLAG_READ);
         if (ret < 0)
             goto end;
-
-        /* create a 0-terminated string based on the read file */
-        graph_buf = av_malloc(file_bufsize + 1);
-        if (!graph_buf) {
-            av_file_unmap(file_buf, file_bufsize);
-            FAIL(AVERROR(ENOMEM));
+        av_bprint_init(&graph_file_pb, 0, AV_BPRINT_SIZE_UNLIMITED);
+        ret = avio_read_to_bprint(avio, &graph_file_pb, INT_MAX);
+        avio_close(avio);
+        av_bprint_chars(&graph_file_pb, '\0', 1);
+        if (!ret && !av_bprint_is_complete(&graph_file_pb))
+            ret = AVERROR(ENOMEM);
+        if (ret) {
+            av_bprint_finalize(&graph_file_pb, NULL);
+            goto end;
         }
-        memcpy(graph_buf, file_buf, file_bufsize);
-        graph_buf[file_bufsize] = 0;
-        av_file_unmap(file_buf, file_bufsize);
-        lavfi->graph_str = graph_buf;
+        if ((ret = av_bprint_finalize(&graph_file_pb, &lavfi->graph_str)))
+            goto end;
     }
 
     if (!lavfi->graph_str)
@@ -143,7 +143,7 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
 
     if ((ret = avfilter_graph_parse_ptr(lavfi->graph, lavfi->graph_str,
                                     &input_links, &output_links, avctx)) < 0)
-        FAIL(ret);
+        goto end;
 
     if (input_links) {
         av_log(avctx, AV_LOG_ERROR,
@@ -184,14 +184,6 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
             FAIL(AVERROR(EINVAL));
         }
 
-        /* is an audio or video output? */
-        type = inout->filter_ctx->output_pads[inout->pad_idx].type;
-        if (type != AVMEDIA_TYPE_VIDEO && type != AVMEDIA_TYPE_AUDIO) {
-            av_log(avctx,  AV_LOG_ERROR,
-                   "Output '%s' is not a video or audio output, not yet supported\n", inout->name);
-            FAIL(AVERROR(EINVAL));
-        }
-
         if (lavfi->stream_sink_map[stream_idx] != -1) {
             av_log(avctx,  AV_LOG_ERROR,
                    "An output with stream index %d was already specified\n",
@@ -211,7 +203,7 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
     }
 
     /* create a sink for each output and connect them to the graph */
-    lavfi->sinks = av_malloc(sizeof(AVFilterContext *) * avctx->nb_streams);
+    lavfi->sinks = av_malloc_array(avctx->nb_streams, sizeof(AVFilterContext *));
     if (!lavfi->sinks)
         FAIL(AVERROR(ENOMEM));
 
@@ -248,16 +240,24 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
                 ret = av_opt_set_int_list(sink, "sample_fmts", sample_fmts,  AV_SAMPLE_FMT_NONE, AV_OPT_SEARCH_CHILDREN);
             if (ret < 0)
                 goto end;
+            ret = av_opt_set_int(sink, "all_channel_counts", 1,
+                                 AV_OPT_SEARCH_CHILDREN);
+            if (ret < 0)
+                goto end;
+        } else {
+            av_log(avctx,  AV_LOG_ERROR,
+                   "Output '%s' is not a video or audio output, not yet supported\n", inout->name);
+            FAIL(AVERROR(EINVAL));
         }
 
         lavfi->sinks[i] = sink;
         if ((ret = avfilter_link(inout->filter_ctx, inout->pad_idx, sink, 0)) < 0)
-            FAIL(ret);
+            goto end;
     }
 
     /* configure the graph */
     if ((ret = avfilter_graph_config(lavfi->graph, avctx)) < 0)
-        FAIL(ret);
+        goto end;
 
     if (lavfi->dump_graph) {
         char *dump = avfilter_graph_dump(lavfi->graph, lavfi->dump_graph);
@@ -286,7 +286,7 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
                                      30);
         } else if (link->type == AVMEDIA_TYPE_AUDIO) {
             st->codec->codec_id    = av_get_pcm_codec(link->format, -1);
-            st->codec->channels    = av_get_channel_layout_nb_channels(link->channel_layout);
+            st->codec->channels    = avfilter_link_get_channels(link);
             st->codec->sample_fmt  = link->format;
             st->codec->sample_rate = link->sample_rate;
             st->codec->time_base   = link->time_base;
@@ -421,6 +421,7 @@ static const AVClass lavfi_class = {
     .item_name  = av_default_item_name,
     .option     = options,
     .version    = LIBAVUTIL_VERSION_INT,
+    .category   = AV_CLASS_CATEGORY_DEVICE_INPUT,
 };
 
 AVInputFormat ff_lavfi_demuxer = {

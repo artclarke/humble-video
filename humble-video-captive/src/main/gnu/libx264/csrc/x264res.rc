@@ -1,9 +1,9 @@
 /*****************************************************************************
  * x264res.rc: windows resource file
  *****************************************************************************
- * Copyright (C) 2012-2013 x264 project
+ * Copyright (C) 2012-2014 x264 project
  *
- * Authors: Henrik Gramner <hengar-6@student.ltu.se>
+ * Authors: Henrik Gramner <henrik@gramner.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ FILESUBTYPE     VFT2_UNKNOWN
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904E4"
+        BLOCK "040904B0"
         BEGIN
             VALUE "CompanyName",      "x264 project"
 #ifdef DLL
@@ -60,7 +60,7 @@ BEGIN
 #endif
             VALUE "FileVersion",      X264_POINTVER
             VALUE "InternalName",     "x264"
-            VALUE "LegalCopyright",   "Copyright (C) 2003-2013 x264 project"
+            VALUE "LegalCopyright",   "Copyright (C) 2003-2014 x264 project"
 #ifdef DLL
             VALUE "OriginalFilename", "libx264-" xstr(X264_BUILD) ".dll"
 #else
@@ -73,6 +73,6 @@ BEGIN
 
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x0409, 0x04E4
+        VALUE "Translation", 0x0409, 0x04B0 /* U.S. English (Unicode) */
     END
 END

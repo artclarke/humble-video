@@ -113,7 +113,7 @@ typedef struct AVFloatDSPContext {
      *             constraints: 32-byte aligned
      * @param src1 second input vector
      *             constraints: 32-byte aligned
-     * @param src1 third input vector
+     * @param src2 third input vector
      *             constraints: 32-byte aligned
      * @param len  number of elements in the input
      *             constraints: multiple of 16
@@ -131,8 +131,6 @@ typedef struct AVFloatDSPContext {
      * @param src0 first input vector
      *             constraints: 32-byte aligned
      * @param src1 second input vector
-     *             constraints: 32-byte aligned
-     * @param src1 third input vector
      *             constraints: 32-byte aligned
      * @param len  number of elements in the input
      *             constraints: multiple of 16
@@ -181,6 +179,7 @@ float avpriv_scalarproduct_float_c(const float *v1, const float *v2, int len);
 void avpriv_float_dsp_init(AVFloatDSPContext *fdsp, int strict);
 
 
+void ff_float_dsp_init_aarch64(AVFloatDSPContext *fdsp);
 void ff_float_dsp_init_arm(AVFloatDSPContext *fdsp);
 void ff_float_dsp_init_ppc(AVFloatDSPContext *fdsp, int strict);
 void ff_float_dsp_init_x86(AVFloatDSPContext *fdsp);

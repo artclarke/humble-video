@@ -57,7 +57,9 @@
  */
 
 /* We need to define this to get macros like S_IFBLK and S_IFCHR */
+#if !defined(OPENSSL_SYS_VXWORKS)
 #define _XOPEN_SOURCE 500
+#endif
 
 #include <errno.h>
 #include <stdio.h>
@@ -77,6 +79,7 @@
 #endif
 #ifndef OPENSSL_NO_POSIX_IO
 # include <sys/stat.h>
+# include <fcntl.h>
 #endif
 
 #ifdef _WIN32

@@ -28,9 +28,9 @@
 #include "libavutil/internal.h"
 #include "libavutil/samplefmt.h"
 #include "tak.h"
+#include "audiodsp.h"
 #include "thread.h"
 #include "avcodec.h"
-#include "dsputil.h"
 #include "internal.h"
 #include "unary.h"
 
@@ -46,7 +46,7 @@ typedef struct MCDParam {
 
 typedef struct TAKDecContext {
     AVCodecContext *avctx;                          ///< parent AVCodecContext
-    DSPContext      dsp;
+    AudioDSPContext adsp;
     TAKStreamInfo   ti;
     GetBitContext   gb;                             ///< bitstream reader initialized to start at the current frame
 
@@ -171,8 +171,7 @@ static av_cold int tak_decode_init(AVCodecContext *avctx)
 {
     TAKDecContext *s = avctx->priv_data;
 
-    ff_tak_init_crc();
-    ff_dsputil_init(&s->dsp, avctx);
+    ff_audiodsp_init(&s->adsp);
 
     s->avctx = avctx;
     avctx->bits_per_raw_sample = avctx->bits_per_coded_sample;
@@ -372,7 +371,7 @@ static int decode_subframe(TAKDecContext *s, int32_t *decoded,
                            int subframe_size, int prev_subframe_size)
 {
     GetBitContext *gb = &s->gb;
-    int tmp, x, y, i, j, ret = 0;
+    int x, y, i, j, ret = 0;
     int dshift, size, filter_quant, filter_order;
     int tfilter[MAX_PREDICTORS];
 
@@ -422,7 +421,7 @@ static int decode_subframe(TAKDecContext *s, int32_t *decoded,
     s->predictors[2] = get_sbits(gb, size) << (10 - size);
     s->predictors[3] = get_sbits(gb, size) << (10 - size);
     if (filter_order > 4) {
-        tmp = size - get_bits1(gb);
+        int tmp = size - get_bits1(gb);
 
         for (i = 4; i < filter_order; i++) {
             if (!(i & 3))
@@ -449,7 +448,6 @@ static int decode_subframe(TAKDecContext *s, int32_t *decoded,
     x = 1 << (32 - (15 - filter_quant));
     y = 1 << ((15 - filter_quant) - 1);
     for (i = 0, j = filter_order - 1; i < filter_order / 2; i++, j--) {
-        tmp = y + tfilter[j];
         s->filter[j] = x - ((tfilter[i] + y) >> (15 - filter_quant));
         s->filter[i] = x - ((tfilter[j] + y) >> (15 - filter_quant));
     }
@@ -464,14 +462,14 @@ static int decode_subframe(TAKDecContext *s, int32_t *decoded,
     y    = FF_ARRAY_ELEMS(s->residues) - filter_order;
     x    = subframe_size - filter_order;
     while (x > 0) {
-        tmp = FFMIN(y, x);
+        int tmp = FFMIN(y, x);
 
         for (i = 0; i < tmp; i++) {
             int v = 1 << (filter_quant - 1);
 
             if (filter_order & -16)
-                v += s->dsp.scalarproduct_int16(&s->residues[i], s->filter,
-                                                filter_order & -16);
+                v += s->adsp.scalarproduct_int16(&s->residues[i], s->filter,
+                                                 filter_order & -16);
             for (j = filter_order & -16; j < filter_order; j += 4) {
                 v += s->residues[i + j + 3] * s->filter[j + 3] +
                      s->residues[i + j + 2] * s->filter[j + 2] +
@@ -641,8 +639,8 @@ static int decorrelate(TAKDecContext *s, int c1, int c2, int length)
                 int v = 1 << 9;
 
                 if (filter_order == 16) {
-                    v += s->dsp.scalarproduct_int16(&s->residues[i], s->filter,
-                                                    filter_order);
+                    v += s->adsp.scalarproduct_int16(&s->residues[i], s->filter,
+                                                     filter_order);
                 } else {
                     v += s->residues[i + 7] * s->filter[7] +
                          s->residues[i + 6] * s->filter[6] +
@@ -687,11 +685,12 @@ static int tak_decode_frame(AVCodecContext *avctx, void *data,
     if ((ret = ff_tak_decode_frame_header(avctx, gb, &s->ti, 0)) < 0)
         return ret;
 
-    if (avctx->err_recognition & AV_EF_CRCCHECK) {
-        hsize = get_bits_count(gb) / 8;
+    hsize = get_bits_count(gb) / 8;
+    if (avctx->err_recognition & (AV_EF_CRCCHECK|AV_EF_COMPLIANT)) {
         if (ff_tak_check_crc(pkt->data, hsize)) {
             av_log(avctx, AV_LOG_ERROR, "CRC error\n");
-            return AVERROR_INVALIDDATA;
+            if (avctx->err_recognition & AV_EF_EXPLODE)
+                return AVERROR_INVALIDDATA;
         }
     }
 
@@ -721,11 +720,9 @@ static int tak_decode_frame(AVCodecContext *avctx, void *data,
         return AVERROR_INVALIDDATA;
     }
 
-    if (s->ti.bps != avctx->bits_per_raw_sample) {
-        avctx->bits_per_raw_sample = s->ti.bps;
-        if ((ret = set_bps_params(avctx)) < 0)
-            return ret;
-    }
+    avctx->bits_per_raw_sample = s->ti.bps;
+    if ((ret = set_bps_params(avctx)) < 0)
+        return ret;
     if (s->ti.sample_rate != avctx->sample_rate) {
         avctx->sample_rate = s->ti.sample_rate;
         set_sample_rate_params(avctx);
@@ -862,11 +859,12 @@ static int tak_decode_frame(AVCodecContext *avctx, void *data,
     else if (get_bits_left(gb) > 0)
         av_log(avctx, AV_LOG_DEBUG, "underread\n");
 
-    if (avctx->err_recognition & AV_EF_CRCCHECK) {
+    if (avctx->err_recognition & (AV_EF_CRCCHECK | AV_EF_COMPLIANT)) {
         if (ff_tak_check_crc(pkt->data + hsize,
                              get_bits_count(gb) / 8 - hsize)) {
             av_log(avctx, AV_LOG_ERROR, "CRC error\n");
-            return AVERROR_INVALIDDATA;
+            if (avctx->err_recognition & AV_EF_EXPLODE)
+                return AVERROR_INVALIDDATA;
         }
     }
 
@@ -932,6 +930,7 @@ static av_cold int tak_decode_close(AVCodecContext *avctx)
 
 AVCodec ff_tak_decoder = {
     .name             = "tak",
+    .long_name        = NULL_IF_CONFIG_SMALL("TAK (Tom's lossless Audio Kompressor)"),
     .type             = AVMEDIA_TYPE_AUDIO,
     .id               = AV_CODEC_ID_TAK,
     .priv_data_size   = sizeof(TAKDecContext),
@@ -941,7 +940,6 @@ AVCodec ff_tak_decoder = {
     .init_thread_copy = ONLY_IF_THREADS_ENABLED(init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
     .capabilities     = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
-    .long_name        = NULL_IF_CONFIG_SMALL("TAK (Tom's lossless Audio Kompressor)"),
     .sample_fmts      = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,
                                                         AV_SAMPLE_FMT_S16P,
                                                         AV_SAMPLE_FMT_S32P,

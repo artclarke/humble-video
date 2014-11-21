@@ -57,6 +57,7 @@ public:
   typedef enum State {
     STATE_INITED,
     STATE_OPENED,
+    STATE_FLUSHING,
     STATE_ERROR,
   } State;
 
@@ -127,6 +128,9 @@ public:
     FLAG2_CHUNKS = CODEC_FLAG2_CHUNKS,
     /** Show all frames before the first keyframe */
     FLAG2_SHOW_ALL = CODEC_FLAG2_SHOW_ALL,
+    /** Export motion vectors through frame side data */
+    FLAG2_EXPORT_MVS = CODEC_FLAG2_EXPORT_MVS,
+
   } Flag2;
 
   /**
@@ -353,7 +357,7 @@ public:
 #endif
 
 protected:
-  virtual void setState(State state) { mState = state; }
+  virtual void setState(State state);
   /*
    * Override to make a more specific allocator for frames.
    */

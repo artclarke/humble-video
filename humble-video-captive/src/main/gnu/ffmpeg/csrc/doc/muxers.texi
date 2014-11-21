@@ -23,6 +23,8 @@ A description of some of the currently available muxers follows.
 
 Audio Interchange File Format muxer.
 
+@subsection Options
+
 It accepts the following options:
 
 @table @option
@@ -49,6 +51,10 @@ The output of the muxer consists of a single line of the form:
 CRC=0x@var{CRC}, where @var{CRC} is a hexadecimal number 0-padded to
 8 digits containing the CRC for all the decoded input frames.
 
+See also the @ref{framecrc} muxer.
+
+@subsection Examples
+
 For example to compute the CRC of the input, and store it in the file
 @file{out.crc}:
 @example
@@ -68,8 +74,6 @@ and the input video converted to MPEG-2 video, use the command:
 ffmpeg -i INPUT -c:a pcm_u8 -c:v mpeg2video -f crc -
 @end example
 
-See also the @ref{framecrc} muxer.
-
 @anchor{framecrc}
 @section framecrc
 
@@ -88,6 +92,8 @@ packet of the form:
 
 @var{CRC} is a hexadecimal number 0-padded to 8 digits containing the
 CRC of the packet.
+
+@subsection Examples
 
 For example to compute the CRC of the audio and video frames in
 @file{INPUT}, converted to raw audio and video packets, and store it
@@ -132,6 +138,8 @@ packet of the form:
 @var{MD5} is a hexadecimal number representing the computed MD5 hash
 for the packet.
 
+@subsection Examples
+
 For example to compute the MD5 of the audio and video frames in
 @file{INPUT}, converted to raw audio and video packets, and store it
 in the file @file{out.md5}:
@@ -146,30 +154,93 @@ ffmpeg -i INPUT -f framemd5 -
 
 See also the @ref{md5} muxer.
 
+@anchor{gif}
+@section gif
+
+Animated GIF muxer.
+
+It accepts the following options:
+
+@table @option
+@item loop
+Set the number of times to loop the output. Use @code{-1} for no loop, @code{0}
+for looping indefinitely (default).
+
+@item final_delay
+Force the delay (expressed in centiseconds) after the last frame. Each frame
+ends with a delay until the next frame. The default is @code{-1}, which is a
+special value to tell the muxer to re-use the previous delay. In case of a
+loop, you might want to customize this value to mark a pause for instance.
+@end table
+
+For example, to encode a gif looping 10 times, with a 5 seconds delay between
+the loops:
+@example
+ffmpeg -i INPUT -loop 10 -final_delay 500 out.gif
+@end example
+
+Note 1: if you wish to extract the frames in separate GIF files, you need to
+force the @ref{image2} muxer:
+@example
+ffmpeg -i INPUT -c:v gif -f image2 "out%d.gif"
+@end example
+
+Note 2: the GIF format has a very small time base: the delay between two frames
+can not be smaller than one centi second.
+
 @anchor{hls}
 @section hls
 
 Apple HTTP Live Streaming muxer that segments MPEG-TS according to
-the HTTP Live Streaming specification.
+the HTTP Live Streaming (HLS) specification.
 
 It creates a playlist file and numbered segment files. The output
 filename specifies the playlist filename; the segment filenames
 receive the same basename as the playlist, a sequential number and
 a .ts extension.
 
+For example, to convert an input file with @command{ffmpeg}:
 @example
 ffmpeg -i in.nut out.m3u8
 @end example
 
+See also the @ref{segment} muxer, which provides a more generic and
+flexible implementation of a segmenter, and can be used to perform HLS
+segmentation.
+
+@subsection Options
+
+This muxer supports the following options:
+
 @table @option
-@item -hls_time @var{seconds}
-Set the segment length in seconds.
-@item -hls_list_size @var{size}
-Set the maximum number of playlist entries.
-@item -hls_wrap @var{wrap}
-Set the number after which index wraps.
-@item -start_number @var{number}
-Start the sequence from @var{number}.
+@item hls_time @var{seconds}
+Set the segment length in seconds. Default value is 2.
+
+@item hls_list_size @var{size}
+Set the maximum number of playlist entries. If set to 0 the list file
+will contain all the segments. Default value is 5.
+
+@item hls_wrap @var{wrap}
+Set the number after which the segment filename number (the number
+specified in each segment file) wraps. If set to 0 the number will be
+never wrapped. Default value is 0.
+
+This option is useful to avoid to fill the disk with many segment
+files, and limits the maximum number of segment files written to disk
+to @var{wrap}.
+
+@item start_number @var{number}
+Start the playlist sequence number from @var{number}. Default value is
+0.
+
+@item hls_base_url @var{baseurl}
+Append @var{baseurl} to every entry in the playlist.
+Useful to generate playlists with absolute paths.
+
+Note that the playlist sequence number must be unique for each segment
+and it is not to be confused with the segment filename sequence number
+which can be cyclic, for example if the @option{wrap} option is
+specified.
 @end table
 
 @anchor{ico}
@@ -235,6 +306,8 @@ The pattern "img%%-%d.jpg" will specify a sequence of filenames of the
 form @file{img%-1.jpg}, @file{img%-2.jpg}, ..., @file{img%-10.jpg},
 etc.
 
+@subsection Examples
+
 The following example shows how to use @command{ffmpeg} for creating a
 sequence of files @file{img-001.jpeg}, @file{img-002.jpeg}, ...,
 taking one image every second from the input video:
@@ -257,16 +330,32 @@ Note also that the pattern must not necessarily contain "%d" or
 ffmpeg -i in.avi -f image2 -frames:v 1 img.jpeg
 @end example
 
+The @option{strftime} option allows you to expand the filename with
+date and time information. Check the documentation of
+the @code{strftime()} function for the syntax.
+
+For example to generate image files from the @code{strftime()}
+"%Y-%m-%d_%H-%M-%S" pattern, the following @command{ffmpeg} command
+can be used:
+@example
+ffmpeg -f v4l2 -r 1 -i /dev/video0 -f image2 -strftime 1 "%Y-%m-%d_%H-%M-%S.jpg"
+@end example
+
+@subsection Options
+
 @table @option
-@item start_number @var{number}
-Start the sequence from @var{number}. Default value is 1. Must be a
-positive number.
+@item start_number
+Start the sequence from the specified number. Default value is 1. Must
+be a non-negative number.
 
-@item -update @var{number}
-If @var{number} is nonzero, the filename will always be interpreted as just a
-filename, not a pattern, and this file will be continuously overwritten with new
-images.
+@item update
+If set to 1, the filename will always be interpreted as just a
+filename, not a pattern, and the corresponding file will be continuously
+overwritten with new images. Default value is 0.
 
+@item strftime
+If set to 1, expand the filename with date and time information from
+@code{strftime()}. Default value is 0.
 @end table
 
 The image muxer supports the .Y.U.V image file format. This format is
@@ -281,25 +370,27 @@ Matroska container muxer.
 
 This muxer implements the matroska and webm container specs.
 
+@subsection Metadata
+
 The recognized metadata settings in this muxer are:
 
 @table @option
+@item title
+Set title name provided to a single track.
 
-@item title=@var{title name}
-Name provided to a single track
-@end table
+@item language
+Specify the language of the track in the Matroska languages form.
 
-@table @option
+The language can be either the 3 letters bibliographic ISO-639-2 (ISO
+639-2/B) form (like "fre" for French), or a language code mixed with a
+country code for specialities in languages (like "fre-ca" for Canadian
+French).
 
-@item language=@var{language name}
-Specifies the language of the track in the Matroska languages form
-@end table
+@item stereo_mode
+Set stereo 3D video layout of two views in a single video track.
 
-@table @option
-
-@item stereo_mode=@var{mode}
-Stereo 3D video layout of two views in a single video track
-@table @option
+The following values are recognized:
+@table @samp
 @item mono
 video is not stereo
 @item left_right
@@ -338,10 +429,11 @@ For example a 3D WebM clip can be created using the following command line:
 ffmpeg -i sample_left_right_clip.mpg -an -c:v libvpx -metadata stereo_mode=left_right -y stereo_clip.webm
 @end example
 
+@subsection Options
+
 This muxer supports the following options:
 
 @table @option
-
 @item reserve_index_space
 By default, this muxer writes the index for seeking (called cues in Matroska
 terms) at the end of the file, because it cannot know in advance how much space
@@ -356,7 +448,6 @@ for most use cases should be about 50kB per hour of video.
 
 Note that cues are only written if the output is seekable and this option will
 have no effect if it is not.
-
 @end table
 
 @anchor{md5}
@@ -386,7 +477,9 @@ ffmpeg -i INPUT -f md5 -
 
 See also the @ref{framemd5} muxer.
 
-@section MOV/MP4/ISMV
+@section mov, mp4, ismv
+
+MOV/MP4/ISMV (Smooth Streaming) muxer.
 
 The mov/mp4/ismv muxer supports fragmentation. Normally, a MOV/MP4
 file has all the metadata about all packets stored in one location
@@ -401,6 +494,8 @@ it is not properly finished), and it requires less memory when writing
 very long files (since writing normal MOV/MP4 files stores info about
 every single packet in memory until the file is closed). The downside
 is that it is less compatible with other applications.
+
+@subsection Options
 
 Fragmentation is enabled by setting one of the AVOptions that define
 how to cut the file into fragments:
@@ -451,12 +546,20 @@ pair for each track, making it easier to separate tracks.
 
 This option is implicitly set when writing ismv (Smooth Streaming) files.
 @item -movflags faststart
-Run a second pass moving the moov atom on top of the file. This
-operation can take a while, and will not work in various situations such
+Run a second pass moving the index (moov atom) to the beginning of the file.
+This operation can take a while, and will not work in various situations such
 as fragmented output, thus it is not enabled by default.
 @item -movflags rtphint
 Add RTP hinting tracks to the output file.
+@item -movflags disable_chpl
+Disable Nero chapter markers (chpl atom).  Normally, both Nero chapters
+and a QuickTime chapter track are written to the file. With this option
+set, only the QuickTime chapter track will be written. Nero chapters can
+cause failures when the file is reprocessed with certain tagging programs, like
+mp3Tag 2.61a and iTunes 11.3, most likely other versions are affected as well.
 @end table
+
+@subsection Example
 
 Smooth Streaming content can be pushed in real time to a publishing
 point on IIS with this muxer. Example:
@@ -468,12 +571,15 @@ ffmpeg -re @var{<normal input/transcoding options>} -movflags isml+frag_keyframe
 
 The MP3 muxer writes a raw MP3 stream with an ID3v2 header at the beginning and
 optionally an ID3v1 tag at the end. ID3v2.3 and ID3v2.4 are supported, the
-@code{id3v2_version} option controls which one is used. The legacy ID3v1 tag is
-not written by default, but may be enabled with the @code{write_id3v1} option.
+@code{id3v2_version} option controls which one is used. Setting
+@code{id3v2_version} to 0 will disable the ID3v2 header completely. The legacy
+ID3v1 tag is not written by default, but may be enabled with the
+@code{write_id3v1} option.
 
-For seekable output the muxer also writes a Xing frame at the beginning, which
-contains the number of frames in the file. It is useful for computing duration
-of VBR files.
+The muxer may also write a Xing frame at the beginning, which contains the
+number of frames in the file. It is useful for computing duration of VBR files.
+The Xing frame is written if the output stream is seekable and if the
+@code{write_xing} option is set to 1 (the default).
 
 The muxer supports writing ID3v2 attached pictures (APIC frames). The pictures
 are supplied to the muxer in form of a video stream with a single packet. There
@@ -500,11 +606,23 @@ ffmpeg -i input.mp3 -i cover.png -c copy -map 0 -map 1
 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (Front)" out.mp3
 @end example
 
+Write a "clean" MP3 without any extra features:
+@example
+ffmpeg -i input.wav -write_xing 0 -id3v2_version 0 out.mp3
+@end example
+
 @section mpegts
 
 MPEG transport stream muxer.
 
 This muxer implements ISO 13818-1 and part of ETSI EN 300 468.
+
+The recognized metadata settings in mpegts muxer are @code{service_provider}
+and @code{service_name}. If they are not set the default for
+@code{service_provider} is "FFmpeg" and the default for
+@code{service_name} is "Service01".
+
+@subsection Options
 
 The muxer options are:
 
@@ -522,12 +640,46 @@ Set the service_id (default 0x0001) also known as program in DVB.
 Set the first PID for PMT (default 0x1000, max 0x1f00).
 @item -mpegts_start_pid @var{number}
 Set the first PID for data packets (default 0x0100, max 0x0f00).
+@item -mpegts_m2ts_mode @var{number}
+Enable m2ts mode if set to 1. Default value is -1 which disables m2ts mode.
+@item -muxrate @var{number}
+Set a constant muxrate (default VBR).
+@item -pcr_period @var{numer}
+Override the default PCR retransmission time (default 20ms), ignored
+if variable muxrate is selected.
+@item -pes_payload_size @var{number}
+Set minimum PES packet payload in bytes.
+@item -mpegts_flags @var{flags}
+Set flags (see below).
+@item -mpegts_copyts @var{number}
+Preserve original timestamps, if value is set to 1. Default value is -1, which
+results in shifting timestamps so that they start from 0.
+@item -tables_version @var{number}
+Set PAT, PMT and SDT version (default 0, valid values are from 0 to 31, inclusively).
+This option allows updating stream structure so that standard consumer may
+detect the change. To do so, reopen output AVFormatContext (in case of API
+usage) or restart ffmpeg instance, cyclically changing tables_version value:
+@example
+ffmpeg -i source1.ts -codec copy -f mpegts -tables_version 0 udp://1.1.1.1:1111
+ffmpeg -i source2.ts -codec copy -f mpegts -tables_version 1 udp://1.1.1.1:1111
+...
+ffmpeg -i source3.ts -codec copy -f mpegts -tables_version 31 udp://1.1.1.1:1111
+ffmpeg -i source1.ts -codec copy -f mpegts -tables_version 0 udp://1.1.1.1:1111
+ffmpeg -i source2.ts -codec copy -f mpegts -tables_version 1 udp://1.1.1.1:1111
+...
+@end example
 @end table
 
-The recognized metadata settings in mpegts muxer are @code{service_provider}
-and @code{service_name}. If they are not set the default for
-@code{service_provider} is "FFmpeg" and the default for
-@code{service_name} is "Service01".
+Option mpegts_flags may take a set of such flags:
+
+@table @option
+@item resend_headers
+Reemit PAT/PMT before writing the next packet.
+@item latm
+Use LATM packetization for AAC.
+@end table
+
+@subsection Example
 
 @example
 ffmpeg -i file.mpg -c copy \
@@ -563,6 +715,30 @@ Alternatively you can write the command as:
 ffmpeg -benchmark -i INPUT -f null -
 @end example
 
+@section nut
+
+@table @option
+@item -syncpoints @var{flags}
+Change the syncpoint usage in nut:
+@table @option
+@item @var{default} use the normal low-overhead seeking aids.
+@item @var{none} do not use the syncpoints at all, reducing the overhead but making the stream non-seekable;
+    Use of this option is not recommended, as the resulting files are very damage
+    sensitive and seeking is not possible. Also in general the overhead from
+    syncpoints is negligible. Note, -@code{write_index} 0 can be used to disable
+    all growing data tables, allowing to mux endless streams with limited memory
+    and wihout these disadvantages.
+@item @var{timestamped} extend the syncpoint with a wallclock field.
+@end table
+The @var{none} and @var{timestamped} flags are experimental.
+@item -write_index @var{bool}
+Write index at the end, the default is to write an index.
+@end table
+
+@example
+ffmpeg -i INPUT -f_strict experimental -syncpoints none - | processor
+@end example
+
 @section ogg
 
 Ogg container muxer.
@@ -578,11 +754,12 @@ situations, giving a small seek granularity at the cost of additional container
 overhead.
 @end table
 
+@anchor{segment}
 @section segment, stream_segment, ssegment
 
 Basic stream segmenter.
 
-The segmenter muxer outputs streams to a number of separate files of nearly
+This muxer outputs streams to a number of separate files of nearly
 fixed duration. Output filename pattern can be set in a fashion similar to
 @ref{image2}.
 
@@ -604,14 +781,21 @@ The segment muxer works best with a single constant frame rate video.
 
 Optionally it can generate a list of the created segments, by setting
 the option @var{segment_list}. The list type is specified by the
-@var{segment_list_type} option.
+@var{segment_list_type} option. The entry filenames in the segment
+list are set by default to the basename of the corresponding segment
+files.
+
+See also the @ref{hls} muxer, which provides a more specific
+implementation for HLS segmentation.
+
+@subsection Options
 
 The segment muxer supports the following options:
 
 @table @option
 @item reference_stream @var{specifier}
 Set the reference stream, as specified by the string @var{specifier}.
-If @var{specifier} is set to @code{auto}, the reference is choosen
+If @var{specifier} is set to @code{auto}, the reference is chosen
 automatically. Otherwise it must be a stream specifier (see the ``Stream
 specifiers'' chapter in the ffmpeg manual) which specifies the
 reference stream. The default value is @code{auto}.
@@ -619,6 +803,11 @@ reference stream. The default value is @code{auto}.
 @item segment_format @var{format}
 Override the inner container format, by default it is guessed by the filename
 extension.
+
+@item segment_format_options @var{options_list}
+Set output format options using a :-separated list of key=value
+parameters. Values containing the @code{:} special character must be
+escaped.
 
 @item segment_list @var{name}
 Generate also a listfile named @var{name}. If not specified no
@@ -636,15 +825,21 @@ Allow caching (only affects M3U8 list files).
 Allow live-friendly file generation.
 @end table
 
-Default value is @code{samp}.
+@item segment_list_type @var{type}
+Select the listing format.
+@table @option
+@item @var{flat} use a simple flat list of entries.
+@item @var{hls} use a m3u8-like structure.
+@end table
 
 @item segment_list_size @var{size}
-Update the list file so that it contains at most the last @var{size}
+Update the list file so that it contains at most @var{size}
 segments. If 0 the list file will contain all the segments. Default
 value is 0.
 
-@item segment_list_type @var{type}
-Specify the format for the segment list file.
+@item segment_list_entry_prefix @var{prefix}
+Prepend @var{prefix} to each entry. Useful to generate absolute paths.
+By default no prefix is applied.
 
 The following values are recognized:
 @table @samp
@@ -695,6 +890,16 @@ Note that splitting may not be accurate, unless you force the
 reference stream key-frames at the given time. See the introductory
 notice and the examples below.
 
+@item segment_atclocktime @var{1|0}
+If set to "1" split at regular clock time intervals starting from 00:00
+o'clock. The @var{time} value specified in @option{segment_time} is
+used for setting the length of the splitting interval.
+
+For example with @option{segment_time} set to "900" this makes it possible
+to create files at 12:00 o'clock, 12:15, 12:30, etc.
+
+Default value is "0".
+
 @item segment_time_delta @var{delta}
 Specify the accuracy time when selecting the start time for a
 segment, expressed as a duration specification. Default value is "0".
@@ -714,7 +919,7 @@ In particular may be used in combination with the @file{ffmpeg} option
 @var{force_key_frames} may not be set accurately because of rounding
 issues, with the consequence that a key frame time may result set just
 before the specified time. For constant frame rate videos a value of
-1/2*@var{frame_rate} should address the worst case mismatch between
+1/(2*@var{frame_rate}) should address the worst case mismatch between
 the specified time and the time set by @var{force_key_frames}.
 
 @item segment_times @var{times}
@@ -741,13 +946,17 @@ Reset timestamps at the begin of each segment, so that each segment
 will start with near-zero timestamps. It is meant to ease the playback
 of the generated segments. May not work with some combinations of
 muxers/codecs. It is set to @code{0} by default.
+
+@item initial_offset @var{offset}
+Specify timestamp offset to apply to the output packet timestamps. The
+argument must be a time duration specification, and defaults to 0.
 @end table
 
 @subsection Examples
 
 @itemize
 @item
-To remux the content of file @file{in.mkv} to a list of segments
+Remux the content of file @file{in.mkv} to a list of segments
 @file{out-000.nut}, @file{out-001.nut}, etc., and write the list of
 generated segments to @file{out.list}:
 @example
@@ -755,14 +964,20 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.list out%03d.nu
 @end example
 
 @item
-As the example above, but segment the input file according to the split
-points specified by the @var{segment_times} option:
+Segment input and set output format options for the output segments:
+@example
+ffmpeg -i in.mkv -f segment -segment_time 10 -segment_format_options movflags=+faststart out%03d.mp4
+@end example
+
+@item
+Segment the input file according to the split points specified by the
+@var{segment_times} option:
 @example
 ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_times 1,2,3,5,8,13,21 out%03d.nut
 @end example
 
 @item
-As the example above, but use the @command{ffmpeg} @option{force_key_frames}
+Use the @command{ffmpeg} @option{force_key_frames}
 option to force key frames in the input at the specified location, together
 with the segment option @option{segment_time_delta} to account for
 possible roundings operated when setting key frame times.
@@ -781,7 +996,7 @@ ffmpeg -i in.mkv -codec copy -map 0 -f segment -segment_list out.csv -segment_fr
 @end example
 
 @item
-To convert the @file{in.mkv} to TS segments using the @code{libx264}
+Convert the @file{in.mkv} to TS segments using the @code{libx264}
 and @code{libfaac} encoders:
 @example
 ffmpeg -i in.mkv -map 0 -codec:v libx264 -codec:a libfaac -f ssegment -segment_list out.list out%03d.ts
@@ -795,6 +1010,28 @@ ffmpeg -re -i in.mkv -codec copy -map 0 -f segment -segment_list playlist.m3u8 \
 -segment_list_flags +live -segment_time 10 out%03d.mkv
 @end example
 @end itemize
+
+@section smoothstreaming
+
+Smooth Streaming muxer generates a set of files (Manifest, chunks) suitable for serving with conventional web server.
+
+@table @option
+@item window_size
+Specify the number of fragments kept in the manifest. Default 0 (keep all).
+
+@item extra_window_size
+Specify the number of fragments kept outside of the manifest before removing from disk. Default 5.
+
+@item lookahead_count
+Specify the number of lookahead fragments. Default 2.
+
+@item min_frag_duration
+Specify the minimum fragment duration (in microseconds). Default 5000000.
+
+@item remove_at_exit
+Specify whether to remove all fragments when finished. Default 0 (do not remove).
+
+@end table
 
 @section tee
 
@@ -811,24 +1048,103 @@ to feed the same packets to several muxers directly.
 The slave outputs are specified in the file name given to the muxer,
 separated by '|'. If any of the slave name contains the '|' separator,
 leading or trailing spaces or any special character, it must be
-escaped (see the ``Quoting and escaping'' section in the ffmpeg-utils
-manual).
+escaped (see @ref{quoting_and_escaping,,the "Quoting and escaping"
+section in the ffmpeg-utils(1) manual,ffmpeg-utils}).
 
-Options can be specified for each slave by prepending them as a list of
+Muxer options can be specified for each slave by prepending them as a list of
 @var{key}=@var{value} pairs separated by ':', between square brackets. If
 the options values contain a special character or the ':' separator, they
 must be escaped; note that this is a second level escaping.
 
-Example: encode something and both archive it in a WebM file and stream it
-as MPEG-TS over UDP (the streams need to be explicitly mapped):
+The following special options are also recognized:
+@table @option
+@item f
+Specify the format name. Useful if it cannot be guessed from the
+output name suffix.
 
+@item bsfs[/@var{spec}]
+Specify a list of bitstream filters to apply to the specified
+output.
+
+It is possible to specify to which streams a given bitstream filter
+applies, by appending a stream specifier to the option separated by
+@code{/}. @var{spec} must be a stream specifier (see @ref{Format
+stream specifiers}).  If the stream specifier is not specified, the
+bitstream filters will be applied to all streams in the output.
+
+Several bitstream filters can be specified, separated by ",".
+
+@item select
+Select the streams that should be mapped to the slave output,
+specified by a stream specifier. If not specified, this defaults to
+all the input streams.
+@end table
+
+@subsection Examples
+
+@itemize
+@item
+Encode something and both archive it in a WebM file and stream it
+as MPEG-TS over UDP (the streams need to be explicitly mapped):
 @example
 ffmpeg -i ... -c:v libx264 -c:a mp2 -f tee -map 0:v -map 0:a
   "archive-20121107.mkv|[f=mpegts]udp://10.0.1.255:1234/"
 @end example
 
+@item
+Use @command{ffmpeg} to encode the input, and send the output
+to three different destinations. The @code{dump_extra} bitstream
+filter is used to add extradata information to all the output video
+keyframes packets, as requested by the MPEG-TS format. The select
+option is applied to @file{out.aac} in order to make it contain only
+audio packets.
+@example
+ffmpeg -i ... -map 0 -flags +global_header -c:v libx264 -c:a aac -strict experimental
+       -f tee "[bsfs/v=dump_extra]out.ts|[movflags=+faststart]out.mp4|[select=a]out.aac"
+@end example
+
+@item
+As below, but select only stream @code{a:1} for the audio output. Note
+that a second level escaping must be performed, as ":" is a special
+character used to separate options.
+@example
+ffmpeg -i ... -map 0 -flags +global_header -c:v libx264 -c:a aac -strict experimental
+       -f tee "[bsfs/v=dump_extra]out.ts|[movflags=+faststart]out.mp4|[select=\'a:1\']out.aac"
+@end example
+@end itemize
+
 Note: some codecs may need different options depending on the output format;
 the auto-detection of this can not work with the tee muxer. The main example
 is the @option{global_header} flag.
+
+@section webm_dash_manifest
+
+WebM DASH Manifest muxer.
+
+This muxer implements the WebM DASH Manifest specification to generate the DASH manifest XML.
+
+@subsection Options
+
+This muxer supports the following options:
+
+@table @option
+@item adaptation_sets
+This option has the following syntax: "id=x,streams=a,b,c id=y,streams=d,e" where x and y are the
+unique identifiers of the adaptation sets and a,b,c,d and e are the indices of the corresponding
+audio and video streams. Any number of adaptation sets can be added using this option.
+@end table
+
+@subsection Example
+@example
+ffmpeg -f webm_dash_manifest -i video1.webm \
+       -f webm_dash_manifest -i video2.webm \
+       -f webm_dash_manifest -i audio1.webm \
+       -f webm_dash_manifest -i audio2.webm \
+       -map 0 -map 1 -map 2 -map 3 \
+       -c copy \
+       -f webm_dash_manifest \
+       -adaptation_sets "id=0,streams=0,1 id=1,streams=2,3" \
+       manifest.xml
+@end example
 
 @c man end MUXERS

@@ -4,7 +4,7 @@
 ;* Copyright (C) 2005-2011 x264 project
 ;*
 ;* Authors: Loren Merritt <lorenm@u.washington.edu>
-;*          Jason Garrett-Glaser <darkshikari@gmail.com>
+;*          Fiona Glaser <fiona@x264.com>
 ;*          Oskar Arvidsson <oskar@irock.se>
 ;*
 ;* This file is part of FFmpeg.
@@ -283,7 +283,8 @@ cextern pb_3
 
 %if ARCH_X86_64
 ;-----------------------------------------------------------------------------
-; void deblock_v_luma( uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0 )
+; void ff_deblock_v_luma(uint8_t *pix, int stride, int alpha, int beta,
+;                        int8_t *tc0)
 ;-----------------------------------------------------------------------------
 %macro DEBLOCK_LUMA 0
 cglobal deblock_v_luma_8, 5,5,10
@@ -328,19 +329,18 @@ cglobal deblock_v_luma_8, 5,5,10
     RET
 
 ;-----------------------------------------------------------------------------
-; void deblock_h_luma( uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0 )
+; void ff_deblock_h_luma(uint8_t *pix, int stride, int alpha, int beta,
+;                        int8_t *tc0)
 ;-----------------------------------------------------------------------------
 INIT_MMX cpuname
-cglobal deblock_h_luma_8, 5,9
+cglobal deblock_h_luma_8, 5,9,0,0x60+16*WIN64
     movsxd r7,  r1d
     lea    r8,  [r7+r7*2]
     lea    r6,  [r0-4]
     lea    r5,  [r0-4+r8]
 %if WIN64
-    sub    rsp, 0x98
-    %define pix_tmp rsp+0x30
+    %define pix_tmp rsp+0x30 ; shadow space + r4
 %else
-    sub    rsp, 0x68
     %define pix_tmp rsp
 %endif
 
@@ -379,11 +379,6 @@ cglobal deblock_h_luma_8, 5,9
     movq   m3, [pix_tmp+0x40]
     TRANSPOSE8x4B_STORE  PASS8ROWS(r6, r5, r7, r8)
 
-%if WIN64
-    add    rsp, 0x98
-%else
-    add    rsp, 0x68
-%endif
     RET
 %endmacro
 
@@ -398,7 +393,8 @@ DEBLOCK_LUMA
 
 %macro DEBLOCK_LUMA 2
 ;-----------------------------------------------------------------------------
-; void deblock_v8_luma( uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0 )
+; void ff_deblock_v8_luma(uint8_t *pix, int stride, int alpha, int beta,
+;                         int8_t *tc0)
 ;-----------------------------------------------------------------------------
 cglobal deblock_%1_luma_8, 5,5,8,2*%2
     lea     r4, [r1*3]
@@ -446,7 +442,8 @@ cglobal deblock_%1_luma_8, 5,5,8,2*%2
     RET
 
 ;-----------------------------------------------------------------------------
-; void deblock_h_luma( uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0 )
+; void ff_deblock_h_luma(uint8_t *pix, int stride, int alpha, int beta,
+;                        int8_t *tc0)
 ;-----------------------------------------------------------------------------
 INIT_MMX cpuname
 cglobal deblock_h_luma_8, 0,5,8,0x60+HAVE_ALIGNED_STACK*12
@@ -646,7 +643,7 @@ DEBLOCK_LUMA v, 16
 %endif
 
 ;-----------------------------------------------------------------------------
-; void deblock_v_luma_intra( uint8_t *pix, int stride, int alpha, int beta )
+; void ff_deblock_v_luma_intra(uint8_t *pix, int stride, int alpha, int beta)
 ;-----------------------------------------------------------------------------
 %if WIN64
 cglobal deblock_%1_luma_intra_8, 4,6,16,0x10
@@ -706,15 +703,18 @@ cglobal deblock_%1_luma_intra_8, 4,6,16,ARCH_X86_64*0x50-0x50
 INIT_MMX cpuname
 %if ARCH_X86_64
 ;-----------------------------------------------------------------------------
-; void deblock_h_luma_intra( uint8_t *pix, int stride, int alpha, int beta )
+; void ff_deblock_h_luma_intra(uint8_t *pix, int stride, int alpha, int beta)
 ;-----------------------------------------------------------------------------
-cglobal deblock_h_luma_intra_8, 4,9
+cglobal deblock_h_luma_intra_8, 4,9,0,0x80
     movsxd r7,  r1d
     lea    r8,  [r7*3]
     lea    r6,  [r0-4]
     lea    r5,  [r0-4+r8]
-    sub    rsp, 0x88
+%if WIN64
+    %define pix_tmp rsp+0x20 ; shadow space
+%else
     %define pix_tmp rsp
+%endif
 
     ; transpose 8x16 -> tmp space
     TRANSPOSE8x8_MEM  PASS8ROWS(r6, r5, r7, r8), PASS8ROWS(pix_tmp, pix_tmp+0x30, 0x10, 0x30)
@@ -734,7 +734,6 @@ cglobal deblock_h_luma_intra_8, 4,9
     sub    r5,  r7
     shr    r7,  3
     TRANSPOSE8x8_MEM  PASS8ROWS(pix_tmp, pix_tmp+0x30, 0x10, 0x30), PASS8ROWS(r6, r5, r7, r8)
-    add    rsp, 0x88
     RET
 %else
 cglobal deblock_h_luma_intra_8, 2,4,8,0x80
@@ -809,7 +808,8 @@ INIT_MMX mmxext
 %define t6 r6
 
 ;-----------------------------------------------------------------------------
-; void ff_deblock_v_chroma( uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0 )
+; void ff_deblock_v_chroma(uint8_t *pix, int stride, int alpha, int beta,
+;                          int8_t *tc0)
 ;-----------------------------------------------------------------------------
 cglobal deblock_v_chroma_8, 5,6
     CHROMA_V_START
@@ -823,13 +823,14 @@ cglobal deblock_v_chroma_8, 5,6
     RET
 
 ;-----------------------------------------------------------------------------
-; void ff_deblock_h_chroma( uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0 )
+; void ff_deblock_h_chroma(uint8_t *pix, int stride, int alpha, int beta,
+;                          int8_t *tc0)
 ;-----------------------------------------------------------------------------
 cglobal deblock_h_chroma_8, 5,7
-%if UNIX64
-    %define buf0 [rsp-24]
-    %define buf1 [rsp-16]
-%elif WIN64
+%if ARCH_X86_64
+    ; This could use the red zone on 64 bit unix to avoid the stack pointer
+    ; readjustment, but valgrind assumes the red zone is clobbered on
+    ; function calls and returns.
     sub   rsp, 16
     %define buf0 [rsp]
     %define buf1 [rsp+8]
@@ -849,7 +850,7 @@ cglobal deblock_h_chroma_8, 5,7
     movq  m0, buf0
     movq  m3, buf1
     TRANSPOSE8x4B_STORE PASS8ROWS(t5, r0, r1, t6)
-%if WIN64
+%if ARCH_X86_64
     add   rsp, 16
 %endif
     RET
@@ -879,9 +880,9 @@ ff_chroma_inter_body_mmxext:
 %define t5 r4
 %define t6 r5
 
-;-----------------------------------------------------------------------------
-; void ff_deblock_v_chroma_intra( uint8_t *pix, int stride, int alpha, int beta )
-;-----------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; void ff_deblock_v_chroma_intra(uint8_t *pix, int stride, int alpha, int beta)
+;------------------------------------------------------------------------------
 cglobal deblock_v_chroma_intra_8, 4,5
     CHROMA_V_START
     movq  m0, [t5]
@@ -893,9 +894,9 @@ cglobal deblock_v_chroma_intra_8, 4,5
     movq  [r0], m2
     RET
 
-;-----------------------------------------------------------------------------
-; void ff_deblock_h_chroma_intra( uint8_t *pix, int stride, int alpha, int beta )
-;-----------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; void ff_deblock_h_chroma_intra(uint8_t *pix, int stride, int alpha, int beta)
+;------------------------------------------------------------------------------
 cglobal deblock_h_chroma_intra_8, 4,6
     CHROMA_H_START
     TRANSPOSE4x8_LOAD  bw, wd, dq, PASS8ROWS(t5, r0, r1, t6)
@@ -919,10 +920,10 @@ ff_chroma_intra_body_mmxext:
     ret
 
 ;-----------------------------------------------------------------------------
-; void h264_loop_filter_strength(int16_t bs[2][4][4], uint8_t nnz[40],
-;                                int8_t ref[2][40], int16_t mv[2][40][2],
-;                                int bidir,    int edges,    int step,
-;                                int mask_mv0, int mask_mv1, int field);
+; void ff_h264_loop_filter_strength(int16_t bs[2][4][4], uint8_t nnz[40],
+;                                   int8_t ref[2][40], int16_t mv[2][40][2],
+;                                   int bidir,    int edges,    int step,
+;                                   int mask_mv0, int mask_mv1, int field);
 ;
 ; bidir    is 0 or 1
 ; edges    is 1 or 4

@@ -23,37 +23,8 @@
 #include "libavutil/cpu.h"
 #include "libavutil/common.h"
 #include "libavutil/opt.h"
-#include "libavutil/pixdesc.h"
-#include "avfilter.h"
 #include "internal.h"
-
-#define HIST_SIZE 4
-
-typedef enum {
-    TFF,
-    BFF,
-    PROGRSSIVE,
-    UNDETERMINED,
-} Type;
-
-typedef struct {
-    const AVClass *class;
-    float interlace_threshold;
-    float progressive_threshold;
-
-    Type last_type;
-    int prestat[4];
-    int poststat[4];
-
-    uint8_t history[HIST_SIZE];
-
-    AVFrame *cur;
-    AVFrame *next;
-    AVFrame *prev;
-    int (*filter_line)(const uint8_t *prev, const uint8_t *cur, const uint8_t *next, int w);
-
-    const AVPixFmtDescriptor *csp;
-} IDETContext;
+#include "vf_idet.h"
 
 #define OFFSET(x) offsetof(IDETContext, x)
 #define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
@@ -77,7 +48,7 @@ static const char *type2str(Type type)
     return NULL;
 }
 
-static int filter_line_c(const uint8_t *a, const uint8_t *b, const uint8_t *c, int w)
+int ff_idet_filter_line_c(const uint8_t *a, const uint8_t *b, const uint8_t *c, int w)
 {
     int x;
     int ret=0;
@@ -90,7 +61,7 @@ static int filter_line_c(const uint8_t *a, const uint8_t *b, const uint8_t *c, i
     return ret;
 }
 
-static int filter_line_c_16bit(const uint16_t *a, const uint16_t *b, const uint16_t *c, int w)
+int ff_idet_filter_line_c_16bit(const uint16_t *a, const uint16_t *b, const uint16_t *c, int w)
 {
     int x;
     int ret=0;
@@ -198,8 +169,11 @@ static int filter_frame(AVFilterLink *link, AVFrame *picref)
 
     if (!idet->csp)
         idet->csp = av_pix_fmt_desc_get(link->format);
-    if (idet->csp->comp[0].depth_minus1 / 8 == 1)
-        idet->filter_line = (void*)filter_line_c_16bit;
+    if (idet->csp->comp[0].depth_minus1 / 8 == 1){
+        idet->filter_line = (ff_idet_filter_func)ff_idet_filter_line_c_16bit;
+        if (ARCH_X86)
+            ff_idet_init_x86(idet, 1);
+    }
 
     filter(ctx);
 
@@ -240,15 +214,15 @@ static int query_formats(AVFilterContext *ctx)
         AV_PIX_FMT_YUVJ420P,
         AV_PIX_FMT_YUVJ422P,
         AV_PIX_FMT_YUVJ444P,
-        AV_NE( AV_PIX_FMT_GRAY16BE, AV_PIX_FMT_GRAY16LE ),
+        AV_PIX_FMT_GRAY16,
         AV_PIX_FMT_YUV440P,
         AV_PIX_FMT_YUVJ440P,
-        AV_NE( AV_PIX_FMT_YUV420P10BE, AV_PIX_FMT_YUV420P10LE ),
-        AV_NE( AV_PIX_FMT_YUV422P10BE, AV_PIX_FMT_YUV422P10LE ),
-        AV_NE( AV_PIX_FMT_YUV444P10BE, AV_PIX_FMT_YUV444P10LE ),
-        AV_NE( AV_PIX_FMT_YUV420P16BE, AV_PIX_FMT_YUV420P16LE ),
-        AV_NE( AV_PIX_FMT_YUV422P16BE, AV_PIX_FMT_YUV422P16LE ),
-        AV_NE( AV_PIX_FMT_YUV444P16BE, AV_PIX_FMT_YUV444P16LE ),
+        AV_PIX_FMT_YUV420P10,
+        AV_PIX_FMT_YUV422P10,
+        AV_PIX_FMT_YUV444P10,
+        AV_PIX_FMT_YUV420P16,
+        AV_PIX_FMT_YUV422P16,
+        AV_PIX_FMT_YUV444P16,
         AV_PIX_FMT_YUVA420P,
         AV_PIX_FMT_NONE
     };
@@ -271,7 +245,10 @@ static av_cold int init(AVFilterContext *ctx)
     idet->last_type = UNDETERMINED;
     memset(idet->history, UNDETERMINED, HIST_SIZE);
 
-    idet->filter_line = filter_line_c;
+    idet->filter_line = ff_idet_filter_line_c;
+
+    if (ARCH_X86)
+        ff_idet_init_x86(idet, 0);
 
     return 0;
 }
@@ -288,17 +265,16 @@ static const AVFilterPad idet_inputs[] = {
 
 static const AVFilterPad idet_outputs[] = {
     {
-        .name          = "default",
-        .type          = AVMEDIA_TYPE_VIDEO,
-        .config_props  = config_output,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = config_output,
     },
     { NULL }
 };
 
-AVFilter avfilter_vf_idet = {
+AVFilter ff_vf_idet = {
     .name          = "idet",
     .description   = NULL_IF_CONFIG_SMALL("Interlace detect Filter."),
-
     .priv_size     = sizeof(IDETContext),
     .init          = init,
     .uninit        = uninit,

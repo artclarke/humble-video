@@ -171,6 +171,7 @@ extern "C"
 #define RTMP_LF_PLST	0x0008	/* send playlist before play */
 #define RTMP_LF_BUFX	0x0010	/* toggle stream on BufferEmpty msg */
 #define RTMP_LF_FTCU	0x0020	/* free tcUrl on close */
+#define RTMP_LF_FAPU	0x0040	/* free app on close */
     int lFlags;
 
     int swfAge;
@@ -178,12 +179,7 @@ extern "C"
     int protocol;
     int timeout;		/* connection timeout in seconds */
 
-#define RTMP_PUB_NAME   0x0001  /* send login to server */
-#define RTMP_PUB_RESP   0x0002  /* send salted password hash */
-#define RTMP_PUB_ALLOC  0x0004  /* allocated data for new tcUrl & app */
-#define RTMP_PUB_CLEAN  0x0008  /* need to free allocated data for newer tcUrl & app at exit */
-#define RTMP_PUB_CLATE  0x0010  /* late clean tcUrl & app at exit */
-    int pFlags;
+    int pFlags;			/* unused, but kept to avoid breaking ABI */
 
     unsigned short socksport;
     unsigned short port;

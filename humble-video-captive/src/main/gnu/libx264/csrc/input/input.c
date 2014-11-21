@@ -1,7 +1,7 @@
 /*****************************************************************************
  * input.c: common input functions
  *****************************************************************************
- * Copyright (C) 2010-2013 x264 project
+ * Copyright (C) 2010-2014 x264 project
  *
  * Authors: Steven Walters <kemuri9@gmail.com>
  *
@@ -42,7 +42,8 @@ const x264_cli_csp_t x264_cli_csps[] = {
 int x264_cli_csp_is_invalid( int csp )
 {
     int csp_mask = csp & X264_CSP_MASK;
-    return csp_mask <= X264_CSP_NONE || csp_mask >= X264_CSP_CLI_MAX || csp & X264_CSP_OTHER;
+    return csp_mask <= X264_CSP_NONE || csp_mask >= X264_CSP_CLI_MAX ||
+           csp_mask == X264_CSP_V210 || csp & X264_CSP_OTHER;
 }
 
 int x264_cli_csp_depth_factor( int csp )
@@ -74,7 +75,7 @@ uint64_t x264_cli_pic_size( int csp, int width, int height )
     return size;
 }
 
-int x264_cli_pic_alloc( cli_pic_t *pic, int csp, int width, int height )
+static int x264_cli_pic_alloc_internal( cli_pic_t *pic, int csp, int width, int height, int align )
 {
     memset( pic, 0, sizeof(cli_pic_t) );
     int csp_mask = csp & X264_CSP_MASK;
@@ -87,13 +88,27 @@ int x264_cli_pic_alloc( cli_pic_t *pic, int csp, int width, int height )
     pic->img.height = height;
     for( int i = 0; i < pic->img.planes; i++ )
     {
-         pic->img.plane[i] = x264_malloc( x264_cli_pic_plane_size( csp, width, height, i ) );
-         if( !pic->img.plane[i] )
-             return -1;
-         pic->img.stride[i] = width * x264_cli_csps[csp_mask].width[i] * x264_cli_csp_depth_factor( csp );
+        int stride = width * x264_cli_csps[csp_mask].width[i];
+        stride *= x264_cli_csp_depth_factor( csp );
+        stride = ALIGN( stride, align );
+        uint64_t size = (uint64_t)(height * x264_cli_csps[csp_mask].height[i]) * stride;
+        pic->img.plane[i] = x264_malloc( size );
+        if( !pic->img.plane[i] )
+            return -1;
+        pic->img.stride[i] = stride;
     }
 
     return 0;
+}
+
+int x264_cli_pic_alloc( cli_pic_t *pic, int csp, int width, int height )
+{
+    return x264_cli_pic_alloc_internal( pic, csp, width, height, 1 );
+}
+
+int x264_cli_pic_alloc_aligned( cli_pic_t *pic, int csp, int width, int height )
+{
+    return x264_cli_pic_alloc_internal( pic, csp, width, height, NATIVE_ALIGN );
 }
 
 void x264_cli_pic_clean( cli_pic_t *pic )

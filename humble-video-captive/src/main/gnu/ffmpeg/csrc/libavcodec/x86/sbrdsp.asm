@@ -2,20 +2,20 @@
 ;* AAC Spectral Band Replication decoding functions
 ;* Copyright (C) 2012 Christophe Gisquet <christophe.gisquet@gmail.com>
 ;*
-;* This file is part of Libav.
+;* This file is part of FFmpeg.
 ;*
-;* Libav is free software; you can redistribute it and/or
+;* FFmpeg is free software; you can redistribute it and/or
 ;* modify it under the terms of the GNU Lesser General Public
 ;* License as published by the Free Software Foundation; either
 ;* version 2.1 of the License, or (at your option) any later version.
 ;*
-;* Libav is distributed in the hope that it will be useful,
+;* FFmpeg is distributed in the hope that it will be useful,
 ;* but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ;* Lesser General Public License for more details.
 ;*
 ;* You should have received a copy of the GNU Lesser General Public
-;* License along with Libav; if not, write to the Free Software
+;* License along with FFmpeg; if not, write to the Free Software
 ;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
@@ -25,13 +25,13 @@ SECTION_RODATA
 ; mask equivalent for multiply by -1.0 1.0
 ps_mask         times 2 dd 1<<31, 0
 ps_mask2        times 2 dd 0, 1<<31
-ps_neg          times 4 dd 1<<31
 ps_noise0       times 2 dd  1.0,  0.0,
 ps_noise2       times 2 dd -1.0,  0.0
 ps_noise13      dd  0.0,  1.0, 0.0, -1.0
                 dd  0.0, -1.0, 0.0,  1.0
                 dd  0.0,  1.0, 0.0, -1.0
 cextern         sbr_noise_table
+cextern         ps_neg
 
 SECTION_TEXT
 
@@ -124,9 +124,9 @@ cglobal sbr_hf_g_filt, 5, 6, 5
 .end:
     RET
 
-; static void sbr_hf_gen_c(float (*X_high)[2], const float (*X_low)[2],
-;                          const float alpha0[2], const float alpha1[2],
-;                          float bw, int start, int end)
+; void ff_sbr_hf_gen_sse(float (*X_high)[2], const float (*X_low)[2],
+;                        const float alpha0[2], const float alpha1[2],
+;                        float bw, int start, int end)
 ;
 cglobal sbr_hf_gen, 4,4,8, X_high, X_low, alpha0, alpha1, BW, S, E
     ; load alpha factors
@@ -249,7 +249,7 @@ cglobal sbr_neg_odd_64, 1,2,4,z
     jne      .loop
     REP_RET
 
-; sbr_qmf_deint_bfly(float *v, const float *src0, const float *src1)
+; void ff_sbr_qmf_deint_bfly_sse2(float *v, const float *src0, const float *src1)
 %macro SBR_QMF_DEINT_BFLY  0
 cglobal sbr_qmf_deint_bfly, 3,5,8, v,src0,src1,vrev,c
     mov               cq, 64*4-2*mmsize
@@ -423,3 +423,25 @@ apply_noise_main:
     add    count, mmsize
     jl      .loop
     RET
+
+INIT_XMM sse
+cglobal sbr_qmf_deint_neg, 2,4,4,v,src,vrev,c
+%define COUNT  32*4
+%define OFFSET 32*4
+    mov        cq, -COUNT
+    lea     vrevq, [vq + OFFSET + COUNT]
+    add        vq, OFFSET-mmsize
+    add      srcq, 2*COUNT
+    mova       m3, [ps_neg]
+.loop:
+    mova       m0, [srcq + 2*cq + 0*mmsize]
+    mova       m1, [srcq + 2*cq + 1*mmsize]
+    shufps     m2, m0, m1, q2020
+    shufps     m1, m0, q1313
+    xorps      m2, m3
+    mova     [vq], m1
+    mova  [vrevq + cq], m2
+    sub        vq, mmsize
+    add        cq, mmsize
+    jl      .loop
+    REP_RET

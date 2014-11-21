@@ -68,7 +68,7 @@ static int query_formats(AVFilterContext *ctx)
     return 0;
 }
 
-typedef struct {
+typedef struct OCVContext {
     const AVClass *class;
     char *name;
     char *params;
@@ -78,7 +78,7 @@ typedef struct {
     void *priv;
 } OCVContext;
 
-typedef struct {
+typedef struct SmoothContext {
     int type;
     int    param1, param2;
     double param3, param4;
@@ -166,7 +166,7 @@ static int read_shape_from_file(int *cols, int *rows, int **values, const char *
                *rows, *cols);
         return AVERROR_INVALIDDATA;
     }
-    if (!(*values = av_mallocz(sizeof(int) * *rows * *cols)))
+    if (!(*values = av_mallocz_array(sizeof(int) * *rows, *cols)))
         return AVERROR(ENOMEM);
 
     /* fill *values */
@@ -245,7 +245,7 @@ static int parse_iplconvkernel(IplConvKernel **kernel, char *buf, void *log_ctx)
     return 0;
 }
 
-typedef struct {
+typedef struct DilateContext {
     int nb_iterations;
     IplConvKernel *kernel;
 } DilateContext;
@@ -302,7 +302,7 @@ static void erode_end_frame_filter(AVFilterContext *ctx, IplImage *inimg, IplIma
     cvErode(inimg, outimg, dilate->kernel, dilate->nb_iterations);
 }
 
-typedef struct {
+typedef struct OCVFilterEntry {
     const char *name;
     size_t priv_size;
     int  (*init)(AVFilterContext *ctx, const char *args);
@@ -381,15 +381,15 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 static const AVOption ocv_options[] = {
     { "filter_name",   NULL, OFFSET(name),   AV_OPT_TYPE_STRING, .flags = FLAGS },
     { "filter_params", NULL, OFFSET(params), AV_OPT_TYPE_STRING, .flags = FLAGS },
-    { NULL },
+    { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(ocv);
 
 static const AVFilterPad avfilter_vf_ocv_inputs[] = {
     {
-        .name       = "default",
-        .type       = AVMEDIA_TYPE_VIDEO,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
         .filter_frame = filter_frame,
     },
     { NULL }
@@ -403,18 +403,14 @@ static const AVFilterPad avfilter_vf_ocv_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_ocv = {
-    .name        = "ocv",
-    .description = NULL_IF_CONFIG_SMALL("Apply transform using libopencv."),
-
-    .priv_size = sizeof(OCVContext),
-    .priv_class = &ocv_class,
-
+AVFilter ff_vf_ocv = {
+    .name          = "ocv",
+    .description   = NULL_IF_CONFIG_SMALL("Apply transform using libopencv."),
+    .priv_size     = sizeof(OCVContext),
+    .priv_class    = &ocv_class,
     .query_formats = query_formats,
-    .init = init,
-    .uninit = uninit,
-
-    .inputs    = avfilter_vf_ocv_inputs,
-
-    .outputs   = avfilter_vf_ocv_outputs,
+    .init          = init,
+    .uninit        = uninit,
+    .inputs        = avfilter_vf_ocv_inputs,
+    .outputs       = avfilter_vf_ocv_outputs,
 };

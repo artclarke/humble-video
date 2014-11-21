@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2003 Michael Niedermayer <michaelni@gmx.at>
- * Copyright (c) 2013 Clément Bœsch <ubitux@gmail.com>
+ * Copyright (c) 2013 Clément Bœsch <u pkh me>
  *
  * This file is part of FFmpeg.
  *
@@ -31,7 +31,6 @@
  * ported by Clément Bœsch for FFmpeg.
  */
 
-#include "libavcodec/dsputil.h"
 #include "libavutil/avassert.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/opt.h"
@@ -45,6 +44,17 @@ enum mode {
     NB_MODES
 };
 
+static const AVClass *child_class_next(const AVClass *prev)
+{
+    return prev ? NULL : avcodec_dct_get_class();
+}
+
+static void *child_next(void *obj, void *prev)
+{
+    SPPContext *s = obj;
+    return prev ? NULL : s->dct;
+}
+
 #define OFFSET(x) offsetof(SPPContext, x)
 #define FLAGS AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM
 static const AVOption spp_options[] = {
@@ -57,7 +67,15 @@ static const AVOption spp_options[] = {
     { NULL }
 };
 
-AVFILTER_DEFINE_CLASS(spp);
+static const AVClass spp_class = {
+    .class_name       = "spp",
+    .item_name        = av_default_item_name,
+    .option           = spp_options,
+    .version          = LIBAVUTIL_VERSION_INT,
+    .category         = AV_CLASS_CATEGORY_FILTER,
+    .child_class_next = child_class_next,
+    .child_next       = child_next,
+};
 
 // XXX: share between filters?
 DECLARE_ALIGNED(8, static const uint8_t, ldither)[8][8] = {
@@ -232,10 +250,10 @@ static void filter(SPPContext *p, uint8_t *dst, uint8_t *src,
                 const int x1 = x + offset[i + count - 1][0];
                 const int y1 = y + offset[i + count - 1][1];
                 const int index = x1 + y1*linesize;
-                p->dsp.get_pixels(block, p->src + index, linesize);
-                p->dsp.fdct(block);
-                p->requantize(block2, block, qp, p->dsp.idct_permutation);
-                p->dsp.idct(block2);
+                p->dct->get_pixels(block, p->src + index, linesize);
+                p->dct->fdct(block);
+                p->requantize(block2, block, qp, p->dct->idct_permutation);
+                p->dct->idct(block2);
                 add_block(p->temp + index, linesize, block2);
             }
         }
@@ -270,8 +288,8 @@ static int config_input(AVFilterLink *inlink)
     spp->hsub = desc->log2_chroma_w;
     spp->vsub = desc->log2_chroma_h;
     spp->temp_linesize = FFALIGN(inlink->w + 16, 16);
-    spp->temp = av_malloc(spp->temp_linesize * h * sizeof(*spp->temp));
-    spp->src  = av_malloc(spp->temp_linesize * h * sizeof(*spp->src));
+    spp->temp = av_malloc_array(spp->temp_linesize, h * sizeof(*spp->temp));
+    spp->src  = av_malloc_array(spp->temp_linesize, h * sizeof(*spp->src));
     if (!spp->use_bframe_qp) {
         /* we are assuming here the qp blocks will not be smaller that 16x16 */
         spp->non_b_qp_alloc_size = FF_CEIL_RSHIFT(inlink->w, 4) * FF_CEIL_RSHIFT(inlink->h, 4);
@@ -373,14 +391,27 @@ static int process_command(AVFilterContext *ctx, const char *cmd, const char *ar
     return AVERROR(ENOSYS);
 }
 
-static av_cold int init(AVFilterContext *ctx)
+static av_cold int init_dict(AVFilterContext *ctx, AVDictionary **opts)
 {
     SPPContext *spp = ctx->priv;
+    int ret;
 
     spp->avctx = avcodec_alloc_context3(NULL);
-    if (!spp->avctx)
+    spp->dct = avcodec_dct_alloc();
+    if (!spp->avctx || !spp->dct)
         return AVERROR(ENOMEM);
-    avpriv_dsputil_init(&spp->dsp, spp->avctx);
+
+    if (opts) {
+        AVDictionaryEntry *e = NULL;
+
+        while ((e = av_dict_get(*opts, "", e, AV_DICT_IGNORE_SUFFIX))) {
+            if ((ret = av_opt_set(spp->dct, e->key, e->value, 0)) < 0)
+                return ret;
+        }
+        av_dict_free(opts);
+    }
+
+    avcodec_dct_init(spp->dct);
     spp->store_slice = store_slice_c;
     switch (spp->mode) {
     case MODE_HARD: spp->requantize = hardthresh_c; break;
@@ -401,6 +432,7 @@ static av_cold void uninit(AVFilterContext *ctx)
         avcodec_close(spp->avctx);
         av_freep(&spp->avctx);
     }
+    av_freep(&spp->dct);
     av_freep(&spp->non_b_qp_table);
 }
 
@@ -422,11 +454,11 @@ static const AVFilterPad spp_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_spp = {
+AVFilter ff_vf_spp = {
     .name            = "spp",
     .description     = NULL_IF_CONFIG_SMALL("Apply a simple post processing filter."),
     .priv_size       = sizeof(SPPContext),
-    .init            = init,
+    .init_dict       = init_dict,
     .uninit          = uninit,
     .query_formats   = query_formats,
     .inputs          = spp_inputs,

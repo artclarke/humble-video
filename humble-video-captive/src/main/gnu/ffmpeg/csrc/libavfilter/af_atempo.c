@@ -949,7 +949,13 @@ static int yae_flush(ATempoContext *atempo,
         }
     }
 
-    // flush the remaininder of the current fragment:
+    // check whether all of the input samples have been consumed:
+    if (frag->position[0] + frag->nsamples < atempo->position[0]) {
+        yae_advance_to_next_frag(atempo);
+        return AVERROR(EAGAIN);
+    }
+
+    // flush the remainder of the current fragment:
     start_here = FFMAX(atempo->position[1], overlap_end);
     stop_here  = frag->position[1] + frag->nsamples;
     offset     = start_here - frag->position[1];
@@ -1058,11 +1064,11 @@ static int push_samples(ATempoContext *atempo,
                      outlink->time_base);
 
     ret = ff_filter_frame(outlink, atempo->dst_buffer);
-    if (ret < 0)
-        return ret;
     atempo->dst_buffer = NULL;
     atempo->dst        = NULL;
     atempo->dst_end    = NULL;
+    if (ret < 0)
+        return ret;
 
     atempo->nsamples_out += n_out;
     return 0;
@@ -1182,7 +1188,7 @@ static const AVFilterPad atempo_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_af_atempo = {
+AVFilter ff_af_atempo = {
     .name            = "atempo",
     .description     = NULL_IF_CONFIG_SMALL("Adjust audio tempo."),
     .init            = init,

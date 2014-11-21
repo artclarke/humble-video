@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dct.c: ppc transform and zigzag
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Guillaume Poirier <gpoirier@mplayerhq.hu>
  *          Eric Petit <eric.petit@lapsus.org>

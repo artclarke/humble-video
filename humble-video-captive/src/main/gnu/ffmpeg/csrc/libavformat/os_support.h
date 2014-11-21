@@ -45,7 +45,7 @@
 #   undef fstat
 #  endif
 #  define fstat(f,s) _fstati64((f), (s))
-#endif /* defined(__MINGW32__) && !defined(__MINGW32CE__) */
+#endif /* defined(_WIN32) && !defined(__MINGW32CE__) */
 
 #ifdef _WIN32
 #if HAVE_DIRECT_H
@@ -54,8 +54,6 @@
 #include <io.h>
 #endif
 #define mkdir(a, b) _mkdir(a)
-#else
-#include <sys/stat.h>
 #endif
 
 static inline int is_dos_path(const char *path)
@@ -84,11 +82,6 @@ static inline int is_dos_path(const char *path)
 #ifndef S_IWUSR
 #define S_IWUSR S_IWRITE
 #endif
-#endif
-
-#if defined(_WIN32) && !defined(__MINGW32CE__)
-int ff_win32_open(const char *filename, int oflag, int pmode);
-#define open ff_win32_open
 #endif
 
 #if CONFIG_NETWORK

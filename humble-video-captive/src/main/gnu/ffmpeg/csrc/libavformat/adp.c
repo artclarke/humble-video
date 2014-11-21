@@ -26,14 +26,21 @@
 
 static int adp_probe(AVProbeData *p)
 {
-    int i;
+    int i, changes = 0;
+    char last = 0;
 
     if (p->buf_size < 32)
         return 0;
 
-    for (i = 0; i < p->buf_size - 3; i+=32)
+    for (i = 0; i < p->buf_size - 3; i+=32) {
         if (p->buf[i] != p->buf[i+2] || p->buf[i+1] != p->buf[i+3])
             return 0;
+        if (p->buf[i] != last)
+            changes++;
+        last = p->buf[i];
+    }
+    if (changes <= 1)
+        return 0;
 
     return p->buf_size < 260 ? 1 : AVPROBE_SCORE_MAX / 4;
 }
@@ -64,7 +71,7 @@ static int adp_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
     int ret, size = 1024;
 
-    if (url_feof(s->pb))
+    if (avio_feof(s->pb))
         return AVERROR_EOF;
 
     ret = av_get_packet(s->pb, pkt, size);

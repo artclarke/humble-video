@@ -1,7 +1,7 @@
 /****************************************************************************
  * dct-a.S: arm transform and zigzag
  *****************************************************************************
- * Copyright (C) 2009-2013 x264 project
+ * Copyright (C) 2009-2014 x264 project
  *
  * Authors: David Conrad <lessen42@gmail.com>
  *
@@ -131,7 +131,7 @@ function x264_sub4x4_dct_neon
     bx              lr
 .endfunc
 
-function x264_sub8x4_dct_neon
+function x264_sub8x4_dct_neon, export=0
     vld1.64         {d0}, [r1,:64], r3
     vld1.64         {d1}, [r2,:64], ip
     vsubl.u8        q8,  d0,  d1
@@ -283,17 +283,17 @@ function x264_sub8x8_dct8_neon
 
 function x264_sub16x16_dct8_neon
     push            {lr}
-    bl              x264_sub8x8_dct8_neon
+    bl              X(x264_sub8x8_dct8_neon)
     sub             r1,  r1,  #FENC_STRIDE*8 - 8
     sub             r2,  r2,  #FDEC_STRIDE*8 - 8
-    bl              x264_sub8x8_dct8_neon
+    bl              X(x264_sub8x8_dct8_neon)
     sub             r1,  r1,  #8
     sub             r2,  r2,  #8
-    bl              x264_sub8x8_dct8_neon
+    bl              X(x264_sub8x8_dct8_neon)
     pop             {lr}
     sub             r1,  r1,  #FENC_STRIDE*8 - 8
     sub             r2,  r2,  #FDEC_STRIDE*8 - 8
-    b               x264_sub8x8_dct8_neon
+    b               X(x264_sub8x8_dct8_neon)
 .endfunc
 
 
@@ -338,7 +338,7 @@ function x264_add4x4_idct_neon
     bx              lr
 .endfunc
 
-function x264_add8x4_idct_neon
+function x264_add8x4_idct_neon, export=0
     vld1.64         {d0-d3}, [r1,:128]!
     IDCT_1D         d16, d18, d20, d22, d0, d1, d2, d3
     vld1.64         {d4-d7}, [r1,:128]!
@@ -502,14 +502,14 @@ function x264_add8x8_idct8_neon
 
 function x264_add16x16_idct8_neon
     mov             ip,  lr
-    bl              x264_add8x8_idct8_neon
+    bl              X(x264_add8x8_idct8_neon)
     sub             r0,  r0,  #8*FDEC_STRIDE-8
-    bl              x264_add8x8_idct8_neon
+    bl              X(x264_add8x8_idct8_neon)
     sub             r0,  r0,  #8
-    bl              x264_add8x8_idct8_neon
+    bl              X(x264_add8x8_idct8_neon)
     sub             r0,  r0,  #8*FDEC_STRIDE-8
     mov             lr,  ip
-    b               x264_add8x8_idct8_neon
+    b               X(x264_add8x8_idct8_neon)
 .endfunc
 
 

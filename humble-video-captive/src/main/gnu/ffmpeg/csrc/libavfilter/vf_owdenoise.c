@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2007 Michael Niedermayer <michaelni@gmx.at>
- * Copyright (c) 2013 Clément Bœsch <ubitux@gmail.com>
+ * Copyright (c) 2013 Clément Bœsch <u pkh me>
  *
  * This file is part of FFmpeg.
  *
@@ -293,7 +293,7 @@ static int config_input(AVFilterLink *inlink)
     s->linesize = FFALIGN(inlink->w, 16);
     for (j = 0; j < 4; j++) {
         for (i = 0; i <= s->depth; i++) {
-            s->plane[i][j] = av_malloc(s->linesize * h * sizeof(s->plane[0][0][0]));
+            s->plane[i][j] = av_malloc_array(s->linesize, h * sizeof(s->plane[0][0][0]));
             if (!s->plane[i][j])
                 return AVERROR(ENOMEM);
         }
@@ -329,7 +329,7 @@ static const AVFilterPad owdenoise_outputs[] = {
      { NULL }
 };
 
-AVFilter avfilter_vf_owdenoise = {
+AVFilter ff_vf_owdenoise = {
     .name          = "owdenoise",
     .description   = NULL_IF_CONFIG_SMALL("Denoise using wavelets."),
     .priv_size     = sizeof(OWDenoiseContext),

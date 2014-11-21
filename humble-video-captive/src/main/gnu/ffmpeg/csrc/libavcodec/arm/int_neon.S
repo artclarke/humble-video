@@ -21,8 +21,6 @@
 
 #include "libavutil/arm/asm.S"
 
-        .fpu neon
-
 function ff_scalarproduct_int16_neon, export=1
         vmov.i16        q0,  #0
         vmov.i16        q1,  #0
@@ -37,56 +35,17 @@ function ff_scalarproduct_int16_neon, export=1
         vmlal.s16       q2,  d18,  d22
         vmlal.s16       q3,  d19,  d23
         subs            r2,  r2,   #16
-        bne             1b
+        bgt             1b
 
         vpadd.s32       d16, d0,   d1
         vpadd.s32       d17, d2,   d3
-        vpadd.s32       d10, d4,   d5
-        vpadd.s32       d11, d6,   d7
+        vpadd.s32       d18, d4,   d5
+        vpadd.s32       d19, d6,   d7
         vpadd.s32       d0,  d16,  d17
-        vpadd.s32       d1,  d10,  d11
+        vpadd.s32       d1,  d18,  d19
         vpadd.s32       d2,  d0,   d1
         vpaddl.s32      d3,  d2
         vmov.32         r0,  d3[0]
         bx              lr
 endfunc
 
-@ scalarproduct_and_madd_int16(/*aligned*/v0,v1,v2,order,mul)
-function ff_scalarproduct_and_madd_int16_neon, export=1
-        vld1.16         {d28[],d29[]}, [sp]
-        vmov.i16        q0,  #0
-        vmov.i16        q1,  #0
-        vmov.i16        q2,  #0
-        vmov.i16        q3,  #0
-        mov             r12, r0
-
-1:      vld1.16         {d16-d17}, [r0,:128]!
-        vld1.16         {d18-d19}, [r1]!
-        vld1.16         {d20-d21}, [r2]!
-        vld1.16         {d22-d23}, [r0,:128]!
-        vld1.16         {d24-d25}, [r1]!
-        vld1.16         {d26-d27}, [r2]!
-        vmul.s16        q10, q10,  q14
-        vmul.s16        q13, q13,  q14
-        vmlal.s16       q0,  d16,  d18
-        vmlal.s16       q1,  d17,  d19
-        vadd.s16        q10, q8,   q10
-        vadd.s16        q13, q11,  q13
-        vmlal.s16       q2,  d22,  d24
-        vmlal.s16       q3,  d23,  d25
-        vst1.16         {q10},     [r12,:128]!
-        subs            r3,  r3,   #16
-        vst1.16         {q13},     [r12,:128]!
-        bne             1b
-
-        vpadd.s32       d16, d0,   d1
-        vpadd.s32       d17, d2,   d3
-        vpadd.s32       d10, d4,   d5
-        vpadd.s32       d11, d6,   d7
-        vpadd.s32       d0,  d16,  d17
-        vpadd.s32       d1,  d10,  d11
-        vpadd.s32       d2,  d0,   d1
-        vpaddl.s32      d3,  d2
-        vmov.32         r0,  d3[0]
-        bx              lr
-endfunc

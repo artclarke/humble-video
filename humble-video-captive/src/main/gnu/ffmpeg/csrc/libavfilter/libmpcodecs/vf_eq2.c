@@ -120,7 +120,7 @@ void create_lut (eq2_param_t *par)
   par->lut_clean = 1;
 }
 
-#if HAVE_MMX
+#if HAVE_MMX && HAVE_6REGS
 static
 void affine_1d_MMX (eq2_param_t *par, unsigned char *dst, unsigned char *src,
   unsigned w, unsigned h, unsigned dstride, unsigned sstride)
@@ -265,7 +265,7 @@ int put_image (vf_instance_t *vf, mp_image_t *src, double pts)
   dst = ff_vf_get_image (vf->next, src->imgfmt, MP_IMGTYPE_EXPORT, 0, src->w, src->h);
 
   for (i = 0; i < ((src->num_planes>1)?3:1); i++) {
-    if (eq2->param[i].adjust != NULL) {
+    if (eq2->param[i].adjust) {
       dst->planes[i] = eq2->buf[i];
       dst->stride[i] = eq2->buf_w[i];
 
@@ -289,7 +289,7 @@ void check_values (eq2_param_t *par)
   if ((par->c == 1.0) && (par->b == 0.0) && (par->g == 1.0)) {
     par->adjust = NULL;
   }
-#if HAVE_MMX
+#if HAVE_MMX && HAVE_6REGS
   else if (par->g == 1.0 && ff_gCpuCaps.hasMMX) {
     par->adjust = &affine_1d_MMX;
   }
@@ -439,7 +439,7 @@ int query_format (vf_instance_t *vf, unsigned fmt)
 static
 void uninit (vf_instance_t *vf)
 {
-  if (vf->priv != NULL) {
+  if (vf->priv) {
     free (vf->priv->buf[0]);
     free (vf->priv);
   }
@@ -482,7 +482,7 @@ int vf_open(vf_instance_t *vf, char *args)
   eq2->ggamma = 1.0;
   eq2->bgamma = 1.0;
 
-  if (args != NULL) {
+  if (args) {
     par[0] = 1.0;
     par[1] = 1.0;
     par[2] = 0.0;

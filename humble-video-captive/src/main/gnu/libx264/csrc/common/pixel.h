@@ -1,11 +1,11 @@
 /*****************************************************************************
  * pixel.c: pixel metrics
  *****************************************************************************
- * Copyright (C) 2004-2013 x264 project
+ * Copyright (C) 2004-2014 x264 project
  *
  * Authors: Loren Merritt <lorenm@u.washington.edu>
- *          Jason Garrett-Glaser <darkshikari@gmail.com>
-            Henrik Gramner <hengar-6@student.ltu.se>
+ *          Fiona Glaser <fiona@x264.com>
+            Henrik Gramner <henrik@gramner.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

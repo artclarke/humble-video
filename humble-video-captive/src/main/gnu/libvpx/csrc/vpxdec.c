@@ -8,10 +8,6 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-
-/* This is a simple program that reads ivf files and decodes them
- * using the new interface. Decoded frames are output as YV12 raw.
- */
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,100 +15,91 @@
 #include <string.h>
 #include <limits.h>
 
-#define VPX_CODEC_DISABLE_COMPAT 1
-#include "vpx_config.h"
+#include "./vpx_config.h"
+
+#if CONFIG_LIBYUV
+#include "third_party/libyuv/include/libyuv/scale.h"
+#endif
+
+#include "./args.h"
+#include "./ivfdec.h"
+
 #include "vpx/vpx_decoder.h"
+#include "vpx_ports/mem_ops.h"
 #include "vpx_ports/vpx_timer.h"
+
 #if CONFIG_VP8_DECODER || CONFIG_VP9_DECODER
 #include "vpx/vp8dx.h"
 #endif
-#if CONFIG_MD5
-#include "md5_utils.h"
-#endif
-#include "tools_common.h"
-#include "nestegg/include/nestegg/nestegg.h"
-#include "third_party/libyuv/include/libyuv/scale.h"
 
-#if CONFIG_OS_SUPPORT
-#if defined(_MSC_VER)
-#include <io.h>
-#define snprintf _snprintf
-#define isatty   _isatty
-#define fileno   _fileno
-#else
-#include <unistd.h>
-#endif
-#endif
+#include "./md5_utils.h"
 
-#ifndef PATH_MAX
-#define PATH_MAX 256
+#include "./tools_common.h"
+#if CONFIG_WEBM_IO
+#include "./webmdec.h"
 #endif
+#include "./y4menc.h"
 
 static const char *exec_name;
 
-#define VP8_FOURCC (0x00385056)
-#define VP9_FOURCC (0x00395056)
-static const struct {
-  char const *name;
-  const vpx_codec_iface_t *(*iface)(void);
-  unsigned int             fourcc;
-  unsigned int             fourcc_mask;
-} ifaces[] = {
-#if CONFIG_VP8_DECODER
-  {"vp8",  vpx_codec_vp8_dx,   VP8_FOURCC, 0x00FFFFFF},
-#endif
-#if CONFIG_VP9_DECODER
-  {"vp9",  vpx_codec_vp9_dx,   VP9_FOURCC, 0x00FFFFFF},
-#endif
+struct VpxDecInputContext {
+  struct VpxInputContext *vpx_input_ctx;
+  struct WebmInputContext *webm_ctx;
 };
 
-#include "args.h"
-static const arg_def_t looparg = ARG_DEF(NULL, "loops", 1,
-                                          "Number of times to decode the file");
-static const arg_def_t codecarg = ARG_DEF(NULL, "codec", 1,
-                                          "Codec to use");
-static const arg_def_t use_yv12 = ARG_DEF(NULL, "yv12", 0,
-                                          "Output raw YV12 frames");
-static const arg_def_t use_i420 = ARG_DEF(NULL, "i420", 0,
-                                          "Output raw I420 frames");
-static const arg_def_t flipuvarg = ARG_DEF(NULL, "flipuv", 0,
-                                           "Flip the chroma planes in the output");
-static const arg_def_t noblitarg = ARG_DEF(NULL, "noblit", 0,
-                                           "Don't process the decoded frames");
-static const arg_def_t progressarg = ARG_DEF(NULL, "progress", 0,
-                                             "Show progress after each frame decodes");
-static const arg_def_t limitarg = ARG_DEF(NULL, "limit", 1,
-                                          "Stop decoding after n frames");
-static const arg_def_t skiparg = ARG_DEF(NULL, "skip", 1,
-                                         "Skip the first n input frames");
-static const arg_def_t postprocarg = ARG_DEF(NULL, "postproc", 0,
-                                             "Postprocess decoded frames");
-static const arg_def_t summaryarg = ARG_DEF(NULL, "summary", 0,
-                                            "Show timing summary");
-static const arg_def_t outputfile = ARG_DEF("o", "output", 1,
-                                            "Output file name pattern (see below)");
-static const arg_def_t threadsarg = ARG_DEF("t", "threads", 1,
-                                            "Max threads to use");
-static const arg_def_t verbosearg = ARG_DEF("v", "verbose", 0,
-                                            "Show version string");
-static const arg_def_t error_concealment = ARG_DEF(NULL, "error-concealment", 0,
-                                                   "Enable decoder error-concealment");
-static const arg_def_t scalearg = ARG_DEF("S", "scale", 0,
-                                            "Scale output frames uniformly");
-
-
-#if CONFIG_MD5
-static const arg_def_t md5arg = ARG_DEF(NULL, "md5", 0,
-                                        "Compute the MD5 sum of the decoded frame");
+static const arg_def_t looparg = ARG_DEF(
+    NULL, "loops", 1, "Number of times to decode the file");
+static const arg_def_t codecarg = ARG_DEF(
+    NULL, "codec", 1, "Codec to use");
+static const arg_def_t use_yv12 = ARG_DEF(
+    NULL, "yv12", 0, "Output raw YV12 frames");
+static const arg_def_t use_i420 = ARG_DEF(
+    NULL, "i420", 0, "Output raw I420 frames");
+static const arg_def_t flipuvarg = ARG_DEF(
+    NULL, "flipuv", 0, "Flip the chroma planes in the output");
+static const arg_def_t rawvideo = ARG_DEF(
+    NULL, "rawvideo", 0, "Output raw YUV frames");
+static const arg_def_t noblitarg = ARG_DEF(
+    NULL, "noblit", 0, "Don't process the decoded frames");
+static const arg_def_t progressarg = ARG_DEF(
+    NULL, "progress", 0, "Show progress after each frame decodes");
+static const arg_def_t limitarg = ARG_DEF(
+    NULL, "limit", 1, "Stop decoding after n frames");
+static const arg_def_t skiparg = ARG_DEF(
+    NULL, "skip", 1, "Skip the first n input frames");
+static const arg_def_t postprocarg = ARG_DEF(
+    NULL, "postproc", 0, "Postprocess decoded frames");
+static const arg_def_t summaryarg = ARG_DEF(
+    NULL, "summary", 0, "Show timing summary");
+static const arg_def_t outputfile = ARG_DEF(
+    "o", "output", 1, "Output file name pattern (see below)");
+static const arg_def_t threadsarg = ARG_DEF(
+    "t", "threads", 1, "Max threads to use");
+static const arg_def_t verbosearg = ARG_DEF(
+    "v", "verbose", 0, "Show version string");
+static const arg_def_t error_concealment = ARG_DEF(
+    NULL, "error-concealment", 0, "Enable decoder error-concealment");
+static const arg_def_t scalearg = ARG_DEF(
+    "S", "scale", 0, "Scale output frames uniformly");
+static const arg_def_t continuearg = ARG_DEF(
+    "k", "keep-going", 0, "(debug) Continue decoding after error");
+static const arg_def_t fb_arg = ARG_DEF(
+    NULL, "frame-buffers", 1, "Number of frame buffers to use");
+static const arg_def_t md5arg = ARG_DEF(
+    NULL, "md5", 0, "Compute the MD5 sum of the decoded frame");
+#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+static const arg_def_t outbitdeptharg = ARG_DEF(
+    NULL, "output-bit-depth", 1, "Output bit-depth for decoded frames");
 #endif
+
 static const arg_def_t *all_args[] = {
-  &codecarg, &use_yv12, &use_i420, &flipuvarg, &noblitarg,
+  &codecarg, &use_yv12, &use_i420, &flipuvarg, &rawvideo, &noblitarg,
   &progressarg, &limitarg, &skiparg, &postprocarg, &summaryarg, &outputfile,
-  &threadsarg, &verbosearg, &scalearg,
-#if CONFIG_MD5
-  &md5arg,
+  &threadsarg, &verbosearg, &scalearg, &fb_arg,
+  &md5arg, &error_concealment, &continuearg,
+#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+  &outbitdeptharg,
 #endif
-  &error_concealment,
   NULL
 };
 
@@ -143,7 +130,44 @@ static const arg_def_t *vp8_pp_args[] = {
 };
 #endif
 
-static void usage_exit() {
+#if CONFIG_LIBYUV
+static INLINE int vpx_image_scale(vpx_image_t *src, vpx_image_t *dst,
+                                  FilterModeEnum mode) {
+#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+  if (src->fmt == VPX_IMG_FMT_I42016) {
+    assert(dst->fmt == VPX_IMG_FMT_I42016);
+    return I420Scale_16((uint16_t*)src->planes[VPX_PLANE_Y],
+                        src->stride[VPX_PLANE_Y]/2,
+                        (uint16_t*)src->planes[VPX_PLANE_U],
+                        src->stride[VPX_PLANE_U]/2,
+                        (uint16_t*)src->planes[VPX_PLANE_V],
+                        src->stride[VPX_PLANE_V]/2,
+                        src->d_w, src->d_h,
+                        (uint16_t*)dst->planes[VPX_PLANE_Y],
+                        dst->stride[VPX_PLANE_Y]/2,
+                        (uint16_t*)dst->planes[VPX_PLANE_U],
+                        dst->stride[VPX_PLANE_U]/2,
+                        (uint16_t*)dst->planes[VPX_PLANE_V],
+                        dst->stride[VPX_PLANE_V]/2,
+                        dst->d_w, dst->d_h,
+                        mode);
+  }
+#endif
+  assert(src->fmt == VPX_IMG_FMT_I420);
+  assert(dst->fmt == VPX_IMG_FMT_I420);
+  return I420Scale(src->planes[VPX_PLANE_Y], src->stride[VPX_PLANE_Y],
+                   src->planes[VPX_PLANE_U], src->stride[VPX_PLANE_U],
+                   src->planes[VPX_PLANE_V], src->stride[VPX_PLANE_V],
+                   src->d_w, src->d_h,
+                   dst->planes[VPX_PLANE_Y], dst->stride[VPX_PLANE_Y],
+                   dst->planes[VPX_PLANE_U], dst->stride[VPX_PLANE_U],
+                   dst->planes[VPX_PLANE_V], dst->stride[VPX_PLANE_V],
+                   dst->d_w, dst->d_h,
+                   mode);
+}
+#endif
+
+void usage_exit() {
   int i;
 
   fprintf(stderr, "Usage: %s <options> filename\n\n"
@@ -170,433 +194,221 @@ static void usage_exit() {
          );
   fprintf(stderr, "\nIncluded decoders:\n\n");
 
-  for (i = 0; i < sizeof(ifaces) / sizeof(ifaces[0]); i++)
+  for (i = 0; i < get_vpx_decoder_count(); ++i) {
+    const VpxInterface *const decoder = get_vpx_decoder_by_index(i);
     fprintf(stderr, "    %-6s - %s\n",
-            ifaces[i].name,
-            vpx_codec_iface_name(ifaces[i].iface()));
+            decoder->name, vpx_codec_iface_name(decoder->codec_interface()));
+  }
 
   exit(EXIT_FAILURE);
 }
 
-void die(const char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-  vfprintf(stderr, fmt, ap);
-  fprintf(stderr, "\n");
-  usage_exit();
-}
+static int raw_read_frame(FILE *infile, uint8_t **buffer,
+                          size_t *bytes_read, size_t *buffer_size) {
+  char raw_hdr[RAW_FRAME_HDR_SZ];
+  size_t frame_size = 0;
 
-static unsigned int mem_get_le16(const void *vmem) {
-  unsigned int  val;
-  const unsigned char *mem = (const unsigned char *)vmem;
-
-  val = mem[1] << 8;
-  val |= mem[0];
-  return val;
-}
-
-static unsigned int mem_get_le32(const void *vmem) {
-  unsigned int  val;
-  const unsigned char *mem = (const unsigned char *)vmem;
-
-  val = mem[3] << 24;
-  val |= mem[2] << 16;
-  val |= mem[1] << 8;
-  val |= mem[0];
-  return val;
-}
-
-enum file_kind {
-  RAW_FILE,
-  IVF_FILE,
-  WEBM_FILE
-};
-
-struct input_ctx {
-  enum file_kind  kind;
-  FILE           *infile;
-  nestegg        *nestegg_ctx;
-  nestegg_packet *pkt;
-  unsigned int    chunk;
-  unsigned int    chunks;
-  unsigned int    video_track;
-};
-
-#define IVF_FRAME_HDR_SZ (sizeof(uint32_t) + sizeof(uint64_t))
-#define RAW_FRAME_HDR_SZ (sizeof(uint32_t))
-static int read_frame(struct input_ctx      *input,
-                      uint8_t               **buf,
-                      size_t                *buf_sz,
-                      size_t                *buf_alloc_sz) {
-  char            raw_hdr[IVF_FRAME_HDR_SZ];
-  size_t          new_buf_sz;
-  FILE           *infile = input->infile;
-  enum file_kind  kind = input->kind;
-  if (kind == WEBM_FILE) {
-    if (input->chunk >= input->chunks) {
-      unsigned int track;
-
-      do {
-        /* End of this packet, get another. */
-        if (input->pkt)
-          nestegg_free_packet(input->pkt);
-
-        if (nestegg_read_packet(input->nestegg_ctx, &input->pkt) <= 0
-            || nestegg_packet_track(input->pkt, &track))
-          return 1;
-
-      } while (track != input->video_track);
-
-      if (nestegg_packet_count(input->pkt, &input->chunks))
-        return 1;
-      input->chunk = 0;
-    }
-
-    if (nestegg_packet_data(input->pkt, input->chunk, buf, buf_sz))
-      return 1;
-    input->chunk++;
-
-    return 0;
-  }
-  /* For both the raw and ivf formats, the frame size is the first 4 bytes
-   * of the frame header. We just need to special case on the header
-   * size.
-   */
-  else if (fread(raw_hdr, kind == IVF_FILE
-                 ? IVF_FRAME_HDR_SZ : RAW_FRAME_HDR_SZ, 1, infile) != 1) {
+  if (fread(raw_hdr, RAW_FRAME_HDR_SZ, 1, infile) != 1) {
     if (!feof(infile))
-      fprintf(stderr, "Failed to read frame size\n");
-
-    new_buf_sz = 0;
+      warn("Failed to read RAW frame size\n");
   } else {
-    new_buf_sz = mem_get_le32(raw_hdr);
+    const size_t kCorruptFrameThreshold = 256 * 1024 * 1024;
+    const size_t kFrameTooSmallThreshold = 256 * 1024;
+    frame_size = mem_get_le32(raw_hdr);
 
-    if (new_buf_sz > 256 * 1024 * 1024) {
-      fprintf(stderr, "Error: Read invalid frame size (%u)\n",
-              (unsigned int)new_buf_sz);
-      new_buf_sz = 0;
+    if (frame_size > kCorruptFrameThreshold) {
+      warn("Read invalid frame size (%u)\n", (unsigned int)frame_size);
+      frame_size = 0;
     }
 
-    if (kind == RAW_FILE && new_buf_sz > 256 * 1024)
-      fprintf(stderr, "Warning: Read invalid frame size (%u)"
-              " - not a raw file?\n", (unsigned int)new_buf_sz);
+    if (frame_size < kFrameTooSmallThreshold) {
+      warn("Warning: Read invalid frame size (%u) - not a raw file?\n",
+           (unsigned int)frame_size);
+    }
 
-    if (new_buf_sz > *buf_alloc_sz) {
-      uint8_t *new_buf = realloc(*buf, 2 * new_buf_sz);
-
+    if (frame_size > *buffer_size) {
+      uint8_t *new_buf = realloc(*buffer, 2 * frame_size);
       if (new_buf) {
-        *buf = new_buf;
-        *buf_alloc_sz = 2 * new_buf_sz;
+        *buffer = new_buf;
+        *buffer_size = 2 * frame_size;
       } else {
-        fprintf(stderr, "Failed to allocate compressed data buffer\n");
-        new_buf_sz = 0;
+        warn("Failed to allocate compressed data buffer\n");
+        frame_size = 0;
       }
     }
   }
-
-  *buf_sz = new_buf_sz;
 
   if (!feof(infile)) {
-    if (fread(*buf, 1, *buf_sz, infile) != *buf_sz) {
-      fprintf(stderr, "Failed to read full frame\n");
+    if (fread(*buffer, 1, frame_size, infile) != frame_size) {
+      warn("Failed to read full frame\n");
       return 1;
     }
-
-    return 0;
+    *bytes_read = frame_size;
   }
 
-  return 1;
+  return 0;
 }
 
-void *out_open(const char *out_fn, int do_md5) {
-  void *out = NULL;
-
-  if (do_md5) {
-#if CONFIG_MD5
-    MD5Context *md5_ctx = out = malloc(sizeof(MD5Context));
-    (void)out_fn;
-    MD5Init(md5_ctx);
+static int read_frame(struct VpxDecInputContext *input, uint8_t **buf,
+                      size_t *bytes_in_buffer, size_t *buffer_size) {
+  switch (input->vpx_input_ctx->file_type) {
+#if CONFIG_WEBM_IO
+    case FILE_TYPE_WEBM:
+      return webm_read_frame(input->webm_ctx,
+                             buf, bytes_in_buffer, buffer_size);
 #endif
-  } else {
-    FILE *outfile = out = strcmp("-", out_fn) ? fopen(out_fn, "wb")
-                          : set_binary_mode(stdout);
+    case FILE_TYPE_RAW:
+      return raw_read_frame(input->vpx_input_ctx->file,
+                            buf, bytes_in_buffer, buffer_size);
+    case FILE_TYPE_IVF:
+      return ivf_read_frame(input->vpx_input_ctx->file,
+                            buf, bytes_in_buffer, buffer_size);
+    default:
+      return 1;
+  }
+}
 
-    if (!outfile) {
-      fprintf(stderr, "Failed to output file");
-      exit(EXIT_FAILURE);
+static void update_image_md5(const vpx_image_t *img, const int planes[3],
+                             MD5Context *md5) {
+  int i, y;
+
+  for (i = 0; i < 3; ++i) {
+    const int plane = planes[i];
+    const unsigned char *buf = img->planes[plane];
+    const int stride = img->stride[plane];
+    const int w = vpx_img_plane_width(img, plane) *
+                ((img->fmt & VPX_IMG_FMT_HIGHBITDEPTH) ? 2 : 1);
+    const int h = vpx_img_plane_height(img, plane);
+
+    for (y = 0; y < h; ++y) {
+      MD5Update(md5, buf, w);
+      buf += stride;
     }
   }
-
-  return out;
 }
 
-void out_put(void *out, const uint8_t *buf, unsigned int len, int do_md5) {
-  if (do_md5) {
-#if CONFIG_MD5
-    MD5Update(out, buf, len);
+static void write_image_file(const vpx_image_t *img, const int planes[3],
+                             FILE *file) {
+  int i, y;
+#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+  const int bytes_per_sample = ((img->fmt & VPX_IMG_FMT_HIGHBITDEPTH) ? 2 : 1);
+#else
+  const int bytes_per_sample = 1;
 #endif
-  } else {
-    (void) fwrite(buf, 1, len, out);
-  }
-}
 
-void out_close(void *out, const char *out_fn, int do_md5) {
-  if (do_md5) {
-#if CONFIG_MD5
-    uint8_t md5[16];
-    int i;
+  for (i = 0; i < 3; ++i) {
+    const int plane = planes[i];
+    const unsigned char *buf = img->planes[plane];
+    const int stride = img->stride[plane];
+    const int w = vpx_img_plane_width(img, plane);
+    const int h = vpx_img_plane_height(img, plane);
 
-    MD5Final(md5, out);
-    free(out);
-
-    for (i = 0; i < 16; i++)
-      printf("%02x", md5[i]);
-
-    printf("  %s\n", out_fn);
-#endif
-  } else {
-    fclose(out);
-  }
-}
-
-unsigned int file_is_ivf(FILE *infile,
-                         unsigned int *fourcc,
-                         unsigned int *width,
-                         unsigned int *height,
-                         unsigned int *fps_den,
-                         unsigned int *fps_num) {
-  char raw_hdr[32];
-  int is_ivf = 0;
-
-  if (fread(raw_hdr, 1, 32, infile) == 32) {
-    if (raw_hdr[0] == 'D' && raw_hdr[1] == 'K'
-        && raw_hdr[2] == 'I' && raw_hdr[3] == 'F') {
-      is_ivf = 1;
-
-      if (mem_get_le16(raw_hdr + 4) != 0)
-        fprintf(stderr, "Error: Unrecognized IVF version! This file may not"
-                " decode properly.");
-
-      *fourcc = mem_get_le32(raw_hdr + 8);
-      *width = mem_get_le16(raw_hdr + 12);
-      *height = mem_get_le16(raw_hdr + 14);
-      *fps_num = mem_get_le32(raw_hdr + 16);
-      *fps_den = mem_get_le32(raw_hdr + 20);
-
-      /* Some versions of vpxenc used 1/(2*fps) for the timebase, so
-       * we can guess the framerate using only the timebase in this
-       * case. Other files would require reading ahead to guess the
-       * timebase, like we do for webm.
-       */
-      if (*fps_num < 1000) {
-        /* Correct for the factor of 2 applied to the timebase in the
-         * encoder.
-         */
-        if (*fps_num & 1)*fps_den <<= 1;
-        else *fps_num >>= 1;
-      } else {
-        /* Don't know FPS for sure, and don't have readahead code
-         * (yet?), so just default to 30fps.
-         */
-        *fps_num = 30;
-        *fps_den = 1;
-      }
+    for (y = 0; y < h; ++y) {
+      fwrite(buf, bytes_per_sample, w, file);
+      buf += stride;
     }
   }
-
-  if (!is_ivf)
-    rewind(infile);
-
-  return is_ivf;
 }
 
-
-unsigned int file_is_raw(FILE *infile,
-                         unsigned int *fourcc,
-                         unsigned int *width,
-                         unsigned int *height,
-                         unsigned int *fps_den,
-                         unsigned int *fps_num) {
-  unsigned char buf[32];
+int file_is_raw(struct VpxInputContext *input) {
+  uint8_t buf[32];
   int is_raw = 0;
   vpx_codec_stream_info_t si;
 
   si.sz = sizeof(si);
 
-  if (fread(buf, 1, 32, infile) == 32) {
+  if (fread(buf, 1, 32, input->file) == 32) {
     int i;
 
-    if (mem_get_le32(buf) < 256 * 1024 * 1024)
-      for (i = 0; i < sizeof(ifaces) / sizeof(ifaces[0]); i++)
-        if (!vpx_codec_peek_stream_info(ifaces[i].iface(),
+    if (mem_get_le32(buf) < 256 * 1024 * 1024) {
+      for (i = 0; i < get_vpx_decoder_count(); ++i) {
+        const VpxInterface *const decoder = get_vpx_decoder_by_index(i);
+        if (!vpx_codec_peek_stream_info(decoder->codec_interface(),
                                         buf + 4, 32 - 4, &si)) {
           is_raw = 1;
-          *fourcc = ifaces[i].fourcc;
-          *width = si.w;
-          *height = si.h;
-          *fps_num = 30;
-          *fps_den = 1;
+          input->fourcc = decoder->fourcc;
+          input->width = si.w;
+          input->height = si.h;
+          input->framerate.numerator = 30;
+          input->framerate.denominator = 1;
           break;
         }
+      }
+    }
   }
 
-  rewind(infile);
+  rewind(input->file);
   return is_raw;
 }
 
-
-static int
-nestegg_read_cb(void *buffer, size_t length, void *userdata) {
-  FILE *f = userdata;
-
-  if (fread(buffer, 1, length, f) < length) {
-    if (ferror(f))
-      return -1;
-    if (feof(f))
-      return 0;
-  }
-  return 1;
-}
-
-
-static int
-nestegg_seek_cb(int64_t offset, int whence, void *userdata) {
-  switch (whence) {
-    case NESTEGG_SEEK_SET:
-      whence = SEEK_SET;
-      break;
-    case NESTEGG_SEEK_CUR:
-      whence = SEEK_CUR;
-      break;
-    case NESTEGG_SEEK_END:
-      whence = SEEK_END;
-      break;
-  };
-  return fseek(userdata, (long)offset, whence) ? -1 : 0;
-}
-
-
-static int64_t
-nestegg_tell_cb(void *userdata) {
-  return ftell(userdata);
-}
-
-
-static void
-nestegg_log_cb(nestegg *context, unsigned int severity, char const *format,
-               ...) {
-  va_list ap;
-
-  va_start(ap, format);
-  vfprintf(stderr, format, ap);
-  fprintf(stderr, "\n");
-  va_end(ap);
-}
-
-
-static int
-webm_guess_framerate(struct input_ctx *input,
-                     unsigned int     *fps_den,
-                     unsigned int     *fps_num) {
-  unsigned int i;
-  uint64_t     tstamp = 0;
-
-  /* Guess the framerate. Read up to 1 second, or 50 video packets,
-   * whichever comes first.
-   */
-  for (i = 0; tstamp < 1000000000 && i < 50;) {
-    nestegg_packet *pkt;
-    unsigned int track;
-
-    if (nestegg_read_packet(input->nestegg_ctx, &pkt) <= 0)
-      break;
-
-    nestegg_packet_track(pkt, &track);
-    if (track == input->video_track) {
-      nestegg_packet_tstamp(pkt, &tstamp);
-      i++;
-    }
-
-    nestegg_free_packet(pkt);
-  }
-
-  if (nestegg_track_seek(input->nestegg_ctx, input->video_track, 0))
-    goto fail;
-
-  *fps_num = (i - 1) * 1000000;
-  *fps_den = (unsigned int)(tstamp / 1000);
-  return 0;
-fail:
-  nestegg_destroy(input->nestegg_ctx);
-  input->nestegg_ctx = NULL;
-  rewind(input->infile);
-  return 1;
-}
-
-
-static int
-file_is_webm(struct input_ctx *input,
-             unsigned int     *fourcc,
-             unsigned int     *width,
-             unsigned int     *height,
-             unsigned int     *fps_den,
-             unsigned int     *fps_num) {
-  unsigned int i, n;
-  int          track_type = -1;
-  int          codec_id;
-
-  nestegg_io io = {nestegg_read_cb, nestegg_seek_cb, nestegg_tell_cb, 0};
-  nestegg_video_params params;
-
-  io.userdata = input->infile;
-  if (nestegg_init(&input->nestegg_ctx, io, NULL))
-    goto fail;
-
-  if (nestegg_track_count(input->nestegg_ctx, &n))
-    goto fail;
-
-  for (i = 0; i < n; i++) {
-    track_type = nestegg_track_type(input->nestegg_ctx, i);
-
-    if (track_type == NESTEGG_TRACK_VIDEO)
-      break;
-    else if (track_type < 0)
-      goto fail;
-  }
-
-  codec_id = nestegg_track_codec_id(input->nestegg_ctx, i);
-  if (codec_id == NESTEGG_CODEC_VP8) {
-    *fourcc = VP8_FOURCC;
-  } else if (codec_id == NESTEGG_CODEC_VP9) {
-    *fourcc = VP9_FOURCC;
-  } else {
-    fprintf(stderr, "Not VPx video, quitting.\n");
-    exit(1);
-  }
-
-  input->video_track = i;
-
-  if (nestegg_track_video_params(input->nestegg_ctx, i, &params))
-    goto fail;
-
-  *fps_den = 0;
-  *fps_num = 0;
-  *width = params.width;
-  *height = params.height;
-  return 1;
-fail:
-  input->nestegg_ctx = NULL;
-  rewind(input->infile);
-  return 0;
-}
-
-
-void show_progress(int frame_in, int frame_out, unsigned long dx_time) {
-  fprintf(stderr, "%d decoded frames/%d showed frames in %lu us (%.2f fps)\r",
+void show_progress(int frame_in, int frame_out, uint64_t dx_time) {
+  fprintf(stderr,
+          "%d decoded frames/%d showed frames in %"PRId64" us (%.2f fps)\r",
           frame_in, frame_out, dx_time,
-          (float)frame_out * 1000000.0 / (float)dx_time);
+          (double)frame_out * 1000000.0 / (double)dx_time);
 }
 
+struct ExternalFrameBuffer {
+  uint8_t* data;
+  size_t size;
+  int in_use;
+};
+
+struct ExternalFrameBufferList {
+  int num_external_frame_buffers;
+  struct ExternalFrameBuffer *ext_fb;
+};
+
+// Callback used by libvpx to request an external frame buffer. |cb_priv|
+// Application private data passed into the set function. |min_size| is the
+// minimum size in bytes needed to decode the next frame. |fb| pointer to the
+// frame buffer.
+int get_vp9_frame_buffer(void *cb_priv, size_t min_size,
+                         vpx_codec_frame_buffer_t *fb) {
+  int i;
+  struct ExternalFrameBufferList *const ext_fb_list =
+      (struct ExternalFrameBufferList *)cb_priv;
+  if (ext_fb_list == NULL)
+    return -1;
+
+  // Find a free frame buffer.
+  for (i = 0; i < ext_fb_list->num_external_frame_buffers; ++i) {
+    if (!ext_fb_list->ext_fb[i].in_use)
+      break;
+  }
+
+  if (i == ext_fb_list->num_external_frame_buffers)
+    return -1;
+
+  if (ext_fb_list->ext_fb[i].size < min_size) {
+    free(ext_fb_list->ext_fb[i].data);
+    ext_fb_list->ext_fb[i].data = (uint8_t *)calloc(min_size, sizeof(uint8_t));
+    if (!ext_fb_list->ext_fb[i].data)
+      return -1;
+
+    ext_fb_list->ext_fb[i].size = min_size;
+  }
+
+  fb->data = ext_fb_list->ext_fb[i].data;
+  fb->size = ext_fb_list->ext_fb[i].size;
+  ext_fb_list->ext_fb[i].in_use = 1;
+
+  // Set the frame buffer's private data to point at the external frame buffer.
+  fb->priv = &ext_fb_list->ext_fb[i];
+  return 0;
+}
+
+// Callback used by libvpx when there are no references to the frame buffer.
+// |cb_priv| user private data passed into the set function. |fb| pointer
+// to the frame buffer.
+int release_vp9_frame_buffer(void *cb_priv,
+                             vpx_codec_frame_buffer_t *fb) {
+  struct ExternalFrameBuffer *const ext_fb =
+      (struct ExternalFrameBuffer *)fb->priv;
+  (void)cb_priv;
+  ext_fb->in_use = 0;
+  return 0;
+}
 
 void generate_filename(const char *pattern, char *out, size_t q_len,
                        unsigned int d_w, unsigned int d_h,
@@ -648,6 +460,7 @@ void generate_filename(const char *pattern, char *out, size_t q_len,
           break;
         default:
           die("Unrecognized pattern %%%c\n", p[1]);
+          break;
       }
 
       pat_len = strlen(q);
@@ -677,33 +490,77 @@ void generate_filename(const char *pattern, char *out, size_t q_len,
   } while (*p);
 }
 
+static int is_single_file(const char *outfile_pattern) {
+  const char *p = outfile_pattern;
+
+  do {
+    p = strchr(p, '%');
+    if (p && p[1] >= '1' && p[1] <= '9')
+      return 0;  // pattern contains sequence number, so it's not unique
+    if (p)
+      p++;
+  } while (p);
+
+  return 1;
+}
+
+static void print_md5(unsigned char digest[16], const char *filename) {
+  int i;
+
+  for (i = 0; i < 16; ++i)
+    printf("%02x", digest[i]);
+  printf("  %s\n", filename);
+}
+
+static FILE *open_outfile(const char *name) {
+  if (strcmp("-", name) == 0) {
+    set_binary_mode(stdout);
+    return stdout;
+  } else {
+    FILE *file = fopen(name, "wb");
+    if (!file)
+      fatal("Failed to output file %s", name);
+    return file;
+  }
+}
+
+#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+static int img_shifted_realloc_required(const vpx_image_t *img,
+                                        const vpx_image_t *shifted,
+                                        vpx_img_fmt_t required_fmt) {
+  return img->d_w != shifted->d_w ||
+         img->d_h != shifted->d_h ||
+         required_fmt != shifted->fmt;
+}
+#endif
 
 int main_loop(int argc, const char **argv_) {
-  vpx_codec_ctx_t          decoder;
+  vpx_codec_ctx_t       decoder;
   char                  *fn = NULL;
   int                    i;
   uint8_t               *buf = NULL;
-  size_t                 buf_sz = 0, buf_alloc_sz = 0;
+  size_t                 bytes_in_buffer = 0, buffer_size = 0;
   FILE                  *infile;
-  int                    frame_in = 0, frame_out = 0, flipuv = 0, noblit = 0, do_md5 = 0, progress = 0;
+  int                    frame_in = 0, frame_out = 0, flipuv = 0, noblit = 0;
+  int                    do_md5 = 0, progress = 0;
   int                    stop_after = 0, postproc = 0, summary = 0, quiet = 1;
   int                    arg_skip = 0;
   int                    ec_enabled = 0;
-  vpx_codec_iface_t       *iface = NULL;
-  unsigned int           fourcc;
-  unsigned long          dx_time = 0;
+  int                    keep_going = 0;
+  const VpxInterface *interface = NULL;
+  const VpxInterface *fourcc_interface = NULL;
+  uint64_t dx_time = 0;
   struct arg               arg;
   char                   **argv, **argi, **argj;
-  const char             *outfile_pattern = 0;
-  char                    outfile[PATH_MAX];
+
   int                     single_file;
   int                     use_y4m = 1;
-  unsigned int            width;
-  unsigned int            height;
-  unsigned int            fps_den;
-  unsigned int            fps_num;
-  void                   *out = NULL;
-  vpx_codec_dec_cfg_t     cfg = {0};
+  int                     opt_yv12 = 0;
+  int                     opt_i420 = 0;
+  vpx_codec_dec_cfg_t     cfg = {0, 0, 0};
+#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+  int                     output_bit_depth = 0;
+#endif
 #if CONFIG_VP8_DECODER
   vp8_postproc_cfg_t      vp8_pp_cfg = {0};
   int                     vp8_dbg_color_ref_frame = 0;
@@ -711,13 +568,32 @@ int main_loop(int argc, const char **argv_) {
   int                     vp8_dbg_color_b_modes = 0;
   int                     vp8_dbg_display_mv = 0;
 #endif
-  struct input_ctx        input = {0};
   int                     frames_corrupted = 0;
   int                     dec_flags = 0;
   int                     do_scale = 0;
-  int                     stream_w = 0, stream_h = 0;
   vpx_image_t             *scaled_img = NULL;
+#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+  vpx_image_t             *img_shifted = NULL;
+#endif
   int                     frame_avail, got_data;
+  int                     num_external_frame_buffers = 0;
+  struct ExternalFrameBufferList ext_fb_list = {0, NULL};
+
+  const char *outfile_pattern = NULL;
+  char outfile_name[PATH_MAX] = {0};
+  FILE *outfile = NULL;
+
+  MD5Context md5_ctx;
+  unsigned char md5_digest[16];
+
+  struct VpxDecInputContext input = {NULL, NULL};
+  struct VpxInputContext vpx_input_ctx;
+#if CONFIG_WEBM_IO
+  struct WebmInputContext webm_ctx;
+  memset(&(webm_ctx), 0, sizeof(webm_ctx));
+  input.webm_ctx = &webm_ctx;
+#endif
+  input.vpx_input_ctx = &vpx_input_ctx;
 
   /* Parse command line */
   exec_name = argv_[0];
@@ -728,17 +604,9 @@ int main_loop(int argc, const char **argv_) {
     arg.argv_step = 1;
 
     if (arg_match(&arg, &codecarg, argi)) {
-      int j, k = -1;
-
-      for (j = 0; j < sizeof(ifaces) / sizeof(ifaces[0]); j++)
-        if (!strcmp(ifaces[j].name, arg.val))
-          k = j;
-
-      if (k >= 0)
-        iface = ifaces[k].iface();
-      else
-        die("Error: Unrecognized argument (%s) to --codec\n",
-            arg.val);
+      interface = get_vpx_decoder_by_name(arg.val);
+      if (!interface)
+        die("Error: Unrecognized argument (%s) to --codec\n", arg.val);
     } else if (arg_match(&arg, &looparg, argi)) {
       // no-op
     } else if (arg_match(&arg, &outputfile, argi))
@@ -746,9 +614,16 @@ int main_loop(int argc, const char **argv_) {
     else if (arg_match(&arg, &use_yv12, argi)) {
       use_y4m = 0;
       flipuv = 1;
+      opt_yv12 = 1;
+#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+      output_bit_depth = 8;  // For yv12 8-bit depth output is assumed
+#endif
     } else if (arg_match(&arg, &use_i420, argi)) {
       use_y4m = 0;
       flipuv = 0;
+      opt_i420 = 1;
+    } else if (arg_match(&arg, &rawvideo, argi)) {
+      use_y4m = 0;
     } else if (arg_match(&arg, &flipuvarg, argi))
       flipuv = 1;
     else if (arg_match(&arg, &noblitarg, argi))
@@ -771,7 +646,15 @@ int main_loop(int argc, const char **argv_) {
       quiet = 0;
     else if (arg_match(&arg, &scalearg, argi))
       do_scale = 1;
-
+    else if (arg_match(&arg, &fb_arg, argi))
+      num_external_frame_buffers = arg_parse_uint(&arg);
+    else if (arg_match(&arg, &continuearg, argi))
+      keep_going = 1;
+#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+    else if (arg_match(&arg, &outbitdeptharg, argi)) {
+      output_bit_depth = arg_parse_uint(&arg);
+    }
+#endif
 #if CONFIG_VP8_DECODER
     else if (arg_match(&arg, &addnoise_level, argi)) {
       postproc = 1;
@@ -822,8 +705,7 @@ int main_loop(int argc, const char **argv_) {
     } else if (arg_match(&arg, &error_concealment, argi)) {
       ec_enabled = 1;
     }
-
-#endif
+#endif  // CONFIG_VP8_DECODER
     else
       argj++;
   }
@@ -843,8 +725,7 @@ int main_loop(int argc, const char **argv_) {
   infile = strcmp(fn, "-") ? fopen(fn, "rb") : set_binary_mode(stdin);
 
   if (!infile) {
-    fprintf(stderr, "Failed to open file '%s'",
-            strcmp(fn, "-") ? fn : "stdin");
+    fprintf(stderr, "Failed to open file '%s'", strcmp(fn, "-") ? fn : "stdin");
     return EXIT_FAILURE;
   }
 #if CONFIG_OS_SUPPORT
@@ -856,89 +737,68 @@ int main_loop(int argc, const char **argv_) {
     return EXIT_FAILURE;
   }
 #endif
-  input.infile = infile;
-  if (file_is_ivf(infile, &fourcc, &width, &height, &fps_den,
-                  &fps_num))
-    input.kind = IVF_FILE;
-  else if (file_is_webm(&input, &fourcc, &width, &height, &fps_den, &fps_num))
-    input.kind = WEBM_FILE;
-  else if (file_is_raw(infile, &fourcc, &width, &height, &fps_den, &fps_num))
-    input.kind = RAW_FILE;
+  input.vpx_input_ctx->file = infile;
+  if (file_is_ivf(input.vpx_input_ctx))
+    input.vpx_input_ctx->file_type = FILE_TYPE_IVF;
+#if CONFIG_WEBM_IO
+  else if (file_is_webm(input.webm_ctx, input.vpx_input_ctx))
+    input.vpx_input_ctx->file_type = FILE_TYPE_WEBM;
+#endif
+  else if (file_is_raw(input.vpx_input_ctx))
+    input.vpx_input_ctx->file_type = FILE_TYPE_RAW;
   else {
     fprintf(stderr, "Unrecognized input file type.\n");
+#if !CONFIG_WEBM_IO
+    fprintf(stderr, "vpxdec was built without WebM container support.\n");
+#endif
     return EXIT_FAILURE;
   }
 
-  /* If the output file is not set or doesn't have a sequence number in
-   * it, then we only open it once.
-   */
   outfile_pattern = outfile_pattern ? outfile_pattern : "-";
-  single_file = 1;
-  {
-    const char *p = outfile_pattern;
-    do {
-      p = strchr(p, '%');
-      if (p && p[1] >= '1' && p[1] <= '9') {
-        /* pattern contains sequence number, so it's not unique. */
-        single_file = 0;
-        break;
-      }
-      if (p)
-        p++;
-    } while (p);
-  }
+  single_file = is_single_file(outfile_pattern);
 
-  if (single_file && !noblit) {
-    generate_filename(outfile_pattern, outfile, sizeof(outfile) - 1,
-                      width, height, 0);
-    out = out_open(outfile, do_md5);
+  if (!noblit && single_file) {
+    generate_filename(outfile_pattern, outfile_name, PATH_MAX,
+                      vpx_input_ctx.width, vpx_input_ctx.height, 0);
+    if (do_md5)
+      MD5Init(&md5_ctx);
+    else
+      outfile = open_outfile(outfile_name);
   }
 
   if (use_y4m && !noblit) {
-    char buffer[128];
-
     if (!single_file) {
       fprintf(stderr, "YUV4MPEG2 not supported with output patterns,"
-              " try --i420 or --yv12.\n");
+              " try --i420 or --yv12 or --rawvideo.\n");
       return EXIT_FAILURE;
     }
 
-    if (input.kind == WEBM_FILE)
-      if (webm_guess_framerate(&input, &fps_den, &fps_num)) {
+#if CONFIG_WEBM_IO
+    if (vpx_input_ctx.file_type == FILE_TYPE_WEBM) {
+      if (webm_guess_framerate(input.webm_ctx, input.vpx_input_ctx)) {
         fprintf(stderr, "Failed to guess framerate -- error parsing "
                 "webm file?\n");
         return EXIT_FAILURE;
       }
-
-
-    /*Note: We can't output an aspect ratio here because IVF doesn't
-       store one, and neither does VP8.
-      That will have to wait until these tools support WebM natively.*/
-    snprintf(buffer, sizeof(buffer), "YUV4MPEG2 W%u H%u F%u:%u I%c ",
-             width, height, fps_num, fps_den, 'p');
-    out_put(out, (unsigned char *)buffer,
-            (unsigned int)strlen(buffer), do_md5);
+    }
+#endif
   }
 
-  /* Try to determine the codec from the fourcc. */
-  for (i = 0; i < sizeof(ifaces) / sizeof(ifaces[0]); i++)
-    if ((fourcc & ifaces[i].fourcc_mask) == ifaces[i].fourcc) {
-      vpx_codec_iface_t  *ivf_iface = ifaces[i].iface();
+  fourcc_interface = get_vpx_decoder_by_fourcc(vpx_input_ctx.fourcc);
+  if (interface && fourcc_interface && interface != fourcc_interface)
+    warn("Header indicates codec: %s\n", fourcc_interface->name);
+  else
+    interface = fourcc_interface;
 
-      if (iface && iface != ivf_iface)
-        fprintf(stderr, "Notice -- IVF header indicates codec: %s\n",
-                ifaces[i].name);
-      else
-        iface = ivf_iface;
-
-      break;
-    }
+  if (!interface)
+    interface = get_vpx_decoder_by_index(0);
 
   dec_flags = (postproc ? VPX_CODEC_USE_POSTPROC : 0) |
               (ec_enabled ? VPX_CODEC_USE_ERROR_CONCEALMENT : 0);
-  if (vpx_codec_dec_init(&decoder, iface ? iface :  ifaces[0].iface(), &cfg,
-                         dec_flags)) {
-    fprintf(stderr, "Failed to initialize decoder: %s\n", vpx_codec_error(&decoder));
+  if (vpx_codec_dec_init(&decoder, interface->codec_interface(),
+                         &cfg, dec_flags)) {
+    fprintf(stderr, "Failed to initialize decoder: %s\n",
+            vpx_codec_error(&decoder));
     return EXIT_FAILURE;
   }
 
@@ -979,12 +839,25 @@ int main_loop(int argc, const char **argv_) {
 #endif
 
 
-  if(arg_skip)
-    fprintf(stderr, "Skiping first %d frames.\n", arg_skip);
+  if (arg_skip)
+    fprintf(stderr, "Skipping first %d frames.\n", arg_skip);
   while (arg_skip) {
-    if (read_frame(&input, &buf, &buf_sz, &buf_alloc_sz))
+    if (read_frame(&input, &buf, &bytes_in_buffer, &buffer_size))
       break;
     arg_skip--;
+  }
+
+  if (num_external_frame_buffers > 0) {
+    ext_fb_list.num_external_frame_buffers = num_external_frame_buffers;
+    ext_fb_list.ext_fb = (struct ExternalFrameBuffer *)calloc(
+        num_external_frame_buffers, sizeof(*ext_fb_list.ext_fb));
+    if (vpx_codec_set_frame_buffer_functions(
+            &decoder, get_vp9_frame_buffer, release_vp9_frame_buffer,
+            &ext_fb_list)) {
+      fprintf(stderr, "Failed to configure external frame buffers: %s\n",
+              vpx_codec_error(&decoder));
+      return EXIT_FAILURE;
+    }
   }
 
   frame_avail = 1;
@@ -999,24 +872,26 @@ int main_loop(int argc, const char **argv_) {
 
     frame_avail = 0;
     if (!stop_after || frame_in < stop_after) {
-      if(!read_frame(&input, &buf, &buf_sz, &buf_alloc_sz)) {
+      if (!read_frame(&input, &buf, &bytes_in_buffer, &buffer_size)) {
         frame_avail = 1;
         frame_in++;
 
         vpx_usec_timer_start(&timer);
 
-        if (vpx_codec_decode(&decoder, buf, (unsigned int)buf_sz, NULL, 0)) {
+        if (vpx_codec_decode(&decoder, buf, (unsigned int)bytes_in_buffer,
+                             NULL, 0)) {
           const char *detail = vpx_codec_error_detail(&decoder);
-          fprintf(stderr, "Failed to decode frame: %s\n",
-                  vpx_codec_error(&decoder));
+          warn("Failed to decode frame %d: %s",
+               frame_in, vpx_codec_error(&decoder));
 
           if (detail)
-            fprintf(stderr, "  Additional information: %s\n", detail);
-          goto fail;
+            warn("Additional information: %s", detail);
+          if (!keep_going)
+            goto fail;
         }
 
         vpx_usec_timer_mark(&timer);
-        dx_time += (unsigned int)vpx_usec_timer_elapsed(&timer);
+        dx_time += vpx_usec_timer_elapsed(&timer);
       }
     }
 
@@ -1032,8 +907,7 @@ int main_loop(int argc, const char **argv_) {
     dx_time += (unsigned int)vpx_usec_timer_elapsed(&timer);
 
     if (vpx_codec_control(&decoder, VP8D_GET_FRAME_CORRUPTED, &corrupted)) {
-      fprintf(stderr, "Failed VP8_GET_FRAME_CORRUPTED: %s\n",
-              vpx_codec_error(&decoder));
+      warn("Failed VP8_GET_FRAME_CORRUPTED: %s", vpx_codec_error(&decoder));
       goto fail;
     }
     frames_corrupted += corrupted;
@@ -1041,87 +915,149 @@ int main_loop(int argc, const char **argv_) {
     if (progress)
       show_progress(frame_in, frame_out, dx_time);
 
-    if (!noblit) {
-      if (frame_out == 1 && img && use_y4m) {
-        /* Write out the color format to terminate the header line */
-        const char *color =
-            img->fmt == VPX_IMG_FMT_444A ? "C444alpha\n" :
-            img->fmt == VPX_IMG_FMT_I444 ? "C444\n" :
-            img->fmt == VPX_IMG_FMT_I422 ? "C422\n" :
-            "C420jpeg\n";
-
-        out_put(out, (const unsigned char*)color, strlen(color), do_md5);
-      }
+    if (!noblit && img) {
+      const int PLANES_YUV[] = {VPX_PLANE_Y, VPX_PLANE_U, VPX_PLANE_V};
+      const int PLANES_YVU[] = {VPX_PLANE_Y, VPX_PLANE_V, VPX_PLANE_U};
+      const int *planes = flipuv ? PLANES_YVU : PLANES_YUV;
 
       if (do_scale) {
-        if (img && frame_out == 1) {
-          stream_w = img->d_w;
-          stream_h = img->d_h;
-          scaled_img = vpx_img_alloc(NULL, VPX_IMG_FMT_I420,
-                                     stream_w, stream_h, 16);
+        if (frame_out == 1) {
+          // If the output frames are to be scaled to a fixed display size then
+          // use the width and height specified in the container. If either of
+          // these is set to 0, use the display size set in the first frame
+          // header. If that is unavailable, use the raw decoded size of the
+          // first decoded frame.
+          int display_width = vpx_input_ctx.width;
+          int display_height = vpx_input_ctx.height;
+          if (!display_width || !display_height) {
+            int display_size[2];
+            if (vpx_codec_control(&decoder, VP9D_GET_DISPLAY_SIZE,
+                                  display_size)) {
+              // As last resort use size of first frame as display size.
+              display_width = img->d_w;
+              display_height = img->d_h;
+            } else {
+              display_width = display_size[0];
+              display_height = display_size[1];
+            }
+          }
+          scaled_img = vpx_img_alloc(NULL, img->fmt, display_width,
+                                     display_height, 16);
+          scaled_img->bit_depth = img->bit_depth;
         }
-        if (img && (img->d_w != stream_w || img->d_h != stream_h)) {
-          assert(img->fmt == VPX_IMG_FMT_I420);
-          I420Scale(img->planes[VPX_PLANE_Y], img->stride[VPX_PLANE_Y],
-                    img->planes[VPX_PLANE_U], img->stride[VPX_PLANE_U],
-                    img->planes[VPX_PLANE_V], img->stride[VPX_PLANE_V],
-                    img->d_w, img->d_h,
-                    scaled_img->planes[VPX_PLANE_Y],
-                    scaled_img->stride[VPX_PLANE_Y],
-                    scaled_img->planes[VPX_PLANE_U],
-                    scaled_img->stride[VPX_PLANE_U],
-                    scaled_img->planes[VPX_PLANE_V],
-                    scaled_img->stride[VPX_PLANE_V],
-                    stream_w, stream_h,
-                    kFilterBox);
+
+        if (img->d_w != scaled_img->d_w || img->d_h != scaled_img->d_h) {
+#if CONFIG_LIBYUV
+          vpx_image_scale(img, scaled_img, kFilterBox);
           img = scaled_img;
+#else
+          fprintf(stderr, "Failed  to scale output frame: %s.\n"
+                  "Scaling is disabled in this configuration. "
+                  "To enable scaling, configure with --enable-libyuv\n",
+                  vpx_codec_error(&decoder));
+          return EXIT_FAILURE;
+#endif
         }
       }
+#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+      // Default to codec bit depth if output bit depth not set
+      if (!output_bit_depth) {
+        output_bit_depth = img->bit_depth;
+      }
+      // Shift up or down if necessary
+      if (output_bit_depth != img->bit_depth) {
+        const vpx_img_fmt_t shifted_fmt = output_bit_depth == 8 ?
+            img->fmt ^ (img->fmt & VPX_IMG_FMT_HIGHBITDEPTH) :
+            img->fmt | VPX_IMG_FMT_HIGHBITDEPTH;
+        if (img_shifted &&
+            img_shifted_realloc_required(img, img_shifted, shifted_fmt)) {
+          vpx_img_free(img_shifted);
+          img_shifted = NULL;
+        }
+        if (!img_shifted) {
+          img_shifted = vpx_img_alloc(NULL, shifted_fmt,
+                                      img->d_w, img->d_h, 16);
+          img_shifted->bit_depth = output_bit_depth;
+        }
+        if (output_bit_depth > img->bit_depth) {
+          vpx_img_upshift(img_shifted, img,
+                          output_bit_depth - img->bit_depth);
+        } else {
+          vpx_img_downshift(img_shifted, img,
+                            img->bit_depth - output_bit_depth);
+        }
+        img = img_shifted;
+      }
+#endif
 
-      if (img) {
-        unsigned int y;
-        char out_fn[PATH_MAX];
-        uint8_t *buf;
-        unsigned int c_w =
-            img->x_chroma_shift ? (1 + img->d_w) >> img->x_chroma_shift
-                                : img->d_w;
-        unsigned int c_h =
-            img->y_chroma_shift ? (1 + img->d_h) >> img->y_chroma_shift
-                                : img->d_h;
+      if (single_file) {
+        if (use_y4m) {
+          char buf[Y4M_BUFFER_SIZE] = {0};
+          size_t len = 0;
+          if (img->fmt == VPX_IMG_FMT_I440 || img->fmt == VPX_IMG_FMT_I44016) {
+            fprintf(stderr, "Cannot produce y4m output for 440 sampling.\n");
+            goto fail;
+          }
+          if (frame_out == 1) {
+            // Y4M file header
+            len = y4m_write_file_header(buf, sizeof(buf),
+                                        vpx_input_ctx.width,
+                                        vpx_input_ctx.height,
+                                        &vpx_input_ctx.framerate,
+                                        img->fmt, img->bit_depth);
+            if (do_md5) {
+              MD5Update(&md5_ctx, (md5byte *)buf, (unsigned int)len);
+            } else {
+              fputs(buf, outfile);
+            }
+          }
 
-        if (!single_file) {
-          size_t len = sizeof(out_fn) - 1;
-
-          out_fn[len] = '\0';
-          generate_filename(outfile_pattern, out_fn, len - 1,
-                            img->d_w, img->d_h, frame_in);
-          out = out_open(out_fn, do_md5);
-        } else if (use_y4m)
-          out_put(out, (unsigned char *)"FRAME\n", 6, do_md5);
-
-        buf = img->planes[VPX_PLANE_Y];
-
-        for (y = 0; y < img->d_h; y++) {
-          out_put(out, buf, img->d_w, do_md5);
-          buf += img->stride[VPX_PLANE_Y];
+          // Y4M frame header
+          len = y4m_write_frame_header(buf, sizeof(buf));
+          if (do_md5) {
+            MD5Update(&md5_ctx, (md5byte *)buf, (unsigned int)len);
+          } else {
+            fputs(buf, outfile);
+          }
+        } else {
+          if (frame_out == 1) {
+            // Check if --yv12 or --i420 options are consistent with the
+            // bit-stream decoded
+            if (opt_i420) {
+              if (img->fmt != VPX_IMG_FMT_I420 &&
+                  img->fmt != VPX_IMG_FMT_I42016) {
+                fprintf(stderr, "Cannot produce i420 output for bit-stream.\n");
+                goto fail;
+              }
+            }
+            if (opt_yv12) {
+              if ((img->fmt != VPX_IMG_FMT_I420 &&
+                   img->fmt != VPX_IMG_FMT_YV12) || img->bit_depth != 8) {
+                fprintf(stderr, "Cannot produce yv12 output for bit-stream.\n");
+                goto fail;
+              }
+            }
+          }
         }
 
-        buf = img->planes[flipuv ? VPX_PLANE_V : VPX_PLANE_U];
-
-        for (y = 0; y < c_h; y++) {
-          out_put(out, buf, c_w, do_md5);
-          buf += img->stride[VPX_PLANE_U];
+        if (do_md5) {
+          update_image_md5(img, planes, &md5_ctx);
+        } else {
+          write_image_file(img, planes, outfile);
         }
-
-        buf = img->planes[flipuv ? VPX_PLANE_U : VPX_PLANE_V];
-
-        for (y = 0; y < c_h; y++) {
-          out_put(out, buf, c_w, do_md5);
-          buf += img->stride[VPX_PLANE_V];
+      } else {
+        generate_filename(outfile_pattern, outfile_name, PATH_MAX,
+                          img->d_w, img->d_h, frame_in);
+        if (do_md5) {
+          MD5Init(&md5_ctx);
+          update_image_md5(img, planes, &md5_ctx);
+          MD5Final(md5_digest, &md5_ctx);
+          print_md5(md5_digest, outfile_name);
+        } else {
+          outfile = open_outfile(outfile_name);
+          write_image_file(img, planes, outfile);
+          fclose(outfile);
         }
-
-        if (!single_file)
-          out_close(out, out_fn, do_md5);
       }
     }
 
@@ -1140,17 +1076,38 @@ int main_loop(int argc, const char **argv_) {
 fail:
 
   if (vpx_codec_destroy(&decoder)) {
-    fprintf(stderr, "Failed to destroy decoder: %s\n", vpx_codec_error(&decoder));
+    fprintf(stderr, "Failed to destroy decoder: %s\n",
+            vpx_codec_error(&decoder));
     return EXIT_FAILURE;
   }
 
-  if (single_file && !noblit)
-    out_close(out, outfile, do_md5);
+  if (!noblit && single_file) {
+    if (do_md5) {
+      MD5Final(md5_digest, &md5_ctx);
+      print_md5(md5_digest, outfile_name);
+    } else {
+      fclose(outfile);
+    }
+  }
 
-  if (input.nestegg_ctx)
-    nestegg_destroy(input.nestegg_ctx);
-  if (input.kind != WEBM_FILE)
+#if CONFIG_WEBM_IO
+  if (input.vpx_input_ctx->file_type == FILE_TYPE_WEBM)
+    webm_free(input.webm_ctx);
+#endif
+
+  if (input.vpx_input_ctx->file_type != FILE_TYPE_WEBM)
     free(buf);
+
+  if (scaled_img) vpx_img_free(scaled_img);
+#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+  if (img_shifted) vpx_img_free(img_shifted);
+#endif
+
+  for (i = 0; i < ext_fb_list.num_external_frame_buffers; ++i) {
+    free(ext_fb_list.ext_fb[i].data);
+  }
+  free(ext_fb_list.ext_fb);
+
   fclose(infile);
   free(argv);
 

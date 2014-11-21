@@ -459,7 +459,7 @@ static int RSA_eay_private_encrypt(int flen, const unsigned char *from,
 	if (padding == RSA_X931_PADDING)
 		{
 		BN_sub(f, rsa->n, ret);
-		if (BN_cmp(ret, f))
+		if (BN_cmp(ret, f) > 0)
 			res = f;
 		else
 			res = ret;
@@ -847,12 +847,12 @@ static int RSA_eay_mod_exp(BIGNUM *r0, const BIGNUM *I, RSA *rsa, BN_CTX *ctx)
 	if (!BN_mod(r0,pr1,rsa->p,ctx)) goto err;
 
 	/* If p < q it is occasionally possible for the correction of
-         * adding 'p' if r0 is negative above to leave the result still
+	 * adding 'p' if r0 is negative above to leave the result still
 	 * negative. This can break the private key operations: the following
 	 * second correction should *always* correct this rare occurrence.
 	 * This will *never* happen with OpenSSL generated keys because
-         * they ensure p > q [steve]
-         */
+	 * they ensure p > q [steve]
+	 */
 	if (BN_is_negative(r0))
 		if (!BN_add(r0,r0,rsa->p)) goto err;
 	if (!BN_mul(r1,r0,rsa->q,ctx)) goto err;

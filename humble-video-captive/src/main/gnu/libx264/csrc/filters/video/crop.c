@@ -1,7 +1,7 @@
 /*****************************************************************************
  * crop.c: crop video filter
  *****************************************************************************
- * Copyright (C) 2010-2013 x264 project
+ * Copyright (C) 2010-2014 x264 project
  *
  * Authors: Steven Walters <kemuri9@gmail.com>
  *          James Darnley <james.darnley@gmail.com>
@@ -105,8 +105,7 @@ static int get_frame( hnd_t handle, cli_pic_t *output, int frame )
     for( int i = 0; i < output->img.planes; i++ )
     {
         intptr_t offset = output->img.stride[i] * h->dims[1] * h->csp->height[i];
-        offset += h->dims[0] * h->csp->width[i];
-        offset *= x264_cli_csp_depth_factor( output->img.csp );
+        offset += h->dims[0] * h->csp->width[i] * x264_cli_csp_depth_factor( output->img.csp );
         output->img.plane[i] += offset;
     }
     return 0;

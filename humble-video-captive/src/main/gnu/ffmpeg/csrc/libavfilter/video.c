@@ -45,32 +45,6 @@ AVFrame *ff_default_get_video_buffer(AVFilterLink *link, int w, int h)
     AVFrame *frame = av_frame_alloc();
     int ret;
 
-#if 0 //POOL
-    AVFilterPool *pool = link->pool;
-    if (pool) {
-        for (i = 0; i < POOL_SIZE; i++) {
-            picref = pool->pic[i];
-            if (picref && picref->buf->format == link->format && picref->buf->w == w && picref->buf->h == h) {
-                AVFilterBuffer *pic = picref->buf;
-                pool->pic[i] = NULL;
-                pool->count--;
-                av_assert0(!picref->video->qp_table);
-                picref->video->w = w;
-                picref->video->h = h;
-                picref->perms = full_perms;
-                picref->format = link->format;
-                pic->refcount = 1;
-                memcpy(picref->data,     pic->data,     sizeof(picref->data));
-                memcpy(picref->linesize, pic->linesize, sizeof(picref->linesize));
-                pool->refcount++;
-                return picref;
-            }
-        }
-    } else {
-        pool = link->pool = av_mallocz(sizeof(AVFilterPool));
-        pool->refcount = 1;
-    }
-#endif
     if (!frame)
         return NULL;
 
@@ -81,14 +55,6 @@ AVFrame *ff_default_get_video_buffer(AVFilterLink *link, int w, int h)
     ret = av_frame_get_buffer(frame, 32);
     if (ret < 0)
         av_frame_free(&frame);
-
-#if 0 //POOL
-    memset(data[0], 128, i);
-
-    picref->buf->priv = pool;
-    picref->buf->free = NULL;
-    pool->refcount++;
-#endif
 
     return frame;
 }
@@ -144,7 +110,6 @@ AVFrame *ff_get_video_buffer(AVFilterLink *link, int w, int h)
 {
     AVFrame *ret = NULL;
 
-    av_unused char buf[16];
     FF_TPRINTF_START(NULL, get_video_buffer); ff_tlog_link(NULL, link, 0);
 
     if (link->dstpad->get_video_buffer)

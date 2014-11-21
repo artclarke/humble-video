@@ -73,7 +73,7 @@ enum var_name {
     VAR_VARS_NB
 };
 
-typedef struct {
+typedef struct CropContext {
     const AVClass *class;
     int  x;             ///< x offset of the non-cropped area with respect to the input area
     int  y;             ///< y offset of the non-cropped area with respect to the input area
@@ -95,7 +95,7 @@ static int query_formats(AVFilterContext *ctx)
     AVFilterFormats *formats = NULL;
     int fmt;
 
-    for (fmt = 0; fmt < AV_PIX_FMT_NB; fmt++) {
+    for (fmt = 0; av_pix_fmt_desc_get(fmt); fmt++) {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
         if (!(desc->flags & (AV_PIX_FMT_FLAG_HWACCEL | AV_PIX_FMT_FLAG_BITSTREAM)) &&
             !((desc->log2_chroma_w || desc->log2_chroma_h) && !(desc->flags & AV_PIX_FMT_FLAG_PLANAR)))
@@ -308,18 +308,17 @@ static const AVOption crop_options[] = {
     { "x",           "set the x crop area expression",       OFFSET(x_expr), AV_OPT_TYPE_STRING, {.str = "(in_w-out_w)/2"}, CHAR_MIN, CHAR_MAX, FLAGS },
     { "y",           "set the y crop area expression",       OFFSET(y_expr), AV_OPT_TYPE_STRING, {.str = "(in_h-out_h)/2"}, CHAR_MIN, CHAR_MAX, FLAGS },
     { "keep_aspect", "keep aspect ratio",                    OFFSET(keep_aspect), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, FLAGS },
-    {NULL}
+    { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(crop);
 
 static const AVFilterPad avfilter_vf_crop_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_VIDEO,
-        .filter_frame     = filter_frame,
-        .get_video_buffer = ff_null_get_video_buffer,
-        .config_props     = config_input,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .filter_frame = filter_frame,
+        .config_props = config_input,
     },
     { NULL }
 };
@@ -333,16 +332,13 @@ static const AVFilterPad avfilter_vf_crop_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_crop = {
-    .name      = "crop",
-    .description = NULL_IF_CONFIG_SMALL("Crop the input video to width:height:x:y."),
-
-    .priv_size = sizeof(CropContext),
-    .priv_class = &crop_class,
-
+AVFilter ff_vf_crop = {
+    .name          = "crop",
+    .description   = NULL_IF_CONFIG_SMALL("Crop the input video."),
+    .priv_size     = sizeof(CropContext),
+    .priv_class    = &crop_class,
     .query_formats = query_formats,
     .uninit        = uninit,
-
-    .inputs    = avfilter_vf_crop_inputs,
-    .outputs   = avfilter_vf_crop_outputs,
+    .inputs        = avfilter_vf_crop_inputs,
+    .outputs       = avfilter_vf_crop_outputs,
 };

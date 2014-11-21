@@ -1,6 +1,6 @@
 /*
  * Interplay MVE File Demuxer
- * Copyright (c) 2003 The ffmpeg Project
+ * Copyright (c) 2003 The FFmpeg Project
  *
  * This file is part of FFmpeg.
  *
@@ -237,7 +237,7 @@ static int process_ipmovie_chunk(IPMVEContext *s, AVIOContext *pb,
         return chunk_type;
 
     /* read the next chunk, wherever the file happens to be pointing */
-    if (url_feof(pb))
+    if (avio_feof(pb))
         return CHUNK_EOF;
     if (avio_read(pb, chunk_preamble, CHUNK_PREAMBLE_SIZE) !=
         CHUNK_PREAMBLE_SIZE)
@@ -283,7 +283,7 @@ static int process_ipmovie_chunk(IPMVEContext *s, AVIOContext *pb,
     while ((chunk_size > 0) && (chunk_type != CHUNK_BAD)) {
 
         /* read the next chunk, wherever the file happens to be pointing */
-        if (url_feof(pb)) {
+        if (avio_feof(pb)) {
             chunk_type = CHUNK_EOF;
             break;
         }
@@ -321,7 +321,7 @@ static int process_ipmovie_chunk(IPMVEContext *s, AVIOContext *pb,
 
         case OPCODE_CREATE_TIMER:
             av_dlog(NULL, "create timer\n");
-            if ((opcode_version > 0) || (opcode_size > 6)) {
+            if ((opcode_version > 0) || (opcode_size != 6)) {
                 av_dlog(NULL, "bad create_timer opcode\n");
                 chunk_type = CHUNK_BAD;
                 break;
@@ -339,7 +339,7 @@ static int process_ipmovie_chunk(IPMVEContext *s, AVIOContext *pb,
 
         case OPCODE_INIT_AUDIO_BUFFERS:
             av_dlog(NULL, "initialize audio buffers\n");
-            if ((opcode_version > 1) || (opcode_size > 10)) {
+            if (opcode_version > 1 || opcode_size > 10 || opcode_size < 6) {
                 av_dlog(NULL, "bad init_audio_buffers opcode\n");
                 chunk_type = CHUNK_BAD;
                 break;
@@ -376,7 +376,9 @@ static int process_ipmovie_chunk(IPMVEContext *s, AVIOContext *pb,
 
         case OPCODE_INIT_VIDEO_BUFFERS:
             av_dlog(NULL, "initialize video buffers\n");
-            if ((opcode_version > 2) || (opcode_size > 8)) {
+            if ((opcode_version > 2) || (opcode_size > 8) || opcode_size < 4
+                || opcode_version == 2 && opcode_size < 8
+            ) {
                 av_dlog(NULL, "bad init_video_buffers opcode\n");
                 chunk_type = CHUNK_BAD;
                 break;
@@ -449,8 +451,8 @@ static int process_ipmovie_chunk(IPMVEContext *s, AVIOContext *pb,
             av_dlog(NULL, "set palette\n");
             /* check for the logical maximum palette size
              * (3 * 256 + 4 bytes) */
-            if (opcode_size > 0x304) {
-                av_dlog(NULL, "demux_ipmovie: set_palette opcode too large\n");
+            if (opcode_size > 0x304 || opcode_size < 4) {
+                av_dlog(NULL, "demux_ipmovie: set_palette opcode with invalid size\n");
                 chunk_type = CHUNK_BAD;
                 break;
             }
@@ -463,7 +465,8 @@ static int process_ipmovie_chunk(IPMVEContext *s, AVIOContext *pb,
             first_color = AV_RL16(&scratch[0]);
             last_color = first_color + AV_RL16(&scratch[2]) - 1;
             /* sanity check (since they are 16 bit values) */
-            if ((first_color > 0xFF) || (last_color > 0xFF)) {
+            if (   (first_color > 0xFF) || (last_color > 0xFF)
+                || (last_color - first_color + 1)*3 + 4 > opcode_size) {
                 av_dlog(NULL, "demux_ipmovie: set_palette indexes out of range (%d -> %d)\n",
                     first_color, last_color);
                 chunk_type = CHUNK_BAD;
@@ -552,7 +555,7 @@ static int ipmovie_read_header(AVFormatContext *s)
     while (memcmp(signature_buffer, signature, sizeof(signature))) {
         memmove(signature_buffer, signature_buffer + 1, sizeof(signature_buffer) - 1);
         signature_buffer[sizeof(signature_buffer) - 1] = avio_r8(pb);
-        if (url_feof(pb))
+        if (avio_feof(pb))
             return AVERROR_EOF;
     }
     /* initialize private context members */

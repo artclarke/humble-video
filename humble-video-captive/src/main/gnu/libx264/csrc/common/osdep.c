@@ -1,10 +1,11 @@
 /*****************************************************************************
  * osdep.c: platform-specific code
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Steven Walters <kemuri9@gmail.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
+ *          Henrik Gramner <henrik@gramner.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +27,11 @@
 
 #include "common.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#include <io.h>
+#endif
+
 #if SYS_WINDOWS
 #include <sys/types.h>
 #include <sys/timeb.h>
@@ -35,8 +41,6 @@
 #include <time.h>
 
 #if PTW32_STATIC_LIB
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 /* this is a global in pthread-win32 to indicate if it has been initialized or not */
 extern int ptw32_processInitialized;
 #endif
@@ -133,4 +137,74 @@ void __intel_cpu_indicator_init( void )
 void x264_intel_cpu_indicator_init( void )
 {}
 #endif
+#endif
+
+#ifdef _WIN32
+/* Functions for dealing with Unicode on Windows. */
+FILE *x264_fopen( const char *filename, const char *mode )
+{
+    wchar_t filename_utf16[MAX_PATH];
+    wchar_t mode_utf16[16];
+    if( utf8_to_utf16( filename, filename_utf16 ) && utf8_to_utf16( mode, mode_utf16 ) )
+        return _wfopen( filename_utf16, mode_utf16 );
+    return NULL;
+}
+
+int x264_rename( const char *oldname, const char *newname )
+{
+    wchar_t oldname_utf16[MAX_PATH];
+    wchar_t newname_utf16[MAX_PATH];
+    if( utf8_to_utf16( oldname, oldname_utf16 ) && utf8_to_utf16( newname, newname_utf16 ) )
+    {
+        /* POSIX says that rename() removes the destination, but Win32 doesn't. */
+        _wunlink( newname_utf16 );
+        return _wrename( oldname_utf16, newname_utf16 );
+    }
+    return -1;
+}
+
+int x264_stat( const char *path, x264_struct_stat *buf )
+{
+    wchar_t path_utf16[MAX_PATH];
+    if( utf8_to_utf16( path, path_utf16 ) )
+        return _wstati64( path_utf16, buf );
+    return -1;
+}
+
+int x264_vfprintf( FILE *stream, const char *format, va_list arg )
+{
+    HANDLE console = NULL;
+    DWORD mode;
+
+    if( stream == stdout )
+        console = GetStdHandle( STD_OUTPUT_HANDLE );
+    else if( stream == stderr )
+        console = GetStdHandle( STD_ERROR_HANDLE );
+
+    /* Only attempt to convert to UTF-16 when writing to a non-redirected console screen buffer. */
+    if( GetConsoleMode( console, &mode ) )
+    {
+        char buf[4096];
+        wchar_t buf_utf16[4096];
+
+        int length = vsnprintf( buf, sizeof(buf), format, arg );
+        if( length > 0 && length < sizeof(buf) )
+        {
+            /* WriteConsoleW is the most reliable way to output Unicode to a console. */
+            int length_utf16 = MultiByteToWideChar( CP_UTF8, 0, buf, length, buf_utf16, sizeof(buf_utf16)/sizeof(wchar_t) );
+            DWORD written;
+            WriteConsoleW( console, buf_utf16, length_utf16, &written, NULL );
+            return length;
+        }
+    }
+    return vfprintf( stream, format, arg );
+}
+
+int x264_is_pipe( const char *path )
+{
+    wchar_t path_utf16[MAX_PATH];
+    if( utf8_to_utf16( path, path_utf16 ) )
+        return WaitNamedPipeW( path_utf16, 0 );
+    return 0;
+}
 #endif

@@ -53,7 +53,7 @@ static av_cold int tta_encode_init(AVCodecContext *avctx)
     s->bps = avctx->bits_per_raw_sample >> 3;
     avctx->frame_size = 256 * avctx->sample_rate / 245;
 
-    s->ch_ctx = av_malloc(avctx->channels * sizeof(*s->ch_ctx));
+    s->ch_ctx = av_malloc_array(avctx->channels, sizeof(*s->ch_ctx));
     if (!s->ch_ctx)
         return AVERROR(ENOMEM);
 
@@ -144,7 +144,7 @@ static int tta_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
         }
 
         temp = value;
-#define PRED(x, k) (int32_t)((((uint64_t)x << k) - x) >> k)
+#define PRED(x, k) (int32_t)((((uint64_t)(x) << (k)) - (x)) >> (k))
         switch (s->bps) {
         case 1: value -= PRED(c->predictor, 4); break;
         case 2:
@@ -217,6 +217,7 @@ static av_cold int tta_encode_close(AVCodecContext *avctx)
 
 AVCodec ff_tta_encoder = {
     .name           = "tta",
+    .long_name      = NULL_IF_CONFIG_SMALL("TTA (True Audio)"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_TTA,
     .priv_data_size = sizeof(TTAEncContext),
@@ -228,5 +229,4 @@ AVCodec ff_tta_encoder = {
                                                      AV_SAMPLE_FMT_S16,
                                                      AV_SAMPLE_FMT_S32,
                                                      AV_SAMPLE_FMT_NONE },
-    .long_name      = NULL_IF_CONFIG_SMALL("TTA (True Audio)"),
 };
