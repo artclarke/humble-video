@@ -196,7 +196,8 @@ Muxer::open(KeyValueBag *aInputOptions, KeyValueBag* aOutputOptions) {
     } else if (!fmt || !(fmt->flags & AVFMT_NOFILE)) {
       retval = avio_open2(&ctx->pb, url, AVIO_FLAG_WRITE,
           &ctx->interrupt_callback, 0);
-    }
+    } else
+      retval = 0;
     if (retval < 0) {
       mState = STATE_ERROR;
       FfmpegException::check(retval, "Error opening url: %s; ", url);
@@ -255,7 +256,7 @@ Muxer::close() {
   }
   if (mIOHandler) {
     e = mIOHandler->url_close();
-  } else
+  } else if (!ctx->flags & AVFMT_NOFILE)
     e = avio_close(ctx->pb);
   FfmpegException::check(e, "could not close url ");
   mState = STATE_CLOSED;

@@ -7,6 +7,7 @@ include @top_builddir@/mk/Makefile.global
 SUBDIRS=customio
 
 check_PROGRAMS=\
+  BitStreamFilterTester \
   FilterTypeTester \
   FilterGraphTester \
   MediaAudioResamplerTester \
@@ -29,6 +30,7 @@ check_PROGRAMS=\
   RationalTester 
 
 BUILT_SOURCES= \
+  BitStreamFilterTest_CXXRunner.cpp \
   FilterTypeTest_CXXRunner.cpp \
   FilterGraphTest_CXXRunner.cpp \
   MediaAudioResamplerTest_CXXRunner.cpp \
@@ -51,6 +53,7 @@ BUILT_SOURCES= \
   RationalTest_CXXRunner.cpp
 
 noinst_HEADERS = \
+  BitStreamFilterTest.h \
   FilterTypeTest.h \
   FilterGraphTest.h \
   MediaAudioResamplerTest.h \
@@ -84,6 +87,17 @@ else
 TESTS+=$(check_PROGRAMS)
 endif
 
+BitStreamFilterTester_SOURCES= \
+  BitStreamFilterTest.cpp \
+  TestData.cpp \
+  Main.cpp
+
+nodist_BitStreamFilterTester_SOURCES= \
+  BitStreamFilterTest_CXXRunner.cpp
+
+BitStreamFilterTester_LDADD= \
+  $(top_builddir)/src/io/humble/libhumblevideo.la 
+  
 FilterGraphTester_SOURCES= \
   FilterGraphTest.cpp \
   TestData.cpp \

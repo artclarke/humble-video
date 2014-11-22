@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2014, Andrew "Art" Clarke.  All rights reserved.
- *   
+ *
  * This file is part of Humble-Video.
  *
  * Humble-Video is free software: you can redistribute it and/or modify
@@ -16,35 +16,40 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-/*
- * MuxerTest.h
- *
- *  Created on: Aug 14, 2013
- *      Author: aclarke
- */
 
-#ifndef MUXERTEST_H_
-#define MUXERTEST_H_
+#ifndef SRC_MAIN_GNU_TEST_IO_HUMBLE_VIDEO_BITSTREAMFILTERTEST_H_
+#define SRC_MAIN_GNU_TEST_IO_HUMBLE_VIDEO_BITSTREAMFILTERTEST_H_
 
 #include <io/humble/testutils/TestUtils.h>
-#include <io/humble/testutils/TestUtils.h>
-#include <io/humble/video/Muxer.h>
-#include "TestData.h"
-
+#include <io/humble/video/BitStreamFilter.h>
 using namespace io::humble::video;
 using namespace io::humble::ferry;
 
-class MuxerTest : public CxxTest::TestSuite
+class BitStreamFilterTypeTest : public CxxTest::TestSuite
 {
 public:
-  MuxerTest();
-  virtual
-  ~MuxerTest();
-  void testCreation();
-  void testRemuxing();
-  void testHLSRemuxing();
-private:
-  TestData mFixtures;
+  BitStreamFilterTypeTest();
+
+  void testGetNumBitStreamFilterTypes();
+  void testGetBitStreamFilterType();
+
+  virtual ~BitStreamFilterTypeTest();
 };
 
-#endif /* MUXERTEST_H_ */
+class BitStreamFilterTest : public CxxTest::TestSuite
+{
+public:
+  BitStreamFilterTest ();
+
+  void testMakeByName();
+  void testMakeByType();
+
+  /** Tests the noise filter, which allocates a output buffer */
+  void testNoiseFilter();
+  /** Tests the chomp filter, which does not allocate an output buffer in ffmpeg land */
+  void testChompFilter();
+
+  virtual ~BitStreamFilterTest ();
+};
+
+#endif /* SRC_MAIN_GNU_TEST_IO_HUMBLE_VIDEO_BITSTREAMFILTERTEST_H_ */

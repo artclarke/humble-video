@@ -63,6 +63,7 @@
 #include <io/humble/video/FilterSink.h>
 #include <io/humble/video/FilterAudioSink.h>
 #include <io/humble/video/FilterPictureSink.h>
+#include <io/humble/video/BitStreamFilter.h>
 
 using namespace VS_CPP_NAMESPACE;
 
@@ -214,3 +215,4 @@ import io.humble.ferry.Buffer;
 %include <io/humble/video/FilterSink.swg>
 %include <io/humble/video/FilterAudioSink.swg>
 %include <io/humble/video/FilterPictureSink.swg>
+%include <io/humble/video/BitStreamFilter.swg>
