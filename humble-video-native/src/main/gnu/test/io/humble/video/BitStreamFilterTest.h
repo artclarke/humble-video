@@ -43,7 +43,11 @@ public:
 
   void testMakeByName();
   void testMakeByType();
+
+  /** Tests the noise filter, which allocates a output buffer */
   void testNoiseFilter();
+  /** Tests the chomp filter, which does not allocate an output buffer in ffmpeg land */
+  void testChompFilter();
 
   virtual ~BitStreamFilterTest ();
 };

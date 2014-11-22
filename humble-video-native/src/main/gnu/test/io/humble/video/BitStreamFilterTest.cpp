@@ -119,3 +119,32 @@ BitStreamFilterTest::testNoiseFilter() {
   // noise should make sure that not all elements match.
   TS_ASSERT(matches < inSize);
 }
+
+void
+BitStreamFilterTest::testChompFilter() {
+  const char* name = "chomp";
+  RefPointer<BitStreamFilter> f = BitStreamFilter::make(name);
+
+  // let's generate a buffer to chomp nulls off the end of.
+  const int32_t inSize = 1024;
+  RefPointer<Buffer> inBuf = Buffer::make(0, inSize);
+  uint8_t* in = static_cast<uint8_t*>(inBuf->getBytes(0, inSize));
+  int32_t outSize = inSize;
+  RefPointer<Buffer> outBuf = Buffer::make(0, outSize);
+  uint8_t* out = static_cast<uint8_t*>(outBuf->getBytes(0, outSize));
+
+  // set the entire input buffer to null for now.
+  memset(in, 0, inSize);
+  // then set the first half of the buffer to be non-null.
+  for(int32_t i = 0; i < inSize/2; i++) {
+    in[i] = 0x01;
+    out[i] = in[i];
+  }
+
+  // should filter out all the null bytes at the end.
+  outSize = f->filter(outBuf.value(), 0, inBuf.value(), 0, inSize, 0, 0, false);
+  TS_ASSERT_EQUALS(outSize, inSize/2);
+  for(int32_t i = 0; i < inSize/2; i++) {
+    TS_ASSERT_EQUALS(in[i], out[i]);
+  }
+}
