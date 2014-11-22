@@ -162,7 +162,7 @@ namespace io { namespace humble { namespace video {
   {
     if (!output)
       throw HumbleInvalidArgument("no output");
-    if (!outputOffset)
+    if (outputOffset < 0)
       throw HumbleInvalidArgument("output offset < 0");
     if (!input)
       throw HumbleInvalidArgument("no input");

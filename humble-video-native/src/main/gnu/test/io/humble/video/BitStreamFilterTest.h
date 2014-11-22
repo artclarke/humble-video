@@ -43,6 +43,7 @@ public:
 
   void testMakeByName();
   void testMakeByType();
+  void testNoiseFilter();
 
   virtual ~BitStreamFilterTest ();
 };

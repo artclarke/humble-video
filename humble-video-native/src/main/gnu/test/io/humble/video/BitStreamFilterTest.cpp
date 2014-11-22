@@ -22,6 +22,7 @@
 #include <io/humble/ferry/LoggerStack.h>
 
 #include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/Buffer.h>
 
 using namespace io::humble::ferry;
 using namespace io::humble::video;
@@ -86,4 +87,32 @@ BitStreamFilterTest::testMakeByType () {
   TS_ASSERT(strcmp(name, t->getName())==0);
   RefPointer<BitStreamFilter> f = BitStreamFilter::make(t.value());
   TS_ASSERT(strcmp(name, f->getName())==0);
+}
+
+void
+BitStreamFilterTest::testNoiseFilter() {
+  const char* name = "noise";
+  RefPointer<BitStreamFilter> f = BitStreamFilter::make(name);
+
+  // let's generate a buffer to add noise to.
+  const int32_t inSize = 1024;
+  RefPointer<Buffer> inBuf = Buffer::make(0, inSize);
+  uint8_t* in = static_cast<uint8_t*>(inBuf->getBytes(0, inSize));
+  int32_t outSize = inSize;
+  RefPointer<Buffer> outBuf = Buffer::make(0, outSize);
+  uint8_t* out = static_cast<uint8_t*>(outBuf->getBytes(0, outSize));
+  for(int32_t i = 0; i < inSize; i++) {
+    in[i] = static_cast<uint8_t>(i);
+    out[i] = in[i];
+  }
+
+  outSize = f->filter(outBuf.value(), 0, inBuf.value(), 0, inSize, 0, 0, false);
+  TS_ASSERT_EQUALS(outSize, inSize);
+  int matches = 0;
+  for(int32_t i = 0; i < inSize; i++) {
+    if (in[i] == out[i])
+      ++ matches;
+  }
+  // noise should make sure that not all elements match.
+  TS_ASSERT(matches < inSize);
 }

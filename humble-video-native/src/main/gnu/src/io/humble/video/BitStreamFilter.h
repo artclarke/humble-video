@@ -114,8 +114,8 @@ namespace io { namespace humble { namespace video {
      *
      * @return The number of bytes copied into output once filtering is done.
      *
-     * @throw InvalidArgument if any parameters are invalid.
-     * @throw FfmpegException if the filtering fails for any reason.
+     * @throws InvalidArgument if any parameters are invalid.
+     * @throws FfmpegException if the filtering fails for any reason.
      *
      */
     virtual int32_t filter(io::humble::ferry::Buffer* output,
