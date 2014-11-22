@@ -49,6 +49,10 @@ BitStreamFilterTypeTest::testGetBitStreamFilterType() {
   LoggerStack stack;
   stack.setGlobalLevel(Logger::LEVEL_INFO, false);
 
+  // This test makes sure that the getBitStreamFilterType method calls Global::init
+  RefPointer<BitStreamFilterType> t = BitStreamFilterType::getBitStreamFilterType(0);
+  TS_ASSERT(t.value());
+
   int32_t n = BitStreamFilterType::getNumBitStreamFilterTypes();
   for(int32_t i = 0; i < n; i++) {
     RefPointer<BitStreamFilterType> t1 = BitStreamFilterType::getBitStreamFilterType(i);
