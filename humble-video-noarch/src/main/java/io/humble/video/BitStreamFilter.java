@@ -113,27 +113,64 @@ public class BitStreamFilter extends RefCounted {
   // JNIHelper.swg: End generated code
   
 
+/**
+ * Create a filter given the name.<br>
+ * <br>
+ * @param filtername The name of the filter.<br>
+ * <br>
+ * @see BitStreamFilterType
+ */
   public static BitStreamFilter make(String filtername) {
     long cPtr = VideoJNI.BitStreamFilter_make__SWIG_0(filtername);
     return (cPtr == 0) ? null : new BitStreamFilter(cPtr, false);
   }
 
+/**
+ * Create a filter given the type.<br>
+ * <br>
+ * @param type The type of the filter.<br>
+ * <br>
+ * @see BitStreamFilterType
+ */
   public static BitStreamFilter make(BitStreamFilterType type) {
     long cPtr = VideoJNI.BitStreamFilter_make__SWIG_1(BitStreamFilterType.getCPtr(type), type);
     return (cPtr == 0) ? null : new BitStreamFilter(cPtr, false);
   }
 
+/**
+ * Get the type of this filter.
+ */
   public BitStreamFilterType getType() {
     long cPtr = VideoJNI.BitStreamFilter_getType(swigCPtr, this);
     return (cPtr == 0) ? null : new BitStreamFilterType(cPtr, false);
   }
 
+/**
+ * Get the name of this filter.
+ */
   public String getName() {
     return VideoJNI.BitStreamFilter_getName(swigCPtr, this);
   }
 
-  public int filter(Buffer output, Buffer input, int inputSize, String args, boolean isKey) {
-    return VideoJNI.BitStreamFilter_filter(swigCPtr, this, Buffer.getCPtr(output), output, Buffer.getCPtr(input), input, inputSize, args, isKey);
+/**
+ * Filter the input buffer into the output buffer.<br>
+ * <br>
+ * @param output The output buffer to copy filtered bytes to.<br>
+ * @param outputOffset The offset in output to copy data into.<br>
+ * @param input The input buffer to filter.<br>
+ * @param inputOffset The number of bytes into input to start filtering at.<br>
+ * @param inputSize The number of bytes (from inputOffset) to filter.<br>
+ * @param coder The Coder context belong to the Stream that this data will eventually get outputted to.<br>
+ * @param args String arguments for the filter call. See the FFmpeg documentation or source code.<br>
+ * @param isKey Does this data represent a key packet.<br>
+ * <br>
+ * @return The number of bytes copied into output once filtering is done.<br>
+ * <br>
+ * @throws InvalidArgument if any parameters are invalid.<br>
+ * @throws FfmpegException if the filtering fails for any reason.
+ */
+  public int filter(Buffer output, int outputOffset, Buffer input, int inputOffset, int inputSize, Coder coder, String args, boolean isKey) {
+    return VideoJNI.BitStreamFilter_filter(swigCPtr, this, Buffer.getCPtr(output), output, outputOffset, Buffer.getCPtr(input), input, inputOffset, inputSize, Coder.getCPtr(coder), coder, args, isKey);
   }
 
 }

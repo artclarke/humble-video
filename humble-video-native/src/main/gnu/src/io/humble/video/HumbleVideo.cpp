@@ -35321,31 +35321,38 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_BitStreamFilter_1getNam
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_BitStreamFilter_1filter(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jint jarg4, jstring jarg5, jboolean jarg6) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_BitStreamFilter_1filter(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jlong jarg4, jobject jarg4_, jint jarg5, jint jarg6, jlong jarg7, jobject jarg7_, jstring jarg8, jboolean jarg9) {
   jint jresult = 0 ;
   io::humble::video::BitStreamFilter *arg1 = (io::humble::video::BitStreamFilter *) 0 ;
   io::humble::ferry::Buffer *arg2 = (io::humble::ferry::Buffer *) 0 ;
-  io::humble::ferry::Buffer *arg3 = (io::humble::ferry::Buffer *) 0 ;
-  int32_t arg4 ;
-  char *arg5 = (char *) 0 ;
-  bool arg6 ;
+  int32_t arg3 ;
+  io::humble::ferry::Buffer *arg4 = (io::humble::ferry::Buffer *) 0 ;
+  int32_t arg5 ;
+  int32_t arg6 ;
+  io::humble::video::Coder *arg7 = (io::humble::video::Coder *) 0 ;
+  char *arg8 = (char *) 0 ;
+  bool arg9 ;
   int32_t result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   (void)jarg2_;
-  (void)jarg3_;
+  (void)jarg4_;
+  (void)jarg7_;
   arg1 = *(io::humble::video::BitStreamFilter **)&jarg1; 
   arg2 = *(io::humble::ferry::Buffer **)&jarg2; 
-  arg3 = *(io::humble::ferry::Buffer **)&jarg3; 
-  arg4 = (int32_t)jarg4; 
-  arg5 = 0;
-  if (jarg5) {
-    arg5 = (char *)jenv->GetStringUTFChars(jarg5, 0);
-    if (!arg5) return 0;
+  arg3 = (int32_t)jarg3; 
+  arg4 = *(io::humble::ferry::Buffer **)&jarg4; 
+  arg5 = (int32_t)jarg5; 
+  arg6 = (int32_t)jarg6; 
+  arg7 = *(io::humble::video::Coder **)&jarg7; 
+  arg8 = 0;
+  if (jarg8) {
+    arg8 = (char *)jenv->GetStringUTFChars(jarg8, 0);
+    if (!arg8) return 0;
   }
-  arg6 = jarg6 ? true : false; 
+  arg9 = jarg9 ? true : false; 
   
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
@@ -35359,7 +35366,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_BitStreamFilter_1filter(JN
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)(arg1)->filter(arg2,arg3,arg4,(char const *)arg5,arg6);
+      result = (int32_t)(arg1)->filter(arg2,arg3,arg4,arg5,arg6,arg7,(char const *)arg8,arg9);
     }
     catch(std::exception & e)
     {
@@ -35379,7 +35386,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_BitStreamFilter_1filter(JN
     /*@SWIG@*/
   }
   jresult = (jint)result; 
-  if (arg5) jenv->ReleaseStringUTFChars(jarg5, (const char *)arg5);
+  if (arg8) jenv->ReleaseStringUTFChars(jarg8, (const char *)arg8);
   return jresult;
 }
 

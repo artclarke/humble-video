@@ -152,18 +152,61 @@ namespace io { namespace humble { namespace video {
 
   int32_t
   BitStreamFilter::filter(Buffer* output,
+                          int32_t outputOffset,
                           Buffer* input,
+                          int32_t inputOffset,
                           int32_t inputSize,
+                          Coder* coder,
                           const char* args,
                           bool isKey)
   {
-    (void) output;
-    (void) input;
-    (void) inputSize;
-    (void) args;
-    (void) isKey;
-    throw HumbleRuntimeError("unimplemented method");
-    return -1;
+    if (!output)
+      throw HumbleInvalidArgument("no output");
+    if (!outputOffset)
+      throw HumbleInvalidArgument("output offset < 0");
+    if (!input)
+      throw HumbleInvalidArgument("no input");
+    if (inputSize <= 0)
+      throw HumbleInvalidArgument("inputSize <= 0");
+    if (inputOffset < 0)
+      throw HumbleInvalidArgument("input offset < 0");
+
+
+    // get the raw bytes for input and output
+    int32_t outputSize = 0;
+    uint8_t* out = 0;
+    int e = -1;
+    uint8_t* in = static_cast<uint8_t*>(input->getBytes(inputOffset, inputSize));
+
+    try {
+      if (!in)
+        throw HumbleRuntimeError("could not get input bytes");
+
+      AVCodecContext* avctx = coder ? coder->getCodecCtx() : 0;
+      e = av_bitstream_filter_filter(mCtx, avctx, args,
+                                     &out, &outputSize,
+                                     in, inputSize, isKey);
+      FfmpegException::check(e, "could not filter buffer");
+      if (e == 0)
+        // see documentation of av_bitstream_filter_filter
+        if (!out) out = in;
+
+      // we ALWAYS copy the buffers when filtering.
+      uint8_t* outB = static_cast<uint8_t*>(output->getBytes(outputOffset, outputSize));
+      if (!outB)
+        throw HumbleRuntimeError("could not get output bytes; buffer may not be large enough");
+      memcpy(outB, out, outputSize);
+      if (!e){
+        // the output buffer was allocated.
+        av_free(out);
+      }
+    } catch (...) {
+      if (!e){
+        // the output buffer was allocated.
+        av_free(out);
+      }
+    }
+    return outputSize;
   }
 
 } /* namespace video */

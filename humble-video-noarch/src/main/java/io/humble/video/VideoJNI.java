@@ -1448,7 +1448,7 @@ public class VideoJNI {
   public final static native long BitStreamFilter_make__SWIG_1(long jarg1, BitStreamFilterType jarg1_);
   public final static native long BitStreamFilter_getType(long jarg1, BitStreamFilter jarg1_);
   public final static native String BitStreamFilter_getName(long jarg1, BitStreamFilter jarg1_);
-  public final static native int BitStreamFilter_filter(long jarg1, BitStreamFilter jarg1_, long jarg2, Buffer jarg2_, long jarg3, Buffer jarg3_, int jarg4, String jarg5, boolean jarg6);
+  public final static native int BitStreamFilter_filter(long jarg1, BitStreamFilter jarg1_, long jarg2, Buffer jarg2_, int jarg3, long jarg4, Buffer jarg4_, int jarg5, int jarg6, long jarg7, Coder jarg7_, String jarg8, boolean jarg9);
   public final static native long PixelFormat_SWIGUpcast(long jarg1);
   public final static native long PixelComponentDescriptor_SWIGUpcast(long jarg1);
   public final static native long PixelFormatDescriptor_SWIGUpcast(long jarg1);

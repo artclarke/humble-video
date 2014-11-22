@@ -67,19 +67,63 @@ namespace io { namespace humble { namespace video {
   class BitStreamFilter : public io::humble::ferry::RefCounted
   {
   public:
+    /**
+     * Create a filter given the name.
+     *
+     * @param filtername The name of the filter.
+     *
+     * @see BitStreamFilterType
+     */
     static BitStreamFilter* make(const char* filtername);
+
+    /**
+     * Create a filter given the type.
+     *
+     * @param type The type of the filter.
+     *
+     * @see BitStreamFilterType
+     */
     static BitStreamFilter* make(BitStreamFilterType* type);
+
 #ifndef SWIG
     static BitStreamFilter* make(AVBitStreamFilterContext *c,
                                  BitStreamFilterType* t);
 #endif
 
+    /**
+     * Get the type of this filter.
+     */
     virtual BitStreamFilterType* getType() { return mType.get(); }
+
+    /**
+     * Get the name of this filter.
+     */
     virtual const char* getName() { return mType->getName(); }
 
+    /**
+     * Filter the input buffer into the output buffer.
+     *
+     * @param output The output buffer to copy filtered bytes to.
+     * @param outputOffset The offset in output to copy data into.
+     * @param input The input buffer to filter.
+     * @param inputOffset The number of bytes into input to start filtering at.
+     * @param inputSize The number of bytes (from inputOffset) to filter.
+     * @param coder The Coder context belong to the Stream that this data will eventually get outputted to.
+     * @param args String arguments for the filter call. See the FFmpeg documentation or source code.
+     * @param isKey Does this data represent a key packet.
+     *
+     * @return The number of bytes copied into output once filtering is done.
+     *
+     * @throw InvalidArgument if any parameters are invalid.
+     * @throw FfmpegException if the filtering fails for any reason.
+     *
+     */
     virtual int32_t filter(io::humble::ferry::Buffer* output,
+           int32_t outputOffset,
            io::humble::ferry::Buffer* input,
+           int32_t inputOffset,
            int32_t inputSize,
+           Coder* coder,
            const char* args,
            bool isKey);
     /*
