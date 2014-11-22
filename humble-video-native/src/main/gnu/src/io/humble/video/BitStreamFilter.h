@@ -49,8 +49,10 @@ namespace io { namespace humble { namespace video {
     static int32_t getNumBitStreamFilterTypes();
     static BitStreamFilterType* getBitStreamFilterType(int32_t i);
     static BitStreamFilterType* getBitStreamFilterType(const char* name);
-  private:
+#ifndef SWIG
     static BitStreamFilterType* make(AVBitStreamFilter* c);
+#endif
+  private:
     virtual ~BitStreamFilterType() {}
 
     BitStreamFilterType(AVBitStreamFilter*ctx) : mCtx(ctx) {}
@@ -65,26 +67,30 @@ namespace io { namespace humble { namespace video {
   class BitStreamFilter : public io::humble::ferry::RefCounted
   {
   public:
-    /*
-    static BitStreamFilter* make(const char* filtername, Coder* coder=0);
-    static BitStreamFilter* make(BitStreamFilterType* type, Coder* coder=0);
+    static BitStreamFilter* make(const char* filtername);
+    static BitStreamFilter* make(BitStreamFilterType* type);
+#ifndef SWIG
+    static BitStreamFilter* make(AVBitStreamFilterContext *c,
+                                 BitStreamFilterType* t);
+#endif
+
+    virtual BitStreamFilterType* getType() { return mType.get(); }
+    virtual const char* getName() { return mType->getName(); }
 
     virtual int32_t filter(io::humble::ferry::Buffer* output,
            io::humble::ferry::Buffer* input,
            int32_t inputSize,
            const char* args,
            bool isKey);
+    /*
     virtual void filter(MediaPacket* output, MediaPacket* input, const char* args);
 
-    virtual BitStreamFilterType* getType() { return mType.get(); }
-    virtual const char* getName() { return mType->getName(); }
 */
   private:
     virtual ~BitStreamFilter ();
-    BitStreamFilter (BitStreamFilterType *type, Coder* coder);
+    BitStreamFilter (AVBitStreamFilterContext* ctx, BitStreamFilterType *type);
     AVBitStreamFilterContext* mCtx;
     io::humble::ferry::RefPointer<BitStreamFilterType> mType;
-    io::humble::ferry::RefPointer<Coder> mCoder;
   };
 
 } /* namespace video */

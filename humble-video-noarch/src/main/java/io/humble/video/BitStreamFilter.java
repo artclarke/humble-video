@@ -113,4 +113,27 @@ public class BitStreamFilter extends RefCounted {
   // JNIHelper.swg: End generated code
   
 
+  public static BitStreamFilter make(String filtername) {
+    long cPtr = VideoJNI.BitStreamFilter_make__SWIG_0(filtername);
+    return (cPtr == 0) ? null : new BitStreamFilter(cPtr, false);
+  }
+
+  public static BitStreamFilter make(BitStreamFilterType type) {
+    long cPtr = VideoJNI.BitStreamFilter_make__SWIG_1(BitStreamFilterType.getCPtr(type), type);
+    return (cPtr == 0) ? null : new BitStreamFilter(cPtr, false);
+  }
+
+  public BitStreamFilterType getType() {
+    long cPtr = VideoJNI.BitStreamFilter_getType(swigCPtr, this);
+    return (cPtr == 0) ? null : new BitStreamFilterType(cPtr, false);
+  }
+
+  public String getName() {
+    return VideoJNI.BitStreamFilter_getName(swigCPtr, this);
+  }
+
+  public int filter(Buffer output, Buffer input, int inputSize, String args, boolean isKey) {
+    return VideoJNI.BitStreamFilter_filter(swigCPtr, this, Buffer.getCPtr(output), output, Buffer.getCPtr(input), input, inputSize, args, isKey);
+  }
+
 }

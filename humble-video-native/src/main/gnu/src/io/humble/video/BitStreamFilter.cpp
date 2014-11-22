@@ -102,11 +102,68 @@ namespace io { namespace humble { namespace video {
       av_bitstream_filter_close(mCtx);
     mCtx = 0;
   }
-  BitStreamFilter::BitStreamFilter (BitStreamFilterType *type, Coder* coder)
+  BitStreamFilter::BitStreamFilter (AVBitStreamFilterContext* ctx,
+                                    BitStreamFilterType *type)
   {
-    (void) type;
-    (void) coder;
-    mCtx = 0;
+    mCtx = ctx;
+    if (type) {
+      mType.reset(type, true);
+    } else {
+      mType = BitStreamFilterType::make(mCtx->filter);
+    }
+  }
+
+  BitStreamFilter*
+  BitStreamFilter::make(const char* filtername) {
+    Global::init();
+
+    if (!filtername || !*filtername)
+      throw HumbleInvalidArgument("no filtername passed in");
+    AVBitStreamFilterContext* b = av_bitstream_filter_init(filtername);
+    if (!b)
+      throw HumbleBadAlloc();
+    return make(b, 0);
+  }
+
+  BitStreamFilter*
+  BitStreamFilter::make(BitStreamFilterType *type) {
+    if (!type)
+      throw HumbleInvalidArgument("no filter type");
+    AVBitStreamFilterContext* b = av_bitstream_filter_init(type->getName());
+    if (!b)
+      throw HumbleBadAlloc();
+    return make(b, type);
+  }
+
+  BitStreamFilter*
+  BitStreamFilter::make(AVBitStreamFilterContext*c,
+                        BitStreamFilterType* t)
+  {
+    Global::init();
+    if (!c)
+      throw HumbleInvalidArgument("no filter context");
+
+    BitStreamFilter* r = new BitStreamFilter(c, t);
+    if (!r)
+      throw HumbleBadAlloc();
+    r->acquire();
+    return r;
+  }
+
+  int32_t
+  BitStreamFilter::filter(Buffer* output,
+                          Buffer* input,
+                          int32_t inputSize,
+                          const char* args,
+                          bool isKey)
+  {
+    (void) output;
+    (void) input;
+    (void) inputSize;
+    (void) args;
+    (void) isKey;
+    throw HumbleRuntimeError("unimplemented method");
+    return -1;
   }
 
 } /* namespace video */
