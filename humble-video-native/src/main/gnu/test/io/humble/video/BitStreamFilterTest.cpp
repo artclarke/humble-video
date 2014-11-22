@@ -72,6 +72,18 @@ BitStreamFilterTest::~BitStreamFilterTest ()
 }
 
 void
-BitStreamFilterTest::testTrue () {
-
+BitStreamFilterTest::testMakeByName () {
+  const char* name = "noise";
+  RefPointer<BitStreamFilter> f = BitStreamFilter::make(name);
+  TS_ASSERT(strcmp(name, f->getName())==0);
+  RefPointer<BitStreamFilterType> t = f->getType();
+  TS_ASSERT(strcmp(name, t->getName())==0);
+}
+void
+BitStreamFilterTest::testMakeByType () {
+  const char* name = "noise";
+  RefPointer<BitStreamFilterType> t = BitStreamFilterType::getBitStreamFilterType(name);
+  TS_ASSERT(strcmp(name, t->getName())==0);
+  RefPointer<BitStreamFilter> f = BitStreamFilter::make(t.value());
+  TS_ASSERT(strcmp(name, f->getName())==0);
 }

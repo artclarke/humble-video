@@ -41,7 +41,8 @@ class BitStreamFilterTest : public CxxTest::TestSuite
 public:
   BitStreamFilterTest ();
 
-  void testTrue();
+  void testMakeByName();
+  void testMakeByType();
 
   virtual ~BitStreamFilterTest ();
 };
