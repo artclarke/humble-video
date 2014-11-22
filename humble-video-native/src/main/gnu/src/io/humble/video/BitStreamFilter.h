@@ -50,6 +50,7 @@ namespace io { namespace humble { namespace video {
     static BitStreamFilterType* getBitStreamFilterType(int32_t i);
     static BitStreamFilterType* getBitStreamFilterType(const char* name);
   private:
+    static BitStreamFilterType* make(AVBitStreamFilter* c);
     virtual ~BitStreamFilterType() {}
 
     BitStreamFilterType(AVBitStreamFilter*ctx) : mCtx(ctx) {}
@@ -64,6 +65,7 @@ namespace io { namespace humble { namespace video {
   class BitStreamFilter : public io::humble::ferry::RefCounted
   {
   public:
+    /*
     static BitStreamFilter* make(const char* filtername, Coder* coder=0);
     static BitStreamFilter* make(BitStreamFilterType* type, Coder* coder=0);
 
@@ -76,7 +78,7 @@ namespace io { namespace humble { namespace video {
 
     virtual BitStreamFilterType* getType() { return mType.get(); }
     virtual const char* getName() { return mType->getName(); }
-
+*/
   private:
     virtual ~BitStreamFilter ();
     BitStreamFilter (BitStreamFilterType *type, Coder* coder);

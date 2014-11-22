@@ -23,9 +23,78 @@
  *      Author: aclarke
  */
 
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/HumbleException.h>
+#include <io/humble/video/Global.h>
+
 #include "BitStreamFilter.h"
 
+using namespace io::humble::ferry;
+
+VS_LOG_SETUP(VS_CPP_PACKAGE.BitStreamFilter);
+
 namespace io { namespace humble { namespace video {
+
+  BitStreamFilterType*
+  BitStreamFilterType::make(AVBitStreamFilter* f)
+  {
+    if (!f)
+      throw HumbleInvalidArgument("no filter passed in");
+    BitStreamFilterType* r = new BitStreamFilterType(f);
+    r->acquire();
+    return r;
+  }
+
+  int32_t
+  BitStreamFilterType::getNumBitStreamFilterTypes() {
+    Global::init();
+
+    AVBitStreamFilter* f = 0;
+    int32_t i = 0;
+    while ((f = av_bitstream_filter_next(f)) != 0) {
+      ++i;
+    }
+    return i;
+  }
+
+  BitStreamFilterType*
+  BitStreamFilterType::getBitStreamFilterType(int32_t index) {
+    Global::init();
+
+    AVBitStreamFilter* f = 0;
+    int32_t i = 0;
+    while ((f = av_bitstream_filter_next(f)) != 0) {
+      if (i == index) {
+        VS_LOG_TRACE("Found filter \"%s\" at position %d",
+                     f->name,
+                     i);
+        // this is the one we want
+        break;
+      }
+      ++i;
+    }
+    return f ? make(f) : 0;
+  }
+
+  BitStreamFilterType*
+  BitStreamFilterType::getBitStreamFilterType(const char* name) {
+    Global::init();
+
+    AVBitStreamFilter* f = 0;
+    int32_t i = 0;
+    while ((f = av_bitstream_filter_next(f)) != 0) {
+      if (strcmp(name, f->name)==0) {
+        VS_LOG_TRACE("Found filter \"%s\" at position %d",
+                     f->name,
+                     i);
+        // this is the one we want
+        break;
+      }
+      ++i;
+    }
+    return f ? make(f) : 0;
+  }
+
 
   BitStreamFilter::~BitStreamFilter ()
   {

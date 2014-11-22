@@ -25,6 +25,17 @@
 using namespace io::humble::video;
 using namespace io::humble::ferry;
 
+class BitStreamFilterTypeTest : public CxxTest::TestSuite
+{
+public:
+  BitStreamFilterTypeTest();
+
+  void testGetNumBitStreamFilterTypes();
+  void testGetBitStreamFilterType();
+
+  virtual ~BitStreamFilterTypeTest();
+};
+
 class BitStreamFilterTest : public CxxTest::TestSuite
 {
 public:

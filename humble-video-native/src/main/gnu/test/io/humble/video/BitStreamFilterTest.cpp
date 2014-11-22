@@ -18,6 +18,46 @@
  *******************************************************************************/
 
 #include "BitStreamFilterTest.h"
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/LoggerStack.h>
+
+#include <io/humble/ferry/RefPointer.h>
+
+using namespace io::humble::ferry;
+using namespace io::humble::video;
+
+VS_LOG_SETUP(VS_CPP_PACKAGE);
+
+BitStreamFilterTypeTest::BitStreamFilterTypeTest ()
+{
+}
+
+BitStreamFilterTypeTest::~BitStreamFilterTypeTest ()
+{
+}
+
+void
+BitStreamFilterTypeTest::testGetNumBitStreamFilterTypes() {
+  int32_t n = BitStreamFilterType::getNumBitStreamFilterTypes();
+  // NOTE: This will break each time a new bit filter type is added to Ffmpeg,
+  // but I want that so we re-look at it.
+  TS_ASSERT_EQUALS(12, n);
+}
+
+void
+BitStreamFilterTypeTest::testGetBitStreamFilterType() {
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_INFO, false);
+
+  int32_t n = BitStreamFilterType::getNumBitStreamFilterTypes();
+  for(int32_t i = 0; i < n; i++) {
+    RefPointer<BitStreamFilterType> t1 = BitStreamFilterType::getBitStreamFilterType(i);
+    TS_ASSERT(t1->getName() != 0);
+    RefPointer<BitStreamFilterType> t2 = BitStreamFilterType::getBitStreamFilterType(t1->getName());
+    TS_ASSERT(strcmp(t1->getName(), t2->getName()) == 0);
+    VS_LOG_DEBUG("(%03d) Filter: %s", i, t1->getName());
+  }
+}
 
 BitStreamFilterTest::BitStreamFilterTest ()
 {

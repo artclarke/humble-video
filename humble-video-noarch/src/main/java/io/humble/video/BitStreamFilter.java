@@ -113,41 +113,4 @@ public class BitStreamFilter extends RefCounted {
   // JNIHelper.swg: End generated code
   
 
-  public static BitStreamFilter make(String filtername, Coder coder) {
-    long cPtr = VideoJNI.BitStreamFilter_make__SWIG_0(filtername, Coder.getCPtr(coder), coder);
-    return (cPtr == 0) ? null : new BitStreamFilter(cPtr, false);
-  }
-
-  public static BitStreamFilter make(String filtername) {
-    long cPtr = VideoJNI.BitStreamFilter_make__SWIG_1(filtername);
-    return (cPtr == 0) ? null : new BitStreamFilter(cPtr, false);
-  }
-
-  public static BitStreamFilter make(BitStreamFilterType type, Coder coder) {
-    long cPtr = VideoJNI.BitStreamFilter_make__SWIG_2(BitStreamFilterType.getCPtr(type), type, Coder.getCPtr(coder), coder);
-    return (cPtr == 0) ? null : new BitStreamFilter(cPtr, false);
-  }
-
-  public static BitStreamFilter make(BitStreamFilterType type) {
-    long cPtr = VideoJNI.BitStreamFilter_make__SWIG_3(BitStreamFilterType.getCPtr(type), type);
-    return (cPtr == 0) ? null : new BitStreamFilter(cPtr, false);
-  }
-
-  public int filter(Buffer output, Buffer input, int inputSize, String args, boolean isKey) {
-    return VideoJNI.BitStreamFilter_filter__SWIG_0(swigCPtr, this, Buffer.getCPtr(output), output, Buffer.getCPtr(input), input, inputSize, args, isKey);
-  }
-
-  public void filter(MediaPacket output, MediaPacket input, String args) {
-    VideoJNI.BitStreamFilter_filter__SWIG_1(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaPacket.getCPtr(input), input, args);
-  }
-
-  public BitStreamFilterType getType() {
-    long cPtr = VideoJNI.BitStreamFilter_getType(swigCPtr, this);
-    return (cPtr == 0) ? null : new BitStreamFilterType(cPtr, false);
-  }
-
-  public String getName() {
-    return VideoJNI.BitStreamFilter_getName(swigCPtr, this);
-  }
-
 }
