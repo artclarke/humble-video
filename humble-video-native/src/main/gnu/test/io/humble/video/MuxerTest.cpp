@@ -29,6 +29,7 @@
 #include <io/humble/video/Demuxer.h>
 #include <io/humble/video/Decoder.h>
 #include <io/humble/video/MediaPacket.h>
+#include <io/humble/video/BitStreamFilter.h>
 
 VS_LOG_SETUP(io.humble.video);
 
@@ -112,14 +113,14 @@ MuxerTest::testHLSRemuxing() {
 //  TS_SKIP("leak fixed but still need to determine right muxing strategy");
   RefPointer<Muxer> muxer;
 
-  muxer = Muxer::make("MuxerTest_testHLSRemuxing", 0, "hls");
+  muxer = Muxer::make("MuxerTest_testHLSRemuxing.m3u8", 0, "hls");
   muxer->setProperty("start_number", (int64_t)0LL);
-  muxer->setProperty("hls_time", (int64_t)1LL);
-  muxer->setProperty("hls_list_size", (int64_t)5LL);
+  muxer->setProperty("hls_time", (int64_t)2LL);
+  muxer->setProperty("hls_list_size", (int64_t)0LL);
   muxer->setProperty("hls_wrap", (int64_t)0LL);
 
-  //  TestData::Fixture* fixture=mFixtures.getFixture("testfile_h264_mp4a_tmcd.mov");
-  TestData::Fixture* fixture=mFixtures.getFixture("ucl_h264_aac.mp4");
+  TestData::Fixture* fixture=mFixtures.getFixture("testfile_h264_mp4a_tmcd.mov");
+//  TestData::Fixture* fixture=mFixtures.getFixture("ucl_h264_aac.mp4");
   TS_ASSERT(fixture);
   char filepath[2048];
   mFixtures.fillPath(fixture, filepath, sizeof(filepath));
@@ -132,14 +133,26 @@ MuxerTest::testHLSRemuxing() {
   for(int i = 0; i < n; i++) {
     RefPointer<DemuxerStream> demuxerStream = demuxer->getStream(i);
     RefPointer<Decoder> d = demuxerStream->getDecoder();
-    RefPointer<MuxerStream> muxerStream = muxer->addNewStream(d.value());
+    if (d)
+      RefPointer<MuxerStream> muxerStream = muxer->addNewStream(d.value());
   }
   RefPointer<MediaPacket> packet = MediaPacket::make();
+
+  RefPointer<BitStreamFilter> vFilter = BitStreamFilter::make("h264_mp4toannexb");
 
   muxer->open(0, 0);
   int32_t packetNo = 0;
   bool isMemcheck = getenv("VS_TEST_MEMCHECK");
   while(demuxer->read(packet.value()) >= 0) {
+    RefPointer<Coder> coder = packet->getCoder();
+    if (!coder)
+      // skip
+      continue;
+
+    if (coder->getCodecType() == MediaDescriptor::MEDIA_VIDEO) {
+      // call the bit stream filter.
+      vFilter->filter(packet.value(), 0);
+    }
     muxer->write(packet.value(), false);
     ++packetNo;
     if (isMemcheck && packetNo > 10) {

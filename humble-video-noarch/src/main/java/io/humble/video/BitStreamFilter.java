@@ -170,7 +170,25 @@ public class BitStreamFilter extends RefCounted {
  * @throws FfmpegException if the filtering fails for any reason.
  */
   public int filter(Buffer output, int outputOffset, Buffer input, int inputOffset, int inputSize, Coder coder, String args, boolean isKey) {
-    return VideoJNI.BitStreamFilter_filter(swigCPtr, this, Buffer.getCPtr(output), output, outputOffset, Buffer.getCPtr(input), input, inputOffset, inputSize, Coder.getCPtr(coder), coder, args, isKey);
+    return VideoJNI.BitStreamFilter_filter__SWIG_0(swigCPtr, this, Buffer.getCPtr(output), output, outputOffset, Buffer.getCPtr(input), input, inputOffset, inputSize, Coder.getCPtr(coder), coder, args, isKey);
+  }
+
+/**
+ * Filters a packet in place (i.e. the prior contents will be replaced<br>
+ * with the filtered data).<br>
+ * <br>
+ * This method assumes packet.getCoder() is the coder that is being used<br>
+ * for outputting the packet to a stream. If this is not the case, use<br>
+ * the other filter mechanism and construct packets yourself.<br>
+ * <br>
+ * @param packet The packet to filter in place.<br>
+ * @param args Text arguments for the filter.<br>
+ * <br>
+ * @throws InvalidArgument if output is null.<br>
+ * @throws InvalidArgument if input is null or not complete.
+ */
+  public void filter(MediaPacket packet, String args) {
+    VideoJNI.BitStreamFilter_filter__SWIG_1(swigCPtr, this, MediaPacket.getCPtr(packet), packet, args);
   }
 
 }

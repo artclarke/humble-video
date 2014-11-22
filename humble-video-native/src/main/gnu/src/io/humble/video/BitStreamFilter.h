@@ -34,7 +34,6 @@
 #include <io/humble/video/Coder.h>
 #include <io/humble/video/MediaPacket.h>
 
-
 namespace io { namespace humble { namespace video {
 
   /**
@@ -126,10 +125,23 @@ namespace io { namespace humble { namespace video {
            Coder* coder,
            const char* args,
            bool isKey);
-    /*
-    virtual void filter(MediaPacket* output, MediaPacket* input, const char* args);
 
-*/
+    /**
+     * Filters a packet in place (i.e. the prior contents will be replaced
+     * with the filtered data).
+     *
+     * This method assumes packet.getCoder() is the coder that is being used
+     * for outputting the packet to a stream. If this is not the case, use
+     * the other filter mechanism and construct packets yourself.
+     *
+     * @param packet The packet to filter in place.
+     * @param args Text arguments for the filter.
+     *
+     * @throws InvalidArgument if output is null.
+     * @throws InvalidArgument if input is null or not complete.
+     */
+    virtual void filter(MediaPacket* packet,
+                        const char* args);
   private:
     virtual ~BitStreamFilter ();
     BitStreamFilter (AVBitStreamFilterContext* ctx, BitStreamFilterType *type);

@@ -26,6 +26,7 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/Global.h>
+#include <io/humble/video/MediaPacketImpl.h>
 
 #include "BitStreamFilter.h"
 
@@ -187,26 +188,54 @@ namespace io { namespace humble { namespace video {
                                      &out, &outputSize,
                                      in, inputSize, isKey);
       FfmpegException::check(e, "could not filter buffer");
-      if (e == 0)
-        // see documentation of av_bitstream_filter_filter
-        if (!out) out = in;
 
       // we ALWAYS copy the buffers when filtering.
       uint8_t* outB = static_cast<uint8_t*>(output->getBytes(outputOffset, outputSize));
       if (!outB)
         throw HumbleRuntimeError("could not get output bytes; buffer may not be large enough");
-      memcpy(outB, out, outputSize);
-      if (e){
+      if (e) {
+        if (!out)
+          throw HumbleRuntimeError("no memory allocated for output buffer?");
+        // guaranteed to be allocated memory
+        memcpy(outB, out, outputSize);
         // the output buffer was allocated.
         av_free(out);
+        out = 0;
+      } else {
+        // see documentation of av_bitstream_filter_filter
+        if (!out) out = in;
+
+        // be cautious and do memmove in case input == output.
+        memmove(outB, out, outputSize);
       }
     } catch (...) {
       if (e){
         // the output buffer was allocated.
         av_free(out);
+        out = 0;
       }
     }
     return outputSize;
+  }
+
+  void
+  BitStreamFilter::filter(MediaPacket* aPacket, const char* args) {
+    MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(aPacket);
+    if (!packet)
+      throw HumbleInvalidArgument("no packet");
+
+    if (!packet->isComplete())
+      throw HumbleInvalidArgument("packet is not complete");
+
+    // let's get our buffer
+    RefPointer<Buffer> input = packet->getData();
+    RefPointer<Coder> coder = packet->getCoder();
+
+    int32_t size = filter(input.value(), 0,
+                          input.value(), 0, packet->getSize(),
+                          coder.value(), args, packet->isKey());
+
+    packet->setComplete(true, size);
   }
 
 } /* namespace video */

@@ -35321,7 +35321,7 @@ SWIGEXPORT jstring JNICALL Java_io_humble_video_VideoJNI_BitStreamFilter_1getNam
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_BitStreamFilter_1filter(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jlong jarg4, jobject jarg4_, jint jarg5, jint jarg6, jlong jarg7, jobject jarg7_, jstring jarg8, jboolean jarg9) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_BitStreamFilter_1filter_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jlong jarg4, jobject jarg4_, jint jarg5, jint jarg6, jlong jarg7, jobject jarg7_, jstring jarg8, jboolean jarg9) {
   jint jresult = 0 ;
   io::humble::video::BitStreamFilter *arg1 = (io::humble::video::BitStreamFilter *) 0 ;
   io::humble::ferry::Buffer *arg2 = (io::humble::ferry::Buffer *) 0 ;
@@ -35388,6 +35388,58 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_BitStreamFilter_1filter(JN
   jresult = (jint)result; 
   if (arg8) jenv->ReleaseStringUTFChars(jarg8, (const char *)arg8);
   return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_BitStreamFilter_1filter_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jstring jarg3) {
+  io::humble::video::BitStreamFilter *arg1 = (io::humble::video::BitStreamFilter *) 0 ;
+  io::humble::video::MediaPacket *arg2 = (io::humble::video::MediaPacket *) 0 ;
+  char *arg3 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(io::humble::video::BitStreamFilter **)&jarg1; 
+  arg2 = *(io::humble::video::MediaPacket **)&jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return ;
+  }
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return ;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,142,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      (arg1)->filter(arg2,(char const *)arg3);
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return ;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return ;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
 }
 
 
