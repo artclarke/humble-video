@@ -173,7 +173,7 @@ namespace io { namespace humble { namespace video {
 
 
     // get the raw bytes for input and output
-    int32_t outputSize = 0;
+    int32_t outputSize = inputSize;
     uint8_t* out = 0;
     int e = -1;
     uint8_t* in = static_cast<uint8_t*>(input->getBytes(inputOffset, inputSize));
@@ -196,12 +196,12 @@ namespace io { namespace humble { namespace video {
       if (!outB)
         throw HumbleRuntimeError("could not get output bytes; buffer may not be large enough");
       memcpy(outB, out, outputSize);
-      if (!e){
+      if (e){
         // the output buffer was allocated.
         av_free(out);
       }
     } catch (...) {
-      if (!e){
+      if (e){
         // the output buffer was allocated.
         av_free(out);
       }
