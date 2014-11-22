@@ -113,10 +113,10 @@ MuxerTest::testHLSRemuxing() {
   RefPointer<Muxer> muxer;
 
   muxer = Muxer::make("MuxerTest_testHLSRemuxing", 0, "hls");
-  muxer->setProperty("start_number", 0LL);
-  muxer->setProperty("hls_time", 1LL);
-  muxer->setProperty("hls_list_size", 5LL);
-  muxer->setProperty("hls_wrap", 0LL);
+  muxer->setProperty("start_number", (int64_t)0LL);
+  muxer->setProperty("hls_time", (int64_t)1LL);
+  muxer->setProperty("hls_list_size", (int64_t)5LL);
+  muxer->setProperty("hls_wrap", (int64_t)0LL);
 
   //  TestData::Fixture* fixture=mFixtures.getFixture("testfile_h264_mp4a_tmcd.mov");
   TestData::Fixture* fixture=mFixtures.getFixture("ucl_h264_aac.mp4");
