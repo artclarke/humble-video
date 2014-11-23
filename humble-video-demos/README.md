@@ -5,7 +5,7 @@ concepts.
 
 | Demo | What You'll Learn |
 | ------ | ------------------- |
-| [GetContainerInfo](https://github.com/artclarke/humble-video/blob/develop/humble-video-demos/src/main/java/io/humble/video/demos/GetContainerInfo.java) | How to open up a media file (Container) and query the contents of that container. |
+| [GetContainerInfo](src/main/java/io/humble/video/demos/GetContainerInfo.java) | How to open up a media file (Container) and query the contents of that container. |
 | [DecodeAndPlayAudio](https://github.com/artclarke/humble-video/blob/develop/humble-video-demos/src/main/java/io/humble/video/demos/DecodeAndPlayAudio.java) | How to open a media file, find an audio stream, decode/uncompress the audio, and play it back on your speakers. |
 | [DecodeAndPlayVideo](https://github.com/artclarke/humble-video/blob/develop/humble-video-demos/src/main/java/io/humble/video/demos/DecodeAndPlayVideo.java) | How to open a media file, find an video stream, decode/uncompress the video, and then use timestamps to determine the right time to display different pictures so the on-screen timing is right. |
 | [RecordAndEncodeVideo](https://github.com/artclarke/humble-video/blob/develop/humble-video-demos/src/main/java/io/humble/video/demos/RecordAndEncodeVideo.java) | Recording a screen-capture. This demo shows how to open a media file for writing (Muxer), how to get screenshots from Java, how to add streams to a Muxer, and how to Encode and write video data. |
