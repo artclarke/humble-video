@@ -256,7 +256,7 @@ Muxer::close() {
   }
   if (mIOHandler) {
     e = mIOHandler->url_close();
-  } else if (!ctx->flags & AVFMT_NOFILE)
+  } else if (!(ctx->flags & AVFMT_NOFILE))
     e = avio_close(ctx->pb);
   FfmpegException::check(e, "could not close url ");
   mState = STATE_CLOSED;
