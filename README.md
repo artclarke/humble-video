@@ -9,13 +9,32 @@ If using Maven, Humble is deployed to the Maven Central Repository. To include i
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-all</artifactId>
-      <version>0.1.1</version>
+      <version>0.2.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
 ```
 
-# Please read this BEFORE running 'mvn install'.
+# Demoes of the API in action.
+
+To see how to use the API, go to the [humble-video-demos](humble-video-demos/) package.
+
+# Support Platforms
+
+Humble Video's Maven Central artifacts contain native (i.e. non-Java) code and are tests to run on the following platforms:
+
+
+| Operating System | Architecture |
+| ------ | ------------------- |
+| Microsoft Windows XP or later | i686 and x86_64 intel processors |
+| Apple OS X | i686 and x86_64 intel processors |
+| Ubuntu 12.04 LTS and later | i686 and x86_64 intel processors |
+
+If you are running on other platforms, the Maven Central artifacts may not work and you'll have to build your own version. And beware ... building Humble takes a very long time.
+
+# Building Humble Video
+
+## Please read this BEFORE running 'mvn install'.
 
 Welcome to the Humble Video uber project.
 
@@ -39,6 +58,7 @@ It consists of several sub-projects which are detailed below:
   that are inserted into `humble-video-all`.
 * `humble-video-noarch/`: All Java code (and only Java code), including some generated Java code from `humble-video-native`. Unit tests run from here.  These are built with maven. 
 * `humble-video-test/`: All integration (very long running) tests for humble-video. Depends on humble-video-noarch and (via maven profiles) whatever architecture specific versions of the native code Jars it needs.
+* `humble-video-demos/`: A series of demo programs showing the Humble API in action.
 * `humble-video-all/`: A pom that depends on humble-video-noarch and humble-video-arch-all. This will only successfully build on build machines that have all architecture files required staged (i.e. probably not your box).
 * `humble-video-stage/`: Where all the native code's final artifacts (DLLs and the like) end up being place so that all the rest of the maven build system knows where to find them
 
