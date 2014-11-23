@@ -1,7 +1,6 @@
 package io.humble.video;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -37,7 +36,7 @@ public class MuxerFormatTest extends TestCase {
     final MuxerFormat f = MuxerFormat.guessFormat("mp4", null, null);
     assertNotNull(f);
     
-    final List<Codec.ID> l = f.getSupportedCodecs();
+    final Collection<Codec.ID> l = f.getSupportedCodecs();
     assertEquals(21, l.size());
   }
 
