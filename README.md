@@ -19,7 +19,7 @@ If using Maven, Humble is deployed to the Maven Central Repository. To include i
 
 To see how to use the API, go to the [humble-video-demos](humble-video-demos/) package.
 
-# Support Platforms
+# Supported Platforms
 
 Humble Video's Maven Central artifacts contain native (i.e. non-Java) code and are tests to run on the following platforms:
 
