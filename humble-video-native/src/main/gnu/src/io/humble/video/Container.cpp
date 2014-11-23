@@ -160,7 +160,7 @@ Container::doSetupStreams() {
                      );
         avStream->time_base = *goodTimebase;
       } else {
-        VS_LOG_WARN("No timebase set on stream %ld. And no good guess for what to set",
+        VS_LOG_TRACE("No timebase set on stream %ld. And no good guess for what to set",
                     (int32_t)i);
       }
     }

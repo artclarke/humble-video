@@ -87,7 +87,7 @@ Coder::setState(State state) {
   descrs[STATE_OPENED] = "STATE_OPENED";
   descrs[STATE_FLUSHING] = "STATE_FLUSHING";
   descrs[STATE_ERROR] = "STATE_ERROR";
-  VS_LOG_DEBUG("setState Coder@%p[%s -> %s]",
+  VS_LOG_TRACE("setState Coder@%p[%s -> %s]",
                this,
                descrs[mState],
                descrs[state]);
