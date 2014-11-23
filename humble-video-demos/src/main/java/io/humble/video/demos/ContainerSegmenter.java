@@ -20,10 +20,12 @@ package io.humble.video.demos;
 
 import java.io.IOException;
 
+import io.humble.video.BitStreamFilter;
 import io.humble.video.Coder;
 import io.humble.video.Decoder;
 import io.humble.video.Demuxer;
 import io.humble.video.DemuxerStream;
+import io.humble.video.MediaDescriptor.Type;
 import io.humble.video.MediaPacket;
 import io.humble.video.Muxer;
 import io.humble.video.MuxerFormat;
@@ -44,23 +46,25 @@ import org.apache.commons.cli.ParseException;
  * </p>
  * <ul>
  * <li>Re-muxing: The idea of changing containers while not actually re-encoding the data.</li>
+ * <li>Bit Stream Filters: Some containers (like MPEG2TS) require slightly different packets (like annexb: http://www.szatmary.org/blog/25) layouts.
+ *     Bit Stream Filters can re-write packets inline to different layouts.</li>
  * </ul>
  * 
  * <p> 
  * To run from maven, do:
  * </p>
  * <pre>
- * mvn -DskipTests install exec:java -Dexec.mainClass="io.humble.video.demos.ContainerSegmenter" -Dexec.args="inputfile.mp4 output.m3u8"
+ * mvn -DskipTests install exec:java -Dexec.mainClass="io.humble.video.demos.ContainerSegmenter" -Dexec.args="-vf h264_mp4toannexb inputfile.mp4 output.m3u8"
  * </pre>
  * @author aclarke
  *
  */
 public class ContainerSegmenter {
 
-  /**
-   */
   private static void segmentFile(String input, String output, int hls_start,
-      int hls_time, int hls_list_size, int hls_wrap, String hls_base_url) throws InterruptedException, IOException {
+      int hls_time, int hls_list_size, int hls_wrap, String hls_base_url,
+      String vFilter,
+      String aFilter) throws InterruptedException, IOException {
 
     final Demuxer demuxer = Demuxer.make();
     
@@ -77,12 +81,18 @@ public class ContainerSegmenter {
     
     final MuxerFormat format = MuxerFormat.guessFormat("mp4", null, null);
     
+    /**
+     * Create bit stream filters if we are asked to.
+     */
+    final BitStreamFilter vf = vFilter != null ? BitStreamFilter.make(vFilter) : null;
+    final BitStreamFilter af = aFilter != null ? BitStreamFilter.make(aFilter) : null;
+    
     int n = demuxer.getNumStreams();
-    Decoder[] decoders = new Decoder[n];
+    final Decoder[] decoders = new Decoder[n];
     for(int i = 0; i < n; i++) {
-      DemuxerStream ds = demuxer.getStream(i);
+      final DemuxerStream ds = demuxer.getStream(i);
       decoders[i] = ds.getDecoder();
-      Decoder d = decoders[i];
+      final Decoder d = decoders[i];
       
       if (d != null) {
         // neat; we can decode. Now let's see if this decoder can fit into the mp4 format.
@@ -101,8 +111,16 @@ public class ContainerSegmenter {
       /**
        * Now we have a packet, but we can only write packets that had decoders we knew what to do with.
        */
-      if (packet.isComplete() && decoders[packet.getStreamIndex()] != null)
+      final Decoder d = decoders[packet.getStreamIndex()];
+      if (packet.isComplete() && d != null) {
+        // check to see if we are using bit stream filters, and if so, filter the audio
+        // or video.
+        if (vf != null && d.getCodecType() == Type.MEDIA_VIDEO)
+          vf.filter(packet, null);
+        else if (af != null && d.getCodecType() == Type.MEDIA_AUDIO)
+          af.filter(packet, null);
         muxer.write(packet, true);
+      }
     }
 
     // It is good practice to close demuxers when you're done to free
@@ -136,7 +154,7 @@ public class ContainerSegmenter {
     options.addOption(OptionBuilder.withArgName("hls_list_size")
         .withLongOpt("hls_list_size")
         .hasArg()
-        .withDescription("maximum number of playlist entries (defaults to 5).")
+        .withDescription("maximum number of playlist entries (defaults to 0).")
         .create("l"));
     options.addOption(OptionBuilder.withArgName("hls_wrap")
         .withLongOpt("hls_wrap")
@@ -147,7 +165,17 @@ public class ContainerSegmenter {
         .withLongOpt("hls_base_url")
         .hasArg()
         .withDescription("URL to prepend to each playlist entry (defaults to '').")
-        .create("w"));
+        .create("b"));
+    options.addOption(OptionBuilder.withArgName("v_filter")
+        .withLongOpt("v_filter")
+        .hasArg()
+        .withDescription("bitstream filter to use for video packets (defaults to '').")
+        .create("vf"));
+    options.addOption(OptionBuilder.withArgName("a_filter")
+        .withLongOpt("a_filter")
+        .hasArg()
+        .withDescription("bitstream filter to use for audio packets (defaults to '').")
+        .create("af"));
 
     final CommandLineParser parser = new org.apache.commons.cli.BasicParser();
     try {
@@ -170,16 +198,18 @@ public class ContainerSegmenter {
         final int hls_time = Integer.parseInt(cmd.getOptionValue("hls_time", "2"));
         if (hls_time <= 0)
           throw new IllegalArgumentException("hls_time must be > 0");
-        final int hls_list_size = Integer.parseInt(cmd.getOptionValue("hls_list_size", "5"));
-        if (hls_list_size <= 0)
+        final int hls_list_size = Integer.parseInt(cmd.getOptionValue("hls_list_size", "0"));
+        if (hls_list_size < 0)
           throw new IllegalArgumentException("hls_list_size must be > 0");
         final int hls_wrap = Integer.parseInt(cmd.getOptionValue("hls_wrap", "0"));
         if (hls_wrap < 0)
           throw new IllegalArgumentException("hls_wrap must be >= 0");
         final String hls_base_url = cmd.getOptionValue("hls_base_url");
+        final String vFilter = cmd.getOptionValue("v_filter");
+        final String aFilter = cmd.getOptionValue("a_filter");
         final String input = cmd.getArgs()[0];
         final String output = cmd.getArgs()[1];
-        segmentFile(input, output, hls_start, hls_time, hls_list_size, hls_wrap, hls_base_url);
+        segmentFile(input, output, hls_start, hls_time, hls_list_size, hls_wrap, hls_base_url, vFilter, aFilter);
       }
     } catch (ParseException e) {
       System.err.println("Exception parsing command line: " + e.getLocalizedMessage());

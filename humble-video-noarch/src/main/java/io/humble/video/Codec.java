@@ -165,7 +165,7 @@ public class Codec extends RefCounted {
    * @return a list
    */
 
-  public java.util.List<Rational>
+  public java.util.Collection<Rational>
   getSupportedVideoFrameRates()
   {
     java.util.List<Rational> retval =
@@ -194,7 +194,7 @@ public class Codec extends RefCounted {
    * @return a list
    */
 
-  public java.util.List<PixelFormat.Type>
+  public java.util.Collection<PixelFormat.Type>
   getSupportedVideoPixelFormats()
   {
     java.util.List<PixelFormat.Type> retval =
@@ -223,7 +223,7 @@ public class Codec extends RefCounted {
    * @return a list
    */
 
-  public java.util.List<Integer>
+  public java.util.Collection<Integer>
   getSupportedAudioSampleRates()
   {
     java.util.List<Integer> retval =
@@ -252,7 +252,7 @@ public class Codec extends RefCounted {
    * @return a list
    */
 
-  public java.util.List<AudioFormat.Type>
+  public java.util.Collection<AudioFormat.Type>
   getSupportedAudioFormats()
   {
     java.util.List<AudioFormat.Type> retval =
@@ -281,7 +281,7 @@ public class Codec extends RefCounted {
    * @return a list
    */
 
-  public java.util.List<AudioChannel.Layout>
+  public java.util.Collection<AudioChannel.Layout>
   getSupportedAudioChannelLayouts()
   {
     java.util.List<AudioChannel.Layout> retval =

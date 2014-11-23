@@ -18,9 +18,60 @@
  *******************************************************************************/
 
 %typemap (javacode) io::humble::video::BitStreamFilterType,io::humble::video::BitStreamFilterType*,io::humble::video::BitStreamFilterType& %{
+  /**
+   * info about this filter object
+   * @return information about this object
+   */
+   
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("name:"+getName()+";");
+    result.append("]");
+    return result.toString();
+  }
+  
+    /**
+   * Gets a collection of ALL codecs installed on this
+   * system. 
+   * 
+   * @return A collection of all installed codecs.
+   */
+  public static java.util.Collection<BitStreamFilterType>
+  getInstalledBitStreamFilterTypes()
+  {
+    java.util.Collection<BitStreamFilterType> retval = new java.util.HashSet<BitStreamFilterType>();
+    int count = getNumBitStreamFilterTypes();
+    for(int i=0;i<count;i++)
+    {
+      BitStreamFilterType t = getBitStreamFilterType(i);
+      if (t != null)
+        retval.add(t);
+    }
+    return retval;
+  }
 %}
 
 %typemap (javacode) io::humble::video::BitStreamFilter,io::humble::video::BitStreamFilter*,io::humble::video::BitStreamFilter& %{
+  /**
+   * info about this filter object
+   * @return information about this object
+   */
+   
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("name:"+getName()+";");
+    result.append("]");
+    return result.toString();
+  }
+  
 %}
 
 %include <io/humble/video/BitStreamFilter.h>

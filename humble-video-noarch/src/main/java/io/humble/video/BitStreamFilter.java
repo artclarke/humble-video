@@ -112,6 +112,22 @@ public class BitStreamFilter extends RefCounted {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<
   // JNIHelper.swg: End generated code
   
+  /**
+   * info about this filter object
+   * @return information about this object
+   */
+   
+  @Override
+  public String toString()
+  {
+    StringBuilder result = new StringBuilder();
+    
+    result.append(this.getClass().getName()+"@"+hashCode()+"[");
+    result.append("name:"+getName()+";");
+    result.append("]");
+    return result.toString();
+  }
+  
 
 /**
  * Create a filter given the name.<br>

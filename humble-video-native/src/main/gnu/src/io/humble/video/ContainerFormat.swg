@@ -56,7 +56,7 @@
     *
     * @return A list of supported codecs, in decreasing preferred order.
     */
-   public java.util.List<Codec.ID> getSupportedCodecs()
+   public java.util.Collection<Codec.ID> getSupportedCodecs()
    {
      final java.util.List<Codec.ID> retval =
        new java.util.LinkedList<Codec.ID>();
@@ -87,7 +87,7 @@
     *
     * @return A list of supported codec tags, in decreasing preferred order.
     */
-   public java.util.List<Long> getSupportedTags()
+   public java.util.Collection<Long> getSupportedTags()
    {
      final java.util.List<Long> retval =
        new java.util.LinkedList<Long>();
