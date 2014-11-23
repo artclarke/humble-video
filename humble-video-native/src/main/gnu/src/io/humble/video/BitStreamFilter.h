@@ -41,7 +41,7 @@ namespace io { namespace humble { namespace video {
    *
    * @see BitStreamFilter
    */
-  class BitStreamFilterType : public io::humble::ferry::RefCounted
+  class VS_API_HUMBLEVIDEO BitStreamFilterType : public io::humble::ferry::RefCounted
   {
   public:
     virtual const char* getName() { return mCtx->name; }
@@ -63,7 +63,7 @@ namespace io { namespace humble { namespace video {
    * in to add, remove, or modify the bit-stream.
    *
    */
-  class BitStreamFilter : public io::humble::ferry::RefCounted
+  class VS_API_HUMBLEVIDEO BitStreamFilter : public io::humble::ferry::RefCounted
   {
   public:
     /**
