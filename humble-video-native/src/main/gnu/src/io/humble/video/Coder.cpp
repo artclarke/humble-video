@@ -83,6 +83,7 @@ Coder::~Coder() {
 void
 Coder::setState(State state) {
   const char* descrs[4];
+  (void) descrs; // because VS_LOG_TRACE gets compiled away in debug builds.
   descrs[STATE_INITED] = "STATE_INITED";
   descrs[STATE_OPENED] = "STATE_OPENED";
   descrs[STATE_FLUSHING] = "STATE_FLUSHING";
