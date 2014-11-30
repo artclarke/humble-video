@@ -1299,6 +1299,7 @@ public class VideoJNI {
   public final static native long ContainerStream_getIndexEntry(long jarg1, ContainerStream jarg1_, int jarg2);
   public final static native int ContainerStream_getDisposition(long jarg1, ContainerStream jarg1_);
   public final static native long ContainerStream_getAttachedPic(long jarg1, ContainerStream jarg1_);
+  public final static native boolean ContainerStream_matchSpecifier(long jarg1, ContainerStream jarg1_, String jarg2);
   public final static native int Container_FLAG_GENPTS_get();
   public final static native int Container_FLAG_IGNIDX_get();
   public final static native int Container_FLAG_NONBLOCK_get();

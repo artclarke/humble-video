@@ -307,6 +307,23 @@ namespace io { namespace humble { namespace video
     */
    virtual MediaPacket* getAttachedPic();
 
+   /**
+    * Check if the stream is matched by the stream specifier.
+    *
+    * See the "stream specifiers" chapter in the FFmpeg documentation for the syntax
+    * of specifier: https://www.ffmpeg.org/ffmpeg.html#Stream-selection
+    *
+    * @param specifier the specifier string
+    * @return  true if this stream is matched by specifier; false if this stream is not
+    *   matched by specifier;
+    *
+    * @throw InvalidArgument if the specifier is invalid.
+    *
+    * @note  A stream specifier can match several streams in a container.
+    */
+   virtual bool matchSpecifier(const char* specifier);
+
+
 #ifndef SWIG
 
    virtual void setTimeBase(Rational *);
