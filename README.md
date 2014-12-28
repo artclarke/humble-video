@@ -9,7 +9,7 @@ If using Maven, Humble is deployed to the Maven Central Repository. To include i
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-all</artifactId>
-      <version>0.2.0-SNAPSHOT</version>
+      <version>0.2.0</version>
     </dependency>
   </dependencies>
 </project>
