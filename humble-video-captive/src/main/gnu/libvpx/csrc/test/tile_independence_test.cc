@@ -1,11 +1,11 @@
 /*
- Copyright (c) 2012 The WebM project authors. All Rights Reserved.
-
- Use of this source code is governed by a BSD-style license
- that can be found in the LICENSE file in the root of the source
- tree. An additional intellectual property rights grant can be found
- in the file PATENTS.  All contributing project authors may
- be found in the AUTHORS file in the root of the source tree.
+ *  Copyright (c) 2013 The WebM project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree. An additional intellectual property rights grant can be found
+ *  in the file PATENTS.  All contributing project authors may
+ *  be found in the AUTHORS file in the root of the source tree.
  */
 
 #include <cstdio>
@@ -17,9 +17,7 @@
 #include "test/i420_video_source.h"
 #include "test/util.h"
 #include "test/md5_helper.h"
-extern "C" {
 #include "vpx_mem/vpx_mem.h"
-}
 
 namespace {
 class TileIndependenceTest : public ::libvpx_test::EncoderTest,
@@ -31,7 +29,7 @@ class TileIndependenceTest : public ::libvpx_test::EncoderTest,
         md5_inv_order_(),
         n_tiles_(GET_PARAM(1)) {
     init_flags_ = VPX_CODEC_USE_PSNR;
-    vpx_codec_dec_cfg_t cfg;
+    vpx_codec_dec_cfg_t cfg = vpx_codec_dec_cfg_t();
     cfg.w = 704;
     cfg.h = 144;
     cfg.threads = 1;

@@ -23,7 +23,7 @@
 #define AVFILTER_SPP_H
 
 #include "libavcodec/avcodec.h"
-#include "libavcodec/dsputil.h"
+#include "libavcodec/avdct.h"
 #include "avfilter.h"
 
 #define MAX_LEVEL 6 /* quality levels */
@@ -39,7 +39,7 @@ typedef struct {
     uint8_t *src;
     int16_t *temp;
     AVCodecContext *avctx;
-    DSPContext dsp;
+    AVDCT *dct;
     int8_t *non_b_qp_table;
     int non_b_qp_alloc_size;
     int use_bframe_qp;

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2013 Wei Gao <weigao@multicorewareinc.com>
+ * Copyright (C) 2013 Lenny Wang
  *
  * This file is part of FFmpeg.
  *
@@ -23,8 +24,8 @@
 
 #include "config.h"
 #include "avfilter.h"
-#include "libavcodec/dsputil.h"
 #include "transform.h"
+#include "libavutil/pixelutils.h"
 #if CONFIG_OPENCL
 #include "libavutil/opencl.h"
 #endif
@@ -47,7 +48,7 @@ typedef struct {
 } MotionVector;
 
 typedef struct {
-    MotionVector vector;  ///< Motion vector
+    MotionVector vec;     ///< Motion vector
     double angle;         ///< Angle of rotation
     double zoom;          ///< Zoom percentage
 } Transform;
@@ -55,11 +56,10 @@ typedef struct {
 #if CONFIG_OPENCL
 
 typedef struct {
-    size_t matrix_size;
-    float matrix_y[9];
-    float matrix_uv[9];
-    cl_mem cl_matrix_y;
-    cl_mem cl_matrix_uv;
+    cl_command_queue command_queue;
+    cl_program program;
+    cl_kernel kernel_luma;
+    cl_kernel kernel_chroma;
     int in_plane_size[8];
     int out_plane_size[8];
     int plane_num;
@@ -67,13 +67,17 @@ typedef struct {
     size_t cl_inbuf_size;
     cl_mem cl_outbuf;
     size_t cl_outbuf_size;
-    AVOpenCLKernelEnv kernel_env;
 } DeshakeOpenclContext;
 
 #endif
 
+#define MAX_R 64
+
 typedef struct {
     const AVClass *class;
+    int counts[2*MAX_R+1][2*MAX_R+1]; /// < Scratch buffer for motion search
+    double *angles;            ///< Scratch buffer for block angles
+    unsigned angles_size;
     AVFrame *ref;              ///< Previous frame
     int rx;                    ///< Maximum horizontal shift
     int ry;                    ///< Maximum vertical shift
@@ -81,8 +85,7 @@ typedef struct {
     int blocksize;             ///< Size of blocks to compare
     int contrast;              ///< Contrast threshold
     int search;                ///< Motion search method
-    AVCodecContext *avctx;
-    DSPContext c;              ///< Context providing optimized SAD methods
+    av_pixelutils_sad_fn sad;  ///< Sum of the absolute difference function
     Transform last;            ///< Transform from last frame
     int refcount;              ///< Number of reference frames (defines averaging window)
     FILE *fp;

@@ -58,7 +58,7 @@ public class Ferry {
    */
   public static int getMajorVersion() { return MAJOR_VERSION; } 
 
-  private static final int MINOR_VERSION=1;
+  private static final int MINOR_VERSION=2;
   /** The Minor Version Number (Currently
    * &quot;{@value #MINOR_VERSION}&quot;).
    * @return the minor version number.
@@ -67,7 +67,7 @@ public class Ferry {
   public static int getMinorVersion() { return MINOR_VERSION; } 
 
   private static final String VERSION=
-  "0.1";
+  "0.2";
 
   /** The Version String (Currently {@value #VERSION}).
    * @return the version string

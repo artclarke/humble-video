@@ -9,8 +9,8 @@
  */
 
 
-#ifndef VPX_PORTS_MEM_H
-#define VPX_PORTS_MEM_H
+#ifndef VPX_PORTS_MEM_H_
+#define VPX_PORTS_MEM_H_
 
 #include "vpx_config.h"
 #include "vpx/vpx_integer.h"
@@ -22,7 +22,6 @@
 #else
 #warning No alignment directives known for this compiler.
 #define DECLARE_ALIGNED(n,typ,val)  typ val
-#endif
 #endif
 
 
@@ -45,3 +44,9 @@
 #else
 #define UNINITIALIZED_IS_SAFE(x) x
 #endif
+
+#if HAVE_NEON && defined(_MSC_VER)
+#define __builtin_prefetch(x)
+#endif
+
+#endif  // VPX_PORTS_MEM_H_

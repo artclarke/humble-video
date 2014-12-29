@@ -45,6 +45,8 @@
 #include "flacdata.h"
 #include "flacdsp.h"
 #include "thread.h"
+#include "unary.h"
+
 
 typedef struct FLACContext {
     FLACSTREAMINFO
@@ -128,6 +130,7 @@ static void dump_headers(AVCodecContext *avctx, FLACStreaminfo *s)
 static int allocate_buffers(FLACContext *s)
 {
     int buf_size;
+    int ret;
 
     av_assert0(s->max_blocksize);
 
@@ -140,9 +143,10 @@ static int allocate_buffers(FLACContext *s)
     if (!s->decoded_buffer)
         return AVERROR(ENOMEM);
 
-    return av_samples_fill_arrays((uint8_t **)s->decoded, NULL,
+    ret = av_samples_fill_arrays((uint8_t **)s->decoded, NULL,
                                   s->decoded_buffer, s->channels,
                                   s->max_blocksize, AV_SAMPLE_FMT_S32P, 0);
+    return ret < 0 ? ret : 0;
 }
 
 /**
@@ -160,7 +164,7 @@ static int parse_streaminfo(FLACContext *s, const uint8_t *buf, int buf_size)
         /* need more data */
         return 0;
     }
-    avpriv_flac_parse_block_header(&buf[4], NULL, &metadata_type, &metadata_size);
+    flac_parse_block_header(&buf[4], NULL, &metadata_type, &metadata_size);
     if (metadata_type != FLAC_METADATA_TYPE_STREAMINFO ||
         metadata_size != FLAC_STREAMINFO_SIZE) {
         return AVERROR_INVALIDDATA;
@@ -191,7 +195,7 @@ static int get_metadata_size(const uint8_t *buf, int buf_size)
     do {
         if (buf_end - buf < 4)
             return 0;
-        avpriv_flac_parse_block_header(buf, &metadata_last, NULL, &metadata_size);
+        flac_parse_block_header(buf, &metadata_last, NULL, &metadata_size);
         buf += 4;
         if (buf_end - buf < metadata_size) {
             /* need more data in order to read the complete header */
@@ -219,6 +223,12 @@ static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
     rice_order = get_bits(&s->gb, 4);
 
     samples= s->blocksize >> rice_order;
+    if (samples << rice_order != s->blocksize) {
+        av_log(s->avctx, AV_LOG_ERROR, "invalid rice order: %i blocksize %i\n",
+               rice_order, s->blocksize);
+        return AVERROR_INVALIDDATA;
+    }
+
     if (pred_order > samples) {
         av_log(s->avctx, AV_LOG_ERROR, "invalid predictor order: %i > %i\n",
                pred_order, samples);
@@ -357,7 +367,6 @@ static inline int decode_subframe(FLACContext *s, int channel)
 
     if (get_bits1(&s->gb)) {
         int left = get_bits_left(&s->gb);
-        wasted = 1;
         if ( left < 0 ||
             (left < bps && !show_bits_long(&s->gb, left)) ||
                            !show_bits_long(&s->gb, bps)) {
@@ -366,8 +375,7 @@ static inline int decode_subframe(FLACContext *s, int channel)
                    bps, left);
             return AVERROR_INVALIDDATA;
         }
-        while (!get_bits1(&s->gb))
-            wasted++;
+        wasted = 1 + get_unary(&s->gb, 1, get_bits_left(&s->gb));
         bps -= wasted;
     }
     if (bps > 32) {
@@ -409,9 +417,9 @@ static int decode_frame(FLACContext *s)
     GetBitContext *gb = &s->gb;
     FLACFrameInfo fi;
 
-    if (ff_flac_decode_frame_header(s->avctx, gb, &fi, 0)) {
+    if ((ret = ff_flac_decode_frame_header(s->avctx, gb, &fi, 0)) < 0) {
         av_log(s->avctx, AV_LOG_ERROR, "invalid frame header\n");
-        return AVERROR_INVALIDDATA;
+        return ret;
     }
 
     if (s->channels && fi.channels != s->channels && s->got_streaminfo) {
@@ -435,7 +443,7 @@ static int decode_frame(FLACContext *s)
     } else if (s->bps && fi.bps != s->bps) {
         av_log(s->avctx, AV_LOG_ERROR, "switching bps mid-stream is not "
                                        "supported\n");
-        return -1;
+        return AVERROR_INVALIDDATA;
     }
 
     if (!s->bps) {
@@ -506,12 +514,12 @@ static int flac_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     if (buf_size > 5 && !memcmp(buf, "\177FLAC", 5)) {
-        av_log(s->avctx, AV_LOG_DEBUG, "skiping flac header packet 1\n");
+        av_log(s->avctx, AV_LOG_DEBUG, "skipping flac header packet 1\n");
         return buf_size;
     }
 
     if (buf_size > 0 && (*buf & 0x7F) == FLAC_METADATA_TYPE_VORBIS_COMMENT) {
-        av_log(s->avctx, AV_LOG_DEBUG, "skiping vorbis comment\n");
+        av_log(s->avctx, AV_LOG_DEBUG, "skipping vorbis comment\n");
         return buf_size;
     }
 
@@ -523,9 +531,9 @@ static int flac_decode_frame(AVCodecContext *avctx, void *data,
 
     /* check for inline header */
     if (AV_RB32(buf) == MKBETAG('f','L','a','C')) {
-        if (!s->got_streaminfo && parse_streaminfo(s, buf, buf_size)) {
+        if (!s->got_streaminfo && (ret = parse_streaminfo(s, buf, buf_size))) {
             av_log(s->avctx, AV_LOG_ERROR, "invalid header\n");
-            return AVERROR_INVALIDDATA;
+            return ret;
         }
         return get_metadata_size(buf, buf_size);
     }
@@ -539,7 +547,7 @@ static int flac_decode_frame(AVCodecContext *avctx, void *data,
     }
     bytes_read = get_bits_count(&s->gb)/8;
 
-    if ((s->avctx->err_recognition & AV_EF_CRCCHECK) &&
+    if ((s->avctx->err_recognition & (AV_EF_CRCCHECK|AV_EF_COMPLIANT)) &&
         av_crc(av_crc_get_table(AV_CRC_16_ANSI),
                0, buf, bytes_read)) {
         av_log(s->avctx, AV_LOG_ERROR, "CRC error at PTS %"PRId64"\n", avpkt->pts);
@@ -591,6 +599,7 @@ static av_cold int flac_decode_close(AVCodecContext *avctx)
 
 AVCodec ff_flac_decoder = {
     .name           = "flac",
+    .long_name      = NULL_IF_CONFIG_SMALL("FLAC (Free Lossless Audio Codec)"),
     .type           = AVMEDIA_TYPE_AUDIO,
     .id             = AV_CODEC_ID_FLAC,
     .priv_data_size = sizeof(FLACContext),
@@ -599,7 +608,6 @@ AVCodec ff_flac_decoder = {
     .decode         = flac_decode_frame,
     .init_thread_copy = ONLY_IF_THREADS_ENABLED(init_thread_copy),
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
-    .long_name      = NULL_IF_CONFIG_SMALL("FLAC (Free Lossless Audio Codec)"),
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16,
                                                       AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_S32,

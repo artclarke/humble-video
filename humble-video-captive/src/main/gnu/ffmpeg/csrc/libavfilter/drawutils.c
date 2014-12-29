@@ -180,10 +180,8 @@ int ff_draw_init(FFDrawContext *draw, enum AVPixelFormat format, unsigned flags)
     draw->format    = format;
     draw->nb_planes = nb_planes;
     memcpy(draw->pixelstep, pixelstep, sizeof(draw->pixelstep));
-    if (nb_planes >= 3 && !(desc->flags & AV_PIX_FMT_FLAG_RGB)) {
-        draw->hsub[1] = draw->hsub[2] = draw->hsub_max = desc->log2_chroma_w;
-        draw->vsub[1] = draw->vsub[2] = draw->vsub_max = desc->log2_chroma_h;
-    }
+    draw->hsub[1] = draw->hsub[2] = draw->hsub_max = desc->log2_chroma_w;
+    draw->vsub[1] = draw->vsub[2] = draw->vsub_max = desc->log2_chroma_h;
     for (i = 0; i < ((desc->nb_components - 1) | 1); i++)
         draw->comp_mask[desc->comp[i].plane] |=
             1 << (desc->comp[i].offset_plus1 - 1);
@@ -519,15 +517,14 @@ int ff_draw_round_to_sub(FFDrawContext *draw, int sub_dir, int round_dir,
 
 AVFilterFormats *ff_draw_supported_pixel_formats(unsigned flags)
 {
-    enum AVPixelFormat i, pix_fmts[AV_PIX_FMT_NB + 1];
-    unsigned n = 0;
+    enum AVPixelFormat i;
     FFDrawContext draw;
+    AVFilterFormats *fmts = NULL;
 
-    for (i = 0; i < AV_PIX_FMT_NB; i++)
+    for (i = 0; av_pix_fmt_desc_get(i); i++)
         if (ff_draw_init(&draw, i, flags) >= 0)
-            pix_fmts[n++] = i;
-    pix_fmts[n++] = AV_PIX_FMT_NONE;
-    return ff_make_format_list(pix_fmts);
+            ff_add_format(&fmts, i);
+    return fmts;
 }
 
 #ifdef TEST
@@ -542,7 +539,7 @@ int main(void)
     FFDrawColor color;
     int r, i;
 
-    for (f = 0; f < AV_PIX_FMT_NB; f++) {
+    for (f = 0; av_pix_fmt_desc_get(f); f++) {
         desc = av_pix_fmt_desc_get(f);
         if (!desc->name)
             continue;

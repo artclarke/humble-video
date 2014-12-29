@@ -1,7 +1,7 @@
 /*****************************************************************************
  * x264cli.h: x264cli common
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -62,6 +62,13 @@ static inline char *get_filename_extension( char *filename )
 
 void x264_cli_log( const char *name, int i_level, const char *fmt, ... );
 void x264_cli_printf( int i_level, const char *fmt, ... );
+
+#ifdef _WIN32
+void x264_cli_set_console_title( const char *title );
+int x264_ansi_filename( const char *filename, char *ansi_filename, int size, int create_file );
+#else
+#define x264_cli_set_console_title( title )
+#endif
 
 #define RETURN_IF_ERR( cond, name, ret, ... )\
 if( cond )\

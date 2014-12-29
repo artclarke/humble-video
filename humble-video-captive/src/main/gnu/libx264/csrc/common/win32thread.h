@@ -1,7 +1,7 @@
 /*****************************************************************************
  * win32thread.h: windows threading
  *****************************************************************************
- * Copyright (C) 2010-2013 x264 project
+ * Copyright (C) 2010-2014 x264 project
  *
  * Authors: Steven Walters <kemuri9@gmail.com>
  *
@@ -26,7 +26,6 @@
 #ifndef X264_WIN32THREAD_H
 #define X264_WIN32THREAD_H
 
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 /* the following macro is used within x264 */
 #undef ERROR

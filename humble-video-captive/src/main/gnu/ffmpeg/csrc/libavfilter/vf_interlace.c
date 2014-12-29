@@ -46,7 +46,7 @@ enum FieldType {
     FIELD_LOWER = 1,
 };
 
-typedef struct {
+typedef struct InterlaceContext {
     const AVClass *class;
     enum ScanMode scan;    // top or bottom field first scanning
     int lowpass;           // enable or disable low pass filterning
@@ -100,6 +100,11 @@ static int config_out_props(AVFilterLink *outlink)
         av_log(ctx, AV_LOG_ERROR, "input video height is too small\n");
         return AVERROR_INVALIDDATA;
     }
+
+    if (!s->lowpass)
+        av_log(ctx, AV_LOG_WARNING, "***warning*** Lowpass filter is disabled, "
+               "the resulting video will be aliased rather than interlaced.\n");
+
     // same input size
     outlink->w = inlink->w;
     outlink->h = inlink->h;
@@ -132,7 +137,7 @@ static void copy_picture_field(AVFrame *src_frame, AVFrame *dst_frame,
 
         av_assert0(linesize >= 0);
 
-        lines /= 2;
+        lines = (lines + (field_type == FIELD_UPPER)) / 2;
         if (field_type == FIELD_LOWER)
             srcp += src_frame->linesize[plane];
         if (field_type == FIELD_LOWER)
@@ -180,6 +185,17 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
     if (!s->cur || !s->next)
         return 0;
 
+    if (s->cur->interlaced_frame) {
+        av_log(ctx, AV_LOG_WARNING,
+               "video is already interlaced, adjusting framerate only\n");
+        out = av_frame_clone(s->cur);
+        if (!out)
+            return AVERROR(ENOMEM);
+        out->pts /= 2;  // adjust pts to new framerate
+        ret = ff_filter_frame(outlink, out);
+        return ret;
+    }
+
     tff = (s->scan == MODE_TFF);
     out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
     if (!out)
@@ -214,23 +230,20 @@ static const AVFilterPad inputs[] = {
 
 static const AVFilterPad outputs[] = {
     {
-        .name          = "default",
-        .type          = AVMEDIA_TYPE_VIDEO,
-        .config_props  = config_out_props,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = config_out_props,
     },
     { NULL }
 };
 
-AVFilter avfilter_vf_interlace = {
+AVFilter ff_vf_interlace = {
     .name          = "interlace",
     .description   = NULL_IF_CONFIG_SMALL("Convert progressive video into interlaced."),
     .uninit        = uninit,
-
     .priv_class    = &interlace_class,
     .priv_size     = sizeof(InterlaceContext),
     .query_formats = query_formats,
-
     .inputs        = inputs,
     .outputs       = outputs,
 };
-

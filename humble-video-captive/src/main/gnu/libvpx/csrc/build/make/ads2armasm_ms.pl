@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 ##
 ##  Copyright (c) 2013 The WebM project authors. All Rights Reserved.
 ##
@@ -32,6 +32,7 @@ while (<STDIN>)
 
     s/ldrneb/ldrbne/i;
     s/ldrneh/ldrhne/i;
+    s/^(\s*)ENDP.*/$&\n$1ALIGN 4/;
 
     print;
 }

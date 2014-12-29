@@ -5,8 +5,8 @@
 # ALSO CHANGE ANY CORRESPONDING VERSION NUMBERS IN THE
 # JAVA build.xml FILE
 m4_define([VSM4_LIB_MAJOR_VERSION], [0])
-m4_define([VSM4_LIB_MINOR_VERSION], [1])
-m4_define([VSM4_LIB_PATCH_VERSION], [1])
+m4_define([VSM4_LIB_MINOR_VERSION], [2])
+m4_define([VSM4_LIB_PATCH_VERSION], [0])
 m4_define([VSM4_PROJECT_NAME], [humble-video])
 
 AC_INIT(VSM4_PROJECT_NAME,[VSM4_LIB_MAJOR_VERSION.VSM4_LIB_MINOR_VERSION.VSM4_LIB_PATCH_VERSION],[info@humble.io])
@@ -153,10 +153,17 @@ case $host in
   ;;
   *darwin*)
   HOST_TYPE=Mac
+  VS_CFLAGS+="-Wno-error=unused-command-line-argument "
+  VS_LDFLAGS+="-Wno-error=unused-command-line-argument "
+  case $host_cpu in
+     *i?86*)
+     VS_LDFLAGS+="-Wl,-read_only_relocs -Wl,suppress "
+     ;;
+  esac
   ;;
   *linux*)
   HOST_TYPE=Linux
-  VS_LDFLAGS+="-Wl,-Bsymbolic"
+  VS_LDFLAGS+="-Wl,-Bsymbolic "
   ;;
   *)
   HOST_TYPE=Linux
@@ -325,6 +332,8 @@ AC_FUNC_MALLOC
 AC_FUNC_FSEEKO
 AC_CHECK_FUNCS([memmove memset])
 
+AC_CHECK_LIB(rt,clock_gettime,[VS_LDFLAGS+="-lrt "])
+
 AC_LANG_WERROR
 AC_MSG_CHECKING([if you're now hunting rabbits as well]) #'
 AC_MSG_RESULT([yes])
@@ -398,6 +407,5 @@ AC_CONFIG_FILES([Makefile
                  test/io/humble/ferry/Makefile
                  test/io/humble/video/Makefile
                  test/io/humble/video/customio/Makefile
-                 pom.xml:mk/pom.xml.in
                  ])
 AC_OUTPUT

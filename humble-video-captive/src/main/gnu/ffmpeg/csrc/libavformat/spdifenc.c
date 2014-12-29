@@ -44,6 +44,8 @@
  *      dependent from data-type (spaces between packets are filled by zeros)
  */
 
+#include <inttypes.h>
+
 #include "avformat.h"
 #include "avio_internal.h"
 #include "spdif.h"
@@ -274,7 +276,7 @@ static int spdif_header_dts(AVFormatContext *s, AVPacket *pkt)
         av_log(s, AV_LOG_ERROR, "stray DTS-HD frame\n");
         return AVERROR_INVALIDDATA;
     default:
-        av_log(s, AV_LOG_ERROR, "bad DTS syncword 0x%x\n", syncword_dts);
+        av_log(s, AV_LOG_ERROR, "bad DTS syncword 0x%"PRIx32"\n", syncword_dts);
         return AVERROR_INVALIDDATA;
     }
     blocks++;
@@ -369,8 +371,8 @@ static int spdif_header_aac(AVFormatContext *s, AVPacket *pkt)
         ctx->data_type = IEC61937_MPEG2_AAC_LSF_4096;
         break;
     default:
-        av_log(s, AV_LOG_ERROR, "%i samples in AAC frame not supported\n",
-               hdr.samples);
+        av_log(s, AV_LOG_ERROR,
+               "%"PRIu32" samples in AAC frame not supported\n", hdr.samples);
         return AVERROR(EINVAL);
     }
     //TODO Data type dependent info (LC profile/SBR)
@@ -395,15 +397,15 @@ static int spdif_header_truehd(AVFormatContext *s, AVPacket *pkt)
 {
     IEC61937Context *ctx = s->priv_data;
     int mat_code_length = 0;
-    const char mat_end_code[16] = { 0xC3, 0xC2, 0xC0, 0xC4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x97, 0x11 };
+    static const char mat_end_code[16] = { 0xC3, 0xC2, 0xC0, 0xC4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x97, 0x11 };
 
     if (!ctx->hd_buf_count) {
-        const char mat_start_code[20] = { 0x07, 0x9E, 0x00, 0x03, 0x84, 0x01, 0x01, 0x01, 0x80, 0x00, 0x56, 0xA5, 0x3B, 0xF4, 0x81, 0x83, 0x49, 0x80, 0x77, 0xE0 };
+        static const char mat_start_code[20] = { 0x07, 0x9E, 0x00, 0x03, 0x84, 0x01, 0x01, 0x01, 0x80, 0x00, 0x56, 0xA5, 0x3B, 0xF4, 0x81, 0x83, 0x49, 0x80, 0x77, 0xE0 };
         mat_code_length = sizeof(mat_start_code) + BURST_HEADER_SIZE;
         memcpy(ctx->hd_buf, mat_start_code, sizeof(mat_start_code));
 
     } else if (ctx->hd_buf_count == 12) {
-        const char mat_middle_code[12] = { 0xC3, 0xC1, 0x42, 0x49, 0x3B, 0xFA, 0x82, 0x83, 0x49, 0x80, 0x77, 0xE0 };
+        static const char mat_middle_code[12] = { 0xC3, 0xC1, 0x42, 0x49, 0x3B, 0xFA, 0x82, 0x83, 0x49, 0x80, 0x77, 0xE0 };
         mat_code_length = sizeof(mat_middle_code) + MAT_MIDDLE_CODE_OFFSET;
         memcpy(&ctx->hd_buf[12 * TRUEHD_FRAME_OFFSET - BURST_HEADER_SIZE + MAT_MIDDLE_CODE_OFFSET],
                mat_middle_code, sizeof(mat_middle_code));

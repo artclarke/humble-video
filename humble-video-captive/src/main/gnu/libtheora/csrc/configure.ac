@@ -168,7 +168,7 @@ else
         case $host in 
         *)
                 DEBUG="-g -Wall -Wno-parentheses -DDEBUG -D__NO_MATH_INLINES"
-                CFLAGS="-Wall -Wno-parentheses -O3 -fforce-addr -fomit-frame-pointer -finline-functions -funroll-loops"
+                CFLAGS="-Wall -Wno-parentheses -O3 -fomit-frame-pointer -finline-functions -funroll-loops"
                 PROFILE="-Wall -Wno-parentheses -pg -g -O3 -fno-inline-functions -DDEBUG";;
         esac
 fi

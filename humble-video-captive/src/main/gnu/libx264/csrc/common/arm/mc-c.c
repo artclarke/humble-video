@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mc-c.c: arm motion compensation
  *****************************************************************************
- * Copyright (C) 2009-2013 x264 project
+ * Copyright (C) 2009-2014 x264 project
  *
  * Authors: David Conrad <lessen42@gmail.com>
  *
@@ -37,6 +37,7 @@ void x264_pixel_avg_16x8_neon ( uint8_t *, intptr_t, uint8_t *, intptr_t, uint8_
 void x264_pixel_avg_8x16_neon ( uint8_t *, intptr_t, uint8_t *, intptr_t, uint8_t *, intptr_t, int );
 void x264_pixel_avg_8x8_neon  ( uint8_t *, intptr_t, uint8_t *, intptr_t, uint8_t *, intptr_t, int );
 void x264_pixel_avg_8x4_neon  ( uint8_t *, intptr_t, uint8_t *, intptr_t, uint8_t *, intptr_t, int );
+void x264_pixel_avg_4x16_neon ( uint8_t *, intptr_t, uint8_t *, intptr_t, uint8_t *, intptr_t, int );
 void x264_pixel_avg_4x8_neon  ( uint8_t *, intptr_t, uint8_t *, intptr_t, uint8_t *, intptr_t, int );
 void x264_pixel_avg_4x4_neon  ( uint8_t *, intptr_t, uint8_t *, intptr_t, uint8_t *, intptr_t, int );
 void x264_pixel_avg_4x2_neon  ( uint8_t *, intptr_t, uint8_t *, intptr_t, uint8_t *, intptr_t, int );
@@ -46,13 +47,28 @@ void x264_pixel_avg2_w8_neon ( uint8_t *, intptr_t, uint8_t *, intptr_t, uint8_t
 void x264_pixel_avg2_w16_neon( uint8_t *, intptr_t, uint8_t *, intptr_t, uint8_t *, int );
 void x264_pixel_avg2_w20_neon( uint8_t *, intptr_t, uint8_t *, intptr_t, uint8_t *, int );
 
+void x264_plane_copy_deinterleave_neon(  pixel *dstu, intptr_t i_dstu,
+                                         pixel *dstv, intptr_t i_dstv,
+                                         pixel *src,  intptr_t i_src, int w, int h );
+void x264_plane_copy_deinterleave_rgb_neon( pixel *dsta, intptr_t i_dsta,
+                                            pixel *dstb, intptr_t i_dstb,
+                                            pixel *dstc, intptr_t i_dstc,
+                                            pixel *src,  intptr_t i_src, int pw, int w, int h );
+void x264_plane_copy_interleave_neon( pixel *dst,  intptr_t i_dst,
+                                      pixel *srcu, intptr_t i_srcu,
+                                      pixel *srcv, intptr_t i_srcv, int w, int h );
+
+void x264_store_interleave_chroma_neon( pixel *dst, intptr_t i_dst, pixel *srcu, pixel *srcv, int height );
+void x264_load_deinterleave_chroma_fdec_neon( pixel *dst, pixel *src, intptr_t i_src, int height );
+void x264_load_deinterleave_chroma_fenc_neon( pixel *dst, pixel *src, intptr_t i_src, int height );
+
 #define MC_WEIGHT(func)\
 void x264_mc_weight_w20##func##_neon( uint8_t *, intptr_t, uint8_t *, intptr_t, const x264_weight_t *, int );\
 void x264_mc_weight_w16##func##_neon( uint8_t *, intptr_t, uint8_t *, intptr_t, const x264_weight_t *, int );\
 void x264_mc_weight_w8##func##_neon ( uint8_t *, intptr_t, uint8_t *, intptr_t, const x264_weight_t *, int );\
 void x264_mc_weight_w4##func##_neon ( uint8_t *, intptr_t, uint8_t *, intptr_t, const x264_weight_t *, int );\
 \
-static void (* const x264_mc##func##_wtab_neon[6])( uint8_t *, intptr_t, uint8_t *, intptr_t, const x264_weight_t *, int ) =\
+static weight_fn_t x264_mc##func##_wtab_neon[6] =\
 {\
     x264_mc_weight_w4##func##_neon,\
     x264_mc_weight_w4##func##_neon,\
@@ -72,7 +88,7 @@ void x264_mc_copy_w8_neon ( uint8_t *, intptr_t, uint8_t *, intptr_t, int );
 void x264_mc_copy_w16_neon( uint8_t *, intptr_t, uint8_t *, intptr_t, int );
 void x264_mc_copy_w16_aligned_neon( uint8_t *, intptr_t, uint8_t *, intptr_t, int );
 
-void x264_mc_chroma_neon( uint8_t *, intptr_t, uint8_t *, intptr_t, int, int, int, int );
+void x264_mc_chroma_neon( uint8_t *, uint8_t *, intptr_t, uint8_t *, intptr_t, int, int, int, int );
 void x264_frame_init_lowres_core_neon( uint8_t *, uint8_t *, uint8_t *, uint8_t *, uint8_t *, intptr_t, intptr_t, int, int );
 
 void x264_hpel_filter_v_neon( uint8_t *, uint8_t *, int16_t *, intptr_t, int );
@@ -224,11 +240,20 @@ void x264_mc_init_arm( int cpu, x264_mc_functions_t *pf )
     pf->copy[PIXEL_8x8]   = x264_mc_copy_w8_neon;
     pf->copy[PIXEL_4x4]   = x264_mc_copy_w4_neon;
 
+    pf->plane_copy_deinterleave = x264_plane_copy_deinterleave_neon;
+    pf->plane_copy_deinterleave_rgb = x264_plane_copy_deinterleave_rgb_neon;
+    pf->plane_copy_interleave = x264_plane_copy_interleave_neon;
+
+    pf->store_interleave_chroma = x264_store_interleave_chroma_neon;
+    pf->load_deinterleave_chroma_fdec = x264_load_deinterleave_chroma_fdec_neon;
+    pf->load_deinterleave_chroma_fenc = x264_load_deinterleave_chroma_fenc_neon;
+
     pf->avg[PIXEL_16x16] = x264_pixel_avg_16x16_neon;
     pf->avg[PIXEL_16x8]  = x264_pixel_avg_16x8_neon;
     pf->avg[PIXEL_8x16]  = x264_pixel_avg_8x16_neon;
     pf->avg[PIXEL_8x8]   = x264_pixel_avg_8x8_neon;
     pf->avg[PIXEL_8x4]   = x264_pixel_avg_8x4_neon;
+    pf->avg[PIXEL_4x16]  = x264_pixel_avg_4x16_neon;
     pf->avg[PIXEL_4x8]   = x264_pixel_avg_4x8_neon;
     pf->avg[PIXEL_4x4]   = x264_pixel_avg_4x4_neon;
     pf->avg[PIXEL_4x2]   = x264_pixel_avg_4x2_neon;

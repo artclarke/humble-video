@@ -1,10 +1,10 @@
 ;*****************************************************************************
 ;* const-a.asm: x86 global constants
 ;*****************************************************************************
-;* Copyright (C) 2010-2013 x264 project
+;* Copyright (C) 2010-2014 x264 project
 ;*
 ;* Authors: Loren Merritt <lorenm@u.washington.edu>
-;*          Jason Garrett-Glaser <darkshikari@gmail.com>
+;*          Fiona Glaser <fiona@x264.com>
 ;*
 ;* This program is free software; you can redistribute it and/or modify
 ;* it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ const pw_32,       times 16 dw 32
 const pw_512,      times 16 dw 512
 const pw_00ff,     times 16 dw 0x00ff
 const pw_pixel_max,times 16 dw ((1 << BIT_DEPTH)-1)
+const pw_0to15,    dw 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 const pd_1,        times 8 dd 1
 const deinterleave_shufd, dd 0,4,1,5,2,6,3,7
 const pb_unpackbd1, times 2 db 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3

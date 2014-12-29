@@ -1,7 +1,7 @@
 /*****************************************************************************
  * set.h: header writing
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -38,6 +38,8 @@ void x264_sei_buffering_period_write( x264_t *h, bs_t *s );
 void x264_sei_pic_timing_write( x264_t *h, bs_t *s );
 void x264_sei_dec_ref_pic_marking_write( x264_t *h, bs_t *s );
 void x264_sei_frame_packing_write( x264_t *h, bs_t *s );
+int  x264_sei_avcintra_umid_write( x264_t *h, bs_t *s );
+int  x264_sei_avcintra_vanc_write( x264_t *h, bs_t *s, int len );
 void x264_sei_write( bs_t *s, uint8_t *payload, int payload_size, int payload_type );
 void x264_filler_write( x264_t *h, bs_t *s, int filler );
 

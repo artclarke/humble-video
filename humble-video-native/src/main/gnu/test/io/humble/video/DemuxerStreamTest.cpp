@@ -91,7 +91,7 @@ DemuxerStreamTest::testCreationAndDestruction()
   TS_ASSERT_EQUALS(ContainerStream::PARSE_NONE, fs->getParseType());
   TS_ASSERT(!fs->getAttachedPic());
   RefPointer<Rational> r = fs->getFrameRate();
-  TS_ASSERT(!r);
+  TS_ASSERT_DELTA(15.0, r->getDouble(), 0.0001);
   r = fs->getTimeBase();
   TS_ASSERT_DELTA(f->time_base, r->getDouble(), 0.0001);
   TS_ASSERT_EQUALS(4, fs->getNumIndexEntries());

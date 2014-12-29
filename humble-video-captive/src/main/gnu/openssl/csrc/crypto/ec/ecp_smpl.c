@@ -65,11 +65,16 @@
 #include <openssl/err.h>
 #include <openssl/symhacks.h>
 
+#ifdef OPENSSL_FIPS
+#include <openssl/fips.h>
+#endif
+
 #include "ec_lcl.h"
 
 const EC_METHOD *EC_GFp_simple_method(void)
 	{
 	static const EC_METHOD ret = {
+		EC_FLAGS_DEFAULT_OCT,
 		NID_X9_62_prime_field,
 		ec_GFp_simple_group_init,
 		ec_GFp_simple_group_finish,
@@ -88,9 +93,7 @@ const EC_METHOD *EC_GFp_simple_method(void)
 		ec_GFp_simple_get_Jprojective_coordinates_GFp,
 		ec_GFp_simple_point_set_affine_coordinates,
 		ec_GFp_simple_point_get_affine_coordinates,
-		ec_GFp_simple_set_compressed_coordinates,
-		ec_GFp_simple_point2oct,
-		ec_GFp_simple_oct2point,
+		0,0,0,
 		ec_GFp_simple_add,
 		ec_GFp_simple_dbl,
 		ec_GFp_simple_invert,
@@ -108,6 +111,11 @@ const EC_METHOD *EC_GFp_simple_method(void)
 		0 /* field_encode */,
 		0 /* field_decode */,
 		0 /* field_set_to_one */ };
+
+#ifdef OPENSSL_FIPS
+	if (FIPS_mode())
+		return fips_ec_gfp_simple_method();
+#endif
 
 	return &ret;
 	}
@@ -632,372 +640,6 @@ int ec_GFp_simple_point_get_affine_coordinates(const EC_GROUP *group, const EC_P
 		BN_CTX_free(new_ctx);
 	return ret;
 	}
-
-
-int ec_GFp_simple_set_compressed_coordinates(const EC_GROUP *group, EC_POINT *point,
-	const BIGNUM *x_, int y_bit, BN_CTX *ctx)
-	{
-	BN_CTX *new_ctx = NULL;
-	BIGNUM *tmp1, *tmp2, *x, *y;
-	int ret = 0;
-
-	/* clear error queue*/
-	ERR_clear_error();
-
-	if (ctx == NULL)
-		{
-		ctx = new_ctx = BN_CTX_new();
-		if (ctx == NULL)
-			return 0;
-		}
-
-	y_bit = (y_bit != 0);
-
-	BN_CTX_start(ctx);
-	tmp1 = BN_CTX_get(ctx);
-	tmp2 = BN_CTX_get(ctx);
-	x = BN_CTX_get(ctx);
-	y = BN_CTX_get(ctx);
-	if (y == NULL) goto err;
-
-	/* Recover y.  We have a Weierstrass equation
-	 *     y^2 = x^3 + a*x + b,
-	 * so  y  is one of the square roots of  x^3 + a*x + b.
-	 */
-
-	/* tmp1 := x^3 */
-	if (!BN_nnmod(x, x_, &group->field,ctx)) goto err;
-	if (group->meth->field_decode == 0)
-		{
-		/* field_{sqr,mul} work on standard representation */
-		if (!group->meth->field_sqr(group, tmp2, x_, ctx)) goto err;
-		if (!group->meth->field_mul(group, tmp1, tmp2, x_, ctx)) goto err;
-		}
-	else
-		{
-		if (!BN_mod_sqr(tmp2, x_, &group->field, ctx)) goto err;
-		if (!BN_mod_mul(tmp1, tmp2, x_, &group->field, ctx)) goto err;
-		}
-	
-	/* tmp1 := tmp1 + a*x */
-	if (group->a_is_minus3)
-		{
-		if (!BN_mod_lshift1_quick(tmp2, x, &group->field)) goto err;
-		if (!BN_mod_add_quick(tmp2, tmp2, x, &group->field)) goto err;
-		if (!BN_mod_sub_quick(tmp1, tmp1, tmp2, &group->field)) goto err;
-		}
-	else
-		{
-		if (group->meth->field_decode)
-			{
-			if (!group->meth->field_decode(group, tmp2, &group->a, ctx)) goto err;
-			if (!BN_mod_mul(tmp2, tmp2, x, &group->field, ctx)) goto err;
-			}
-		else
-			{
-			/* field_mul works on standard representation */
-			if (!group->meth->field_mul(group, tmp2, &group->a, x, ctx)) goto err;
-			}
-		
-		if (!BN_mod_add_quick(tmp1, tmp1, tmp2, &group->field)) goto err;
-		}
-	
-	/* tmp1 := tmp1 + b */
-	if (group->meth->field_decode)
-		{
-		if (!group->meth->field_decode(group, tmp2, &group->b, ctx)) goto err;
-		if (!BN_mod_add_quick(tmp1, tmp1, tmp2, &group->field)) goto err;
-		}
-	else
-		{
-		if (!BN_mod_add_quick(tmp1, tmp1, &group->b, &group->field)) goto err;
-		}
-	
-	if (!BN_mod_sqrt(y, tmp1, &group->field, ctx))
-		{
-		unsigned long err = ERR_peek_last_error();
-		
-		if (ERR_GET_LIB(err) == ERR_LIB_BN && ERR_GET_REASON(err) == BN_R_NOT_A_SQUARE)
-			{
-			ERR_clear_error();
-			ECerr(EC_F_EC_GFP_SIMPLE_SET_COMPRESSED_COORDINATES, EC_R_INVALID_COMPRESSED_POINT);
-			}
-		else
-			ECerr(EC_F_EC_GFP_SIMPLE_SET_COMPRESSED_COORDINATES, ERR_R_BN_LIB);
-		goto err;
-		}
-
-	if (y_bit != BN_is_odd(y))
-		{
-		if (BN_is_zero(y))
-			{
-			int kron;
-
-			kron = BN_kronecker(x, &group->field, ctx);
-			if (kron == -2) goto err;
-
-			if (kron == 1)
-				ECerr(EC_F_EC_GFP_SIMPLE_SET_COMPRESSED_COORDINATES, EC_R_INVALID_COMPRESSION_BIT);
-			else
-				/* BN_mod_sqrt() should have cought this error (not a square) */
-				ECerr(EC_F_EC_GFP_SIMPLE_SET_COMPRESSED_COORDINATES, EC_R_INVALID_COMPRESSED_POINT);
-			goto err;
-			}
-		if (!BN_usub(y, &group->field, y)) goto err;
-		}
-	if (y_bit != BN_is_odd(y))
-		{
-		ECerr(EC_F_EC_GFP_SIMPLE_SET_COMPRESSED_COORDINATES, ERR_R_INTERNAL_ERROR);
-		goto err;
-		}
-
-	if (!EC_POINT_set_affine_coordinates_GFp(group, point, x, y, ctx)) goto err;
-
-	ret = 1;
-
- err:
-	BN_CTX_end(ctx);
-	if (new_ctx != NULL)
-		BN_CTX_free(new_ctx);
-	return ret;
-	}
-
-
-size_t ec_GFp_simple_point2oct(const EC_GROUP *group, const EC_POINT *point, point_conversion_form_t form,
-	unsigned char *buf, size_t len, BN_CTX *ctx)
-	{
-	size_t ret;
-	BN_CTX *new_ctx = NULL;
-	int used_ctx = 0;
-	BIGNUM *x, *y;
-	size_t field_len, i, skip;
-
-	if ((form != POINT_CONVERSION_COMPRESSED)
-		&& (form != POINT_CONVERSION_UNCOMPRESSED)
-		&& (form != POINT_CONVERSION_HYBRID))
-		{
-		ECerr(EC_F_EC_GFP_SIMPLE_POINT2OCT, EC_R_INVALID_FORM);
-		goto err;
-		}
-
-	if (EC_POINT_is_at_infinity(group, point))
-		{
-		/* encodes to a single 0 octet */
-		if (buf != NULL)
-			{
-			if (len < 1)
-				{
-				ECerr(EC_F_EC_GFP_SIMPLE_POINT2OCT, EC_R_BUFFER_TOO_SMALL);
-				return 0;
-				}
-			buf[0] = 0;
-			}
-		return 1;
-		}
-
-
-	/* ret := required output buffer length */
-	field_len = BN_num_bytes(&group->field);
-	ret = (form == POINT_CONVERSION_COMPRESSED) ? 1 + field_len : 1 + 2*field_len;
-
-	/* if 'buf' is NULL, just return required length */
-	if (buf != NULL)
-		{
-		if (len < ret)
-			{
-			ECerr(EC_F_EC_GFP_SIMPLE_POINT2OCT, EC_R_BUFFER_TOO_SMALL);
-			goto err;
-			}
-
-		if (ctx == NULL)
-			{
-			ctx = new_ctx = BN_CTX_new();
-			if (ctx == NULL)
-				return 0;
-			}
-
-		BN_CTX_start(ctx);
-		used_ctx = 1;
-		x = BN_CTX_get(ctx);
-		y = BN_CTX_get(ctx);
-		if (y == NULL) goto err;
-
-		if (!EC_POINT_get_affine_coordinates_GFp(group, point, x, y, ctx)) goto err;
-
-		if ((form == POINT_CONVERSION_COMPRESSED || form == POINT_CONVERSION_HYBRID) && BN_is_odd(y))
-			buf[0] = form + 1;
-		else
-			buf[0] = form;
-	
-		i = 1;
-		
-		skip = field_len - BN_num_bytes(x);
-		if (skip > field_len)
-			{
-			ECerr(EC_F_EC_GFP_SIMPLE_POINT2OCT, ERR_R_INTERNAL_ERROR);
-			goto err;
-			}
-		while (skip > 0)
-			{
-			buf[i++] = 0;
-			skip--;
-			}
-		skip = BN_bn2bin(x, buf + i);
-		i += skip;
-		if (i != 1 + field_len)
-			{
-			ECerr(EC_F_EC_GFP_SIMPLE_POINT2OCT, ERR_R_INTERNAL_ERROR);
-			goto err;
-			}
-
-		if (form == POINT_CONVERSION_UNCOMPRESSED || form == POINT_CONVERSION_HYBRID)
-			{
-			skip = field_len - BN_num_bytes(y);
-			if (skip > field_len)
-				{
-				ECerr(EC_F_EC_GFP_SIMPLE_POINT2OCT, ERR_R_INTERNAL_ERROR);
-				goto err;
-				}
-			while (skip > 0)
-				{
-				buf[i++] = 0;
-				skip--;
-				}
-			skip = BN_bn2bin(y, buf + i);
-			i += skip;
-			}
-
-		if (i != ret)
-			{
-			ECerr(EC_F_EC_GFP_SIMPLE_POINT2OCT, ERR_R_INTERNAL_ERROR);
-			goto err;
-			}
-		}
-	
-	if (used_ctx)
-		BN_CTX_end(ctx);
-	if (new_ctx != NULL)
-		BN_CTX_free(new_ctx);
-	return ret;
-
- err:
-	if (used_ctx)
-		BN_CTX_end(ctx);
-	if (new_ctx != NULL)
-		BN_CTX_free(new_ctx);
-	return 0;
-	}
-
-
-int ec_GFp_simple_oct2point(const EC_GROUP *group, EC_POINT *point,
-	const unsigned char *buf, size_t len, BN_CTX *ctx)
-	{
-	point_conversion_form_t form;
-	int y_bit;
-	BN_CTX *new_ctx = NULL;
-	BIGNUM *x, *y;
-	size_t field_len, enc_len;
-	int ret = 0;
-
-	if (len == 0)
-		{
-		ECerr(EC_F_EC_GFP_SIMPLE_OCT2POINT, EC_R_BUFFER_TOO_SMALL);
-		return 0;
-		}
-	form = buf[0];
-	y_bit = form & 1;
-	form = form & ~1U;
-	if ((form != 0)	&& (form != POINT_CONVERSION_COMPRESSED)
-		&& (form != POINT_CONVERSION_UNCOMPRESSED)
-		&& (form != POINT_CONVERSION_HYBRID))
-		{
-		ECerr(EC_F_EC_GFP_SIMPLE_OCT2POINT, EC_R_INVALID_ENCODING);
-		return 0;
-		}
-	if ((form == 0 || form == POINT_CONVERSION_UNCOMPRESSED) && y_bit)
-		{
-		ECerr(EC_F_EC_GFP_SIMPLE_OCT2POINT, EC_R_INVALID_ENCODING);
-		return 0;
-		}
-
-	if (form == 0)
-		{
-		if (len != 1)
-			{
-			ECerr(EC_F_EC_GFP_SIMPLE_OCT2POINT, EC_R_INVALID_ENCODING);
-			return 0;
-			}
-
-		return EC_POINT_set_to_infinity(group, point);
-		}
-	
-	field_len = BN_num_bytes(&group->field);
-	enc_len = (form == POINT_CONVERSION_COMPRESSED) ? 1 + field_len : 1 + 2*field_len;
-
-	if (len != enc_len)
-		{
-		ECerr(EC_F_EC_GFP_SIMPLE_OCT2POINT, EC_R_INVALID_ENCODING);
-		return 0;
-		}
-
-	if (ctx == NULL)
-		{
-		ctx = new_ctx = BN_CTX_new();
-		if (ctx == NULL)
-			return 0;
-		}
-
-	BN_CTX_start(ctx);
-	x = BN_CTX_get(ctx);
-	y = BN_CTX_get(ctx);
-	if (y == NULL) goto err;
-
-	if (!BN_bin2bn(buf + 1, field_len, x)) goto err;
-	if (BN_ucmp(x, &group->field) >= 0)
-		{
-		ECerr(EC_F_EC_GFP_SIMPLE_OCT2POINT, EC_R_INVALID_ENCODING);
-		goto err;
-		}
-
-	if (form == POINT_CONVERSION_COMPRESSED)
-		{
-		if (!EC_POINT_set_compressed_coordinates_GFp(group, point, x, y_bit, ctx)) goto err;
-		}
-	else
-		{
-		if (!BN_bin2bn(buf + 1 + field_len, field_len, y)) goto err;
-		if (BN_ucmp(y, &group->field) >= 0)
-			{
-			ECerr(EC_F_EC_GFP_SIMPLE_OCT2POINT, EC_R_INVALID_ENCODING);
-			goto err;
-			}
-		if (form == POINT_CONVERSION_HYBRID)
-			{
-			if (y_bit != BN_is_odd(y))
-				{
-				ECerr(EC_F_EC_GFP_SIMPLE_OCT2POINT, EC_R_INVALID_ENCODING);
-				goto err;
-				}
-			}
-
-		if (!EC_POINT_set_affine_coordinates_GFp(group, point, x, y, ctx)) goto err;
-		}
-	
-	if (!EC_POINT_is_on_curve(group, point, ctx)) /* test required by X9.62 */
-		{
-		ECerr(EC_F_EC_GFP_SIMPLE_OCT2POINT, EC_R_POINT_IS_NOT_ON_CURVE);
-		goto err;
-		}
-
-	ret = 1;
-	
- err:
-	BN_CTX_end(ctx);
-	if (new_ctx != NULL)
-		BN_CTX_free(new_ctx);
-	return ret;
-	}
-
 
 int ec_GFp_simple_add(const EC_GROUP *group, EC_POINT *r, const EC_POINT *a, const EC_POINT *b, BN_CTX *ctx)
 	{
@@ -1540,9 +1182,8 @@ int ec_GFp_simple_make_affine(const EC_GROUP *group, EC_POINT *point, BN_CTX *ct
 int ec_GFp_simple_points_make_affine(const EC_GROUP *group, size_t num, EC_POINT *points[], BN_CTX *ctx)
 	{
 	BN_CTX *new_ctx = NULL;
-	BIGNUM *tmp0, *tmp1;
-	size_t pow2 = 0;
-	BIGNUM **heap = NULL;
+	BIGNUM *tmp, *tmp_Z;
+	BIGNUM **prod_Z = NULL;
 	size_t i;
 	int ret = 0;
 
@@ -1557,124 +1198,104 @@ int ec_GFp_simple_points_make_affine(const EC_GROUP *group, size_t num, EC_POINT
 		}
 
 	BN_CTX_start(ctx);
-	tmp0 = BN_CTX_get(ctx);
-	tmp1 = BN_CTX_get(ctx);
-	if (tmp0  == NULL || tmp1 == NULL) goto err;
+	tmp = BN_CTX_get(ctx);
+	tmp_Z = BN_CTX_get(ctx);
+	if (tmp == NULL || tmp_Z == NULL) goto err;
 
-	/* Before converting the individual points, compute inverses of all Z values.
-	 * Modular inversion is rather slow, but luckily we can do with a single
-	 * explicit inversion, plus about 3 multiplications per input value.
-	 */
-
-	pow2 = 1;
-	while (num > pow2)
-		pow2 <<= 1;
-	/* Now pow2 is the smallest power of 2 satifsying pow2 >= num.
-	 * We need twice that. */
-	pow2 <<= 1;
-
-	heap = OPENSSL_malloc(pow2 * sizeof heap[0]);
-	if (heap == NULL) goto err;
-	
-	/* The array is used as a binary tree, exactly as in heapsort:
-	 *
-	 *                               heap[1]
-	 *                 heap[2]                     heap[3]
-	 *          heap[4]       heap[5]       heap[6]       heap[7]
-	 *   heap[8]heap[9] heap[10]heap[11] heap[12]heap[13] heap[14] heap[15]
-	 *
-	 * We put the Z's in the last line;
-	 * then we set each other node to the product of its two child-nodes (where
-	 * empty or 0 entries are treated as ones);
-	 * then we invert heap[1];
-	 * then we invert each other node by replacing it by the product of its
-	 * parent (after inversion) and its sibling (before inversion).
-	 */
-	heap[0] = NULL;
-	for (i = pow2/2 - 1; i > 0; i--)
-		heap[i] = NULL;
+	prod_Z = OPENSSL_malloc(num * sizeof prod_Z[0]);
+	if (prod_Z == NULL) goto err;
 	for (i = 0; i < num; i++)
-		heap[pow2/2 + i] = &points[i]->Z;
-	for (i = pow2/2 + num; i < pow2; i++)
-		heap[i] = NULL;
-	
-	/* set each node to the product of its children */
-	for (i = pow2/2 - 1; i > 0; i--)
 		{
-		heap[i] = BN_new();
-		if (heap[i] == NULL) goto err;
-		
-		if (heap[2*i] != NULL)
-			{
-			if ((heap[2*i + 1] == NULL) || BN_is_zero(heap[2*i + 1]))
-				{
-				if (!BN_copy(heap[i], heap[2*i])) goto err;
-				}
-			else
-				{
-				if (BN_is_zero(heap[2*i]))
-					{
-					if (!BN_copy(heap[i], heap[2*i + 1])) goto err;
-					}
-				else
-					{
-					if (!group->meth->field_mul(group, heap[i],
-						heap[2*i], heap[2*i + 1], ctx)) goto err;
-					}
-				}
-			}
+		prod_Z[i] = BN_new();
+		if (prod_Z[i] == NULL) goto err;
 		}
 
-	/* invert heap[1] */
-	if (!BN_is_zero(heap[1]))
-		{
-		if (!BN_mod_inverse(heap[1], heap[1], &group->field, ctx))
-			{
-			ECerr(EC_F_EC_GFP_SIMPLE_POINTS_MAKE_AFFINE, ERR_R_BN_LIB);
-			goto err;
-			}
-		}
-	if (group->meth->field_encode != 0)
-		{
-		/* in the Montgomery case, we just turned  R*H  (representing H)
-		 * into  1/(R*H),  but we need  R*(1/H)  (representing 1/H);
-		 * i.e. we have need to multiply by the Montgomery factor twice */
-		if (!group->meth->field_encode(group, heap[1], heap[1], ctx)) goto err;
-		if (!group->meth->field_encode(group, heap[1], heap[1], ctx)) goto err;
-		}
+	/* Set each prod_Z[i] to the product of points[0]->Z .. points[i]->Z,
+	 * skipping any zero-valued inputs (pretend that they're 1). */
 
-	/* set other heap[i]'s to their inverses */
-	for (i = 2; i < pow2/2 + num; i += 2)
+	if (!BN_is_zero(&points[0]->Z))
 		{
-		/* i is even */
-		if ((heap[i + 1] != NULL) && !BN_is_zero(heap[i + 1]))
+		if (!BN_copy(prod_Z[0], &points[0]->Z)) goto err;
+		}
+	else
+		{
+		if (group->meth->field_set_to_one != 0)
 			{
-			if (!group->meth->field_mul(group, tmp0, heap[i/2], heap[i + 1], ctx)) goto err;
-			if (!group->meth->field_mul(group, tmp1, heap[i/2], heap[i], ctx)) goto err;
-			if (!BN_copy(heap[i], tmp0)) goto err;
-			if (!BN_copy(heap[i + 1], tmp1)) goto err;
+			if (!group->meth->field_set_to_one(group, prod_Z[0], ctx)) goto err;
 			}
 		else
 			{
-			if (!BN_copy(heap[i], heap[i/2])) goto err;
+			if (!BN_one(prod_Z[0])) goto err;
 			}
 		}
 
-	/* we have replaced all non-zero Z's by their inverses, now fix up all the points */
+	for (i = 1; i < num; i++)
+		{
+		if (!BN_is_zero(&points[i]->Z))
+			{
+			if (!group->meth->field_mul(group, prod_Z[i], prod_Z[i - 1], &points[i]->Z, ctx)) goto err;
+			}
+		else
+			{
+			if (!BN_copy(prod_Z[i], prod_Z[i - 1])) goto err;
+			}
+		}
+
+	/* Now use a single explicit inversion to replace every
+	 * non-zero points[i]->Z by its inverse. */
+
+	if (!BN_mod_inverse(tmp, prod_Z[num - 1], &group->field, ctx))
+		{
+		ECerr(EC_F_EC_GFP_SIMPLE_POINTS_MAKE_AFFINE, ERR_R_BN_LIB);
+		goto err;
+		}
+	if (group->meth->field_encode != 0)
+		{
+		/* In the Montgomery case, we just turned  R*H  (representing H)
+		 * into  1/(R*H),  but we need  R*(1/H)  (representing 1/H);
+		 * i.e. we need to multiply by the Montgomery factor twice. */
+		if (!group->meth->field_encode(group, tmp, tmp, ctx)) goto err;
+		if (!group->meth->field_encode(group, tmp, tmp, ctx)) goto err;
+		}
+
+	for (i = num - 1; i > 0; --i)
+		{
+		/* Loop invariant: tmp is the product of the inverses of
+		 * points[0]->Z .. points[i]->Z (zero-valued inputs skipped). */
+		if (!BN_is_zero(&points[i]->Z))
+			{
+			/* Set tmp_Z to the inverse of points[i]->Z (as product
+			 * of Z inverses 0 .. i, Z values 0 .. i - 1). */
+			if (!group->meth->field_mul(group, tmp_Z, prod_Z[i - 1], tmp, ctx)) goto err;
+			/* Update tmp to satisfy the loop invariant for i - 1. */
+			if (!group->meth->field_mul(group, tmp, tmp, &points[i]->Z, ctx)) goto err;
+			/* Replace points[i]->Z by its inverse. */
+			if (!BN_copy(&points[i]->Z, tmp_Z)) goto err;
+			}
+		}
+
+	if (!BN_is_zero(&points[0]->Z))
+		{
+		/* Replace points[0]->Z by its inverse. */
+		if (!BN_copy(&points[0]->Z, tmp)) goto err;
+		}
+
+	/* Finally, fix up the X and Y coordinates for all points. */
+
 	for (i = 0; i < num; i++)
 		{
 		EC_POINT *p = points[i];
-		
+
 		if (!BN_is_zero(&p->Z))
 			{
 			/* turn  (X, Y, 1/Z)  into  (X/Z^2, Y/Z^3, 1) */
 
-			if (!group->meth->field_sqr(group, tmp1, &p->Z, ctx)) goto err;
-			if (!group->meth->field_mul(group, &p->X, &p->X, tmp1, ctx)) goto err;
+			if (!group->meth->field_sqr(group, tmp, &p->Z, ctx)) goto err;
+			if (!group->meth->field_mul(group, &p->X, &p->X, tmp, ctx)) goto err;
 
-			if (!group->meth->field_mul(group, tmp1, tmp1, &p->Z, ctx)) goto err;
-			if (!group->meth->field_mul(group, &p->Y, &p->Y, tmp1, ctx)) goto err;
-		
+			if (!group->meth->field_mul(group, tmp, tmp, &p->Z, ctx)) goto err;
+			if (!group->meth->field_mul(group, &p->Y, &p->Y, tmp, ctx)) goto err;
+
 			if (group->meth->field_set_to_one != 0)
 				{
 				if (!group->meth->field_set_to_one(group, &p->Z, ctx)) goto err;
@@ -1688,20 +1309,19 @@ int ec_GFp_simple_points_make_affine(const EC_GROUP *group, size_t num, EC_POINT
 		}
 
 	ret = 1;
-		
+
  err:
 	BN_CTX_end(ctx);
 	if (new_ctx != NULL)
 		BN_CTX_free(new_ctx);
-	if (heap != NULL)
+	if (prod_Z != NULL)
 		{
-		/* heap[pow2/2] .. heap[pow2-1] have not been allocated locally! */
-		for (i = pow2/2 - 1; i > 0; i--)
+		for (i = 0; i < num; i++)
 			{
-			if (heap[i] != NULL)
-				BN_clear_free(heap[i]);
+			if (prod_Z[i] == NULL) break;
+			BN_clear_free(prod_Z[i]);
 			}
-		OPENSSL_free(heap);
+		OPENSSL_free(prod_Z);
 		}
 	return ret;
 	}

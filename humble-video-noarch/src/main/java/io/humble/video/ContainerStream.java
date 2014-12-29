@@ -394,6 +394,24 @@ public class ContainerStream extends RefCounted {
     return (cPtr == 0) ? null : new MediaPacket(cPtr, false);
   }
 
+/**
+ * Check if the stream is matched by the stream specifier.<br>
+ * <br>
+ * See the "stream specifiers" chapter in the FFmpeg documentation for the syntax<br>
+ * of specifier: https://www.ffmpeg.org/ffmpeg.html#Stream-selection<br>
+ * <br>
+ * @param specifier the specifier string<br>
+ * @return true if this stream is matched by specifier; false if this stream is not<br>
+ *   matched by specifier;<br>
+ * <br>
+ * @throws InvalidArgument if the specifier is invalid.<br>
+ * <br>
+ * Note: A stream specifier can match several streams in a container.
+ */
+  public boolean matchSpecifier(String specifier) {
+    return VideoJNI.ContainerStream_matchSpecifier(swigCPtr, this, specifier);
+  }
+
   /**
    * The disposition of this stream. Some streams can have special<br>
    * meanings in some Containers.

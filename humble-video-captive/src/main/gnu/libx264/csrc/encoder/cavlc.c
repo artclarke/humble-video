@@ -1,11 +1,11 @@
 /*****************************************************************************
  * cavlc.c: cavlc bitstream writing
  *****************************************************************************
- * Copyright (C) 2003-2013 x264 project
+ * Copyright (C) 2003-2014 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
- *          Jason Garrett-Glaser <darkshikari@gmail.com>
+ *          Fiona Glaser <fiona@x264.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -500,6 +500,9 @@ void x264_macroblock_write_cavlc( x264_t *h )
         && (!(h->mb.i_mb_y & 1) || IS_SKIP(h->mb.type[h->mb.i_mb_xy - h->mb.i_mb_stride])) )
     {
         bs_write1( s, MB_INTERLACED );
+#if !RDO_SKIP_BS
+        h->mb.field_decoding_flag = MB_INTERLACED;
+#endif
     }
 
 #if !RDO_SKIP_BS

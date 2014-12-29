@@ -26,6 +26,10 @@ int ff_intel_h263_decode_picture_header(MpegEncContext *s)
 {
     int format;
 
+    if (get_bits_left(&s->gb) == 64) { /* special dummy frames */
+        return FRAME_SKIPPED;
+    }
+
     /* picture header */
     if (get_bits_long(&s->gb, 22) != 0x20) {
         av_log(s->avctx, AV_LOG_ERROR, "Bad picture start code\n");
@@ -111,9 +115,8 @@ int ff_intel_h263_decode_picture_header(MpegEncContext *s)
     }
 
     /* PEI */
-    while (get_bits1(&s->gb) != 0) {
-        skip_bits(&s->gb, 8);
-    }
+    if (skip_1stop_8data_bits(&s->gb) < 0)
+        return AVERROR_INVALIDDATA;
     s->f_code = 1;
 
     s->y_dc_scale_table=
@@ -126,6 +129,7 @@ int ff_intel_h263_decode_picture_header(MpegEncContext *s)
 
 AVCodec ff_h263i_decoder = {
     .name           = "h263i",
+    .long_name      = NULL_IF_CONFIG_SMALL("Intel H.263"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_H263I,
     .priv_data_size = sizeof(MpegEncContext),
@@ -133,6 +137,8 @@ AVCodec ff_h263i_decoder = {
     .close          = ff_h263_decode_end,
     .decode         = ff_h263_decode_frame,
     .capabilities   = CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Intel H.263"),
-    .pix_fmts       = ff_pixfmt_list_420,
+    .pix_fmts       = (const enum AVPixelFormat[]) {
+        AV_PIX_FMT_YUV420P,
+        AV_PIX_FMT_NONE
+    },
 };

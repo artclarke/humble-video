@@ -27,12 +27,21 @@
 #include <stdint.h>
 
 #include "libavutil/buffer.h"
+#include "libavutil/channel_layout.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/pixfmt.h"
 #include "avcodec.h"
 #include "config.h"
 
 #define FF_SANE_NB_CHANNELS 63U
+
+#if HAVE_AVX
+#   define STRIDE_ALIGN 32
+#elif HAVE_SIMD_ALIGN_16
+#   define STRIDE_ALIGN 16
+#else
+#   define STRIDE_ALIGN 8
+#endif
 
 typedef struct FramePool {
     /**
@@ -91,9 +100,17 @@ typedef struct AVCodecInternal {
      */
     int last_audio_frame;
 
-    AVFrame to_free;
+    AVFrame *to_free;
 
     FramePool *pool;
+
+    void *thread_ctx;
+
+    /**
+     * Current packet as passed into the decoder, to avoid having to pass the
+     * packet into every function.
+     */
+    AVPacket *pkt;
 
     /**
      * temporary buffer used for encoders to store their bitstream
@@ -107,6 +124,11 @@ typedef struct AVCodecInternal {
      * Number of audio samples to skip at the start of the next decoded frame
      */
     int skip_samples;
+
+    /**
+     * hwaccel-specific private data
+     */
+    void *hwaccel_priv_data;
 } AVCodecInternal;
 
 struct AVCodecDefault {
@@ -114,15 +136,7 @@ struct AVCodecDefault {
     const uint8_t *value;
 };
 
-/**
- * Return the hardware accelerated codec for codec codec_id and
- * pixel format pix_fmt.
- *
- * @param codec_id the codec to match
- * @param pix_fmt the pixel format to match
- * @return the hardware accelerated codec, or NULL if none was found.
- */
-AVHWAccel *ff_find_hwaccel(enum AVCodecID codec_id, enum AVPixelFormat pix_fmt);
+extern const uint8_t ff_log2_run[41];
 
 /**
  * Return the index into tab at which {a,b} match elements {[0],[1]} of tab.
@@ -139,11 +153,6 @@ int ff_init_buffer_info(AVCodecContext *s, AVFrame *frame);
 
 
 void avpriv_color_frame(AVFrame *frame, const int color[4]);
-
-/**
- * Remove and free all side data from packet.
- */
-void ff_packet_free_side_data(AVPacket *pkt);
 
 extern volatile int ff_avcodec_locked;
 int ff_lock_avcodec(AVCodecContext *log_ctx);
@@ -176,7 +185,7 @@ int avpriv_unlock_avformat(void);
  * @param size    the minimum required packet size
  * @return        0 on success, negative error code on failure
  */
-int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int size);
+int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int64_t size);
 
 int ff_alloc_packet(AVPacket *avpkt, int size);
 
@@ -217,11 +226,6 @@ int avpriv_h264_has_num_reorder_frames(AVCodecContext *avctx);
 int ff_codec_open2_recursive(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options);
 
 /**
- * Call avcodec_close recursively, counterpart to avcodec_open2_recursive.
- */
-int ff_codec_close_recursive(AVCodecContext *avctx);
-
-/**
  * Finalize buf into extradata and set its size appropriately.
  */
 int avpriv_bprint_to_extradata(AVCodecContext *avctx, struct AVBPrint *buf);
@@ -229,5 +233,35 @@ int avpriv_bprint_to_extradata(AVCodecContext *avctx, struct AVBPrint *buf);
 const uint8_t *avpriv_find_start_code(const uint8_t *p,
                                       const uint8_t *end,
                                       uint32_t *state);
+
+/**
+ * Check that the provided frame dimensions are valid and set them on the codec
+ * context.
+ */
+int ff_set_dimensions(AVCodecContext *s, int width, int height);
+
+/**
+ * Check that the provided sample aspect ratio is valid and set it on the codec
+ * context.
+ */
+int ff_set_sar(AVCodecContext *avctx, AVRational sar);
+
+/**
+ * Add or update AV_FRAME_DATA_MATRIXENCODING side data.
+ */
+int ff_side_data_update_matrix_encoding(AVFrame *frame,
+                                        enum AVMatrixEncoding matrix_encoding);
+
+/**
+ * Select the (possibly hardware accelerated) pixel format.
+ * This is a wrapper around AVCodecContext.get_format() and should be used
+ * instead of calling get_format() directly.
+ */
+int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt);
+
+/**
+ * Set various frame properties from the codec context / packet data.
+ */
+int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame);
 
 #endif /* AVCODEC_INTERNAL_H */

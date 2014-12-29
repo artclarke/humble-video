@@ -6,7 +6,7 @@
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
     <version>@LIB_MAJOR_VERSION@.@LIB_MINOR_VERSION@.@LIB_PATCH_VERSION@-SNAPSHOT</version>
-    <relativePath/>
+    <relativePath>../../humble-video-parent/pom.xml</relativePath>
   </parent>
 
   <groupId>io.humble</groupId>

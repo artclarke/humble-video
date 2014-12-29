@@ -1,6 +1,6 @@
 /*
  * Cinepak Video Decoder
- * Copyright (C) 2003 the ffmpeg project
+ * Copyright (c) 2003 The FFmpeg Project
  *
  * This file is part of FFmpeg.
  *
@@ -135,7 +135,7 @@ static int cinepak_decode_vectors (CinepakContext *s, cvid_strip *strip,
     const uint8_t   *eod = (data + size);
     uint32_t         flag, mask;
     uint8_t         *cb0, *cb1, *cb2, *cb3;
-    unsigned int     x, y;
+    int             x, y;
     char            *ip0, *ip1, *ip2, *ip3;
 
     flag = 0;
@@ -477,6 +477,7 @@ static av_cold int cinepak_decode_end(AVCodecContext *avctx)
 
 AVCodec ff_cinepak_decoder = {
     .name           = "cinepak",
+    .long_name      = NULL_IF_CONFIG_SMALL("Cinepak"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_CINEPAK,
     .priv_data_size = sizeof(CinepakContext),
@@ -484,5 +485,4 @@ AVCodec ff_cinepak_decoder = {
     .close          = cinepak_decode_end,
     .decode         = cinepak_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Cinepak"),
 };

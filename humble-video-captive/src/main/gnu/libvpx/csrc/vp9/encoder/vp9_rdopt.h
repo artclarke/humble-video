@@ -8,29 +8,52 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-
 #ifndef VP9_ENCODER_VP9_RDOPT_H_
 #define VP9_ENCODER_VP9_RDOPT_H_
 
-#define RDCOST(RM,DM,R,D) ( ((128+((int64_t)R)*(RM)) >> 8) + ((int64_t)DM)*(D) )
-#define QIDX_SKIP_THRESH     115
+#include "vp9/common/vp9_blockd.h"
 
-void vp9_initialize_rd_consts(VP9_COMP *cpi, int qindex);
+#include "vp9/encoder/vp9_block.h"
+#include "vp9/encoder/vp9_context_tree.h"
 
-void vp9_initialize_me_consts(VP9_COMP *cpi, int qindex);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void vp9_rd_pick_intra_mode_sb(VP9_COMP *cpi, MACROBLOCK *x,
-                               int *r, int64_t *d, BLOCK_SIZE_TYPE bsize,
+struct TileInfo;
+struct VP9_COMP;
+struct macroblock;
+struct RD_COST;
+
+void vp9_rd_pick_intra_mode_sb(struct VP9_COMP *cpi, struct macroblock *x,
+                               struct RD_COST *rd_cost, BLOCK_SIZE bsize,
                                PICK_MODE_CONTEXT *ctx, int64_t best_rd);
 
-int64_t vp9_rd_pick_inter_mode_sb(VP9_COMP *cpi, MACROBLOCK *x,
-                                  int mi_row, int mi_col,
-                                  int *r, int64_t *d, BLOCK_SIZE_TYPE bsize,
-                                  PICK_MODE_CONTEXT *ctx, int64_t best_rd);
+void vp9_rd_pick_inter_mode_sb(struct VP9_COMP *cpi,
+                               struct TileDataEnc *tile_data,
+                               struct macroblock *x,
+                               int mi_row, int mi_col,
+                               struct RD_COST *rd_cost,
+                               BLOCK_SIZE bsize, PICK_MODE_CONTEXT *ctx,
+                               int64_t best_rd_so_far);
 
-void vp9_init_me_luts();
+void vp9_rd_pick_inter_mode_sb_seg_skip(struct VP9_COMP *cpi,
+                                        struct TileDataEnc *tile_data,
+                                        struct macroblock *x,
+                                        struct RD_COST *rd_cost,
+                                        BLOCK_SIZE bsize,
+                                        PICK_MODE_CONTEXT *ctx,
+                                        int64_t best_rd_so_far);
 
-void vp9_set_mbmode_and_mvs(MACROBLOCK *x,
-                            MB_PREDICTION_MODE mb, int_mv *mv);
+void vp9_rd_pick_inter_mode_sub8x8(struct VP9_COMP *cpi,
+                                   struct TileDataEnc *tile_data,
+                                   struct macroblock *x,
+                                   int mi_row, int mi_col,
+                                   struct RD_COST *rd_cost,
+                                   BLOCK_SIZE bsize, PICK_MODE_CONTEXT *ctx,
+                                   int64_t best_rd_so_far);
+#ifdef __cplusplus
+}  // extern "C"
+#endif
 
 #endif  // VP9_ENCODER_VP9_RDOPT_H_

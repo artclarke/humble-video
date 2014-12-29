@@ -24,7 +24,6 @@
 #include "libavcodec/avcodec.h"
 #include "libavcodec/snow.h"
 #include "libavcodec/snow_dwt.h"
-#include "dsputil_x86.h"
 
 #if HAVE_INLINE_ASM
 
@@ -606,6 +605,7 @@ static void ff_snow_vertical_compose97i_mmx(IDWTELEM *b0, IDWTELEM *b1, IDWTELEM
 }
 #endif //HAVE_7REGS
 
+#if HAVE_6REGS
 #define snow_inner_add_yblock_sse2_header \
     IDWTELEM * * dst_array = sb->line + src_y;\
     x86_reg tmp;\
@@ -671,6 +671,7 @@ static void ff_snow_vertical_compose97i_mmx(IDWTELEM *b0, IDWTELEM *b1, IDWTELEM
              :"+m"(dst8),"+m"(dst_array),"=&r"(tmp)\
              :\
              "rm"((x86_reg)(src_x<<1)),"m"(obmc),"a"(block),"m"(b_h),"m"(src_stride):\
+             XMM_CLOBBERS("%xmm0", "%xmm1", "%xmm2", "%xmm3", "%xmm4", "%xmm5", "%xmm6", "%xmm7", )\
              "%"REG_c"","%"REG_S"","%"REG_D"","%"REG_d"");
 
 #define snow_inner_add_yblock_sse2_end_8\
@@ -872,6 +873,7 @@ static void ff_snow_inner_add_yblock_mmx(const uint8_t *obmc, const int obmc_str
     else
         ff_snow_inner_add_yblock(obmc, obmc_stride, block, b_w, b_h, src_x,src_y, src_stride, sb, add, dst8);
 }
+#endif /* HAVE_6REGS */
 
 #endif /* HAVE_INLINE_ASM */
 
@@ -886,7 +888,9 @@ void ff_dwt_init_x86(SnowDWTContext *c)
 #if HAVE_7REGS
             c->vertical_compose97i = ff_snow_vertical_compose97i_sse2;
 #endif
+#if HAVE_6REGS
             c->inner_add_yblock = ff_snow_inner_add_yblock_sse2;
+#endif
         }
         else{
             if (mm_flags & AV_CPU_FLAG_MMXEXT) {
@@ -895,7 +899,9 @@ void ff_dwt_init_x86(SnowDWTContext *c)
             c->vertical_compose97i = ff_snow_vertical_compose97i_mmx;
 #endif
             }
+#if HAVE_6REGS
             c->inner_add_yblock = ff_snow_inner_add_yblock_mmx;
+#endif
         }
     }
 #endif /* HAVE_INLINE_ASM */

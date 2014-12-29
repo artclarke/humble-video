@@ -1,7 +1,7 @@
 /*****************************************************************************
  * flv_bytestream.c: flv muxer utilities
  *****************************************************************************
- * Copyright (C) 2009-2013 x264 project
+ * Copyright (C) 2009-2014 x264 project
  *
  * Authors: Kieran Kunhya <kieran@kunhya.com>
  *
@@ -87,16 +87,14 @@ void flv_put_amf_double( flv_buffer *c, double d )
 
 flv_buffer *flv_create_writer( const char *filename )
 {
-    flv_buffer *c = malloc( sizeof(*c) );
-
+    flv_buffer *c = calloc( 1, sizeof(flv_buffer) );
     if( !c )
         return NULL;
-    memset( c, 0, sizeof(*c) );
 
     if( !strcmp( filename, "-" ) )
         c->fp = stdout;
     else
-        c->fp = fopen( filename, "wb" );
+        c->fp = x264_fopen( filename, "wb" );
     if( !c->fp )
     {
         free( c );

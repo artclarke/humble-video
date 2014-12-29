@@ -96,13 +96,7 @@ int MAIN(int argc, char **argv)
 	char buf[512];
 	BIO *STDout=NULL;
 
-#if !defined(OPENSSL_NO_SSL2) && !defined(OPENSSL_NO_SSL3)
 	meth=SSLv23_server_method();
-#elif !defined(OPENSSL_NO_SSL3)
-	meth=SSLv3_server_method();
-#elif !defined(OPENSSL_NO_SSL2)
-	meth=SSLv2_server_method();
-#endif
 
 	apps_startup();
 
@@ -196,7 +190,7 @@ int MAIN(int argc, char **argv)
 			
 			if (Verbose)
 				{
-				unsigned long id = c->id;
+				unsigned long id = SSL_CIPHER_get_id(c);
 				int id0 = (int)(id >> 24);
 				int id1 = (int)((id >> 16) & 0xffL);
 				int id2 = (int)((id >> 8) & 0xffL);

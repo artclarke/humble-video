@@ -44,7 +44,7 @@
 #define BLOCK 16
 
 //===========================================================================//
-static const uint8_t  __attribute__((aligned(8))) dither[8][8]={
+DECLARE_ALIGNED(8, static const uint8_t, dither)[8][8] = {
 {  0*4,  48*4,  12*4,  60*4,   3*4,  51*4,  15*4,  63*4, },
 { 32*4,  16*4,  44*4,  28*4,  35*4,  19*4,  47*4,  31*4, },
 {  8*4,  56*4,   4*4,  52*4,  11*4,  59*4,   7*4,  55*4, },
@@ -241,12 +241,13 @@ static int config(struct vf_instance *vf,
             avctx_enc->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
             avctx_enc->global_quality= 123;
             av_dict_set(&opts, "no_bitstream", "1", 0);
-            avcodec_open2(avctx_enc, enc, &opts);
+            if (avcodec_open2(avctx_enc, enc, &opts) < 0)
+                return 0;
             av_dict_free(&opts);
             assert(avctx_enc->codec);
         }
-        vf->priv->frame= avcodec_alloc_frame();
-        vf->priv->frame_dec= avcodec_alloc_frame();
+        vf->priv->frame= av_frame_alloc();
+        vf->priv->frame_dec= av_frame_alloc();
 
         vf->priv->outbuf_size= (width + BLOCK)*(height + BLOCK)*10;
         vf->priv->outbuf= malloc(vf->priv->outbuf_size);

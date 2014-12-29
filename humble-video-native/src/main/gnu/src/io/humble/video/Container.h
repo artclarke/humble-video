@@ -98,6 +98,9 @@ public:
   getNumStreams();
 
 #ifndef SWIG
+  virtual void* getCtx() { return getFormatCtx(); }
+  virtual AVFormatContext* getFormatCtx()=0;
+
   /*
    *  This method contains classes that the Container shares internally inside Humble Video,
    *  but which Swig should not care about.
@@ -184,8 +187,6 @@ protected:
   virtual
   ~Container();
 #ifndef SWIG
-  virtual void* getCtx() { return getFormatCtx(); }
-  virtual AVFormatContext* getFormatCtx()=0;
   // static methods for custom IO
   static int url_read(void*h, unsigned char* buf, int size);
   static int url_write(void*h, unsigned char* buf, int size);

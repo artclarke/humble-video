@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mc.S: arm motion compensation
  *****************************************************************************
- * Copyright (C) 2009-2013 x264 project
+ * Copyright (C) 2009-2014 x264 project
  *
  * Authors: David Conrad <lessen42@gmail.com>
  *          Mans Rullgard <mans@mansr.com>
@@ -88,7 +88,7 @@ function x264_memcpy_aligned_neon
 .endfunc
 
 .macro MEMCPY_ALIGNED srcalign dstalign
-function memcpy_aligned_\dstalign\()_\srcalign\()_neon
+function memcpy_aligned_\dstalign\()_\srcalign\()_neon, export=0
     mov         r3, r0
 .if \srcalign == 8 && \dstalign == 8
     sub         r2, #16
@@ -167,7 +167,7 @@ function x264_pixel_avg_\w\()x\h\()_neon
     ldr         ip, [sp, #8]
     push        {r4-r6,lr}
     cmp         ip, #32
-    ldrd        r4, [sp, #16]
+    ldrd        r4, r5, [sp, #16]
     mov         lr, #\h
     beq         x264_pixel_avg_w\w\()_neon
     rsbs        r6,  ip,  #64
@@ -181,6 +181,7 @@ function x264_pixel_avg_\w\()x\h\()_neon
 AVGH  4, 2
 AVGH  4, 4
 AVGH  4, 8
+AVGH  4, 16
 AVGH  8, 4
 AVGH  8, 8
 AVGH  8, 16
@@ -238,7 +239,7 @@ AVGH 16, 16
 .endm
 
 .macro AVG_WEIGHT ext
-function x264_pixel_avg_weight_w4_\ext\()_neon
+function x264_pixel_avg_weight_w4_\ext\()_neon, export=0
     load_weights_\ext
 1:  // height loop
     subs            lr,  lr,  #2
@@ -254,7 +255,7 @@ function x264_pixel_avg_weight_w4_\ext\()_neon
     pop             {r4-r6,pc}
 .endfunc
 
-function x264_pixel_avg_weight_w8_\ext\()_neon
+function x264_pixel_avg_weight_w8_\ext\()_neon, export=0
     load_weights_\ext
 1:  // height loop
     subs            lr,  lr,  #4
@@ -278,7 +279,7 @@ function x264_pixel_avg_weight_w8_\ext\()_neon
     pop             {r4-r6,pc}
 .endfunc
 
-function x264_pixel_avg_weight_w16_\ext\()_neon
+function x264_pixel_avg_weight_w16_\ext\()_neon, export=0
     load_weights_\ext
 1:  // height loop
     subs            lr,  lr,  #2
@@ -303,7 +304,7 @@ AVG_WEIGHT add_add
 AVG_WEIGHT add_sub
 AVG_WEIGHT sub_add
 
-function x264_pixel_avg_w4_neon
+function x264_pixel_avg_w4_neon, export=0
     subs        lr,  lr,  #2
     vld1.32     {d0[]}, [r2], r3
     vld1.32     {d2[]}, [r4], r5
@@ -317,7 +318,7 @@ function x264_pixel_avg_w4_neon
     pop         {r4-r6,pc}
 .endfunc
 
-function x264_pixel_avg_w8_neon
+function x264_pixel_avg_w8_neon, export=0
     subs        lr,  lr,  #4
     vld1.64     {d0}, [r2], r3
     vld1.64     {d2}, [r4], r5
@@ -339,7 +340,7 @@ function x264_pixel_avg_w8_neon
     pop         {r4-r6,pc}
 .endfunc
 
-function x264_pixel_avg_w16_neon
+function x264_pixel_avg_w16_neon, export=0
     subs        lr,  lr,  #4
     vld1.64     {d0-d1}, [r2], r3
     vld1.64     {d2-d3}, [r4], r5
@@ -447,7 +448,7 @@ avg2_w20_loop:
 .ifc \type, full
     ldr         lr,  [r4, #32]      // denom
 .endif
-    ldrd        r4,  [r4, #32+4]    // scale, offset
+    ldrd        r4,  r5,  [r4, #32+4]    // scale, offset
     vdup.16     q0,  r4
     vdup.16     q1,  r5
 .ifc \type, full
@@ -818,8 +819,8 @@ copy_w16_aligned_loop:
 function x264_mc_chroma_neon
     push            {r4-r8, lr}
     vpush           {d8-d11}
-    ldrd            r4, [sp, #56]
-    ldrd            r6, [sp, #64]
+    ldrd            r4, r5, [sp, #56]
+    ldrd            r6, r7, [sp, #64]
 
     asr             lr, r6, #3
     mul             lr, r4, lr
@@ -1380,8 +1381,8 @@ filter_h_loop:
 function x264_frame_init_lowres_core_neon
     push            {r4-r10,lr}
     vpush           {d8-d15}
-    ldrd            r4,  [sp, #96]
-    ldrd            r6,  [sp, #104]
+    ldrd            r4,  r5,  [sp, #96]
+    ldrd            r6,  r7,  [sp, #104]
     ldr             lr,  [sp, #112]
     sub             r10, r6,  r7            // dst_stride - width
     and             r10, r10, #~15
@@ -1463,4 +1464,149 @@ lowres_xloop_end:
 
     vpop            {d8-d15}
     pop             {r4-r10,pc}
+.endfunc
+
+function x264_load_deinterleave_chroma_fdec_neon
+    mov             ip,  #FDEC_STRIDE/2
+1:
+    vld2.8          {d0-d1}, [r1,:128], r2
+    subs            r3,  r3,  #1
+    pld             [r1]
+    vst1.8          {d0},    [r0,:64], ip
+    vst1.8          {d1},    [r0,:64], ip
+    bgt             1b
+
+    bx              lr
+.endfunc
+
+function x264_load_deinterleave_chroma_fenc_neon
+    mov             ip,  #FENC_STRIDE/2
+1:
+    vld2.8          {d0-d1}, [r1,:128], r2
+    subs            r3,  r3,  #1
+    pld             [r1]
+    vst1.8          {d0},    [r0,:64], ip
+    vst1.8          {d1},    [r0,:64], ip
+    bgt             1b
+
+    bx              lr
+.endfunc
+
+function x264_plane_copy_deinterleave_neon
+    push            {r4-r7, lr}
+    ldrd            r6, r7, [sp, #28]
+    ldrd            r4, r5, [sp, #20]
+    add             lr,  r6,  #15
+    bic             lr,  lr,  #15
+    sub             r1,  r1,  lr
+    sub             r3,  r3,  lr
+    sub             r5,  r5,  lr, lsl #1
+block:
+    vld2.8          {d0-d3}, [r4,:128]!
+    subs            lr,  lr,  #16
+    vst1.8          {q0},    [r0]!
+    vst1.8          {q1},    [r2]!
+    bgt             block
+
+    add             r4,  r4,  r5
+    subs            r7,  r7,  #1
+    add             r0,  r0,  r1
+    add             r2,  r2,  r3
+    mov             lr,  r6
+    bgt             block
+
+    pop             {r4-r7, pc}
+.endfunc
+
+function x264_plane_copy_deinterleave_rgb_neon
+    push            {r4-r8, r10, r11, lr}
+    ldrd            r4,  r5,  [sp, #32]
+    ldrd            r6,  r7,  [sp, #40]
+    ldr             r8,  [sp, #48]
+    ldrd            r10, r11, [sp, #52]
+    add             lr,  r10, #7
+    subs            r8,  r8,  #3
+    bic             lr,  lr,  #7
+    sub             r7,  r7,  lr, lsl #1
+    sub             r1,  r1,  lr
+    sub             r3,  r3,  lr
+    sub             r5,  r5,  lr
+    subne           r7,  r7,  lr, lsl #1
+    subeq           r7,  r7,  lr
+    bne             block4
+block3:
+    vld3.8          {d0,d1,d2}, [r6]!
+    subs            lr,  lr,  #8
+    vst1.8          {d0},    [r0]!
+    vst1.8          {d1},    [r2]!
+    vst1.8          {d2},    [r4]!
+    bgt             block3
+
+    subs            r11, r11, #1
+    add             r0,  r0,  r1
+    add             r2,  r2,  r3
+    add             r4,  r4,  r5
+    add             r6,  r6,  r7
+    mov             lr,  r10
+    bgt             block3
+
+    pop             {r4-r8, r10, r11, pc}
+block4:
+    vld4.8          {d0,d1,d2,d3}, [r6]!
+    subs            lr,  lr,  #8
+    vst1.8          {d0},    [r0]!
+    vst1.8          {d1},    [r2]!
+    vst1.8          {d2},    [r4]!
+    bgt             block4
+
+    subs            r11, r11, #1
+    add             r0,  r0,  r1
+    add             r2,  r2,  r3
+    add             r4,  r4,  r5
+    add             r6,  r6,  r7
+    mov             lr,  r10
+    bgt             block4
+
+    pop             {r4-r8, r10, r11, pc}
+.endfunc
+
+function x264_plane_copy_interleave_neon
+    push            {r4-r7, lr}
+    ldrd            r6, r7, [sp, #28]
+    ldrd            r4, r5, [sp, #20]
+    add             lr,  r6,  #15
+    bic             lr,  lr,  #15
+    sub             r1,  r1,  lr, lsl #1
+    sub             r3,  r3,  lr
+    sub             r5,  r5,  lr
+blocki:
+    vld1.8          {q0}, [r2]!
+    vld1.8          {q1}, [r4]!
+    subs            lr,  lr,  #16
+    vst2.8          {d0,d2}, [r0]!
+    vst2.8          {d1,d3}, [r0]!
+    bgt             blocki
+
+    subs            r7,  r7,  #1
+    add             r0,  r0,  r1
+    add             r2,  r2,  r3
+    add             r4,  r4,  r5
+    mov             lr,  r6
+    bgt             blocki
+
+    pop             {r4-r7, pc}
+.endfunc
+
+function x264_store_interleave_chroma_neon
+    push            {lr}
+    ldr             lr,  [sp, #4]
+    mov             ip,  #FDEC_STRIDE
+1:
+    vld1.8          {d0}, [r2], ip
+    vld1.8          {d1}, [r3], ip
+    subs            lr,  lr,  #1
+    vst2.8          {d0,d1}, [r0,:128], r1
+    bgt             1b
+
+    pop             {pc}
 .endfunc

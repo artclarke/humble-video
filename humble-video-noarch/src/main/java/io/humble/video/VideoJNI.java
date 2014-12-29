@@ -597,6 +597,8 @@ public class VideoJNI {
   public final static native int CodecProfile_PROFILE_AAC_HE_V2_get();
   public final static native int CodecProfile_PROFILE_AAC_LD_get();
   public final static native int CodecProfile_PROFILE_AAC_ELD_get();
+  public final static native int CodecProfile_PROFILE_MPEG2_AAC_LOW_get();
+  public final static native int CodecProfile_PROFILE_MPEG2_AAC_HE_get();
   public final static native int CodecProfile_PROFILE_DTS_get();
   public final static native int CodecProfile_PROFILE_DTS_ES_get();
   public final static native int CodecProfile_PROFILE_DTS_96_24_get();
@@ -643,6 +645,15 @@ public class VideoJNI {
   public final static native int CodecProfile_PROFILE_MPEG4_ADVANCED_SCALABLE_TEXTURE_get();
   public final static native int CodecProfile_PROFILE_MPEG4_SIMPLE_STUDIO_get();
   public final static native int CodecProfile_PROFILE_MPEG4_ADVANCED_SIMPLE_get();
+  public final static native int CodecProfile_PROFILE_JPEG2000_CSTREAM_RESTRICTION_0_get();
+  public final static native int CodecProfile_PROFILE_JPEG2000_CSTREAM_RESTRICTION_1_get();
+  public final static native int CodecProfile_PROFILE_JPEG2000_CSTREAM_NO_RESTRICTION_get();
+  public final static native int CodecProfile_PROFILE_JPEG2000_DCINEMA_2K_get();
+  public final static native int CodecProfile_PROFILE_JPEG2000_DCINEMA_4K_get();
+  public final static native int CodecProfile_PROFILE_HEVC_MAIN_get();
+  public final static native int CodecProfile_PROFILE_HEVC_MAIN_10_get();
+  public final static native int CodecProfile_PROFILE_HEVC_MAIN_STILL_PICTURE_get();
+  public final static native int CodecProfile_PROFILE_HEVC_REXT_get();
   public final static native int CodecProfile_getProfile(long jarg1, CodecProfile jarg1_);
   public final static native String CodecProfile_getName(long jarg1, CodecProfile jarg1_);
   public final static native int Codec_DISCARD_NONE_get();
@@ -654,7 +665,6 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_NONE_get();
   public final static native int Codec_CODEC_ID_MPEG1VIDEO_get();
   public final static native int Codec_CODEC_ID_MPEG2VIDEO_get();
-  public final static native int Codec_CODEC_ID_MPEG2VIDEO_XVMC_get();
   public final static native int Codec_CODEC_ID_H261_get();
   public final static native int Codec_CODEC_ID_H263_get();
   public final static native int Codec_CODEC_ID_RV10_get();
@@ -824,6 +834,19 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_AIC_get();
   public final static native int Codec_CODEC_ID_ESCAPE130_DEPRECATED_get();
   public final static native int Codec_CODEC_ID_G2M_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_WEBP_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_HNM4_VIDEO_get();
+  public final static native int Codec_CODEC_ID_HEVC_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_FIC_get();
+  public final static native int Codec_CODEC_ID_ALIAS_PIX_get();
+  public final static native int Codec_CODEC_ID_BRENDER_PIX_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_PAF_VIDEO_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_EXR_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_VP7_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_SANM_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_SGIRLE_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_MVC1_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_MVC2_DEPRECATED_get();
   public final static native int Codec_CODEC_ID_BRENDER_PIX_get();
   public final static native int Codec_CODEC_ID_Y41P_get();
   public final static native int Codec_CODEC_ID_ESCAPE130_get();
@@ -848,6 +871,8 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_SNOW_get();
   public final static native int Codec_CODEC_ID_WEBP_get();
   public final static native int Codec_CODEC_ID_SMVJPEG_get();
+  public final static native int Codec_CODEC_ID_HEVC_get();
+  public final static native int Codec_CODEC_ID_VP7_get();
   public final static native int Codec_CODEC_ID_FIRST_AUDIO_get();
   public final static native int Codec_CODEC_ID_PCM_S16LE_get();
   public final static native int Codec_CODEC_ID_PCM_S16BE_get();
@@ -877,6 +902,8 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_PCM_LXF_get();
   public final static native int Codec_CODEC_ID_S302M_get();
   public final static native int Codec_CODEC_ID_PCM_S8_PLANAR_get();
+  public final static native int Codec_CODEC_ID_PCM_S24LE_PLANAR_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_PCM_S32LE_PLANAR_DEPRECATED_get();
   public final static native int Codec_CODEC_ID_PCM_S24LE_PLANAR_get();
   public final static native int Codec_CODEC_ID_PCM_S32LE_PLANAR_get();
   public final static native int Codec_CODEC_ID_PCM_S16BE_PLANAR_get();
@@ -910,11 +937,14 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_ADPCM_IMA_ISS_get();
   public final static native int Codec_CODEC_ID_ADPCM_G722_get();
   public final static native int Codec_CODEC_ID_ADPCM_IMA_APC_get();
+  public final static native int Codec_CODEC_ID_ADPCM_VIMA_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_ADPCM_VIMA_get();
   public final static native int Codec_CODEC_ID_VIMA_get();
   public final static native int Codec_CODEC_ID_ADPCM_AFC_get();
   public final static native int Codec_CODEC_ID_ADPCM_IMA_OKI_get();
   public final static native int Codec_CODEC_ID_ADPCM_DTK_get();
   public final static native int Codec_CODEC_ID_ADPCM_IMA_RAD_get();
+  public final static native int Codec_CODEC_ID_ADPCM_G726LE_get();
   public final static native int Codec_CODEC_ID_AMR_NB_get();
   public final static native int Codec_CODEC_ID_AMR_WB_get();
   public final static native int Codec_CODEC_ID_RA_144_get();
@@ -924,6 +954,7 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_XAN_DPCM_get();
   public final static native int Codec_CODEC_ID_SOL_DPCM_get();
   public final static native int Codec_CODEC_ID_MP2_get();
+  public final static native int Codec_CODEC_ID_MP3_get();
   public final static native int Codec_CODEC_ID_AAC_get();
   public final static native int Codec_CODEC_ID_AC3_get();
   public final static native int Codec_CODEC_ID_DTS_get();
@@ -954,7 +985,6 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_MLP_get();
   public final static native int Codec_CODEC_ID_GSM_MS_get();
   public final static native int Codec_CODEC_ID_ATRAC3_get();
-  public final static native int Codec_CODEC_ID_VOXWARE_get();
   public final static native int Codec_CODEC_ID_APE_get();
   public final static native int Codec_CODEC_ID_NELLYMOSER_get();
   public final static native int Codec_CODEC_ID_MUSEPACK8_get();
@@ -986,6 +1016,9 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_OPUS_DEPRECATED_get();
   public final static native int Codec_CODEC_ID_COMFORT_NOISE_get();
   public final static native int Codec_CODEC_ID_TAK_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_METASOUND_get();
+  public final static native int Codec_CODEC_ID_PAF_AUDIO_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_ON2AVC_get();
   public final static native int Codec_CODEC_ID_FFWAVESYNTH_get();
   public final static native int Codec_CODEC_ID_SONIC_get();
   public final static native int Codec_CODEC_ID_SONIC_LS_get();
@@ -994,6 +1027,10 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_TAK_get();
   public final static native int Codec_CODEC_ID_EVRC_get();
   public final static native int Codec_CODEC_ID_SMV_get();
+  public final static native int Codec_CODEC_ID_DSD_LSBF_get();
+  public final static native int Codec_CODEC_ID_DSD_MSBF_get();
+  public final static native int Codec_CODEC_ID_DSD_LSBF_PLANAR_get();
+  public final static native int Codec_CODEC_ID_DSD_MSBF_PLANAR_get();
   public final static native int Codec_CODEC_ID_FIRST_SUBTITLE_get();
   public final static native int Codec_CODEC_ID_DVD_SUBTITLE_get();
   public final static native int Codec_CODEC_ID_DVB_SUBTITLE_get();
@@ -1025,6 +1062,8 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_OTF_get();
   public final static native int Codec_CODEC_ID_SMPTE_KLV_get();
   public final static native int Codec_CODEC_ID_DVD_NAV_get();
+  public final static native int Codec_CODEC_ID_TIMED_ID3_get();
+  public final static native int Codec_CODEC_ID_BIN_DATA_get();
   public final static native int Codec_CODEC_ID_PROBE_get();
   public final static native int Codec_CODEC_ID_MPEG2TS_get();
   public final static native int Codec_CODEC_ID_MPEG4SYSTEMS_get();
@@ -1117,6 +1156,7 @@ public class VideoJNI {
   public final static native int Coder_FLAG2_IGNORE_CROP_get();
   public final static native int Coder_FLAG2_CHUNKS_get();
   public final static native int Coder_FLAG2_SHOW_ALL_get();
+  public final static native int Coder_FLAG2_EXPORT_MVS_get();
   public final static native void Coder_open(long jarg1, Coder jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_);
   public final static native long Coder_getCodec(long jarg1, Coder jarg1_);
   public final static native int Coder_getCodecType(long jarg1, Coder jarg1_);
@@ -1259,6 +1299,7 @@ public class VideoJNI {
   public final static native long ContainerStream_getIndexEntry(long jarg1, ContainerStream jarg1_, int jarg2);
   public final static native int ContainerStream_getDisposition(long jarg1, ContainerStream jarg1_);
   public final static native long ContainerStream_getAttachedPic(long jarg1, ContainerStream jarg1_);
+  public final static native boolean ContainerStream_matchSpecifier(long jarg1, ContainerStream jarg1_, String jarg2);
   public final static native int Container_FLAG_GENPTS_get();
   public final static native int Container_FLAG_IGNIDX_get();
   public final static native int Container_FLAG_NONBLOCK_get();
@@ -1400,6 +1441,16 @@ public class VideoJNI {
   public final static native int FilterSink_getFrameSize(long jarg1, FilterSink jarg1_);
   public final static native int FilterAudioSink_getAudio(long jarg1, FilterAudioSink jarg1_, long jarg2, MediaAudio jarg2_);
   public final static native int FilterPictureSink_getPicture(long jarg1, FilterPictureSink jarg1_, long jarg2, MediaPicture jarg2_);
+  public final static native String BitStreamFilterType_getName(long jarg1, BitStreamFilterType jarg1_);
+  public final static native int BitStreamFilterType_getNumBitStreamFilterTypes();
+  public final static native long BitStreamFilterType_getBitStreamFilterType__SWIG_0(int jarg1);
+  public final static native long BitStreamFilterType_getBitStreamFilterType__SWIG_1(String jarg1);
+  public final static native long BitStreamFilter_make__SWIG_0(String jarg1);
+  public final static native long BitStreamFilter_make__SWIG_1(long jarg1, BitStreamFilterType jarg1_);
+  public final static native long BitStreamFilter_getType(long jarg1, BitStreamFilter jarg1_);
+  public final static native String BitStreamFilter_getName(long jarg1, BitStreamFilter jarg1_);
+  public final static native int BitStreamFilter_filter__SWIG_0(long jarg1, BitStreamFilter jarg1_, long jarg2, Buffer jarg2_, int jarg3, long jarg4, Buffer jarg4_, int jarg5, int jarg6, long jarg7, Coder jarg7_, String jarg8, boolean jarg9);
+  public final static native void BitStreamFilter_filter__SWIG_1(long jarg1, BitStreamFilter jarg1_, long jarg2, MediaPacket jarg2_, String jarg3);
   public final static native long PixelFormat_SWIGUpcast(long jarg1);
   public final static native long PixelComponentDescriptor_SWIGUpcast(long jarg1);
   public final static native long PixelFormatDescriptor_SWIGUpcast(long jarg1);
@@ -1450,4 +1501,6 @@ public class VideoJNI {
   public final static native long FilterSink_SWIGUpcast(long jarg1);
   public final static native long FilterAudioSink_SWIGUpcast(long jarg1);
   public final static native long FilterPictureSink_SWIGUpcast(long jarg1);
+  public final static native long BitStreamFilterType_SWIGUpcast(long jarg1);
+  public final static native long BitStreamFilter_SWIGUpcast(long jarg1);
 }

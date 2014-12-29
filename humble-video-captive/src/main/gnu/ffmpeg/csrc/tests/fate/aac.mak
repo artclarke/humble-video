@@ -42,6 +42,10 @@ FATE_AAC += fate-aac-al_sbr_hq_cm_48_5.1
 fate-aac-al_sbr_hq_cm_48_5.1: CMD = pcm -i $(TARGET_SAMPLES)/aac/al_sbr_cm_48_5.1.mp4
 fate-aac-al_sbr_hq_cm_48_5.1: REF = $(SAMPLES)/aac/al_sbr_hq_cm_48_5.1_reorder.s16
 
+FATE_AAC += fate-aac-al_sbr_hq_sr_48_2_fsaac48
+fate-aac-al_sbr_hq_sr_48_2_fsaac48: CMD = pcm -i $(TARGET_SAMPLES)/aac/al_sbr_sr_48_2_fsaac48.mp4
+fate-aac-al_sbr_hq_sr_48_2_fsaac48: REF = $(SAMPLES)/aac/al_sbr_hq_sr_48_2_fsaac48.s16
+
 FATE_AAC += fate-aac-al_sbr_ps_06_ur
 fate-aac-al_sbr_ps_06_ur: CMD = pcm -i $(TARGET_SAMPLES)/aac/al_sbr_ps_06_new.mp4
 fate-aac-al_sbr_ps_06_ur: REF = $(SAMPLES)/aac/al_sbr_ps_06_ur.s16
@@ -49,6 +53,19 @@ fate-aac-al_sbr_ps_06_ur: REF = $(SAMPLES)/aac/al_sbr_ps_06_ur.s16
 FATE_AAC += fate-aac-ap05_48
 fate-aac-ap05_48: CMD = pcm -i $(TARGET_SAMPLES)/aac/ap05_48.mp4
 fate-aac-ap05_48: REF = $(SAMPLES)/aac/ap05_48.s16
+
+FATE_AAC += fate-aac-er_ad6000np_44_ep0
+fate-aac-er_ad6000np_44_ep0: CMD = pcm -i $(TARGET_SAMPLES)/aac/er_ad6000np_44_ep0.mp4
+fate-aac-er_ad6000np_44_ep0: REF = $(SAMPLES)/aac/er_ad6000np_44.s16
+
+FATE_AAC += fate-aac-er_eld1001np_44_ep0
+fate-aac-er_eld1001np_44_ep0: CMD = pcm -i $(TARGET_SAMPLES)/aac/er_eld1001np_44_ep0.mp4
+fate-aac-er_eld1001np_44_ep0: REF = $(SAMPLES)/aac/er_eld1001np_44.s16
+
+FATE_AAC += fate-aac-er_eld2000np_48_ep0
+fate-aac-er_eld2000np_48_ep0: CMD = pcm -i $(TARGET_SAMPLES)/aac/er_eld2000np_48_ep0.mp4
+fate-aac-er_eld2000np_48_ep0: REF = $(SAMPLES)/aac/er_eld2000np_48_ep0.s16
+
 
 fate-aac-ct%: CMD = pcm -i $(TARGET_SAMPLES)/aac/CT_DecoderCheck/$(@:fate-aac-ct-%=%)
 fate-aac-ct%: REF = $(SAMPLES)/aac/CT_DecoderCheck/aacPlusv2.wav
@@ -74,7 +91,7 @@ fate-aac-aref-encode: CMP_TARGET = 1862
 fate-aac-aref-encode: SIZE_TOLERANCE = 2464
 
 FATE_AAC_ENCODE += fate-aac-ln-encode
-fate-aac-ln-encode: CMD = enc_dec_pcm adts wav s16le $(REF) -strict -2 -c:a aac -b:a 512k
+fate-aac-ln-encode: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -strict -2 -c:a aac -b:a 512k
 fate-aac-ln-encode: CMP = stddev
 fate-aac-ln-encode: REF = $(SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav
 fate-aac-ln-encode: CMP_SHIFT = -4096

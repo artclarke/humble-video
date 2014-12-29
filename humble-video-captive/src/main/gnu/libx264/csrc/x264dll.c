@@ -1,7 +1,7 @@
 /*****************************************************************************
  * x264dll: x264 DLLMain for win32
  *****************************************************************************
- * Copyright (C) 2009-2013 x264 project
+ * Copyright (C) 2009-2014 x264 project
  *
  * Authors: Anton Mitrofanov <BugMaster@narod.ru>
  *
@@ -27,7 +27,7 @@
 #include <windows.h>
 
 /* Callback for our DLL so we can initialize pthread */
-BOOL WINAPI DllMain( HANDLE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
+BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 {
 #if PTW32_STATIC_LIB
     switch( fdwReason )

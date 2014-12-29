@@ -63,10 +63,9 @@ static int txd_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         return AVERROR_PATCHWELCOME;
     }
 
-    if ((ret = av_image_check_size(w, h, 0, avctx)) < 0)
+    if ((ret = ff_set_dimensions(avctx, w, h)) < 0)
         return ret;
-    if (w != avctx->width || h != avctx->height)
-        avcodec_set_dimensions(avctx, w, h);
+
     if ((ret = ff_get_buffer(avctx, p, 0)) < 0)
         return ret;
 
@@ -134,9 +133,9 @@ unsupported:
 
 AVCodec ff_txd_decoder = {
     .name           = "txd",
+    .long_name      = NULL_IF_CONFIG_SMALL("Renderware TXD (TeXture Dictionary) image"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_TXD,
     .decode         = txd_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("Renderware TXD (TeXture Dictionary) image"),
 };

@@ -3,7 +3,6 @@ package io.humble.video;
 import static org.junit.Assert.*;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Test;
 
@@ -16,7 +15,7 @@ public class DemuxerFormatTest {
     
     assertEquals("aiff", f.getName());
     assertEquals("Audio IFF", f.getLongName());
-    List<Codec.ID> l = f.getSupportedCodecs();
+    Collection<Codec.ID> l = f.getSupportedCodecs();
     assertTrue(17 < l.size());
   }
   

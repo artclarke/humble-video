@@ -30,11 +30,11 @@
 
 #include "internal.h"
 #include "avcodec.h"
-#include "mpegvideo.h"
 #include "h264.h"
 #include "h264data.h" // FIXME FIXME FIXME
 #include "h264_mvpred.h"
 #include "golomb.h"
+#include "mpegutils.h"
 #include "libavutil/avassert.h"
 
 
@@ -773,6 +773,10 @@ decode_intra_mb:
 
         // We assume these blocks are very rare so we do not optimize it.
         h->intra_pcm_ptr = align_get_bits(&h->gb);
+        if (get_bits_left(&h->gb) < mb_size) {
+            av_log(h->avctx, AV_LOG_ERROR, "Not enough data for an intra PCM block.\n");
+            return AVERROR_INVALIDDATA;
+        }
         skip_bits_long(&h->gb, mb_size);
 
         // In deblocking, the quantizer is 0
@@ -866,7 +870,7 @@ decode_intra_mb:
         }
 
         for(list=0; list<h->list_count; list++){
-            int ref_count= IS_REF0(mb_type) ? 1 : local_ref_count[list];
+            int ref_count = IS_REF0(mb_type) ? 1 : local_ref_count[list];
             for(i=0; i<4; i++){
                 if(IS_DIRECT(h->sub_mb_type[i])) continue;
                 if(IS_DIR(h->sub_mb_type[i], 0, list)){
@@ -948,11 +952,11 @@ decode_intra_mb:
                     if(IS_DIR(mb_type, 0, list)){
                         if(local_ref_count[list]==1){
                             val= 0;
-                        }else if(local_ref_count[list]==2){
+                        } else if(local_ref_count[list]==2){
                             val= get_bits1(&h->gb)^1;
                         }else{
                             val= get_ue_golomb_31(&h->gb);
-                            if(val >= local_ref_count[list]){
+                            if (val >= local_ref_count[list]){
                                 av_log(h->avctx, AV_LOG_ERROR, "ref %u overflow\n", val);
                                 return -1;
                             }
@@ -976,13 +980,13 @@ decode_intra_mb:
                     for(i=0; i<2; i++){
                         unsigned int val;
                         if(IS_DIR(mb_type, i, list)){
-                            if(local_ref_count[list] == 1){
+                            if(local_ref_count[list] == 1) {
                                 val= 0;
-                            }else if(local_ref_count[list] == 2){
+                            } else if(local_ref_count[list] == 2) {
                                 val= get_bits1(&h->gb)^1;
                             }else{
                                 val= get_ue_golomb_31(&h->gb);
-                                if(val >= local_ref_count[list]){
+                                if (val >= local_ref_count[list]){
                                     av_log(h->avctx, AV_LOG_ERROR, "ref %u overflow\n", val);
                                     return -1;
                                 }
@@ -1015,11 +1019,11 @@ decode_intra_mb:
                         if(IS_DIR(mb_type, i, list)){ //FIXME optimize
                             if(local_ref_count[list]==1){
                                 val= 0;
-                            }else if(local_ref_count[list]==2){
+                            } else if(local_ref_count[list]==2){
                                 val= get_bits1(&h->gb)^1;
                             }else{
                                 val= get_ue_golomb_31(&h->gb);
-                                if(val >= local_ref_count[list]){
+                                if (val >= local_ref_count[list]){
                                     av_log(h->avctx, AV_LOG_ERROR, "ref %u overflow\n", val);
                                     return -1;
                                 }
@@ -1142,12 +1146,12 @@ decode_intra_mb:
                 for(chroma_idx=0; chroma_idx<2; chroma_idx++){
                     const uint32_t *qmul = h->dequant4_coeff[chroma_idx+1+(IS_INTRA( mb_type ) ? 0:3)][h->chroma_qp[chroma_idx]];
                     int16_t *mb = h->mb + (16*(16 + 16*chroma_idx) << pixel_shift);
-                    for (i8x8=0; i8x8<num_c8x8; i8x8++) {
-                        for (i4x4=0; i4x4<4; i4x4++) {
-                            const int index= 16 + 16*chroma_idx + 8*i8x8 + i4x4;
+                    for (i8x8 = 0; i8x8<num_c8x8; i8x8++) {
+                        for (i4x4 = 0; i4x4 < 4; i4x4++) {
+                            const int index = 16 + 16*chroma_idx + 8*i8x8 + i4x4;
                             if (decode_residual(h, gb, mb, index, scan + 1, qmul, 15) < 0)
                                 return -1;
-                            mb += 16<<pixel_shift;
+                            mb += 16 << pixel_shift;
                         }
                     }
                 }

@@ -1,0 +1,16 @@
+Name: libyuv
+URL: http://code.google.com/p/libyuv/
+Version: 1060
+License: BSD
+License File: LICENSE
+
+Description:
+libyuv is an open source project that includes YUV conversion and scaling
+functionality.
+
+The optimized scaler in libyuv is used in multiple resolution encoder example,
+which down-samples the original input video (f.g. 1280x720) a number of times
+in order to encode multiple resolution bit streams.
+
+Local Modifications:
+cherry-pick 'Issue 24479004: Fix building with MSVC for arm'

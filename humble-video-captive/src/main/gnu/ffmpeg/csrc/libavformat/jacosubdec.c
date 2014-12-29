@@ -43,8 +43,9 @@ typedef struct {
 static int timed_line(const char *ptr)
 {
     char c;
+    int fs, fe;
     return (sscanf(ptr, "%*u:%*u:%*u.%*u %*u:%*u:%*u.%*u %c", &c) == 1 ||
-            sscanf(ptr, "@%*u @%*u %c",                       &c) == 1);
+            (sscanf(ptr, "@%u @%u %c", &fs, &fe, &c) == 3 && fs < fe));
 }
 
 static int jacosub_probe(AVProbeData *p)
@@ -63,7 +64,7 @@ static int jacosub_probe(AVProbeData *p)
                 return AVPROBE_SCORE_EXTENSION + 1;
             return 0;
         }
-        ptr += strcspn(ptr, "\n") + 1;
+        ptr += ff_subtitles_next_line(ptr);
     }
     return 0;
 }
@@ -173,7 +174,7 @@ static int jacosub_read_header(AVFormatContext *s)
 
     av_bprint_init(&header, 1024+FF_INPUT_BUFFER_PADDING_SIZE, 4096);
 
-    while (!url_feof(pb)) {
+    while (!avio_feof(pb)) {
         int cmd_len;
         const char *p = line;
         int64_t pos = avio_tell(pb);

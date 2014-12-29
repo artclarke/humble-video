@@ -20,7 +20,7 @@
 
 /**
  * @file
- * audio to video multimedia vector scope filter
+ * audio to video multimedia vectorscope filter
  */
 
 #include "libavutil/avassert.h"
@@ -70,7 +70,7 @@ static const AVOption avectorscope_options[] = {
     { "gf", "set green fade",     OFFSET(fade[1]), AV_OPT_TYPE_INT, {.i64=10}, 0, 255, FLAGS },
     { "bf", "set blue fade",      OFFSET(fade[2]), AV_OPT_TYPE_INT, {.i64=5}, 0, 255, FLAGS },
     { "zoom", "set zoom factor",  OFFSET(zoom), AV_OPT_TYPE_DOUBLE, {.dbl=1}, 1, 10, FLAGS },
-    {NULL},
+    { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(avectorscope);
@@ -186,9 +186,10 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
                          p->outpicref->height != outlink->h) {
         av_frame_free(&p->outpicref);
         p->outpicref = ff_get_video_buffer(outlink, outlink->w, outlink->h);
-        if (!p->outpicref)
+        if (!p->outpicref) {
             av_frame_free(&insamples);
             return AVERROR(ENOMEM);
+        }
 
         for (i = 0; i < outlink->h; i++)
             memset(p->outpicref->data[0] + i * p->outpicref->linesize[0], 0, outlink->w * 4);
@@ -254,16 +255,16 @@ static const AVFilterPad audiovectorscope_inputs[] = {
 
 static const AVFilterPad audiovectorscope_outputs[] = {
     {
-        .name          = "default",
-        .type          = AVMEDIA_TYPE_VIDEO,
-        .config_props  = config_output,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = config_output,
     },
     { NULL }
 };
 
-AVFilter avfilter_avf_avectorscope = {
+AVFilter ff_avf_avectorscope = {
     .name          = "avectorscope",
-    .description   = NULL_IF_CONFIG_SMALL("Display audio vector scope."),
+    .description   = NULL_IF_CONFIG_SMALL("Convert input audio to vectorscope video output."),
     .uninit        = uninit,
     .query_formats = query_formats,
     .priv_size     = sizeof(AudioVectorScopeContext),

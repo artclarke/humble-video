@@ -31,6 +31,7 @@
 #define AVCODEC_TIFF_H
 
 #include <stdint.h>
+#include "tiff_common.h"
 
 /** abridged list of TIFF tags */
 enum TiffTags {
@@ -39,7 +40,7 @@ enum TiffTags {
     TIFF_HEIGHT,
     TIFF_BPP,
     TIFF_COMPR,
-    TIFF_INVERT             = 0x106,
+    TIFF_PHOTOMETRIC        = 0x106,
     TIFF_FILL_ORDER         = 0x10A,
     TIFF_DOCUMENT_NAME      = 0x10D,
     TIFF_IMAGE_DESCRIPTION  = 0x10E,
@@ -94,23 +95,8 @@ enum TiffCompr {
     TIFF_NEWJPEG,
     TIFF_ADOBE_DEFLATE,
     TIFF_PACKBITS = 0x8005,
-    TIFF_DEFLATE  = 0x80B2
-};
-
-enum TiffTypes {
-    TIFF_BYTE = 1,
-    TIFF_STRING,
-    TIFF_SHORT,
-    TIFF_LONG,
-    TIFF_RATIONAL,
-    TIFF_SBYTE,
-    TIFF_UNDEFINED,
-    TIFF_SSHORT,
-    TIFF_SLONG,
-    TIFF_SRATIONAL,
-    TIFF_FLOAT,
-    TIFF_DOUBLE,
-    TIFF_IFD
+    TIFF_DEFLATE  = 0x80B2,
+    TIFF_LZMA     = 0x886D,
 };
 
 enum TiffGeoTagKey {
@@ -161,15 +147,28 @@ enum TiffGeoTagKey {
     TIFF_VERTICAL_UNITS_GEOKEY               = 4099
 };
 
+enum TiffPhotometric {
+    TIFF_PHOTOMETRIC_NONE       = -1,
+    TIFF_PHOTOMETRIC_WHITE_IS_ZERO,      /* mono or grayscale, 0 is white */
+    TIFF_PHOTOMETRIC_BLACK_IS_ZERO,      /* mono or grayscale, 0 is black */
+    TIFF_PHOTOMETRIC_RGB,                /* RGB or RGBA*/
+    TIFF_PHOTOMETRIC_PALETTE,            /* Uses a palette */
+    TIFF_PHOTOMETRIC_ALPHA_MASK,         /* Transparency mask */
+    TIFF_PHOTOMETRIC_SEPARATED,          /* CMYK or some other ink set */
+    TIFF_PHOTOMETRIC_YCBCR,              /* YCbCr */
+    TIFF_PHOTOMETRIC_CIE_LAB    = 8,     /* 1976 CIE L*a*b* */
+    TIFF_PHOTOMETRIC_ICC_LAB,            /* ICC L*a*b* */
+    TIFF_PHOTOMETRIC_ITU_LAB,            /* ITU L*a*b* */
+    TIFF_PHOTOMETRIC_CFA        = 32803, /* Color Filter Array (DNG) */
+    TIFF_PHOTOMETRIC_LOG_L      = 32844, /* CIE Log2(L) */
+    TIFF_PHOTOMETRIC_LOG_LUV,            /* CIE Log L*u*v* */
+    TIFF_PHOTOMETRIC_LINEAR_RAW = 34892, /* Linear Raw (DNG) */
+};
+
 enum TiffGeoTagType {
     GEOTIFF_SHORT  = 0,
     GEOTIFF_DOUBLE = 34736,
     GEOTIFF_STRING = 34737
-};
-
-/** sizes of various TIFF field types (string size = 100)*/
-static const uint8_t type_sizes[14] = {
-    0, 1, 100, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8, 4
 };
 
 typedef struct TiffGeoTag {

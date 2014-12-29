@@ -251,6 +251,14 @@ ContainerStream::setId(int32_t aId) {
   getCtx()->id = aId;
 }
 
+bool
+ContainerStream::matchSpecifier(const char* specifier) {
+  AVFormatContext* ctx = mContainer->getFormatCtx();
+  AVStream* stream = getCtx();;
+  int e = specifier ? avformat_match_stream_specifier(ctx, stream, specifier) : 0;
+  FfmpegException::check(e, "invalid stream specifier: %s", specifier);
+  return e > 0 ? true : false;
+}
 }
 }
 }

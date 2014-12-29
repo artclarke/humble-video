@@ -5,17 +5,17 @@
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with FFmpeg; if not, write to the Free Software
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -56,14 +56,14 @@ typedef struct {
 typedef struct {
     const AVClass *class;
     int nb_planes;
-    int linesize[4];
+    int bytewidth[4];
     int height[4];
     FilterParams all;
     FilterParams param[4];
     int rand_shift[MAX_RES];
     int rand_shift_init;
-    void (*line_noise)(uint8_t *dst, const uint8_t *src, int8_t *noise, int len, int shift);
-    void (*line_noise_avg)(uint8_t *dst, const uint8_t *src, int len, int8_t **shift);
+    void (*line_noise)(uint8_t *dst, const uint8_t *src, const int8_t *noise, int len, int shift);
+    void (*line_noise_avg)(uint8_t *dst, const uint8_t *src, int len, const int8_t * const *shift);
 } NoiseContext;
 
 typedef struct ThreadData {
@@ -98,7 +98,7 @@ AVFILTER_DEFINE_CLASS(noise);
 static const int8_t patt[4] = { -1, 0, 1, 0 };
 
 #define RAND_N(range) ((int) ((double) range * av_lfg_get(lfg) / (UINT_MAX + 1.0)))
-static int init_noise(NoiseContext *n, int comp)
+static av_cold int init_noise(NoiseContext *n, int comp)
 {
     int8_t *noise = av_malloc(MAX_NOISE * sizeof(int8_t));
     FilterParams *fp = &n->param[comp];
@@ -172,7 +172,7 @@ static int query_formats(AVFilterContext *ctx)
     AVFilterFormats *formats = NULL;
     int fmt;
 
-    for (fmt = 0; fmt < AV_PIX_FMT_NB; fmt++) {
+    for (fmt = 0; av_pix_fmt_desc_get(fmt); fmt++) {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
         if (desc->flags & AV_PIX_FMT_FLAG_PLANAR && !((desc->comp[0].depth_minus1 + 1) & 7))
             ff_add_format(&formats, fmt);
@@ -190,7 +190,7 @@ static int config_input(AVFilterLink *inlink)
 
     n->nb_planes = av_pix_fmt_count_planes(inlink->format);
 
-    if ((ret = av_image_fill_linesizes(n->linesize, inlink->format, inlink->w)) < 0)
+    if ((ret = av_image_fill_linesizes(n->bytewidth, inlink->format, inlink->w)) < 0)
         return ret;
 
     n->height[1] = n->height[2] = FF_CEIL_RSHIFT(inlink->h, desc->log2_chroma_h);
@@ -199,7 +199,7 @@ static int config_input(AVFilterLink *inlink)
     return 0;
 }
 
-static inline void line_noise_c(uint8_t *dst, const uint8_t *src, int8_t *noise,
+static inline void line_noise_c(uint8_t *dst, const uint8_t *src, const int8_t *noise,
                        int len, int shift)
 {
     int i;
@@ -215,7 +215,7 @@ static inline void line_noise_c(uint8_t *dst, const uint8_t *src, int8_t *noise,
 #define ASMALIGN(ZEROBITS) ".p2align " #ZEROBITS "\n\t"
 
 static void line_noise_mmx(uint8_t *dst, const uint8_t *src,
-                           int8_t *noise, int len, int shift)
+                           const int8_t *noise, int len, int shift)
 {
 #if HAVE_MMX_INLINE
     x86_reg mmx_len= len&(~7);
@@ -245,7 +245,7 @@ static void line_noise_mmx(uint8_t *dst, const uint8_t *src,
 }
 
 static void line_noise_mmxext(uint8_t *dst, const uint8_t *src,
-                              int8_t *noise, int len, int shift)
+                              const int8_t *noise, int len, int shift)
 {
 #if HAVE_MMXEXT_INLINE
     x86_reg mmx_len= len&(~7);
@@ -275,10 +275,10 @@ static void line_noise_mmxext(uint8_t *dst, const uint8_t *src,
 }
 
 static inline void line_noise_avg_c(uint8_t *dst, const uint8_t *src,
-                           int len, int8_t **shift)
+                           int len, const int8_t * const *shift)
 {
     int i;
-    int8_t *src2 = (int8_t*)src;
+    const int8_t *src2 = (const int8_t*)src;
 
     for (i = 0; i < len; i++) {
         const int n = shift[0][i] + shift[1][i] + shift[2][i];
@@ -287,9 +287,9 @@ static inline void line_noise_avg_c(uint8_t *dst, const uint8_t *src,
 }
 
 static inline void line_noise_avg_mmx(uint8_t *dst, const uint8_t *src,
-                                      int len, int8_t **shift)
+                                      int len, const int8_t * const *shift)
 {
-#if HAVE_MMX_INLINE
+#if HAVE_MMX_INLINE && HAVE_6REGS
     x86_reg mmx_len= len&(~7);
 
     __asm__ volatile(
@@ -324,7 +324,7 @@ static inline void line_noise_avg_mmx(uint8_t *dst, const uint8_t *src,
         );
 
     if (mmx_len != len){
-        int8_t *shift2[3]={shift[0]+mmx_len, shift[1]+mmx_len, shift[2]+mmx_len};
+        const int8_t *shift2[3]={shift[0]+mmx_len, shift[1]+mmx_len, shift[2]+mmx_len};
         line_noise_avg_c(dst+mmx_len, src+mmx_len, len-mmx_len, shift2);
     }
 #endif
@@ -354,7 +354,7 @@ static void noise(uint8_t *dst, const uint8_t *src,
             shift = n->rand_shift[ix];
 
         if (flags & NOISE_AVERAGED) {
-            n->line_noise_avg(dst, src, width, p->prev_shift[ix]);
+            n->line_noise_avg(dst, src, width, (const int8_t**)p->prev_shift[ix]);
             p->prev_shift[ix][shift & 3] = noise + shift;
         } else {
             n->line_noise(dst, src, noise, width, shift);
@@ -377,7 +377,7 @@ static int filter_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
         noise(td->out->data[plane] + start * td->out->linesize[plane],
               td->in->data[plane]  + start * td->in->linesize[plane],
               td->out->linesize[plane], td->in->linesize[plane],
-              s->linesize[plane], start, end, s, plane);
+              s->bytewidth[plane], start, end, s, plane);
     }
     return 0;
 }
@@ -432,10 +432,15 @@ static av_cold int init(AVFilterContext *ctx)
             return ret;
     }
 
+    n->line_noise     = line_noise_c;
+    n->line_noise_avg = line_noise_avg_c;
+
     if (HAVE_MMX_INLINE &&
         cpu_flags & AV_CPU_FLAG_MMX) {
         n->line_noise = line_noise_mmx;
+#if HAVE_6REGS
         n->line_noise_avg = line_noise_avg_mmx;
+#endif
     }
     if (HAVE_MMXEXT_INLINE &&
         cpu_flags & AV_CPU_FLAG_MMXEXT)
@@ -455,23 +460,23 @@ static av_cold void uninit(AVFilterContext *ctx)
 
 static const AVFilterPad noise_inputs[] = {
     {
-        .name             = "default",
-        .type             = AVMEDIA_TYPE_VIDEO,
-        .filter_frame     = filter_frame,
-        .config_props     = config_input,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .filter_frame = filter_frame,
+        .config_props = config_input,
     },
     { NULL }
 };
 
 static const AVFilterPad noise_outputs[] = {
     {
-        .name          = "default",
-        .type          = AVMEDIA_TYPE_VIDEO,
+        .name = "default",
+        .type = AVMEDIA_TYPE_VIDEO,
     },
     { NULL }
 };
 
-AVFilter avfilter_vf_noise = {
+AVFilter ff_vf_noise = {
     .name          = "noise",
     .description   = NULL_IF_CONFIG_SMALL("Add noise."),
     .priv_size     = sizeof(NoiseContext),

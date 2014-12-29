@@ -154,8 +154,11 @@ static void get_private_data(OutputStream *os)
     if (!ptr)
         return;
     os->private_str = av_mallocz(2*size + 1);
+    if (!os->private_str)
+        goto fail;
     for (i = 0; i < size; i++)
         snprintf(&os->private_str[2*i], 3, "%02x", ptr[i]);
+fail:
     if (ptr != codec->extradata)
         av_free(ptr);
 }
@@ -210,14 +213,15 @@ static int write_manifest(AVFormatContext *s, int final)
 {
     SmoothStreamingContext *c = s->priv_data;
     AVIOContext *out;
-    char filename[1024];
+    char filename[1024], temp_filename[1024];
     int ret, i, video_chunks = 0, audio_chunks = 0, video_streams = 0, audio_streams = 0;
     int64_t duration = 0;
 
     snprintf(filename, sizeof(filename), "%s/Manifest", s->filename);
-    ret = avio_open2(&out, filename, AVIO_FLAG_WRITE, &s->interrupt_callback, NULL);
+    snprintf(temp_filename, sizeof(temp_filename), "%s/Manifest.tmp", s->filename);
+    ret = avio_open2(&out, temp_filename, AVIO_FLAG_WRITE, &s->interrupt_callback, NULL);
     if (ret < 0) {
-        av_log(s, AV_LOG_ERROR, "Unable to open %s for writing\n", filename);
+        av_log(s, AV_LOG_ERROR, "Unable to open %s for writing\n", temp_filename);
         return ret;
     }
     avio_printf(out, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
@@ -278,6 +282,7 @@ static int write_manifest(AVFormatContext *s, int final)
     avio_printf(out, "</SmoothStreamingMedia>\n");
     avio_flush(out);
     avio_close(out);
+    rename(temp_filename, filename);
     return 0;
 }
 
@@ -287,7 +292,7 @@ static int ism_write_header(AVFormatContext *s)
     int ret = 0, i;
     AVOutputFormat *oformat;
 
-    if (mkdir(s->filename, 0777) < 0) {
+    if (mkdir(s->filename, 0777) == -1 && errno != EEXIST) {
         av_log(s, AV_LOG_ERROR, "mkdir failed\n");
         ret = AVERROR(errno);
         goto fail;
@@ -299,7 +304,7 @@ static int ism_write_header(AVFormatContext *s)
         goto fail;
     }
 
-    c->streams = av_mallocz(sizeof(*c->streams) * s->nb_streams);
+    c->streams = av_mallocz_array(s->nb_streams, sizeof(*c->streams));
     if (!c->streams) {
         ret = AVERROR(ENOMEM);
         goto fail;
@@ -310,7 +315,6 @@ static int ism_write_header(AVFormatContext *s)
         AVFormatContext *ctx;
         AVStream *st;
         AVDictionary *opts = NULL;
-        char buf[10];
 
         if (!s->streams[i]->codec->bit_rate) {
             av_log(s, AV_LOG_ERROR, "No bit rate set for stream %d\n", i);
@@ -318,7 +322,7 @@ static int ism_write_header(AVFormatContext *s)
             goto fail;
         }
         snprintf(os->dirname, sizeof(os->dirname), "%s/QualityLevels(%d)", s->filename, s->streams[i]->codec->bit_rate);
-        if (mkdir(os->dirname, 0777) < 0) {
+        if (mkdir(os->dirname, 0777) == -1 && errno != EEXIST) {
             ret = AVERROR(errno);
             av_log(s, AV_LOG_ERROR, "mkdir failed\n");
             goto fail;
@@ -346,8 +350,7 @@ static int ism_write_header(AVFormatContext *s)
             goto fail;
         }
 
-        snprintf(buf, sizeof(buf), "%d", c->lookahead_count);
-        av_dict_set(&opts, "ism_lookahead", buf, 0);
+        av_dict_set_int(&opts, "ism_lookahead", c->lookahead_count, 0);
         av_dict_set(&opts, "movflags", "frag_custom", 0);
         if ((ret = avformat_write_header(ctx, &opts)) < 0) {
              goto fail;
@@ -428,7 +431,7 @@ static int parse_fragment(AVFormatContext *s, const char *filename, int64_t *sta
         if (len < 8 || len >= *moof_size)
             goto fail;
         if (tag == MKTAG('u','u','i','d')) {
-            const uint8_t tfxd[] = {
+            static const uint8_t tfxd[] = {
                 0x6d, 0x1d, 0x9b, 0x05, 0x42, 0xd5, 0x44, 0xe6,
                 0x80, 0xe2, 0x14, 0x1d, 0xaf, 0xf7, 0x57, 0xb2
             };
@@ -451,12 +454,16 @@ fail:
 
 static int add_fragment(OutputStream *os, const char *file, const char *infofile, int64_t start_time, int64_t duration, int64_t start_pos, int64_t size)
 {
+    int err;
     Fragment *frag;
     if (os->nb_fragments >= os->fragments_size) {
         os->fragments_size = (os->fragments_size + 1) * 2;
-        os->fragments = av_realloc(os->fragments, sizeof(*os->fragments)*os->fragments_size);
-        if (!os->fragments)
-            return AVERROR(ENOMEM);
+        if ((err = av_reallocp(&os->fragments, sizeof(*os->fragments) *
+                               os->fragments_size)) < 0) {
+            os->fragments_size = 0;
+            os->nb_fragments = 0;
+            return err;
+        }
     }
     frag = av_mallocz(sizeof(*frag));
     if (!frag)
@@ -584,7 +591,7 @@ static int ism_write_packet(AVFormatContext *s, AVPacket *pkt)
     }
 
     os->packets_written++;
-    return ff_write_chained(os->ctx, 0, pkt, s);
+    return ff_write_chained(os->ctx, 0, pkt, s, 0);
 }
 
 static int ism_write_trailer(AVFormatContext *s)

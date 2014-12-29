@@ -435,6 +435,7 @@ public class Coder extends Configurable {
   public enum State {
     STATE_INITED,
     STATE_OPENED,
+    STATE_FLUSHING,
     STATE_ERROR,
   ;
 
@@ -631,6 +632,10 @@ public class Coder extends Configurable {
    * Show all frames before the first keyframe 
    */
     FLAG2_SHOW_ALL(VideoJNI.Coder_FLAG2_SHOW_ALL_get()),
+  /**
+   * Export motion vectors through frame side data 
+   */
+    FLAG2_EXPORT_MVS(VideoJNI.Coder_FLAG2_EXPORT_MVS_get()),
   ;
 
     public final int swigValue() {

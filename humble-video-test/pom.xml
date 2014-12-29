@@ -4,12 +4,11 @@
   <parent>
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
-    <relativePath/>
+    <version>0.2.0</version>
+    <relativePath>../humble-video-parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>humble-video-test</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>humble-video-test</name>
@@ -52,12 +51,12 @@
       <dependencies>
         <dependency>
           <groupId>io.humble</groupId>
-          <artifactId>humble-video-arch-i686-w64-mingw32</artifactId>
+          <artifactId>humble-video-arch-i686-w64-mingw32-debug</artifactId>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>io.humble</groupId>
-          <artifactId>humble-video-arch-x86_64-w64-mingw32</artifactId>
+          <artifactId>humble-video-arch-x86_64-w64-mingw32-debug</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -72,12 +71,12 @@
       <dependencies>
         <dependency>
           <groupId>io.humble</groupId>
-          <artifactId>humble-video-arch-i686-apple-darwin12</artifactId>
+          <artifactId>humble-video-arch-i686-apple-darwin12-debug</artifactId>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>io.humble</groupId>
-          <artifactId>humble-video-arch-x86_64-apple-darwin12</artifactId>
+          <artifactId>humble-video-arch-x86_64-apple-darwin12-debug</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -92,12 +91,12 @@
       <dependencies>
         <dependency>
           <groupId>io.humble</groupId>
-          <artifactId>humble-video-arch-i686-pc-linux-gnu6</artifactId>
+          <artifactId>humble-video-arch-i686-pc-linux-gnu6-debug</artifactId>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>io.humble</groupId>
-          <artifactId>humble-video-arch-x86_64-pc-linux-gnu6</artifactId>
+          <artifactId>humble-video-arch-x86_64-pc-linux-gnu6-debug</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>

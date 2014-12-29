@@ -2,20 +2,20 @@
  * Copyright (c) 2006 Michael Niedermayer <michaelni@gmx.at>
  * Copyright (c) 2012 Justin Ruggles <justin.ruggles@gmail.com>
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -288,8 +288,8 @@ AudioConvert *ff_audio_convert_alloc(AVAudioResampleContext *avr,
         return ac;
     }
 
-    in_planar  = av_sample_fmt_is_planar(in_fmt);
-    out_planar = av_sample_fmt_is_planar(out_fmt);
+    in_planar  = ff_sample_fmt_is_planar(in_fmt, channels);
+    out_planar = ff_sample_fmt_is_planar(out_fmt, channels);
 
     if (in_planar == out_planar) {
         ac->func_type = CONV_FUNC_TYPE_FLAT;
@@ -301,6 +301,8 @@ AudioConvert *ff_audio_convert_alloc(AVAudioResampleContext *avr,
 
     set_generic_function(ac);
 
+    if (ARCH_AARCH64)
+        ff_audio_convert_init_aarch64(ac);
     if (ARCH_ARM)
         ff_audio_convert_init_arm(ac);
     if (ARCH_X86)
@@ -343,13 +345,13 @@ int ff_audio_convert(AudioConvert *ac, AudioData *out, AudioData *in)
     if (ac->apply_map) {
         ChannelMapInfo *map = &ac->avr->ch_map_info;
 
-        if (!av_sample_fmt_is_planar(ac->out_fmt)) {
+        if (!ff_sample_fmt_is_planar(ac->out_fmt, ac->channels)) {
             av_log(ac->avr, AV_LOG_ERROR, "cannot remap packed format during conversion\n");
             return AVERROR(EINVAL);
         }
 
         if (map->do_remap) {
-            if (av_sample_fmt_is_planar(ac->in_fmt)) {
+            if (ff_sample_fmt_is_planar(ac->in_fmt, ac->channels)) {
                 conv_func_flat *convert = use_generic ? ac->conv_flat_generic :
                                                         ac->conv_flat;
 

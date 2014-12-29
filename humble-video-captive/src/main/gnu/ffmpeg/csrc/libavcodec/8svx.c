@@ -101,7 +101,7 @@ static int eightsvx_decode_frame(AVCodecContext *avctx, void *data,
         }
         if (avpkt->size < (hdr_size + 1) * avctx->channels) {
             av_log(avctx, AV_LOG_ERROR, "packet size is too small\n");
-            return AVERROR(EINVAL);
+            return AVERROR_INVALIDDATA;
         }
 
         esc->fib_acc[0] = avpkt->data[1] + 128;
@@ -124,7 +124,7 @@ static int eightsvx_decode_frame(AVCodecContext *avctx, void *data,
     }
     if (!esc->data[0]) {
         av_log(avctx, AV_LOG_ERROR, "unexpected empty packet\n");
-        return AVERROR(EINVAL);
+        return AVERROR_INVALIDDATA;
     }
 
     /* decode next piece of data from the buffer */
@@ -187,6 +187,7 @@ static av_cold int eightsvx_decode_close(AVCodecContext *avctx)
 #if CONFIG_EIGHTSVX_FIB_DECODER
 AVCodec ff_eightsvx_fib_decoder = {
   .name           = "8svx_fib",
+  .long_name      = NULL_IF_CONFIG_SMALL("8SVX fibonacci"),
   .type           = AVMEDIA_TYPE_AUDIO,
   .id             = AV_CODEC_ID_8SVX_FIB,
   .priv_data_size = sizeof (EightSvxContext),
@@ -194,7 +195,6 @@ AVCodec ff_eightsvx_fib_decoder = {
   .decode         = eightsvx_decode_frame,
   .close          = eightsvx_decode_close,
   .capabilities   = CODEC_CAP_DR1,
-  .long_name      = NULL_IF_CONFIG_SMALL("8SVX fibonacci"),
   .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,
                                                     AV_SAMPLE_FMT_NONE },
 };
@@ -202,6 +202,7 @@ AVCodec ff_eightsvx_fib_decoder = {
 #if CONFIG_EIGHTSVX_EXP_DECODER
 AVCodec ff_eightsvx_exp_decoder = {
   .name           = "8svx_exp",
+  .long_name      = NULL_IF_CONFIG_SMALL("8SVX exponential"),
   .type           = AVMEDIA_TYPE_AUDIO,
   .id             = AV_CODEC_ID_8SVX_EXP,
   .priv_data_size = sizeof (EightSvxContext),
@@ -209,7 +210,6 @@ AVCodec ff_eightsvx_exp_decoder = {
   .decode         = eightsvx_decode_frame,
   .close          = eightsvx_decode_close,
   .capabilities   = CODEC_CAP_DR1,
-  .long_name      = NULL_IF_CONFIG_SMALL("8SVX exponential"),
   .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,
                                                     AV_SAMPLE_FMT_NONE },
 };

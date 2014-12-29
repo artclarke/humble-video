@@ -109,7 +109,7 @@
  *
  */
 
-#ifndef _POSIX_C_SOURCE
+#if !defined(_POSIX_C_SOURCE) && defined(OPENSSL_SYS_VMS)
 #define _POSIX_C_SOURCE 2	/* On VMS, you need to define this to get
 				   the declaration of fileno().  The value
 				   2 is to make sure no function defined
@@ -390,6 +390,8 @@ int chopup_args(ARGS *arg, char *buf, int *argc, char **argv[])
 		{
 		arg->count=20;
 		arg->data=(char **)OPENSSL_malloc(sizeof(char *)*arg->count);
+		if (arg->data == NULL)
+			return 0;
 		}
 	for (i=0; i<arg->count; i++)
 		arg->data[i]=NULL;
@@ -586,12 +588,12 @@ int password_callback(char *buf, int bufsiz, int verify,
 
 		if (ok >= 0)
 			ok = UI_add_input_string(ui,prompt,ui_flags,buf,
-				PW_MIN_LENGTH,BUFSIZ-1);
+				PW_MIN_LENGTH,bufsiz-1);
 		if (ok >= 0 && verify)
 			{
 			buff = (char *)OPENSSL_malloc(bufsiz);
 			ok = UI_add_verify_string(ui,prompt,ui_flags,buff,
-				PW_MIN_LENGTH,BUFSIZ-1, buf);
+				PW_MIN_LENGTH,bufsiz-1, buf);
 			}
 		if (ok >= 0)
 			do
@@ -1215,7 +1217,8 @@ STACK_OF(X509) *load_certs(BIO *err, const char *file, int format,
 	const char *pass, ENGINE *e, const char *desc)
 	{
 	STACK_OF(X509) *certs;
-	load_certs_crls(err, file, format, pass, e, desc, &certs, NULL);
+	if (!load_certs_crls(err, file, format, pass, e, desc, &certs, NULL))
+		return NULL;
 	return certs;
 	}	
 
@@ -1223,7 +1226,8 @@ STACK_OF(X509_CRL) *load_crls(BIO *err, const char *file, int format,
 	const char *pass, ENGINE *e, const char *desc)
 	{
 	STACK_OF(X509_CRL) *crls;
-	load_certs_crls(err, file, format, pass, e, desc, NULL, &crls);
+	if (!load_certs_crls(err, file, format, pass, e, desc, NULL, &crls))
+		return NULL;
 	return crls;
 	}	
 
@@ -1540,6 +1544,8 @@ char *make_config_name()
 
 	len=strlen(t)+strlen(OPENSSL_CONF)+2;
 	p=OPENSSL_malloc(len);
+	if (p == NULL)
+		return NULL;
 	BUF_strlcpy(p,t,len);
 #ifndef OPENSSL_SYS_VMS
 	BUF_strlcat(p,"/",len);
@@ -2130,7 +2136,7 @@ X509_NAME *parse_name(char *subject, long chtype, int multirdn)
 	X509_NAME *n = NULL;
 	int nid;
 
-	if (!buf || !ne_types || !ne_values)
+	if (!buf || !ne_types || !ne_values || !mval)
 		{
 		BIO_printf(bio_err, "malloc error\n");
 		goto error;
@@ -2234,6 +2240,7 @@ X509_NAME *parse_name(char *subject, long chtype, int multirdn)
 	OPENSSL_free(ne_values);
 	OPENSSL_free(ne_types);
 	OPENSSL_free(buf);
+	OPENSSL_free(mval);
 	return n;
 
 error:
@@ -2242,6 +2249,8 @@ error:
 		OPENSSL_free(ne_values);
 	if (ne_types)
 		OPENSSL_free(ne_types);
+	if (mval)
+		OPENSSL_free(mval);
 	if (buf)
 		OPENSSL_free(buf);
 	return NULL;
@@ -2256,6 +2265,7 @@ int args_verify(char ***pargs, int *pargc,
 	int purpose = 0, depth = -1;
 	char **oldargs = *pargs;
 	char *arg = **pargs, *argn = (*pargs)[1];
+	time_t at_time = 0;
 	if (!strcmp(arg, "-policy"))
 		{
 		if (!argn)
@@ -2305,6 +2315,27 @@ int args_verify(char ***pargs, int *pargc,
 				BIO_printf(err, "invalid depth\n");
 				*badarg = 1;
 				}
+			}
+		(*pargs)++;
+		}
+	else if (strcmp(arg,"-attime") == 0)
+		{
+		if (!argn)
+			*badarg = 1;
+		else
+			{
+			long timestamp;
+			/* interpret the -attime argument as seconds since
+			 * Epoch */
+			if (sscanf(argn, "%li", &timestamp) != 1)
+				{
+				BIO_printf(bio_err,
+						"Error parsing timestamp %s\n",
+					   	argn);
+				*badarg = 1;
+				}
+			/* on some platforms time_t may be a float */
+			at_time = (time_t) timestamp;
 			}
 		(*pargs)++;
 		}
@@ -2361,6 +2392,9 @@ int args_verify(char ***pargs, int *pargc,
 
 	if (depth >= 0)
 		X509_VERIFY_PARAM_set_depth(*pm, depth);
+
+	if (at_time) 
+		X509_VERIFY_PARAM_set_time(*pm, at_time);
 
 	end:
 
@@ -2693,6 +2727,50 @@ void jpake_server_auth(BIO *out, BIO *conn, const char *secret)
 
 #endif
 
+#if !defined(OPENSSL_NO_TLSEXT) && !defined(OPENSSL_NO_NEXTPROTONEG)
+/* next_protos_parse parses a comma separated list of strings into a string
+ * in a format suitable for passing to SSL_CTX_set_next_protos_advertised.
+ *   outlen: (output) set to the length of the resulting buffer on success.
+ *   err: (maybe NULL) on failure, an error message line is written to this BIO.
+ *   in: a NUL termianted string like "abc,def,ghi"
+ *
+ *   returns: a malloced buffer or NULL on failure.
+ */
+unsigned char *next_protos_parse(unsigned short *outlen, const char *in)
+	{
+	size_t len;
+	unsigned char *out;
+	size_t i, start = 0;
+
+	len = strlen(in);
+	if (len >= 65535)
+		return NULL;
+
+	out = OPENSSL_malloc(strlen(in) + 1);
+	if (!out)
+		return NULL;
+
+	for (i = 0; i <= len; ++i)
+		{
+		if (i == len || in[i] == ',')
+			{
+			if (i - start > 255)
+				{
+				OPENSSL_free(out);
+				return NULL;
+				}
+			out[start] = i - start;
+			start = i + 1;
+			}
+		else
+			out[i+1] = in[i];
+		}
+
+	*outlen = len + 1;
+	return out;
+	}
+#endif  /* !OPENSSL_NO_TLSEXT && !OPENSSL_NO_NEXTPROTONEG */
+
 /*
  * Platform-specific sections
  */
@@ -2767,7 +2845,7 @@ double app_tminterval(int stop,int usertime)
 
 	if (proc==NULL)
 		{
-		if (GetVersion() < 0x80000000)
+		if (check_winnt())
 			proc = OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,
 						GetCurrentProcessId());
 		if (proc==NULL) proc = (HANDLE)-1;

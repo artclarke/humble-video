@@ -25,10 +25,12 @@
  * @author Nathan Caldwell
  */
 
+#include <inttypes.h>
+
 #include "avcodec.h"
 #include "get_bits.h"
 #include "mathops.h"
-#include "dsputil.h"
+#include "huffyuvdsp.h"
 #include "lagarithrac.h"
 #include "thread.h"
 
@@ -48,10 +50,11 @@ enum LagarithFrameType {
 
 typedef struct LagarithContext {
     AVCodecContext *avctx;
-    DSPContext dsp;
+    HuffYUVDSPContext hdsp;
     int zeros;                  /**< number of consecutive zero bytes encountered */
     int zeros_rem;              /**< number of zero bytes remaining to output */
     uint8_t *rgb_planes;
+    int      rgb_planes_allocated;
     int rgb_stride;
 } LagarithContext;
 
@@ -174,7 +177,15 @@ static int lag_read_prob_header(lag_rac *rac, GetBitContext *gb)
 
     if (cumul_prob & (cumul_prob - 1)) {
         uint64_t mul = softfloat_reciprocal(cumul_prob);
-        for (i = 1; i < 257; i++) {
+        for (i = 1; i <= 128; i++) {
+            rac->prob[i] = softfloat_mul(rac->prob[i], mul);
+            scaled_cumul_prob += rac->prob[i];
+        }
+        if (scaled_cumul_prob <= 0) {
+            av_log(rac->avctx, AV_LOG_ERROR, "Scaled probabilities invalid\n");
+            return AVERROR_INVALIDDATA;
+        }
+        for (; i < 257; i++) {
             rac->prob[i] = softfloat_mul(rac->prob[i], mul);
             scaled_cumul_prob += rac->prob[i];
         }
@@ -222,7 +233,7 @@ static void add_lag_median_prediction(uint8_t *dst, uint8_t *src1,
                                       uint8_t *diff, int w, int *left,
                                       int *left_top)
 {
-    /* This is almost identical to add_hfyu_median_prediction in dsputil.h.
+    /* This is almost identical to add_hfyu_median_pred in huffyuvdsp.h.
      * However the &0xFF on the gradient predictor yealds incorrect output
      * for lagarith.
      */
@@ -249,8 +260,7 @@ static void lag_pred_line(LagarithContext *l, uint8_t *buf,
 
     if (!line) {
         /* Left prediction only for first line */
-        L = l->dsp.add_hfyu_left_prediction(buf, buf,
-                                            width, 0);
+        L = l->hdsp.add_hfyu_left_pred(buf, buf, width, 0);
     } else {
         /* Left pixel is actually prev_row[width] */
         L = buf[width - stride - 1];
@@ -279,7 +289,7 @@ static void lag_pred_line_yuy2(LagarithContext *l, uint8_t *buf,
         L= buf[0];
         if (is_luma)
             buf[0] = 0;
-        l->dsp.add_hfyu_left_prediction(buf, buf, width, 0);
+        l->hdsp.add_hfyu_left_pred(buf, buf, width, 0);
         if (is_luma)
             buf[0] = L;
         return;
@@ -294,16 +304,15 @@ static void lag_pred_line_yuy2(LagarithContext *l, uint8_t *buf,
             L += buf[i];
             buf[i] = L;
         }
-        for (; i<width; i++) {
-            L     = mid_pred(L&0xFF, buf[i-stride], (L + buf[i-stride] - TL)&0xFF) + buf[i];
-            TL    = buf[i-stride];
-            buf[i]= L;
+        for (; i < width; i++) {
+            L      = mid_pred(L & 0xFF, buf[i - stride], (L + buf[i - stride] - TL) & 0xFF) + buf[i];
+            TL     = buf[i - stride];
+            buf[i] = L;
         }
     } else {
         TL = buf[width - (2 * stride) - 1];
         L  = buf[width - stride - 1];
-        l->dsp.add_hfyu_median_prediction(buf, buf - stride, buf, width,
-                                        &L, &TL);
+        l->hdsp.add_hfyu_median_pred(buf, buf - stride, buf, width, &L, &TL);
     }
 }
 
@@ -361,6 +370,10 @@ static int lag_decode_zero_run_line(LagarithContext *l, uint8_t *dst,
     uint8_t mask2 = -(esc_count < 3);
     uint8_t *end = dst + (width - 2);
 
+    avpriv_request_sample(l->avctx, "zero_run_line");
+
+    memset(dst, 0, width);
+
 output_zeros:
     if (l->zeros_rem) {
         count = FFMIN(l->zeros_rem, width - i);
@@ -415,6 +428,7 @@ static int lag_decode_arith_plane(LagarithContext *l, uint8_t *dst,
     GetBitContext gb;
     lag_rac rac;
     const uint8_t *src_end = src + src_size;
+    int ret;
 
     rac.avctx = l->avctx;
     l->zeros = 0;
@@ -432,7 +446,8 @@ static int lag_decode_arith_plane(LagarithContext *l, uint8_t *dst,
             offset += 4;
         }
 
-        init_get_bits(&gb, src + offset, src_size * 8);
+        if ((ret = init_get_bits8(&gb, src + offset, src_size - offset)) < 0)
+            return ret;
 
         if (lag_read_prob_header(&rac, &gb) < 0)
             return -1;
@@ -445,10 +460,12 @@ static int lag_decode_arith_plane(LagarithContext *l, uint8_t *dst,
 
         if (read > length)
             av_log(l->avctx, AV_LOG_WARNING,
-                   "Output more bytes than length (%d of %d)\n", read,
+                   "Output more bytes than length (%d of %"PRIu32")\n", read,
                    length);
     } else if (esc_count < 8) {
         esc_count -= 4;
+        src ++;
+        src_size --;
         if (esc_count > 0) {
             /* Zero run coding only, no range coding. */
             for (i = 0; i < height; i++) {
@@ -595,13 +612,12 @@ static int lag_decode_frame(AVCodecContext *avctx,
         offs[1] = offset_gu;
         offs[2] = offset_ry;
 
+        l->rgb_stride = FFALIGN(avctx->width, 16);
+        av_fast_malloc(&l->rgb_planes, &l->rgb_planes_allocated,
+                       l->rgb_stride * avctx->height * planes + 1);
         if (!l->rgb_planes) {
-            l->rgb_stride = FFALIGN(avctx->width, 16);
-            l->rgb_planes = av_malloc(l->rgb_stride * avctx->height * 4 + 16);
-            if (!l->rgb_planes) {
-                av_log(avctx, AV_LOG_ERROR, "cannot allocate temporary buffer\n");
-                return AVERROR(ENOMEM);
-            }
+            av_log(avctx, AV_LOG_ERROR, "cannot allocate temporary buffer\n");
+            return AVERROR(ENOMEM);
         }
         for (i = 0; i < planes; i++)
             srcs[i] = l->rgb_planes + (i + 1) * l->rgb_stride * avctx->height - l->rgb_stride;
@@ -695,7 +711,7 @@ static int lag_decode_frame(AVCodecContext *avctx,
         break;
     default:
         av_log(avctx, AV_LOG_ERROR,
-               "Unsupported Lagarith frame type: %#x\n", frametype);
+               "Unsupported Lagarith frame type: %#"PRIx8"\n", frametype);
         return AVERROR_PATCHWELCOME;
     }
 
@@ -709,7 +725,7 @@ static av_cold int lag_decode_init(AVCodecContext *avctx)
     LagarithContext *l = avctx->priv_data;
     l->avctx = avctx;
 
-    ff_dsputil_init(&l->dsp, avctx);
+    ff_huffyuvdsp_init(&l->hdsp);
 
     return 0;
 }
@@ -725,6 +741,7 @@ static av_cold int lag_decode_end(AVCodecContext *avctx)
 
 AVCodec ff_lagarith_decoder = {
     .name           = "lagarith",
+    .long_name      = NULL_IF_CONFIG_SMALL("Lagarith lossless"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_LAGARITH,
     .priv_data_size = sizeof(LagarithContext),
@@ -732,5 +749,4 @@ AVCodec ff_lagarith_decoder = {
     .close          = lag_decode_end,
     .decode         = lag_decode_frame,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
-    .long_name      = NULL_IF_CONFIG_SMALL("Lagarith lossless"),
 };

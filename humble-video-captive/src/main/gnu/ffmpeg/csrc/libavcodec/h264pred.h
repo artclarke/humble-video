@@ -60,7 +60,7 @@
 #define VERT_VP8_PRED         10    ///< for VP8, #VERT_PRED is the average of
                                     ///< (left col+cur col x2+right col) / 4;
                                     ///< this is the "unaveraged" one
-#define HOR_VP8_PRED          11    ///< unaveraged version of #HOR_PRED, see
+#define HOR_VP8_PRED          14    ///< unaveraged version of #HOR_PRED, see
                                     ///< #VERT_VP8_PRED for details
 #define DC_127_PRED           12
 #define DC_129_PRED           13
@@ -101,6 +101,8 @@ typedef struct H264PredContext {
                           int16_t *block /*align 16*/, ptrdiff_t stride);
     void(*pred8x8l_add[2])(uint8_t *pix /*align  8*/,
                            int16_t *block /*align 16*/, ptrdiff_t stride);
+    void(*pred8x8l_filter_add[2])(uint8_t *pix /*align  8*/,
+                           int16_t *block /*align 16*/, int topleft, int topright, ptrdiff_t stride);
     void(*pred8x8_add[3])(uint8_t *pix /*align  8*/,
                           const int *block_offset,
                           int16_t *block /*align 16*/, ptrdiff_t stride);

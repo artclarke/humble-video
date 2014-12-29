@@ -1,13 +1,12 @@
 /*
-*  Copyright (c) 2012 The WebM project authors. All Rights Reserved.
-*
-*  Use of this source code is governed by a BSD-style license
-*  that can be found in the LICENSE file in the root of the source
-*  tree. An additional intellectual property rights grant can be found
-*  in the file PATENTS.  All contributing project authors may
-*  be found in the AUTHORS file in the root of the source tree.
-*/
-
+ *  Copyright (c) 2013 The WebM project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree. An additional intellectual property rights grant can be found
+ *  in the file PATENTS.  All contributing project authors may
+ *  be found in the AUTHORS file in the root of the source tree.
+ */
 
 #include <math.h>
 #include <stddef.h>
@@ -16,15 +15,11 @@
 #include <string.h>
 #include <sys/types.h>
 
-
-extern "C" {
-#include "vp8_rtcd.h"
-}
+#include "./vp8_rtcd.h"
 
 #include "test/acm_random.h"
 #include "third_party/googletest/src/include/gtest/gtest.h"
 #include "vpx/vpx_integer.h"
-
 
 namespace {
 
@@ -73,7 +68,7 @@ void reference_idct4x4(const int16_t *input, int16_t *output) {
 
 using libvpx_test::ACMRandom;
 
-TEST(Vp8FdctTest, SignBiasCheck) {
+TEST(VP8FdctTest, SignBiasCheck) {
   ACMRandom rnd(ACMRandom::DeterministicSeed());
   int16_t test_input_block[16];
   int16_t test_output_block[16];
@@ -132,7 +127,7 @@ TEST(Vp8FdctTest, SignBiasCheck) {
     << "Error: 4x4 FDCT has a sign bias > 10% for input range [-15, 15]";
 };
 
-TEST(Vp8FdctTest, RoundTripErrorCheck) {
+TEST(VP8FdctTest, RoundTripErrorCheck) {
   ACMRandom rnd(ACMRandom::DeterministicSeed());
   int max_error = 0;
   double total_error = 0;

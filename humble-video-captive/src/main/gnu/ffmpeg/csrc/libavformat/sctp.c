@@ -2,20 +2,20 @@
  * SCTP protocol
  * Copyright (c) 2012 Luca Barbato
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -98,7 +98,7 @@ static int ff_sctp_recvmsg(int s, void *msg, size_t len, struct sockaddr *from,
     if (msg_flags)
         *msg_flags = inmsg.msg_flags;
 
-    for (cmsg = CMSG_FIRSTHDR(&inmsg); cmsg != NULL;
+    for (cmsg = CMSG_FIRSTHDR(&inmsg); cmsg;
          cmsg = CMSG_NXTHDR(&inmsg, cmsg)) {
         if ((IPPROTO_SCTP == cmsg->cmsg_level) &&
             (SCTP_SNDRCV  == cmsg->cmsg_type))
@@ -143,7 +143,7 @@ static int ff_sctp_send(int s, const void *msg, size_t len,
         memcpy(CMSG_DATA(cmsg), sinfo, sizeof(struct sctp_sndrcvinfo));
     }
 
-    return sendmsg(s, &outmsg, flags);
+    return sendmsg(s, &outmsg, flags | MSG_NOSIGNAL);
 }
 
 typedef struct SCTPContext {
@@ -198,7 +198,7 @@ static int sctp_open(URLContext *h, const char *uri, int flags)
 
     cur_ai = ai;
 
-    fd = socket(cur_ai->ai_family, SOCK_STREAM, IPPROTO_SCTP);
+    fd = ff_socket(cur_ai->ai_family, SOCK_STREAM, IPPROTO_SCTP);
     if (fd < 0)
         goto fail;
 
@@ -302,7 +302,7 @@ static int sctp_write(URLContext *h, const uint8_t *buf, int size)
         }
         ret = ff_sctp_send(s->fd, buf + 2, size - 2, &info, MSG_EOR);
     } else
-        ret = send(s->fd, buf, size, 0);
+        ret = send(s->fd, buf, size, MSG_NOSIGNAL);
 
     return ret < 0 ? ff_neterrno() : ret;
 }

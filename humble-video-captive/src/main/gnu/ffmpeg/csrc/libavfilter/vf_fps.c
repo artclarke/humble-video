@@ -25,6 +25,9 @@
  * a filter enforcing given constant framerate
  */
 
+#include <float.h>
+#include <stdint.h>
+
 #include "libavutil/common.h"
 #include "libavutil/fifo.h"
 #include "libavutil/mathematics.h"
@@ -42,7 +45,8 @@ typedef struct FPSContext {
 
     /* timestamps in input timebase */
     int64_t first_pts;      ///< pts of the first frame that arrived on this filter
-    int64_t pts;            ///< pts of the first frame currently in the fifo
+
+    double start_time;      ///< pts, in seconds, of the expected first frame
 
     AVRational framerate;   ///< target framerate
     int rounding;           ///< AVRounding method for timestamps
@@ -59,13 +63,14 @@ typedef struct FPSContext {
 #define F AV_OPT_FLAG_FILTERING_PARAM
 static const AVOption fps_options[] = {
     { "fps", "A string describing desired output framerate", OFFSET(framerate), AV_OPT_TYPE_VIDEO_RATE, { .str = "25" }, .flags = V|F },
+    { "start_time", "Assume the first PTS should be this value.", OFFSET(start_time), AV_OPT_TYPE_DOUBLE, { .dbl = DBL_MAX}, -DBL_MAX, DBL_MAX, V },
     { "round", "set rounding method for timestamps", OFFSET(rounding), AV_OPT_TYPE_INT, { .i64 = AV_ROUND_NEAR_INF }, 0, 5, V|F, "round" },
     { "zero", "round towards 0",      OFFSET(rounding), AV_OPT_TYPE_CONST, { .i64 = AV_ROUND_ZERO     }, 0, 5, V|F, "round" },
     { "inf",  "round away from 0",    OFFSET(rounding), AV_OPT_TYPE_CONST, { .i64 = AV_ROUND_INF      }, 0, 5, V|F, "round" },
     { "down", "round towards -infty", OFFSET(rounding), AV_OPT_TYPE_CONST, { .i64 = AV_ROUND_DOWN     }, 0, 5, V|F, "round" },
     { "up",   "round towards +infty", OFFSET(rounding), AV_OPT_TYPE_CONST, { .i64 = AV_ROUND_UP       }, 0, 5, V|F, "round" },
     { "near", "round to nearest",     OFFSET(rounding), AV_OPT_TYPE_CONST, { .i64 = AV_ROUND_NEAR_INF }, 0, 5, V|F, "round" },
-    { NULL },
+    { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(fps);
@@ -74,10 +79,10 @@ static av_cold int init(AVFilterContext *ctx)
 {
     FPSContext *s = ctx->priv;
 
-    if (!(s->fifo = av_fifo_alloc(2*sizeof(AVFrame*))))
+    if (!(s->fifo = av_fifo_alloc_array(2, sizeof(AVFrame*))))
         return AVERROR(ENOMEM);
 
-    s->pts          = AV_NOPTS_VALUE;
+    s->first_pts    = AV_NOPTS_VALUE;
 
     av_log(ctx, AV_LOG_VERBOSE, "fps=%d/%d\n", s->framerate.num, s->framerate.den);
     return 0;
@@ -98,7 +103,7 @@ static av_cold void uninit(AVFilterContext *ctx)
     if (s->fifo) {
         s->drop += av_fifo_size(s->fifo) / sizeof(AVFrame*);
         flush_fifo(s->fifo);
-        av_fifo_free(s->fifo);
+        av_fifo_freep(&s->fifo);
     }
 
     av_log(ctx, AV_LOG_VERBOSE, "%d frames in, %d frames out; %d frames dropped, "
@@ -172,13 +177,23 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
 
     s->frames_in++;
     /* discard frames until we get the first timestamp */
-    if (s->pts == AV_NOPTS_VALUE) {
+    if (s->first_pts == AV_NOPTS_VALUE) {
         if (buf->pts != AV_NOPTS_VALUE) {
             ret = write_to_fifo(s->fifo, buf);
             if (ret < 0)
                 return ret;
 
-            s->first_pts = s->pts = buf->pts;
+            if (s->start_time != DBL_MAX && s->start_time != AV_NOPTS_VALUE) {
+                double first_pts = s->start_time * AV_TIME_BASE;
+                first_pts = FFMIN(FFMAX(first_pts, INT64_MIN), INT64_MAX);
+                s->first_pts = av_rescale_q(first_pts, AV_TIME_BASE_Q,
+                                                     inlink->time_base);
+                av_log(ctx, AV_LOG_VERBOSE, "Set first pts to (in:%"PRId64" out:%"PRId64")\n",
+                       s->first_pts, av_rescale_q(first_pts, AV_TIME_BASE_Q,
+                                                  outlink->time_base));
+            } else {
+                s->first_pts = buf->pts;
+            }
         } else {
             av_log(ctx, AV_LOG_WARNING, "Discarding initial frame(s) with no "
                    "timestamp.\n");
@@ -189,13 +204,13 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
     }
 
     /* now wait for the next timestamp */
-    if (buf->pts == AV_NOPTS_VALUE) {
+    if (buf->pts == AV_NOPTS_VALUE || av_fifo_size(s->fifo) <= 0) {
         return write_to_fifo(s->fifo, buf);
     }
 
     /* number of output frames */
-    delta = av_rescale_q_rnd(buf->pts - s->pts, inlink->time_base,
-                             outlink->time_base, s->rounding);
+    delta = av_rescale_q_rnd(buf->pts - s->first_pts, inlink->time_base,
+                             outlink->time_base, s->rounding) - s->frames_out ;
 
     if (delta < 1) {
         /* drop the frame and everything buffered except the first */
@@ -250,15 +265,14 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
     flush_fifo(s->fifo);
 
     ret = write_to_fifo(s->fifo, buf);
-    s->pts = s->first_pts + av_rescale_q(s->frames_out, outlink->time_base, inlink->time_base);
 
     return ret;
 }
 
 static const AVFilterPad avfilter_vf_fps_inputs[] = {
     {
-        .name        = "default",
-        .type        = AVMEDIA_TYPE_VIDEO,
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
         .filter_frame = filter_frame,
     },
     { NULL }
@@ -274,16 +288,13 @@ static const AVFilterPad avfilter_vf_fps_outputs[] = {
     { NULL }
 };
 
-AVFilter avfilter_vf_fps = {
+AVFilter ff_vf_fps = {
     .name        = "fps",
     .description = NULL_IF_CONFIG_SMALL("Force constant framerate."),
-
-    .init      = init,
-    .uninit    = uninit,
-
-    .priv_size = sizeof(FPSContext),
-    .priv_class = &fps_class,
-
-    .inputs    = avfilter_vf_fps_inputs,
-    .outputs   = avfilter_vf_fps_outputs,
+    .init        = init,
+    .uninit      = uninit,
+    .priv_size   = sizeof(FPSContext),
+    .priv_class  = &fps_class,
+    .inputs      = avfilter_vf_fps_inputs,
+    .outputs     = avfilter_vf_fps_outputs,
 };

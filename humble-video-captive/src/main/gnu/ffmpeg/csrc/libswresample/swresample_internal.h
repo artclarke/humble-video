@@ -25,6 +25,8 @@
 #include "libavutil/channel_layout.h"
 #include "config.h"
 
+#define SWR_CH_MAX 32
+
 #define SQRT3_2      1.22474487139158904909  /* sqrt(3/2) */
 
 #define NS_TAPS 20
@@ -62,7 +64,7 @@ struct DitherContext {
     float ns_coeffs[NS_TAPS];                       ///< Noise shaping filter coefficients
     float ns_errors[SWR_CH_MAX][2*NS_TAPS];
     AudioData noise;                                ///< noise used for dithering
-    AudioData temp;                                 ///< temporary storage when writing into the input buffer isnt possible
+    AudioData temp;                                 ///< temporary storage when writing into the input buffer isn't possible
     int output_sample_bits;                         ///< the number of used output bits, needed to scale dither correctly
 };
 
@@ -82,6 +84,7 @@ struct SwrContext {
     float clev;                                     ///< center mixing level
     float lfe_mix_level;                            ///< LFE mixing level
     float rematrix_volume;                          ///< rematrixing volume coefficient
+    float rematrix_maxval;                          ///< maximum value for rematrixing output
     enum AVMatrixEncoding matrix_encoding;          /**< matrixed stereo encoding */
     const int *channel_map;                         ///< channel index (or -1 if muted channel) map
     int used_ch_count;                              ///< number of used input channels (mapped channel count if channel_map, otherwise in.ch_count)
@@ -156,6 +159,7 @@ typedef int     (* multiple_resample_func)(struct ResampleContext *c, AudioData 
 typedef int     (* resample_flush_func)(struct SwrContext *c);
 typedef int     (* set_compensation_func)(struct ResampleContext *c, int sample_delta, int compensation_distance);
 typedef int64_t (* get_delay_func)(struct SwrContext *s, int64_t base);
+typedef int     (* invert_initial_buffer_func)(struct ResampleContext *c, AudioData *dst, const AudioData *src, int src_size, int *dst_idx, int *dst_count);
 
 struct Resampler {
   resample_init_func            init;
@@ -164,15 +168,12 @@ struct Resampler {
   resample_flush_func           flush;
   set_compensation_func         set_compensation;
   get_delay_func                get_delay;
+  invert_initial_buffer_func    invert_initial_buffer;
 };
 
 extern struct Resampler const swri_resampler;
 
 int swri_realloc_audio(AudioData *a, int count);
-int swri_resample_int16(struct ResampleContext *c, int16_t *dst, const int16_t *src, int *consumed, int src_size, int dst_size, int update_ctx);
-int swri_resample_int32(struct ResampleContext *c, int32_t *dst, const int32_t *src, int *consumed, int src_size, int dst_size, int update_ctx);
-int swri_resample_float(struct ResampleContext *c, float   *dst, const float   *src, int *consumed, int src_size, int dst_size, int update_ctx);
-int swri_resample_double(struct ResampleContext *c,double  *dst, const double  *src, int *consumed, int src_size, int dst_size, int update_ctx);
 
 void swri_noise_shaping_int16 (SwrContext *s, AudioData *dsts, const AudioData *srcs, const AudioData *noises, int count);
 void swri_noise_shaping_int32 (SwrContext *s, AudioData *dsts, const AudioData *srcs, const AudioData *noises, int count);
@@ -187,6 +188,10 @@ void swri_rematrix_init_x86(struct SwrContext *s);
 void swri_get_dither(SwrContext *s, void *dst, int len, unsigned seed, enum AVSampleFormat noise_fmt);
 int swri_dither_init(SwrContext *s, enum AVSampleFormat out_fmt, enum AVSampleFormat in_fmt);
 
+void swri_audio_convert_init_aarch64(struct AudioConvert *ac,
+                                 enum AVSampleFormat out_fmt,
+                                 enum AVSampleFormat in_fmt,
+                                 int channels);
 void swri_audio_convert_init_arm(struct AudioConvert *ac,
                                  enum AVSampleFormat out_fmt,
                                  enum AVSampleFormat in_fmt,

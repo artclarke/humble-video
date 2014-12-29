@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.humble</groupId>
+    <artifactId>humble-video-parent</artifactId>
+    <version>0.2.0-SNAPSHOT</version>
+    <relativePath>../humble-video-parent/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>humble-video-demos</artifactId>
+  <packaging>jar</packaging>
+
+  <name>video_demos</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-arch-x86_64-apple-darwin12-debug</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-arch-i686-apple-darwin12-debug</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-noarch</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>commons-cli</groupId>
+    	<artifactId>commons-cli</artifactId>
+    	<version>1.2</version>
+    </dependency>
+  </dependencies>
+</project>

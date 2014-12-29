@@ -1,5 +1,5 @@
 @
-@ ARMv5te optimized DSP utils
+@ ARMv5te-optimized core video DSP functions
 @ Copyright (c) 2004 AGAWA Koji <i (AT) atty (DOT) jp>
 @
 @ This file is part of FFmpeg
@@ -26,6 +26,6 @@ function ff_prefetch_arm, export=1
         subs            r2,  r2,  #1
         pld             [r0]
         add             r0,  r0,  r1
-        bne             ff_prefetch_arm
+        bne             X(ff_prefetch_arm)
         bx              lr
 endfunc

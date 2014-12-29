@@ -62,8 +62,8 @@
  *               V
  */
 
-#include "libavutil/opt.h"
 #include "libavutil/avassert.h"
+#include "libavutil/opt.h"
 #include "audio.h"
 #include "avfilter.h"
 #include "internal.h"
@@ -161,7 +161,7 @@ static int query_formats(AVFilterContext *ctx)
     return 0;
 }
 
-#define BIQUAD_FILTER(name, type, min, max)                                   \
+#define BIQUAD_FILTER(name, type, min, max, need_clipping)                    \
 static void biquad_## name (const void *input, void *output, int len,         \
                             double *in1, double *in2,                         \
                             double *out1, double *out2,                       \
@@ -181,10 +181,10 @@ static void biquad_## name (const void *input, void *output, int len,         \
     for (i = 0; i+1 < len; i++) {                                             \
         o2 = i2 * b2 + i1 * b1 + ibuf[i] * b0 + o2 * a2 + o1 * a1;            \
         i2 = ibuf[i];                                                         \
-        if (o2 < min) {                                                       \
+        if (need_clipping && o2 < min) {                                      \
             av_log(NULL, AV_LOG_WARNING, "clipping\n");                       \
             obuf[i] = min;                                                    \
-        } else if (o2 > max) {                                                \
+        } else if (need_clipping && o2 > max) {                               \
             av_log(NULL, AV_LOG_WARNING, "clipping\n");                       \
             obuf[i] = max;                                                    \
         } else {                                                              \
@@ -193,10 +193,10 @@ static void biquad_## name (const void *input, void *output, int len,         \
         i++;                                                                  \
         o1 = i1 * b2 + i2 * b1 + ibuf[i] * b0 + o1 * a2 + o2 * a1;            \
         i1 = ibuf[i];                                                         \
-        if (o1 < min) {                                                       \
+        if (need_clipping && o1 < min) {                                      \
             av_log(NULL, AV_LOG_WARNING, "clipping\n");                       \
             obuf[i] = min;                                                    \
-        } else if (o1 > max) {                                                \
+        } else if (need_clipping && o1 > max) {                               \
             av_log(NULL, AV_LOG_WARNING, "clipping\n");                       \
             obuf[i] = max;                                                    \
         } else {                                                              \
@@ -209,10 +209,10 @@ static void biquad_## name (const void *input, void *output, int len,         \
         i1 = ibuf[i];                                                         \
         o2 = o1;                                                              \
         o1 = o0;                                                              \
-        if (o0 < min) {                                                       \
+        if (need_clipping && o0 < min) {                                      \
             av_log(NULL, AV_LOG_WARNING, "clipping\n");                       \
             obuf[i] = min;                                                    \
-        } else if (o0 > max) {                                                \
+        } else if (need_clipping && o0 > max) {                               \
             av_log(NULL, AV_LOG_WARNING, "clipping\n");                       \
             obuf[i] = max;                                                    \
         } else {                                                              \
@@ -225,10 +225,10 @@ static void biquad_## name (const void *input, void *output, int len,         \
     *out2 = o2;                                                               \
 }
 
-BIQUAD_FILTER(s16, int16_t, INT16_MIN, INT16_MAX)
-BIQUAD_FILTER(s32, int32_t, INT32_MIN, INT32_MAX)
-BIQUAD_FILTER(flt, float,   -1., 1.)
-BIQUAD_FILTER(dbl, double,  -1., 1.)
+BIQUAD_FILTER(s16, int16_t, INT16_MIN, INT16_MAX, 1)
+BIQUAD_FILTER(s32, int32_t, INT32_MIN, INT32_MAX, 1)
+BIQUAD_FILTER(flt, float,   -1., 1., 0)
+BIQUAD_FILTER(dbl, double,  -1., 1., 0)
 
 static int config_output(AVFilterLink *outlink)
 {
@@ -454,7 +454,7 @@ static av_cold int name_##_init(AVFilterContext *ctx) \
     return init(ctx);                                             \
 }                                                                       \
                                                          \
-AVFilter avfilter_af_##name_ = {                         \
+AVFilter ff_af_##name_ = {                         \
     .name          = #name_,                             \
     .description   = NULL_IF_CONFIG_SMALL(description_), \
     .priv_size     = sizeof(BiquadsContext),             \
@@ -479,7 +479,7 @@ static const AVOption equalizer_options[] = {
     {"w",     "set band-width", OFFSET(width), AV_OPT_TYPE_DOUBLE, {.dbl=1}, 0, 999, FLAGS},
     {"gain", "set gain", OFFSET(gain), AV_OPT_TYPE_DOUBLE, {.dbl=0}, -900, 900, FLAGS},
     {"g",    "set gain", OFFSET(gain), AV_OPT_TYPE_DOUBLE, {.dbl=0}, -900, 900, FLAGS},
-    {NULL},
+    {NULL}
 };
 
 DEFINE_BIQUAD_FILTER(equalizer, "Apply two-pole peaking equalization (EQ) filter.");
@@ -497,7 +497,7 @@ static const AVOption bass_options[] = {
     {"w",     "set shelf transition steep", OFFSET(width), AV_OPT_TYPE_DOUBLE, {.dbl=0.5}, 0, 99999, FLAGS},
     {"gain", "set gain", OFFSET(gain), AV_OPT_TYPE_DOUBLE, {.dbl=0}, -900, 900, FLAGS},
     {"g",    "set gain", OFFSET(gain), AV_OPT_TYPE_DOUBLE, {.dbl=0}, -900, 900, FLAGS},
-    {NULL},
+    {NULL}
 };
 
 DEFINE_BIQUAD_FILTER(bass, "Boost or cut lower frequencies.");
@@ -515,7 +515,7 @@ static const AVOption treble_options[] = {
     {"w",     "set shelf transition steep", OFFSET(width), AV_OPT_TYPE_DOUBLE, {.dbl=0.5}, 0, 99999, FLAGS},
     {"gain", "set gain", OFFSET(gain), AV_OPT_TYPE_DOUBLE, {.dbl=0}, -900, 900, FLAGS},
     {"g",    "set gain", OFFSET(gain), AV_OPT_TYPE_DOUBLE, {.dbl=0}, -900, 900, FLAGS},
-    {NULL},
+    {NULL}
 };
 
 DEFINE_BIQUAD_FILTER(treble, "Boost or cut upper frequencies.");
@@ -532,7 +532,7 @@ static const AVOption bandpass_options[] = {
     {"width", "set band-width", OFFSET(width), AV_OPT_TYPE_DOUBLE, {.dbl=0.5}, 0, 999, FLAGS},
     {"w",     "set band-width", OFFSET(width), AV_OPT_TYPE_DOUBLE, {.dbl=0.5}, 0, 999, FLAGS},
     {"csg",   "use constant skirt gain", OFFSET(csg), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, FLAGS},
-    {NULL},
+    {NULL}
 };
 
 DEFINE_BIQUAD_FILTER(bandpass, "Apply a two-pole Butterworth band-pass filter.");
@@ -548,7 +548,7 @@ static const AVOption bandreject_options[] = {
     {"s", "slope", 0, AV_OPT_TYPE_CONST, {.i64=SLOPE}, 0, 0, FLAGS, "width_type"},
     {"width", "set band-width", OFFSET(width), AV_OPT_TYPE_DOUBLE, {.dbl=0.5}, 0, 999, FLAGS},
     {"w",     "set band-width", OFFSET(width), AV_OPT_TYPE_DOUBLE, {.dbl=0.5}, 0, 999, FLAGS},
-    {NULL},
+    {NULL}
 };
 
 DEFINE_BIQUAD_FILTER(bandreject, "Apply a two-pole Butterworth band-reject filter.");
@@ -566,7 +566,7 @@ static const AVOption lowpass_options[] = {
     {"w",     "set width", OFFSET(width), AV_OPT_TYPE_DOUBLE, {.dbl=0.707}, 0, 99999, FLAGS},
     {"poles", "set number of poles", OFFSET(poles), AV_OPT_TYPE_INT, {.i64=2}, 1, 2, FLAGS},
     {"p",     "set number of poles", OFFSET(poles), AV_OPT_TYPE_INT, {.i64=2}, 1, 2, FLAGS},
-    {NULL},
+    {NULL}
 };
 
 DEFINE_BIQUAD_FILTER(lowpass, "Apply a low-pass filter with 3dB point frequency.");
@@ -584,7 +584,7 @@ static const AVOption highpass_options[] = {
     {"w",     "set width", OFFSET(width), AV_OPT_TYPE_DOUBLE, {.dbl=0.707}, 0, 99999, FLAGS},
     {"poles", "set number of poles", OFFSET(poles), AV_OPT_TYPE_INT, {.i64=2}, 1, 2, FLAGS},
     {"p",     "set number of poles", OFFSET(poles), AV_OPT_TYPE_INT, {.i64=2}, 1, 2, FLAGS},
-    {NULL},
+    {NULL}
 };
 
 DEFINE_BIQUAD_FILTER(highpass, "Apply a high-pass filter with 3dB point frequency.");
@@ -600,7 +600,7 @@ static const AVOption allpass_options[] = {
     {"s", "slope", 0, AV_OPT_TYPE_CONST, {.i64=SLOPE}, 0, 0, FLAGS, "width_type"},
     {"width", "set filter-width", OFFSET(width), AV_OPT_TYPE_DOUBLE, {.dbl=707.1}, 0, 99999, FLAGS},
     {"w",     "set filter-width", OFFSET(width), AV_OPT_TYPE_DOUBLE, {.dbl=707.1}, 0, 99999, FLAGS},
-    {NULL},
+    {NULL}
 };
 
 DEFINE_BIQUAD_FILTER(allpass, "Apply a two-pole all-pass filter.");
@@ -613,7 +613,7 @@ static const AVOption biquad_options[] = {
     {"b0", NULL, OFFSET(b0), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MIN, INT16_MAX, FLAGS},
     {"b1", NULL, OFFSET(b1), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MIN, INT16_MAX, FLAGS},
     {"b2", NULL, OFFSET(b2), AV_OPT_TYPE_DOUBLE, {.dbl=1}, INT16_MIN, INT16_MAX, FLAGS},
-    {NULL},
+    {NULL}
 };
 
 DEFINE_BIQUAD_FILTER(biquad, "Apply a biquad IIR filter with the given coefficients.");

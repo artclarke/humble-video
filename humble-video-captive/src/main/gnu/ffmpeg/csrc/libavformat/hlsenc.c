@@ -20,7 +20,9 @@
  */
 
 #include <float.h>
+#include <stdint.h>
 
+#include "libavutil/avassert.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/parseutils.h"
 #include "libavutil/avstring.h"
@@ -30,30 +32,39 @@
 #include "avformat.h"
 #include "internal.h"
 
-typedef struct ListEntry {
-    char  name[1024];
-    int   duration;
-    struct ListEntry *next;
-} ListEntry;
+typedef struct HLSSegment {
+    char filename[1024];
+    double duration; /* in seconds */
+
+    struct HLSSegment *next;
+} HLSSegment;
 
 typedef struct HLSContext {
     const AVClass *class;  // Class for private options.
     unsigned number;
     int64_t sequence;
+    int64_t start_sequence;
     AVOutputFormat *oformat;
+
     AVFormatContext *avf;
+
     float time;            // Set by a private option.
-    int  size;             // Set by a private option.
+    int max_nb_segments;   // Set by a private option.
     int  wrap;             // Set by a private option.
+
     int64_t recording_time;
     int has_video;
     int64_t start_pts;
     int64_t end_pts;
-    int64_t duration;      ///< last segment duration computed so far, in seconds
+    double duration;      // last segment duration computed so far, in seconds
     int nb_entries;
-    ListEntry *list;
-    ListEntry *end_list;
+
+    HLSSegment *segments;
+    HLSSegment *last_segment;
+
     char *basename;
+    char *baseurl;
+
     AVIOContext *pb;
 } HLSContext;
 
@@ -69,6 +80,7 @@ static int hls_mux_init(AVFormatContext *s)
 
     oc->oformat            = hls->oformat;
     oc->interrupt_callback = s->interrupt_callback;
+    av_dict_copy(&oc->metadata, s->metadata, 0);
 
     for (i = 0; i < s->nb_streams; i++) {
         AVStream *st;
@@ -81,28 +93,29 @@ static int hls_mux_init(AVFormatContext *s)
     return 0;
 }
 
-static int append_entry(HLSContext *hls, uint64_t duration)
+/* Create a new segment and append it to the segment list */
+static int hls_append_segment(HLSContext *hls, double duration)
 {
-    ListEntry *en = av_malloc(sizeof(*en));
+    HLSSegment *en = av_malloc(sizeof(*en));
 
     if (!en)
         return AVERROR(ENOMEM);
 
-    av_strlcpy(en->name, av_basename(hls->avf->filename), sizeof(en->name));
+    av_strlcpy(en->filename, av_basename(hls->avf->filename), sizeof(en->filename));
 
     en->duration = duration;
     en->next     = NULL;
 
-    if (!hls->list)
-        hls->list = en;
+    if (!hls->segments)
+        hls->segments = en;
     else
-        hls->end_list->next = en;
+        hls->last_segment->next = en;
 
-    hls->end_list = en;
+    hls->last_segment = en;
 
-    if (hls->nb_entries >= hls->size) {
-        en = hls->list;
-        hls->list = en->next;
+    if (hls->max_nb_segments && hls->nb_entries >= hls->max_nb_segments) {
+        en = hls->segments;
+        hls->segments = en->next;
         av_free(en);
     } else
         hls->nb_entries++;
@@ -112,9 +125,9 @@ static int append_entry(HLSContext *hls, uint64_t duration)
     return 0;
 }
 
-static void free_entries(HLSContext *hls)
+static void hls_free_segments(HLSContext *hls)
 {
-    ListEntry *p = hls->list, *en;
+    HLSSegment *p = hls->segments, *en;
 
     while(p) {
         en = p;
@@ -126,28 +139,33 @@ static void free_entries(HLSContext *hls)
 static int hls_window(AVFormatContext *s, int last)
 {
     HLSContext *hls = s->priv_data;
-    ListEntry *en;
+    HLSSegment *en;
     int target_duration = 0;
     int ret = 0;
+    int64_t sequence = FFMAX(hls->start_sequence, hls->sequence - hls->nb_entries);
 
     if ((ret = avio_open2(&hls->pb, s->filename, AVIO_FLAG_WRITE,
                           &s->interrupt_callback, NULL)) < 0)
         goto fail;
 
-    for (en = hls->list; en; en = en->next) {
+    for (en = hls->segments; en; en = en->next) {
         if (target_duration < en->duration)
-            target_duration = en->duration;
+            target_duration = ceil(en->duration);
     }
 
     avio_printf(hls->pb, "#EXTM3U\n");
     avio_printf(hls->pb, "#EXT-X-VERSION:3\n");
     avio_printf(hls->pb, "#EXT-X-TARGETDURATION:%d\n", target_duration);
-    avio_printf(hls->pb, "#EXT-X-MEDIA-SEQUENCE:%"PRId64"\n",
-                FFMAX(0, hls->sequence - hls->size));
+    avio_printf(hls->pb, "#EXT-X-MEDIA-SEQUENCE:%"PRId64"\n", sequence);
 
-    for (en = hls->list; en; en = en->next) {
-        avio_printf(hls->pb, "#EXTINF:%d,\n", en->duration);
-        avio_printf(hls->pb, "%s\n", en->name);
+    av_log(s, AV_LOG_VERBOSE, "EXT-X-MEDIA-SEQUENCE:%"PRId64"\n",
+           sequence);
+
+    for (en = hls->segments; en; en = en->next) {
+        avio_printf(hls->pb, "#EXTINF:%f,\n", en->duration);
+        if (hls->baseurl)
+            avio_printf(hls->pb, "%s", hls->baseurl);
+        avio_printf(hls->pb, "%s\n", en->filename);
     }
 
     if (last)
@@ -165,7 +183,7 @@ static int hls_start(AVFormatContext *s)
     int err = 0;
 
     if (av_get_frame_filename(oc->filename, sizeof(oc->filename),
-                              c->basename, c->wrap ? c->number % c->wrap : c->number) < 0) {
+                              c->basename, c->wrap ? c->sequence % c->wrap : c->sequence) < 0) {
         av_log(oc, AV_LOG_ERROR, "Invalid segment filename template '%s'\n", c->basename);
         return AVERROR(EINVAL);
     }
@@ -189,8 +207,7 @@ static int hls_write_header(AVFormatContext *s)
     const char *pattern = "%d.ts";
     int basename_size = strlen(s->filename) + strlen(pattern) + 1;
 
-    hls->number      = 0;
-
+    hls->sequence       = hls->start_sequence;
     hls->recording_time = hls->time * AV_TIME_BASE;
     hls->start_pts      = AV_NOPTS_VALUE;
 
@@ -233,8 +250,14 @@ static int hls_write_header(AVFormatContext *s)
         goto fail;
 
     if ((ret = avformat_write_header(hls->avf, NULL)) < 0)
-        return ret;
+        goto fail;
 
+    av_assert0(s->nb_streams == hls->avf->nb_streams);
+    for (i = 0; i < s->nb_streams; i++) {
+        AVStream *inner_st  = hls->avf->streams[i];
+        AVStream *outter_st = s->streams[i];
+        avpriv_set_pts_info(outter_st, inner_st->pts_wrap_bits, inner_st->time_base.num, inner_st->time_base.den);
+    }
 
 fail:
     if (ret) {
@@ -268,12 +291,12 @@ static int hls_write_packet(AVFormatContext *s, AVPacket *pkt)
         is_ref_pkt = can_split = 0;
 
     if (is_ref_pkt)
-        hls->duration = av_rescale(pkt->pts - hls->end_pts,
-                                   st->time_base.num, st->time_base.den);
+        hls->duration = (double)(pkt->pts - hls->end_pts)
+                                   * st->time_base.num / st->time_base.den;
 
     if (can_split && av_compare_ts(pkt->pts - hls->start_pts, st->time_base,
                                    end_pts, AV_TIME_BASE_Q) >= 0) {
-        ret = append_entry(hls, hls->duration);
+        ret = hls_append_segment(hls, hls->duration);
         if (ret)
             return ret;
 
@@ -294,7 +317,7 @@ static int hls_write_packet(AVFormatContext *s, AVPacket *pkt)
             return ret;
     }
 
-    ret = ff_write_chained(oc, pkt->stream_index, pkt, s);
+    ret = ff_write_chained(oc, pkt->stream_index, pkt, s, 0);
 
     return ret;
 }
@@ -306,12 +329,13 @@ static int hls_write_trailer(struct AVFormatContext *s)
 
     av_write_trailer(oc);
     avio_closep(&oc->pb);
-    avformat_free_context(oc);
     av_free(hls->basename);
-    append_entry(hls, hls->duration);
+    hls_append_segment(hls, hls->duration);
+    avformat_free_context(oc);
+    hls->avf = NULL;
     hls_window(s, 1);
 
-    free_entries(hls);
+    hls_free_segments(hls);
     avio_close(hls->pb);
     return 0;
 }
@@ -319,10 +343,11 @@ static int hls_write_trailer(struct AVFormatContext *s)
 #define OFFSET(x) offsetof(HLSContext, x)
 #define E AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    {"start_number",  "set first number in the sequence",        OFFSET(sequence),AV_OPT_TYPE_INT64,  {.i64 = 0},     0, INT64_MAX, E},
+    {"start_number",  "set first number in the sequence",        OFFSET(start_sequence),AV_OPT_TYPE_INT64,  {.i64 = 0},     0, INT64_MAX, E},
     {"hls_time",      "set segment length in seconds",           OFFSET(time),    AV_OPT_TYPE_FLOAT,  {.dbl = 2},     0, FLT_MAX, E},
-    {"hls_list_size", "set maximum number of playlist entries",  OFFSET(size),    AV_OPT_TYPE_INT,    {.i64 = 5},     0, INT_MAX, E},
+    {"hls_list_size", "set maximum number of playlist entries",  OFFSET(max_nb_segments),    AV_OPT_TYPE_INT,    {.i64 = 5},     0, INT_MAX, E},
     {"hls_wrap",      "set number after which the index wraps",  OFFSET(wrap),    AV_OPT_TYPE_INT,    {.i64 = 0},     0, INT_MAX, E},
+    {"hls_base_url",  "url to prepend to each playlist entry",   OFFSET(baseurl), AV_OPT_TYPE_STRING, {.str = NULL},  0, 0,       E},
     { NULL },
 };
 
@@ -339,8 +364,8 @@ AVOutputFormat ff_hls_muxer = {
     .long_name      = NULL_IF_CONFIG_SMALL("Apple HTTP Live Streaming"),
     .extensions     = "m3u8",
     .priv_data_size = sizeof(HLSContext),
-    .audio_codec    = AV_CODEC_ID_MP2,
-    .video_codec    = AV_CODEC_ID_MPEG2VIDEO,
+    .audio_codec    = AV_CODEC_ID_AAC,
+    .video_codec    = AV_CODEC_ID_H264,
     .flags          = AVFMT_NOFILE | AVFMT_ALLOW_FLUSH,
     .write_header   = hls_write_header,
     .write_packet   = hls_write_packet,

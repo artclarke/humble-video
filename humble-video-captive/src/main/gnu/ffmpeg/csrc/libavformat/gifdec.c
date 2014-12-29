@@ -84,7 +84,7 @@ static int resync(AVIOContext *pb)
         int b = avio_r8(pb);
         if (b != gif87a_sig[i] && b != gif89a_sig[i])
             i = -(b != 'G');
-        if (url_feof(pb))
+        if (avio_feof(pb))
             return AVERROR_EOF;
     }
     return 0;
@@ -164,16 +164,26 @@ static int gif_read_ext(AVFormatContext *s)
         if ((ret = avio_skip(pb, sb_size - 3)) < 0 )
             return ret;
     } else if (ext_label == GIF_APP_EXT_LABEL) {
-        uint8_t netscape_ext[sizeof(NETSCAPE_EXT_STR)-1 + 2];
+        uint8_t data[256];
 
-        if ((sb_size = avio_r8(pb)) != strlen(NETSCAPE_EXT_STR))
-            return 0;
-        ret = avio_read(pb, netscape_ext, sizeof(netscape_ext));
-        if (ret < sizeof(netscape_ext))
+        sb_size = avio_r8(pb);
+        ret = avio_read(pb, data, sb_size);
+        if (ret < 0 || !sb_size)
             return ret;
-        gdc->total_iter = avio_rl16(pb);
-        if (gdc->total_iter == 0)
-            gdc->total_iter = -1;
+
+        if (sb_size == strlen(NETSCAPE_EXT_STR)) {
+            sb_size = avio_r8(pb);
+            ret = avio_read(pb, data, sb_size);
+            if (ret < 0 || !sb_size)
+                return ret;
+
+            if (sb_size == 3 && data[0] == 1) {
+                gdc->total_iter = AV_RL16(data+1);
+
+                if (gdc->total_iter == 0)
+                    gdc->total_iter = -1;
+            }
+        }
     }
 
     if ((ret = gif_skip_subblocks(pb)) < 0)
@@ -224,7 +234,7 @@ parse_keyframe:
         ret = AVERROR_EOF;
     }
 
-    while (GIF_TRAILER != (block_label = avio_r8(pb)) && !url_feof(pb)) {
+    while (GIF_TRAILER != (block_label = avio_r8(pb)) && !avio_feof(pb)) {
         if (block_label == GIF_EXTENSION_INTRODUCER) {
             if ((ret = gif_read_ext (s)) < 0 )
                 goto resync;
@@ -289,7 +299,7 @@ resync:
     if ((ret >= 0 && !frame_parsed) || ret == AVERROR_EOF) {
         /* This might happen when there is no image block
          * between extension blocks and GIF_TRAILER or EOF */
-        if (!gdc->ignore_loop && (block_label == GIF_TRAILER || url_feof(pb))
+        if (!gdc->ignore_loop && (block_label == GIF_TRAILER || avio_feof(pb))
             && (gdc->total_iter < 0 || ++gdc->iter_count < gdc->total_iter))
             return avio_seek(pb, 0, SEEK_SET);
         return AVERROR_EOF;
