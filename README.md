@@ -9,7 +9,7 @@ If using Maven, Humble is deployed to the Maven Central Repository. To include i
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-all</artifactId>
-      <version>0.2.0</version>
+      <version>0.3.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
@@ -220,11 +220,13 @@ git flow release finish v<version-number>
 
 14. Peg your develop tree to the next snapshot.
 
+Edit this file to have the right version at the top.
+
 ```bash
 cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number>-SNAPSHOT
-cd humble-video-noarch/src/main/gnu
+cd humble-video-native/src/main/gnu
 <edit configure.ac to update version numbers in an editor of your choice>
-autoreconf
+vagrant ssh --command "cd /vagrant/humble-video-native/src/main/gnu && autoreconf"
 ```
 
 15. Done!
