@@ -2,13 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.humble</groupId>
   <artifactId>humble-video-parent</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
   <packaging>pom</packaging>
   <name>humble-video-parent</name>
   <url>http://www.humble.io</url>
 
   <properties>
-    <humble.version>0.2.0-SNAPSHOT</humble.version>
+    <humble.version>0.2.1</humble.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
     <humble.build.timestamp>${maven.build.timestamp}</humble.build.timestamp>
@@ -131,6 +131,7 @@
               -nodefontsize 9
               -nodefontpackagesize 7
               -enumerations
+              -Xdoclint:none
             </additionalparam>
             <useStandardDocletOptions>true</useStandardDocletOptions>
           </configuration>
