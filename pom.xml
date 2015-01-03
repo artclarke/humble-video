@@ -8,7 +8,7 @@
   <parent>
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.2.1</version>
     <relativePath>./humble-video-parent/pom.xml</relativePath>
   </parent>
 
@@ -33,6 +33,7 @@
         <module>humble-video-native</module>
         <module>humble-video-noarch</module>
         <module>humble-video-test</module>
+        <module>humble-video-demos</module>
       </modules>
       <activation>
         <!-- activate when a file is missing, which should be always. This

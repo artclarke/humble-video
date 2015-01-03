@@ -9,7 +9,7 @@ If using Maven, Humble is deployed to the Maven Central Repository. To include i
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-all</artifactId>
-      <version>0.3.0-SNAPSHOT</version>
+      <version>0.2.1</version>
     </dependency>
   </dependencies>
 </project>
@@ -192,14 +192,14 @@ vagrant up && mvn install && vagrant ssh --command "cd /vagrant && mvn install" 
   
 9. If successful, it's time to PEG the snapshots to a specific release. Now things get hairy.
 
+Edit humble-video-parent/pom.xml BY HAND to set the humble.version
 ```bash
 cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number>
 ```
-
 10. Now, rebuild all Java Source
 
 ```bash
-(cd humble-video-noarch && mvn clean) && (cd humble-video-test && mvn clean)
+(cd humble-video-noarch && mvn clean) && (cd humble-video-test && mvn clean) && (cd humble-video-demos && mvn clean)
 ```
 
 11. Do one last rebuild (you do not need to rebuild native sources) and deploy
@@ -212,16 +212,23 @@ vagrant up && mvn install && vagrant ssh --command "cd /vagrant && mvn install" 
 
     https://oss.sonatype.org/content/repositories/snapshots/io/humble/
 
-13. Merge your changes back into Develop
+13. Make sure it was done correctly by deleting all your m2 artifacts, and forcing a redownload.
+
+```bash
+rm -rf $HOME/.m2/repository/io/humble/humble-video-*
+(cd humble-video-tests && mvn test)
+(cd humble-video-demos && mvn test)
+```
+
+14. Merge your changes back into Develop
 
 ```bash
 git flow release finish v<version-number>
 ```
 
-14. Peg your develop tree to the next snapshot.
+15. Peg your develop tree to the next snapshot.
 
-Edit this file to have the right version at the top.
-
+Edit humble-video-parent/pom.xml BY HAND to set the humble.version
 ```bash
 cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number>-SNAPSHOT
 cd humble-video-native/src/main/gnu
@@ -229,7 +236,7 @@ cd humble-video-native/src/main/gnu
 vagrant ssh --command "cd /vagrant/humble-video-native/src/main/gnu && autoreconf"
 ```
 
-15. Done!
+16. Done!
 
 Enjoy!
 
