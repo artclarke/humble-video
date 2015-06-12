@@ -102,6 +102,16 @@ The 'brew' utility is your on Mac OS X friend. Use it often. You can install yas
     brew install yasm
     brew install valgrind
 
+To install the Humble-Swig version of Swig:
+```bash
+git clone git@github.com:artclarke/humble-swig.git
+cd humble-swig
+./autogen.sh
+./configure
+make
+make install
+```
+
 Also, on Mac OS X the Valgrind test suite only works for 64-bit builds.
 
 To cross-compile for linux and windows in addition to Mac OS X, run:
