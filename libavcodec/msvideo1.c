@@ -306,11 +306,14 @@ static int msvideo1_decode_frame(AVCodecContext *avctx,
         return ret;
 
     if (s->mode_8bit) {
-        const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, NULL);
+        int size;
+        const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, &size);
 
-        if (pal) {
+        if (pal && size == AVPALETTE_SIZE) {
             memcpy(s->pal, pal, AVPALETTE_SIZE);
             s->frame->palette_has_changed = 1;
+        } else if (pal) {
+            av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", size);
         }
     }
 
@@ -346,5 +349,5 @@ AVCodec ff_msvideo1_decoder = {
     .init           = msvideo1_decode_init,
     .close          = msvideo1_decode_end,
     .decode         = msvideo1_decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
+    .capabilities   = AV_CODEC_CAP_DR1,
 };

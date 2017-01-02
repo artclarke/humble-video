@@ -27,6 +27,7 @@
 #include "error_resilience.h"
 #include "internal.h"
 #include "mpeg_er.h"
+#include "msmpeg4.h"
 #include "msmpeg4data.h"
 #include "qpeldsp.h"
 #include "vc1.h"
@@ -51,9 +52,9 @@ static void arith2_normalise(ArithCoder *c)
             c->value ^= 0x8000;
             c->low   ^= 0x8000;
         }
-        c->high  = c->high  << 8 & 0xFFFFFF | 0xFF;
-        c->value = c->value << 8 & 0xFFFFFF | bytestream2_get_byte(c->gbc.gB);
-        c->low   = c->low   << 8 & 0xFFFFFF;
+        c->high  = (uint16_t)c->high  << 8  | 0xFF;
+        c->value = (uint16_t)c->value << 8  | bytestream2_get_byte(c->gbc.gB);
+        c->low   = (uint16_t)c->low   << 8;
     }
 }
 
@@ -209,8 +210,13 @@ static int decode_555(GetByteContext *gB, uint16_t *dst, int stride,
                     last_symbol = b << 8 | bytestream2_get_byte(gB);
                 else if (b > 129) {
                     repeat = 0;
-                    while (b-- > 130)
+                    while (b-- > 130) {
+                        if (repeat >= (INT_MAX >> 8) - 1) {
+                            av_log(NULL, AV_LOG_ERROR, "repeat overflow\n");
+                            return AVERROR_INVALIDDATA;
+                        }
                         repeat = (repeat << 8) + bytestream2_get_byte(gB) + 1;
+                    }
                     if (last_symbol == -2) {
                         int skip = FFMIN((unsigned)repeat, dst + w - p);
                         repeat -= skip;
@@ -317,7 +323,7 @@ static int decode_rle(GetBitContext *gb, uint8_t *pal_dst, int pal_stride,
     if (next_code != 1 << current_length)
         return AVERROR_INVALIDDATA;
 
-    if (i = init_vlc(&vlc, 9, alphabet_size, bits, 1, 1, codes, 4, 4, 0))
+    if ((i = init_vlc(&vlc, 9, alphabet_size, bits, 1, 1, codes, 4, 4, 0)) < 0)
         return i;
 
     /* frame decode */
@@ -416,7 +422,13 @@ static int decode_wmv9(AVCodecContext *avctx, const uint8_t *buf, int buf_size,
 
     ff_vc1_decode_blocks(v);
 
-    ff_er_frame_end(&s->er);
+    if (v->end_mb_x == s->mb_width && s->end_mb_y == s->mb_height) {
+        ff_er_frame_end(&s->er);
+    } else {
+        av_log(v->s.avctx, AV_LOG_WARNING,
+               "disabling error correction due to block count mismatch %dx%d != %dx%d\n",
+               v->end_mb_x, s->end_mb_y, s->mb_width, s->mb_height);
+    }
 
     ff_mpv_frame_end(s);
 
@@ -476,7 +488,7 @@ static int mss2_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     Rectangle wmv9rects[MAX_WMV9_RECTANGLES], *r;
     int used_rects = 0, i, implicit_rect = 0, av_uninit(wmv9_mask);
 
-    av_assert0(FF_INPUT_BUFFER_PADDING_SIZE >=
+    av_assert0(AV_INPUT_BUFFER_PADDING_SIZE >=
                ARITH2_PADDING + (MIN_CACHE_BITS + 7) / 8);
 
     if ((ret = init_get_bits8(&gb, buf, buf_size)) < 0)
@@ -848,5 +860,5 @@ AVCodec ff_mss2_decoder = {
     .init           = mss2_decode_init,
     .close          = mss2_decode_end,
     .decode         = mss2_decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
+    .capabilities   = AV_CODEC_CAP_DR1,
 };

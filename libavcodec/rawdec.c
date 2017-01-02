@@ -172,6 +172,9 @@ static int raw_decode(AVCodecContext *avctx, void *data, int *got_frame,
         context->frame_size = avpicture_get_size(avctx->pix_fmt, avctx->width,
                                                  avctx->height);
     }
+    if (context->frame_size < 0)
+        return context->frame_size;
+
     need_copy = !avpkt->buf || context->is_2_4_bpp || context->is_yuv2 || context->is_lt_16bpp;
 
     frame->pict_type        = AV_PICTURE_TYPE_I;
@@ -255,7 +258,7 @@ static int raw_decode(AVCodecContext *avctx, void *data, int *got_frame,
         buf += buf_size - context->frame_size;
 
     len = context->frame_size - (avctx->pix_fmt==AV_PIX_FMT_PAL8 ? AVPALETTE_SIZE : 0);
-    if (buf_size < len && (avctx->codec_tag & 0xFFFFFF) != MKTAG('B','I','T', 0)) {
+    if (buf_size < len && ((avctx->codec_tag & 0xFFFFFF) != MKTAG('B','I','T', 0) || !need_copy)) {
         av_log(avctx, AV_LOG_ERROR, "Invalid buffer size, packet size %d < expected frame_size %d\n", buf_size, len);
         av_buffer_unref(&frame->buf[0]);
         return AVERROR(EINVAL);
@@ -268,8 +271,13 @@ static int raw_decode(AVCodecContext *avctx, void *data, int *got_frame,
     }
 
     if (avctx->pix_fmt == AV_PIX_FMT_PAL8) {
+        int pal_size;
         const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE,
-                                                     NULL);
+                                                     &pal_size);
+        if (pal_size != AVPALETTE_SIZE) {
+            av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", pal_size);
+            pal = NULL;
+        }
 
         if (pal) {
             av_buffer_unref(&context->palette);
@@ -369,5 +377,5 @@ AVCodec ff_rawvideo_decoder = {
     .close          = raw_close_decoder,
     .decode         = raw_decode,
     .priv_class     = &rawdec_class,
-    .capabilities   = CODEC_CAP_PARAM_CHANGE,
+    .capabilities   = AV_CODEC_CAP_PARAM_CHANGE,
 };

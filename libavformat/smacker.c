@@ -120,6 +120,11 @@ static int smacker_read_header(AVFormatContext *s)
     smk->height = avio_rl32(pb);
     smk->frames = avio_rl32(pb);
     smk->pts_inc = (int32_t)avio_rl32(pb);
+    if (smk->pts_inc > INT_MAX / 100) {
+        av_log(s, AV_LOG_ERROR, "pts_inc %d is too large\n", smk->pts_inc);
+        return AVERROR_INVALIDDATA;
+    }
+
     smk->flags = avio_rl32(pb);
     if(smk->flags & SMACKER_FLAG_RING_FRAME)
         smk->frames++;
@@ -321,7 +326,7 @@ static int smacker_read_packet(AVFormatContext *s, AVPacket *pkt)
                 int err;
 
                 size = avio_rl32(s->pb) - 4;
-                if (!size || size + 4L > frame_size) {
+                if (!size || size + 4LL > frame_size) {
                     av_log(s, AV_LOG_ERROR, "Invalid audio part size\n");
                     return AVERROR_INVALIDDATA;
                 }

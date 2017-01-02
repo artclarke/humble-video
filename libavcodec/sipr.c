@@ -44,7 +44,7 @@
 #include "sipr.h"
 #include "siprdata.h"
 
-typedef struct {
+typedef struct SiprModeParam {
     const char *mode_name;
     uint16_t bits_per_frame;
     uint8_t subframe_count;
@@ -570,5 +570,5 @@ AVCodec ff_sipr_decoder = {
     .priv_data_size = sizeof(SiprContext),
     .init           = sipr_decoder_init,
     .decode         = sipr_decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
+    .capabilities   = AV_CODEC_CAP_DR1,
 };

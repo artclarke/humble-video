@@ -20,6 +20,7 @@
  */
 
 #include "libavutil/channel_layout.h"
+#include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/intfloat.h"
 #include "avformat.h"
@@ -32,7 +33,7 @@ static const AVCodecTag nuv_audio_tags[] = {
     { AV_CODEC_ID_NONE,      0 },
 };
 
-typedef struct {
+typedef struct NUVContext {
     int v_id;
     int a_id;
     int rtjpg_video;
@@ -171,6 +172,15 @@ static int nuv_header(AVFormatContext *s)
     if (aspect > 0.9999 && aspect < 1.0001)
         aspect = 4.0 / 3.0;
     fps = av_int2double(avio_rl64(pb));
+    if (fps < 0.0f) {
+        if (s->error_recognition & AV_EF_EXPLODE) {
+            av_log(s, AV_LOG_ERROR, "Invalid frame rate %f\n", fps);
+            return AVERROR_INVALIDDATA;
+        } else {
+            av_log(s, AV_LOG_WARNING, "Invalid frame rate %f, setting to 0.\n", fps);
+            fps = 0.0f;
+        }
+    }
 
     // number of packets per stream type, -1 means unknown, e.g. streaming
     v_packs = avio_rl32(pb);
@@ -184,6 +194,10 @@ static int nuv_header(AVFormatContext *s)
         if (!vst)
             return AVERROR(ENOMEM);
         ctx->v_id = vst->index;
+
+        ret = av_image_check_size(width, height, 0, ctx);
+        if (ret < 0)
+            return ret;
 
         vst->codec->codec_type            = AVMEDIA_TYPE_VIDEO;
         vst->codec->codec_id              = AV_CODEC_ID_NUV;

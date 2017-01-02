@@ -32,6 +32,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
     WMACodecContext *s = avctx->priv_data;
     int i, flags1, flags2, block_align;
     uint8_t *extradata;
+    int ret;
 
     s->avctx = avctx;
 
@@ -60,11 +61,15 @@ static av_cold int encode_init(AVCodecContext *avctx)
     flags2 = 1;
     if (avctx->codec->id == AV_CODEC_ID_WMAV1) {
         extradata             = av_malloc(4);
+        if (!extradata)
+            return AVERROR(ENOMEM);
         avctx->extradata_size = 4;
         AV_WL16(extradata, flags1);
         AV_WL16(extradata + 2, flags2);
     } else if (avctx->codec->id == AV_CODEC_ID_WMAV2) {
         extradata             = av_mallocz(10);
+        if (!extradata)
+            return AVERROR(ENOMEM);
         avctx->extradata_size = 10;
         AV_WL32(extradata, flags1);
         AV_WL16(extradata + 4, flags2);
@@ -78,7 +83,8 @@ static av_cold int encode_init(AVCodecContext *avctx)
     if (avctx->channels == 2)
         s->ms_stereo = 1;
 
-    ff_wma_init(avctx, flags2);
+    if ((ret = ff_wma_init(avctx, flags2)) < 0)
+        return ret;
 
     /* init MDCT */
     for (i = 0; i < s->nb_block_sizes; i++)
@@ -88,9 +94,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
                          (avctx->sample_rate * 8);
     block_align        = FFMIN(block_align, MAX_CODED_SUPERFRAME_SIZE);
     avctx->block_align = block_align;
-
-    avctx->frame_size  =
-    avctx->delay       = s->frame_len;
+    avctx->frame_size = avctx->initial_padding = s->frame_len;
 
     return 0;
 }
@@ -109,10 +113,10 @@ static void apply_window_and_mdct(AVCodecContext *avctx, const AVFrame *frame)
 
     for (ch = 0; ch < avctx->channels; ch++) {
         memcpy(s->output, s->frame_out[ch], window_len * sizeof(*s->output));
-        s->fdsp.vector_fmul_scalar(s->frame_out[ch], audio[ch], n, len);
-        s->fdsp.vector_fmul_reverse(&s->output[window_len], s->frame_out[ch],
+        s->fdsp->vector_fmul_scalar(s->frame_out[ch], audio[ch], n, len);
+        s->fdsp->vector_fmul_reverse(&s->output[window_len], s->frame_out[ch],
                                     win, len);
-        s->fdsp.vector_fmul(s->frame_out[ch], s->frame_out[ch], win, len);
+        s->fdsp->vector_fmul(s->frame_out[ch], s->frame_out[ch], win, len);
         mdct->mdct_calc(mdct, s->coefs[ch], s->output);
     }
 }
@@ -375,7 +379,7 @@ static int encode_superframe(AVCodecContext *avctx, AVPacket *avpkt,
         }
     }
 
-    if ((ret = ff_alloc_packet2(avctx, avpkt, 2 * MAX_CODED_SUPERFRAME_SIZE)) < 0)
+    if ((ret = ff_alloc_packet2(avctx, avpkt, 2 * MAX_CODED_SUPERFRAME_SIZE, 0)) < 0)
         return ret;
 
     total_gain = 128;
@@ -403,7 +407,7 @@ static int encode_superframe(AVCodecContext *avctx, AVPacket *avpkt,
     av_assert0(put_bits_ptr(&s->pb) - s->pb.buf == avctx->block_align);
 
     if (frame->pts != AV_NOPTS_VALUE)
-        avpkt->pts = frame->pts - ff_samples_to_time_base(avctx, avctx->delay);
+        avpkt->pts = frame->pts - ff_samples_to_time_base(avctx, avctx->initial_padding);
 
     avpkt->size     = avctx->block_align;
     *got_packet_ptr = 1;

@@ -429,10 +429,9 @@ static void write_element(AlacEncodeContext *s,
 
         // write extra bits if needed
         if (s->extra_bits) {
-            uint32_t mask = (1 << s->extra_bits) - 1;
             for (i = 0; i < s->frame_size; i++) {
                 for (j = 0; j < channels; j++) {
-                    put_bits(pb, s->extra_bits, s->predictor_buf[j][i] & mask);
+                    put_bits(pb, s->extra_bits, s->predictor_buf[j][i]);
                 }
             }
         }
@@ -444,7 +443,7 @@ static void write_element(AlacEncodeContext *s,
             // TODO: determine when this will actually help. for now it's not used.
             if (prediction_type == 15) {
                 // 2nd pass 1st order filter
-                int32_t *residual = s->predictor_buf[channels];
+                int32_t *residual = s->predictor_buf[i];
                 for (j = s->frame_size - 1; j > 0; j--)
                     residual[j] -= residual[j - 1];
             }
@@ -532,7 +531,7 @@ static av_cold int alac_encode_init(AVCodecContext *avctx)
                                                  avctx->channels,
                                                  avctx->bits_per_raw_sample);
 
-    avctx->extradata = av_mallocz(ALAC_EXTRADATA_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
+    avctx->extradata = av_mallocz(ALAC_EXTRADATA_SIZE + AV_INPUT_BUFFER_PADDING_SIZE);
     if (!avctx->extradata) {
         ret = AVERROR(ENOMEM);
         goto error;
@@ -619,7 +618,7 @@ static int alac_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
     else
         max_frame_size = s->max_coded_frame_size;
 
-    if ((ret = ff_alloc_packet2(avctx, avpkt, 2 * max_frame_size)) < 0)
+    if ((ret = ff_alloc_packet2(avctx, avpkt, 2 * max_frame_size, 0)) < 0)
         return ret;
 
     /* use verbatim mode for compression_level 0 */
@@ -654,7 +653,7 @@ AVCodec ff_alac_encoder = {
     .init           = alac_encode_init,
     .encode2        = alac_encode_frame,
     .close          = alac_encode_close,
-    .capabilities   = CODEC_CAP_SMALL_LAST_FRAME,
+    .capabilities   = AV_CODEC_CAP_SMALL_LAST_FRAME,
     .channel_layouts = ff_alac_channel_layouts,
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32P,
                                                      AV_SAMPLE_FMT_S16P,

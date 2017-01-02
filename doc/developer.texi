@@ -1,4 +1,5 @@
 \input texinfo @c -*- texinfo -*-
+@documentencoding UTF-8
 
 @settitle Developer Documentation
 @titlepage
@@ -227,7 +228,7 @@ autocmd InsertEnter * match ForbiddenWhitespace /\t\|\s\+\%#\@@<!$/
 @end example
 
 For Emacs, add these roughly equivalent lines to your @file{.emacs.d/init.el}:
-@example
+@lisp
 (c-add-style "ffmpeg"
              '("k&r"
                (c-basic-offset . 4)
@@ -238,7 +239,7 @@ For Emacs, add these roughly equivalent lines to your @file{.emacs.d/init.el}:
                )
              )
 (setq c-default-style "ffmpeg")
-@end example
+@end lisp
 
 @section Development Policy
 
@@ -399,6 +400,35 @@ finding a new maintainer and also don't forget updating the @file{MAINTAINERS} f
 
 We think our rules are not too hard. If you have comments, contact us.
 
+@section Code of conduct
+
+Be friendly and respectful towards others and third parties.
+Treat others the way you yourself want to be treated.
+
+Be considerate. Not everyone shares the same viewpoint and priorities as you do.
+Different opinions and interpretations help the project.
+Looking at issues from a different perspective assists development.
+
+Do not assume malice for things that can be attributed to incompetence. Even if
+it is malice, it's rarely good to start with that as initial assumption.
+
+Stay friendly even if someone acts contrarily. Everyone has a bad day
+once in a while.
+If you yourself have a bad day or are angry then try to take a break and reply
+once you are calm and without anger if you have to.
+
+Try to help other team members and cooperate if you can.
+
+The goal of software development is to create technical excellence, not for any
+individual to be better and "win" against the others. Large software projects
+are only possible and successful through teamwork.
+
+If someone struggles do not put them down. Give them a helping hand
+instead and point them in the right direction.
+
+Finally, keep in mind the immortal words of Bill and Ted,
+"Be excellent to each other."
+
 @anchor{Submitting patches}
 @section Submitting patches
 
@@ -543,6 +573,10 @@ should not crash, end in a (near) infinite loop, or allocate ridiculous
 amounts of memory when fed damaged data.
 
 @item
+Did you test your decoder or demuxer against sample files?
+Samples may be obtained at @url{http://samples.ffmpeg.org}.
+
+@item
 Does the patch not mix functional and cosmetic changes?
 
 @item
@@ -632,6 +666,10 @@ not related to the comments received during review. Such patches will
 be rejected. Instead, submit significant changes or new features as
 separate patches.
 
+Everyone is welcome to review patches. Also if you are waiting for your patch
+to be reviewed, please consider helping to review other patches, that is a great
+way to get everyone's patches reviewed sooner.
+
 @anchor{Regression tests}
 @section Regression tests
 
@@ -647,12 +685,12 @@ accordingly].
 @subsection Adding files to the fate-suite dataset
 
 When there is no muxer or encoder available to generate test media for a
-specific test then the media has to be inlcuded in the fate-suite.
+specific test then the media has to be included in the fate-suite.
 First please make sure that the sample file is as small as possible to test the
 respective decoder or demuxer sufficiently. Large files increase network
 bandwidth and disk space requirements.
 Once you have a working fate test and fate sample, provide in the commit
-message or introductionary message for the patch series that you post to
+message or introductory message for the patch series that you post to
 the ffmpeg-devel mailing list, a direct link to download the sample media.
 
 
