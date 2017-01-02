@@ -24,7 +24,6 @@
  */
 
 #include "Encoder.h"
-#include <libavutil/samplefmt.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/MediaPacketImpl.h>

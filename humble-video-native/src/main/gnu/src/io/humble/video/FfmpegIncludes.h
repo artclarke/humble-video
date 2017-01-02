@@ -55,5 +55,10 @@ extern "C"
 #include <libswresample/swresample.h>
 #include <libswscale/swscale.h>
 
+#include <libavutil/samplefmt.h>
+#include <libavutil/log.h>
+#include <libavutil/mathematics.h>
+
+
 }
 #endif /*HUMBLEFFMPEGINCLUDES_H_*/

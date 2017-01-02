@@ -31,7 +31,6 @@
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaAudioResampler.h>
-#include <libavutil/mathematics.h>
 #include "EncoderTest.h"
 
 using namespace io::humble::ferry;
