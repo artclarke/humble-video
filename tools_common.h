@@ -16,6 +16,7 @@
 #include "vpx/vpx_codec.h"
 #include "vpx/vpx_image.h"
 #include "vpx/vpx_integer.h"
+#include "vpx_ports/msvc.h"
 
 #if CONFIG_ENCODERS
 #include "./y4minput.h"
@@ -29,25 +30,24 @@
 /* MinGW uses f{seek,tell}o64 for large files. */
 #define fseeko fseeko64
 #define ftello ftello64
-#endif  /* _WIN32 */
+#endif /* _WIN32 */
 
 #if CONFIG_OS_SUPPORT
 #if defined(_MSC_VER)
-#include <io.h>  /* NOLINT */
-#define snprintf _snprintf
-#define isatty   _isatty
-#define fileno   _fileno
+#include <io.h> /* NOLINT */
+#define isatty _isatty
+#define fileno _fileno
 #else
-#include <unistd.h>  /* NOLINT */
-#endif  /* _MSC_VER */
-#endif  /* CONFIG_OS_SUPPORT */
+#include <unistd.h> /* NOLINT */
+#endif              /* _MSC_VER */
+#endif              /* CONFIG_OS_SUPPORT */
 
 /* Use 32-bit file operations in WebM file format when building ARM
  * executables (.axf) with RVCT. */
 #if !CONFIG_OS_SUPPORT
 #define fseeko fseek
 #define ftello ftell
-#endif  /* CONFIG_OS_SUPPORT */
+#endif /* CONFIG_OS_SUPPORT */
 
 #define LITERALU64(hi, lo) ((((uint64_t)hi) << 32) | lo)
 
@@ -55,7 +55,7 @@
 #define PATH_MAX 512
 #endif
 
-#define IVF_FRAME_HDR_SZ (4 + 8)  /* 4 byte size + 8 byte timestamp */
+#define IVF_FRAME_HDR_SZ (4 + 8) /* 4 byte size + 8 byte timestamp */
 #define IVF_FILE_HDR_SZ 32
 
 #define RAW_FRAME_HDR_SZ sizeof(uint32_t)
@@ -89,6 +89,7 @@ struct VpxInputContext {
   enum VideoFileType file_type;
   uint32_t width;
   uint32_t height;
+  struct VpxRational pixel_aspect_ratio;
   vpx_img_fmt_t fmt;
   vpx_bit_depth_t bit_depth;
   int only_i420;
@@ -119,7 +120,7 @@ void warn(const char *fmt, ...);
 void die_codec(vpx_codec_ctx_t *ctx, const char *s) VPX_NO_RETURN;
 
 /* The tool including this file must define usage_exit() */
-void usage_exit() VPX_NO_RETURN;
+void usage_exit(void) VPX_NO_RETURN;
 
 #undef VPX_NO_RETURN
 
@@ -131,11 +132,11 @@ typedef struct VpxInterface {
   vpx_codec_iface_t *(*const codec_interface)();
 } VpxInterface;
 
-int get_vpx_encoder_count();
+int get_vpx_encoder_count(void);
 const VpxInterface *get_vpx_encoder_by_index(int i);
 const VpxInterface *get_vpx_encoder_by_name(const char *name);
 
-int get_vpx_decoder_count();
+int get_vpx_decoder_count(void);
 const VpxInterface *get_vpx_decoder_by_index(int i);
 const VpxInterface *get_vpx_decoder_by_name(const char *name);
 const VpxInterface *get_vpx_decoder_by_fourcc(uint32_t fourcc);
@@ -149,14 +150,14 @@ int vpx_img_read(vpx_image_t *img, FILE *file);
 
 double sse_to_psnr(double samples, double peak, double mse);
 
-#if CONFIG_VP9 && CONFIG_VP9_HIGHBITDEPTH
+#if CONFIG_VP9_HIGHBITDEPTH
 void vpx_img_upshift(vpx_image_t *dst, vpx_image_t *src, int input_shift);
 void vpx_img_downshift(vpx_image_t *dst, vpx_image_t *src, int down_shift);
 void vpx_img_truncate_16_to_8(vpx_image_t *dst, vpx_image_t *src);
 #endif
 
 #ifdef __cplusplus
-}  /* extern "C" */
+} /* extern "C" */
 #endif
 
 #endif  // TOOLS_COMMON_H_

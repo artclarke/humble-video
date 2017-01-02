@@ -106,22 +106,24 @@ check_git_hashes() {
   fi
 }
 
+# $1 is the name of an environment variable containing a directory name to
+# test.
+test_env_var_dir() {
+  local dir=$(eval echo "\${$1}")
+  if [ ! -d "${dir}" ]; then
+    elog "'${dir}': No such directory"
+    elog "The $1 environment variable must be set to a valid directory."
+    return 1
+  fi
+}
+
 # This script requires that the LIBVPX_BIN_PATH, LIBVPX_CONFIG_PATH, and
 # LIBVPX_TEST_DATA_PATH variables are in the environment: Confirm that
 # the variables are set and that they all evaluate to directory paths.
 verify_vpx_test_environment() {
-  if [ ! -d "${LIBVPX_BIN_PATH}" ]; then
-    echo "The LIBVPX_BIN_PATH environment variable must be set."
-    return 1
-  fi
-  if [ ! -d "${LIBVPX_CONFIG_PATH}" ]; then
-    echo "The LIBVPX_CONFIG_PATH environment variable must be set."
-    return 1
-  fi
-  if [ ! -d "${LIBVPX_TEST_DATA_PATH}" ]; then
-    echo "The LIBVPX_TEST_DATA_PATH environment variable must be set."
-    return 1
-  fi
+  test_env_var_dir "LIBVPX_BIN_PATH" \
+    && test_env_var_dir "LIBVPX_CONFIG_PATH" \
+    && test_env_var_dir "LIBVPX_TEST_DATA_PATH"
 }
 
 # Greps vpx_config.h in LIBVPX_CONFIG_PATH for positional parameter one, which
@@ -261,6 +263,9 @@ run_tests() {
     return
   fi
 
+  # Don't bother with the environment tests if everything else was disabled.
+  [ -z "${tests_to_filter}" ] && return
+
   # Combine environment and actual tests.
   local tests_to_run="${env_tests} ${tests_to_filter}"
 
@@ -378,8 +383,7 @@ else
   VPX_TEST_TEMP_ROOT=/tmp
 fi
 
-VPX_TEST_RAND=$(awk 'BEGIN { srand(); printf "%d\n",(rand() * 32768)}')
-VPX_TEST_OUTPUT_DIR="${VPX_TEST_TEMP_ROOT}/vpx_test_${VPX_TEST_RAND}"
+VPX_TEST_OUTPUT_DIR="${VPX_TEST_TEMP_ROOT}/vpx_test_$$"
 
 if ! mkdir -p "${VPX_TEST_OUTPUT_DIR}" || \
    [ ! -d "${VPX_TEST_OUTPUT_DIR}" ]; then
@@ -397,10 +401,15 @@ VP8_IVF_FILE="${LIBVPX_TEST_DATA_PATH}/vp80-00-comprehensive-001.ivf"
 VP9_IVF_FILE="${LIBVPX_TEST_DATA_PATH}/vp90-2-09-subpixel-00.ivf"
 
 VP9_WEBM_FILE="${LIBVPX_TEST_DATA_PATH}/vp90-2-00-quantizer-00.webm"
+VP9_FPM_WEBM_FILE="${LIBVPX_TEST_DATA_PATH}/vp90-2-07-frame_parallel-1.webm"
+VP9_LT_50_FRAMES_WEBM_FILE="${LIBVPX_TEST_DATA_PATH}/vp90-2-02-size-32x08.webm"
 
 YUV_RAW_INPUT="${LIBVPX_TEST_DATA_PATH}/hantro_collage_w352h288.yuv"
 YUV_RAW_INPUT_WIDTH=352
 YUV_RAW_INPUT_HEIGHT=288
+
+Y4M_NOSQ_PAR_INPUT="${LIBVPX_TEST_DATA_PATH}/park_joy_90p_8_420_a10-1.y4m"
+Y4M_720P_INPUT="${LIBVPX_TEST_DATA_PATH}/niklas_1280_720_30.y4m"
 
 # Setup a trap function to clean up after tests complete.
 trap cleanup EXIT
@@ -417,13 +426,13 @@ vlog "$(basename "${0%.*}") test configuration:
   VPX_TEST_LIST_TESTS=${VPX_TEST_LIST_TESTS}
   VPX_TEST_OUTPUT_DIR=${VPX_TEST_OUTPUT_DIR}
   VPX_TEST_PREFIX=${VPX_TEST_PREFIX}
-  VPX_TEST_RAND=${VPX_TEST_RAND}
   VPX_TEST_RUN_DISABLED_TESTS=${VPX_TEST_RUN_DISABLED_TESTS}
   VPX_TEST_SHOW_PROGRAM_OUTPUT=${VPX_TEST_SHOW_PROGRAM_OUTPUT}
   VPX_TEST_TEMP_ROOT=${VPX_TEST_TEMP_ROOT}
   VPX_TEST_VERBOSE_OUTPUT=${VPX_TEST_VERBOSE_OUTPUT}
   YUV_RAW_INPUT=${YUV_RAW_INPUT}
   YUV_RAW_INPUT_WIDTH=${YUV_RAW_INPUT_WIDTH}
-  YUV_RAW_INPUT_HEIGHT=${YUV_RAW_INPUT_HEIGHT}"
+  YUV_RAW_INPUT_HEIGHT=${YUV_RAW_INPUT_HEIGHT}
+  Y4M_NOSQ_PAR_INPUT=${Y4M_NOSQ_PAR_INPUT}"
 
 fi  # End $VPX_TEST_TOOLS_COMMON_SH pseudo include guard.

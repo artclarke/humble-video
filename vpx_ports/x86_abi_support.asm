@@ -189,7 +189,6 @@
 %if ABI_IS_32BIT
   %if CONFIG_PIC=1
   %ifidn __OUTPUT_FORMAT__,elf32
-    %define GET_GOT_SAVE_ARG 1
     %define WRT_PLT wrt ..plt
     %macro GET_GOT 1
       extern _GLOBAL_OFFSET_TABLE_
@@ -208,7 +207,6 @@
       %define RESTORE_GOT pop %1
     %endmacro
   %elifidn __OUTPUT_FORMAT__,macho32
-    %define GET_GOT_SAVE_ARG 1
     %macro GET_GOT 1
       push %1
       call %%get_got
@@ -395,7 +393,7 @@ section .text
 
 ; On Android platforms use lrand48 when building postproc routines. Prior to L
 ; rand() was not available.
-%if CONFIG_POSTPROC=1
+%if CONFIG_POSTPROC=1 || CONFIG_VP9_POSTPROC=1
 %ifdef __ANDROID__
 extern sym(lrand48)
 %define LIBVPX_RAND lrand48
@@ -403,4 +401,4 @@ extern sym(lrand48)
 extern sym(rand)
 %define LIBVPX_RAND rand
 %endif
-%endif ; CONFIG_POSTPROC
+%endif ; CONFIG_POSTPROC || CONFIG_VP9_POSTPROC

@@ -28,6 +28,8 @@ struct WebmInputContext {
   int block_frame_index;
   int video_track_index;
   uint64_t timestamp_ns;
+  int is_key_frame;
+  int reached_eos;
 };
 
 // Checks if the input is a WebM file. If so, initializes WebMInputContext so
@@ -40,22 +42,17 @@ int file_is_webm(struct WebmInputContext *webm_ctx,
 
 // Reads a WebM Video Frame. Memory for the buffer is created, owned and managed
 // by this function. For the first call, |buffer| should be NULL and
-// |*bytes_in_buffer| should be 0. Once all the frames are read and used,
+// |*buffer_size| should be 0. Once all the frames are read and used,
 // webm_free() should be called, otherwise there will be a leak.
 // Parameters:
 //      webm_ctx - WebmInputContext object
 //      buffer - pointer where the frame data will be filled.
-//      bytes_in_buffer - pointer to buffer size.
-//      buffer_size - unused TODO(vigneshv): remove this
+//      buffer_size - pointer to buffer size.
 // Return values:
 //      0 - Success
 //      1 - End of Stream
 //     -1 - Error
-// TODO(vigneshv): Make the return values consistent across all functions in
-// this file.
-int webm_read_frame(struct WebmInputContext *webm_ctx,
-                    uint8_t **buffer,
-                    size_t *bytes_in_buffer,
+int webm_read_frame(struct WebmInputContext *webm_ctx, uint8_t **buffer,
                     size_t *buffer_size);
 
 // Guesses the frame rate of the input file based on the container timestamps.

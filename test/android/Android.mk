@@ -40,9 +40,17 @@ include $(CLEAR_VARS)
 LOCAL_ARM_MODE := arm
 LOCAL_MODULE := libvpx_test
 LOCAL_STATIC_LIBRARIES := gtest libwebm
-LOCAL_SHARED_LIBRARIES := vpx
+
+ifeq ($(ENABLE_SHARED),1)
+  LOCAL_SHARED_LIBRARIES := vpx
+else
+  LOCAL_STATIC_LIBRARIES += vpx
+endif
+
 include $(LOCAL_PATH)/test/test.mk
 LOCAL_C_INCLUDES := $(BINDINGS_DIR)
 FILTERED_SRC := $(sort $(filter %.cc %.c, $(LIBVPX_TEST_SRCS-yes)))
 LOCAL_SRC_FILES := $(addprefix ./test/, $(FILTERED_SRC))
+# some test files depend on *_rtcd.h, ensure they're generated first.
+$(eval $(call rtcd_dep_template))
 include $(BUILD_EXECUTABLE)

@@ -8,7 +8,6 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-
 #ifndef VP8_ENCODER_MODECOSTS_H_
 #define VP8_ENCODER_MODECOSTS_H_
 
@@ -16,7 +15,9 @@
 extern "C" {
 #endif
 
-void vp8_init_mode_costs(VP8_COMP *x);
+struct VP8_COMP;
+
+void vp8_init_mode_costs(struct VP8_COMP *x);
 
 #ifdef __cplusplus
 }  // extern "C"

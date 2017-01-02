@@ -14,33 +14,24 @@
 
 #include "third_party/googletest/src/include/gtest/gtest.h"
 
-#include "./vp9_rtcd.h"
-
+#include "./vpx_dsp_rtcd.h"
 #include "test/acm_random.h"
 #include "vpx/vpx_integer.h"
+#include "vpx_ports/msvc.h"  // for round()
 
 using libvpx_test::ACMRandom;
 
 namespace {
-
-#ifdef _MSC_VER
-static int round(double x) {
-  if (x < 0)
-    return static_cast<int>(ceil(x - 0.5));
-  else
-    return static_cast<int>(floor(x + 0.5));
-}
-#endif
 
 void reference_dct_1d(double input[8], double output[8]) {
   const double kPi = 3.141592653589793238462643383279502884;
   const double kInvSqrt2 = 0.707106781186547524400844362104;
   for (int k = 0; k < 8; k++) {
     output[k] = 0.0;
-    for (int n = 0; n < 8; n++)
-      output[k] += input[n]*cos(kPi*(2*n+1)*k/16.0);
-    if (k == 0)
-      output[k] = output[k]*kInvSqrt2;
+    for (int n = 0; n < 8; n++) {
+      output[k] += input[n] * cos(kPi * (2 * n + 1) * k / 16.0);
+    }
+    if (k == 0) output[k] = output[k] * kInvSqrt2;
   }
 }
 
@@ -48,61 +39,19 @@ void reference_dct_2d(int16_t input[64], double output[64]) {
   // First transform columns
   for (int i = 0; i < 8; ++i) {
     double temp_in[8], temp_out[8];
-    for (int j = 0; j < 8; ++j)
-      temp_in[j] = input[j*8 + i];
+    for (int j = 0; j < 8; ++j) temp_in[j] = input[j * 8 + i];
     reference_dct_1d(temp_in, temp_out);
-    for (int j = 0; j < 8; ++j)
-      output[j*8 + i] = temp_out[j];
+    for (int j = 0; j < 8; ++j) output[j * 8 + i] = temp_out[j];
   }
   // Then transform rows
   for (int i = 0; i < 8; ++i) {
     double temp_in[8], temp_out[8];
-    for (int j = 0; j < 8; ++j)
-      temp_in[j] = output[j + i*8];
+    for (int j = 0; j < 8; ++j) temp_in[j] = output[j + i * 8];
     reference_dct_1d(temp_in, temp_out);
-    for (int j = 0; j < 8; ++j)
-      output[j + i*8] = temp_out[j];
+    for (int j = 0; j < 8; ++j) output[j + i * 8] = temp_out[j];
   }
   // Scale by some magic number
-  for (int i = 0; i < 64; ++i)
-    output[i] *= 2;
-}
-
-void reference_idct_1d(double input[8], double output[8]) {
-  const double kPi = 3.141592653589793238462643383279502884;
-  const double kSqrt2 = 1.414213562373095048801688724209698;
-  for (int k = 0; k < 8; k++) {
-    output[k] = 0.0;
-    for (int n = 0; n < 8; n++) {
-      output[k] += input[n]*cos(kPi*(2*k+1)*n/16.0);
-      if (n == 0)
-        output[k] = output[k]/kSqrt2;
-    }
-  }
-}
-
-void reference_idct_2d(double input[64], int16_t output[64]) {
-  double out[64], out2[64];
-  // First transform rows
-  for (int i = 0; i < 8; ++i) {
-    double temp_in[8], temp_out[8];
-    for (int j = 0; j < 8; ++j)
-      temp_in[j] = input[j + i*8];
-    reference_idct_1d(temp_in, temp_out);
-    for (int j = 0; j < 8; ++j)
-      out[j + i*8] = temp_out[j];
-  }
-  // Then transform columns
-  for (int i = 0; i < 8; ++i) {
-    double temp_in[8], temp_out[8];
-    for (int j = 0; j < 8; ++j)
-      temp_in[j] = out[j*8 + i];
-    reference_idct_1d(temp_in, temp_out);
-    for (int j = 0; j < 8; ++j)
-      out2[j*8 + i] = temp_out[j];
-  }
-  for (int i = 0; i < 64; ++i)
-    output[i] = round(out2[i]/32);
+  for (int i = 0; i < 64; ++i) output[i] *= 2;
 }
 
 TEST(VP9Idct8x8Test, AccuracyCheck) {
@@ -119,19 +68,18 @@ TEST(VP9Idct8x8Test, AccuracyCheck) {
       dst[j] = rnd.Rand8();
     }
     // Initialize a test block with input range [-255, 255].
-    for (int j = 0; j < 64; ++j)
-      input[j] = src[j] - dst[j];
+    for (int j = 0; j < 64; ++j) input[j] = src[j] - dst[j];
 
     reference_dct_2d(input, output_r);
-    for (int j = 0; j < 64; ++j)
-      coeff[j] = round(output_r[j]);
-    vp9_idct8x8_64_add_c(coeff, dst, 8);
+    for (int j = 0; j < 64; ++j) {
+      coeff[j] = static_cast<tran_low_t>(round(output_r[j]));
+    }
+    vpx_idct8x8_64_add_c(coeff, dst, 8);
     for (int j = 0; j < 64; ++j) {
       const int diff = dst[j] - src[j];
       const int error = diff * diff;
-      EXPECT_GE(1, error)
-          << "Error: 8x8 FDCT/IDCT has error " << error
-          << " at index " << j;
+      EXPECT_GE(1, error) << "Error: 8x8 FDCT/IDCT has error " << error
+                          << " at index " << j;
     }
   }
 }

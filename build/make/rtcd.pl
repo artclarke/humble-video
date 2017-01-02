@@ -319,13 +319,14 @@ EOF
 
   print <<EOF;
 #if HAVE_DSPR2
+void vpx_dsputil_static_init();
 #if CONFIG_VP8
 void dsputil_static_init();
-dsputil_static_init();
 #endif
-#if CONFIG_VP9
-void vp9_dsputil_static_init();
-vp9_dsputil_static_init();
+
+vpx_dsputil_static_init();
+#if CONFIG_VP8
+dsputil_static_init();
 #endif
 #endif
 }
@@ -376,19 +377,15 @@ if ($opts{arch} eq 'x86') {
       @ALL_ARCHS = filter("$opts{arch}", qw/dspr2/);
       last;
     }
+    if (/HAVE_MSA=yes/) {
+      @ALL_ARCHS = filter("$opts{arch}", qw/msa/);
+      last;
+    }
   }
   close CONFIG_FILE;
   mips;
-} elsif ($opts{arch} eq 'armv5te') {
-  @ALL_ARCHS = filter(qw/edsp/);
-  arm;
-} elsif ($opts{arch} eq 'armv6') {
-  @ALL_ARCHS = filter(qw/edsp media/);
-  arm;
-} elsif ($opts{arch} eq 'armv7') {
-  @ALL_ARCHS = filter(qw/edsp media neon_asm neon/);
-  @REQUIRES = filter(keys %required ? keys %required : qw/media/);
-  &require(@REQUIRES);
+} elsif ($opts{arch} =~ /armv7\w?/) {
+  @ALL_ARCHS = filter(qw/neon_asm neon/);
   arm;
 } elsif ($opts{arch} eq 'armv8' || $opts{arch} eq 'arm64' ) {
   @ALL_ARCHS = filter(qw/neon/);
