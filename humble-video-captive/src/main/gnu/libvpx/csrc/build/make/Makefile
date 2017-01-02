@@ -22,9 +22,11 @@ clean:: .DEFAULT
 exampletest: .DEFAULT
 install:: .DEFAULT
 test:: .DEFAULT
+test-no-data-check:: .DEFAULT
 testdata:: .DEFAULT
 utiltest: .DEFAULT
-
+exampletest-no-data-check utiltest-no-data-check: .DEFAULT
+test_%: .DEFAULT ;
 
 # Note: md5sum is not installed on OS X, but openssl is. Openssl may not be
 # installed on cygwin, so we need to autodetect here.
@@ -56,13 +58,10 @@ dist:
         fi
 endif
 
+# Since we invoke make recursively for multiple targets we need to include the
+# .mk file for the correct target, but only when $(target) is non-empty.
 ifneq ($(target),)
-# Normally, we want to build the filename from the target and the toolchain.
-# This disambiguates from the $(target).mk file that exists in the source tree.
-# However, the toolchain is part of the target in universal builds, so we
-# don't want to include TOOLCHAIN in that case. FAT_ARCHS is used to test
-# if we're in the universal case.
-include $(target)$(if $(FAT_ARCHS),,-$(TOOLCHAIN)).mk
+include $(target)-$(TOOLCHAIN).mk
 endif
 BUILD_ROOT?=.
 VPATH=$(SRC_PATH_BARE)
@@ -91,7 +90,7 @@ all:
 
 .PHONY: clean
 clean::
-	rm -f $(OBJS-yes) $(OBJS-yes:.o=.d) $(OBJS-yes:.asm.s.o=.asm.s)
+	rm -f $(OBJS-yes) $(OBJS-yes:.o=.d) $(OBJS-yes:.asm.S.o=.asm.S)
 	rm -f $(CLEAN-OBJS)
 
 .PHONY: clean
@@ -116,28 +115,29 @@ test::
 testdata::
 .PHONY: utiltest
 utiltest:
+.PHONY: test-no-data-check exampletest-no-data-check utiltest-no-data-check
+test-no-data-check::
+exampletest-no-data-check utiltest-no-data-check:
 
-# Add compiler flags for intrinsic files
+# Force to realign stack always on OS/2
 ifeq ($(TOOLCHAIN), x86-os2-gcc)
-STACKREALIGN=-mstackrealign
-else
-STACKREALIGN=
+CFLAGS += -mstackrealign
 endif
 
 $(BUILD_PFX)%_mmx.c.d: CFLAGS += -mmmx
 $(BUILD_PFX)%_mmx.c.o: CFLAGS += -mmmx
-$(BUILD_PFX)%_sse2.c.d: CFLAGS += -msse2 $(STACKREALIGN)
-$(BUILD_PFX)%_sse2.c.o: CFLAGS += -msse2 $(STACKREALIGN)
-$(BUILD_PFX)%_sse3.c.d: CFLAGS += -msse3 $(STACKREALIGN)
-$(BUILD_PFX)%_sse3.c.o: CFLAGS += -msse3 $(STACKREALIGN)
-$(BUILD_PFX)%_ssse3.c.d: CFLAGS += -mssse3 $(STACKREALIGN)
-$(BUILD_PFX)%_ssse3.c.o: CFLAGS += -mssse3 $(STACKREALIGN)
-$(BUILD_PFX)%_sse4.c.d: CFLAGS += -msse4.1 $(STACKREALIGN)
-$(BUILD_PFX)%_sse4.c.o: CFLAGS += -msse4.1 $(STACKREALIGN)
-$(BUILD_PFX)%_avx.c.d: CFLAGS += -mavx $(STACKREALIGN)
-$(BUILD_PFX)%_avx.c.o: CFLAGS += -mavx $(STACKREALIGN)
-$(BUILD_PFX)%_avx2.c.d: CFLAGS += -mavx2 $(STACKREALIGN)
-$(BUILD_PFX)%_avx2.c.o: CFLAGS += -mavx2 $(STACKREALIGN)
+$(BUILD_PFX)%_sse2.c.d: CFLAGS += -msse2
+$(BUILD_PFX)%_sse2.c.o: CFLAGS += -msse2
+$(BUILD_PFX)%_sse3.c.d: CFLAGS += -msse3
+$(BUILD_PFX)%_sse3.c.o: CFLAGS += -msse3
+$(BUILD_PFX)%_ssse3.c.d: CFLAGS += -mssse3
+$(BUILD_PFX)%_ssse3.c.o: CFLAGS += -mssse3
+$(BUILD_PFX)%_sse4.c.d: CFLAGS += -msse4.1
+$(BUILD_PFX)%_sse4.c.o: CFLAGS += -msse4.1
+$(BUILD_PFX)%_avx.c.d: CFLAGS += -mavx
+$(BUILD_PFX)%_avx.c.o: CFLAGS += -mavx
+$(BUILD_PFX)%_avx2.c.d: CFLAGS += -mavx2
+$(BUILD_PFX)%_avx2.c.o: CFLAGS += -mavx2
 
 $(BUILD_PFX)%.c.d: %.c
 	$(if $(quiet),@echo "    [DEP] $@")
@@ -146,6 +146,7 @@ $(BUILD_PFX)%.c.d: %.c
 
 $(BUILD_PFX)%.c.o: %.c
 	$(if $(quiet),@echo "    [CC] $@")
+	$(qexec)$(if $(CONFIG_DEPENDENCY_TRACKING),,mkdir -p $(dir $@))
 	$(qexec)$(CC) $(INTERNAL_CFLAGS) $(CFLAGS) -c -o $@ $<
 
 $(BUILD_PFX)%.cc.d: %.cc
@@ -155,6 +156,7 @@ $(BUILD_PFX)%.cc.d: %.cc
 
 $(BUILD_PFX)%.cc.o: %.cc
 	$(if $(quiet),@echo "    [CXX] $@")
+	$(qexec)$(if $(CONFIG_DEPENDENCY_TRACKING),,mkdir -p $(dir $@))
 	$(qexec)$(CXX) $(INTERNAL_CFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 $(BUILD_PFX)%.cpp.d: %.cpp
@@ -164,6 +166,7 @@ $(BUILD_PFX)%.cpp.d: %.cpp
 
 $(BUILD_PFX)%.cpp.o: %.cpp
 	$(if $(quiet),@echo "    [CXX] $@")
+	$(qexec)$(if $(CONFIG_DEPENDENCY_TRACKING),,mkdir -p $(dir $@))
 	$(qexec)$(CXX) $(INTERNAL_CFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 $(BUILD_PFX)%.asm.d: %.asm
@@ -174,26 +177,29 @@ $(BUILD_PFX)%.asm.d: %.asm
 
 $(BUILD_PFX)%.asm.o: %.asm
 	$(if $(quiet),@echo "    [AS] $@")
+	$(qexec)$(if $(CONFIG_DEPENDENCY_TRACKING),,mkdir -p $(dir $@))
 	$(qexec)$(AS) $(ASFLAGS) -o $@ $<
 
-$(BUILD_PFX)%.s.d: %.s
+$(BUILD_PFX)%.S.d: %.S
 	$(if $(quiet),@echo "    [DEP] $@")
 	$(qexec)mkdir -p $(dir $@)
 	$(qexec)$(SRC_PATH_BARE)/build/make/gen_asm_deps.sh \
             --build-pfx=$(BUILD_PFX) --depfile=$@ $(ASFLAGS) $< > $@
 
-$(BUILD_PFX)%.s.o: %.s
+$(BUILD_PFX)%.S.o: %.S
 	$(if $(quiet),@echo "    [AS] $@")
+	$(qexec)$(if $(CONFIG_DEPENDENCY_TRACKING),,mkdir -p $(dir $@))
 	$(qexec)$(AS) $(ASFLAGS) -o $@ $<
 
 .PRECIOUS: %.c.S
 %.c.S: CFLAGS += -DINLINE_ASM
 $(BUILD_PFX)%.c.S: %.c
 	$(if $(quiet),@echo "    [GEN] $@")
+	$(qexec)$(if $(CONFIG_DEPENDENCY_TRACKING),,mkdir -p $(dir $@))
 	$(qexec)$(CC) -S $(CFLAGS) -o $@ $<
 
-.PRECIOUS: %.asm.s
-$(BUILD_PFX)%.asm.s: %.asm
+.PRECIOUS: %.asm.S
+$(BUILD_PFX)%.asm.S: %.asm
 	$(if $(quiet),@echo "    [ASM CONVERSION] $@")
 	$(qexec)mkdir -p $(dir $@)
 	$(qexec)$(ASM_CONVERSION) <$< >$@
@@ -215,14 +221,6 @@ else
 	$(if $(quiet),@echo "    [CP] $@ < $<")
 	$(qexec)cp $< $@
 endif
-
-#
-# Rule to extract assembly constants from C sources
-#
-obj_int_extract: build/make/obj_int_extract.c
-	$(if $(quiet),@echo "    [HOSTCC] $@")
-	$(qexec)$(HOSTCC) -I. -I$(SRC_PATH_BARE) -o $@ $<
-CLEAN-OBJS += obj_int_extract
 
 #
 # Utility functions
@@ -285,7 +283,7 @@ define archive_template
 # for creating them.
 $(1):
 	$(if $(quiet),@echo "    [AR] $$@")
-	$(qexec)$$(AR) $$(ARFLAGS) $$@ $$?
+	$(qexec)$$(AR) $$(ARFLAGS) $$@ $$^
 endef
 
 define so_template
@@ -315,18 +313,15 @@ $(1):
         $$(filter %.o,$$^) $$(extralibs)
 endef
 
-
-
-define lipo_lib_template
-$(1): $(addsuffix /$(1),$(FAT_ARCHS))
-	$(if $(quiet),@echo "    [LIPO] $$@")
-	$(qexec)libtool -static -o $$@ $$?
-endef
-
-define lipo_bin_template
-$(1): $(addsuffix /$(1),$(FAT_ARCHS))
-	$(if $(quiet),@echo "    [LIPO] $$@")
-	$(qexec)lipo -output $$@ -create $$?
+define dll_template
+# Not using a pattern rule here because we don't want to generate empty
+# archives when they are listed as a dependency in files not responsible
+# for creating them.
+$(1):
+	$(if $(quiet),@echo "    [LD] $$@")
+	$(qexec)$$(LD) -Zdll $$(LDFLAGS) \
+        -o $$@ \
+        $$(filter %.o,$$^) $$(extralibs) $$(EXPORTS_FILE)
 endef
 
 
@@ -340,9 +335,11 @@ endif
 skip_deps := $(filter %clean,$(MAKECMDGOALS))
 skip_deps += $(findstring testdata,$(MAKECMDGOALS))
 ifeq ($(strip $(skip_deps)),)
-  # Older versions of make don't like -include directives with no arguments
-  ifneq ($(filter %.d,$(OBJS-yes:.o=.d)),)
-    -include $(filter %.d,$(OBJS-yes:.o=.d))
+  ifeq ($(CONFIG_DEPENDENCY_TRACKING),yes)
+    # Older versions of make don't like -include directives with no arguments
+    ifneq ($(filter %.d,$(OBJS-yes:.o=.d)),)
+      -include $(filter %.d,$(OBJS-yes:.o=.d))
+    endif
   endif
 endif
 
@@ -383,8 +380,9 @@ LIBS=$(call enabled,LIBS)
 .libs: $(LIBS)
 	@touch $@
 $(foreach lib,$(filter %_g.a,$(LIBS)),$(eval $(call archive_template,$(lib))))
-$(foreach lib,$(filter %so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH),$(LIBS)),$(eval $(call so_template,$(lib))))
-$(foreach lib,$(filter %$(VERSION_MAJOR).dylib,$(LIBS)),$(eval $(call dl_template,$(lib))))
+$(foreach lib,$(filter %so.$(SO_VERSION_MAJOR).$(SO_VERSION_MINOR).$(SO_VERSION_PATCH),$(LIBS)),$(eval $(call so_template,$(lib))))
+$(foreach lib,$(filter %$(SO_VERSION_MAJOR).dylib,$(LIBS)),$(eval $(call dl_template,$(lib))))
+$(foreach lib,$(filter %$(SO_VERSION_MAJOR).dll,$(LIBS)),$(eval $(call dll_template,$(lib))))
 
 INSTALL-LIBS=$(call cond_enabled,CONFIG_INSTALL_LIBS,INSTALL-LIBS)
 ifeq ($(MAKECMDGOALS),dist)
@@ -420,15 +418,10 @@ ifneq ($(call enabled,DIST-SRCS),)
     DIST-SRCS-yes            += build/make/gen_asm_deps.sh
     DIST-SRCS-yes            += build/make/Makefile
     DIST-SRCS-$(CONFIG_MSVS)  += build/make/gen_msvs_def.sh
-    DIST-SRCS-$(CONFIG_MSVS)  += build/make/gen_msvs_proj.sh
     DIST-SRCS-$(CONFIG_MSVS)  += build/make/gen_msvs_sln.sh
     DIST-SRCS-$(CONFIG_MSVS)  += build/make/gen_msvs_vcxproj.sh
     DIST-SRCS-$(CONFIG_MSVS)  += build/make/msvs_common.sh
-    DIST-SRCS-$(CONFIG_MSVS)  += build/x86-msvs/obj_int_extract.bat
-    DIST-SRCS-$(CONFIG_MSVS)  += build/arm-msvs/obj_int_extract.bat
     DIST-SRCS-$(CONFIG_RVCT) += build/make/armlink_adapter.sh
-    # Include obj_int_extract if we use offsets from *_asm_*_offsets
-    DIST-SRCS-$(ARCH_ARM)$(ARCH_X86)$(ARCH_X86_64)    += build/make/obj_int_extract.c
     DIST-SRCS-$(ARCH_ARM)    += build/make/ads2gas.pl
     DIST-SRCS-$(ARCH_ARM)    += build/make/ads2gas_apple.pl
     DIST-SRCS-$(ARCH_ARM)    += build/make/ads2armasm_ms.pl
@@ -455,3 +448,5 @@ all: $(BUILD_TARGETS)
 install:: $(INSTALL_TARGETS)
 dist: $(INSTALL_TARGETS)
 test::
+
+.SUFFIXES:  # Delete default suffix rules

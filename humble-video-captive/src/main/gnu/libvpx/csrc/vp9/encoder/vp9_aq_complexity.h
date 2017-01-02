@@ -8,7 +8,6 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-
 #ifndef VP9_ENCODER_VP9_AQ_COMPLEXITY_H_
 #define VP9_ENCODER_VP9_AQ_COMPLEXITY_H_
 
@@ -16,12 +15,15 @@
 extern "C" {
 #endif
 
+#include "vp9/common/vp9_enums.h"
+
 struct VP9_COMP;
+struct macroblock;
 
-// Select a segment for the current SB64.
-void vp9_select_in_frame_q_segment(struct VP9_COMP *cpi, int mi_row, int mi_col,
-                                   int output_enabled, int projected_rate);
-
+// Select a segment for the current Block.
+void vp9_caq_select_segment(struct VP9_COMP *cpi, struct macroblock *,
+                            BLOCK_SIZE bs, int mi_row, int mi_col,
+                            int projected_rate);
 
 // This function sets up a set of segments with delta Q values around
 // the baseline frame quantizer.

@@ -22,8 +22,11 @@ extern "C" {
 #include "./vpx_integer.h"
 
 /*!\brief The maximum number of work buffers used by libvpx.
+ *  Support maximum 4 threads to decode video in parallel.
+ *  Each thread will use one work buffer.
+ * TODO(hkuang): Add support to set number of worker threads dynamically.
  */
-#define VPX_MAXIMUM_WORK_BUFFERS 1
+#define VPX_MAXIMUM_WORK_BUFFERS 8
 
 /*!\brief The maximum number of reference buffers that a VP9 encoder may use.
  */
@@ -34,9 +37,9 @@ extern "C" {
  * This structure holds allocated frame buffers used by the decoder.
  */
 typedef struct vpx_codec_frame_buffer {
-  uint8_t *data;  /**< Pointer to the data buffer */
-  size_t size;  /**< Size of data in bytes */
-  void *priv;  /**< Frame's private data */
+  uint8_t *data; /**< Pointer to the data buffer */
+  size_t size;   /**< Size of data in bytes */
+  void *priv;    /**< Frame's private data */
 } vpx_codec_frame_buffer_t;
 
 /*!\brief get frame buffer callback prototype
@@ -57,8 +60,8 @@ typedef struct vpx_codec_frame_buffer {
  * \param[in] new_size     Size in bytes needed by the buffer
  * \param[in,out] fb       Pointer to vpx_codec_frame_buffer_t
  */
-typedef int (*vpx_get_frame_buffer_cb_fn_t)(
-    void *priv, size_t min_size, vpx_codec_frame_buffer_t *fb);
+typedef int (*vpx_get_frame_buffer_cb_fn_t)(void *priv, size_t min_size,
+                                            vpx_codec_frame_buffer_t *fb);
 
 /*!\brief release frame buffer callback prototype
  *
@@ -70,8 +73,8 @@ typedef int (*vpx_get_frame_buffer_cb_fn_t)(
  * \param[in] priv         Callback's private data
  * \param[in] fb           Pointer to vpx_codec_frame_buffer_t
  */
-typedef int (*vpx_release_frame_buffer_cb_fn_t)(
-    void *priv, vpx_codec_frame_buffer_t *fb);
+typedef int (*vpx_release_frame_buffer_cb_fn_t)(void *priv,
+                                                vpx_codec_frame_buffer_t *fb);
 
 #ifdef __cplusplus
 }  // extern "C"

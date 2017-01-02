@@ -40,8 +40,6 @@ struct macroblock_plane {
   int16_t *round;
 
   int64_t quant_thred[2];
-  // Zbin Over Quant value
-  int16_t zbin_extra;
 };
 
 /* The [2] dimension is for whether we skip the EOB node (i.e. if previous
@@ -49,23 +47,52 @@ struct macroblock_plane {
 typedef unsigned int vp9_coeff_cost[PLANE_TYPES][REF_TYPES][COEF_BANDS][2]
                                    [COEFF_CONTEXTS][ENTROPY_TOKENS];
 
+typedef struct {
+  int_mv ref_mvs[MAX_REF_FRAMES][MAX_MV_REF_CANDIDATES];
+  uint8_t mode_context[MAX_REF_FRAMES];
+} MB_MODE_INFO_EXT;
+
+typedef struct {
+  int col_min;
+  int col_max;
+  int row_min;
+  int row_max;
+} MvLimits;
+
 typedef struct macroblock MACROBLOCK;
 struct macroblock {
   struct macroblock_plane plane[MAX_MB_PLANE];
 
   MACROBLOCKD e_mbd;
+  MB_MODE_INFO_EXT *mbmi_ext;
+  MB_MODE_INFO_EXT *mbmi_ext_base;
   int skip_block;
   int select_tx_size;
   int skip_recode;
   int skip_optimize;
   int q_index;
+  int block_qcoeff_opt;
+  int block_tx_domain;
 
+  // The equivalent error at the current rdmult of one whole bit (not one
+  // bitcost unit).
   int errorperbit;
+  // The equivalend SAD error of one (whole) bit at the current quantizer
+  // for large blocks.
   int sadperbit16;
+  // The equivalend SAD error of one (whole) bit at the current quantizer
+  // for sub-8x8 blocks.
   int sadperbit4;
   int rddiv;
   int rdmult;
   int mb_energy;
+  int *m_search_count_ptr;
+  int *ex_search_count_ptr;
+
+  // These are set to their default values at the beginning, and then adjusted
+  // further in the encoding process.
+  BLOCK_SIZE min_partition_size;
+  BLOCK_SIZE max_partition_size;
 
   int mv_best_ref_index[MAX_REF_FRAMES];
   unsigned int max_mv_context[MAX_REF_FRAMES];
@@ -85,20 +112,18 @@ struct macroblock {
 
   // These define limits to motion vector components to prevent them
   // from extending outside the UMV borders
-  int mv_col_min;
-  int mv_col_max;
-  int mv_row_min;
-  int mv_row_max;
+  MvLimits mv_limits;
 
+  // Notes transform blocks where no coefficents are coded.
+  // Set during mode selection. Read during block encoding.
   uint8_t zcoeff_blk[TX_SIZES][256];
+
   int skip;
 
   int encode_breakout;
 
   // note that token_costs is the cost when eob node is skipped
   vp9_coeff_cost token_costs[TX_SIZES];
-
-  int in_static_area;
 
   int optimize;
 
@@ -111,11 +136,25 @@ struct macroblock {
 
   // skip forward transform and quantization
   uint8_t skip_txfm[MAX_MB_PLANE << 2];
+#define SKIP_TXFM_NONE 0
+#define SKIP_TXFM_AC_DC 1
+#define SKIP_TXFM_AC_ONLY 2
 
   int64_t bsse[MAX_MB_PLANE << 2];
 
   // Used to store sub partition's choices.
   MV pred_mv[MAX_REF_FRAMES];
+
+  // Strong color activity detection. Used in RTC coding mode to enhance
+  // the visual quality at the boundary of moving color objects.
+  uint8_t color_sensitivity[2];
+
+  uint8_t sb_is_skin;
+
+  // Used to save the status of whether a block has a low variance in
+  // choose_partitioning. 0 for 64x64, 1~2 for 64x32, 3~4 for 32x64, 5~8 for
+  // 32x32, 9~24 for 16x16.
+  uint8_t variance_low[25];
 
   void (*fwd_txm4x4)(const int16_t *input, tran_low_t *output, int stride);
   void (*itxm_add)(const tran_low_t *input, uint8_t *dest, int stride, int eob);
