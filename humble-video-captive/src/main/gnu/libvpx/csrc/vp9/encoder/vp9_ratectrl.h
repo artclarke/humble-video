@@ -8,7 +8,6 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-
 #ifndef VP9_ENCODER_VP9_RATECTRL_H_
 #define VP9_ENCODER_VP9_RATECTRL_H_
 
@@ -16,13 +15,19 @@
 #include "vpx/vpx_integer.h"
 
 #include "vp9/common/vp9_blockd.h"
+#include "vp9/encoder/vp9_lookahead.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // Bits Per MB at different Q (Multiplied by 512)
-#define BPER_MB_NORMBITS    9
+#define BPER_MB_NORMBITS 9
+
+#define MIN_GF_INTERVAL 4
+#define MAX_GF_INTERVAL 16
+#define FIXED_GF_INTERVAL 8  // Used in some testing modes only
+#define ONEHALFONLY_RESIZE 0
 
 typedef enum {
   INTER_NORMAL = 0,
@@ -33,16 +38,47 @@ typedef enum {
   RATE_FACTOR_LEVELS = 5
 } RATE_FACTOR_LEVEL;
 
+// Internal frame scaling level.
+typedef enum {
+  UNSCALED = 0,     // Frame is unscaled.
+  SCALE_STEP1 = 1,  // First-level down-scaling.
+  FRAME_SCALE_STEPS
+} FRAME_SCALE_LEVEL;
+
+typedef enum {
+  NO_RESIZE = 0,
+  DOWN_THREEFOUR = 1,  // From orig to 3/4.
+  DOWN_ONEHALF = 2,    // From orig or 3/4 to 1/2.
+  UP_THREEFOUR = -1,   // From 1/2 to 3/4.
+  UP_ORIG = -2,        // From 1/2 or 3/4 to orig.
+} RESIZE_ACTION;
+
+typedef enum { ORIG = 0, THREE_QUARTER = 1, ONE_HALF = 2 } RESIZE_STATE;
+
+// Frame dimensions multiplier wrt the native frame size, in 1/16ths,
+// specified for the scale-up case.
+// e.g. 24 => 16/24 = 2/3 of native size. The restriction to 1/16th is
+// intended to match the capabilities of the normative scaling filters,
+// giving precedence to the up-scaling accuracy.
+static const int frame_scale_factor[FRAME_SCALE_STEPS] = { 16, 24 };
+
+// Multiplier of the target rate to be used as threshold for triggering scaling.
+static const double rate_thresh_mult[FRAME_SCALE_STEPS] = { 1.0, 2.0 };
+
+// Scale dependent Rate Correction Factor multipliers. Compensates for the
+// greater number of bits per pixel generated in down-scaled frames.
+static const double rcf_mult[FRAME_SCALE_STEPS] = { 1.0, 2.0 };
+
 typedef struct {
   // Rate targetting variables
-  int base_frame_target;           // A baseline frame target before adjustment
-                                   // for previous under or over shoot.
-  int this_frame_target;           // Actual frame target after rc adjustment.
+  int base_frame_target;  // A baseline frame target before adjustment
+                          // for previous under or over shoot.
+  int this_frame_target;  // Actual frame target after rc adjustment.
   int projected_frame_size;
   int sb64_target_rate;
-  int last_q[FRAME_TYPES];         // Separate values for Intra/Inter
-  int last_boosted_qindex;         // Last boosted GF/KF/ARF q
-  int last_kf_qindex;              // Q index of the last key frame coded.
+  int last_q[FRAME_TYPES];  // Separate values for Intra/Inter
+  int last_boosted_qindex;  // Last boosted GF/KF/ARF q
+  int last_kf_qindex;       // Q index of the last key frame coded.
 
   int gfu_boost;
   int last_boost;
@@ -52,9 +88,11 @@ typedef struct {
 
   int frames_since_golden;
   int frames_till_gf_update_due;
+  int min_gf_interval;
   int max_gf_interval;
   int static_scene_max_gf_interval;
   int baseline_gf_interval;
+  int constrained_gf_group;
   int frames_to_key;
   int frames_since_key;
   int this_key_frame_forced;
@@ -77,6 +115,7 @@ typedef struct {
   int64_t buffer_level;
   int64_t bits_off_target;
   int64_t vbr_bits_off_target;
+  int64_t vbr_bits_off_target_fast;
 
   int decimation_factor;
   int decimation_count;
@@ -99,7 +138,34 @@ typedef struct {
   int64_t starting_buffer_level;
   int64_t optimal_buffer_level;
   int64_t maximum_buffer_size;
-  // int active_best_quality;
+
+  // rate control history for last frame(1) and the frame before(2).
+  // -1: undershot
+  //  1: overshoot
+  //  0: not initialized.
+  int rc_1_frame;
+  int rc_2_frame;
+  int q_1_frame;
+  int q_2_frame;
+
+  // Auto frame-scaling variables.
+  FRAME_SCALE_LEVEL frame_size_selector;
+  FRAME_SCALE_LEVEL next_frame_size_selector;
+  int frame_width[FRAME_SCALE_STEPS];
+  int frame_height[FRAME_SCALE_STEPS];
+  int rf_level_maxq[RATE_FACTOR_LEVELS];
+
+  int fac_active_worst_inter;
+  int fac_active_worst_gf;
+  uint64_t avg_source_sad[MAX_LAG_BUFFERS];
+  uint64_t prev_avg_source_sad_lag;
+  int high_source_sad_lagindex;
+  int alt_ref_gf_group;
+  int high_source_sad;
+  int count_last_scene_change;
+  int avg_frame_low_motion;
+  int af_ratio_onepass_vbr;
+  int force_qpmin;
 } RATE_CONTROL;
 
 struct VP9_COMP;
@@ -108,9 +174,18 @@ struct VP9EncoderConfig;
 void vp9_rc_init(const struct VP9EncoderConfig *oxcf, int pass,
                  RATE_CONTROL *rc);
 
+int vp9_estimate_bits_at_q(FRAME_TYPE frame_kind, int q, int mbs,
+                           double correction_factor, vpx_bit_depth_t bit_depth);
+
 double vp9_convert_qindex_to_q(int qindex, vpx_bit_depth_t bit_depth);
 
-void vp9_rc_init_minq_luts();
+void vp9_rc_init_minq_luts(void);
+
+int vp9_rc_get_default_min_gf_interval(int width, int height, double framerate);
+// Note vp9_rc_get_default_max_gf_interval() requires the min_gf_interval to
+// be passed in to ensure that the max_gf_interval returned is at least as bis
+// as that.
+int vp9_rc_get_default_max_gf_interval(double framerate, int min_frame_rate);
 
 // Generally at the high level, the following flow is expected
 // to be enforced for rate control:
@@ -148,7 +223,7 @@ void vp9_rc_postencode_update_drop_frame(struct VP9_COMP *cpi);
 
 // Updates rate correction factors
 // Changes only the rate correction factors in the rate control structure.
-void vp9_rc_update_rate_correction_factors(struct VP9_COMP *cpi, int damp_var);
+void vp9_rc_update_rate_correction_factors(struct VP9_COMP *cpi);
 
 // Decide if we should drop this frame: For 1-pass CBR.
 // Changes only the decimation count in the rate control structure
@@ -161,8 +236,7 @@ void vp9_rc_compute_frame_size_bounds(const struct VP9_COMP *cpi,
                                       int *frame_over_shoot_limit);
 
 // Picks q and q bounds given the target for bits
-int vp9_rc_pick_q_and_bounds(const struct VP9_COMP *cpi,
-                             int *bottom_index,
+int vp9_rc_pick_q_and_bounds(const struct VP9_COMP *cpi, int *bottom_index,
                              int *top_index);
 
 // Estimates q to achieve a target bits per frame
@@ -193,10 +267,20 @@ int vp9_compute_qdelta_by_rate(const RATE_CONTROL *rc, FRAME_TYPE frame_type,
                                int qindex, double rate_target_ratio,
                                vpx_bit_depth_t bit_depth);
 
+int vp9_frame_type_qdelta(const struct VP9_COMP *cpi, int rf_level, int q);
+
 void vp9_rc_update_framerate(struct VP9_COMP *cpi);
 
-void vp9_rc_set_gf_max_interval(const struct VP9_COMP *const cpi,
-                                RATE_CONTROL *const rc);
+void vp9_rc_set_gf_interval_range(const struct VP9_COMP *const cpi,
+                                  RATE_CONTROL *const rc);
+
+void vp9_set_target_rate(struct VP9_COMP *cpi);
+
+int vp9_resize_one_pass_cbr(struct VP9_COMP *cpi);
+
+void vp9_avg_source_sad(struct VP9_COMP *cpi);
+
+int vp9_encodedframe_overshoot(struct VP9_COMP *cpi, int frame_size, int *q);
 
 #ifdef __cplusplus
 }  // extern "C"

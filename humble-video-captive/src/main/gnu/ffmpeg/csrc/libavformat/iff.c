@@ -98,7 +98,7 @@ typedef enum {
     COMP_EXP
 } svx8_compression_type;
 
-typedef struct {
+typedef struct IffDemuxContext {
     int      is_64bit;  ///< chunk size is 64-bit
     int64_t  body_pos;
     int64_t  body_end;
@@ -285,7 +285,13 @@ static int parse_dsd_prop(AVFormatContext *s, AVStream *st, uint64_t eof)
         case MKTAG('C','M','P','R'):
             if (size < 4)
                 return AVERROR_INVALIDDATA;
-            st->codec->codec_id = ff_codec_get_id(dsd_codec_tags, avio_rl32(pb));
+            tag = avio_rl32(pb);
+            st->codec->codec_id = ff_codec_get_id(dsd_codec_tags, tag);
+            if (!st->codec->codec_id) {
+                av_log(s, AV_LOG_ERROR, "'%c%c%c%c' compression is not supported\n",
+                    tag&0xFF, (tag>>8)&0xFF, (tag>>16)&0xFF, (tag>>24)&0xFF);
+                return AVERROR_PATCHWELCOME;
+            }
             break;
 
         case MKTAG('F','S',' ',' '):
@@ -449,7 +455,7 @@ static int iff_read_header(AVFormatContext *s)
                  return AVERROR_INVALIDDATA;
             }
             st->codec->extradata_size = data_size + IFF_EXTRA_VIDEO_SIZE;
-            st->codec->extradata      = av_malloc(data_size + IFF_EXTRA_VIDEO_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
+            st->codec->extradata      = av_malloc(data_size + IFF_EXTRA_VIDEO_SIZE + AV_INPUT_BUFFER_PADDING_SIZE);
             if (!st->codec->extradata)
                 return AVERROR(ENOMEM);
             if (avio_read(pb, st->codec->extradata + IFF_EXTRA_VIDEO_SIZE, data_size) < 0)
@@ -676,7 +682,7 @@ static int iff_read_header(AVFormatContext *s)
 
         if (!st->codec->extradata) {
             st->codec->extradata_size = IFF_EXTRA_VIDEO_SIZE;
-            st->codec->extradata      = av_malloc(IFF_EXTRA_VIDEO_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
+            st->codec->extradata      = av_malloc(IFF_EXTRA_VIDEO_SIZE + AV_INPUT_BUFFER_PADDING_SIZE);
             if (!st->codec->extradata)
                 return AVERROR(ENOMEM);
         }

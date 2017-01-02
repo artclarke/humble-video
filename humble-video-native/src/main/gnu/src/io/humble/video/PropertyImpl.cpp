@@ -26,7 +26,6 @@
 #include <io/humble/video/VideoExceptions.h>
 extern "C" {
 #include "FfmpegIncludes.h"
-#include <libavutil/log.h>
 }
 
 #include <stdexcept>

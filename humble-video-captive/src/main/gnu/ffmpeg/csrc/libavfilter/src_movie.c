@@ -35,6 +35,7 @@
 #include "libavutil/avassert.h"
 #include "libavutil/opt.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/internal.h"
 #include "libavutil/timestamp.h"
 #include "libavformat/avformat.h"
 #include "audio.h"
@@ -240,7 +241,7 @@ static av_cold int movie_common_init(AVFilterContext *ctx)
         timestamp = movie->seek_point;
         // add the stream start time, should it exist
         if (movie->format_ctx->start_time != AV_NOPTS_VALUE) {
-            if (timestamp > INT64_MAX - movie->format_ctx->start_time) {
+            if (timestamp > 0 && movie->format_ctx->start_time > INT64_MAX - timestamp) {
                 av_log(ctx, AV_LOG_ERROR,
                        "%s: seek value overflow with start_time:%"PRId64" seek_point:%"PRId64"\n",
                        movie->file_name, movie->format_ctx->start_time, movie->seek_point);
@@ -289,6 +290,8 @@ static av_cold int movie_common_init(AVFilterContext *ctx)
         snprintf(name, sizeof(name), "out%d", i);
         pad.type          = movie->st[i].st->codec->codec_type;
         pad.name          = av_strdup(name);
+        if (!pad.name)
+            return AVERROR(ENOMEM);
         pad.config_props  = movie_config_output_props;
         pad.request_frame = movie_request_frame;
         ff_insert_outpad(ctx, i, &pad);
@@ -534,7 +537,7 @@ static int movie_push_frame(AVFilterContext *ctx, unsigned out_id)
     }
 
     frame->pts = av_frame_get_best_effort_timestamp(frame);
-    av_dlog(ctx, "movie_push_frame(): file:'%s' %s\n", movie->file_name,
+    ff_dlog(ctx, "movie_push_frame(): file:'%s' %s\n", movie->file_name,
             describe_frame_to_str((char[1024]){0}, 1024, frame, frame_type, outlink));
 
     if (st->st->codec->codec_type == AVMEDIA_TYPE_VIDEO) {

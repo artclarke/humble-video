@@ -224,6 +224,7 @@ static void decode_lpc(int32_t *coeffs, int mode, int length)
             int a3  = coeffs[2];
             int a4  = a3 + a1;
             int a5  = a4 + a2;
+            coeffs[2] = a5;
             coeffs += 3;
             for (i = 0; i < length - 3; i++) {
                 a3     += *coeffs;
@@ -476,7 +477,7 @@ static int decode_subframe(TAKDecContext *s, int32_t *decoded,
                      s->residues[i + j + 1] * s->filter[j + 1] +
                      s->residues[i + j    ] * s->filter[j    ];
             }
-            v = (av_clip(v >> filter_quant, -8192, 8191) << dshift) - *decoded;
+            v = (av_clip_intp2(v >> filter_quant, 13) << dshift) - *decoded;
             *decoded++ = v;
             s->residues[filter_order + i] = v >> dshift;
         }
@@ -632,7 +633,7 @@ static int decorrelate(TAKDecContext *s, int c1, int c2, int length)
         for (; length2 > 0; length2 -= tmp) {
             tmp = FFMIN(length2, x);
 
-            for (i = 0; i < tmp; i++)
+            for (i = 0; i < tmp - (tmp == length2); i++)
                 s->residues[filter_order + i] = *p2++ >> dshift;
 
             for (i = 0; i < tmp; i++) {
@@ -652,11 +653,11 @@ static int decorrelate(TAKDecContext *s, int c1, int c2, int length)
                          s->residues[i    ] * s->filter[0];
                 }
 
-                v = (av_clip(v >> 10, -8192, 8191) << dshift) - *p1;
+                v = (av_clip_intp2(v >> 10, 13) << dshift) - *p1;
                 *p1++ = v;
             }
 
-            memcpy(s->residues, &s->residues[tmp], 2 * filter_order);
+            memmove(s->residues, &s->residues[tmp], 2 * filter_order);
         }
 
         emms_c();
@@ -743,6 +744,8 @@ static int tak_decode_frame(AVCodecContext *avctx, void *data,
         int buf_size = av_samples_get_buffer_size(NULL, avctx->channels,
                                                   s->nb_samples,
                                                   AV_SAMPLE_FMT_S32P, 0);
+        if (buf_size < 0)
+            return buf_size;
         av_fast_malloc(&s->decode_buffer, &s->decode_buffer_size, buf_size);
         if (!s->decode_buffer)
             return AVERROR(ENOMEM);
@@ -799,6 +802,12 @@ static int tak_decode_frame(AVCodecContext *avctx, void *data,
                     if (s->mcdparams[i].present) {
                         s->mcdparams[i].index = get_bits(gb, 2);
                         s->mcdparams[i].chan2 = get_bits(gb, 4);
+                        if (s->mcdparams[i].chan2 >= avctx->channels) {
+                            av_log(avctx, AV_LOG_ERROR,
+                                   "invalid channel 2 (%d) for %d channel(s)\n",
+                                   s->mcdparams[i].chan2, avctx->channels);
+                            return AVERROR_INVALIDDATA;
+                        }
                         if (s->mcdparams[i].index == 1) {
                             if ((nbit == s->mcdparams[i].chan2) ||
                                 (ch_mask & 1 << s->mcdparams[i].chan2))
@@ -939,7 +948,7 @@ AVCodec ff_tak_decoder = {
     .decode           = tak_decode_frame,
     .init_thread_copy = ONLY_IF_THREADS_ENABLED(init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
-    .capabilities     = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
+    .capabilities     = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
     .sample_fmts      = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,
                                                         AV_SAMPLE_FMT_S16P,
                                                         AV_SAMPLE_FMT_S32P,

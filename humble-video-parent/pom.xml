@@ -8,7 +8,7 @@
   <url>http://www.humble.io</url>
 
   <properties>
-    <humble.version>0.3.0-SNAPSHOT</humble.version>
+    <humble.version>0.3.0</humble.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
     <humble.build.timestamp>${maven.build.timestamp}</humble.build.timestamp>

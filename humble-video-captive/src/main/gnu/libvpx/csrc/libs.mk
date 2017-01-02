@@ -12,36 +12,10 @@
 # ARM assembly files are written in RVCT-style. We use some make magic to
 # filter those files to allow GCC compilation
 ifeq ($(ARCH_ARM),yes)
-  ASM:=$(if $(filter yes,$(CONFIG_GCC)$(CONFIG_MSVS)),.asm.s,.asm)
+  ASM:=$(if $(filter yes,$(CONFIG_GCC)$(CONFIG_MSVS)),.asm.S,.asm)
 else
   ASM:=.asm
 endif
-
-#
-# Calculate platform- and compiler-specific offsets for hand coded assembly
-#
-ifeq ($(filter icc gcc,$(TGT_CC)), $(TGT_CC))
-OFFSET_PATTERN:='^[a-zA-Z0-9_]* EQU'
-define asm_offsets_template
-$$(BUILD_PFX)$(1): $$(BUILD_PFX)$(2).S
-	@echo "    [CREATE] $$@"
-	$$(qexec)LC_ALL=C grep $$(OFFSET_PATTERN) $$< | tr -d '$$$$\#' $$(ADS2GAS) > $$@
-$$(BUILD_PFX)$(2).S: $(2)
-CLEAN-OBJS += $$(BUILD_PFX)$(1) $(2).S
-endef
-else
-  ifeq ($(filter rvct,$(TGT_CC)), $(TGT_CC))
-define asm_offsets_template
-$$(BUILD_PFX)$(1): obj_int_extract
-$$(BUILD_PFX)$(1): $$(BUILD_PFX)$(2).o
-	@echo "    [CREATE] $$@"
-	$$(qexec)./obj_int_extract rvds $$< $$(ADS2GAS) > $$@
-OBJS-yes += $$(BUILD_PFX)$(2).o
-CLEAN-OBJS += $$(BUILD_PFX)$(1)
-$$(filter %$$(ASM).o,$$(OBJS-yes)): $$(BUILD_PFX)$(1)
-endef
-endif # rvct
-endif # !gcc
 
 #
 # Rule to generate runtime cpu detection files
@@ -51,7 +25,7 @@ $$(BUILD_PFX)$(1).h: $$(SRC_PATH_BARE)/$(2)
 	@echo "    [CREATE] $$@"
 	$$(qexec)$$(SRC_PATH_BARE)/build/make/rtcd.pl --arch=$$(TGT_ISA) \
           --sym=$(1) \
-          --config=$$(CONFIG_DIR)$$(target)$$(if $$(FAT_ARCHS),,-$$(TOOLCHAIN)).mk \
+          --config=$$(CONFIG_DIR)$$(target)-$$(TOOLCHAIN).mk \
           $$(RTCD_OPTIONS) $$^ > $$@
 CLEAN-OBJS += $$(BUILD_PFX)$(1).h
 RTCD += $$(BUILD_PFX)$(1).h
@@ -59,13 +33,6 @@ endef
 
 CODEC_SRCS-yes += CHANGELOG
 CODEC_SRCS-yes += libs.mk
-
-# If this is a universal (fat) binary, then all the subarchitectures have
-# already been built and our job is to stitch them together. The
-# BUILD_LIBVPX variable indicates whether we should be building
-# (compiling, linking) the library. The LIPO_LIBVPX variable indicates
-# that we're stitching.
-$(eval $(if $(filter universal%,$(TOOLCHAIN)),LIPO_LIBVPX,BUILD_LIBVPX):=yes)
 
 include $(SRC_PATH_BARE)/vpx/vpx_codec.mk
 CODEC_SRCS-yes += $(addprefix vpx/,$(call enabled,API_SRCS))
@@ -80,7 +47,13 @@ CODEC_SRCS-yes += $(addprefix vpx_scale/,$(call enabled,SCALE_SRCS))
 include $(SRC_PATH_BARE)/vpx_ports/vpx_ports.mk
 CODEC_SRCS-yes += $(addprefix vpx_ports/,$(call enabled,PORTS_SRCS))
 
-ifneq ($(CONFIG_VP8_ENCODER)$(CONFIG_VP8_DECODER),)
+include $(SRC_PATH_BARE)/vpx_dsp/vpx_dsp.mk
+CODEC_SRCS-yes += $(addprefix vpx_dsp/,$(call enabled,DSP_SRCS))
+
+include $(SRC_PATH_BARE)/vpx_util/vpx_util.mk
+CODEC_SRCS-yes += $(addprefix vpx_util/,$(call enabled,UTIL_SRCS))
+
+ifeq ($(CONFIG_VP8),yes)
   VP8_PREFIX=vp8/
   include $(SRC_PATH_BARE)/$(VP8_PREFIX)vp8_common.mk
 endif
@@ -103,7 +76,7 @@ ifeq ($(CONFIG_VP8_DECODER),yes)
   CODEC_DOC_SECTIONS += vp8 vp8_decoder
 endif
 
-ifneq ($(CONFIG_VP9_ENCODER)$(CONFIG_VP9_DECODER),)
+ifeq ($(CONFIG_VP9),yes)
   VP9_PREFIX=vp9/
   include $(SRC_PATH_BARE)/$(VP9_PREFIX)vp9_common.mk
 endif
@@ -133,9 +106,6 @@ ifeq ($(CONFIG_VP9_DECODER),yes)
   CODEC_DOC_SECTIONS += vp9 vp9_decoder
 endif
 
-VP9_PREFIX=vp9/
-$(BUILD_PFX)$(VP9_PREFIX)%.c.o: CFLAGS += -Wextra
-
 ifeq ($(CONFIG_ENCODERS),yes)
   CODEC_DOC_SECTIONS += encoder
 endif
@@ -143,6 +113,12 @@ ifeq ($(CONFIG_DECODERS),yes)
   CODEC_DOC_SECTIONS += decoder
 endif
 
+# Suppress -Wextra warnings in third party code.
+$(BUILD_PFX)third_party/googletest/%.cc.o: CXXFLAGS += -Wno-missing-field-initializers
+# Suppress -Wextra warnings in first party code pending investigation.
+# https://bugs.chromium.org/p/webm/issues/detail?id=1069
+$(BUILD_PFX)vp8/encoder/onyx_if.c.o: CFLAGS += -Wno-unknown-warning-option -Wno-clobbered
+$(BUILD_PFX)vp8/decoder/onyxd_if.c.o: CFLAGS += -Wno-unknown-warning-option -Wno-clobbered
 
 ifeq ($(CONFIG_MSVS),yes)
 CODEC_LIB=$(if $(CONFIG_STATIC_MSVCRT),vpxmt,vpxmd)
@@ -163,19 +139,22 @@ INSTALL_MAPS += $(foreach p,$(VS_PLATFORMS),$(LIBSUBDIR)/$(p)/%  $(p)/Release/%)
 INSTALL_MAPS += $(foreach p,$(VS_PLATFORMS),$(LIBSUBDIR)/$(p)/%  $(p)/Debug/%)
 endif
 
-CODEC_SRCS-$(BUILD_LIBVPX) += build/make/version.sh
-CODEC_SRCS-$(BUILD_LIBVPX) += build/make/rtcd.pl
-CODEC_SRCS-$(BUILD_LIBVPX) += vpx_ports/emmintrin_compat.h
-CODEC_SRCS-$(BUILD_LIBVPX) += vpx_ports/mem_ops.h
-CODEC_SRCS-$(BUILD_LIBVPX) += vpx_ports/mem_ops_aligned.h
-CODEC_SRCS-$(BUILD_LIBVPX) += vpx_ports/vpx_once.h
-CODEC_SRCS-$(BUILD_LIBVPX) += $(BUILD_PFX)vpx_config.c
+CODEC_SRCS-yes += build/make/version.sh
+CODEC_SRCS-yes += build/make/rtcd.pl
+CODEC_SRCS-yes += vpx_ports/emmintrin_compat.h
+CODEC_SRCS-yes += vpx_ports/mem_ops.h
+CODEC_SRCS-yes += vpx_ports/mem_ops_aligned.h
+CODEC_SRCS-yes += vpx_ports/vpx_once.h
+CODEC_SRCS-yes += $(BUILD_PFX)vpx_config.c
 INSTALL-SRCS-no += $(BUILD_PFX)vpx_config.c
 ifeq ($(ARCH_X86)$(ARCH_X86_64),yes)
 INSTALL-SRCS-$(CONFIG_CODEC_SRCS) += third_party/x86inc/x86inc.asm
 endif
-CODEC_EXPORTS-$(BUILD_LIBVPX) += vpx/exports_com
+CODEC_EXPORTS-yes += vpx/exports_com
 CODEC_EXPORTS-$(CONFIG_ENCODERS) += vpx/exports_enc
+ifeq ($(CONFIG_SPATIAL_SVC),yes)
+CODEC_EXPORTS-$(CONFIG_ENCODERS) += vpx/exports_spatial_svc
+endif
 CODEC_EXPORTS-$(CONFIG_DECODERS) += vpx/exports_dec
 
 INSTALL-LIBS-yes += include/vpx/vpx_codec.h
@@ -205,32 +184,12 @@ INSTALL-SRCS-$(CONFIG_CODEC_SRCS) += $(call enabled,CODEC_EXPORTS)
 # based build systems.
 libvpx_srcs.txt:
 	@echo "    [CREATE] $@"
-	@echo $(CODEC_SRCS) | xargs -n1 echo | sort -u > $@
+	@echo $(CODEC_SRCS) | xargs -n1 echo | LC_ALL=C sort -u > $@
 CLEAN-OBJS += libvpx_srcs.txt
 
 
 ifeq ($(CONFIG_EXTERNAL_BUILD),yes)
 ifeq ($(CONFIG_MSVS),yes)
-
-obj_int_extract.bat: $(SRC_PATH_BARE)/build/$(MSVS_ARCH_DIR)/obj_int_extract.bat
-	@cp $^ $@
-
-obj_int_extract.$(VCPROJ_SFX): obj_int_extract.bat
-obj_int_extract.$(VCPROJ_SFX): $(SRC_PATH_BARE)/build/make/obj_int_extract.c
-	@echo "    [CREATE] $@"
-	$(qexec)$(GEN_VCPROJ) \
-    --exe \
-    --target=$(TOOLCHAIN) \
-    --name=obj_int_extract \
-    --ver=$(CONFIG_VS_VERSION) \
-    --proj-guid=E1360C65-D375-4335-8057-7ED99CC3F9B2 \
-    --src-path-bare="$(SRC_PATH_BARE)" \
-    $(if $(CONFIG_STATIC_MSVCRT),--static-crt) \
-    --out=$@ $^ \
-    -I. \
-    -I"$(SRC_PATH_BARE)" \
-
-PROJECTS-$(BUILD_LIBVPX) += obj_int_extract.$(VCPROJ_SFX)
 
 vpx.def: $(call enabled,CODEC_EXPORTS)
 	@echo "    [CREATE] $@"
@@ -246,7 +205,7 @@ ASM_INCLUDES := \
     vpx_config.asm \
     vpx_ports/x86_abi_support.asm \
 
-vpx.$(VCPROJ_SFX): $(CODEC_SRCS) vpx.def obj_int_extract.$(VCPROJ_SFX)
+vpx.$(VCPROJ_SFX): $(CODEC_SRCS) vpx.def
 	@echo "    [CREATE] $@"
 	$(qexec)$(GEN_VCPROJ) \
             $(if $(CONFIG_SHARED),--dll,--lib) \
@@ -261,7 +220,7 @@ vpx.$(VCPROJ_SFX): $(CODEC_SRCS) vpx.def obj_int_extract.$(VCPROJ_SFX)
             $(filter-out $(addprefix %, $(ASM_INCLUDES)), $^) \
             --src-path-bare="$(SRC_PATH_BARE)" \
 
-PROJECTS-$(BUILD_LIBVPX) += vpx.$(VCPROJ_SFX)
+PROJECTS-yes += vpx.$(VCPROJ_SFX)
 
 vpx.$(VCPROJ_SFX): vpx_config.asm
 vpx.$(VCPROJ_SFX): $(RTCD)
@@ -269,32 +228,49 @@ vpx.$(VCPROJ_SFX): $(RTCD)
 endif
 else
 LIBVPX_OBJS=$(call objs,$(CODEC_SRCS))
-OBJS-$(BUILD_LIBVPX) += $(LIBVPX_OBJS)
-LIBS-$(if $(BUILD_LIBVPX),$(CONFIG_STATIC)) += $(BUILD_PFX)libvpx.a $(BUILD_PFX)libvpx_g.a
+OBJS-yes += $(LIBVPX_OBJS)
+LIBS-$(if yes,$(CONFIG_STATIC)) += $(BUILD_PFX)libvpx.a $(BUILD_PFX)libvpx_g.a
 $(BUILD_PFX)libvpx_g.a: $(LIBVPX_OBJS)
 
-
-BUILD_LIBVPX_SO         := $(if $(BUILD_LIBVPX),$(CONFIG_SHARED))
-
+SO_VERSION_MAJOR := 4
+SO_VERSION_MINOR := 0
+SO_VERSION_PATCH := 0
 ifeq ($(filter darwin%,$(TGT_OS)),$(TGT_OS))
-LIBVPX_SO               := libvpx.$(VERSION_MAJOR).dylib
+LIBVPX_SO               := libvpx.$(SO_VERSION_MAJOR).dylib
+SHARED_LIB_SUF          := .dylib
 EXPORT_FILE             := libvpx.syms
 LIBVPX_SO_SYMLINKS      := $(addprefix $(LIBSUBDIR)/, \
                              libvpx.dylib  )
 else
-LIBVPX_SO               := libvpx.so.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
+ifeq ($(filter iphonesimulator%,$(TGT_OS)),$(TGT_OS))
+LIBVPX_SO               := libvpx.$(SO_VERSION_MAJOR).dylib
+SHARED_LIB_SUF          := .dylib
+EXPORT_FILE             := libvpx.syms
+LIBVPX_SO_SYMLINKS      := $(addprefix $(LIBSUBDIR)/, libvpx.dylib)
+else
+ifeq ($(filter os2%,$(TGT_OS)),$(TGT_OS))
+LIBVPX_SO               := libvpx$(SO_VERSION_MAJOR).dll
+SHARED_LIB_SUF          := _dll.a
+EXPORT_FILE             := libvpx.def
+LIBVPX_SO_SYMLINKS      :=
+LIBVPX_SO_IMPLIB        := libvpx_dll.a
+else
+LIBVPX_SO               := libvpx.so.$(SO_VERSION_MAJOR).$(SO_VERSION_MINOR).$(SO_VERSION_PATCH)
+SHARED_LIB_SUF          := .so
 EXPORT_FILE             := libvpx.ver
-SYM_LINK                := libvpx.so
 LIBVPX_SO_SYMLINKS      := $(addprefix $(LIBSUBDIR)/, \
-                             libvpx.so libvpx.so.$(VERSION_MAJOR) \
-                             libvpx.so.$(VERSION_MAJOR).$(VERSION_MINOR))
+                             libvpx.so libvpx.so.$(SO_VERSION_MAJOR) \
+                             libvpx.so.$(SO_VERSION_MAJOR).$(SO_VERSION_MINOR))
+endif
+endif
 endif
 
-LIBS-$(BUILD_LIBVPX_SO) += $(BUILD_PFX)$(LIBVPX_SO)\
-                           $(notdir $(LIBVPX_SO_SYMLINKS))
+LIBS-$(CONFIG_SHARED) += $(BUILD_PFX)$(LIBVPX_SO)\
+                           $(notdir $(LIBVPX_SO_SYMLINKS)) \
+                           $(if $(LIBVPX_SO_IMPLIB), $(BUILD_PFX)$(LIBVPX_SO_IMPLIB))
 $(BUILD_PFX)$(LIBVPX_SO): $(LIBVPX_OBJS) $(EXPORT_FILE)
 $(BUILD_PFX)$(LIBVPX_SO): extralibs += -lm
-$(BUILD_PFX)$(LIBVPX_SO): SONAME = libvpx.so.$(VERSION_MAJOR)
+$(BUILD_PFX)$(LIBVPX_SO): SONAME = libvpx.so.$(SO_VERSION_MAJOR)
 $(BUILD_PFX)$(LIBVPX_SO): EXPORTS_FILE = $(EXPORT_FILE)
 
 libvpx.ver: $(call enabled,CODEC_EXPORTS)
@@ -308,6 +284,19 @@ libvpx.syms: $(call enabled,CODEC_EXPORTS)
 	@echo "    [CREATE] $@"
 	$(qexec)awk '{print "_"$$2}' $^ >$@
 CLEAN-OBJS += libvpx.syms
+
+libvpx.def: $(call enabled,CODEC_EXPORTS)
+	@echo "    [CREATE] $@"
+	$(qexec)echo LIBRARY $(LIBVPX_SO:.dll=) INITINSTANCE TERMINSTANCE > $@
+	$(qexec)echo "DATA MULTIPLE NONSHARED" >> $@
+	$(qexec)echo "EXPORTS" >> $@
+	$(qexec)awk '!/vpx_svc_*/ {print "_"$$2}' $^ >>$@
+CLEAN-OBJS += libvpx.def
+
+libvpx_dll.a: $(LIBVPX_SO)
+	@echo "    [IMPLIB] $@"
+	$(qexec)emximp -o $@ $<
+CLEAN-OBJS += libvpx_dll.a
 
 define libvpx_symlink_template
 $(1): $(2)
@@ -324,11 +313,12 @@ $(eval $(call libvpx_symlink_template,\
     $(LIBVPX_SO)))
 
 
-INSTALL-LIBS-$(BUILD_LIBVPX_SO) += $(LIBVPX_SO_SYMLINKS)
-INSTALL-LIBS-$(BUILD_LIBVPX_SO) += $(LIBSUBDIR)/$(LIBVPX_SO)
+INSTALL-LIBS-$(CONFIG_SHARED) += $(LIBVPX_SO_SYMLINKS)
+INSTALL-LIBS-$(CONFIG_SHARED) += $(LIBSUBDIR)/$(LIBVPX_SO)
+INSTALL-LIBS-$(CONFIG_SHARED) += $(if $(LIBVPX_SO_IMPLIB),$(LIBSUBDIR)/$(LIBVPX_SO_IMPLIB))
 
 
-LIBS-$(BUILD_LIBVPX) += vpx.pc
+LIBS-yes += vpx.pc
 vpx.pc: config.mk libs.mk
 	@echo "    [CREATE] $@"
 	$(qexec)echo '# pkg-config file from libvpx $(VERSION_STRING)' > $@
@@ -354,9 +344,6 @@ INSTALL_MAPS += $(LIBSUBDIR)/pkgconfig/%.pc %.pc
 CLEAN-OBJS += vpx.pc
 endif
 
-LIBS-$(LIPO_LIBVPX) += libvpx.a
-$(eval $(if $(LIPO_LIBVPX),$(call lipo_lib_template,libvpx.a)))
-
 #
 # Rule to make assembler configuration file from C configuration file
 #
@@ -377,15 +364,21 @@ CLEAN-OBJS += $(BUILD_PFX)vpx_config.asm
 endif
 
 #
-# Add assembler dependencies for configuration and offsets
+# Add assembler dependencies for configuration.
 #
-$(filter %.s.o,$(OBJS-yes)):     $(BUILD_PFX)vpx_config.asm
+$(filter %.S.o,$(OBJS-yes)):     $(BUILD_PFX)vpx_config.asm
 $(filter %$(ASM).o,$(OBJS-yes)): $(BUILD_PFX)vpx_config.asm
 
 
 $(shell $(SRC_PATH_BARE)/build/make/version.sh "$(SRC_PATH_BARE)" $(BUILD_PFX)vpx_version.h)
 CLEAN-OBJS += $(BUILD_PFX)vpx_version.h
 
+#
+# Add include path for libwebm sources.
+#
+ifeq ($(CONFIG_WEBM_IO),yes)
+  CXXFLAGS += -I$(SRC_PATH_BARE)/third_party/libwebm
+endif
 
 ##
 ## libvpx test directives
@@ -395,20 +388,24 @@ LIBVPX_TEST_DATA_PATH ?= .
 
 include $(SRC_PATH_BARE)/test/test.mk
 LIBVPX_TEST_SRCS=$(addprefix test/,$(call enabled,LIBVPX_TEST_SRCS))
-LIBVPX_TEST_BINS=./test_libvpx$(EXE_SFX)
+LIBVPX_TEST_BIN=./test_libvpx$(EXE_SFX)
 LIBVPX_TEST_DATA=$(addprefix $(LIBVPX_TEST_DATA_PATH)/,\
                      $(call enabled,LIBVPX_TEST_DATA))
-libvpx_test_data_url=http://downloads.webmproject.org/test_data/libvpx/$(1)
+libvpx_test_data_url=https://storage.googleapis.com/downloads.webmproject.org/test_data/libvpx/$(1)
+
+TEST_INTRA_PRED_SPEED_BIN=./test_intra_pred_speed$(EXE_SFX)
+TEST_INTRA_PRED_SPEED_SRCS=$(addprefix test/,$(call enabled,TEST_INTRA_PRED_SPEED_SRCS))
+TEST_INTRA_PRED_SPEED_OBJS := $(sort $(call objs,$(TEST_INTRA_PRED_SPEED_SRCS)))
 
 libvpx_test_srcs.txt:
 	@echo "    [CREATE] $@"
-	@echo $(LIBVPX_TEST_SRCS) | xargs -n1 echo | sort -u > $@
+	@echo $(LIBVPX_TEST_SRCS) | xargs -n1 echo | LC_ALL=C sort -u > $@
 CLEAN-OBJS += libvpx_test_srcs.txt
 
 $(LIBVPX_TEST_DATA): $(SRC_PATH_BARE)/test/test-data.sha1
 	@echo "    [DOWNLOAD] $@"
 	$(qexec)trap 'rm -f $@' INT TERM &&\
-            curl -L -o $@ $(call libvpx_test_data_url,$(@F))
+            curl --retry 1 -L -o $@ $(call libvpx_test_data_url,$(@F))
 
 testdata:: $(LIBVPX_TEST_DATA)
 	$(qexec)[ -x "$$(which sha1sum)" ] && sha1sum=sha1sum;\
@@ -417,12 +414,10 @@ testdata:: $(LIBVPX_TEST_DATA)
           if [ -n "$${sha1sum}" ]; then\
             set -e;\
             echo "Checking test data:";\
-            if [ -n "$(LIBVPX_TEST_DATA)" ]; then\
-                for f in $(call enabled,LIBVPX_TEST_DATA); do\
-                    grep $$f $(SRC_PATH_BARE)/test/test-data.sha1 |\
-                        (cd $(LIBVPX_TEST_DATA_PATH); $${sha1sum} -c);\
-                done; \
-            fi; \
+            for f in $(call enabled,LIBVPX_TEST_DATA); do\
+                grep $$f $(SRC_PATH_BARE)/test/test-data.sha1 |\
+                    (cd $(LIBVPX_TEST_DATA_PATH); $${sha1sum} -c);\
+            done; \
         else\
             echo "Skipping test data integrity check, sha1sum not found.";\
         fi
@@ -459,11 +454,30 @@ test_libvpx.$(VCPROJ_SFX): $(LIBVPX_TEST_SRCS) vpx.$(VCPROJ_SFX) gtest.$(VCPROJ_
             $(if $(CONFIG_STATIC_MSVCRT),--static-crt) \
             --out=$@ $(INTERNAL_CFLAGS) $(CFLAGS) \
             -I. -I"$(SRC_PATH_BARE)/third_party/googletest/src/include" \
+            $(if $(CONFIG_WEBM_IO),-I"$(SRC_PATH_BARE)/third_party/libwebm") \
             -L. -l$(CODEC_LIB) -l$(GTEST_LIB) $^
 
 PROJECTS-$(CONFIG_MSVS) += test_libvpx.$(VCPROJ_SFX)
 
-LIBVPX_TEST_BINS := $(addprefix $(TGT_OS:win64=x64)/Release/,$(notdir $(LIBVPX_TEST_BINS)))
+LIBVPX_TEST_BIN := $(addprefix $(TGT_OS:win64=x64)/Release/,$(notdir $(LIBVPX_TEST_BIN)))
+
+ifneq ($(strip $(TEST_INTRA_PRED_SPEED_OBJS)),)
+PROJECTS-$(CONFIG_MSVS) += test_intra_pred_speed.$(VCPROJ_SFX)
+test_intra_pred_speed.$(VCPROJ_SFX): $(TEST_INTRA_PRED_SPEED_SRCS) vpx.$(VCPROJ_SFX) gtest.$(VCPROJ_SFX)
+	@echo "    [CREATE] $@"
+	$(qexec)$(GEN_VCPROJ) \
+            --exe \
+            --target=$(TOOLCHAIN) \
+            --name=test_intra_pred_speed \
+            -D_VARIADIC_MAX=10 \
+            --proj-guid=CD837F5F-52D8-4314-A370-895D614166A7 \
+            --ver=$(CONFIG_VS_VERSION) \
+            --src-path-bare="$(SRC_PATH_BARE)" \
+            $(if $(CONFIG_STATIC_MSVCRT),--static-crt) \
+            --out=$@ $(INTERNAL_CFLAGS) $(CFLAGS) \
+            -I. -I"$(SRC_PATH_BARE)/third_party/googletest/src/include" \
+            -L. -l$(CODEC_LIB) -l$(GTEST_LIB) $^
+endif  # TEST_INTRA_PRED_SPEED
 endif
 else
 
@@ -474,45 +488,54 @@ ifeq ($(filter win%,$(TGT_OS)),$(TGT_OS))
 # Disabling pthreads globally will cause issues on darwin and possibly elsewhere
 $(GTEST_OBJS) $(GTEST_OBJS:.o=.d): CXXFLAGS += -DGTEST_HAS_PTHREAD=0
 endif
-$(GTEST_OBJS) $(GTEST_OBJS:.o=.d): CXXFLAGS += -I$(SRC_PATH_BARE)/third_party/googletest/src
-$(GTEST_OBJS) $(GTEST_OBJS:.o=.d): CXXFLAGS += -I$(SRC_PATH_BARE)/third_party/googletest/src/include
-OBJS-$(BUILD_LIBVPX) += $(GTEST_OBJS)
-LIBS-$(BUILD_LIBVPX) += $(BUILD_PFX)libgtest.a $(BUILD_PFX)libgtest_g.a
+GTEST_INCLUDES := -I$(SRC_PATH_BARE)/third_party/googletest/src
+GTEST_INCLUDES += -I$(SRC_PATH_BARE)/third_party/googletest/src/include
+$(GTEST_OBJS) $(GTEST_OBJS:.o=.d): CXXFLAGS += $(GTEST_INCLUDES)
+OBJS-yes += $(GTEST_OBJS)
+LIBS-yes += $(BUILD_PFX)libgtest.a $(BUILD_PFX)libgtest_g.a
 $(BUILD_PFX)libgtest_g.a: $(GTEST_OBJS)
 
 LIBVPX_TEST_OBJS=$(sort $(call objs,$(LIBVPX_TEST_SRCS)))
-$(LIBVPX_TEST_OBJS) $(LIBVPX_TEST_OBJS:.o=.d): CXXFLAGS += -I$(SRC_PATH_BARE)/third_party/googletest/src
-$(LIBVPX_TEST_OBJS) $(LIBVPX_TEST_OBJS:.o=.d): CXXFLAGS += -I$(SRC_PATH_BARE)/third_party/googletest/src/include
-OBJS-$(BUILD_LIBVPX) += $(LIBVPX_TEST_OBJS)
-BINS-$(BUILD_LIBVPX) += $(LIBVPX_TEST_BINS)
+$(LIBVPX_TEST_OBJS) $(LIBVPX_TEST_OBJS:.o=.d): CXXFLAGS += $(GTEST_INCLUDES)
+OBJS-yes += $(LIBVPX_TEST_OBJS)
+BINS-yes += $(LIBVPX_TEST_BIN)
 
 CODEC_LIB=$(if $(CONFIG_DEBUG_LIBS),vpx_g,vpx)
-CODEC_LIB_SUF=$(if $(CONFIG_SHARED),.so,.a)
-$(foreach bin,$(LIBVPX_TEST_BINS),\
-    $(if $(BUILD_LIBVPX),$(eval $(bin): \
-        lib$(CODEC_LIB)$(CODEC_LIB_SUF) libgtest.a ))\
-    $(if $(BUILD_LIBVPX),$(eval $(call linkerxx_template,$(bin),\
-        $(LIBVPX_TEST_OBJS) \
-        -L. -lvpx -lgtest $(extralibs) -lm)\
-        )))\
-    $(if $(LIPO_LIBS),$(eval $(call lipo_bin_template,$(bin))))\
+CODEC_LIB_SUF=$(if $(CONFIG_SHARED),$(SHARED_LIB_SUF),.a)
+TEST_LIBS := lib$(CODEC_LIB)$(CODEC_LIB_SUF) libgtest.a
+$(LIBVPX_TEST_BIN): $(TEST_LIBS)
+$(eval $(call linkerxx_template,$(LIBVPX_TEST_BIN), \
+              $(LIBVPX_TEST_OBJS) \
+              -L. -lvpx -lgtest $(extralibs) -lm))
 
-endif
+ifneq ($(strip $(TEST_INTRA_PRED_SPEED_OBJS)),)
+$(TEST_INTRA_PRED_SPEED_OBJS) $(TEST_INTRA_PRED_SPEED_OBJS:.o=.d): CXXFLAGS += $(GTEST_INCLUDES)
+OBJS-yes += $(TEST_INTRA_PRED_SPEED_OBJS)
+BINS-yes += $(TEST_INTRA_PRED_SPEED_BIN)
+
+$(TEST_INTRA_PRED_SPEED_BIN): $(TEST_LIBS)
+$(eval $(call linkerxx_template,$(TEST_INTRA_PRED_SPEED_BIN), \
+              $(TEST_INTRA_PRED_SPEED_OBJS) \
+              -L. -lvpx -lgtest $(extralibs) -lm))
+endif  # TEST_INTRA_PRED_SPEED
+
+endif  # CONFIG_UNIT_TESTS
 
 # Install test sources only if codec source is included
 INSTALL-SRCS-$(CONFIG_CODEC_SRCS) += $(patsubst $(SRC_PATH_BARE)/%,%,\
     $(shell find $(SRC_PATH_BARE)/third_party/googletest -type f))
 INSTALL-SRCS-$(CONFIG_CODEC_SRCS) += $(LIBVPX_TEST_SRCS)
+INSTALL-SRCS-$(CONFIG_CODEC_SRCS) += $(TEST_INTRA_PRED_SPEED_SRCS)
 
 define test_shard_template
 test:: test_shard.$(1)
-test_shard.$(1): $(LIBVPX_TEST_BINS) testdata
+test-no-data-check:: test_shard_ndc.$(1)
+test_shard.$(1) test_shard_ndc.$(1): $(LIBVPX_TEST_BIN)
 	@set -e; \
-	 for t in $(LIBVPX_TEST_BINS); do \
-	   export GTEST_SHARD_INDEX=$(1); \
-	   export GTEST_TOTAL_SHARDS=$(2); \
-	   $$$$t; \
-	 done
+	 export GTEST_SHARD_INDEX=$(1); \
+	 export GTEST_TOTAL_SHARDS=$(2); \
+	 $(LIBVPX_TEST_BIN)
+test_shard.$(1): testdata
 .PHONY: test_shard.$(1)
 endef
 
@@ -535,7 +558,11 @@ libs.doxy: $(CODEC_DOC_SRCS)
 	@echo "ENABLED_SECTIONS += $(sort $(CODEC_DOC_SECTIONS))" >> $@
 
 ## Generate rtcd.h for all objects
+ifeq ($(CONFIG_DEPENDENCY_TRACKING),yes)
 $(OBJS-yes:.o=.d): $(RTCD)
+else
+$(OBJS-yes): $(RTCD)
+endif
 
 ## Update the global src list
 SRCS += $(CODEC_SRCS) $(LIBVPX_TEST_SRCS) $(GTEST_SRCS)
@@ -553,15 +580,16 @@ ifeq ($(CONFIG_MSVS),yes)
 # TODO(tomfinegan): Support running the debug versions of tools?
 TEST_BIN_PATH := $(addsuffix /$(TGT_OS:win64=x64)/Release, $(TEST_BIN_PATH))
 endif
-utiltest: testdata
+utiltest utiltest-no-data-check:
 	$(qexec)$(SRC_PATH_BARE)/test/vpxdec.sh \
 		--test-data-path $(LIBVPX_TEST_DATA_PATH) \
 		--bin-path $(TEST_BIN_PATH)
 	$(qexec)$(SRC_PATH_BARE)/test/vpxenc.sh \
 		--test-data-path $(LIBVPX_TEST_DATA_PATH) \
 		--bin-path $(TEST_BIN_PATH)
+utiltest: testdata
 else
-utiltest:
+utiltest utiltest-no-data-check:
 	@echo Unit tests must be enabled to make the utiltest target.
 endif
 
@@ -579,11 +607,12 @@ ifeq ($(CONFIG_MSVS),yes)
 # TODO(tomfinegan): Support running the debug versions of tools?
 EXAMPLES_BIN_PATH := $(TGT_OS:win64=x64)/Release
 endif
-exampletest: examples testdata
+exampletest exampletest-no-data-check: examples
 	$(qexec)$(SRC_PATH_BARE)/test/examples.sh \
 		--test-data-path $(LIBVPX_TEST_DATA_PATH) \
 		--bin-path $(EXAMPLES_BIN_PATH)
+exampletest: testdata
 else
-exampletest:
+exampletest exampletest-no-data-check:
 	@echo Unit tests must be enabled to make the exampletest target.
 endif

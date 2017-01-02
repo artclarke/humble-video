@@ -11,6 +11,11 @@
 #define TEST_VIDEO_SOURCE_H_
 
 #if defined(_WIN32)
+#undef NOMINMAX
+#define NOMINMAX
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 #endif
 #include <cstdio>
@@ -48,7 +53,7 @@ static std::string GetDataPath() {
 #undef TO_STRING
 #undef STRINGIFY
 
-static FILE *OpenTestDataFile(const std::string& file_name) {
+inline FILE *OpenTestDataFile(const std::string &file_name) {
   const std::string path_to_source = GetDataPath() + "/" + file_name;
   return fopen(path_to_source.c_str(), "rb");
 }
@@ -73,21 +78,15 @@ static FILE *GetTempOutFile(std::string *file_name) {
 
 class TempOutFile {
  public:
-  TempOutFile() {
-    file_ = GetTempOutFile(&file_name_);
-  }
+  TempOutFile() { file_ = GetTempOutFile(&file_name_); }
   ~TempOutFile() {
     CloseFile();
     if (!file_name_.empty()) {
       EXPECT_EQ(0, remove(file_name_.c_str()));
     }
   }
-  FILE *file() {
-    return file_;
-  }
-  const std::string& file_name() {
-    return file_name_;
-  }
+  FILE *file() { return file_; }
+  const std::string &file_name() { return file_name_; }
 
  protected:
   void CloseFile() {
@@ -131,11 +130,12 @@ class VideoSource {
   virtual unsigned int limit() const = 0;
 };
 
-
 class DummyVideoSource : public VideoSource {
  public:
-  DummyVideoSource() : img_(NULL), limit_(100), width_(0), height_(0) {
-    SetSize(80, 64);
+  DummyVideoSource()
+      : img_(NULL), limit_(100), width_(80), height_(64),
+        format_(VPX_IMG_FMT_I420) {
+    ReallocImage();
   }
 
   virtual ~DummyVideoSource() { vpx_img_free(img_); }
@@ -150,9 +150,7 @@ class DummyVideoSource : public VideoSource {
     FillFrame();
   }
 
-  virtual vpx_image_t *img() const {
-    return (frame_ < limit_) ? img_ : NULL;
-  }
+  virtual vpx_image_t *img() const { return (frame_ < limit_) ? img_ : NULL; }
 
   // Models a stream where Timebase = 1/FPS, so pts == frame.
   virtual vpx_codec_pts_t pts() const { return frame_; }
@@ -160,7 +158,7 @@ class DummyVideoSource : public VideoSource {
   virtual unsigned long duration() const { return 1; }
 
   virtual vpx_rational_t timebase() const {
-    const vpx_rational_t t = {1, 30};
+    const vpx_rational_t t = { 1, 30 };
     return t;
   }
 
@@ -168,37 +166,47 @@ class DummyVideoSource : public VideoSource {
 
   virtual unsigned int limit() const { return limit_; }
 
-  void set_limit(unsigned int limit) {
-    limit_ = limit;
-  }
+  void set_limit(unsigned int limit) { limit_ = limit; }
 
   void SetSize(unsigned int width, unsigned int height) {
     if (width != width_ || height != height_) {
-      vpx_img_free(img_);
-      raw_sz_ = ((width + 31)&~31) * height * 3 / 2;
-      img_ = vpx_img_alloc(NULL, VPX_IMG_FMT_I420, width, height, 32);
       width_ = width;
       height_ = height;
+      ReallocImage();
+    }
+  }
+
+  void SetImageFormat(vpx_img_fmt_t format) {
+    if (format_ != format) {
+      format_ = format;
+      ReallocImage();
     }
   }
 
  protected:
-  virtual void FillFrame() { if (img_) memset(img_->img_data, 0, raw_sz_); }
+  virtual void FillFrame() {
+    if (img_) memset(img_->img_data, 0, raw_sz_);
+  }
+
+  void ReallocImage() {
+    vpx_img_free(img_);
+    img_ = vpx_img_alloc(NULL, format_, width_, height_, 32);
+    raw_sz_ = ((img_->w + 31) & ~31) * img_->h * img_->bps / 8;
+  }
 
   vpx_image_t *img_;
-  size_t       raw_sz_;
+  size_t raw_sz_;
   unsigned int limit_;
   unsigned int frame_;
   unsigned int width_;
   unsigned int height_;
+  vpx_img_fmt_t format_;
 };
-
 
 class RandomVideoSource : public DummyVideoSource {
  public:
   RandomVideoSource(int seed = ACMRandom::DeterministicSeed())
-      : rnd_(seed),
-        seed_(seed) { }
+      : rnd_(seed), seed_(seed) {}
 
  protected:
   // Reset the RNG to get a matching stream for the second pass
@@ -212,11 +220,11 @@ class RandomVideoSource : public DummyVideoSource {
   // than holding previous frames to encourage keyframes to be thrown.
   virtual void FillFrame() {
     if (img_) {
-      if (frame_ % 30 < 15)
-        for (size_t i = 0; i < raw_sz_; ++i)
-          img_->img_data[i] = rnd_.Rand8();
-      else
+      if (frame_ % 30 < 15) {
+        for (size_t i = 0; i < raw_sz_; ++i) img_->img_data[i] = rnd_.Rand8();
+      } else {
         memset(img_->img_data, 0, raw_sz_);
+      }
     }
   }
 

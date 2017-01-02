@@ -201,12 +201,14 @@ int av_picture_crop(AVPicture *dst, const AVPicture *src,
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
     int y_shift;
     int x_shift;
+    int max_step[4];
 
     if (pix_fmt < 0 || pix_fmt >= AV_PIX_FMT_NB)
         return -1;
 
     y_shift = desc->log2_chroma_h;
     x_shift = desc->log2_chroma_w;
+    av_image_fill_max_pixsteps(max_step, NULL, desc);
 
     if (is_yuv_planar(desc)) {
     dst->data[0] = src->data[0] + (top_band * src->linesize[0]) + left_band;
@@ -215,9 +217,7 @@ int av_picture_crop(AVPicture *dst, const AVPicture *src,
     } else{
         if(top_band % (1<<y_shift) || left_band % (1<<x_shift))
             return -1;
-        if(left_band) //FIXME add support for this too
-            return -1;
-        dst->data[0] = src->data[0] + (top_band * src->linesize[0]) + left_band;
+        dst->data[0] = src->data[0] + (top_band * src->linesize[0]) + (left_band * max_step[0]);
     }
 
     dst->linesize[0] = src->linesize[0];
@@ -236,9 +236,41 @@ int av_picture_pad(AVPicture *dst, const AVPicture *src, int height, int width,
     int x_shift;
     int yheight;
     int i, y;
+    int max_step[4];
 
-    if (pix_fmt < 0 || pix_fmt >= AV_PIX_FMT_NB ||
-        !is_yuv_planar(desc)) return -1;
+    if (pix_fmt < 0 || pix_fmt >= AV_PIX_FMT_NB)
+        return -1;
+
+    if (!is_yuv_planar(desc)) {
+        if (src)
+            return -1; //TODO: Not yet implemented
+
+        av_image_fill_max_pixsteps(max_step, NULL, desc);
+
+        if (padtop || padleft) {
+            memset(dst->data[0], color[0],
+                    dst->linesize[0] * padtop + (padleft * max_step[0]));
+        }
+
+        if (padleft || padright) {
+            optr = dst->data[0] + dst->linesize[0] * padtop +
+                    (dst->linesize[0] - (padright * max_step[0]));
+            yheight = height - 1 - (padtop + padbottom);
+            for (y = 0; y < yheight; y++) {
+                memset(optr, color[0], (padleft + padright) * max_step[0]);
+                optr += dst->linesize[0];
+            }
+        }
+
+        if (padbottom || padright) {
+            optr = dst->data[0] + dst->linesize[0] * (height - padbottom) -
+                    (padright * max_step[0]);
+            memset(optr, color[0], dst->linesize[0] * padbottom +
+                    (padright * max_step[0]));
+        }
+
+        return 0;
+    }
 
     for (i = 0; i < 3; i++) {
         x_shift = i ? desc->log2_chroma_w : 0;
@@ -284,6 +316,7 @@ int av_picture_pad(AVPicture *dst, const AVPicture *src, int height, int width,
                 (padbottom >> y_shift) + (padright >> x_shift));
         }
     }
+
     return 0;
 }
 
@@ -378,13 +411,15 @@ static void deinterlace_bottom_field(uint8_t *dst, int dst_wrap,
     deinterlace_line(dst,src_m2,src_m1,src_0,src_0,src_0,width);
 }
 
-static void deinterlace_bottom_field_inplace(uint8_t *src1, int src_wrap,
-                                             int width, int height)
+static int deinterlace_bottom_field_inplace(uint8_t *src1, int src_wrap,
+                                            int width, int height)
 {
     uint8_t *src_m1, *src_0, *src_p1, *src_p2;
     int y;
     uint8_t *buf;
     buf = av_malloc(width);
+    if (!buf)
+        return AVERROR(ENOMEM);
 
     src_m1 = src1;
     memcpy(buf,src_m1,width);
@@ -401,12 +436,13 @@ static void deinterlace_bottom_field_inplace(uint8_t *src1, int src_wrap,
     /* do last line */
     deinterlace_line_inplace(buf,src_m1,src_0,src_0,src_0,width);
     av_free(buf);
+    return 0;
 }
 
 int avpicture_deinterlace(AVPicture *dst, const AVPicture *src,
                           enum AVPixelFormat pix_fmt, int width, int height)
 {
-    int i;
+    int i, ret;
 
     if (pix_fmt != AV_PIX_FMT_YUV420P &&
         pix_fmt != AV_PIX_FMT_YUVJ420P &&
@@ -442,8 +478,11 @@ int avpicture_deinterlace(AVPicture *dst, const AVPicture *src,
             }
         }
         if (src == dst) {
-            deinterlace_bottom_field_inplace(dst->data[i], dst->linesize[i],
-                                 width, height);
+            ret = deinterlace_bottom_field_inplace(dst->data[i],
+                                                   dst->linesize[i],
+                                                   width, height);
+            if (ret < 0)
+                return ret;
         } else {
             deinterlace_bottom_field(dst->data[i],dst->linesize[i],
                                         src->data[i], src->linesize[i],

@@ -47,7 +47,7 @@ typedef uint8_t cvid_codebook[12];
 
 #define MAX_STRIPS      32
 
-typedef struct {
+typedef struct cvid_strip {
     uint16_t          id;
     uint16_t          x1, y1;
     uint16_t          x2, y2;
@@ -443,10 +443,13 @@ static int cinepak_decode_frame(AVCodecContext *avctx,
         return ret;
 
     if (s->palette_video) {
-        const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, NULL);
-        if (pal) {
+        int size;
+        const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, &size);
+        if (pal && size == AVPALETTE_SIZE) {
             s->frame->palette_has_changed = 1;
             memcpy(s->pal, pal, AVPALETTE_SIZE);
+        } else if (pal) {
+            av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", size);
         }
     }
 
@@ -484,5 +487,5 @@ AVCodec ff_cinepak_decoder = {
     .init           = cinepak_decode_init,
     .close          = cinepak_decode_end,
     .decode         = cinepak_decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
+    .capabilities   = AV_CODEC_CAP_DR1,
 };

@@ -12,13 +12,20 @@
 #define VP9_ENCODER_VP9_CONTEXT_TREE_H_
 
 #include "vp9/common/vp9_blockd.h"
+#include "vp9/encoder/vp9_block.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct VP9_COMP;
 struct VP9Common;
+struct ThreadData;
 
 // Structure to hold snapshot of coding context during the mode picking process
 typedef struct {
   MODE_INFO mic;
+  MB_MODE_INFO_EXT mbmi_ext;
   uint8_t *zcoeff_blk;
   tran_low_t *coeff[MAX_MB_PLANE][3];
   tran_low_t *qcoeff[MAX_MB_PLANE][3];
@@ -43,12 +50,17 @@ typedef struct {
   int hybrid_pred_diff;
   int comp_pred_diff;
   int single_pred_diff;
-  int64_t tx_rd_diff[TX_MODES];
   int64_t best_filter_diff[SWITCHABLE_FILTER_CONTEXTS];
+
+  // TODO(jingning) Use RD_COST struct here instead. This involves a boarder
+  // scope of refactoring.
+  int rate;
+  int64_t dist;
 
 #if CONFIG_VP9_TEMPORAL_DENOISING
   unsigned int newmv_sse;
   unsigned int zeromv_sse;
+  unsigned int zeromv_lastref_sse;
   PREDICTION_MODE best_sse_inter_mode;
   int_mv best_sse_mv;
   MV_REFERENCE_FRAME best_reference_frame;
@@ -74,7 +86,11 @@ typedef struct PC_TREE {
   };
 } PC_TREE;
 
-void vp9_setup_pc_tree(struct VP9Common *cm, struct VP9_COMP *cpi);
-void vp9_free_pc_tree(struct VP9_COMP *cpi);
+void vp9_setup_pc_tree(struct VP9Common *cm, struct ThreadData *td);
+void vp9_free_pc_tree(struct ThreadData *td);
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif
 
 #endif /* VP9_ENCODER_VP9_CONTEXT_TREE_H_ */

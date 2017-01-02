@@ -16,7 +16,9 @@
 
 # Environment check: Make sure input is available.
 vpxdec_verify_environment() {
-  if [ ! -e "${VP8_IVF_FILE}" ] || [ ! -e "${VP9_WEBM_FILE}" ]; then
+  if [ ! -e "${VP8_IVF_FILE}" ] || [ ! -e "${VP9_WEBM_FILE}" ] || \
+    [ ! -e "${VP9_FPM_WEBM_FILE}" ] || \
+    [ ! -e "${VP9_LT_50_FRAMES_WEBM_FILE}" ] ; then
     elog "Libvpx test data must exist in LIBVPX_TEST_DATA_PATH."
     return 1
   fi
@@ -78,8 +80,37 @@ vpxdec_vp9_webm() {
   fi
 }
 
+vpxdec_vp9_webm_frame_parallel() {
+  if [ "$(vpxdec_can_decode_vp9)" = "yes" ] && \
+     [ "$(webm_io_available)" = "yes" ]; then
+    for threads in 2 3 4 5 6 7 8; do
+      vpxdec "${VP9_FPM_WEBM_FILE}" --summary --noblit --threads=$threads \
+        --frame-parallel
+    done
+  fi
+}
+
+vpxdec_vp9_webm_less_than_50_frames() {
+  # ensure that reaching eof in webm_guess_framerate doesn't result in invalid
+  # frames in actual webm_read_frame calls.
+  if [ "$(vpxdec_can_decode_vp9)" = "yes" ] && \
+     [ "$(webm_io_available)" = "yes" ]; then
+    local readonly decoder="$(vpx_tool_path vpxdec)"
+    local readonly expected=10
+    local readonly num_frames=$(${VPX_TEST_PREFIX} "${decoder}" \
+      "${VP9_LT_50_FRAMES_WEBM_FILE}" --summary --noblit 2>&1 \
+      | awk '/^[0-9]+ decoded frames/ { print $1 }')
+    if [ "$num_frames" -ne "$expected" ]; then
+      elog "Output frames ($num_frames) != expected ($expected)"
+      return 1
+    fi
+  fi
+}
+
 vpxdec_tests="vpxdec_vp8_ivf
               vpxdec_vp8_ivf_pipe_input
-              vpxdec_vp9_webm"
+              vpxdec_vp9_webm
+              vpxdec_vp9_webm_frame_parallel
+              vpxdec_vp9_webm_less_than_50_frames"
 
 run_tests vpxdec_verify_environment "${vpxdec_tests}"

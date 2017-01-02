@@ -22,6 +22,8 @@ FATE_LAVF-$(call ENCDEC2, MPEG1VIDEO, MP2,       MPEG1SYSTEM MPEGPS) += mpg
 FATE_LAVF-$(call ENCDEC,  PCM_MULAW,             PCM_MULAW)          += mulaw
 FATE_LAVF-$(call ENCDEC2, MPEG2VIDEO, PCM_S16LE, MXF)                += mxf
 FATE_LAVF-$(call ENCDEC2, MPEG2VIDEO, PCM_S16LE, MXF_D10 MXF)        += mxf_d10
+FATE_LAVF-$(call ENCDEC2, DNXHD,      PCM_S16LE, MXF_OPATOM MXF)     += mxf_opatom
+FATE_LAVF-$(call ENCDEC2, DNXHD,      PCM_S16LE, MXF_OPATOM MXF)     += mxf_opatom_audio
 FATE_LAVF-$(call ENCDEC2, MPEG4,      MP2,       NUT)                += nut
 FATE_LAVF-$(call ENCDEC,  FLAC,                  OGG)                += ogg
 FATE_LAVF-$(call ENCDEC,  PAM,                   IMAGE2)             += pam
@@ -59,6 +61,7 @@ FATE_LAVF += $(FATE_LAVF_PIXFMT-yes)
 
 $(FATE_LAVF): $(AREF) $(VREF)
 $(FATE_LAVF): CMD = lavftest
+$(FATE_LAVF): CMP =
 
 FATE_AVCONV += $(FATE_LAVF)
 fate-lavf:     $(FATE_LAVF)

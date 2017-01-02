@@ -60,6 +60,8 @@ HumbleStackTrace::HumbleStackTrace(const HumbleStackTrace & e) {
     if (mSymbols)
       memcpy(mSymbols, e.mSymbols, mNumFrames);
     // if there was a malloc error, just let it pass.
+  } else {
+    mSymbols = 0;
   }
 }
 

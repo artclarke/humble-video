@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # This script is here to update the branch to the latest version
-git subtree pull --prefix=humble-video-captive/src/main/gnu/libvpx/csrc --squash http://git.chromium.org/webm/libvpx.git master
+git subtree pull --prefix=humble-video-captive/src/main/gnu/libvpx/csrc --squash https://chromium.googlesource.com/webm/libvpx master

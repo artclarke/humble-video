@@ -10,11 +10,10 @@
 
 #include "third_party/googletest/src/include/gtest/gtest.h"
 
-#include "test/clear_system_state.h"
-#include "test/register_state_check.h"
-
 #include "./vpx_config.h"
 #include "./vpx_scale_rtcd.h"
+#include "test/clear_system_state.h"
+#include "test/register_state_check.h"
 #include "vpx_mem/vpx_mem.h"
 #include "vpx_scale/yv12config.h"
 
@@ -26,17 +25,15 @@ typedef void (*CopyFrameFunc)(const YV12_BUFFER_CONFIG *src_ybf,
 
 class VpxScaleBase {
  public:
-  virtual ~VpxScaleBase() {
-    libvpx_test::ClearSystemState();
-  }
+  virtual ~VpxScaleBase() { libvpx_test::ClearSystemState(); }
 
   void ResetImage(int width, int height) {
     width_ = width;
     height_ = height;
-    vpx_memset(&img_, 0, sizeof(img_));
+    memset(&img_, 0, sizeof(img_));
     ASSERT_EQ(0, vp8_yv12_alloc_frame_buffer(&img_, width_, height_,
                                              VP8BORDERINPIXELS));
-    vpx_memset(img_.buffer_alloc, kBufFiller, img_.frame_size);
+    memset(img_.buffer_alloc, kBufFiller, img_.frame_size);
     FillPlane(img_.y_buffer, img_.y_crop_width, img_.y_crop_height,
               img_.y_stride);
     FillPlane(img_.u_buffer, img_.uv_crop_width, img_.uv_crop_height,
@@ -44,15 +41,15 @@ class VpxScaleBase {
     FillPlane(img_.v_buffer, img_.uv_crop_width, img_.uv_crop_height,
               img_.uv_stride);
 
-    vpx_memset(&ref_img_, 0, sizeof(ref_img_));
+    memset(&ref_img_, 0, sizeof(ref_img_));
     ASSERT_EQ(0, vp8_yv12_alloc_frame_buffer(&ref_img_, width_, height_,
                                              VP8BORDERINPIXELS));
-    vpx_memset(ref_img_.buffer_alloc, kBufFiller, ref_img_.frame_size);
+    memset(ref_img_.buffer_alloc, kBufFiller, ref_img_.frame_size);
 
-    vpx_memset(&cpy_img_, 0, sizeof(cpy_img_));
+    memset(&cpy_img_, 0, sizeof(cpy_img_));
     ASSERT_EQ(0, vp8_yv12_alloc_frame_buffer(&cpy_img_, width_, height_,
                                              VP8BORDERINPIXELS));
-    vpx_memset(cpy_img_.buffer_alloc, kBufFiller, cpy_img_.frame_size);
+    memset(cpy_img_.buffer_alloc, kBufFiller, cpy_img_.frame_size);
     ReferenceCopyFrame();
   }
 
@@ -87,8 +84,8 @@ class VpxScaleBase {
 
     // Fill the border pixels from the nearest image pixel.
     for (int y = 0; y < crop_height; ++y) {
-      vpx_memset(left, left[padding], padding);
-      vpx_memset(right, right[-1], right_extend);
+      memset(left, left[padding], padding);
+      memset(right, right[-1], right_extend);
       left += stride;
       right += stride;
     }
@@ -101,33 +98,27 @@ class VpxScaleBase {
 
     // The first row was already extended to the left and right. Copy it up.
     for (int y = 0; y < padding; ++y) {
-      vpx_memcpy(top, left, extend_width);
+      memcpy(top, left, extend_width);
       top += stride;
     }
 
     uint8_t *bottom = left + (crop_height * stride);
-    for (int y = 0; y <  bottom_extend; ++y) {
-      vpx_memcpy(bottom, left + (crop_height - 1) * stride, extend_width);
+    for (int y = 0; y < bottom_extend; ++y) {
+      memcpy(bottom, left + (crop_height - 1) * stride, extend_width);
       bottom += stride;
     }
   }
 
   void ReferenceExtendBorder() {
-    ExtendPlane(ref_img_.y_buffer,
-                ref_img_.y_crop_width, ref_img_.y_crop_height,
-                ref_img_.y_width, ref_img_.y_height,
-                ref_img_.y_stride,
-                ref_img_.border);
-    ExtendPlane(ref_img_.u_buffer,
-                ref_img_.uv_crop_width, ref_img_.uv_crop_height,
-                ref_img_.uv_width, ref_img_.uv_height,
-                ref_img_.uv_stride,
-                ref_img_.border / 2);
-    ExtendPlane(ref_img_.v_buffer,
-                ref_img_.uv_crop_width, ref_img_.uv_crop_height,
-                ref_img_.uv_width, ref_img_.uv_height,
-                ref_img_.uv_stride,
-                ref_img_.border / 2);
+    ExtendPlane(ref_img_.y_buffer, ref_img_.y_crop_width,
+                ref_img_.y_crop_height, ref_img_.y_width, ref_img_.y_height,
+                ref_img_.y_stride, ref_img_.border);
+    ExtendPlane(ref_img_.u_buffer, ref_img_.uv_crop_width,
+                ref_img_.uv_crop_height, ref_img_.uv_width, ref_img_.uv_height,
+                ref_img_.uv_stride, ref_img_.border / 2);
+    ExtendPlane(ref_img_.v_buffer, ref_img_.uv_crop_width,
+                ref_img_.uv_crop_height, ref_img_.uv_width, ref_img_.uv_height,
+                ref_img_.uv_stride, ref_img_.border / 2);
   }
 
   void ReferenceCopyFrame() {
@@ -173,13 +164,9 @@ class ExtendBorderTest
   virtual ~ExtendBorderTest() {}
 
  protected:
-  virtual void SetUp() {
-    extend_fn_ = GetParam();
-  }
+  virtual void SetUp() { extend_fn_ = GetParam(); }
 
-  void ExtendBorder() {
-    ASM_REGISTER_STATE_CHECK(extend_fn_(&img_));
-  }
+  void ExtendBorder() { ASM_REGISTER_STATE_CHECK(extend_fn_(&img_)); }
 
   void RunTest() {
 #if ARCH_ARM
@@ -188,7 +175,7 @@ class ExtendBorderTest
 #else
     static const int kNumSizesToTest = 7;
 #endif
-    static const int kSizesToTest[] = {1, 15, 33, 145, 512, 1025, 16383};
+    static const int kSizesToTest[] = { 1, 15, 33, 145, 512, 1025, 16383 };
     for (int h = 0; h < kNumSizesToTest; ++h) {
       for (int w = 0; w < kNumSizesToTest; ++w) {
         ResetImage(kSizesToTest[w], kSizesToTest[h]);
@@ -203,23 +190,18 @@ class ExtendBorderTest
   ExtendFrameBorderFunc extend_fn_;
 };
 
-TEST_P(ExtendBorderTest, ExtendBorder) {
-  ASSERT_NO_FATAL_FAILURE(RunTest());
-}
+TEST_P(ExtendBorderTest, ExtendBorder) { ASSERT_NO_FATAL_FAILURE(RunTest()); }
 
 INSTANTIATE_TEST_CASE_P(C, ExtendBorderTest,
                         ::testing::Values(vp8_yv12_extend_frame_borders_c));
 
-class CopyFrameTest
-    : public VpxScaleBase,
-      public ::testing::TestWithParam<CopyFrameFunc> {
+class CopyFrameTest : public VpxScaleBase,
+                      public ::testing::TestWithParam<CopyFrameFunc> {
  public:
   virtual ~CopyFrameTest() {}
 
  protected:
-  virtual void SetUp() {
-    copy_frame_fn_ = GetParam();
-  }
+  virtual void SetUp() { copy_frame_fn_ = GetParam(); }
 
   void CopyFrame() {
     ASM_REGISTER_STATE_CHECK(copy_frame_fn_(&img_, &cpy_img_));
@@ -232,7 +214,7 @@ class CopyFrameTest
 #else
     static const int kNumSizesToTest = 7;
 #endif
-    static const int kSizesToTest[] = {1, 15, 33, 145, 512, 1025, 16383};
+    static const int kSizesToTest[] = { 1, 15, 33, 145, 512, 1025, 16383 };
     for (int h = 0; h < kNumSizesToTest; ++h) {
       for (int w = 0; w < kNumSizesToTest; ++w) {
         ResetImage(kSizesToTest[w], kSizesToTest[h]);
@@ -247,9 +229,7 @@ class CopyFrameTest
   CopyFrameFunc copy_frame_fn_;
 };
 
-TEST_P(CopyFrameTest, CopyFrame) {
-  ASSERT_NO_FATAL_FAILURE(RunTest());
-}
+TEST_P(CopyFrameTest, CopyFrame) { ASSERT_NO_FATAL_FAILURE(RunTest()); }
 
 INSTANTIATE_TEST_CASE_P(C, CopyFrameTest,
                         ::testing::Values(vp8_yv12_copy_frame_c));
