@@ -59,6 +59,9 @@
 #define VISUAL_OBJ_STARTCODE 0x1B5
 #define VOP_STARTCODE        0x1B6
 
+/* smaller packets likely don't contain a real frame */
+#define MAX_NVOP_SIZE 19
+
 typedef struct Mpeg4DecContext {
     MpegEncContext m;
 
@@ -137,7 +140,7 @@ void ff_mpeg4_encode_mb(MpegEncContext *s,
 void ff_mpeg4_pred_ac(MpegEncContext *s, int16_t *block, int n,
                       int dir);
 void ff_set_mpeg4_time(MpegEncContext *s);
-void ff_mpeg4_encode_picture_header(MpegEncContext *s, int picture_number);
+int ff_mpeg4_encode_picture_header(MpegEncContext *s, int picture_number);
 
 int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb);
 void ff_mpeg4_encode_video_packet_header(MpegEncContext *s);
@@ -227,21 +230,21 @@ static inline int ff_mpeg4_pred_dc(MpegEncContext *s, int n, int level,
     } else {
         level += pred;
         ret    = level;
-        if (s->err_recognition & (AV_EF_BITSTREAM | AV_EF_AGGRESSIVE)) {
+    }
+    level *= scale;
+    if (level & (~2047)) {
+        if (!s->encoding && (s->avctx->err_recognition & (AV_EF_BITSTREAM | AV_EF_AGGRESSIVE))) {
             if (level < 0) {
                 av_log(s->avctx, AV_LOG_ERROR,
                        "dc<0 at %dx%d\n", s->mb_x, s->mb_y);
                 return -1;
             }
-            if (level * scale > 2048 + scale) {
+            if (level > 2048 + scale) {
                 av_log(s->avctx, AV_LOG_ERROR,
                        "dc overflow at %dx%d\n", s->mb_x, s->mb_y);
                 return -1;
             }
         }
-    }
-    level *= scale;
-    if (level & (~2047)) {
         if (level < 0)
             level = 0;
         else if (!(s->workaround_bugs & FF_BUG_DC_CLIP))

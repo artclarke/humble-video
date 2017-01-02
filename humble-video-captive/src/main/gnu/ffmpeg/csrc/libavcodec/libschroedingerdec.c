@@ -195,8 +195,8 @@ static void libschroedinger_handle_first_access_unit(AVCodecContext *avctx)
         return;
     }
 
-    avctx->time_base.den = p_schro_params->format->frame_rate_numerator;
-    avctx->time_base.num = p_schro_params->format->frame_rate_denominator;
+    avctx->framerate.num = p_schro_params->format->frame_rate_numerator;
+    avctx->framerate.den = p_schro_params->format->frame_rate_denominator;
 }
 
 static int libschroedinger_decode_frame(AVCodecContext *avctx,
@@ -218,6 +218,7 @@ static int libschroedinger_decode_frame(AVCodecContext *avctx,
     int outer = 1;
     SchroParseUnitContext parse_ctx;
     LibSchroFrameContext *framewithpts = NULL;
+    int ret;
 
     *got_frame = 0;
 
@@ -267,6 +268,8 @@ static int libschroedinger_decode_frame(AVCodecContext *avctx,
                 /* Decoder needs a frame - create one and push it in. */
                 frame = ff_create_schro_frame(avctx,
                                               p_schro_params->frame_format);
+                if (!frame)
+                    return AVERROR(ENOMEM);
                 schro_decoder_add_output_picture(decoder, frame);
                 break;
 
@@ -305,11 +308,10 @@ static int libschroedinger_decode_frame(AVCodecContext *avctx,
     /* Grab next frame to be returned from the top of the queue. */
     framewithpts = ff_schro_queue_pop(&p_schro_params->dec_frame_queue);
 
-    if (framewithpts && framewithpts->frame) {
-        int ret;
+    if (framewithpts && framewithpts->frame && framewithpts->frame->components[0].stride) {
 
         if ((ret = ff_get_buffer(avctx, avframe, 0)) < 0)
-            return ret;
+            goto end;
 
         memcpy(avframe->data[0],
                framewithpts->frame->components[0].data,
@@ -330,15 +332,17 @@ static int libschroedinger_decode_frame(AVCodecContext *avctx,
         avframe->linesize[2] = framewithpts->frame->components[2].stride;
 
         *got_frame      = 1;
-
-        /* Now free the frame resources. */
-        libschroedinger_decode_frame_free(framewithpts->frame);
-        av_free(framewithpts);
     } else {
         data       = NULL;
         *got_frame = 0;
     }
-    return buf_size;
+    ret = buf_size;
+end:
+    /* Now free the frame resources. */
+    if (framewithpts && framewithpts->frame)
+        libschroedinger_decode_frame_free(framewithpts->frame);
+    av_freep(&framewithpts);
+    return ret;
 }
 
 
@@ -381,6 +385,6 @@ AVCodec ff_libschroedinger_decoder = {
     .init           = libschroedinger_decode_init,
     .close          = libschroedinger_decode_close,
     .decode         = libschroedinger_decode_frame,
-    .capabilities   = CODEC_CAP_DELAY,
+    .capabilities   = AV_CODEC_CAP_DELAY,
     .flush          = libschroedinger_flush,
 };

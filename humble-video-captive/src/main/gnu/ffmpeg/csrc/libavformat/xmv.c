@@ -294,6 +294,7 @@ static int xmv_process_packet_header(AVFormatContext *s)
 {
     XMVDemuxContext *xmv = s->priv_data;
     AVIOContext     *pb  = s->pb;
+    int ret;
 
     uint8_t  data[8];
     uint16_t audio_track;
@@ -381,9 +382,10 @@ static int xmv_process_packet_header(AVFormatContext *s)
                 av_assert0(xmv->video.stream_index < s->nb_streams);
 
                 if (vst->codec->extradata_size < 4) {
-                    av_free(vst->codec->extradata);
+                    av_freep(&vst->codec->extradata);
 
-                    ff_alloc_extradata(vst->codec, 4);
+                    if ((ret = ff_alloc_extradata(vst->codec, 4)) < 0)
+                        return ret;
                 }
 
                 memcpy(vst->codec->extradata, xmv->video.extradata, 4);
@@ -547,16 +549,17 @@ static int xmv_read_packet(AVFormatContext *s,
         /* Fetch a video frame */
 
         result = xmv_fetch_video_packet(s, pkt);
-        if (result)
-            return result;
-
     } else {
         /* Fetch an audio frame */
 
         result = xmv_fetch_audio_packet(s, pkt, xmv->current_stream - 1);
-        if (result)
-            return result;
     }
+    if (result) {
+        xmv->current_stream = 0;
+        xmv->video.current_frame = xmv->video.frame_count;
+        return result;
+    }
+
 
     /* Increase our counters */
     if (++xmv->current_stream >= xmv->stream_count) {

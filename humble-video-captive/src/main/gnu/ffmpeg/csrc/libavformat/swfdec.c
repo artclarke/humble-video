@@ -23,7 +23,9 @@
 #include "libavutil/avassert.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
+#include "libavcodec/get_bits.h"
 #include "swf.h"
 
 static const AVCodecTag swf_audio_codec_tags[] = {
@@ -55,6 +57,9 @@ static int get_swf_tag(AVIOContext *pb, int *len_ptr)
 
 static int swf_probe(AVProbeData *p)
 {
+    GetBitContext gb;
+    int len, xmin, xmax, ymin, ymax;
+
     if(p->buf_size < 15)
         return 0;
 
@@ -63,7 +68,25 @@ static int swf_probe(AVProbeData *p)
         && AV_RB24(p->buf) != AV_RB24("FWS"))
         return 0;
 
-    if (p->buf[3] >= 20)
+    if (   AV_RB24(p->buf) == AV_RB24("CWS")
+        && p->buf[3] <= 20)
+        return AVPROBE_SCORE_MAX / 4 + 1;
+
+    if (init_get_bits8(&gb, p->buf + 3, p->buf_size - 3) < 0)
+        return 0;
+
+    skip_bits(&gb, 40);
+    len = get_bits(&gb, 5);
+    if (!len)
+        return 0;
+    xmin = get_bits_long(&gb, len);
+    xmax = get_bits_long(&gb, len);
+    ymin = get_bits_long(&gb, len);
+    ymax = get_bits_long(&gb, len);
+    if (xmin || ymin || !xmax || !ymax)
+        return 0;
+
+    if (p->buf[3] >= 20 || xmax < 16 || ymax < 16)
         return AVPROBE_SCORE_MAX / 4;
 
     return AVPROBE_SCORE_MAX;
@@ -90,10 +113,10 @@ retry:
     z->avail_out = buf_size;
 
     ret = inflate(z, Z_NO_FLUSH);
-    if (ret < 0)
-        return AVERROR(EINVAL);
     if (ret == Z_STREAM_END)
         return AVERROR_EOF;
+    if (ret != Z_OK)
+        return AVERROR(EINVAL);
 
     if (buf_size - z->avail_out == 0)
         goto retry;
@@ -321,7 +344,7 @@ static int swf_read_packet(AVFormatContext *s, AVPacket *pkt)
 
             out_len = colormapsize * colormapbpp + linesize * height;
 
-            av_dlog(s, "bitmap: ch=%d fmt=%d %dx%d (linesize=%d) len=%d->%ld pal=%d\n",
+            ff_dlog(s, "bitmap: ch=%d fmt=%d %dx%d (linesize=%d) len=%d->%ld pal=%d\n",
                     ch_id, bmp_fmt, width, height, linesize, len, out_len, colormapsize);
 
             zbuf = av_malloc(len);
@@ -390,10 +413,8 @@ static int swf_read_packet(AVFormatContext *s, AVPacket *pkt)
             }
             if (st->codec->pix_fmt != AV_PIX_FMT_NONE && st->codec->pix_fmt != pix_fmt) {
                 av_log(s, AV_LOG_ERROR, "pixel format change unsupported\n");
-                res = AVERROR_PATCHWELCOME;
-                goto bitmap_end;
-            }
-            st->codec->pix_fmt = pix_fmt;
+            } else
+                st->codec->pix_fmt = pix_fmt;
 
             if (linesize * height > pkt->size) {
                 res = AVERROR_INVALIDDATA;

@@ -60,7 +60,7 @@
 
 #define ALAC_EXTRADATA_SIZE 36
 
-typedef struct {
+typedef struct ALACContext {
     AVClass *class;
     AVCodecContext *avctx;
     GetBitContext gb;
@@ -316,6 +316,12 @@ static int decode_element(AVCodecContext *avctx, AVFrame *frame, int ch_index,
         int lpc_quant[2];
         int rice_history_mult[2];
 
+        if (!alac->rice_limit) {
+            avpriv_request_sample(alac->avctx,
+                                  "Compression with rice limit 0");
+            return AVERROR(ENOSYS);
+        }
+
         decorr_shift       = get_bits(&alac->gb, 8);
         decorr_left_weight = get_bits(&alac->gb, 8);
 
@@ -528,6 +534,12 @@ static int allocate_buffers(ALACContext *alac)
     int ch;
     int buf_size = alac->max_samples_per_frame * sizeof(int32_t);
 
+    for (ch = 0; ch < 2; ch++) {
+        alac->predict_error_buffer[ch]  = NULL;
+        alac->output_samples_buffer[ch] = NULL;
+        alac->extra_bits_buffer[ch]     = NULL;
+    }
+
     for (ch = 0; ch < FFMIN(alac->channels, 2); ch++) {
         FF_ALLOC_OR_GOTO(alac->avctx, alac->predict_error_buffer[ch],
                          buf_size, buf_alloc_fail);
@@ -662,6 +674,6 @@ AVCodec ff_alac_decoder = {
     .close          = alac_decode_close,
     .decode         = alac_decode_frame,
     .init_thread_copy = ONLY_IF_THREADS_ENABLED(init_thread_copy),
-    .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
+    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
     .priv_class     = &alac_class
 };

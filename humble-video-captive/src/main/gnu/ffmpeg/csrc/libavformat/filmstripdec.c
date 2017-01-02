@@ -25,12 +25,13 @@
  */
 
 #include "libavutil/intreadwrite.h"
+#include "libavutil/imgutils.h"
 #include "avformat.h"
 #include "internal.h"
 
 #define RAND_TAG MKBETAG('R','a','n','d')
 
-typedef struct {
+typedef struct FilmstripDemuxContext {
     int leading;
 } FilmstripDemuxContext;
 
@@ -67,6 +68,10 @@ static int read_header(AVFormatContext *s)
     st->codec->width      = avio_rb16(pb);
     st->codec->height     = avio_rb16(pb);
     film->leading         = avio_rb16(pb);
+
+    if (av_image_check_size(st->codec->width, st->codec->height, 0, s) < 0)
+        return AVERROR_INVALIDDATA;
+
     avpriv_set_pts_info(st, 64, 1, avio_rb16(pb));
 
     avio_seek(pb, 0, SEEK_SET);
@@ -82,9 +87,9 @@ static int read_packet(AVFormatContext *s,
 
     if (avio_feof(s->pb))
         return AVERROR(EIO);
-    pkt->dts = avio_tell(s->pb) / (st->codec->width * (st->codec->height + film->leading) * 4);
+    pkt->dts = avio_tell(s->pb) / (st->codec->width * (int64_t)(st->codec->height + film->leading) * 4);
     pkt->size = av_get_packet(s->pb, pkt, st->codec->width * st->codec->height * 4);
-    avio_skip(s->pb, st->codec->width * film->leading * 4);
+    avio_skip(s->pb, st->codec->width * (int64_t) film->leading * 4);
     if (pkt->size < 0)
         return pkt->size;
     pkt->flags |= AV_PKT_FLAG_KEY;

@@ -112,15 +112,27 @@ void ff_slice_thread_free(AVCodecContext *avctx)
     pthread_mutex_lock(&c->current_job_lock);
     c->done = 1;
     pthread_cond_broadcast(&c->current_job_cond);
+    for (i = 0; i < c->thread_count; i++)
+        pthread_cond_broadcast(&c->progress_cond[i]);
     pthread_mutex_unlock(&c->current_job_lock);
 
     for (i=0; i<avctx->thread_count; i++)
          pthread_join(c->workers[i], NULL);
 
+    for (i = 0; i < c->thread_count; i++) {
+        pthread_mutex_destroy(&c->progress_mutex[i]);
+        pthread_cond_destroy(&c->progress_cond[i]);
+    }
+
     pthread_mutex_destroy(&c->current_job_lock);
     pthread_cond_destroy(&c->current_job_cond);
     pthread_cond_destroy(&c->last_job_cond);
-    av_free(c->workers);
+
+    av_freep(&c->entries);
+    av_freep(&c->progress_mutex);
+    av_freep(&c->progress_cond);
+
+    av_freep(&c->workers);
     av_freep(&avctx->internal->thread_ctx);
 }
 
@@ -180,6 +192,12 @@ int ff_slice_thread_init(AVCodecContext *avctx)
 #if HAVE_W32THREADS
     w32thread_init();
 #endif
+
+    // We cannot do this in the encoder init as the threads are created before
+    if (av_codec_is_encoder(avctx->codec) &&
+        avctx->codec_id == AV_CODEC_ID_MPEG1VIDEO &&
+        avctx->height > 2800)
+        thread_count = avctx->thread_count = 1;
 
     if (!thread_count) {
         int nb_cpus = av_cpu_count();
