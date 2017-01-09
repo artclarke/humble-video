@@ -689,7 +689,7 @@ public class Codec extends RefCounted {
    * There may be slight deviations from the principle due to implementation<br>
    * details.<br>
    * <br>
-   * From Ffmpeg 2.4.2
+   * From Ffmpeg 2.8
    */
   public enum ID {
     CODEC_ID_NONE(VideoJNI.Codec_CODEC_ID_NONE_get()),
@@ -880,6 +880,11 @@ public class Codec extends RefCounted {
     CODEC_ID_SGIRLE_DEPRECATED(VideoJNI.Codec_CODEC_ID_SGIRLE_DEPRECATED_get()),
     CODEC_ID_MVC1_DEPRECATED(VideoJNI.Codec_CODEC_ID_MVC1_DEPRECATED_get()),
     CODEC_ID_MVC2_DEPRECATED(VideoJNI.Codec_CODEC_ID_MVC2_DEPRECATED_get()),
+    CODEC_ID_HQX(VideoJNI.Codec_CODEC_ID_HQX_get()),
+    CODEC_ID_TDSC(VideoJNI.Codec_CODEC_ID_TDSC_get()),
+    CODEC_ID_HQ_HQA(VideoJNI.Codec_CODEC_ID_HQ_HQA_get()),
+    CODEC_ID_HAP(VideoJNI.Codec_CODEC_ID_HAP_get()),
+    CODEC_ID_DDS(VideoJNI.Codec_CODEC_ID_DDS_get()),
     CODEC_ID_BRENDER_PIX(VideoJNI.Codec_CODEC_ID_BRENDER_PIX_get()),
     CODEC_ID_Y41P(VideoJNI.Codec_CODEC_ID_Y41P_get()),
     CODEC_ID_ESCAPE130(VideoJNI.Codec_CODEC_ID_ESCAPE130_get()),
@@ -906,6 +911,7 @@ public class Codec extends RefCounted {
     CODEC_ID_SMVJPEG(VideoJNI.Codec_CODEC_ID_SMVJPEG_get()),
     CODEC_ID_HEVC(VideoJNI.Codec_CODEC_ID_HEVC_get()),
     CODEC_ID_VP7(VideoJNI.Codec_CODEC_ID_VP7_get()),
+    CODEC_ID_APNG(VideoJNI.Codec_CODEC_ID_APNG_get()),
   /**
    * A dummy id pointing at the start of audio codecs
    */
@@ -940,6 +946,7 @@ public class Codec extends RefCounted {
     CODEC_ID_PCM_S8_PLANAR(VideoJNI.Codec_CODEC_ID_PCM_S8_PLANAR_get()),
     CODEC_ID_PCM_S24LE_PLANAR_DEPRECATED(VideoJNI.Codec_CODEC_ID_PCM_S24LE_PLANAR_DEPRECATED_get()),
     CODEC_ID_PCM_S32LE_PLANAR_DEPRECATED(VideoJNI.Codec_CODEC_ID_PCM_S32LE_PLANAR_DEPRECATED_get()),
+    CODEC_ID_PCM_S16BE_PLANAR_DEPRECATED(VideoJNI.Codec_CODEC_ID_PCM_S16BE_PLANAR_DEPRECATED_get()),
     CODEC_ID_PCM_S24LE_PLANAR(VideoJNI.Codec_CODEC_ID_PCM_S24LE_PLANAR_get()),
     CODEC_ID_PCM_S32LE_PLANAR(VideoJNI.Codec_CODEC_ID_PCM_S32LE_PLANAR_get()),
     CODEC_ID_PCM_S16BE_PLANAR(VideoJNI.Codec_CODEC_ID_PCM_S16BE_PLANAR_get()),
@@ -975,12 +982,12 @@ public class Codec extends RefCounted {
     CODEC_ID_ADPCM_IMA_APC(VideoJNI.Codec_CODEC_ID_ADPCM_IMA_APC_get()),
     CODEC_ID_ADPCM_VIMA_DEPRECATED(VideoJNI.Codec_CODEC_ID_ADPCM_VIMA_DEPRECATED_get()),
     CODEC_ID_ADPCM_VIMA(VideoJNI.Codec_CODEC_ID_ADPCM_VIMA_get()),
-    CODEC_ID_VIMA(VideoJNI.Codec_CODEC_ID_VIMA_get()),
     CODEC_ID_ADPCM_AFC(VideoJNI.Codec_CODEC_ID_ADPCM_AFC_get()),
     CODEC_ID_ADPCM_IMA_OKI(VideoJNI.Codec_CODEC_ID_ADPCM_IMA_OKI_get()),
     CODEC_ID_ADPCM_DTK(VideoJNI.Codec_CODEC_ID_ADPCM_DTK_get()),
     CODEC_ID_ADPCM_IMA_RAD(VideoJNI.Codec_CODEC_ID_ADPCM_IMA_RAD_get()),
     CODEC_ID_ADPCM_G726LE(VideoJNI.Codec_CODEC_ID_ADPCM_G726LE_get()),
+    CODEC_ID_ADPCM_THP_LE(VideoJNI.Codec_CODEC_ID_ADPCM_THP_LE_get()),
     CODEC_ID_AMR_NB(VideoJNI.Codec_CODEC_ID_AMR_NB_get()),
     CODEC_ID_AMR_WB(VideoJNI.Codec_CODEC_ID_AMR_WB_get()),
     CODEC_ID_RA_144(VideoJNI.Codec_CODEC_ID_RA_144_get()),
@@ -1061,6 +1068,7 @@ public class Codec extends RefCounted {
     CODEC_ID_METASOUND(VideoJNI.Codec_CODEC_ID_METASOUND_get()),
     CODEC_ID_PAF_AUDIO_DEPRECATED(VideoJNI.Codec_CODEC_ID_PAF_AUDIO_DEPRECATED_get()),
     CODEC_ID_ON2AVC(VideoJNI.Codec_CODEC_ID_ON2AVC_get()),
+    CODEC_ID_DSS_SP(VideoJNI.Codec_CODEC_ID_DSS_SP_get()),
     CODEC_ID_FFWAVESYNTH(VideoJNI.Codec_CODEC_ID_FFWAVESYNTH_get()),
     CODEC_ID_SONIC(VideoJNI.Codec_CODEC_ID_SONIC_get()),
     CODEC_ID_SONIC_LS(VideoJNI.Codec_CODEC_ID_SONIC_LS_get()),
@@ -1073,6 +1081,7 @@ public class Codec extends RefCounted {
     CODEC_ID_DSD_MSBF(VideoJNI.Codec_CODEC_ID_DSD_MSBF_get()),
     CODEC_ID_DSD_LSBF_PLANAR(VideoJNI.Codec_CODEC_ID_DSD_LSBF_PLANAR_get()),
     CODEC_ID_DSD_MSBF_PLANAR(VideoJNI.Codec_CODEC_ID_DSD_MSBF_PLANAR_get()),
+    CODEC_ID_4GV(VideoJNI.Codec_CODEC_ID_4GV_get()),
   /**
    * A dummy ID pointing at the start of subtitle codecs.
    */
@@ -1094,6 +1103,7 @@ public class Codec extends RefCounted {
     CODEC_ID_JACOSUB(VideoJNI.Codec_CODEC_ID_JACOSUB_get()),
     CODEC_ID_SAMI(VideoJNI.Codec_CODEC_ID_SAMI_get()),
     CODEC_ID_REALTEXT(VideoJNI.Codec_CODEC_ID_REALTEXT_get()),
+    CODEC_ID_STL(VideoJNI.Codec_CODEC_ID_STL_get()),
     CODEC_ID_SUBVIEWER1(VideoJNI.Codec_CODEC_ID_SUBVIEWER1_get()),
     CODEC_ID_SUBVIEWER(VideoJNI.Codec_CODEC_ID_SUBVIEWER_get()),
     CODEC_ID_SUBRIP(VideoJNI.Codec_CODEC_ID_SUBRIP_get()),
@@ -1101,10 +1111,8 @@ public class Codec extends RefCounted {
     CODEC_ID_MPL2(VideoJNI.Codec_CODEC_ID_MPL2_get()),
     CODEC_ID_VPLAYER(VideoJNI.Codec_CODEC_ID_VPLAYER_get()),
     CODEC_ID_PJS(VideoJNI.Codec_CODEC_ID_PJS_get()),
-  /**
-   * ASS as defined in Matroska
-   */
     CODEC_ID_ASS(VideoJNI.Codec_CODEC_ID_ASS_get()),
+    CODEC_ID_HDMV_TEXT_SUBTITLE(VideoJNI.Codec_CODEC_ID_HDMV_TEXT_SUBTITLE_get()),
   /**
    * A dummy ID pointing at the start of various fake codecs.
    */

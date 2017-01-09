@@ -42,7 +42,7 @@ BitStreamFilterTypeTest::testGetNumBitStreamFilterTypes() {
   int32_t n = BitStreamFilterType::getNumBitStreamFilterTypes();
   // NOTE: This will break each time a new bit filter type is added to Ffmpeg,
   // but I want that so we re-look at it.
-  TS_ASSERT_EQUALS(12, n);
+  TS_ASSERT_EQUALS(14, n);
 }
 
 void

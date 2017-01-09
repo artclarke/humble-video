@@ -53,6 +53,10 @@ namespace io { namespace humble { namespace video {
       PROPERTY_IMAGE_SIZE = MKBETAG('S','I','Z','E'),
       PROPERTY_PIXEL_FMT  = MKBETAG('P','F','M','T'),
       PROPERTY_SAMPLE_FMT = MKBETAG('S','F','M','T'),
+      PROPERTY_VIDEO_RATE = MKBETAG('V','R','A','T'), ///< offset must point to AVRational
+      PROPERTY_DURATION   = MKBETAG('D','U','R',' '),
+      PROPERTY_COLOR      = MKBETAG('C','O','L','R'),
+      PROPERTY_CHANNEL_LAYOUT = MKBETAG('C','H','L','A'),
       PROPERTY_UNKNOWN = -1
     } Type;
     

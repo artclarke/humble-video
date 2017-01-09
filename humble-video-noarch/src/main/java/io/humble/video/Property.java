@@ -235,6 +235,13 @@ public class Property extends RefCounted {
     PROPERTY_IMAGE_SIZE(VideoJNI.Property_PROPERTY_IMAGE_SIZE_get()),
     PROPERTY_PIXEL_FMT(VideoJNI.Property_PROPERTY_PIXEL_FMT_get()),
     PROPERTY_SAMPLE_FMT(VideoJNI.Property_PROPERTY_SAMPLE_FMT_get()),
+  /**
+   * offset must point to AVRational
+   */
+    PROPERTY_VIDEO_RATE(VideoJNI.Property_PROPERTY_VIDEO_RATE_get()),
+    PROPERTY_DURATION(VideoJNI.Property_PROPERTY_DURATION_get()),
+    PROPERTY_COLOR(VideoJNI.Property_PROPERTY_COLOR_get()),
+    PROPERTY_CHANNEL_LAYOUT(VideoJNI.Property_PROPERTY_CHANNEL_LAYOUT_get()),
     PROPERTY_UNKNOWN(VideoJNI.Property_PROPERTY_UNKNOWN_get()),
   ;
 

@@ -266,6 +266,10 @@ public class VideoJNI {
   public final static native int Property_PROPERTY_IMAGE_SIZE_get();
   public final static native int Property_PROPERTY_PIXEL_FMT_get();
   public final static native int Property_PROPERTY_SAMPLE_FMT_get();
+  public final static native int Property_PROPERTY_VIDEO_RATE_get();
+  public final static native int Property_PROPERTY_DURATION_get();
+  public final static native int Property_PROPERTY_COLOR_get();
+  public final static native int Property_PROPERTY_CHANNEL_LAYOUT_get();
   public final static native int Property_PROPERTY_UNKNOWN_get();
   public final static native int Property_FLAG_ENCODING_PARAM_get();
   public final static native int Property_FLAG_DECODING_PARAM_get();
@@ -847,6 +851,11 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_SGIRLE_DEPRECATED_get();
   public final static native int Codec_CODEC_ID_MVC1_DEPRECATED_get();
   public final static native int Codec_CODEC_ID_MVC2_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_HQX_get();
+  public final static native int Codec_CODEC_ID_TDSC_get();
+  public final static native int Codec_CODEC_ID_HQ_HQA_get();
+  public final static native int Codec_CODEC_ID_HAP_get();
+  public final static native int Codec_CODEC_ID_DDS_get();
   public final static native int Codec_CODEC_ID_BRENDER_PIX_get();
   public final static native int Codec_CODEC_ID_Y41P_get();
   public final static native int Codec_CODEC_ID_ESCAPE130_get();
@@ -873,6 +882,7 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_SMVJPEG_get();
   public final static native int Codec_CODEC_ID_HEVC_get();
   public final static native int Codec_CODEC_ID_VP7_get();
+  public final static native int Codec_CODEC_ID_APNG_get();
   public final static native int Codec_CODEC_ID_FIRST_AUDIO_get();
   public final static native int Codec_CODEC_ID_PCM_S16LE_get();
   public final static native int Codec_CODEC_ID_PCM_S16BE_get();
@@ -904,6 +914,7 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_PCM_S8_PLANAR_get();
   public final static native int Codec_CODEC_ID_PCM_S24LE_PLANAR_DEPRECATED_get();
   public final static native int Codec_CODEC_ID_PCM_S32LE_PLANAR_DEPRECATED_get();
+  public final static native int Codec_CODEC_ID_PCM_S16BE_PLANAR_DEPRECATED_get();
   public final static native int Codec_CODEC_ID_PCM_S24LE_PLANAR_get();
   public final static native int Codec_CODEC_ID_PCM_S32LE_PLANAR_get();
   public final static native int Codec_CODEC_ID_PCM_S16BE_PLANAR_get();
@@ -939,12 +950,12 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_ADPCM_IMA_APC_get();
   public final static native int Codec_CODEC_ID_ADPCM_VIMA_DEPRECATED_get();
   public final static native int Codec_CODEC_ID_ADPCM_VIMA_get();
-  public final static native int Codec_CODEC_ID_VIMA_get();
   public final static native int Codec_CODEC_ID_ADPCM_AFC_get();
   public final static native int Codec_CODEC_ID_ADPCM_IMA_OKI_get();
   public final static native int Codec_CODEC_ID_ADPCM_DTK_get();
   public final static native int Codec_CODEC_ID_ADPCM_IMA_RAD_get();
   public final static native int Codec_CODEC_ID_ADPCM_G726LE_get();
+  public final static native int Codec_CODEC_ID_ADPCM_THP_LE_get();
   public final static native int Codec_CODEC_ID_AMR_NB_get();
   public final static native int Codec_CODEC_ID_AMR_WB_get();
   public final static native int Codec_CODEC_ID_RA_144_get();
@@ -1019,6 +1030,7 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_METASOUND_get();
   public final static native int Codec_CODEC_ID_PAF_AUDIO_DEPRECATED_get();
   public final static native int Codec_CODEC_ID_ON2AVC_get();
+  public final static native int Codec_CODEC_ID_DSS_SP_get();
   public final static native int Codec_CODEC_ID_FFWAVESYNTH_get();
   public final static native int Codec_CODEC_ID_SONIC_get();
   public final static native int Codec_CODEC_ID_SONIC_LS_get();
@@ -1031,6 +1043,7 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_DSD_MSBF_get();
   public final static native int Codec_CODEC_ID_DSD_LSBF_PLANAR_get();
   public final static native int Codec_CODEC_ID_DSD_MSBF_PLANAR_get();
+  public final static native int Codec_CODEC_ID_4GV_get();
   public final static native int Codec_CODEC_ID_FIRST_SUBTITLE_get();
   public final static native int Codec_CODEC_ID_DVD_SUBTITLE_get();
   public final static native int Codec_CODEC_ID_DVB_SUBTITLE_get();
@@ -1046,6 +1059,7 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_JACOSUB_get();
   public final static native int Codec_CODEC_ID_SAMI_get();
   public final static native int Codec_CODEC_ID_REALTEXT_get();
+  public final static native int Codec_CODEC_ID_STL_get();
   public final static native int Codec_CODEC_ID_SUBVIEWER1_get();
   public final static native int Codec_CODEC_ID_SUBVIEWER_get();
   public final static native int Codec_CODEC_ID_SUBRIP_get();
@@ -1054,6 +1068,7 @@ public class VideoJNI {
   public final static native int Codec_CODEC_ID_VPLAYER_get();
   public final static native int Codec_CODEC_ID_PJS_get();
   public final static native int Codec_CODEC_ID_ASS_get();
+  public final static native int Codec_CODEC_ID_HDMV_TEXT_SUBTITLE_get();
   public final static native int Codec_CODEC_ID_FIRST_UNKNOWN_get();
   public final static native int Codec_CODEC_ID_TTF_get();
   public final static native int Codec_CODEC_ID_BINTEXT_get();

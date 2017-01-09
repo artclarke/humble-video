@@ -92,7 +92,7 @@ void
 PropertyTest :: testIteration()
 {
   LoggerStack stack;
-  stack.setGlobalLevel(Logger::LEVEL_WARN, false);
+  stack.setGlobalLevel(Logger::LEVEL_DEBUG, false);
 
   RefPointer<Configurable> c = Demuxer::make();
 
@@ -108,14 +108,42 @@ PropertyTest :: testIteration()
     VS_LOG_DEBUG("Default: %lld", property->getDefault());
     if (strcmp(name, "cryptokey")==0)
       continue;
-    VS_LOG_DEBUG("Current value (boolean) : %d", (int32_t)c->getPropertyAsBoolean(name));
-    VS_LOG_DEBUG("Current value (double)  : %f", c->getPropertyAsDouble(name));
-    VS_LOG_DEBUG("Current value (long)    : %lld", c->getPropertyAsLong(name));
-    RefPointer<Rational> rational = c->getPropertyAsRational(name);
-    VS_LOG_DEBUG("Current value (rational): %f", rational->getValue());
-    char* value=c->getPropertyAsString(name);
-    VS_LOG_DEBUG("Current value (string)  : %s", value);
-    if (value) free(value);
+    Property::Type type = property->getType();
+    switch (type) {
+      case Property::PROPERTY_INT:
+      case Property::PROPERTY_INT64:
+        VS_LOG_DEBUG("Current value (long)    : %lld", c->getPropertyAsLong(name));
+        break;
+      case Property::PROPERTY_DOUBLE:
+      case Property::PROPERTY_FLOAT:
+        VS_LOG_DEBUG("Current value (double)  : %f", c->getPropertyAsDouble(name));
+        break;
+      case Property::PROPERTY_STRING:
+        {
+          char* value=c->getPropertyAsString(name);
+          VS_LOG_DEBUG("Current value (string)  : %s", value);
+          if (value) free(value);
+        }
+        break;
+      case Property::PROPERTY_RATIONAL:
+        {
+          RefPointer<Rational> rational = c->getPropertyAsRational(name);
+          VS_LOG_DEBUG("Current value (rational): %f", rational->getValue());
+        }
+        break;
+      case Property::PROPERTY_IMAGE_SIZE:
+      case Property::PROPERTY_PIXEL_FMT:
+      case Property::PROPERTY_SAMPLE_FMT:
+      case Property::PROPERTY_VIDEO_RATE:
+      case Property::PROPERTY_DURATION:
+      case Property::PROPERTY_COLOR:
+      case Property::PROPERTY_CHANNEL_LAYOUT:
+        // we need to implement these, but fall through for now.
+        VS_LOG_DEBUG("Current value not supported");
+        break;
+      default:
+        break;
+    }
   }
 }
 
