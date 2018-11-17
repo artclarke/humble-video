@@ -81,7 +81,8 @@ that use the native code.
 To build the native code the autotools stack is required:
 
 * GNU c++ compilers
-* YASM (for assembly)
+* autotool (autoreconf, automake, autoconf, etc.)
+* YASM and NASM (for assembly)
 * pkg-config
 * The Humble-Swig version of Swig (Use https://github.com/artclarke/humble-swig to get JavaDoc generated).
 * Doxygen & DOT (for C++ documentation)
@@ -100,6 +101,7 @@ The 'brew' utility is your on Mac OS X friend. Use it often. You can install yas
 
     brew install pkg-config
     brew install yasm
+    brew install nasm
     brew install valgrind
 
 To install the Humble-Swig version of Swig:
