@@ -15,6 +15,8 @@
 #include "vpx/vpx_integer.h"
 #include "vpx_dsp/arm/transpose_neon.h"
 
+extern const int16_t vpx_rv[];
+
 static uint8x8_t average_k_out(const uint8x8_t a2, const uint8x8_t a1,
                                const uint8x8_t v0, const uint8x8_t b1,
                                const uint8x8_t b2) {
@@ -255,5 +257,229 @@ void vpx_post_proc_down_and_across_mb_row_neon(uint8_t *src_ptr,
     }
 
     dst_ptr += 8 * dst_stride;
+  }
+}
+
+// sum += x;
+// sumsq += x * y;
+static void accumulate_sum_sumsq(const int16x4_t x, const int32x4_t xy,
+                                 int16x4_t *const sum, int32x4_t *const sumsq) {
+  const int16x4_t zero = vdup_n_s16(0);
+  const int32x4_t zeroq = vdupq_n_s32(0);
+
+  // Add in the first set because vext doesn't work with '0'.
+  *sum = vadd_s16(*sum, x);
+  *sumsq = vaddq_s32(*sumsq, xy);
+
+  // Shift x and xy to the right and sum. vext requires an immediate.
+  *sum = vadd_s16(*sum, vext_s16(zero, x, 1));
+  *sumsq = vaddq_s32(*sumsq, vextq_s32(zeroq, xy, 1));
+
+  *sum = vadd_s16(*sum, vext_s16(zero, x, 2));
+  *sumsq = vaddq_s32(*sumsq, vextq_s32(zeroq, xy, 2));
+
+  *sum = vadd_s16(*sum, vext_s16(zero, x, 3));
+  *sumsq = vaddq_s32(*sumsq, vextq_s32(zeroq, xy, 3));
+}
+
+// Generate mask based on (sumsq * 15 - sum * sum < flimit)
+static uint16x4_t calculate_mask(const int16x4_t sum, const int32x4_t sumsq,
+                                 const int32x4_t f, const int32x4_t fifteen) {
+  const int32x4_t a = vmulq_s32(sumsq, fifteen);
+  const int32x4_t b = vmlsl_s16(a, sum, sum);
+  const uint32x4_t mask32 = vcltq_s32(b, f);
+  return vmovn_u32(mask32);
+}
+
+static uint8x8_t combine_mask(const int16x4_t sum_low, const int16x4_t sum_high,
+                              const int32x4_t sumsq_low,
+                              const int32x4_t sumsq_high, const int32x4_t f) {
+  const int32x4_t fifteen = vdupq_n_s32(15);
+  const uint16x4_t mask16_low = calculate_mask(sum_low, sumsq_low, f, fifteen);
+  const uint16x4_t mask16_high =
+      calculate_mask(sum_high, sumsq_high, f, fifteen);
+  return vmovn_u16(vcombine_u16(mask16_low, mask16_high));
+}
+
+// Apply filter of (8 + sum + s[c]) >> 4.
+static uint8x8_t filter_pixels(const int16x8_t sum, const uint8x8_t s) {
+  const int16x8_t s16 = vreinterpretq_s16_u16(vmovl_u8(s));
+  const int16x8_t sum_s = vaddq_s16(sum, s16);
+
+  return vqrshrun_n_s16(sum_s, 4);
+}
+
+void vpx_mbpost_proc_across_ip_neon(uint8_t *src, int pitch, int rows, int cols,
+                                    int flimit) {
+  int row, col;
+  const int32x4_t f = vdupq_n_s32(flimit);
+
+  assert(cols % 8 == 0);
+
+  for (row = 0; row < rows; ++row) {
+    // Sum the first 8 elements, which are extended from s[0].
+    // sumsq gets primed with +16.
+    int sumsq = src[0] * src[0] * 9 + 16;
+    int sum = src[0] * 9;
+
+    uint8x8_t left_context, s, right_context;
+    int16x4_t sum_low, sum_high;
+    int32x4_t sumsq_low, sumsq_high;
+
+    // Sum (+square) the next 6 elements.
+    // Skip [0] because it's included above.
+    for (col = 1; col <= 6; ++col) {
+      sumsq += src[col] * src[col];
+      sum += src[col];
+    }
+
+    // Prime the sums. Later the loop uses the _high values to prime the new
+    // vectors.
+    sumsq_high = vdupq_n_s32(sumsq);
+    sum_high = vdup_n_s16(sum);
+
+    // Manually extend the left border.
+    left_context = vdup_n_u8(src[0]);
+
+    for (col = 0; col < cols; col += 8) {
+      uint8x8_t mask, output;
+      int16x8_t x, y;
+      int32x4_t xy_low, xy_high;
+
+      s = vld1_u8(src + col);
+
+      if (col + 8 == cols) {
+        // Last row. Extend border.
+        right_context = vdup_n_u8(src[col + 7]);
+      } else {
+        right_context = vld1_u8(src + col + 7);
+      }
+
+      x = vreinterpretq_s16_u16(vsubl_u8(right_context, left_context));
+      y = vreinterpretq_s16_u16(vaddl_u8(right_context, left_context));
+      xy_low = vmull_s16(vget_low_s16(x), vget_low_s16(y));
+      xy_high = vmull_s16(vget_high_s16(x), vget_high_s16(y));
+
+      // Catch up to the last sum'd value.
+      sum_low = vdup_lane_s16(sum_high, 3);
+      sumsq_low = vdupq_lane_s32(vget_high_s32(sumsq_high), 1);
+
+      accumulate_sum_sumsq(vget_low_s16(x), xy_low, &sum_low, &sumsq_low);
+
+      // Need to do this sequentially because we need the max value from
+      // sum_low.
+      sum_high = vdup_lane_s16(sum_low, 3);
+      sumsq_high = vdupq_lane_s32(vget_high_s32(sumsq_low), 1);
+
+      accumulate_sum_sumsq(vget_high_s16(x), xy_high, &sum_high, &sumsq_high);
+
+      mask = combine_mask(sum_low, sum_high, sumsq_low, sumsq_high, f);
+
+      output = filter_pixels(vcombine_s16(sum_low, sum_high), s);
+      output = vbsl_u8(mask, output, s);
+
+      vst1_u8(src + col, output);
+
+      left_context = s;
+    }
+
+    src += pitch;
+  }
+}
+
+// Apply filter of (vpx_rv + sum + s[c]) >> 4.
+static uint8x8_t filter_pixels_rv(const int16x8_t sum, const uint8x8_t s,
+                                  const int16x8_t rv) {
+  const int16x8_t s16 = vreinterpretq_s16_u16(vmovl_u8(s));
+  const int16x8_t sum_s = vaddq_s16(sum, s16);
+  const int16x8_t rounded = vaddq_s16(sum_s, rv);
+
+  return vqshrun_n_s16(rounded, 4);
+}
+
+void vpx_mbpost_proc_down_neon(uint8_t *dst, int pitch, int rows, int cols,
+                               int flimit) {
+  int row, col, i;
+  const int32x4_t f = vdupq_n_s32(flimit);
+  uint8x8_t below_context = vdup_n_u8(0);
+
+  // 8 columns are processed at a time.
+  // If rows is less than 8 the bottom border extension fails.
+  assert(cols % 8 == 0);
+  assert(rows >= 8);
+
+  // Load and keep the first 8 values in memory. Process a vertical stripe that
+  // is 8 wide.
+  for (col = 0; col < cols; col += 8) {
+    uint8x8_t s, above_context[8];
+    int16x8_t sum, sum_tmp;
+    int32x4_t sumsq_low, sumsq_high;
+
+    // Load and extend the top border.
+    s = vld1_u8(dst);
+    for (i = 0; i < 8; i++) {
+      above_context[i] = s;
+    }
+
+    sum_tmp = vreinterpretq_s16_u16(vmovl_u8(s));
+
+    // sum * 9
+    sum = vmulq_n_s16(sum_tmp, 9);
+
+    // (sum * 9) * sum == sum * sum * 9
+    sumsq_low = vmull_s16(vget_low_s16(sum), vget_low_s16(sum_tmp));
+    sumsq_high = vmull_s16(vget_high_s16(sum), vget_high_s16(sum_tmp));
+
+    // Load and discard the next 6 values to prime sum and sumsq.
+    for (i = 1; i <= 6; ++i) {
+      const uint8x8_t a = vld1_u8(dst + i * pitch);
+      const int16x8_t b = vreinterpretq_s16_u16(vmovl_u8(a));
+      sum = vaddq_s16(sum, b);
+
+      sumsq_low = vmlal_s16(sumsq_low, vget_low_s16(b), vget_low_s16(b));
+      sumsq_high = vmlal_s16(sumsq_high, vget_high_s16(b), vget_high_s16(b));
+    }
+
+    for (row = 0; row < rows; ++row) {
+      uint8x8_t mask, output;
+      int16x8_t x, y;
+      int32x4_t xy_low, xy_high;
+
+      s = vld1_u8(dst + row * pitch);
+
+      // Extend the bottom border.
+      if (row + 7 < rows) {
+        below_context = vld1_u8(dst + (row + 7) * pitch);
+      }
+
+      x = vreinterpretq_s16_u16(vsubl_u8(below_context, above_context[0]));
+      y = vreinterpretq_s16_u16(vaddl_u8(below_context, above_context[0]));
+      xy_low = vmull_s16(vget_low_s16(x), vget_low_s16(y));
+      xy_high = vmull_s16(vget_high_s16(x), vget_high_s16(y));
+
+      sum = vaddq_s16(sum, x);
+
+      sumsq_low = vaddq_s32(sumsq_low, xy_low);
+      sumsq_high = vaddq_s32(sumsq_high, xy_high);
+
+      mask = combine_mask(vget_low_s16(sum), vget_high_s16(sum), sumsq_low,
+                          sumsq_high, f);
+
+      output = filter_pixels_rv(sum, s, vld1q_s16(vpx_rv + (row & 127)));
+      output = vbsl_u8(mask, output, s);
+
+      vst1_u8(dst + row * pitch, output);
+
+      above_context[0] = above_context[1];
+      above_context[1] = above_context[2];
+      above_context[2] = above_context[3];
+      above_context[3] = above_context[4];
+      above_context[4] = above_context[5];
+      above_context[5] = above_context[6];
+      above_context[6] = above_context[7];
+      above_context[7] = s;
+    }
+
+    dst += 8;
   }
 }
