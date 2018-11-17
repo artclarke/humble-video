@@ -27,7 +27,7 @@ Humble Video's Maven Central artifacts contain native (i.e. non-Java) code and a
 | Operating System | Architecture |
 | ------ | ------------------- |
 | Microsoft Windows XP or later | i686 and x86_64 intel processors |
-| Apple OS X | i686 and x86_64 intel processors |
+| Apple OS X | x86_64 intel processors |
 | Ubuntu 12.04 LTS and later | i686 and x86_64 intel processors |
 
 If you are running on other platforms, the Maven Central artifacts may not work and you'll have to build your own version. And beware ... building Humble takes a very long time.
