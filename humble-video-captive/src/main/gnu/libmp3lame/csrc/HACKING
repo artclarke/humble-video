@@ -3,22 +3,20 @@ First, see the file STYLEGUIDE
 ************************************************************************
 TESTING
 =======
-If you make changes, please test.  There is a python
-script in the test/ directory which will compare two versions
-of lame using a bunch of CBR and ABR options. To run this
-script, copy your favorite (and short!) wav file to the
-lame/test directory, and run:
+
+If you make changes, please test.  There is a python script in the test/ 
+directory which will compare two versions of lame using a bunch of CBR 
+and ABR options. To run this script, copy your favorite (and short!) wav 
+file to the lame/test directory, and run:
 
 % cd lame/test
 % ./lametest.py [-w]  CBRABR.op castanets.wav lame_orig lame_new
 
 
 
-
-
-
 ************************************************************************
 LAME API
+========
 
 For a general outline of the code, see the file API.  
 Also, frontend/main.c is a simple front end to libmp3lame.a
@@ -35,15 +33,15 @@ lame_encode_frame_mp3():
    iteration_loop()       choose scalefactors (via iteration)
                           which determine noise shapping, and 
                           choose best huffman tables for lossless compression
-
    format_bitstream       format the bitstream.  when data+headers are complete,
                           output to internal bit buffer.
    copy_buffer()          copy internal bit buffer into user's mp3 buffer
 
 ************************************************************************
 ADDING NEW OPTIONS
+==================
 
-control variable goes in lame_global_flags sturct.
+control variable goes in lame_global_flags struct.
 Assume the variable is called 'new_variable'.
 
 You also need to write (in set_get.c):
@@ -65,28 +63,27 @@ of the API).
 
 
 ************************************************************************
-
 THREADSAFE:
+===========
 
-Lame should now be thread safe and re-entrant. 
-The only problem seems to be some OS's allocate small
-stacks (< 128K) to threads launched by applictions, and this
-is not enough for LAME.  Fix is to increase the stack space,
-or move some of our automatic variables onto the heap with
-by using bug-prove malloc()'s and free().
-
+Lame should now be thread safe and re-entrant. The only problem seems to 
+be some OS's allocate small stacks (< 128K) to threads launched by 
+applications, and this is not enough for LAME.  Fix is to increase the 
+stack space, or move some of our automatic variables onto the heap with
+by using bug-proof malloc()'s and free().
 
 
 ************************************************************************
 Global Variables:
+=================
 
-There are two types of global variables.  All data in
-both strucs is initialized to zero.
+There are two types of global variables.  All data in both structs is 
+initialized to zero.
 
 1. lame_global_flags *gfp
 
-These are input paramters which are set by the calling program,
-and some information which the calling program may be interested in.
+These are input parameters which are set by the calling program, and some 
+information which the calling program may be interested in.
 
 This struct instantiated by the call to lame_init().  
 
@@ -99,7 +96,7 @@ All internal data not set by the user.  All 'static' data from
 old non-reentrant code should be moved here.
 
 Defined in util.h.  Data for which the size is known
-in advace should be explicitly declaired (for example,
+in advance should be explicitly declaired (for example,
 float xr[576]);  Data which needs to be malloc'd is
 handled by:  
 

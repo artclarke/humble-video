@@ -3,7 +3,7 @@
  *
  *      Copyright (c) 1999 Mark Taylor
  *                    2000 Takehiro TOMINAGA
- *                    2010-2011 Robert Hegemann
+ *                    2010-2012 Robert Hegemann
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: main.c,v 1.127 2011/10/02 14:52:20 robert Exp $ */
+/* $Id: main.c,v 1.131 2017/08/12 18:56:15 robert Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -138,11 +138,11 @@ set_process_affinity()
 void
 dosToLongFileName(char *fn)
 {
-    const int MSIZE = PATH_MAX + 1 - 4; /*  we wanna add ".mp3" later */
+    const size_t MSIZE = PATH_MAX + 1 - 4; /*  we wanna add ".mp3" later */
     WIN32_FIND_DATAA lpFindFileData;
     HANDLE  h = FindFirstFileA(fn, &lpFindFileData);
     if (h != INVALID_HANDLE_VALUE) {
-        int     a;
+        size_t  a;
         char   *q, *p;
         FindClose(h);
         for (a = 0; a < MSIZE; a++) {
@@ -274,6 +274,11 @@ setProcessPriority(int Priority)
  * why not wchar_t all the way?
  * well, that seems to be a big mess and not portable at all
  */
+#ifndef NDEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>  
+#include <crtdbg.h>
+#endif
 #include <wchar.h>
 #include <mbstring.h>
 
@@ -368,13 +373,28 @@ unsigned short* utf8ToUtf16(char const* mbstr) /* additional Byte-Order-Marker *
   return wstr;
 }
 
-
+static
+void setDebugMode()
+{
+#ifndef NDEBUG
+    if ( IsDebuggerPresent() ) {
+        // Get current flag  
+        int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
+        //tmpFlag |= _CRTDBG_DELAY_FREE_MEM_DF;  
+        tmpFlag |= _CRTDBG_ALLOC_MEM_DF|_CRTDBG_LEAK_CHECK_DF;
+        // Set flag to the new value.  
+        _CrtSetDbgFlag( tmpFlag );
+        _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
+        _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
+    }
+#endif
+}
 
 int wmain(int argc, wchar_t* argv[])
 {
   char **utf8_argv;
   int i, ret;
-
+  setDebugMode();
   utf8_argv = calloc(argc, sizeof(char*));
   for (i = 0; i < argc; ++i) {
     utf8_argv[i] = unicodeToUtf8(argv[i]);
@@ -407,13 +427,13 @@ char* lame_getenv(char const* var)
 {
     char* str = 0;
     wchar_t* wvar = utf8ToUnicode(var);
-    wchar_t* wstr = 0;
     if (wvar != 0) {
-        wstr = _wgetenv(wvar);
-        str = unicodeToUtf8(wstr);
+        wchar_t* wstr = _wgetenv(wvar);
+        if (wstr != 0) {
+            str = unicodeToUtf8(wstr);
+        }
     }
     free(wvar);
-    free(wstr);
     return str;
 }
 

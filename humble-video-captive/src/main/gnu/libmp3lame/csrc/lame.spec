@@ -1,5 +1,5 @@
 %define name lame
-%define ver 3.99.4
+%define ver 3.100
 %define rel 1
 %define prefix %{_usr}
 %define docdir %{_defaultdocdir}

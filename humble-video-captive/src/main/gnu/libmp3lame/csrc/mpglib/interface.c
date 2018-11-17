@@ -1,7 +1,7 @@
 /*
  * interface.c
  *
- * Copyright (C) 1999-2010 The L.A.M.E. project
+ * Copyright (C) 1999-2012 The L.A.M.E. project
  *
  * Initially written by Michael Hipp, see also AUTHORS and README.
  *  
@@ -20,7 +20,7 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-/* $Id: interface.c,v 1.64 2010/03/22 14:30:19 robert Exp $ */
+/* $Id: interface.c,v 1.69 2017/09/06 15:07:30 robert Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -56,34 +56,35 @@ InitMP3(PMPSTR mp)
     hip_init_tables_layer2();
     hip_init_tables_layer3();
 
-    memset(mp, 0, sizeof(MPSTR));
+    if (mp) {
+        memset(mp, 0, sizeof(MPSTR));
 
-    mp->framesize = 0;
-    mp->num_frames = 0;
-    mp->enc_delay = -1;
-    mp->enc_padding = -1;
-    mp->vbr_header = 0;
-    mp->header_parsed = 0;
-    mp->side_parsed = 0;
-    mp->data_parsed = 0;
-    mp->free_format = 0;
-    mp->old_free_format = 0;
-    mp->ssize = 0;
-    mp->dsize = 0;
-    mp->fsizeold = -1;
-    mp->bsize = 0;
-    mp->head = mp->tail = NULL;
-    mp->fr.single = -1;
-    mp->bsnum = 0;
-    mp->wordpointer = mp->bsspace[mp->bsnum] + 512;
-    mp->bitindex = 0;
-    mp->synth_bo = 1;
-    mp->sync_bitstream = 1;
+        mp->framesize = 0;
+        mp->num_frames = 0;
+        mp->enc_delay = -1;
+        mp->enc_padding = -1;
+        mp->vbr_header = 0;
+        mp->header_parsed = 0;
+        mp->side_parsed = 0;
+        mp->data_parsed = 0;
+        mp->free_format = 0;
+        mp->old_free_format = 0;
+        mp->ssize = 0;
+        mp->dsize = 0;
+        mp->fsizeold = -1;
+        mp->bsize = 0;
+        mp->head = mp->tail = NULL;
+        mp->fr.single = -1;
+        mp->bsnum = 0;
+        mp->wordpointer = mp->bsspace[mp->bsnum] + 512;
+        mp->bitindex = 0;
+        mp->synth_bo = 1;
+        mp->sync_bitstream = 1;
 
-    mp->report_dbg = &lame_report_def;
-    mp->report_err = &lame_report_def;
-    mp->report_msg = &lame_report_def;
-
+        mp->report_dbg = &lame_report_def;
+        mp->report_err = &lame_report_def;
+        mp->report_msg = &lame_report_def;
+    }
     make_decode_tables(32767);
 
     return 1;
@@ -92,14 +93,16 @@ InitMP3(PMPSTR mp)
 void
 ExitMP3(PMPSTR mp)
 {
-    struct buf *b, *bn;
+    if (mp) {
+        struct buf *b, *bn;
 
-    b = mp->tail;
-    while (b) {
-        free(b->pnt);
-        bn = b->next;
-        free(b);
-        b = bn;
+        b = mp->tail;
+        while (b) {
+            free(b->pnt);
+            bn = b->next;
+            free(b);
+            b = bn;
+        }
     }
 }
 
@@ -316,11 +319,11 @@ sync_buffer(PMPSTR mp, int free_match)
         b[2] = b[3];
         while (pos >= buf->size) {
             buf = buf->next;
-            pos = buf->pos;
             if (!buf) {
                 return -1;
                 /* not enough data to read 4 bytes */
             }
+            pos = buf->pos;
         }
         b[3] = buf->pnt[pos];
         ++pos;
@@ -472,7 +475,9 @@ decodeMP3_clipchoice(PMPSTR mp, unsigned char *in, int isize, char *out, int *do
              * to make sure we do not overflow buffer
              */
             int     size;
-            lame_report_fnc(mp->report_err, "hip: bitstream problem, resyncing skipping %d bytes...\n", bytes);
+            if (mp->fsizeold != -1) {
+                lame_report_fnc(mp->report_err, "hip: bitstream problem, resyncing skipping %d bytes...\n", bytes);
+            }
             mp->old_free_format = 0;
 #if 1
             /* FIXME: correct ??? */
@@ -503,7 +508,8 @@ decodeMP3_clipchoice(PMPSTR mp, unsigned char *in, int isize, char *out, int *do
         }
 
         read_head(mp);
-        decode_header(mp, &mp->fr, mp->header);
+        if (!decode_header(mp, &mp->fr, mp->header))
+            return MP3_ERR;
         mp->header_parsed = 1;
         mp->framesize = mp->fr.framesize;
         mp->free_format = (mp->framesize == 0);
@@ -601,7 +607,8 @@ decodeMP3_clipchoice(PMPSTR mp, unsigned char *in, int isize, char *out, int *do
             if (mp->fr.error_protection)
                 getbits(mp, 16);
 
-            decode_layer1_frame(mp, (unsigned char *) out, done);
+            if (decode_layer1_frame(mp, (unsigned char *) out, done) < 0)
+                return MP3_ERR;
             break;
 
         case 2:

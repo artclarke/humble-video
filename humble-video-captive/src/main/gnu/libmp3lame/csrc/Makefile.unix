@@ -474,7 +474,9 @@ else
 CC_SWITCHES = -D__NO_MATH_INLINES  # only needed by some older glibc
 endif
 
-CC_SWITCHES += -DNDEBUG $(CC_OPTS) $(SNDLIB) $(BRHIST_SWITCH)
+# temporary remove NDEBUG, see configure.in
+#CC_SWITCHES += -DNDEBUG $(CC_OPTS) $(SNDLIB) $(BRHIST_SWITCH)
+CC_SWITCHES += $(CC_OPTS) $(SNDLIB) $(BRHIST_SWITCH)
 frontend_sources = \
 	frontend/main.c \
 	frontend/amiga_mpega.c \

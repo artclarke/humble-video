@@ -22,7 +22,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: mp3rtp.c,v 1.36 2011/10/02 17:13:22 robert Exp $ */
+/* $Id: mp3rtp.c,v 1.37 2017/08/24 20:43:10 robert Exp $ */
 
 /* Still under work ..., need a client for test, where can I get one? */
 
@@ -185,9 +185,17 @@ lame_main(lame_t gf, int argc, char **argv)
      * skip this call and set the values of interest in the gf struct.  
      * (see lame.h for documentation about these parameters)
      */
-
-    argv[1] = argv[0];
-    parse_args(gf, argc - 1, argv + 1, inPath, outPath, NULL, NULL);
+    {
+        int     i;
+        int     argc_mod = argc-1; /* leaving out exactly one argument */
+        char**  argv_mod = calloc(argc_mod, sizeof(char*));
+        argv_mod[0] = argv[0];
+        for (i = 2; i < argc; ++i) { /* leaving out argument number 1, parsed above */
+            argv_mod[i-1] = argv[i];
+        }
+        parse_args(gf, argc_mod, argv_mod, inPath, outPath, NULL, NULL);
+        free(argv_mod);
+    }
 
     /* open the output file.  Filename parsed into gf.inPath */
     if (0 == strcmp(outPath, "-")) {
@@ -209,6 +217,8 @@ lame_main(lame_t gf, int argc, char **argv)
      * these values yourself.  
      */
     if (init_infile(gf, inPath) < 0) {
+        rtp_deinitialization();
+        fclose(outf);
         error_printf("Can't init infile '%s'\n", inPath);
         return 1;
     }
@@ -222,6 +232,8 @@ lame_main(lame_t gf, int argc, char **argv)
         if (ret == -1)
             display_bitrates(stderr);
         rtp_deinitialization();
+        fclose(outf);
+        close_infile();
         error_printf("fatal error during initialization\n");
         return -1;
     }

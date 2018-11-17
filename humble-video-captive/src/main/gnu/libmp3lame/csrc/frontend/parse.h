@@ -16,6 +16,8 @@ int     parse_args(lame_global_flags * gfp, int argc, char **argv, char *const i
 
 void    parse_close();
 
+int     generateOutPath(char const* inPath, char const* outDir, char const* suffix, char* outPath);
+
 #if defined(__cplusplus)
 }
 #endif

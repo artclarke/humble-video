@@ -20,7 +20,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: timestatus.c,v 1.60 2011/05/07 16:05:17 rbrito Exp $ */
+/* $Id: timestatus.c,v 1.61 2013/03/20 20:38:43 robert Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -219,7 +219,7 @@ encoder_progress_begin( lame_global_flags const* gf
         char* i_file = 0;
         char* o_file = 0;
 #if defined( _WIN32 ) && !defined(__MINGW32__)
-        inPath = i_file = utf8ToLocal8Bit(inPath);
+        inPath = i_file = utf8ToConsole8Bit(inPath);
         outPath = o_file = utf8ToConsole8Bit(outPath);
 #endif
         lame_print_config(gf); /* print useful information about options being used */

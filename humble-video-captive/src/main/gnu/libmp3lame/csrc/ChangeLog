@@ -11,6 +11,913 @@
 
 -- 
 
+2017-10-13 20:22  aleidinger
+
+	* vc_solution/Makefile.in:
+
+	update
+
+2017-10-13 20:21  aleidinger
+
+	* vc_solution/Makefile.am:
+
+	list each file explicitely, make dist does not like globs.
+
+2017-10-13 20:16  aleidinger
+
+	* testcase.mp3:
+
+	Update testcase for 3.100 release.
+	Build on FreeBSD 64bit, clang 5.0.0, no advanced compiler flags/optimisations.
+
+2017-10-10 19:31  aleidinger
+
+	* ChangeLog:
+
+	update
+
+2017-09-26 12:25  robert
+
+	* frontend/parse.c:
+
+	forcing MS for j-stereo mode only
+
+2017-09-26 12:14  robert
+
+	* Dll/BladeMP3EncDLL.c, frontend/parse.c, libmp3lame/lame.c:
+
+	forcing MS for j-stereo mode only
+
+2017-09-26 10:31  robert
+
+	* libmp3lame/lame.c:
+
+	set 'use of safe joint' for joint-stereo only, (only effects a bit in vbr tag, sometimes)
+
+2017-09-21 11:00  robert
+
+	* libmp3lame/: gain_analysis.c, machine.h:
+
+	+ fix multiple_of macro
+
+2017-09-19 16:58  robert
+
+	* libmp3lame/version.h:
+
+	release candidate
+
+2017-09-19 16:57  robert
+
+	* frontend/parse.c:
+
+	patch for bug #484: Lame doesn't recognize user locale correctly
+
+2017-09-06 19:40  aleidinger
+
+	* ChangeLog:
+
+	update
+
+2017-09-06 19:38  aleidinger
+
+	* libmp3lame/psymodel.c:
+
+	Add missing (at least in FreeBSD) include for FLT_EPSILON.
+
+2017-09-06 15:07  robert
+
+	* frontend/get_audio.c, libmp3lame/fft.c,
+	  libmp3lame/gain_analysis.c, libmp3lame/psymodel.c,
+	  libmp3lame/quantize_pvt.c, libmp3lame/set_get.c,
+	  libmp3lame/takehiro.c, libmp3lame/util.c, libmp3lame/util.h,
+	  mpglib/interface.c, mpglib/tabinit.c:
+
+	small fixes
+
+2017-08-31 14:14  robert
+
+	* frontend/lame_main.c, include/lame.def, include/lame.h,
+	  include/libmp3lame.sym, libmp3lame/bitstream.c,
+	  libmp3lame/lame.c, libmp3lame/set_get.c:
+
+	another go to fix bug #474: Buffer Overflow possible when input sample rate very low
+
+	- do_copy_buffer did not check buffer size, when size was zero!
+	  0 was a bad choice for the purpose of not checking, because
+	  it was possible to get there, even when checking was demeanded!
+
+2017-08-30 20:48  robert
+
+	* libmp3lame/lame.c:
+
+	fix for bug #474: Buffer Overflow possible when input sample rate very low
+
+	When the input sample rate is very low, like 1 Hz, resampling to 8 kHz can result in a buffer overflow.
+	Found by Gustavo Grieco.
+
+2017-08-30 14:11  robert
+
+	* frontend/: lame_main.c, parse.c, parse.h:
+
+	fix for bug #473: Buffer Overflow possible in lame_main.c
+	- replaced parse_nogap_filename by generateOutPath
+	  (now there is only one function building the output file names)
+	- all nogap file names are now build before any encoding starts
+	- decode and nogap are no valid combination of arguments anymore, wouldn't work as expected
+
+2017-08-28 15:39  robert
+
+	* libmp3lame/id3tag.c:
+
+	fix for bug #472: NULL Pointer Dereference in id3v2AddAudioDuration
+	- plus some more pointer checks
+
+2017-08-28 12:48  robert
+
+	* frontend/gtkanal.c:
+
+	fixing resource leak, hip deocder wasn't closed on quit
+
+2017-08-26 13:20  robert
+
+	* libmp3lame/: lame.c, set_get.c:
+
+	lame_init_params:
+	- removed some impossible returns
+
+2017-08-26 10:54  robert
+
+	* libmp3lame/encoder.c:
+
+	more of psy downgrade
+
+2017-08-24 20:43  robert
+
+	* frontend/mp3rtp.c:
+
+	- free was called twice for some argument c-string
+
+2017-08-23 13:22  robert
+
+	* mpglib/: interface.c, layer1.c:
+
+	hip layer 1 decode: testing for illegal bit allocation value
+
+2017-08-22 23:31  robert
+
+	* mpglib/layer2.c:
+
+	fix for bug #470: global-buffer-overflow mpglib/layer2.c:144 II_step_one
+
+2017-08-22 19:44  robert
+
+	* libmp3lame/: id3tag.c, id3tag.h, util.c:
+
+	id3v2: set 'language'property to a valid language code (COMM field)
+
+2017-08-22 16:02  robert
+
+	* doc/html/history.html, frontend/get_audio.c,
+	  frontend/lame_main.c:
+
+	fixing bug i#434: --clipdetect scale suggestion unaware of --scale input value
+
+2017-08-21 17:10  robert
+
+	* frontend/get_audio.c:
+
+	fix for bug #469 Unable to build without mpglib
+
+2017-08-20 20:06  robert
+
+	* mpglib/layer3.c:
+
+	It looks like 'intensity stereo' decoding is broken. This change prevents a buffer overflow (read) and instead prints an indication, that there is something wrong.
+
+2017-08-20 13:56  robert
+
+	* mpglib/layer3.c:
+
+	fixing map for mixed-block band infos
+
+2017-08-19 20:17  robert
+
+	* mpglib/layer3.c:
+
+	fix for #467: stack-buffer-overflow mpglib/layer3.c:945 III_dequantize_sample
+
+	fix for #468 global-buffer-overflow mpglib/layer3.c:1244 III_i_stereo
+
+2017-08-19 14:20  robert
+
+	* mpglib/common.c:
+
+	fix for bug #465: global-buffer-overflow layer2.c:144 II_step_one
+	- mpeg-2.5 is only supported by Layer3
+
+2017-08-19 12:51  aleidinger
+
+	* ChangeLog:
+
+	update
+
+2017-08-18 22:06  robert
+
+	* mpglib/layer3.c:
+
+	fix for bug #466: "stack-buffer-overflow in ./mpglib/layer3.c:1264 III_i_stereo"
+
+2017-08-18 21:56  robert
+
+	* frontend/: get_audio.c, lame_main.c:
+
+	fix for bug #464: attempting double-free
+
+2017-08-15 19:51  robert
+
+	* libmp3lame/set_get.c:
+
+	estimation of total number of frames changed
+
+2017-08-15 15:40  aleidinger
+
+	* make_changelog.sh:
+
+	add comment how to generate the input file
+
+2017-08-15 15:35  aleidinger
+
+	* ChangeLog:
+
+	update ChangeLog
+
+2017-08-15 15:20  aleidinger
+
+	* Makefile.in, ACM/Makefile.in, ACM/ADbg/Makefile.in,
+	  ACM/ddk/Makefile.in, ACM/tinyxml/Makefile.in, Dll/Makefile.in,
+	  doc/Makefile.in, doc/html/Makefile.in, doc/man/Makefile.in,
+	  dshow/Makefile.in, frontend/Makefile.in, include/Makefile.in,
+	  libmp3lame/Makefile.in, libmp3lame/i386/Makefile.in,
+	  libmp3lame/vector/Makefile.in, mac/Makefile.in,
+	  macosx/Makefile.in, macosx/English.lproj/Makefile.in,
+	  macosx/LAME.xcodeproj/Makefile.in, misc/Makefile.in,
+	  mpglib/Makefile.in, vc_solution/Makefile.in:
+
+	regenerate
+
+2017-08-15 15:16  aleidinger
+
+	* aclocal.m4, configure:
+
+	regenerate
+
+2017-08-15 15:16  aleidinger
+
+	* configure.in:
+
+	Improve compiler version detection  (clang changed version string).
+	Add some future GCC versions in the optimisation part.
+
+2017-08-15 15:15  aleidinger
+
+	* include/lame.def:
+
+	Add lame_encode_buffer_interleaved_int() by Michael Fink.
+	LAME Patch #27.
+
+2017-08-15 14:51  aleidinger
+
+	* include/lame.h, include/libmp3lame.sym, libmp3lame/lame.c:
+
+	patch #27: Add lame_encode_buffer_interleaved_int() by Michael Fink
+
+2017-08-15 14:46  aleidinger
+
+	* compile, config.sub, depcomp, install-sh, missing,
+	  frontend/depcomp, libmp3lame/depcomp, misc/depcomp,
+	  mpglib/depcomp:
+
+	update to a more recent autotools version
+
+2017-08-13 16:18  robert
+
+	* libmp3lame/set_get.c:
+
+	prevent some rare overflow in estimation of total number of frames
+	in case samplerate-out is higher than samplerate-in
+	(it is a visual glitch only)
+
+2017-08-13 13:57  robert
+
+	* doc/html/history.html, frontend/get_audio.c,
+	  libmp3lame/version.h:
+
+	- sanity check when reading pcm data, avoid buffer overflow
+	- version 3.100 beta 0
+
+2017-08-12 18:56  robert
+
+	* frontend/get_audio.c, frontend/lame_main.c, frontend/main.c,
+	  mpglib/common.c, mpglib/interface.c:
+
+	- avoid calling exit in library
+	- free up resources after error condition in frontend
+
+2017-08-12 18:14  robert
+
+	* mpglib/layer3.c:
+
+	- workaround for heap corruption while decoding layer3
+	- some fix for mpeg2.5 decoding with mixed block feature, taken from Takehiro's branch
+
+2017-08-08 17:52  robert
+
+	* doc/man/lame.1:
+
+	fix typo
+
+2017-08-08 13:56  robert
+
+	* doc/html/history.html, libmp3lame/vector/xmm_quantize_sub.c:
+
+	Fix for bug ticket [ #449 ] Make sure functions with SSE instructions maintain their own properly aligned stack. Thanks to Fabian Greffrath
+
+2017-08-08 13:26  robert
+
+	* doc/html/history.html, mpglib/interface.c:
+
+	Fix for bug ticket #445: dereference of a null pointer possible in loop. Thanks to Renu Tyagi
+
+2017-08-08 12:40  robert
+
+	* doc/html/history.html, frontend/lame_main.c:
+
+	Fix for bug ticket #447: Fix dereference NULL and Buffer not NULL terminated issues. Thanks to Surabhi Mishra
+
+2017-08-06 18:15  robert
+
+	* frontend/get_audio.c, libmp3lame/VbrTag.c, libmp3lame/lame.c,
+	  libmp3lame/set_get.c, libmp3lame/util.h:
+
+	in case of illegal sample rate and number of channel, let lame print an error message
+
+2017-08-03 13:07  rjamorim
+
+	* HACKING, INSTALL, LICENSE, README, README.WINGTK, TODO:
+
+	Typos, formatting, grammar...
+
+2017-08-03 13:06  rjamorim
+
+	* ACM/lame.ico:
+
+	Updated icon to the current LAME logo
+
+2017-08-03 12:32  rjamorim
+
+	* USAGE:
+
+	Updated USAGE: fixed typos, formatting, some grammar
+
+2017-08-02 19:56  robert
+
+	* doc/html/history.html:
+
+	- reverting psymodel to that of version 3.99.5
+	 - changing version back to 3.99.5 to ease binary mp3 file comparisons  with version 3.99.5
+
+	Committed on the Free edition of March Hare Software CVSNT Client.
+	Upgrade to CVS Suite for more features and support:
+	http://march-hare.com/cvsnt/
+
+2017-08-02 19:48  robert
+
+	* libmp3lame/: psymodel.c, quantize.c, quantize_pvt.c, util.h,
+	  version.h:
+
+	- reverting psymodel to that of version 3.99.5
+	 - changing version back to 3.99.5 to ease binary mp3 file comparisons  with version 3.99.5
+
+	Committed on the Free edition of March Hare Software CVSNT Client.
+	Upgrade to CVS Suite for more features and support:
+	http://march-hare.com/cvsnt/
+
+2016-01-29 21:36  aleidinger
+
+	* ChangeLog:
+
+	update history
+
+2016-01-29 21:06  aleidinger
+
+	* aclocal.m4, config.h.in, config.sub, Makefile.in, compile,
+	  config.guess, depcomp, install-sh, ltmain.sh, missing,
+	  ACM/Makefile.in, ACM/ADbg/Makefile.in, ACM/ddk/Makefile.in,
+	  ACM/tinyxml/Makefile.in, Dll/Makefile.in, doc/Makefile.in,
+	  doc/html/Makefile.in, doc/man/Makefile.in, dshow/Makefile.in,
+	  frontend/Makefile.in, frontend/depcomp, include/Makefile.in,
+	  libmp3lame/Makefile.in, libmp3lame/depcomp,
+	  libmp3lame/i386/Makefile.in, libmp3lame/vector/Makefile.in,
+	  mac/Makefile.in, macosx/Makefile.in,
+	  macosx/English.lproj/Makefile.in,
+	  macosx/LAME.xcodeproj/Makefile.in, misc/Makefile.in,
+	  misc/depcomp, mpglib/Makefile.in, mpglib/depcomp,
+	  vc_solution/Makefile.in, configure:
+
+	regen
+
+2016-01-29 21:06  aleidinger
+
+	* HACKING, Makefile.MSVC, Makefile.am.global, Makefile.unix,
+	  configure.in, Dll/Makefile.mingw32, libmp3lame/Makefile.am:
+
+	- better check for SSE intrinsics [1]
+	- don't define NDEBUG in release builds
+	  -> asserts trigger segfaults even in release builds
+	  -> quick and user-unfriendly fix until user-fiendly error checks are
+	     implemented
+	- fix spelling mistakes in HACKING file [2]
+	- enable cross-compiling for mingw [3]
+	- fix linker path for libmpelame for mingw [3]
+	- fix out-of-source-tree builds [4]
+	- update files to automake 1.15, autconf 2.69
+	- update compiler version detection (detect clang and add optimization
+	  for at least 3.7.x)
+
+	Submitted by:	dim@FreeBSD.org [1], FreeBSD PR 206620
+			tridecethtwelve@users.sf.net [2] LAME patch #68
+			bardware@users.sf.net [3] LAME patch #70
+			m-a@users.sf.net [4] LAmE patch #67
+
+2015-05-11 07:01  rbrito
+
+	* libmp3lame/lame.c:
+
+	libmp3lame: Remove redundant check for invalid sample rates.
+
+	Thanks Fabian Greffrath for letting me know that I screwed up. :)
+
+	Signed-off-by: Rogério Brito <rbrito@ime.usp.br>
+
+2015-04-28 22:12  rbrito
+
+	* libmp3lame/lame.c:
+
+	libmp3lame: Add check for negative number of channels.
+
+	Thanks to Maks Naumov and Fabian Greffrath for the contribution.
+
+2015-04-28 22:07  rbrito
+
+	* libmp3lame/util.c:
+
+	libmp3lame: Fix decision if sample rate ratio is an integer value or not.
+
+	From Fabian Greffrath's original description:
+
+	   If the sample rate of the input file is sufficiently close to an integer
+	   multiple of the output sample rate, the value of the intratio variable is
+	   calculated incorrectly. This leads to further values being miscalculated
+	   up to the joff variable which is used as an index to dereference the
+	   esv->blackfilt array. This leads top an overflow and causes a
+	   segmentation fault.
+
+	See https://bugs.debian.org/778529 for a discussion.
+
+2015-04-28 22:03  rbrito
+
+	* frontend/get_audio.c:
+
+	frontend: Avoid division by zero.
+
+	Avoid malformed wav causing floating point exception (integer divide by
+	zero).
+
+	Kindly contributed by Fabian Greffrath <fabian+debian@greffrath.com>. See
+	https://bugs.debian.org/777159 for a discussion.
+
+2015-02-21 23:03  rbrito
+
+	* test/lametest.py:
+
+	test: lametest: Some more PEP-8 love.
+
+	This is mostly regarding not having parentheses around boolean expressions.
+
+2015-02-21 22:57  rbrito
+
+	* test/lametest.py:
+
+	test: lametest: Add some PEP-8 love.
+
+2015-02-21 22:49  rbrito
+
+	* test/lametest.py:
+
+	test: lametest: Fix some trailing whitespace.
+
+2015-02-21 22:35  rbrito
+
+	* libmp3lame/lame.c:
+
+	Add check for invalid input sample rate.
+
+	Patch by Maks Naumov <maksqwe1@ukr.net>, forwared to me by Fabian Greffrath
+	<fabian@greffrath.com> from the Debian packaging.
+
+	Thanks for the contribution!
+
+2014-10-01 17:54  jaz001
+
+	* doc/html/links.html:
+
+	links update.
+
+2014-01-28 14:48  robert
+
+	* frontend/get_audio.c, frontend/main.c, libmp3lame/lame.c,
+	  libmp3lame/machine.h, Makefile.MSVC:
+
+	some minor changes:
+	- do not disable replaygain calc and find peak sample, when not writing LAME info header (patch tracker item #66)
+	- remove deprecated linker option from Makefile.MSVC (bug tracker item #442)
+
+2013-12-17 11:24  robert
+
+	* frontend/get_audio.c, frontend/main.h, frontend/parse.c,
+	  libmp3lame/gain_analysis.c, libmp3lame/id3tag.h,
+	  libmp3lame/machine.h, libmp3lame/psymodel.c:
+
+	applying submitted patches
+	#64: fixes undefined references when compiling with mingw32 (send by Patrick)
+	#59: changes static_assert into a more portable form (send by Doug Cook)
+	#55: fixes issues with wave files >2GB (send by lvqcl)
+
+	plus some minor changes to reduce compiler warnings with GCC v4.7.1
+
+2013-12-08 19:49  jaz001
+
+	* LICENSE, USAGE, doc/html/detailed.html, doc/man/lame.1,
+	  frontend/parse.c:
+
+	Documentation updates:
+	-q setting rewording in all docs
+	general updates in USAGE and man page.
+	Small updates in the --help, --longhelp , and --preset help
+
+2013-06-12 09:16  rbrito
+
+	* aclocal.m4, configure.in, doc/html/Makefile.am,
+	  doc/man/Makefile.am, libmp3lame/i386/Makefile.am:
+
+	Make autotools files compatible with automake >= 1.12
+
+	Newer autotools versions don't seem to support ansi2knr, which is probably
+	not a problem, given the last decades of compilers accepting ANSI C (and the
+	rest of the LAME code being written in ANSI C itself).
+
+	This fixes ticket #60, with a patch of Brennan Shacklett, from the Gentoo
+	community.
+
+2013-06-12 09:06  rbrito
+
+	* aclocal.m4, configure.in, doc/html/Makefile.am:
+
+	Kill spurious trailing whitespace from some files.
+
+2013-06-11 08:41  rbrito
+
+	* frontend/brhist.c:
+
+	frontend: brhist: Fix type of formatting string parameter.
+
+2013-06-11 08:41  rbrito
+
+	* frontend/get_audio.c:
+
+	frontend: get_audio: Add missing formatting string parameter.
+
+2013-06-11 08:19  rbrito
+
+	* Dll/Example.cpp:
+
+	Dll/Example.cpp: Remove (some) spurious whitespace.
+
+2013-06-11 08:19  rbrito
+
+	* Dll/Example.cpp:
+
+	Dll/Example.cpp: Remove resource leaks in example code.
+
+2013-06-11 07:26  rbrito
+
+	* config.guess, config.sub:
+
+	config.{sub,guess}: Update files to pick up newer arches.
+
+	This closes ticket #406. Perhaps a better solution would be to rewrite part
+	of our autotools system, but, then, perhaps not.
+
+2013-06-11 06:46  rbrito
+
+	* include/libmp3lame.sym:
+
+	libmp3lame: Regenerate libmp3lame.sym from header file.
+
+	Part of patch submitted by Reimar Döffinger on ticket #63.
+
+	We should review this to check if there are any symbols that we don't want
+	exported.
+
+2013-06-11 06:45  rbrito
+
+	* libmp3lame/Makefile.am:
+
+	libmp3lame: Consider the symbols in libmp3lame.sym.
+
+	This is part of the patch sent by Reimar Döffinger in ticket #63.
+
+2013-03-20 20:38  robert
+
+	* frontend/timestatus.c, doc/html/history.html:
+
+	fix for tracker item 3608583: input file name displayed with wrong character encoding (windows)
+
+2012-10-25 18:46  robert
+
+	* doc/html/history.html, frontend/lame_main.c, frontend/main.c,
+	  frontend/parse.c:
+
+	fix for tracker item 3580176: environment variable LAMEOPT doesn't work anymore
+
+2012-10-13 14:10  robert
+
+	* doc/html/history.html, frontend/parse.c:
+
+	fix for tracker item 3544957: scale (empty) silent encode without warning
+
+	switches with missing argument values will be ignored.  (Those with integer or floating point values, at least)
+
+2012-10-13 11:50  robert
+
+	* doc/html/history.html, frontend/parse.c:
+
+	fix for tracker item 3565659: no progress indication with pipe input :(
+
+2012-10-13 10:36  robert
+
+	* doc/html/history.html, frontend/parse.c:
+
+	fix for tracker item 3567844: problem with Tag genre
+
+2012-10-13 09:33  robert
+
+	* doc/html/history.html, frontend/parse.c:
+
+	fix for tracker item ID 3558466: Bug in path handling
+
+2012-10-09 21:39  robert
+
+	* libmp3lame/version.h:
+
+	bump version
+
+2012-10-09 21:37  robert
+
+	* libmp3lame/: psymodel.c, util.h:
+
+	trying to improve strong tonal samples (lead-voice.wav)
+
+2012-10-09 21:35  robert
+
+	* frontend/parse.c:
+
+	ignore developer-only switches, but parse them for command line compatibility reasons
+
+2012-10-06 15:54  robert
+
+	* libmp3lame/psymodel.c:
+
+	- code refactorings
+	- changed "mask adding", get the max of 3 different ones
+
+2012-10-06 11:44  robert
+
+	* frontend/parse.c, libmp3lame/presets.c:
+
+	+ new command line option "--gain x",  more convenient to adjust replay gain, just use whatever decibel value LAME reported before.
+	+ out-dir option mentioned in long help text
+
+2012-07-19 20:57  robert
+
+	* doc/html/history.html, frontend/get_audio.c, mpglib/interface.c,
+	  libmp3lame/version.h:
+
+	Improved detection of MPEG audio data in RIFF WAVE files.
+	see tracker item 3545112: Invalid sampling detection
+
+2012-07-11 18:31  jaz001
+
+	* doc/html/: detailed.html, usage.html:
+
+	Updates to reflect recent changes in hydrogenaudio wiki.
+
+2012-06-19 00:15  rbrito
+
+	* doc/html/history.html:
+
+	Update the HTML changelog.
+
+2012-06-19 00:00  rbrito
+
+	* Makefile.am, configure.in:
+
+	Don't use use the debian directory as build target.
+
+	Include debian as extra directory instead of directory part of
+	subdirectories used in build.
+
+	Patch stolen from:
+
+	    http://anonscm.debian.org/gitweb/?p=pkg-multimedia/lame.git;a=tree;f=debian/patches
+
+2012-06-18 20:52  rbrito
+
+	* libmp3lame/i386/Makefile.am:
+
+	libmp3lame: Fix possible race condition causing build failures.
+
+	This was discovered in automated builds by the Debian project and the patch
+	provided is by Andres Mejia <amejia@debian.org>.
+
+	Please, note that only part of the patch (the one touching Makefile.am) was
+	applied, since the changes in Makefile.in should be picked up when
+	regenerating files with autotools.
+
+	Signed-off-by: Rogério Brito <rbrito@ime.usp.br>
+
+2012-06-18 20:51  rbrito
+
+	* acinclude.m4:
+
+	acinclude.m4: Include GTK-1 autoconf directives in build system.
+
+	Resurrect knowledge of how to deal with GTK1. This was transplanted back
+	from aclocal.m4 with a patch provided by Andres Mejia <amejia@debian.org>,
+	from Debian's packaging of lame, even though the original code is attributed
+	to Owen Taylor and dated 97-11-3.
+
+	Anyway, with this part not lost again, we can easily regenerate autotools'
+	files with a simple `autoconf -vfi` invocation.
+
+	Signed-off-by: Rogério Brito <rbrito@ime.usp.br>
+
+2012-06-18 20:48  rbrito
+
+	* configure.in:
+
+	configure.in: Rewrap for (human) legibility.
+
+	This also helps by being diff-friendly if we change only one of the parts of
+	a long line.
+
+	Signed-off-by: Rogério Brito <rbrito@ime.usp.br>
+
+2012-02-28 19:07  robert
+
+	* doc/html/history.html:
+
+	bug-fix release 3.99.5
+
+2012-02-28 18:57  robert
+
+	* ChangeLog, configure, configure.in, testcase.mp3,
+	  doc/html/history.html (lame3_99):
+
+	bug-fix release 3.99.5
+
+2012-02-19 00:02  robert
+
+	* libmp3lame/: gain_analysis.c, machine.h:
+
+	rearranging gain analysis kernel table and calc loops to allow better code vectorization
+
+2012-02-18 13:08  robert
+
+	* frontend/get_audio.c, frontend/lame_main.c, frontend/main.c,
+	  frontend/parse.c, libmp3lame/mpglib_interface.c, mpglib/layer2.c:
+
+	removing VC11 x86-64 compiler warnings
+
+2012-02-14 14:24  robert
+
+	* libmp3lame/: VbrTag.c, bitstream.c, encoder.c, id3tag.c, lame.c,
+	  machine.h, mpglib_interface.c, psymodel.c, util.c, util.h:
+
+	some code refactorings
+
+2012-02-14 11:06  robert
+
+	* ChangeLog, doc/html/history.html (lame3_99), ChangeLog,
+	  doc/html/history.html:
+
+	updating history/changelog
+
+2012-02-11 12:11  robert
+
+	* frontend/get_audio.c:
+
+	Bug fix for tracker item ID: 3486753 Artifacts at the beginning of decoded file
+
+2012-02-11 12:10  robert
+
+	* mpglib/layer3.c:
+
+	some hidden global temporary variable removed, could have been some multi threading issue
+
+2012-02-11 12:00  robert
+
+	* frontend/get_audio.c (lame3_99):
+
+	Bug fix for tracker item ID: 3486753 Artifacts at the beginning of decoded file
+
+2012-02-11 11:03  robert
+
+	* mpglib/layer3.c (lame3_99):
+
+	some hidden global temporary variable removed, could have been some multi threading issue
+
+2012-02-10 18:13  rbrito
+
+	* config.h.in, configure.in:
+
+	autotools: Fix compilation on alpha using proper ifdef guards.
+
+	Thanks to Andres Mejia <amejia004@gmail.com> for the patch (with minor
+	whitespace adjustments).
+
+2012-02-10 18:11  rbrito
+
+	* doc/html/history.html:
+
+	doc: Correctly spell Fabian Greffrath's name to give proper credit.
+
+2012-02-10 18:06  rbrito
+
+	* config.h.in, configure.in (lame3_99):
+
+	autotools: Fix compilation on alpha using proper ifdef guards.
+
+	Thanks to Andres Mejia <amejia004@gmail.com> for the patch (with minor
+	whitespace adjustments).
+
+2012-02-10 18:05  rbrito
+
+	* doc/html/history.html (lame3_99):
+
+	doc: Correctly spell Fabian Greffrath's name to give proper credit.
+
+2012-02-07 13:52  robert
+
+	* configMS.h (lame3_99), configMS.h:
+
+	reduce compiler warnings for SSE2 build with VC 11
+
+2012-02-07 13:40  robert
+
+	* configMS.h, frontend/parse.c, libmp3lame/l3side.h,
+	  libmp3lame/machine.h, libmp3lame/quantize_pvt.c,
+	  libmp3lame/vbrquantize.c, libmp3lame/version.h (lame3_99):
+
+	- workaround for cygwin build problem
+	- fix "fast floating point math" problem (possible bitrate bloat on quiet pieces)
+
+2012-02-07 13:36  robert
+
+	* configMS.h, libmp3lame/l3side.h, libmp3lame/machine.h,
+	  libmp3lame/quantize_pvt.c, libmp3lame/vbrquantize.c:
+
+	- workaround for cygwin build problem
+	- fix "fast floating point math" problem (possible bitrate bloat on quiet pieces)
+
+2012-01-25 13:01  robert
+
+	* ChangeLog, doc/html/history.html:
+
+	updating Changelog and History
+
+2012-01-25 12:47  robert
+
+	* configure, configure.in, testcase.mp3 (lame3_99):
+
+	Bug-fix release 3.99.4
+
+2012-01-25 12:33  robert
+
+	* ChangeLog, testcase.mp3, doc/html/history.html (lame3_99):
+
+	updating history and changelog
+
 2012-01-19 14:27  robert
 
 	* frontend/parse.c (lame3_99):

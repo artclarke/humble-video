@@ -7,12 +7,12 @@
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -31,14 +31,14 @@ BEINITSTREAM		beInitStream=NULL;
 BEENCODECHUNK		beEncodeChunk=NULL;
 BEDEINITSTREAM		beDeinitStream=NULL;
 BECLOSESTREAM		beCloseStream=NULL;
-BEVERSION			beVersion=NULL;
+BEVERSION		beVersion=NULL;
 BEWRITEVBRHEADER	beWriteVBRHeader=NULL;
 BEWRITEINFOTAG		beWriteInfoTag=NULL;
 
 
 // Main program
 int main(int argc, char *argv[])
-{	
+{
 	HINSTANCE	hDLL			=NULL;
 	FILE*		pFileIn			=NULL;
 	FILE*		pFileOut		=NULL;
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 	// Add mp3 extention
 	strcat(strFileOut,".mp3");
 
-	// Load lame_enc.dll library (Make sure though that you set the 
+	// Load lame_enc.dll library (Make sure though that you set the
 	// project/settings/debug Working Directory correctly, otherwhise the DLL can't be loaded
 
 	hDLL = LoadLibrary("lame_enc.dll");
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 	beEncodeChunk	= (BEENCODECHUNK) GetProcAddress(hDLL, TEXT_BEENCODECHUNK);
 	beDeinitStream	= (BEDEINITSTREAM) GetProcAddress(hDLL, TEXT_BEDEINITSTREAM);
 	beCloseStream	= (BECLOSESTREAM) GetProcAddress(hDLL, TEXT_BECLOSESTREAM);
-	beVersion		= (BEVERSION) GetProcAddress(hDLL, TEXT_BEVERSION);
+	beVersion	= (BEVERSION) GetProcAddress(hDLL, TEXT_BEVERSION);
 	beWriteVBRHeader= (BEWRITEVBRHEADER) GetProcAddress(hDLL,TEXT_BEWRITEVBRHEADER);
 	beWriteInfoTag  = (BEWRITEINFOTAG) GetProcAddress(hDLL,TEXT_BEWRITEINFOTAG);
 
@@ -111,13 +111,13 @@ int main(int argc, char *argv[])
 	printf(
 			"lame_enc.dll version %u.%02u (%u/%u/%u)\n"
 			"lame_enc Engine %u.%02u\n"
-			"lame_enc homepage at %s\n\n",	
+			"lame_enc homepage at %s\n\n",
 			Version.byDLLMajorVersion, Version.byDLLMinorVersion,
 			Version.byDay, Version.byMonth, Version.wYear,
 			Version.byMajorVersion, Version.byMinorVersion,
 			Version.zHomepage);
 
-	// Try to open the WAV file, be sure to open it as a binary file!	
+	// Try to open the WAV file, be sure to open it as a binary file!
 	pFileIn = fopen( strFileIn, "rb" );
 
 	// Check file open result
@@ -134,6 +134,7 @@ int main(int argc, char *argv[])
 	if(pFileOut == NULL)
 	{
 		fprintf(stderr,"Error creating file %s", strFileOut);
+		fclose(pFileIn);
 		return -1;
 	}
 
@@ -144,21 +145,21 @@ int main(int argc, char *argv[])
 
 	// this are the default settings for testcase.wav
 	beConfig.format.LHV1.dwStructVersion	= 1;
-	beConfig.format.LHV1.dwStructSize		= sizeof(beConfig);		
+	beConfig.format.LHV1.dwStructSize		= sizeof(beConfig);
 	beConfig.format.LHV1.dwSampleRate		= 44100;				// INPUT FREQUENCY
 	beConfig.format.LHV1.dwReSampleRate		= 0;					// DON"T RESAMPLE
 	beConfig.format.LHV1.nMode				= BE_MP3_MODE_JSTEREO;	// OUTPUT IN STREO
 	beConfig.format.LHV1.dwBitrate			= 128;					// MINIMUM BIT RATE
 	beConfig.format.LHV1.nPreset			= LQP_R3MIX;		// QUALITY PRESET SETTING
 	beConfig.format.LHV1.dwMpegVersion		= MPEG1;				// MPEG VERSION (I or II)
-	beConfig.format.LHV1.dwPsyModel			= 0;					// USE DEFAULT PSYCHOACOUSTIC MODEL 
+	beConfig.format.LHV1.dwPsyModel			= 0;					// USE DEFAULT PSYCHOACOUSTIC MODEL
 	beConfig.format.LHV1.dwEmphasis			= 0;					// NO EMPHASIS TURNED ON
 	beConfig.format.LHV1.bOriginal			= TRUE;					// SET ORIGINAL FLAG
 	beConfig.format.LHV1.bWriteVBRHeader	= TRUE;					// Write INFO tag
 
 //	beConfig.format.LHV1.dwMaxBitrate		= 320;					// MAXIMUM BIT RATE
 //	beConfig.format.LHV1.bCRC				= TRUE;					// INSERT CRC
-//	beConfig.format.LHV1.bCopyright			= TRUE;					// SET COPYRIGHT FLAG	
+//	beConfig.format.LHV1.bCopyright			= TRUE;					// SET COPYRIGHT FLAG
 //	beConfig.format.LHV1.bPrivate			= TRUE;					// SET PRIVATE FLAG
 //	beConfig.format.LHV1.bWriteVBRHeader	= TRUE;					// YES, WRITE THE XING VBR HEADER
 //	beConfig.format.LHV1.bEnableVBR			= TRUE;					// USE VBR
@@ -175,6 +176,8 @@ int main(int argc, char *argv[])
 	if(err != BE_ERR_SUCCESSFUL)
 	{
 		fprintf(stderr,"Error opening encoding stream (%lu)", err);
+		fclose(pFileIn);
+		fclose(pFileOut);
 		return -1;
 	}
 
@@ -189,6 +192,8 @@ int main(int argc, char *argv[])
 	if(!pMP3Buffer || !pWAVBuffer)
 	{
 		printf("Out of memory");
+		fclose(pFileIn);
+		fclose(pFileOut);
 		return -1;
 	}
 
@@ -221,7 +226,7 @@ int main(int argc, char *argv[])
 			fprintf(stderr,"beEncodeChunk() failed (%lu)", err);
 			return -1;
 		}
-		
+
 		// write dwWrite bytes that are returned in tehe pMP3Buffer to disk
 		if(fwrite(pMP3Buffer,1,dwWrite,pFileOut) != dwWrite)
 		{
@@ -285,4 +290,3 @@ int main(int argc, char *argv[])
 	// Were done, return OK result
 	return 0;
 }
-

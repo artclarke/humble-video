@@ -20,12 +20,13 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: util.c,v 1.154.2.1 2012/01/08 23:49:58 robert Exp $ */
+/* $Id: util.c,v 1.159 2017/09/06 15:07:30 robert Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
+#include <float.h>
 #include "lame.h"
 #include "machine.h"
 #include "encoder.h"
@@ -48,6 +49,7 @@
 void
 free_id3tag(lame_internal_flags * const gfc)
 {
+    gfc->tag_spec.language[0] = 0;
     if (gfc->tag_spec.title != 0) {
         free(gfc->tag_spec.title);
         gfc->tag_spec.title = 0;
@@ -111,6 +113,7 @@ freegfc(lame_internal_flags * const gfc)
 {                       /* bit stream structure */
     int     i;
 
+    if (gfc == 0) return;
 
     for (i = 0; i <= 2 * BPC; i++)
         if (gfc->sv_enc.blackfilt[i] != NULL) {
@@ -163,16 +166,22 @@ freegfc(lame_internal_flags * const gfc)
 }
 
 void
-malloc_aligned(aligned_pointer_t * ptr, unsigned int size, unsigned int bytes)
+calloc_aligned(aligned_pointer_t * ptr, unsigned int size, unsigned int bytes)
 {
     if (ptr) {
         if (!ptr->pointer) {
             ptr->pointer = malloc(size + bytes);
-            if (bytes > 0) {
-                ptr->aligned = (void *) ((((size_t) ptr->pointer + bytes - 1) / bytes) * bytes);
+            if (ptr->pointer != 0) {
+                memset(ptr->pointer, 0, size + bytes);
+                if (bytes > 0) {
+                    ptr->aligned = (void *) ((((size_t) ptr->pointer + bytes - 1) / bytes) * bytes);
+                }
+                else {
+                    ptr->aligned = ptr->pointer;
+                }
             }
             else {
-                ptr->aligned = ptr->pointer;
+                ptr->aligned = 0;
             }
         }
     }
@@ -544,7 +553,7 @@ fill_buffer_resample(lame_internal_flags * gfc,
     if (bpc > BPC)
         bpc = BPC;
 
-    intratio = (fabs(resample_ratio - floor(.5 + resample_ratio)) < .0001);
+    intratio = (fabs(resample_ratio - floor(.5 + resample_ratio)) < FLT_EPSILON);
     fcn = 1.00 / resample_ratio;
     if (fcn > 1.00)
         fcn = 1.00;
@@ -555,10 +564,10 @@ fill_buffer_resample(lame_internal_flags * gfc,
     BLACKSIZE = filter_l + 1; /* size of data needed for FIR */
 
     if (gfc->fill_buffer_resample_init == 0) {
-        esv->inbuf_old[0] = calloc(BLACKSIZE, sizeof(esv->inbuf_old[0][0]));
-        esv->inbuf_old[1] = calloc(BLACKSIZE, sizeof(esv->inbuf_old[0][0]));
+        esv->inbuf_old[0] = lame_calloc(sample_t, BLACKSIZE);
+        esv->inbuf_old[1] = lame_calloc(sample_t, BLACKSIZE);
         for (i = 0; i <= 2 * bpc; ++i)
-            esv->blackfilt[i] = calloc(BLACKSIZE, sizeof(esv->blackfilt[0][0]));
+            esv->blackfilt[i] = lame_calloc(sample_t, BLACKSIZE);
 
         esv->itime[0] = 0;
         esv->itime[1] = 0;

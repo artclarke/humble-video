@@ -21,7 +21,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: common.c,v 1.40 2010/03/22 14:30:19 robert Exp $ */
+/* $Id: common.c,v 1.42 2017/08/19 14:20:27 robert Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -198,9 +198,14 @@ decode_header(PMPSTR mp, struct frame *fr, unsigned long newhead)
 
 
     fr->lay = 4 - ((newhead >> 17) & 3);
+
+    if (fr->lay != 3 && fr->mpeg25) {
+        lame_report_fnc(mp->report_err, "MPEG-2.5 is supported by Layer3 only\n");
+        return 0;
+    }
     if (((newhead >> 10) & 0x3) == 0x3) {
         lame_report_fnc(mp->report_err, "Stream error\n");
-        exit(1);
+        return 0;
     }
     if (fr->mpeg25) {
         fr->sampling_frequency = 6 + ((newhead >> 10) & 0x3);

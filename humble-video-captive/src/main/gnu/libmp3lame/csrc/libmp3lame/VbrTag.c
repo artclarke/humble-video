@@ -20,7 +20,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: VbrTag.c,v 1.103.2.1 2011/11/18 09:18:28 robert Exp $ */
+/* $Id: VbrTag.c,v 1.106 2017/08/06 18:15:47 robert Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -548,7 +548,7 @@ InitVbrTag(lame_global_flags * gfp)
     gfc->VBR_seek_table.pos = 0;
 
     if (gfc->VBR_seek_table.bag == NULL) {
-        gfc->VBR_seek_table.bag = malloc(400 * sizeof(int));
+        gfc->VBR_seek_table.bag = lame_calloc(int, 400);
         if (gfc->VBR_seek_table.bag != NULL) {
             gfc->VBR_seek_table.size = 400;
         }
@@ -912,7 +912,7 @@ lame_get_lametag_frame(lame_global_flags const *gfp, unsigned char *buffer, size
     if (gfc == 0) {
         return 0;
     }
-    if (gfc->class_id != LAME_ID) {
+    if (!is_lame_internal_flags_valid(gfc)) {
         return 0;
     }
     cfg = &gfc->cfg;

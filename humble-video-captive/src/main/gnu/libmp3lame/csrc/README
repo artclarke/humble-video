@@ -1,7 +1,7 @@
                       LAME 3.xx
                LAME Ain't an MP3 Encoder
-                 http://lame.sf.net
-	             May 2011
+                  http://lame.sf.net
+	                  May 2011
 
 Originally developed by Mike Cheng (www.uq.net.au/~zzmcheng) and was
 latter developed by Mark Taylor (www.mp3dev.org). Currently maintained
@@ -33,7 +33,7 @@ There is HTML documentation and a man page in the doc directory.
 
 ============================================================================
 
-LAME uses the MPGLIB decoding engine, from the MPG123 package, written
+LAME uses the MPGLIB decoding engine, from the mpg123 package, written
 by: Michael Hipp (www.mpg123.de) MPGLIB is released under the GPL.
 
 Copyrights (c) 1999-2011 by The LAME Project

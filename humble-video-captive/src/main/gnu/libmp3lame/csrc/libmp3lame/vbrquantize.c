@@ -2,7 +2,7 @@
  *	MP3 quantization
  *
  *	Copyright (c) 1999-2000 Mark Taylor
- *	Copyright (c) 2000-2011 Robert Hegemann
+ *	Copyright (c) 2000-2012 Robert Hegemann
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: vbrquantize.c,v 1.141 2011/05/07 16:05:17 rbrito Exp $ */
+/* $Id: vbrquantize.c,v 1.142 2012/02/07 13:36:35 robert Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
@@ -69,16 +69,9 @@ struct algo_s {
 #  define VOLATILE volatile
 #  else
 #  define VOLATILE
-#  ifndef FORCEINLINE
-#    define FORCEINLINE __forceinline
-#  endif
 #  endif
 #else
 #  define VOLATILE
-#endif
-
-#ifndef FORCEINLINE 
-#define FORCEINLINE
 #endif
 
 typedef VOLATILE union {
@@ -119,7 +112,7 @@ static DOUBLEX const ROUNDFAC = ROUNDFAC_def;
 static DOUBLEX const MAGIC_FLOAT = MAGIC_FLOAT_def;
 
 
-FORCEINLINE static  float
+inline static  float
 vec_max_c(const float * xr34, unsigned int bw)
 {
     float   xfsf = 0;
@@ -150,30 +143,8 @@ vec_max_c(const float * xr34, unsigned int bw)
     return xfsf;
 }
 
-FORCEINLINE static float
-vec_sum_sq_c(const float * xr, unsigned int bw)
-{
-    float   sum = 0.0f;
-    unsigned int i = bw >> 2u;
-    unsigned int const remaining = bw & 0x03u;    
-    while (i-- > 0) {
-        sum += xr[0] * xr[0];
-        sum += xr[1] * xr[1];
-        sum += xr[2] * xr[2];
-        sum += xr[3] * xr[3];
-        xr += 4;
-    }
-    switch( remaining ) {
-    case 3: sum += xr[2] * xr[2];
-    case 2: sum += xr[1] * xr[1];
-    case 1: sum += xr[0] * xr[0];
-    default: break;
-    }
-    return sum;
-}
 
-
-FORCEINLINE static  uint8_t
+inline static  uint8_t
 find_lowest_scalefac(const FLOAT xr34)
 {
     uint8_t sf_ok = 255;
@@ -195,15 +166,7 @@ find_lowest_scalefac(const FLOAT xr34)
 }
 
 
-FORCEINLINE static int
-below_noise_floor(FLOAT sum, FLOAT l3xmin)
-{
-    FLOAT const d = -1E-20;
-    return (l3xmin - sum) >= d ? 1 : 0;
-}
-
-
-FORCEINLINE static void
+inline static void
 k_34_4(DOUBLEX x[4], int l3[4])
 {
 #ifdef TAKEHIRO_IEEE754_HACK
@@ -435,9 +398,10 @@ block_sf(algo_t * that, const FLOAT l3_xmin[SFBMAX], int vbrsf[SFBMAX], int vbrs
     const FLOAT *const xr = &that->cod_info->xr[0];
     const FLOAT *const xr34_orig = &that->xr34orig[0];
     const int *const width = &that->cod_info->width[0];
+    const char *const energy_above_cutoff = &that->cod_info->energy_above_cutoff[0];
     unsigned int const max_nonzero_coeff = (unsigned int) that->cod_info->max_nonzero_coeff;
     uint8_t maxsf = 0;
-    int     sfb = 0;
+    int     sfb = 0, m_o = -1;
     unsigned int j = 0, i = 0;
     int const psymax = that->cod_info->psymax;
 
@@ -469,8 +433,7 @@ block_sf(algo_t * that, const FLOAT l3_xmin[SFBMAX], int vbrsf[SFBMAX], int vbrs
             i = 0;
         }
         if (sfb < psymax && w > 2) { /* mpeg2.5 at 8 kHz doesn't use all scalefactors, unused have width 2 */
-            float sum_sq = vec_sum_sq_c(&xr[j], l);
-            if (below_noise_floor(sum_sq, l3_xmin[sfb]) == 0) {
+            if (energy_above_cutoff[sfb]) {
                 m2 = that->find(&xr[j], &xr34_orig[j], l3_xmin[sfb], l, m1);
 #if 0
                 if (0) {
@@ -486,6 +449,9 @@ block_sf(algo_t * that, const FLOAT l3_xmin[SFBMAX], int vbrsf[SFBMAX], int vbrs
 #endif
                 if (maxsf < m2) {
                     maxsf = m2;
+                }
+                if (m_o < m2 && m2 < 255) {
+                    m_o = m2;
                 }
             }
             else {
@@ -506,6 +472,14 @@ block_sf(algo_t * that, const FLOAT l3_xmin[SFBMAX], int vbrsf[SFBMAX], int vbrs
     for (; sfb < SFBMAX; ++sfb) {
         vbrsf[sfb] = maxsf;
         vbrsfmin[sfb] = 0;
+    }
+    if (m_o > -1) {
+        maxsf = m_o;
+        for (sfb = 0; sfb < SFBMAX; ++sfb) {
+            if (vbrsf[sfb] == 255) {
+                vbrsf[sfb] = m_o;
+            }
+        }
     }
     return maxsf;
 }

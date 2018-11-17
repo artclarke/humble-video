@@ -15,7 +15,8 @@ OFILES = BladeMP3EncDLL.o $(DLL_NAME)_exp.o
 CFLAGS = -I$(LAME_SRC_ROOT)/include -I$(LAME_SRC_ROOT)/libmp3lame
 CC = g++
 LD = g++
-LFLAGS = -L$(LAME_SRC_ROOT)/libmp3lame -o $(DLL_NAME).dll -mdll -s
+DLLTOOL = dlltool
+LFLAGS = -L$(LAME_SRC_ROOT)/libmp3lame/.libs -o $(DLL_NAME).dll -mdll -s
 LIBS = -lmp3lame
 
 all: $(DLL_NAME).dll example.exe
@@ -27,7 +28,7 @@ $(DLL_NAME).dll : $(OFILES)
 	$(LD) $(LFLAGS) $(OFILES) $(LIBS)
 	
 $(DLL_NAME)_exp.o : BladeMP3EncDLL.o
-	dlltool --input-def BladeMP3EncDLL.def --output-lib lib$(DLL_NAME).a --output-exp $(DLL_NAME)_exp.o --dllname $(DLL_NAME) BladeMP3EncDLL.o
+	$(DLLTOOL) --input-def BladeMP3EncDLL.def --output-lib lib$(DLL_NAME).a --output-exp $(DLL_NAME)_exp.o --dllname $(DLL_NAME) BladeMP3EncDLL.o
 
 %.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@
