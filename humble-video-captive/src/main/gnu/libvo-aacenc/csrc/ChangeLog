@@ -1,6 +1,0 @@
-0.1.1
- - Fix a bitstream corruption error
- - Fix building for windows
-
-0.1.0
- - Initial release of vo-aacenc
