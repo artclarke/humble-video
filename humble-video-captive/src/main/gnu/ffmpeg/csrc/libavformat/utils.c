@@ -894,6 +894,7 @@ static void update_initial_timestamps(AVFormatContext *s, int stream_index,
     if (st->first_dts != AV_NOPTS_VALUE ||
         dts           == AV_NOPTS_VALUE ||
         st->cur_dts   == AV_NOPTS_VALUE ||
+        st->cur_dts < INT_MIN + RELATIVE_TS_BASE ||
         is_relative(dts))
         return;
 
@@ -1504,10 +1505,11 @@ int av_read_frame(AVFormatContext *s, AVPacket *pkt)
                 // last dts seen for this stream. if any of packets following
                 // current one had no dts, we will set this to AV_NOPTS_VALUE.
                 int64_t last_dts = next_pkt->dts;
+                av_assert2(wrap_bits <= 64);
                 while (pktl && next_pkt->pts == AV_NOPTS_VALUE) {
                     if (pktl->pkt.stream_index == next_pkt->stream_index &&
-                        (av_compare_mod(next_pkt->dts, pktl->pkt.dts, 2LL << (wrap_bits - 1)) < 0)) {
-                        if (av_compare_mod(pktl->pkt.pts, pktl->pkt.dts, 2LL << (wrap_bits - 1))) {
+                        av_compare_mod(next_pkt->dts, pktl->pkt.dts, 2ULL << (wrap_bits - 1)) < 0) {
+                        if (av_compare_mod(pktl->pkt.pts, pktl->pkt.dts, 2ULL << (wrap_bits - 1))) {
                             // not B-frame
                             next_pkt->pts = pktl->pkt.dts;
                         }
@@ -3325,7 +3327,7 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
             if (st->info->fps_last_dts != AV_NOPTS_VALUE &&
                 st->info->fps_last_dts_idx > st->info->fps_first_dts_idx &&
                 (pkt->dts - st->info->fps_last_dts) / 1000 >
-                (st->info->fps_last_dts     - st->info->fps_first_dts) /
+                (st->info->fps_last_dts     - (uint64_t)st->info->fps_first_dts) /
                 (st->info->fps_last_dts_idx - st->info->fps_first_dts_idx)) {
                 av_log(ic, AV_LOG_WARNING,
                        "DTS discontinuity in stream %d: packet %d with DTS "
@@ -3433,12 +3435,6 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
                 }
             }
         }
-    }
-
-    // close codecs which were opened in try_decode_frame()
-    for (i = 0; i < ic->nb_streams; i++) {
-        st = ic->streams[i];
-        avcodec_close(st->codec);
     }
 
     ff_rfps_calculate(ic);
@@ -3556,6 +3552,7 @@ find_stream_info_err:
             ic->streams[i]->codec->thread_count = 0;
         if (st->info)
             av_freep(&st->info->duration_error);
+        avcodec_close(st->codec);
         av_freep(&ic->streams[i]->info);
     }
     if (ic->pb)
@@ -3683,9 +3680,7 @@ void ff_free_stream(AVFormatContext *s, AVStream *st) {
     av_dict_free(&st->metadata);
     av_freep(&st->probe_data.buf);
     av_freep(&st->index_entries);
-    av_freep(&st->codec->extradata);
-    av_freep(&st->codec->subtitle_header);
-    av_freep(&st->codec);
+    avcodec_free_context(&st->codec);
     av_freep(&st->priv_data);
     if (st->info)
         av_freep(&st->info->duration_error);
@@ -3725,8 +3720,8 @@ void avformat_free_context(AVFormatContext *s)
     av_freep(&s->chapters);
     av_dict_free(&s->metadata);
     av_freep(&s->streams);
-    av_freep(&s->internal);
     flush_packet_queue(s);
+    av_freep(&s->internal);
     av_free(s);
 }
 
@@ -3764,8 +3759,11 @@ AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c)
     int i;
     AVStream **streams;
 
-    if (s->nb_streams >= INT_MAX/sizeof(*streams))
+    if (s->nb_streams >= FFMIN(s->max_streams, INT_MAX/sizeof(*streams))) {
+        if (s->max_streams < INT_MAX/sizeof(*streams))
+            av_log(s, AV_LOG_ERROR, "Number of streams exceeds max_streams parameter (%d), see the documentation if you wish to increase it\n", s->max_streams);
         return NULL;
+    }
     streams = av_realloc_array(s->streams, s->nb_streams + 1, sizeof(*streams));
     if (!streams)
         return NULL;
