@@ -12,10 +12,10 @@ toolchain available at http://blackfin.uclinux.org/
 The --enable-blackfin-asm option is not required, but it speeds up Speex by
 approximately a factor of two.
 
-2/ In order to cross-compile for uClinux from the Speex SVN:
+2/ In order to cross-compile for uClinux from the Speex Git:
 
-  svn co http://svn.xiph.org/trunk/speex speex-trunk
-  cd speex-trunk
+  git clone git://git.xiph.org/speex.git
+  cd speex
   ./autogen.sh --enable-blackfin-asm --enable-fixed-point --host=bfin-uclinux
   cd libspeex
   make

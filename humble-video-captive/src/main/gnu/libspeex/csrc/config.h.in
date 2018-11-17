@@ -48,12 +48,6 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `m' library (-lm). */
-#undef HAVE_LIBM
-
-/* Define to 1 if you have the `winmm' library (-lwinmm). */
-#undef HAVE_LIBWINMM
-
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
@@ -84,8 +78,7 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
 /* Define to the address where bug reports for this package should be sent. */
@@ -109,11 +102,29 @@
 /* The size of `int', as computed by sizeof. */
 #undef SIZEOF_INT
 
+/* The size of `int16_t', as computed by sizeof. */
+#undef SIZEOF_INT16_T
+
+/* The size of `int32_t', as computed by sizeof. */
+#undef SIZEOF_INT32_T
+
 /* The size of `long', as computed by sizeof. */
 #undef SIZEOF_LONG
 
 /* The size of `short', as computed by sizeof. */
 #undef SIZEOF_SHORT
+
+/* The size of `uint16_t', as computed by sizeof. */
+#undef SIZEOF_UINT16_T
+
+/* The size of `uint32_t', as computed by sizeof. */
+#undef SIZEOF_UINT32_T
+
+/* The size of `u_int16_t', as computed by sizeof. */
+#undef SIZEOF_U_INT16_T
+
+/* The size of `u_int32_t', as computed by sizeof. */
+#undef SIZEOF_U_INT32_T
 
 /* Version extra */
 #undef SPEEX_EXTRA_VERSION
@@ -151,8 +162,14 @@
 /* Use FFT from OggVorbis */
 #undef USE_SMALLFT
 
+/* Use SpeexDSP library */
+#undef USE_SPEEXDSP
+
 /* Use C99 variable-size arrays */
 #undef VAR_ARRAYS
+
+/* Enable support for the Vorbis psy model */
+#undef VORBIS_PSYCHO
 
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */

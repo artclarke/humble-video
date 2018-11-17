@@ -37,7 +37,6 @@
 #define SB_CELP_H
 
 #include "modes.h"
-#include <speex/speex_bits.h>
 #include "nb_celp.h"
 
 /**Structure representing the full state of the sub-band encoder*/
@@ -57,7 +56,7 @@ typedef struct SBEncState {
 
    char  *stack;                  /**< Temporary allocation stack */
    spx_word16_t *high;               /**< High-band signal (buffer) */
-   spx_word16_t *h0_mem, *h1_mem;
+   spx_word16_t *h0_mem;
 
    const spx_word16_t *window;    /**< LPC analysis window */
    const spx_word16_t *lagWindow;       /**< Auto-correlation window */

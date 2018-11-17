@@ -1,22 +1,22 @@
-/* Copyright (C) 2002 Jean-Marc Valin 
+/* Copyright (C) 2002 Jean-Marc Valin
    File: wav_io.c
    Routines to handle wav (RIFF) headers
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -36,7 +36,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "speex/speex_types.h"
 #include "wav_io.h"
 
 
@@ -91,12 +90,12 @@ int read_wav_header(FILE *file, int *rate, int *channels, int *format, spx_int32
       fprintf (stderr, "Corrupted WAVE file: no \"fmt \"\n");
       return -1;
       }*/
-   
+
    fread(&itmp, 4, 1, file);
    itmp = le_int(itmp);
    skip_bytes=itmp-16;
    /*fprintf (stderr, "skip=%d\n", skip_bytes);*/
-   
+
    fread(&stmp, 2, 1, file);
    stmp = le_short(stmp);
    if (stmp!=1)
@@ -108,7 +107,7 @@ int read_wav_header(FILE *file, int *rate, int *channels, int *format, spx_int32
    fread(&stmp, 2, 1, file);
    stmp = le_short(stmp);
    *channels = stmp;
-   
+
    if (stmp>2)
    {
       fprintf (stderr, "Only mono and (intensity) stereo supported\n");
@@ -151,7 +150,7 @@ int read_wav_header(FILE *file, int *rate, int *channels, int *format, spx_int32
       return -1;
    }
 
-   
+
    /*strange way of seeking, but it works even for pipes*/
    if (skip_bytes>0)
       for (i=0;i<skip_bytes;i++)
@@ -189,11 +188,8 @@ int read_wav_header(FILE *file, int *rate, int *channels, int *format, spx_int32
 
 void write_wav_header(FILE *file, int rate, int channels, int format, int size)
 {
-   char ch[5];
    spx_int32_t itmp;
    spx_int16_t stmp;
-
-   ch[4]=0;
 
    fprintf (file, "RIFF");
 

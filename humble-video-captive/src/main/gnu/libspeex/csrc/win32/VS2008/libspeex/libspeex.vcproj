@@ -1438,10 +1438,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\libspeex\filterbank.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\libspeex\filters.c"
 				>
 			</File>
@@ -1463,10 +1459,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\libspeex\high_lsp_tables.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\libspeex\jitter.c"
 				>
 			</File>
 			<File
@@ -1498,10 +1490,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\libspeex\mdf.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\libspeex\modes.c"
 				>
 			</File>
@@ -1511,10 +1499,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\libspeex\nb_celp.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\libspeex\preprocess.c"
 				>
 			</File>
 			<File
@@ -1648,23 +1632,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\include\speex\speex_echo.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\include\speex\speex_header.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\include\speex\speex_jitter.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\include\speex\speex_noglobals.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\speex\speex_preprocess.h"
 				>
 			</File>
 			<File
