@@ -1,5 +1,3 @@
-/* $Id: short_tag.c,v 1.8 2008/04/15 14:20:30 dron Exp $ */
-
 /*
  * Copyright (c) 2004, Andrey Kiselev  <dron@ak4719.spb.edu>
  *
@@ -140,7 +138,7 @@ main()
 	}
 
 	/* Write dummy pixel data. */
-	if (!TIFFWriteScanline(tif, buf, 0, 0) < 0) {
+	if (TIFFWriteScanline(tif, buf, 0, 0) == -1) {
 		fprintf (stderr, "Can't write image data.\n");
 		goto failure;
 	}

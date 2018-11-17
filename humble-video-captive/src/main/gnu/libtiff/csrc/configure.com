@@ -1,4 +1,3 @@
-$! $Id: configure.com,v 1.2 2007/11/23 10:01:34 dron Exp $
 $!
 $! OpenVMS configure procedure for libtiff
 $! (c) Alexey Chupahin  22-NOV-2007
@@ -503,6 +502,12 @@ TIFFFindFieldInfo=PROCEDURE,-
 TIFFFindFieldInfoByName=PROCEDURE,-
 TIFFFieldWithName=PROCEDURE,-
 TIFFFieldWithTag=PROCEDURE,-
+TIFFFieldTag=PROCEDURE,-
+TIFFFieldName=PROCEDURE,-
+TIFFFieldDataType=PROCEDURE,-
+TIFFFieldPassCount=PROCEDURE,-
+TIFFFieldReadCount=PROCEDURE,-
+TIFFFieldWriteCount=PROCEDURE,-
 TIFFCurrentDirOffset=PROCEDURE,-
 TIFFWriteCheck=PROCEDURE,-
 TIFFRGBAImageOK=PROCEDURE,-
@@ -648,6 +653,12 @@ UNIVERSAL=TIFFFindFieldInfo
 UNIVERSAL=TIFFFindFieldInfoByName
 UNIVERSAL=TIFFFieldWithName
 UNIVERSAL=TIFFFieldWithTag
+UNIVERSAL=TIFFFieldTag
+UNIVERSAL=TIFFFieldName
+UNIVERSAL=TIFFFieldDataType
+UNIVERSAL=TIFFFieldPassCount
+UNIVERSAL=TIFFFieldReadCount
+UNIVERSAL=TIFFFieldWriteCount
 UNIVERSAL=TIFFCurrentDirOffset
 UNIVERSAL=TIFFWriteCheck
 UNIVERSAL=TIFFRGBAImageOK

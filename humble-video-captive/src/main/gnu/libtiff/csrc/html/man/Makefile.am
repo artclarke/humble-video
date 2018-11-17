@@ -39,6 +39,12 @@ docfiles = \
 	TIFFcolor.3tiff.html \
 	TIFFDataWidth.3tiff.html \
 	TIFFError.3tiff.html \
+	TIFFFieldDataType.3tiff.html \
+	TIFFFieldName.3tiff.html \
+	TIFFFieldPassCount.3tiff.html \
+	TIFFFieldReadCount.3tiff.html \
+	TIFFFieldTag.3tiff.html \
+	TIFFFieldWriteCount.3tiff.html \
 	TIFFFlush.3tiff.html \
 	TIFFGetField.3tiff.html \
 	TIFFmemory.3tiff.html \
@@ -72,14 +78,9 @@ docfiles = \
 	TIFFWriteTile.3tiff.html \
 	fax2ps.1.html \
 	fax2tiff.1.html \
-	gif2tiff.1.html \
 	pal2rgb.1.html \
 	ppm2tiff.1.html \
-	ras2tiff.1.html \
 	raw2tiff.1.html \
-	rgb2ycbcr.1.html \
-	sgi2tiff.1.html \
-	thumbnail.1.html \
 	tiff2bw.1.html \
 	tiff2pdf.1.html \
 	tiff2ps.1.html \
@@ -93,8 +94,7 @@ docfiles = \
 	tiffinfo.1.html \
 	tiffmedian.1.html \
 	tiffset.1.html \
-	tiffsplit.1.html \
-	tiffsv.1.html
+	tiffsplit.1.html
 
 dist_doc_DATA = $(indexfile) $(docfiles)
 
@@ -117,3 +117,6 @@ htmldoc:
 		${GROFF} $(MANSRCDIR)/$$i > $(HTMLMANDIR)/$$i.html;	\
 	done
 
+EXTRA_DIST = \
+	CMakeLists.txt \
+	HtmlDoc.cmake

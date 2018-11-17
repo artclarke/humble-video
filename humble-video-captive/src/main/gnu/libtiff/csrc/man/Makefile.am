@@ -24,17 +24,11 @@
 # Process this file with automake to produce Makefile.in.
 
 dist_man1_MANS = \
-	bmp2tiff.1 \
 	fax2ps.1 \
 	fax2tiff.1 \
-	gif2tiff.1 \
 	pal2rgb.1 \
 	ppm2tiff.1 \
-	ras2tiff.1 \
 	raw2tiff.1 \
-	rgb2ycbcr.1 \
-	sgi2tiff.1 \
-	thumbnail.1 \
 	tiff2bw.1 \
 	tiff2pdf.1 \
 	tiff2ps.1 \
@@ -48,8 +42,7 @@ dist_man1_MANS = \
 	tiffinfo.1 \
 	tiffmedian.1 \
 	tiffset.1 \
-	tiffsplit.1 \
-	tiffsv.1
+	tiffsplit.1
 
 dist_man3_MANS = \
 	libtiff.3tiff \
@@ -59,6 +52,12 @@ dist_man3_MANS = \
 	TIFFcolor.3tiff \
 	TIFFDataWidth.3tiff \
 	TIFFError.3tiff \
+	TIFFFieldDataType.3tiff \
+	TIFFFieldName.3tiff \
+	TIFFFieldPassCount.3tiff \
+	TIFFFieldReadCount.3tiff \
+	TIFFFieldTag.3tiff \
+	TIFFFieldWriteCount.3tiff \
 	TIFFFlush.3tiff \
 	TIFFGetField.3tiff \
 	TIFFmemory.3tiff \
@@ -90,3 +89,6 @@ dist_man3_MANS = \
 	TIFFWriteRawTile.3tiff \
 	TIFFWriteScanline.3tiff \
 	TIFFWriteTile.3tiff
+
+EXTRA_DIST = \
+	CMakeLists.txt

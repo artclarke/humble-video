@@ -1,5 +1,3 @@
-/* $Id: tif_win32.c,v 1.39 2011-12-22 17:07:57 bfriesen Exp $ */
-
 /*
  * Copyright (c) 1988-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.
@@ -28,6 +26,31 @@
  * TIFF Library Win32-specific Routines.  Adapted from tif_unix.c 4/5/95 by
  * Scott Wagner (wagner@itek.com), Itek Graphix, Rochester, NY USA
  */
+
+/*
+  CreateFileA/CreateFileW return type 'HANDLE'.
+
+  thandle_t is declared like
+
+    DECLARE_HANDLE(thandle_t);
+
+  in tiffio.h.
+
+  Windows (from winnt.h) DECLARE_HANDLE logic looks like
+
+  #ifdef STRICT
+    typedef void *HANDLE;
+  #define DECLARE_HANDLE(name) struct name##__ { int unused; }; typedef struct name##__ *name
+  #else
+    typedef PVOID HANDLE;
+  #define DECLARE_HANDLE(name) typedef HANDLE name
+  #endif
+
+  See http://bugzilla.maptools.org/show_bug.cgi?id=1941 for problems in WIN64
+  builds resulting from this.  Unfortunately, the proposed patch was lost.
+
+*/
+  
 #include "tiffiop.h"
 
 #include <windows.h>
@@ -214,7 +237,7 @@ TIFFFdOpen(int ifd, const char* name, const char* mode)
 			break;
 		}
 	}
-	tif = TIFFClientOpen(name, mode, (thandle_t)ifd,
+	tif = TIFFClientOpen(name, mode, (thandle_t)ifd, /* FIXME: WIN64 cast to pointer warning */
 			_tiffReadProc, _tiffWriteProc,
 			_tiffSeekProc, _tiffCloseProc, _tiffSizeProc,
 			fSuppressMap ? _tiffDummyMapProc : _tiffMapProc,
@@ -259,7 +282,7 @@ TIFFOpen(const char* name, const char* mode)
 		return ((TIFF *)0);
 	}
 
-	tif = TIFFFdOpen((int)fd, name, mode);
+	tif = TIFFFdOpen((int)fd, name, mode);   /* FIXME: WIN64 cast from pointer to int warning */
 	if(!tif)
 		CloseHandle(fd);
 	return tif;
@@ -314,7 +337,7 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 				    NULL, NULL);
 	}
 
-	tif = TIFFFdOpen((int)fd,
+	tif = TIFFFdOpen((int)fd,    /* FIXME: WIN64 cast from pointer to int warning */
 			 (mbname != NULL) ? mbname : "<unknown>", mode);
 	if(!tif)
 		CloseHandle(fd);
@@ -329,7 +352,18 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 void*
 _TIFFmalloc(tmsize_t s)
 {
+        if (s == 0)
+                return ((void *) NULL);
+
 	return (malloc((size_t) s));
+}
+
+void* _TIFFcalloc(tmsize_t nmemb, tmsize_t siz)
+{
+    if( nmemb == 0 || siz == 0 )
+        return ((void *) NULL);
+
+    return calloc((size_t) nmemb, (size_t)siz);
 }
 
 void
@@ -371,60 +405,21 @@ _TIFFmemcmp(const void* p1, const void* p2, tmsize_t c)
 static void
 Win32WarningHandler(const char* module, const char* fmt, va_list ap)
 {
-#ifndef TIF_PLATFORM_CONSOLE
-	LPTSTR szTitle;
-	LPTSTR szTmp;
-	LPCTSTR szTitleText = "%s Warning";
-	LPCTSTR szDefaultModule = "LIBTIFF";
-	LPCTSTR szTmpModule = (module == NULL) ? szDefaultModule : module;
-        SIZE_T nBufSize = (strlen(szTmpModule) +
-                        strlen(szTitleText) + strlen(fmt) + 256)*sizeof(char);
-
-	if ((szTitle = (LPTSTR)LocalAlloc(LMEM_FIXED, nBufSize)) == NULL)
-		return;
-	sprintf(szTitle, szTitleText, szTmpModule);
-	szTmp = szTitle + (strlen(szTitle)+2)*sizeof(char);
-	vsnprintf(szTmp, nBufSize-(strlen(szTitle)+2)*sizeof(char), fmt, ap);
-	MessageBoxA(GetFocus(), szTmp, szTitle, MB_OK | MB_ICONINFORMATION);
-	LocalFree(szTitle);
-
-	return;
-#else
 	if (module != NULL)
 		fprintf(stderr, "%s: ", module);
 	fprintf(stderr, "Warning, ");
 	vfprintf(stderr, fmt, ap);
 	fprintf(stderr, ".\n");
-#endif        
 }
 TIFFErrorHandler _TIFFwarningHandler = Win32WarningHandler;
 
 static void
 Win32ErrorHandler(const char* module, const char* fmt, va_list ap)
 {
-#ifndef TIF_PLATFORM_CONSOLE
-	LPTSTR szTitle;
-	LPTSTR szTmp;
-	LPCTSTR szTitleText = "%s Error";
-	LPCTSTR szDefaultModule = "LIBTIFF";
-	LPCTSTR szTmpModule = (module == NULL) ? szDefaultModule : module;
-        SIZE_T nBufSize = (strlen(szTmpModule) +
-                        strlen(szTitleText) + strlen(fmt) + 256)*sizeof(char);
-
-	if ((szTitle = (LPTSTR)LocalAlloc(LMEM_FIXED, nBufSize)) == NULL)
-		return;
-	sprintf(szTitle, szTitleText, szTmpModule);
-	szTmp = szTitle + (strlen(szTitle)+2)*sizeof(char);
-	vsnprintf(szTmp, nBufSize-(strlen(szTitle)+2)*sizeof(char), fmt, ap);
-	MessageBoxA(GetFocus(), szTmp, szTitle, MB_OK | MB_ICONEXCLAMATION);
-	LocalFree(szTitle);
-	return;
-#else
 	if (module != NULL)
 		fprintf(stderr, "%s: ", module);
 	vfprintf(stderr, fmt, ap);
 	fprintf(stderr, ".\n");
-#endif        
 }
 TIFFErrorHandler _TIFFerrorHandler = Win32ErrorHandler;
 

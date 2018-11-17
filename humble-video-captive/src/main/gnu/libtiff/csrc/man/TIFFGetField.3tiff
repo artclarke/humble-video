@@ -1,4 +1,3 @@
-.\" $Id: TIFFGetField.3tiff,v 1.5 2010-05-06 02:54:46 olivier Exp $
 .\"
 .\" Copyright (c) 1988-1997 Sam Leffler
 .\" Copyright (c) 1991-1997 Silicon Graphics, Inc.
@@ -160,7 +159,7 @@ TIFFTAG_STONITS	1	double**
 TIFFTAG_STRIPBYTECOUNTS	1	uint32**
 TIFFTAG_STRIPOFFSETS	1	uint32**
 TIFFTAG_SUBFILETYPE	1	uint32*
-TIFFTAG_SUBIFD	2	uint16*,uint32**	count & offsets array
+TIFFTAG_SUBIFD	2	uint16*,uint64**	count & offsets array
 TIFFTAG_TARGETPRINTER	1	char**
 TIFFTAG_THRESHHOLDING	1	uint16*
 TIFFTAG_TILEBYTECOUNTS	1	uint32**
@@ -188,14 +187,16 @@ is one, then a single array is returned; otherwise three arrays are returned.
 Annex B.3 "Embedding ICC Profiles in TIFF Files" (available at
 http://www.color.org) for an explanation.
 .SH AUTOREGISTERED TAGS
-If you can't find the tag in the table above that means this is unsupported
-tag. But you still be able to read it's value if you know the data type of
+If you can't find the tag in the table above that means this is an unsupported
+tag and is not directly supported by
+.BR libtiff(3TIFF)
+library. You will still be able to read it's value if you know the data type of
 that tag. For example, if you want to read the LONG value from the tag 33424
 and ASCII string from the tag 36867 you can use the following code:
 .PP
 .RS
 .nf
-uint16  count;
+uint32  count;
 void    *data;
 
 TIFFGetField(tiff, 33424, &count, &data);
@@ -205,11 +206,6 @@ printf("Tag %d: %s, count %d\n", 36867, (char *)data, count);
 .fi
 .RE
 .PP
-
-
-is not supported by
-.BR libtiff(3TIFF),
-library
 .SH RETURN VALUES
 1 is returned if the tag is defined in the current directory; otherwise a 0 is
 returned.
@@ -229,4 +225,4 @@ An unknown tag was supplied.
 .BR libtiff (3TIFF),
 .PP
 Libtiff library home page:
-.BR http://www.remotesensing.org/libtiff/
+.BR http://www.simplesystems.org/libtiff/

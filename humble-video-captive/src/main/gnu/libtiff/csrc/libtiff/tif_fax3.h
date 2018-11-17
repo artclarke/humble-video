@@ -1,5 +1,3 @@
-/* $Id: tif_fax3.h,v 1.9 2011-03-10 20:23:07 fwarmerdam Exp $ */
-
 /*
  * Copyright (c) 1990-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.
@@ -39,7 +37,7 @@
 
 /*
  * To override the default routine used to image decoded
- * spans one can use the pseduo tag TIFFTAG_FAXFILLFUNC.
+ * spans one can use the pseudo tag TIFFTAG_FAXFILLFUNC.
  * The routine must have the type signature given below;
  * for example:
  *
@@ -81,10 +79,12 @@ extern void _TIFFFax3fillruns(unsigned char*, uint32*, uint32*, uint32);
 #define S_MakeUp   11
 #define S_EOL      12
 
+/* WARNING: do not change the layout of this structure as the HylaFAX software */
+/* really depends on it. See http://bugzilla.maptools.org/show_bug.cgi?id=2636 */
 typedef struct {                /* state table entry */
 	unsigned char State;    /* see above */
 	unsigned char Width;    /* width of code in bits */
-	uint32 Param;           /* unsigned 32-bit run length in bits */
+	uint32 Param;           /* unsigned 32-bit run length in bits (holds on 16 bit actually, but cannot be changed. See above warning) */
 } TIFFFaxTabEnt;
 
 extern const TIFFFaxTabEnt TIFFFaxMainTable[];
