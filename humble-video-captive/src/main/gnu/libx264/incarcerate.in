@@ -7,7 +7,7 @@ exec_prefix="@exec_prefix@"
 X264_OPTIONS=
 LDFLAGS="@LDFLAGS@"
 CFLAGS="@CFLAGS@"
-YASM="@YASM@"
+NASM="@NASM@"
 HOST_TYPE=@HOST_TYPE@
 HOST_OS=@HOST_OS@
 VS_DEBUG=@VS_DEBUG@
@@ -34,7 +34,7 @@ else
   echo "Creating release version of libx264: $VS_DEBUG"
 fi
 
-if test "x$YASM" = "x"; then
+if test "x$NASM" = "x"; then
 # no assembly for us :(
   X264_OPTIONS="$X264_OPTIONS --disable-asm"
 fi
