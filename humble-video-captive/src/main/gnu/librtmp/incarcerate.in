@@ -13,6 +13,18 @@ else
   CROSS=
 fi
 
+# LIBRARY doesn't support VPATH builds, so we fake it
+echo "Copying @abs_srcdir@/csrc to @abs_builddir@/csrc"
+# create the directory
+mkdir -p @abs_builddir@/csrc
+# copy over all the source
+cp -r @abs_srcdir@/csrc/* @abs_builddir@/csrc/
+# and make everything user writeable so distcheck will pass
+chmod -R u+w @abs_builddir@/csrc/*
+
+# apply all the patches
+echo "Applying patches to @abs_builddir@/csrc/src"
+(cd @abs_builddir@/csrc/src && for f in @abs_srcdir@/patches/*; do echo "patch -p1 <$f"; patch -p1 <$f; done)
 
 export PKG_CONFIG_PATH="@libdir@/pkgconfig"
 export PKG_CONFIG="pkg-config --static"
@@ -32,7 +44,7 @@ STRIP="@STRIP@" \
 RANLIB="@RANLIB@" \
 AR="@AR@" \
 DLLTOOL="@DLLTOOL@" \
-PATH="$PATH:@abs_top_builddir@@bindir@@" sh @abs_srcdir@/csrc/configure \
+PATH="$PATH:@abs_top_builddir@@bindir@@" sh @abs_builddir@/csrc/configure \
   ${CROSS} \
   --disable-shared \
   --with-pic \
