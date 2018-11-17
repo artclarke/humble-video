@@ -2,5 +2,10 @@ OpenSSL 1.1.1
 Software Homepage: http://www.openssl.org/
 Source Download URL: https://www.openssl.org/source/openssl-1.1.1.tar.gz
 
-NOTE: You must add a file called "configure" to the distribution to allow
- it to build.  That file should just call "Configure"
+Changes:
+- Modify csrc/Configure to remove the #!/usr/bin/env perl and replace with
+  a portable solution:```
+   #!/bin/sh
+   exec perl -x "$0" "$@"
+   #!perl
+   ```

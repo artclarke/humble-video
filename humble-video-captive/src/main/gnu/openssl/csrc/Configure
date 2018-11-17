@@ -1,4 +1,6 @@
-#! /usr/bin/env perl
+#!/bin/sh
+exec perl -x "$0" "$@"
+#!perl
 # -*- mode: perl; -*-
 # Copyright 2016-2018 The OpenSSL Project Authors. All Rights Reserved.
 #
