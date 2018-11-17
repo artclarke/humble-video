@@ -1,6 +1,6 @@
-OpenSSL 1.0.1j
+OpenSSL 1.1.1
 Software Homepage: http://www.openssl.org/
-Source Download URL: http://www.openssl.org/source/openssl-1.0.1j.tar.gz
+Source Download URL: https://www.openssl.org/source/openssl-1.1.1.tar.gz
 
 NOTE: You must add a file called "configure" to the distribution to allow
  it to build.  That file should just call "Configure"
