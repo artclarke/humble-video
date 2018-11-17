@@ -1,4 +1,3 @@
-% $Id$
 \documentclass[12pt,paper=a4]{scrartcl}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,6 +40,8 @@
 % we use the underscore package to change this default behavior.
 \usepackage[nohyphen]{underscore}
 
+\usepackage{enumitem}
+
 % In LaTeX, pictures are normally put into floating environments, and it is
 % left to the typesetting engine to place them in the "optimal" spot. These
 % docs however expect pictures to be placed in a *specific* position. So we
@@ -48,6 +49,14 @@
 % To still be able to use captions, we use the capt-of package.
 \usepackage{capt-of}
 
+% strikeout support
+\usepackage[normalem]{ulem}
+
+% blockquote support
+\usepackage{csquotes}
+
+% allow 'special' characters in filenames, like undescore :-P
+\usepackage{grffile}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Custom commands
