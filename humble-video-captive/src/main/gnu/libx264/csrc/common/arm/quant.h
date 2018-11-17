@@ -1,7 +1,7 @@
 /*****************************************************************************
  * quant.h: arm quantization and level-run
  *****************************************************************************
- * Copyright (C) 2005-2014 x264 project
+ * Copyright (C) 2005-2018 x264 project
  *
  * Authors: David Conrad <lessen42@gmail.com>
  *
@@ -26,22 +26,46 @@
 #ifndef X264_ARM_QUANT_H
 #define X264_ARM_QUANT_H
 
+#define x264_quant_2x2_dc_armv6 x264_template(quant_2x2_dc_armv6)
 int x264_quant_2x2_dc_armv6( int16_t dct[4], int mf, int bias );
 
+#define x264_quant_2x2_dc_neon x264_template(quant_2x2_dc_neon)
 int x264_quant_2x2_dc_neon( int16_t dct[4], int mf, int bias );
+#define x264_quant_4x4_dc_neon x264_template(quant_4x4_dc_neon)
 int x264_quant_4x4_dc_neon( int16_t dct[16], int mf, int bias );
+#define x264_quant_4x4_neon x264_template(quant_4x4_neon)
 int x264_quant_4x4_neon( int16_t dct[16], uint16_t mf[16], uint16_t bias[16] );
+#define x264_quant_4x4x4_neon x264_template(quant_4x4x4_neon)
 int x264_quant_4x4x4_neon( int16_t dct[4][16], uint16_t mf[16], uint16_t bias[16] );
+#define x264_quant_8x8_neon x264_template(quant_8x8_neon)
 int x264_quant_8x8_neon( int16_t dct[64], uint16_t mf[64], uint16_t bias[64] );
 
+#define x264_dequant_4x4_dc_neon x264_template(dequant_4x4_dc_neon)
 void x264_dequant_4x4_dc_neon( int16_t dct[16], int dequant_mf[6][16], int i_qp );
+#define x264_dequant_4x4_neon x264_template(dequant_4x4_neon)
 void x264_dequant_4x4_neon( int16_t dct[16], int dequant_mf[6][16], int i_qp );
+#define x264_dequant_8x8_neon x264_template(dequant_8x8_neon)
 void x264_dequant_8x8_neon( int16_t dct[64], int dequant_mf[6][64], int i_qp );
 
+#define x264_decimate_score15_neon x264_template(decimate_score15_neon)
+int x264_decimate_score15_neon( int16_t * );
+#define x264_decimate_score16_neon x264_template(decimate_score16_neon)
+int x264_decimate_score16_neon( int16_t * );
+#define x264_decimate_score64_neon x264_template(decimate_score64_neon)
+int x264_decimate_score64_neon( int16_t * );
+
+#define x264_coeff_last4_arm x264_template(coeff_last4_arm)
 int x264_coeff_last4_arm( int16_t * );
+#define x264_coeff_last8_arm x264_template(coeff_last8_arm)
 int x264_coeff_last8_arm( int16_t * );
+#define x264_coeff_last15_neon x264_template(coeff_last15_neon)
 int x264_coeff_last15_neon( int16_t * );
+#define x264_coeff_last16_neon x264_template(coeff_last16_neon)
 int x264_coeff_last16_neon( int16_t * );
+#define x264_coeff_last64_neon x264_template(coeff_last64_neon)
 int x264_coeff_last64_neon( int16_t * );
+
+#define x264_denoise_dct_neon x264_template(denoise_dct_neon)
+void x264_denoise_dct_neon( dctcoef *, uint32_t *, udctcoef *, int );
 
 #endif

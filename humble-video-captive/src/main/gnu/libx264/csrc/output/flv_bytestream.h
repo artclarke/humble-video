@@ -1,7 +1,7 @@
 /*****************************************************************************
  * flv_bytestream.h: flv muxer utilities
  *****************************************************************************
- * Copyright (C) 2009-2014 x264 project
+ * Copyright (C) 2009-2018 x264 project
  *
  * Authors: Kieran Kunhya <kieran@kunhya.com>
  *
@@ -90,8 +90,8 @@ enum
 
 enum
 {
-    FLV_FRAME_KEY   = 1 << FLV_VIDEO_FRAMETYPE_OFFSET | 7,
-    FLV_FRAME_INTER = 2 << FLV_VIDEO_FRAMETYPE_OFFSET | 7,
+    FLV_FRAME_KEY   = 1 << FLV_VIDEO_FRAMETYPE_OFFSET,
+    FLV_FRAME_INTER = 2 << FLV_VIDEO_FRAMETYPE_OFFSET,
 };
 
 typedef enum

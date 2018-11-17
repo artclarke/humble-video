@@ -1,7 +1,7 @@
 /*****************************************************************************
  * analyse.h: macroblock analysis
  *****************************************************************************
- * Copyright (C) 2003-2014 x264 project
+ * Copyright (C) 2003-2018 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -24,24 +24,32 @@
  * For more information, contact us at licensing@x264.com.
  *****************************************************************************/
 
-#ifndef X264_ANALYSE_H
-#define X264_ANALYSE_H
+#ifndef X264_ENCODER_ANALYSE_H
+#define X264_ENCODER_ANALYSE_H
 
-float *x264_analyse_prepare_costs( x264_t *h );
-int x264_analyse_init_costs( x264_t *h, float *logs, int qp );
+#define x264_analyse_init_costs x264_template(analyse_init_costs)
+int x264_analyse_init_costs( x264_t *h );
+#define x264_analyse_free_costs x264_template(analyse_free_costs)
 void x264_analyse_free_costs( x264_t *h );
+#define x264_analyse_weight_frame x264_template(analyse_weight_frame)
 void x264_analyse_weight_frame( x264_t *h, int end );
+#define x264_macroblock_analyse x264_template(macroblock_analyse)
 void x264_macroblock_analyse( x264_t *h );
+#define x264_slicetype_decide x264_template(slicetype_decide)
 void x264_slicetype_decide( x264_t *h );
 
+#define x264_slicetype_analyse x264_template(slicetype_analyse)
 void x264_slicetype_analyse( x264_t *h, int intra_minigop );
 
-int x264_weighted_reference_duplicate( x264_t *h, int i_ref, const x264_weight_t *w );
-
+#define x264_lookahead_init x264_template(lookahead_init)
 int  x264_lookahead_init( x264_t *h, int i_slicetype_length );
+#define x264_lookahead_is_empty x264_template(lookahead_is_empty)
 int  x264_lookahead_is_empty( x264_t *h );
+#define x264_lookahead_put_frame x264_template(lookahead_put_frame)
 void x264_lookahead_put_frame( x264_t *h, x264_frame_t *frame );
+#define x264_lookahead_get_frames x264_template(lookahead_get_frames)
 void x264_lookahead_get_frames( x264_t *h );
+#define x264_lookahead_delete x264_template(lookahead_delete)
 void x264_lookahead_delete( x264_t *h );
 
 #endif

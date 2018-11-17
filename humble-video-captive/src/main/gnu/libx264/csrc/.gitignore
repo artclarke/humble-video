@@ -18,6 +18,7 @@
 .*.swp
 .depend
 .DS_Store
+TAGS
 config.h
 config.mak
 config.log

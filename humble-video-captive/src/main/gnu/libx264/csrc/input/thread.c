@@ -1,7 +1,7 @@
 /*****************************************************************************
  * thread.c: threaded input
  *****************************************************************************
- * Copyright (C) 2003-2014 x264 project
+ * Copyright (C) 2003-2018 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -25,6 +25,9 @@
  *****************************************************************************/
 
 #include "input.h"
+#include "common/common.h"
+
+#define thread_input x264_glue3(thread, BIT_DEPTH, input)
 
 typedef struct
 {
@@ -48,8 +51,8 @@ typedef struct thread_input_arg_t
 static int open_file( char *psz_filename, hnd_t *p_handle, video_info_t *info, cli_input_opt_t *opt )
 {
     thread_hnd_t *h = malloc( sizeof(thread_hnd_t) );
-    FAIL_IF_ERR( !h || cli_input.picture_alloc( &h->pic, info->csp, info->width, info->height ),
-                 "x264", "malloc failed\n" )
+    FAIL_IF_ERR( !h || cli_input.picture_alloc( &h->pic, *p_handle, info->csp, info->width, info->height ),
+                 "x264", "malloc failed\n" );
     h->input = cli_input;
     h->p_handle = *p_handle;
     h->next_frame = -1;
@@ -59,8 +62,6 @@ static int open_file( char *psz_filename, hnd_t *p_handle, video_info_t *info, c
     h->next_args->h = h;
     h->next_args->status = 0;
     h->frame_total = info->num_frames;
-    thread_input.picture_alloc = h->input.picture_alloc;
-    thread_input.picture_clean = h->input.picture_clean;
 
     if( x264_threadpool_init( &h->pool, 1, NULL, NULL ) )
         return -1;
@@ -115,15 +116,27 @@ static int release_frame( cli_pic_t *pic, hnd_t handle )
     return 0;
 }
 
+static int picture_alloc( cli_pic_t *pic, hnd_t handle, int csp, int width, int height )
+{
+    thread_hnd_t *h = handle;
+    return h->input.picture_alloc( pic, h->p_handle, csp, width, height );
+}
+
+static void picture_clean( cli_pic_t *pic, hnd_t handle )
+{
+    thread_hnd_t *h = handle;
+    h->input.picture_clean( pic, h->p_handle );
+}
+
 static int close_file( hnd_t handle )
 {
     thread_hnd_t *h = handle;
     x264_threadpool_delete( h->pool );
+    h->input.picture_clean( &h->pic, h->p_handle );
     h->input.close_file( h->p_handle );
-    h->input.picture_clean( &h->pic );
     free( h->next_args );
     free( h );
     return 0;
 }
 
-cli_input_t thread_input = { open_file, NULL, read_frame, release_frame, NULL, close_file };
+const cli_input_t thread_input = { open_file, picture_alloc, read_frame, release_frame, picture_clean, close_file };

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dct.h: transform and zigzag
  *****************************************************************************
- * Copyright (C) 2004-2014 x264 project
+ * Copyright (C) 2004-2018 x264 project
  *
  * Authors: Loren Merritt <lorenm@u.washington.edu>
  *
@@ -26,32 +26,27 @@
 #ifndef X264_DCT_H
 #define X264_DCT_H
 
-extern const uint32_t x264_dct4_weight_tab[16];
-extern const uint32_t x264_dct8_weight_tab[64];
-extern const uint32_t x264_dct4_weight2_tab[16];
-extern const uint32_t x264_dct8_weight2_tab[64];
-
 typedef struct
 {
     // pix1  stride = FENC_STRIDE
     // pix2  stride = FDEC_STRIDE
     // p_dst stride = FDEC_STRIDE
-    void (*sub4x4_dct)   ( dctcoef dct[16], pixel *pix1, pixel *pix2 );
-    void (*add4x4_idct)  ( pixel *p_dst, dctcoef dct[16] );
+    void (*sub4x4_dct) ( dctcoef dct[16], pixel *pix1, pixel *pix2 );
+    void (*add4x4_idct)( pixel *p_dst, dctcoef dct[16] );
 
-    void (*sub8x8_dct)   ( dctcoef dct[4][16], pixel *pix1, pixel *pix2 );
-    void (*sub8x8_dct_dc)( dctcoef dct[4], pixel *pix1, pixel *pix2 );
-    void (*add8x8_idct)  ( pixel *p_dst, dctcoef dct[4][16] );
-    void (*add8x8_idct_dc) ( pixel *p_dst, dctcoef dct[4] );
+    void (*sub8x8_dct)    ( dctcoef dct[4][16], pixel *pix1, pixel *pix2 );
+    void (*sub8x8_dct_dc) ( dctcoef dct[4], pixel *pix1, pixel *pix2 );
+    void (*add8x8_idct)   ( pixel *p_dst, dctcoef dct[4][16] );
+    void (*add8x8_idct_dc)( pixel *p_dst, dctcoef dct[4] );
 
     void (*sub8x16_dct_dc)( dctcoef dct[8], pixel *pix1, pixel *pix2 );
 
-    void (*sub16x16_dct) ( dctcoef dct[16][16], pixel *pix1, pixel *pix2 );
-    void (*add16x16_idct)( pixel *p_dst, dctcoef dct[16][16] );
-    void (*add16x16_idct_dc) ( pixel *p_dst, dctcoef dct[16] );
+    void (*sub16x16_dct)    ( dctcoef dct[16][16], pixel *pix1, pixel *pix2 );
+    void (*add16x16_idct)   ( pixel *p_dst, dctcoef dct[16][16] );
+    void (*add16x16_idct_dc)( pixel *p_dst, dctcoef dct[16] );
 
-    void (*sub8x8_dct8)  ( dctcoef dct[64], pixel *pix1, pixel *pix2 );
-    void (*add8x8_idct8) ( pixel *p_dst, dctcoef dct[64] );
+    void (*sub8x8_dct8) ( dctcoef dct[64], pixel *pix1, pixel *pix2 );
+    void (*add8x8_idct8)( pixel *p_dst, dctcoef dct[64] );
 
     void (*sub16x16_dct8) ( dctcoef dct[4][64], pixel *pix1, pixel *pix2 );
     void (*add16x16_idct8)( pixel *p_dst, dctcoef dct[4][64] );
@@ -74,8 +69,9 @@ typedef struct
 
 } x264_zigzag_function_t;
 
+#define x264_dct_init x264_template(dct_init)
 void x264_dct_init( int cpu, x264_dct_function_t *dctf );
-void x264_dct_init_weights( void );
+#define x264_zigzag_init x264_template(zigzag_init)
 void x264_zigzag_init( int cpu, x264_zigzag_function_t *pf_progressive, x264_zigzag_function_t *pf_interlaced );
 
 #endif

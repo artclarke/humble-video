@@ -1,7 +1,7 @@
 ;*****************************************************************************
 ;* trellis-64.asm: x86_64 trellis quantization
 ;*****************************************************************************
-;* Copyright (C) 2012-2014 x264 project
+;* Copyright (C) 2012-2018 x264 project
 ;*
 ;* Authors: Loren Merritt <lorenm@u.washington.edu>
 ;*
@@ -53,25 +53,25 @@
 
 SECTION_RODATA
 
-pd_8: times 4 dd 8
 pd_m16: times 4 dd -16
-pd_0123: dd 0, 1, 2, 3
-pd_4567: dd 4, 5, 6, 7
 sq_1: dq 1, 0
 pq_128: times 2 dq 128
 pq_ffffffff: times 2 dq 0xffffffff
 
-cextern cabac_entropy
-cextern cabac_transition
+cextern pd_8
+cextern pd_0123
+cextern pd_4567
+cextern_common cabac_entropy
+cextern_common cabac_transition
 cextern cabac_size_unary
 cextern cabac_transition_unary
-cextern dct4_weight_tab
-cextern dct8_weight_tab
-cextern dct4_weight2_tab
-cextern dct8_weight2_tab
-cextern last_coeff_flag_offset_8x8
-cextern significant_coeff_flag_offset_8x8
-cextern coeff_flag_offset_chroma_422_dc
+cextern_common dct4_weight_tab
+cextern_common dct8_weight_tab
+cextern_common dct4_weight2_tab
+cextern_common dct8_weight2_tab
+cextern_common last_coeff_flag_offset_8x8
+cextern_common significant_coeff_flag_offset_8x8
+cextern_common coeff_flag_offset_chroma_422_dc
 
 SECTION .text
 
@@ -600,8 +600,8 @@ TRELLIS trellis_cabac_chroma_422_dc, 8, 1, 0
 INIT_XMM
 %macro clocal 1
     ALIGN 16
-    global mangle(x264_%1)
-    mangle(x264_%1):
+    global mangle(private_prefix %+ _%1)
+    mangle(private_prefix %+ _%1):
     %1:
     %assign stack_offset stack_offset_bak+gprsize
 %endmacro

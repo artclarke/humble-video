@@ -1,7 +1,7 @@
 /*****************************************************************************
  * resize.c: resize video filter
  *****************************************************************************
- * Copyright (C) 2010-2014 x264 project
+ * Copyright (C) 2010-2018 x264 project
  *
  * Authors: Steven Walters <kemuri9@gmail.com>
  *
@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #include "video.h"
+
 #define NAME "resize"
 #define FAIL_IF_ERROR( cond, ... ) FAIL_IF_ERR( cond, NAME, __VA_ARGS__ )
 
@@ -154,9 +155,12 @@ static int convert_csp_to_pix_fmt( int csp )
         case X264_CSP_RGB:  return csp&X264_CSP_HIGH_DEPTH ? AV_PIX_FMT_RGB48     : AV_PIX_FMT_RGB24;
         case X264_CSP_BGR:  return csp&X264_CSP_HIGH_DEPTH ? AV_PIX_FMT_BGR48     : AV_PIX_FMT_BGR24;
         case X264_CSP_BGRA: return csp&X264_CSP_HIGH_DEPTH ? AV_PIX_FMT_BGRA64    : AV_PIX_FMT_BGRA;
-        /* the next csp has no equivalent 16bit depth in swscale */
+        /* the following has no equivalent 16-bit depth in swscale */
         case X264_CSP_NV12: return csp&X264_CSP_HIGH_DEPTH ? AV_PIX_FMT_NONE      : AV_PIX_FMT_NV12;
-        /* the next csp is no supported by swscale at all */
+        case X264_CSP_NV21: return csp&X264_CSP_HIGH_DEPTH ? AV_PIX_FMT_NONE      : AV_PIX_FMT_NV21;
+        case X264_CSP_YUYV: return csp&X264_CSP_HIGH_DEPTH ? AV_PIX_FMT_NONE      : AV_PIX_FMT_YUYV422;
+        case X264_CSP_UYVY: return csp&X264_CSP_HIGH_DEPTH ? AV_PIX_FMT_NONE      : AV_PIX_FMT_UYVY422;
+        /* the following is not supported by swscale at all */
         case X264_CSP_NV16:
         default:            return AV_PIX_FMT_NONE;
     }
@@ -208,12 +212,12 @@ static int pick_closest_supported_csp( int csp )
     }
     // now determine high depth
     for( int i = 0; i < pix_desc->nb_components; i++ )
-        if( pix_desc->comp[i].depth_minus1 >= 8 )
+        if( pix_desc->comp[i].depth > 8 )
             ret |= X264_CSP_HIGH_DEPTH;
     return ret;
 }
 
-static int handle_opts( const char **optlist, char **opts, video_info_t *info, resizer_hnd_t *h )
+static int handle_opts( const char * const *optlist, char **opts, video_info_t *info, resizer_hnd_t *h )
 {
     uint32_t out_sar_w, out_sar_h;
 
@@ -264,7 +268,7 @@ static int handle_opts( const char **optlist, char **opts, video_info_t *info, r
     {
         FAIL_IF_ERROR( 2 != sscanf( str_sar, "%u:%u", &out_sar_w, &out_sar_h ) &&
                        2 != sscanf( str_sar, "%u/%u", &out_sar_w, &out_sar_h ),
-                       "invalid sar `%s'\n", str_sar )
+                       "invalid sar `%s'\n", str_sar );
     }
     else
         out_sar_w = out_sar_h = 1;
@@ -274,19 +278,19 @@ static int handle_opts( const char **optlist, char **opts, video_info_t *info, r
         if( !strcasecmp( fittobox, "both" ) )
         {
             FAIL_IF_ERROR( width <= 0 || height <= 0, "invalid box resolution %sx%s\n",
-                           x264_otos( str_width, "<unset>" ), x264_otos( str_height, "<unset>" ) )
+                           x264_otos( str_width, "<unset>" ), x264_otos( str_height, "<unset>" ) );
         }
         else if( !strcasecmp( fittobox, "width" ) )
         {
-            FAIL_IF_ERROR( width <= 0, "invalid box width `%s'\n", x264_otos( str_width, "<unset>" ) )
+            FAIL_IF_ERROR( width <= 0, "invalid box width `%s'\n", x264_otos( str_width, "<unset>" ) );
             height = INT_MAX;
         }
         else if( !strcasecmp( fittobox, "height" ) )
         {
-            FAIL_IF_ERROR( height <= 0, "invalid box height `%s'\n", x264_otos( str_height, "<unset>" ) )
+            FAIL_IF_ERROR( height <= 0, "invalid box height `%s'\n", x264_otos( str_height, "<unset>" ) );
             width = INT_MAX;
         }
-        else FAIL_IF_ERROR( 1, "invalid fittobox mode `%s'\n", fittobox )
+        else FAIL_IF_ERROR( 1, "invalid fittobox mode `%s'\n", fittobox );
 
         /* maximally fit the new coded resolution to the box */
         const x264_cli_csp_t *csp = x264_cli_get_csp( h->dst_csp );
@@ -312,7 +316,7 @@ static int handle_opts( const char **optlist, char **opts, video_info_t *info, r
         if( str_width || str_height )
         {
             FAIL_IF_ERROR( width <= 0 || height <= 0, "invalid resolution %sx%s\n",
-                           x264_otos( str_width, "<unset>" ), x264_otos( str_height, "<unset>" ) )
+                           x264_otos( str_width, "<unset>" ), x264_otos( str_height, "<unset>" ) );
             if( !str_sar ) /* res only -> adjust sar */
             {
                 /* new_sar = (new_h * old_w * old_sar_w) / (old_h * new_w * old_sar_h) */
@@ -359,7 +363,7 @@ static int handle_opts( const char **optlist, char **opts, video_info_t *info, r
     return 0;
 }
 
-static int x264_init_sws_context( resizer_hnd_t *h )
+static int init_sws_context( resizer_hnd_t *h )
 {
     if( h->ctx )
         sws_freeContext( h->ctx );
@@ -402,7 +406,7 @@ static int check_resizer( resizer_hnd_t *h, cli_pic_t *in )
             return -1;
         h->buffer_allocated = 1;
     }
-    FAIL_IF_ERROR( x264_init_sws_context( h ), "swscale init failed\n" )
+    FAIL_IF_ERROR( init_sws_context( h ), "swscale init failed\n" );
     return 0;
 }
 
@@ -415,7 +419,7 @@ static int init( hnd_t *handle, cli_vid_filter_t *filter, video_info_t *info, x2
     if( !opt_string && !full_check( info, param ) )
         return 0;
 
-    static const char *optlist[] = { "width", "height", "sar", "fittobox", "csp", "method", NULL };
+    static const char * const optlist[] = { "width", "height", "sar", "fittobox", "csp", "method", NULL };
     char **opts = x264_split_options( opt_string, optlist );
     if( !opts && opt_string )
         return -1;
@@ -423,6 +427,9 @@ static int init( hnd_t *handle, cli_vid_filter_t *filter, video_info_t *info, x2
     resizer_hnd_t *h = calloc( 1, sizeof(resizer_hnd_t) );
     if( !h )
         return -1;
+
+    h->ctx_flags = convert_method_to_flag( x264_otos( x264_get_option( optlist[5], opts ), "" ) );
+
     if( opts )
     {
         h->dst_csp    = info->csp;
@@ -431,14 +438,20 @@ static int init( hnd_t *handle, cli_vid_filter_t *filter, video_info_t *info, x2
         h->dst.range  = info->fullrange; // maintain input range
         if( !strcmp( opt_string, "normcsp" ) )
         {
+            free( opts );
             /* only in normalization scenarios is the input capable of changing properties */
             h->variable_input = 1;
             h->dst_csp = pick_closest_supported_csp( info->csp );
             FAIL_IF_ERROR( h->dst_csp == X264_CSP_NONE,
-                           "filter get invalid input pixel format %d (colorspace %d)\n", convert_csp_to_pix_fmt( info->csp ), info->csp )
+                           "filter get invalid input pixel format %d (colorspace %d)\n", convert_csp_to_pix_fmt( info->csp ), info->csp );
         }
-        else if( handle_opts( optlist, opts, info, h ) )
-            return -1;
+        else
+        {
+            int err = handle_opts( optlist, opts, info, h );
+            free( opts );
+            if( err )
+                return -1;
+        }
     }
     else
     {
@@ -447,8 +460,6 @@ static int init( hnd_t *handle, cli_vid_filter_t *filter, video_info_t *info, x2
         h->dst.height = param->i_height;
         h->dst.range  = param->vui.b_fullrange; // change to libx264's range
     }
-    h->ctx_flags = convert_method_to_flag( x264_otos( x264_get_option( optlist[5], opts ), "" ) );
-    x264_free_string_array( opts );
 
     if( h->ctx_flags != SWS_FAST_BILINEAR )
         h->ctx_flags |= SWS_FULL_CHR_H_INT | SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
@@ -471,17 +482,17 @@ static int init( hnd_t *handle, cli_vid_filter_t *filter, video_info_t *info, x2
     FAIL_IF_ERROR( src_pix_fmt == AV_PIX_FMT_NONE && src_pix_fmt_inv != AV_PIX_FMT_NONE,
                    "input colorspace %s with bit depth %d is not supported\n", av_get_pix_fmt_name( src_pix_fmt_inv ),
                    info->csp & X264_CSP_HIGH_DEPTH ? 16 : 8 );
-    FAIL_IF_ERROR( !sws_isSupportedInput( src_pix_fmt ), "input colorspace %s is not supported\n", av_get_pix_fmt_name( src_pix_fmt ) )
+    FAIL_IF_ERROR( !sws_isSupportedInput( src_pix_fmt ), "input colorspace %s is not supported\n", av_get_pix_fmt_name( src_pix_fmt ) );
     FAIL_IF_ERROR( h->dst.pix_fmt == AV_PIX_FMT_NONE && dst_pix_fmt_inv != AV_PIX_FMT_NONE,
                    "input colorspace %s with bit depth %d is not supported\n", av_get_pix_fmt_name( dst_pix_fmt_inv ),
                    h->dst_csp & X264_CSP_HIGH_DEPTH ? 16 : 8 );
-    FAIL_IF_ERROR( !sws_isSupportedOutput( h->dst.pix_fmt ), "output colorspace %s is not supported\n", av_get_pix_fmt_name( h->dst.pix_fmt ) )
+    FAIL_IF_ERROR( !sws_isSupportedOutput( h->dst.pix_fmt ), "output colorspace %s is not supported\n", av_get_pix_fmt_name( h->dst.pix_fmt ) );
     FAIL_IF_ERROR( h->dst.height != info->height && info->interlaced,
-                   "swscale is not compatible with interlaced vertical resizing\n" )
+                   "swscale is not compatible with interlaced vertical resizing\n" );
     /* confirm that the desired resolution meets the colorspace requirements */
     const x264_cli_csp_t *csp = x264_cli_get_csp( h->dst_csp );
     FAIL_IF_ERROR( h->dst.width % csp->mod_width || h->dst.height % csp->mod_height,
-                   "resolution %dx%d is not compliant with colorspace %s\n", h->dst.width, h->dst.height, csp->name )
+                   "resolution %dx%d is not compliant with colorspace %s\n", h->dst.width, h->dst.height, csp->name );
 
     if( h->dst.width != info->width || h->dst.height != info->height )
         x264_cli_log( NAME, X264_LOG_INFO, "resizing to %dx%d\n", h->dst.width, h->dst.height );
@@ -572,7 +583,7 @@ static int init( hnd_t *handle, cli_vid_filter_t *filter, video_info_t *info, x2
     }
 
     /* pass if nothing needs to be done, otherwise fail */
-    FAIL_IF_ERROR( ret, "not compiled with swscale support\n" )
+    FAIL_IF_ERROR( ret, "not compiled with swscale support\n" );
     return 0;
 }
 

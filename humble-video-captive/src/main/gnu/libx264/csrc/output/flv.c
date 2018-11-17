@@ -1,7 +1,7 @@
 /*****************************************************************************
  * flv.c: flv muxer
  *****************************************************************************
- * Copyright (C) 2009-2014 x264 project
+ * Copyright (C) 2009-2018 x264 project
  *
  * Authors: Kieran Kunhya <kieran@kunhya.com>
  *
@@ -75,21 +75,29 @@ static int write_header( flv_buffer *c )
 
 static int open_file( char *psz_filename, hnd_t *p_handle, cli_output_opt_t *opt )
 {
-    *p_handle = NULL;
     flv_hnd_t *p_flv = calloc( 1, sizeof(flv_hnd_t) );
-    if( !p_flv )
-        return -1;
+    if( p_flv )
+    {
+        flv_buffer *c = flv_create_writer( psz_filename );
+        if( c )
+        {
+            if( !write_header( c ) )
+            {
+                p_flv->c = c;
+                p_flv->b_dts_compress = opt->use_dts_compress;
+                *p_handle = p_flv;
+                return 0;
+            }
 
-    p_flv->b_dts_compress = opt->use_dts_compress;
+            fclose( c->fp );
+            free( c->data );
+            free( c );
+        }
+        free( p_flv );
+    }
 
-    p_flv->c = flv_create_writer( psz_filename );
-    if( !p_flv->c )
-        return -1;
-
-    CHECK( write_header( p_flv->c ) );
-    *p_handle = p_flv;
-
-    return 0;
+    *p_handle = NULL;
+    return -1;
 }
 
 static int set_param( hnd_t handle, x264_param_t *p_param )
@@ -188,7 +196,7 @@ static int write_headers( hnd_t handle, x264_nal_t *p_nal )
     flv_put_be24( c, 0 ); // StreamID - Always 0
     p_flv->start = c->d_cur; // needed for overwriting length
 
-    flv_put_byte( c, 7 | FLV_FRAME_KEY ); // Frametype and CodecID
+    flv_put_byte( c, FLV_FRAME_KEY | FLV_CODECID_H264 ); // FrameType and CodecID
     flv_put_byte( c, 0 ); // AVC sequence header
     flv_put_be24( c, 0 ); // composition time
 
@@ -271,7 +279,7 @@ static int write_frame( hnd_t handle, uint8_t *p_nalu, int i_size, x264_picture_
     flv_put_be24( c, 0 );
 
     p_flv->start = c->d_cur;
-    flv_put_byte( c, p_picture->b_keyframe ? FLV_FRAME_KEY : FLV_FRAME_INTER );
+    flv_put_byte( c, (p_picture->b_keyframe ? FLV_FRAME_KEY : FLV_FRAME_INTER) | FLV_CODECID_H264 );
     flv_put_byte( c, 1 ); // AVC NALU
     flv_put_be24( c, offset );
 
@@ -293,21 +301,33 @@ static int write_frame( hnd_t handle, uint8_t *p_nalu, int i_size, x264_picture_
     return i_size;
 }
 
-static void rewrite_amf_double( FILE *fp, uint64_t position, double value )
+static int rewrite_amf_double( FILE *fp, uint64_t position, double value )
 {
     uint64_t x = endian_fix64( flv_dbl2int( value ) );
-    fseek( fp, position, SEEK_SET );
-    fwrite( &x, 8, 1, fp );
+    return !fseek( fp, position, SEEK_SET ) && fwrite( &x, 8, 1, fp ) == 1 ? 0 : -1;
 }
+
+#undef CHECK
+#define CHECK(x)\
+do {\
+    if( (x) < 0 )\
+        goto error;\
+} while( 0 )
 
 static int close_file( hnd_t handle, int64_t largest_pts, int64_t second_largest_pts )
 {
+    int ret = -1;
     flv_hnd_t *p_flv = handle;
     flv_buffer *c = p_flv->c;
 
     CHECK( flv_flush_data( c ) );
 
-    double total_duration = (2 * largest_pts - second_largest_pts) * p_flv->d_timebase;
+    double total_duration;
+    /* duration algorithm fails with one frame */
+    if( p_flv->i_framenum == 1 )
+        total_duration = p_flv->i_fps_num ? (double)p_flv->i_fps_den / p_flv->i_fps_num : 0;
+    else
+        total_duration = (2 * largest_pts - second_largest_pts) * p_flv->d_timebase;
 
     if( x264_is_regular_file( c->fp ) && total_duration > 0 )
     {
@@ -317,19 +337,22 @@ static int close_file( hnd_t handle, int64_t largest_pts, int64_t second_largest
         if( p_flv->i_framerate_pos )
         {
             framerate = (double)p_flv->i_framenum / total_duration;
-            rewrite_amf_double( c->fp, p_flv->i_framerate_pos, framerate );
+            CHECK( rewrite_amf_double( c->fp, p_flv->i_framerate_pos, framerate ) );
         }
 
-        rewrite_amf_double( c->fp, p_flv->i_duration_pos, total_duration );
-        rewrite_amf_double( c->fp, p_flv->i_filesize_pos, filesize );
-        rewrite_amf_double( c->fp, p_flv->i_bitrate_pos, filesize * 8 / ( total_duration * 1000 ) );
+        CHECK( rewrite_amf_double( c->fp, p_flv->i_duration_pos, total_duration ) );
+        CHECK( rewrite_amf_double( c->fp, p_flv->i_filesize_pos, filesize ) );
+        CHECK( rewrite_amf_double( c->fp, p_flv->i_bitrate_pos, filesize * 8 / ( total_duration * 1000 ) ) );
     }
+    ret = 0;
 
+error:
     fclose( c->fp );
-    free( p_flv );
+    free( c->data );
     free( c );
+    free( p_flv );
 
-    return 0;
+    return ret;
 }
 
 const cli_output_t flv_output = { open_file, set_param, write_headers, write_frame, close_file };
