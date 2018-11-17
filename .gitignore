@@ -12,8 +12,8 @@ Makefile
 config.log
 config.status
 libtool
-/mvn.out
-/*/mvn.out
+/mvn*.out
+/*/mvn*.out
 /*/test.log
 .libs/
 *.lo
