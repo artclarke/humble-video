@@ -49,10 +49,9 @@ STAGE_DIR="${HUMBLE_HOME:-/tmp}"
 
 case $HOST in
   *darwin*)
-    # Darwin can only cross compile on Darwin
+    # Darwin can only cross compile on Darwin, and only x86_64 as of November 2018
     for cross_os in \
-      x86_64-apple-darwin12 \
-      i686-apple-darwin12
+      x86_64-apple-darwin18
       do
         humble_configure "${STAGE_DIR}" $cross_os
       done
