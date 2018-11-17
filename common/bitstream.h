@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bitstream.h: bitstream writing
  *****************************************************************************
- * Copyright (C) 2003-2014 x264 project
+ * Copyright (C) 2003-2018 x264 project
  *
  * Authors: Loren Merritt <lorenm@u.washington.edu>
  *          Fiona Glaser <fiona@x264.com>
@@ -30,12 +30,6 @@
 
 typedef struct
 {
-    uint8_t i_bits;
-    uint8_t i_size;
-} vlc_t;
-
-typedef struct
-{
     uint16_t i_bits;
     uint8_t  i_size;
     /* Next level table to use */
@@ -60,15 +54,9 @@ typedef struct
     ALIGNED_16( dctcoef level[18] );
 } x264_run_level_t;
 
-extern const vlc_t x264_coeff0_token[6];
-extern const vlc_t x264_coeff_token[6][16][4];
-extern const vlc_t x264_total_zeros[15][16];
-extern const vlc_t x264_total_zeros_2x2_dc[3][4];
-extern const vlc_t x264_total_zeros_2x4_dc[7][8];
-
 typedef struct
 {
-    uint8_t *(*nal_escape) ( uint8_t *dst, uint8_t *src, uint8_t *end );
+    uint8_t *(*nal_escape)( uint8_t *dst, uint8_t *src, uint8_t *end );
     void (*cabac_block_residual_internal)( dctcoef *l, int b_interlaced,
                                            intptr_t ctx_block_cat, x264_cabac_t *cb );
     void (*cabac_block_residual_rd_internal)( dctcoef *l, int b_interlaced,
@@ -77,6 +65,7 @@ typedef struct
                                                   intptr_t ctx_block_cat, x264_cabac_t *cb );
 } x264_bitstream_function_t;
 
+#define x264_bitstream_init x264_template(bitstream_init)
 void x264_bitstream_init( int cpu, x264_bitstream_function_t *pf );
 
 /* A larger level table size theoretically could help a bit at extremely
@@ -85,11 +74,13 @@ void x264_bitstream_init( int cpu, x264_bitstream_function_t *pf );
  * This size appears to be optimal for QP18 encoding on a Nehalem CPU.
  * FIXME: Do further testing? */
 #define LEVEL_TABLE_SIZE 128
+#define x264_level_token x264_template(level_token)
 extern vlc_large_t x264_level_token[7][LEVEL_TABLE_SIZE];
 
 /* The longest possible set of zero run codes sums to 25 bits.  This leaves
  * plenty of room for both the code (25 bits) and size (5 bits) in a uint32_t. */
 
+#define x264_run_before x264_template(run_before)
 extern uint32_t x264_run_before[1<<16];
 
 static inline void bs_init( bs_t *s, void *p_data, int i_data )
@@ -98,8 +89,13 @@ static inline void bs_init( bs_t *s, void *p_data, int i_data )
     s->p       = s->p_start = (uint8_t*)p_data - offset;
     s->p_end   = (uint8_t*)p_data + i_data;
     s->i_left  = (WORD_SIZE - offset)*8;
-    s->cur_bits = endian_fix32( M32(s->p) );
-    s->cur_bits >>= (4-offset)*8;
+    if( offset )
+    {
+        s->cur_bits = endian_fix32( M32(s->p) );
+        s->cur_bits >>= (4-offset)*8;
+    }
+    else
+        s->cur_bits = 0;
 }
 static inline int bs_pos( bs_t *s )
 {
@@ -197,6 +193,7 @@ static inline void bs_align_10( bs_t *s )
 {
     if( s->i_left&7 )
         bs_write( s, s->i_left&7, 1 << ( (s->i_left&7) - 1 ) );
+    bs_flush( s );
 }
 
 /* golomb functions */

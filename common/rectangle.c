@@ -1,7 +1,7 @@
 /*****************************************************************************
  * rectangle.c: rectangle filling
  *****************************************************************************
- * Copyright (C) 2010-2014 x264 project
+ * Copyright (C) 2010-2018 x264 project
  *
  * Authors: Fiona Glaser <fiona@x264.com>
  *
@@ -26,7 +26,7 @@
 #include "common.h"
 
 #define CACHE_FUNC(name,size,width,height)\
-static void x264_macroblock_cache_##name##_##width##_##height( void *target, uint32_t val )\
+static void macroblock_cache_##name##_##width##_##height( void *target, uint32_t val )\
 {\
     x264_macroblock_cache_rect( target, width*size, height, size, val );\
 }
@@ -41,16 +41,16 @@ CACHE_FUNC(name,size,1,2)\
 CACHE_FUNC(name,size,1,1)\
 void (*x264_cache_##name##_func_table[10])(void *, uint32_t) =\
 {\
-    x264_macroblock_cache_##name##_1_1,\
-    x264_macroblock_cache_##name##_2_1,\
-    x264_macroblock_cache_##name##_1_2,\
-    x264_macroblock_cache_##name##_2_2,\
+    macroblock_cache_##name##_1_1,\
+    macroblock_cache_##name##_2_1,\
+    macroblock_cache_##name##_1_2,\
+    macroblock_cache_##name##_2_2,\
     NULL,\
-    x264_macroblock_cache_##name##_4_2,\
+    macroblock_cache_##name##_4_2,\
     NULL,\
-    x264_macroblock_cache_##name##_2_4,\
+    macroblock_cache_##name##_2_4,\
     NULL,\
-    x264_macroblock_cache_##name##_4_4\
+    macroblock_cache_##name##_4_4\
 };\
 
 CACHE_FUNCS(mv, 4)

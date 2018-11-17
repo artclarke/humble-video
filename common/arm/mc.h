@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mc.h: arm motion compensation
  *****************************************************************************
- * Copyright (C) 2009-2014 x264 project
+ * Copyright (C) 2009-2018 x264 project
  *
  * Authors: David Conrad <lessen42@gmail.com>
  *
@@ -26,6 +26,7 @@
 #ifndef X264_ARM_MC_H
 #define X264_ARM_MC_H
 
+#define x264_mc_init_arm x264_template(mc_init_arm)
 void x264_mc_init_arm( int cpu, x264_mc_functions_t *pf );
 
 #endif

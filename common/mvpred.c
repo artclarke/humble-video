@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mvpred.c: motion vector prediction
  *****************************************************************************
- * Copyright (C) 2003-2014 x264 project
+ * Copyright (C) 2003-2018 x264 project
  *
  * Authors: Loren Merritt <lorenm@u.washington.edu>
  *          Fiona Glaser <fiona@x264.com>
@@ -180,7 +180,7 @@ void x264_mb_predict_mv_pskip( x264_t *h, int16_t mv[2] )
         x264_mb_predict_mv_16x16( h, 0, 0, mv );
 }
 
-static int x264_mb_predict_mv_direct16x16_temporal( x264_t *h )
+static int mb_predict_mv_direct16x16_temporal( x264_t *h )
 {
     int mb_x = h->mb.i_mb_x;
     int mb_y = h->mb.i_mb_y;
@@ -286,7 +286,7 @@ static int x264_mb_predict_mv_direct16x16_temporal( x264_t *h )
     return 1;
 }
 
-static ALWAYS_INLINE int x264_mb_predict_mv_direct16x16_spatial( x264_t *h, int b_interlaced )
+static ALWAYS_INLINE int mb_predict_mv_direct16x16_spatial( x264_t *h, int b_interlaced )
 {
     int8_t ref[2];
     ALIGNED_ARRAY_8( int16_t, mv,[2],[2] );
@@ -370,8 +370,8 @@ static ALWAYS_INLINE int x264_mb_predict_mv_direct16x16_spatial( x264_t *h, int 
             h->mb.i_partition = partition_col[0];
         }
     }
-    int i_mb_4x4 = b_interlaced ? 4 * (h->mb.i_b4_stride*mb_y + mb_x) : h->mb.i_b4_xy ;
-    int i_mb_8x8 = b_interlaced ? 2 * (h->mb.i_b8_stride*mb_y + mb_x) : h->mb.i_b8_xy ;
+    int i_mb_4x4 = b_interlaced ? 4 * (h->mb.i_b4_stride*mb_y + mb_x) : h->mb.i_b4_xy;
+    int i_mb_8x8 = b_interlaced ? 2 * (h->mb.i_b8_stride*mb_y + mb_x) : h->mb.i_b8_xy;
 
     int8_t *l1ref0 = &h->fref[1][0]->ref[0][i_mb_8x8];
     int8_t *l1ref1 = &h->fref[1][0]->ref[1][i_mb_8x8];
@@ -441,14 +441,14 @@ static ALWAYS_INLINE int x264_mb_predict_mv_direct16x16_spatial( x264_t *h, int 
 }
 
 
-static int x264_mb_predict_mv_direct16x16_spatial_interlaced( x264_t *h )
+static int mb_predict_mv_direct16x16_spatial_interlaced( x264_t *h )
 {
-    return x264_mb_predict_mv_direct16x16_spatial( h, 1 );
+    return mb_predict_mv_direct16x16_spatial( h, 1 );
 }
 
-static int x264_mb_predict_mv_direct16x16_spatial_progressive( x264_t *h )
+static int mb_predict_mv_direct16x16_spatial_progressive( x264_t *h )
 {
-    return x264_mb_predict_mv_direct16x16_spatial( h, 0 );
+    return mb_predict_mv_direct16x16_spatial( h, 0 );
 }
 
 int x264_mb_predict_mv_direct16x16( x264_t *h, int *b_changed )
@@ -459,12 +459,12 @@ int x264_mb_predict_mv_direct16x16( x264_t *h, int *b_changed )
     else if( h->sh.b_direct_spatial_mv_pred )
     {
         if( SLICE_MBAFF )
-            b_available = x264_mb_predict_mv_direct16x16_spatial_interlaced( h );
+            b_available = mb_predict_mv_direct16x16_spatial_interlaced( h );
         else
-            b_available = x264_mb_predict_mv_direct16x16_spatial_progressive( h );
+            b_available = mb_predict_mv_direct16x16_spatial_progressive( h );
     }
     else
-        b_available = x264_mb_predict_mv_direct16x16_temporal( h );
+        b_available = mb_predict_mv_direct16x16_temporal( h );
 
     if( b_changed != NULL && b_available )
     {

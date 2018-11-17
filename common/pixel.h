@@ -1,7 +1,7 @@
 /*****************************************************************************
  * pixel.c: pixel metrics
  *****************************************************************************
- * Copyright (C) 2004-2014 x264 project
+ * Copyright (C) 2004-2018 x264 project
  *
  * Authors: Loren Merritt <lorenm@u.washington.edu>
  *          Fiona Glaser <fiona@x264.com>
@@ -30,9 +30,9 @@
 
 // SSD assumes all args aligned
 // other cmp functions assume first arg aligned
-typedef int  (*x264_pixel_cmp_t) ( pixel *, intptr_t, pixel *, intptr_t );
-typedef void (*x264_pixel_cmp_x3_t) ( pixel *, pixel *, pixel *, pixel *, intptr_t, int[3] );
-typedef void (*x264_pixel_cmp_x4_t) ( pixel *, pixel *, pixel *, pixel *, pixel *, intptr_t, int[4] );
+typedef int  (*x264_pixel_cmp_t)( pixel *, intptr_t, pixel *, intptr_t );
+typedef void (*x264_pixel_cmp_x3_t)( pixel *, pixel *, pixel *, pixel *, intptr_t, int[3] );
+typedef void (*x264_pixel_cmp_x4_t)( pixel *, pixel *, pixel *, pixel *, pixel *, intptr_t, int[4] );
 
 enum
 {
@@ -93,8 +93,7 @@ typedef struct
     uint64_t (*sa8d_satd[1])( pixel *pix1, intptr_t stride1, pixel *pix2, intptr_t stride2 );
 
     uint64_t (*var[4])( pixel *pix, intptr_t stride );
-    int (*var2[4])( pixel *pix1, intptr_t stride1,
-                    pixel *pix2, intptr_t stride2, int *ssd );
+    int (*var2[4])( pixel *fenc, pixel *fdec, int ssd[2] );
     uint64_t (*hadamard_ac[4])( pixel *pix, intptr_t stride );
 
     void (*ssd_nv12_core)( pixel *pixuv1, intptr_t stride1,
@@ -144,13 +143,18 @@ typedef struct
     int (*intra_sad_x9_8x8)  ( pixel *fenc, pixel *fdec, pixel edge[36], uint16_t *bitcosts, uint16_t *satds );
 } x264_pixel_function_t;
 
+#define x264_pixel_init x264_template(pixel_init)
 void x264_pixel_init( int cpu, x264_pixel_function_t *pixf );
+#define x264_pixel_ssd_nv12 x264_template(pixel_ssd_nv12)
 void x264_pixel_ssd_nv12   ( x264_pixel_function_t *pf, pixel *pix1, intptr_t i_pix1, pixel *pix2, intptr_t i_pix2,
                              int i_width, int i_height, uint64_t *ssd_u, uint64_t *ssd_v );
+#define x264_pixel_ssd_wxh x264_template(pixel_ssd_wxh)
 uint64_t x264_pixel_ssd_wxh( x264_pixel_function_t *pf, pixel *pix1, intptr_t i_pix1, pixel *pix2, intptr_t i_pix2,
                              int i_width, int i_height );
+#define x264_pixel_ssim_wxh x264_template(pixel_ssim_wxh)
 float x264_pixel_ssim_wxh  ( x264_pixel_function_t *pf, pixel *pix1, intptr_t i_pix1, pixel *pix2, intptr_t i_pix2,
                              int i_width, int i_height, void *buf, int *cnt );
+#define x264_field_vsad x264_template(field_vsad)
 int x264_field_vsad( x264_t *h, int mb_x, int mb_y );
 
 #endif

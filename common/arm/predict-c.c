@@ -1,7 +1,7 @@
 /*****************************************************************************
  * predict.c: arm intra prediction
  *****************************************************************************
- * Copyright (C) 2009-2014 x264 project
+ * Copyright (C) 2009-2018 x264 project
  *
  * Authors: David Conrad <lessen42@gmail.com>
  *
@@ -29,7 +29,7 @@
 
 void x264_predict_4x4_init_arm( int cpu, x264_predict_t pf[12] )
 {
-    if (!(cpu&X264_CPU_ARMV6))
+    if( !(cpu&X264_CPU_ARMV6) )
         return;
 
 #if !HIGH_BIT_DEPTH
@@ -38,7 +38,7 @@ void x264_predict_4x4_init_arm( int cpu, x264_predict_t pf[12] )
     pf[I_PRED_4x4_DC]  = x264_predict_4x4_dc_armv6;
     pf[I_PRED_4x4_DDR] = x264_predict_4x4_ddr_armv6;
 
-    if (!(cpu&X264_CPU_NEON))
+    if( !(cpu&X264_CPU_NEON) )
         return;
 
     pf[I_PRED_4x4_DC_TOP] = x264_predict_4x4_dc_top_neon;
@@ -48,7 +48,7 @@ void x264_predict_4x4_init_arm( int cpu, x264_predict_t pf[12] )
 
 void x264_predict_8x8c_init_arm( int cpu, x264_predict_t pf[7] )
 {
-    if (!(cpu&X264_CPU_NEON))
+    if( !(cpu&X264_CPU_NEON) )
         return;
 
 #if !HIGH_BIT_DEPTH
@@ -61,9 +61,22 @@ void x264_predict_8x8c_init_arm( int cpu, x264_predict_t pf[7] )
 #endif // !HIGH_BIT_DEPTH
 }
 
+void x264_predict_8x16c_init_arm( int cpu, x264_predict_t pf[7] )
+{
+    if( !(cpu&X264_CPU_NEON) )
+        return;
+
+#if !HIGH_BIT_DEPTH
+    /* The other functions weren't faster than C (gcc 4.7.3) on Cortex A8 and A9. */
+    pf[I_PRED_CHROMA_DC_TOP]  = x264_predict_8x16c_dc_top_neon;
+    pf[I_PRED_CHROMA_H]       = x264_predict_8x16c_h_neon;
+    pf[I_PRED_CHROMA_P]       = x264_predict_8x16c_p_neon;
+#endif // !HIGH_BIT_DEPTH
+}
+
 void x264_predict_8x8_init_arm( int cpu, x264_predict8x8_t pf[12], x264_predict_8x8_filter_t *predict_filter )
 {
-    if (!(cpu&X264_CPU_NEON))
+    if( !(cpu&X264_CPU_NEON) )
         return;
 
 #if !HIGH_BIT_DEPTH
@@ -81,7 +94,7 @@ void x264_predict_8x8_init_arm( int cpu, x264_predict8x8_t pf[12], x264_predict_
 
 void x264_predict_16x16_init_arm( int cpu, x264_predict_t pf[7] )
 {
-    if (!(cpu&X264_CPU_NEON))
+    if( !(cpu&X264_CPU_NEON) )
         return;
 
 #if !HIGH_BIT_DEPTH

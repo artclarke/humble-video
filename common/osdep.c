@@ -1,7 +1,7 @@
 /*****************************************************************************
  * osdep.c: platform-specific code
  *****************************************************************************
- * Copyright (C) 2003-2014 x264 project
+ * Copyright (C) 2003-2018 x264 project
  *
  * Authors: Steven Walters <kemuri9@gmail.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -25,7 +25,7 @@
  * For more information, contact us at licensing@x264.com.
  *****************************************************************************/
 
-#include "common.h"
+#include "osdep.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -60,9 +60,9 @@ int64_t x264_mdate( void )
 
 #if HAVE_WIN32THREAD || PTW32_STATIC_LIB
 /* state of the threading library being initialized */
-static volatile LONG x264_threading_is_init = 0;
+static volatile LONG threading_is_init = 0;
 
-static void x264_threading_destroy( void )
+static void threading_destroy( void )
 {
 #if PTW32_STATIC_LIB
     pthread_win32_thread_detach_np();
@@ -72,11 +72,8 @@ static void x264_threading_destroy( void )
 #endif
 }
 
-int x264_threading_init( void )
+static int threading_init( void )
 {
-    /* if already init, then do nothing */
-    if( InterlockedCompareExchange( &x264_threading_is_init, 1, 0 ) )
-        return 0;
 #if PTW32_STATIC_LIB
     /* if static pthread-win32 is already initialized, then do nothing */
     if( ptw32_processInitialized )
@@ -88,55 +85,27 @@ int x264_threading_init( void )
         return -1;
 #endif
     /* register cleanup to run at process termination */
-    atexit( x264_threading_destroy );
-
+    atexit( threading_destroy );
     return 0;
 }
-#endif
 
-#if HAVE_MMX
-#ifdef __INTEL_COMPILER
-/* Agner's patch to Intel's CPU dispatcher from pages 131-132 of
- * http://agner.org/optimize/optimizing_cpp.pdf (2011-01-30)
- * adapted to x264's cpu schema. */
-
-// Global variable indicating cpu
-int __intel_cpu_indicator = 0;
-// CPU dispatcher function
-void x264_intel_cpu_indicator_init( void )
+int x264_threading_init( void )
 {
-    unsigned int cpu = x264_cpu_detect();
-    if( cpu&X264_CPU_AVX )
-        __intel_cpu_indicator = 0x20000;
-    else if( cpu&X264_CPU_SSE42 )
-        __intel_cpu_indicator = 0x8000;
-    else if( cpu&X264_CPU_SSE4 )
-        __intel_cpu_indicator = 0x2000;
-    else if( cpu&X264_CPU_SSSE3 )
-        __intel_cpu_indicator = 0x1000;
-    else if( cpu&X264_CPU_SSE3 )
-        __intel_cpu_indicator = 0x800;
-    else if( cpu&X264_CPU_SSE2 && !(cpu&X264_CPU_SSE2_IS_SLOW) )
-        __intel_cpu_indicator = 0x200;
-    else if( cpu&X264_CPU_SSE )
-        __intel_cpu_indicator = 0x80;
-    else if( cpu&X264_CPU_MMX2 )
-        __intel_cpu_indicator = 8;
-    else
-        __intel_cpu_indicator = 1;
+    LONG state;
+    while( (state = InterlockedCompareExchange( &threading_is_init, -1, 0 )) != 0 )
+    {
+        /* if already init, then do nothing */
+        if( state > 0 )
+            return 0;
+    }
+    if( threading_init() < 0 )
+    {
+        InterlockedExchange( &threading_is_init, 0 );
+        return -1;
+    }
+    InterlockedExchange( &threading_is_init, 1 );
+    return 0;
 }
-
-/* __intel_cpu_indicator_init appears to have a non-standard calling convention that
- * assumes certain registers aren't preserved, so we'll route it through a function
- * that backs up all the registers. */
-void __intel_cpu_indicator_init( void )
-{
-    x264_safe_intel_cpu_indicator_init();
-}
-#else
-void x264_intel_cpu_indicator_init( void )
-{}
-#endif
 #endif
 
 #ifdef _WIN32
@@ -171,6 +140,7 @@ int x264_stat( const char *path, x264_struct_stat *buf )
     return -1;
 }
 
+#if !HAVE_WINRT
 int x264_vfprintf( FILE *stream, const char *format, va_list arg )
 {
     HANDLE console = NULL;
@@ -186,8 +156,12 @@ int x264_vfprintf( FILE *stream, const char *format, va_list arg )
     {
         char buf[4096];
         wchar_t buf_utf16[4096];
+        va_list arg2;
 
-        int length = vsnprintf( buf, sizeof(buf), format, arg );
+        va_copy( arg2, arg );
+        int length = vsnprintf( buf, sizeof(buf), format, arg2 );
+        va_end( arg2 );
+
         if( length > 0 && length < sizeof(buf) )
         {
             /* WriteConsoleW is the most reliable way to output Unicode to a console. */
@@ -207,4 +181,40 @@ int x264_is_pipe( const char *path )
         return WaitNamedPipeW( path_utf16, 0 );
     return 0;
 }
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+/* MSVC pre-VS2015 has broken snprintf/vsnprintf implementations which are incompatible with C99. */
+int x264_snprintf( char *s, size_t n, const char *fmt, ... )
+{
+    va_list arg;
+    va_start( arg, fmt );
+    int length = x264_vsnprintf( s, n, fmt, arg );
+    va_end( arg );
+    return length;
+}
+
+int x264_vsnprintf( char *s, size_t n, const char *fmt, va_list arg )
+{
+    int length = -1;
+
+    if( n )
+    {
+        va_list arg2;
+        va_copy( arg2, arg );
+        length = _vsnprintf( s, n, fmt, arg2 );
+        va_end( arg2 );
+
+        /* _(v)snprintf adds a null-terminator only if the length is less than the buffer size. */
+        if( length < 0 || length >= n )
+            s[n-1] = '\0';
+    }
+
+    /* _(v)snprintf returns a negative number if the length is greater than the buffer size. */
+    if( length < 0 )
+        return _vscprintf( fmt, arg );
+
+    return length;
+}
+#endif
 #endif

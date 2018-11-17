@@ -1,7 +1,7 @@
 /*****************************************************************************
  * frame.h: frame handling
  *****************************************************************************
- * Copyright (C) 2003-2014 x264 project
+ * Copyright (C) 2003-2018 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -39,6 +39,7 @@ typedef struct x264_frame
     int     i_poc;
     int     i_delta_poc[2];
     int     i_type;
+    int     i_forced_type;
     int     i_qpplus1;
     int64_t i_pts;
     int64_t i_dts;
@@ -210,52 +211,84 @@ typedef struct
     x264_deblock_intra_t deblock_chroma_intra_mbaff;
     x264_deblock_intra_t deblock_chroma_420_intra_mbaff;
     x264_deblock_intra_t deblock_chroma_422_intra_mbaff;
-    void (*deblock_strength) ( uint8_t nnz[X264_SCAN8_SIZE], int8_t ref[2][X264_SCAN8_LUMA_SIZE],
-                               int16_t mv[2][X264_SCAN8_LUMA_SIZE][2], uint8_t bs[2][8][4], int mvy_limit,
-                               int bframe );
+    void (*deblock_strength)( uint8_t nnz[X264_SCAN8_SIZE], int8_t ref[2][X264_SCAN8_LUMA_SIZE],
+                              int16_t mv[2][X264_SCAN8_LUMA_SIZE][2], uint8_t bs[2][8][4], int mvy_limit,
+                              int bframe );
 } x264_deblock_function_t;
 
+#define x264_frame_delete x264_template(frame_delete)
 void          x264_frame_delete( x264_frame_t *frame );
 
+#define x264_frame_copy_picture x264_template(frame_copy_picture)
 int           x264_frame_copy_picture( x264_t *h, x264_frame_t *dst, x264_picture_t *src );
 
+#define x264_frame_expand_border x264_template(frame_expand_border)
 void          x264_frame_expand_border( x264_t *h, x264_frame_t *frame, int mb_y );
+#define x264_frame_expand_border_filtered x264_template(frame_expand_border_filtered)
 void          x264_frame_expand_border_filtered( x264_t *h, x264_frame_t *frame, int mb_y, int b_end );
+#define x264_frame_expand_border_lowres x264_template(frame_expand_border_lowres)
 void          x264_frame_expand_border_lowres( x264_frame_t *frame );
+#define x264_frame_expand_border_chroma x264_template(frame_expand_border_chroma)
 void          x264_frame_expand_border_chroma( x264_t *h, x264_frame_t *frame, int plane );
+#define x264_frame_expand_border_mod16 x264_template(frame_expand_border_mod16)
 void          x264_frame_expand_border_mod16( x264_t *h, x264_frame_t *frame );
+#define x264_expand_border_mbpair x264_template(expand_border_mbpair)
 void          x264_expand_border_mbpair( x264_t *h, int mb_x, int mb_y );
 
+#define x264_frame_deblock_row x264_template(frame_deblock_row)
 void          x264_frame_deblock_row( x264_t *h, int mb_y );
+#define x264_macroblock_deblock x264_template(macroblock_deblock)
 void          x264_macroblock_deblock( x264_t *h );
 
+#define x264_frame_filter x264_template(frame_filter)
 void          x264_frame_filter( x264_t *h, x264_frame_t *frame, int mb_y, int b_end );
+#define x264_frame_init_lowres x264_template(frame_init_lowres)
 void          x264_frame_init_lowres( x264_t *h, x264_frame_t *frame );
 
+#define x264_deblock_init x264_template(deblock_init)
 void          x264_deblock_init( int cpu, x264_deblock_function_t *pf, int b_mbaff );
 
+#define x264_frame_cond_broadcast x264_template(frame_cond_broadcast)
 void          x264_frame_cond_broadcast( x264_frame_t *frame, int i_lines_completed );
+#define x264_frame_cond_wait x264_template(frame_cond_wait)
 void          x264_frame_cond_wait( x264_frame_t *frame, int i_lines_completed );
+#define x264_frame_new_slice x264_template(frame_new_slice)
 int           x264_frame_new_slice( x264_t *h, x264_frame_t *frame );
 
+#define x264_threadslice_cond_broadcast x264_template(threadslice_cond_broadcast)
 void          x264_threadslice_cond_broadcast( x264_t *h, int pass );
+#define x264_threadslice_cond_wait x264_template(threadslice_cond_wait)
 void          x264_threadslice_cond_wait( x264_t *h, int pass );
 
+#define x264_frame_push x264_template(frame_push)
 void          x264_frame_push( x264_frame_t **list, x264_frame_t *frame );
+#define x264_frame_pop x264_template(frame_pop)
 x264_frame_t *x264_frame_pop( x264_frame_t **list );
+#define x264_frame_unshift x264_template(frame_unshift)
 void          x264_frame_unshift( x264_frame_t **list, x264_frame_t *frame );
+#define x264_frame_shift x264_template(frame_shift)
 x264_frame_t *x264_frame_shift( x264_frame_t **list );
+#define x264_frame_push_unused x264_template(frame_push_unused)
 void          x264_frame_push_unused( x264_t *h, x264_frame_t *frame );
+#define x264_frame_push_blank_unused x264_template(frame_push_blank_unused)
 void          x264_frame_push_blank_unused( x264_t *h, x264_frame_t *frame );
+#define x264_frame_pop_blank_unused x264_template(frame_pop_blank_unused)
 x264_frame_t *x264_frame_pop_blank_unused( x264_t *h );
+#define x264_weight_scale_plane x264_template(weight_scale_plane)
 void x264_weight_scale_plane( x264_t *h, pixel *dst, intptr_t i_dst_stride, pixel *src, intptr_t i_src_stride,
                               int i_width, int i_height, x264_weight_t *w );
+#define x264_frame_pop_unused x264_template(frame_pop_unused)
 x264_frame_t *x264_frame_pop_unused( x264_t *h, int b_fdec );
+#define x264_frame_delete_list x264_template(frame_delete_list)
 void          x264_frame_delete_list( x264_frame_t **list );
 
+#define x264_sync_frame_list_init x264_template(sync_frame_list_init)
 int           x264_sync_frame_list_init( x264_sync_frame_list_t *slist, int nelem );
+#define x264_sync_frame_list_delete x264_template(sync_frame_list_delete)
 void          x264_sync_frame_list_delete( x264_sync_frame_list_t *slist );
+#define x264_sync_frame_list_push x264_template(sync_frame_list_push)
 void          x264_sync_frame_list_push( x264_sync_frame_list_t *slist, x264_frame_t *frame );
+#define x264_sync_frame_list_pop x264_template(sync_frame_list_pop)
 x264_frame_t *x264_sync_frame_list_pop( x264_sync_frame_list_t *slist );
 
 #endif

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mc.h: ppc motion compensation
  *****************************************************************************
- * Copyright (C) 2003-2014 x264 project
+ * Copyright (C) 2003-2018 x264 project
  *
  * Authors: Eric Petit <eric.petit@lapsus.org>
  *
@@ -26,6 +26,7 @@
 #ifndef X264_PPC_MC_H
 #define X264_PPC_MC_H
 
-void x264_mc_altivec_init( x264_mc_functions_t *pf );
+#define x264_mc_init_altivec x264_template(mc_init_altivec)
+void x264_mc_init_altivec( x264_mc_functions_t *pf );
 
 #endif

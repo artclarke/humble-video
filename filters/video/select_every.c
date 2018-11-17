@@ -1,7 +1,7 @@
 /*****************************************************************************
  * select_every.c: select-every video filter
  *****************************************************************************
- * Copyright (C) 2010-2014 x264 project
+ * Copyright (C) 2010-2018 x264 project
  *
  * Authors: Steven Walters <kemuri9@gmail.com>
  *
@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #include "video.h"
+
 #define NAME "select_every"
 #define FAIL_IF_ERROR( cond, ... ) FAIL_IF_ERR( cond, NAME, __VA_ARGS__ )
 
@@ -67,16 +68,16 @@ static int init( hnd_t *handle, cli_vid_filter_t *filter, video_info_t *info, x2
         int val = x264_otoi( tok, -1 );
         if( p )
         {
-            FAIL_IF_ERROR( val <= 0, "invalid step `%s'\n", tok )
+            FAIL_IF_ERROR( val <= 0, "invalid step `%s'\n", tok );
             h->step_size = val;
             continue;
         }
-        FAIL_IF_ERROR( val < 0 || val >= h->step_size, "invalid offset `%s'\n", tok )
-        FAIL_IF_ERROR( h->pattern_len >= MAX_PATTERN_SIZE, "max pattern size %d reached\n", MAX_PATTERN_SIZE )
+        FAIL_IF_ERROR( val < 0 || val >= h->step_size, "invalid offset `%s'\n", tok );
+        FAIL_IF_ERROR( h->pattern_len >= MAX_PATTERN_SIZE, "max pattern size %d reached\n", MAX_PATTERN_SIZE );
         offsets[h->pattern_len++] = val;
     }
-    FAIL_IF_ERROR( !h->step_size, "no step size provided\n" )
-    FAIL_IF_ERROR( !h->pattern_len, "no offsets supplied\n" )
+    FAIL_IF_ERROR( !h->step_size, "no step size provided\n" );
+    FAIL_IF_ERROR( !h->pattern_len, "no offsets supplied\n" );
 
     h->pattern = malloc( h->pattern_len * sizeof(int) );
     if( !h->pattern )
@@ -95,7 +96,9 @@ static int init( hnd_t *handle, cli_vid_filter_t *filter, video_info_t *info, x2
          if( max_rewind == h->step_size )
              break;
     }
-    if( x264_init_vid_filter( "cache", handle, filter, info, param, (void*)max_rewind ) )
+    char name[20];
+    sprintf( name, "cache_%d", param->i_bitdepth );
+    if( x264_init_vid_filter( name, handle, filter, info, param, (void*)max_rewind ) )
         return -1;
 
     /* done initing, overwrite properties */
