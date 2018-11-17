@@ -58,6 +58,7 @@
 #include "spandsp/v29tx.h"
 #include "spandsp/v27ter_rx.h"
 #include "spandsp/v27ter_tx.h"
+#include "spandsp/timezone.h"
 #include "spandsp/t4_rx.h"
 #include "spandsp/t4_tx.h"
 #if defined(SPANDSP_SUPPORT_T85)
@@ -73,6 +74,7 @@
 #include "spandsp/t30_logging.h"
 
 #include "spandsp/private/logging.h"
+#include "spandsp/private/timezone.h"
 #if defined(SPANDSP_SUPPORT_T85)
 #include "spandsp/private/t81_t82_arith_coding.h"
 #include "spandsp/private/t85.h"
@@ -571,18 +573,23 @@ SPAN_DECLARE(int) t30_set_tx_page_header_info(t30_state_t *s, const char *info)
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(int) t30_set_tx_page_header_tz(t30_state_t *s, const char *tzstring)
-{
-    t4_tx_set_header_tz(&s->t4.tx, tzstring);
-    return 0;
-}
-/*- End of function --------------------------------------------------------*/
-
 SPAN_DECLARE(size_t) t30_get_tx_page_header_info(t30_state_t *s, char *info)
 {
     if (info)
         strcpy(info, s->header_info);
     return strlen(s->header_info);
+}
+/*- End of function --------------------------------------------------------*/
+
+SPAN_DECLARE(int) t30_set_tx_page_header_tz(t30_state_t *s, const char *tzstring)
+{
+    if (tz_init(&s->tz, tzstring))
+    {
+        s->use_own_tz = TRUE;
+        t4_tx_set_header_tz(&s->t4.tx, &s->tz);
+        return 0;
+    }
+    return -1;
 }
 /*- End of function --------------------------------------------------------*/
 
@@ -724,7 +731,11 @@ SPAN_DECLARE(int) t30_set_supported_t30_features(t30_state_t *s, int supported_t
 
 SPAN_DECLARE(void) t30_set_status(t30_state_t *s, int status)
 {
-    s->current_status = status;
+    if (s->current_status != status)
+    {
+        span_log(&s->logging, SPAN_LOG_FLOW, "Status changing to '%s'\n", t30_completion_code_to_str(status));
+        s->current_status = status;
+    }
 }
 /*- End of function --------------------------------------------------------*/
 

@@ -1,7 +1,7 @@
-Spandsp Version 0.0.6pre20
+Spandsp Version 0.0.6
 Software Homepage: http://www.soft-switch.org/
 License: LGPL 2.1
-Source Download URL: http://www.soft-switch.org/downloads/spandsp/spandsp-0.0.6pre20.tgz
+Source Download URL: https://www.soft-switch.org/downloads/spandsp/spandsp-0.0.6.tar.gz
 Modifications:
  - Added 'AM_MAINTAINER_MODE([disable])'
  - Ran autoreconf --force --install

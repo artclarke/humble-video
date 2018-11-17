@@ -287,7 +287,7 @@ SPAN_DECLARE_NONSTD(int) v27ter_tx(v27ter_tx_state_t *s, int16_t amp[], int len)
             /* Now create and modulate the carrier */
             x.re >>= 14;
             x.im >>= 14;
-            z = dds_complexi(&(s->carrier_phase), s->carrier_phase_rate);
+            z = dds_complexi(&s->carrier_phase, s->carrier_phase_rate);
             /* Don't bother saturating. We should never clip. */
             i = (x.re*z.re - x.im*z.im) >> 15;
             amp[sample] = (int16_t) ((i*s->gain_4800) >> 15);
@@ -299,7 +299,7 @@ SPAN_DECLARE_NONSTD(int) v27ter_tx(v27ter_tx_state_t *s, int16_t amp[], int len)
                 x.im += tx_pulseshaper_4800[TX_PULSESHAPER_4800_COEFF_SETS - 1 - s->baud_phase][i]*s->rrc_filter[i + s->rrc_filter_step].im;
             }
             /* Now create and modulate the carrier */
-            z = dds_complexf(&(s->carrier_phase), s->carrier_phase_rate);
+            z = dds_complexf(&s->carrier_phase, s->carrier_phase_rate);
             /* Don't bother saturating. We should never clip. */
             amp[sample] = (int16_t) lfastrintf((x.re*z.re - x.im*z.im)*s->gain_4800);
 #endif
@@ -328,7 +328,7 @@ SPAN_DECLARE_NONSTD(int) v27ter_tx(v27ter_tx_state_t *s, int16_t amp[], int len)
             /* Now create and modulate the carrier */
             x.re >>= 14;
             x.im >>= 14;
-            z = dds_complexi(&(s->carrier_phase), s->carrier_phase_rate);
+            z = dds_complexi(&s->carrier_phase, s->carrier_phase_rate);
             /* Don't bother saturating. We should never clip. */
             i = (x.re*z.re - x.im*z.im) >> 15;
             amp[sample] = (int16_t) ((i*s->gain_2400) >> 15);
@@ -340,7 +340,7 @@ SPAN_DECLARE_NONSTD(int) v27ter_tx(v27ter_tx_state_t *s, int16_t amp[], int len)
                 x.im += tx_pulseshaper_2400[TX_PULSESHAPER_2400_COEFF_SETS - 1 - s->baud_phase][i]*s->rrc_filter[i + s->rrc_filter_step].im;
             }
             /* Now create and modulate the carrier */
-            z = dds_complexf(&(s->carrier_phase), s->carrier_phase_rate);
+            z = dds_complexf(&s->carrier_phase, s->carrier_phase_rate);
             /* Don't bother saturating. We should never clip. */
             amp[sample] = (int16_t) lfastrintf((x.re*z.re - x.im*z.im)*s->gain_2400);
 #endif
@@ -374,7 +374,7 @@ SPAN_DECLARE(void) v27ter_tx_set_get_bit(v27ter_tx_state_t *s, get_bit_func_t ge
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) v27ter_tx_set_modem_status_handler(v27ter_tx_state_t *s, modem_tx_status_func_t handler, void *user_data)
+SPAN_DECLARE(void) v27ter_tx_set_modem_status_handler(v27ter_tx_state_t *s, modem_status_func_t handler, void *user_data)
 {
     s->status_handler = handler;
     s->status_user_data = user_data;

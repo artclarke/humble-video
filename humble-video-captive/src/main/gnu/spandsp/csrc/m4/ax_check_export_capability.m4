@@ -20,7 +20,7 @@ ac_cv_symbol_export_capability="no"
 case "${ax_cv_c_compiler_vendor}" in
 gnu)
     save_CFLAGS="${CFLAGS}"
-    CFLAGS="${CFLAGS} -Werror -fvisibility=hidden"
+    CFLAGS="${CFLAGS} -fvisibility=hidden"
     AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM(
             [int foo __attribute__ ((visibility("default")));],
@@ -28,8 +28,8 @@ gnu)
         )],
 
         [AC_MSG_RESULT([yes])
-         COMP_VENDOR_CFLAGS="-fvisibility=hidden -DSWITCH_API_VISIBILITY=1 -DHAVE_VISIBILITY=1 $COMP_VENDOR_CFLAGS"
-         COMP_VENDOR_CXXFLAGS="-fvisibility=hidden -DSWITCH_API_VISIBILITY=1 -DHAVE_VISIBILITY=1 $COMP_VENDOR_CXXFLAGS"
+         COMP_VENDOR_CFLAGS="-fvisibility=hidden -DHAVE_VISIBILITY=1 $COMP_VENDOR_CFLAGS"
+         COMP_VENDOR_CXXFLAGS="-fvisibility=hidden -DHAVE_VISIBILITY=1 $COMP_VENDOR_CXXFLAGS"
          ac_cv_symbol_export_capability="yes"],
 
         [AC_MSG_RESULT([no])]
@@ -47,8 +47,8 @@ sun)
         )],
 
         [AC_MSG_RESULT([yes])
-         COMP_VENDOR_CFLAGS="-xldscope=hidden -DSWITCH_API_VISIBILITY=1 -DHAVE_VISIBILITY=1 $COMP_VENDOR_CFLAGS"
-         COMP_VENDOR_CXXFLAGS="-xldscope=hidden -DSWITCH_API_VISIBILITY=1 -DHAVE_VISIBILITY=1 $COMP_VENDOR_CXXFLAGS"
+         COMP_VENDOR_CFLAGS="-xldscope=hidden -DHAVE_VISIBILITY=1 $COMP_VENDOR_CFLAGS"
+         COMP_VENDOR_CXXFLAGS="-xldscope=hidden -DHAVE_VISIBILITY=1 $COMP_VENDOR_CXXFLAGS"
          ac_cv_symbol_export_capability="yes"],
 
         [AC_MSG_RESULT([no])]

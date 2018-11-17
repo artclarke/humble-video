@@ -130,7 +130,7 @@ static void STATE_TRACE(const char *format, ...)
 #endif
 
 #if defined(HAVE_LIBTIFF)
-static int set_tiff_directory_info(t4_state_t *s)
+static int set_tiff_directory_info(t4_rx_state_t *s)
 {
     time_t now;
     struct tm *tm;
@@ -189,17 +189,17 @@ static int set_tiff_directory_info(t4_state_t *s)
         TIFFSetField(t->tiff_file, TIFFTAG_HOSTCOMPUTER, buf);
 
 #if defined(TIFFTAG_FAXDCS)
-    if (t->dcs)
-        TIFFSetField(t->tiff_file, TIFFTAG_FAXDCS, t->dcs);
+    if (t->metadata.dcs)
+        TIFFSetField(t->tiff_file, TIFFTAG_FAXDCS, t->metadata.dcs);
 #endif
-    if (t->sub_address)
-        TIFFSetField(t->tiff_file, TIFFTAG_FAXSUBADDRESS, t->sub_address);
-    if (t->far_ident)
-        TIFFSetField(t->tiff_file, TIFFTAG_IMAGEDESCRIPTION, t->far_ident);
-    if (t->vendor)
-        TIFFSetField(t->tiff_file, TIFFTAG_MAKE, t->vendor);
-    if (t->model)
-        TIFFSetField(t->tiff_file, TIFFTAG_MODEL, t->model);
+    if (t->metadata.sub_address)
+        TIFFSetField(t->tiff_file, TIFFTAG_FAXSUBADDRESS, t->metadata.sub_address);
+    if (t->metadata.far_ident)
+        TIFFSetField(t->tiff_file, TIFFTAG_IMAGEDESCRIPTION, t->metadata.far_ident);
+    if (t->metadata.vendor)
+        TIFFSetField(t->tiff_file, TIFFTAG_MAKE, t->metadata.vendor);
+    if (t->metadata.model)
+        TIFFSetField(t->tiff_file, TIFFTAG_MODEL, t->metadata.model);
 
     time(&now);
     tm = localtime(&now);
@@ -238,7 +238,7 @@ static int set_tiff_directory_info(t4_state_t *s)
 }
 /*- End of function --------------------------------------------------------*/
 
-static int open_tiff_output_file(t4_state_t *s, const char *file)
+static int open_tiff_output_file(t4_rx_state_t *s, const char *file)
 {
     if ((s->tiff.tiff_file = TIFFOpen(file, "w")) == NULL)
         return -1;
@@ -246,7 +246,7 @@ static int open_tiff_output_file(t4_state_t *s, const char *file)
 }
 /*- End of function --------------------------------------------------------*/
 
-static void write_tiff_image(t4_state_t *s)
+static void write_tiff_image(t4_rx_state_t *s)
 {
     /* Set up the TIFF directory info... */
     set_tiff_directory_info(s);
@@ -258,7 +258,7 @@ static void write_tiff_image(t4_state_t *s)
 }
 /*- End of function --------------------------------------------------------*/
 
-static int close_tiff_output_file(t4_state_t *s)
+static int close_tiff_output_file(t4_rx_state_t *s)
 {
     int i;
     t4_tiff_state_t *t;
@@ -295,62 +295,62 @@ static int close_tiff_output_file(t4_state_t *s)
 
 #else
 
-static int set_tiff_directory_info(t4_state_t *s)
+static int set_tiff_directory_info(t4_rx_state_t *s)
 {
     return 0;
 }
 /*- End of function --------------------------------------------------------*/
 
-static int get_tiff_directory_info(t4_state_t *s)
+static int get_tiff_directory_info(t4_rx_state_t *s)
 {
     return 0;
 }
 /*- End of function --------------------------------------------------------*/
 
-static int test_tiff_directory_info(t4_state_t *s)
+static int test_tiff_directory_info(t4_rx_state_t *s)
 {
     return 0;
 }
 /*- End of function --------------------------------------------------------*/
 
-static int open_tiff_input_file(t4_state_t *s, const char *file)
+static int open_tiff_input_file(t4_rx_state_t *s, const char *file)
 {
     return 0;
 }
 /*- End of function --------------------------------------------------------*/
 
-static int read_tiff_image(t4_state_t *s)
+static int read_tiff_image(t4_rx_state_t *s)
 {
     return 0;
 }
 /*- End of function --------------------------------------------------------*/
 
-static int close_tiff_input_file(t4_state_t *s)
+static int close_tiff_input_file(t4_rx_state_t *s)
 {
     return 0;
 }
 /*- End of function --------------------------------------------------------*/
 
-static int open_tiff_output_file(t4_state_t *s, const char *file)
+static int open_tiff_output_file(t4_rx_state_t *s, const char *file)
 {
     return 0;
 }
 /*- End of function --------------------------------------------------------*/
 
-static void write_tiff_image(t4_state_t *s)
+static void write_tiff_image(t4_rx_state_t *s)
 {
     return 0;
 }
 /*- End of function --------------------------------------------------------*/
 
-static int close_tiff_output_file(t4_state_t *s)
+static int close_tiff_output_file(t4_rx_state_t *s)
 {
     return 0;
 }
 /*- End of function --------------------------------------------------------*/
 #endif
 
-static void update_row_bit_info(t4_state_t *s)
+static void update_row_bit_info(t4_rx_state_t *s)
 {
     if (s->row_bits > s->max_row_bits)
         s->max_row_bits = s->row_bits;
@@ -394,7 +394,7 @@ static __inline__ int run_length(unsigned int bits)
 /*- End of function --------------------------------------------------------*/
 #endif
 
-static int free_buffers(t4_state_t *s)
+static int free_buffers(t4_rx_state_t *s)
 {
     if (s->image_buffer)
     {
@@ -421,7 +421,7 @@ static int free_buffers(t4_state_t *s)
 }
 /*- End of function --------------------------------------------------------*/
 
-static __inline__ void add_run_to_row(t4_state_t *s)
+static __inline__ void add_run_to_row(t4_rx_state_t *s)
 {
     if (s->t4_t6_rx.run_length >= 0)
     {
@@ -434,7 +434,7 @@ static __inline__ void add_run_to_row(t4_state_t *s)
 }
 /*- End of function --------------------------------------------------------*/
 
-static int put_decoded_row(t4_state_t *s)
+static int put_decoded_row(t4_rx_state_t *s)
 {
     static const int msbmask[9] =
     {
@@ -578,7 +578,7 @@ static int put_decoded_row(t4_state_t *s)
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(int) t4_rx_end_page(t4_state_t *s)
+SPAN_DECLARE(int) t4_rx_end_page(t4_rx_state_t *s)
 {
     int row;
     int i;
@@ -627,7 +627,7 @@ SPAN_DECLARE(int) t4_rx_end_page(t4_state_t *s)
 }
 /*- End of function --------------------------------------------------------*/
 
-static __inline__ void drop_rx_bits(t4_state_t *s, int bits)
+static __inline__ void drop_rx_bits(t4_rx_state_t *s, int bits)
 {
     /* Only remove one bit right now. The rest need to be removed step by step,
        checking for a misaligned EOL along the way. This is time consuming, but
@@ -639,7 +639,7 @@ static __inline__ void drop_rx_bits(t4_state_t *s, int bits)
 }
 /*- End of function --------------------------------------------------------*/
 
-static __inline__ void force_drop_rx_bits(t4_state_t *s, int bits)
+static __inline__ void force_drop_rx_bits(t4_rx_state_t *s, int bits)
 {
     /* This should only be called to drop the bits of an EOL, as that is the
        only place where it is safe to drop them all at once. */
@@ -650,7 +650,7 @@ static __inline__ void force_drop_rx_bits(t4_state_t *s, int bits)
 }
 /*- End of function --------------------------------------------------------*/
 
-static int rx_put_bits(t4_state_t *s, uint32_t bit_string, int quantity)
+static int rx_put_bits(t4_rx_state_t *s, uint32_t bit_string, int quantity)
 {
     int bits;
     int old_a0;
@@ -972,19 +972,19 @@ static int rx_put_bits(t4_state_t *s, uint32_t bit_string, int quantity)
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(int) t4_rx_put_bit(t4_state_t *s, int bit)
+SPAN_DECLARE(int) t4_rx_put_bit(t4_rx_state_t *s, int bit)
 {
     return rx_put_bits(s, bit & 1, 1);
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(int) t4_rx_put_byte(t4_state_t *s, uint8_t byte)
+SPAN_DECLARE(int) t4_rx_put_byte(t4_rx_state_t *s, uint8_t byte)
 {
     return rx_put_bits(s, byte & 0xFF, 8);
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(int) t4_rx_put_chunk(t4_state_t *s, const uint8_t buf[], int len)
+SPAN_DECLARE(int) t4_rx_put_chunk(t4_rx_state_t *s, const uint8_t buf[], int len)
 {
     int i;
     uint8_t byte;
@@ -999,7 +999,7 @@ SPAN_DECLARE(int) t4_rx_put_chunk(t4_state_t *s, const uint8_t buf[], int len)
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(int) t4_rx_set_row_write_handler(t4_state_t *s, t4_row_write_handler_t handler, void *user_data)
+SPAN_DECLARE(int) t4_rx_set_row_write_handler(t4_rx_state_t *s, t4_row_write_handler_t handler, void *user_data)
 {
     s->t4_t6_rx.row_write_handler = handler;
     s->t4_t6_rx.row_write_user_data = user_data;
@@ -1007,65 +1007,7 @@ SPAN_DECLARE(int) t4_rx_set_row_write_handler(t4_state_t *s, t4_row_write_handle
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(t4_state_t *) t4_rx_init(t4_state_t *s, const char *file, int output_encoding)
-{
-    if (s == NULL)
-    {
-        if ((s = (t4_state_t *) malloc(sizeof(*s))) == NULL)
-            return NULL;
-    }
-    memset(s, 0, sizeof(*s));
-    span_log_init(&s->logging, SPAN_LOG_NONE, NULL);
-    span_log_set_protocol(&s->logging, "T.4");
-    s->rx = TRUE;
-    
-    span_log(&s->logging, SPAN_LOG_FLOW, "Start rx document\n");
-
-    if (open_tiff_output_file(s, file) < 0)
-        return NULL;
-
-    /* Save the file name for logging reports. */
-    s->tiff.file = strdup(file);
-    /* Only provide for one form of coding throughout the file, even though the
-       coding on the wire could change between pages. */
-    switch (output_encoding)
-    {
-    case T4_COMPRESSION_ITU_T4_1D:
-        s->tiff.output_compression = COMPRESSION_CCITT_T4;
-        s->tiff.output_t4_options = GROUP3OPT_FILLBITS;
-        break;
-    case T4_COMPRESSION_ITU_T4_2D:
-        s->tiff.output_compression = COMPRESSION_CCITT_T4;
-        s->tiff.output_t4_options = GROUP3OPT_FILLBITS | GROUP3OPT_2DENCODING;
-        break;
-    case T4_COMPRESSION_ITU_T6:
-        s->tiff.output_compression = COMPRESSION_CCITT_T6;
-        s->tiff.output_t4_options = 0;
-        break;
-    }
-
-    /* Until we have a valid figure for the bytes per row, we need it to be set to a suitable
-       value to ensure it will be seen as changing when the real value is used. */
-    s->bytes_per_row = 0;
-
-    s->current_page = 0;
-    s->tiff.pages_in_file = 0;
-    s->tiff.start_page = 0;
-    s->tiff.stop_page = INT_MAX;
-
-    s->image_buffer = NULL;
-    s->image_buffer_size = 0;
-
-    /* Set some default values */
-    s->x_resolution = T4_X_RESOLUTION_R8;
-    s->y_resolution = T4_Y_RESOLUTION_FINE;
-    s->image_width = T4_WIDTH_R8_A4;
-
-    return s;
-}
-/*- End of function --------------------------------------------------------*/
-
-SPAN_DECLARE(int) t4_rx_start_page(t4_state_t *s)
+SPAN_DECLARE(int) t4_rx_start_page(t4_rx_state_t *s)
 {
     int bytes_per_row;
     int run_space;
@@ -1119,10 +1061,7 @@ SPAN_DECLARE(int) t4_rx_start_page(t4_state_t *s)
     s->t4_t6_rx.black_white = 0;
 
     /* Initialise the reference line to all white */
-    s->ref_runs[0] =
-    s->ref_runs[1] =
-    s->ref_runs[2] =
-    s->ref_runs[3] = s->image_width;
+    s->ref_runs[0] = s->image_width;
 
     s->t4_t6_rx.b_cursor = 1;
     s->t4_t6_rx.a_cursor = 0;
@@ -1137,82 +1076,61 @@ SPAN_DECLARE(int) t4_rx_start_page(t4_state_t *s)
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(int) t4_rx_release(t4_state_t *s)
-{
-    if (!s->rx)
-        return -1;
-    if (s->tiff.tiff_file)
-        close_tiff_output_file(s);
-    free_buffers(s);
-    return 0;
-}
-/*- End of function --------------------------------------------------------*/
-
-SPAN_DECLARE(int) t4_rx_free(t4_state_t *s)
-{
-    int ret;
-
-    ret = t4_rx_release(s);
-    free(s);
-    return ret;
-}
-/*- End of function --------------------------------------------------------*/
-
-SPAN_DECLARE(void) t4_rx_set_rx_encoding(t4_state_t *s, int encoding)
+SPAN_DECLARE(void) t4_rx_set_rx_encoding(t4_rx_state_t *s, int encoding)
 {
     s->line_encoding = encoding;
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) t4_rx_set_image_width(t4_state_t *s, int width)
+SPAN_DECLARE(void) t4_rx_set_image_width(t4_rx_state_t *s, int width)
 {
     s->image_width = width;
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) t4_rx_set_y_resolution(t4_state_t *s, int resolution)
+SPAN_DECLARE(void) t4_rx_set_y_resolution(t4_rx_state_t *s, int resolution)
 {
     s->y_resolution = resolution;
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) t4_rx_set_x_resolution(t4_state_t *s, int resolution)
+SPAN_DECLARE(void) t4_rx_set_x_resolution(t4_rx_state_t *s, int resolution)
 {
     s->x_resolution = resolution;
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) t4_rx_set_dcs(t4_state_t *s, const char *dcs)
+SPAN_DECLARE(void) t4_rx_set_dcs(t4_rx_state_t *s, const char *dcs)
 {
-    s->tiff.dcs = (dcs  &&  dcs[0])  ?  dcs  :  NULL;
+    s->tiff.metadata.dcs = (dcs  &&  dcs[0])  ?  dcs  :  NULL;
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) t4_rx_set_sub_address(t4_state_t *s, const char *sub_address)
+SPAN_DECLARE(void) t4_rx_set_sub_address(t4_rx_state_t *s, const char *sub_address)
 {
-    s->tiff.sub_address = (sub_address  &&  sub_address[0])  ?  sub_address  :  NULL;
+    s->tiff.metadata.sub_address = (sub_address  &&  sub_address[0])  ?  sub_address  :  NULL;
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) t4_rx_set_far_ident(t4_state_t *s, const char *ident)
+SPAN_DECLARE(void) t4_rx_set_far_ident(t4_rx_state_t *s, const char *ident)
 {
-    s->tiff.far_ident = (ident  &&  ident[0])  ?  ident  :  NULL;
+    s->tiff.metadata.far_ident = (ident  &&  ident[0])  ?  ident  :  NULL;
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) t4_rx_set_vendor(t4_state_t *s, const char *vendor)
+SPAN_DECLARE(void) t4_rx_set_vendor(t4_rx_state_t *s, const char *vendor)
 {
-    s->tiff.vendor = vendor;
+    s->tiff.metadata.vendor = vendor;
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) t4_rx_set_model(t4_state_t *s, const char *model)
+SPAN_DECLARE(void) t4_rx_set_model(t4_rx_state_t *s, const char *model)
 {
-    s->tiff.model = model;
+    s->tiff.metadata.model = model;
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) t4_rx_get_transfer_statistics(t4_state_t *s, t4_stats_t *t)
+SPAN_DECLARE(void) t4_rx_get_transfer_statistics(t4_rx_state_t *s, t4_stats_t *t)
 {
     t->pages_transferred = s->current_page - s->tiff.start_page;
     t->pages_in_file = s->tiff.pages_in_file;
@@ -1253,6 +1171,85 @@ SPAN_DECLARE(const char *) t4_encoding_to_str(int encoding)
         return "T.85(L0)";
     }
     return "???";
+}
+/*- End of function --------------------------------------------------------*/
+
+SPAN_DECLARE(t4_rx_state_t *) t4_rx_init(t4_rx_state_t *s, const char *file, int output_encoding)
+{
+    if (s == NULL)
+    {
+        if ((s = (t4_rx_state_t *) malloc(sizeof(*s))) == NULL)
+            return NULL;
+    }
+    memset(s, 0, sizeof(*s));
+    span_log_init(&s->logging, SPAN_LOG_NONE, NULL);
+    span_log_set_protocol(&s->logging, "T.4");
+    s->rx = TRUE;
+    
+    span_log(&s->logging, SPAN_LOG_FLOW, "Start rx document\n");
+
+    if (open_tiff_output_file(s, file) < 0)
+        return NULL;
+
+    /* Save the file name for logging reports. */
+    s->tiff.file = strdup(file);
+    /* Only provide for one form of coding throughout the file, even though the
+       coding on the wire could change between pages. */
+    switch (output_encoding)
+    {
+    case T4_COMPRESSION_ITU_T4_1D:
+        s->tiff.output_compression = COMPRESSION_CCITT_T4;
+        s->tiff.output_t4_options = GROUP3OPT_FILLBITS;
+        break;
+    case T4_COMPRESSION_ITU_T4_2D:
+        s->tiff.output_compression = COMPRESSION_CCITT_T4;
+        s->tiff.output_t4_options = GROUP3OPT_FILLBITS | GROUP3OPT_2DENCODING;
+        break;
+    case T4_COMPRESSION_ITU_T6:
+        s->tiff.output_compression = COMPRESSION_CCITT_T6;
+        s->tiff.output_t4_options = 0;
+        break;
+    }
+
+    /* Until we have a valid figure for the bytes per row, we need it to be set to a suitable
+       value to ensure it will be seen as changing when the real value is used. */
+    s->bytes_per_row = 0;
+
+    s->current_page = 0;
+    s->tiff.pages_in_file = 0;
+    s->tiff.start_page = 0;
+    s->tiff.stop_page = INT_MAX;
+
+    s->image_buffer = NULL;
+    s->image_buffer_size = 0;
+
+    /* Set some default values */
+    s->x_resolution = T4_X_RESOLUTION_R8;
+    s->y_resolution = T4_Y_RESOLUTION_FINE;
+    s->image_width = T4_WIDTH_R8_A4;
+
+    return s;
+}
+/*- End of function --------------------------------------------------------*/
+
+SPAN_DECLARE(int) t4_rx_release(t4_rx_state_t *s)
+{
+    if (!s->rx)
+        return -1;
+    if (s->tiff.tiff_file)
+        close_tiff_output_file(s);
+    free_buffers(s);
+    return 0;
+}
+/*- End of function --------------------------------------------------------*/
+
+SPAN_DECLARE(int) t4_rx_free(t4_rx_state_t *s)
+{
+    int ret;
+
+    ret = t4_rx_release(s);
+    free(s);
+    return ret;
 }
 /*- End of function --------------------------------------------------------*/
 /*- End of file ------------------------------------------------------------*/

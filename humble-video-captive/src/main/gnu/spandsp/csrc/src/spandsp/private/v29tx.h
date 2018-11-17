@@ -43,32 +43,34 @@ struct v29_tx_state_s
     void *get_bit_user_data;
 
     /*! \brief The callback function used to report modem status changes. */
-    modem_tx_status_func_t status_handler;
+    modem_status_func_t status_handler;
     /*! \brief A user specified opaque pointer passed to the status function. */
     void *status_user_data;
 
+#if defined(SPANDSP_USE_FIXED_POINT)
     /*! \brief Gain required to achieve the specified output power, not allowing
                for the size of the current constellation. */
     float base_gain;
     /*! \brief Gain required to achieve the specified output power, allowing
                for the size of the current constellation. */
-#if defined(SPANDSP_USE_FIXED_POINT)
     int32_t gain;
-#else
-    float gain;
-#endif
-
-    /*! \brief The route raised cosine (RRC) pulse shaping filter buffer. */
-#if defined(SPANDSP_USE_FIXED_POINT)
+    /*! \brief The root raised cosine (RRC) pulse shaping filter buffer. */
     complexi16_t rrc_filter[2*V29_TX_FILTER_STEPS];
 #else
+    /*! \brief Gain required to achieve the specified output power, not allowing
+               for the size of the current constellation. */
+    float base_gain;
+    /*! \brief Gain required to achieve the specified output power, allowing
+               for the size of the current constellation. */
+    float gain;
+    /*! \brief The root raised cosine (RRC) pulse shaping filter buffer. */
     complexf_t rrc_filter[2*V29_TX_FILTER_STEPS];
 #endif
     /*! \brief Current offset into the RRC pulse shaping filter buffer. */
     int rrc_filter_step;
 
     /*! \brief The register for the data scrambler. */
-    unsigned int scramble_reg;
+    uint32_t scramble_reg;
     /*! \brief The register for the training scrambler. */
     uint8_t training_scramble_reg;
     /*! \brief TRUE if transmitting the training sequence, or shutting down transmission.

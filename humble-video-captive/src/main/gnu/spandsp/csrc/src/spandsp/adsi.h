@@ -390,6 +390,12 @@ extern "C"
 {
 #endif
 
+/*! Get the logging context associated with an ADSI receive context.
+    \brief Get the logging context associated with an ADSI receive context.
+    \param s The ADSI receive context.
+    \return A pointer to the logging context */
+SPAN_DECLARE(logging_state_t *) adsi_rx_get_logging_state(adsi_rx_state_t *s);
+
 /*! \brief Initialise an ADSI receive context.
     \param s The ADSI receive context.
     \param standard The code for the ADSI standard to be used.

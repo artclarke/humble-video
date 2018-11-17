@@ -90,7 +90,6 @@ static void handler(void *user_data, v8_parms_t *result)
     case V8_STATUS_IN_PROGRESS:
         printf("V.8 negotiation in progress\n");
         return;
-        break;
     case V8_STATUS_V8_OFFERED:
         printf("V.8 offered by the other party\n");
         break;
@@ -207,6 +206,8 @@ static int v8_calls_v8_tests(SNDFILE *outhandle)
     negotiations_ok = 0;
 
     v8_call_parms.modem_connect_tone = MODEM_CONNECT_TONES_NONE;
+    v8_call_parms.send_ci = TRUE;
+    v8_call_parms.v92 = -1;
     v8_call_parms.call_function = V8_CALL_V_SERIES;
     v8_call_parms.modulations = caller_available_modulations;
     v8_call_parms.protocol = V8_PROTOCOL_LAPM_V42;
@@ -220,6 +221,8 @@ static int v8_calls_v8_tests(SNDFILE *outhandle)
                         handler,
                         (void *) "caller");
     v8_answer_parms.modem_connect_tone = MODEM_CONNECT_TONES_ANSAM_PR;
+    v8_answer_parms.send_ci = TRUE;
+    v8_answer_parms.v92 = -1;
     v8_answer_parms.call_function = V8_CALL_V_SERIES;
     v8_answer_parms.modulations = answerer_available_modulations;
     v8_answer_parms.protocol = V8_PROTOCOL_LAPM_V42;
@@ -330,6 +333,8 @@ static int non_v8_calls_v8_tests(SNDFILE *outhandle)
     non_v8_caller_rx = modem_connect_tones_rx_init(NULL, MODEM_CONNECT_TONES_ANS_PR, NULL, NULL);
 
     v8_answer_parms.modem_connect_tone = MODEM_CONNECT_TONES_ANSAM_PR;
+    v8_answer_parms.send_ci = TRUE;
+    v8_answer_parms.v92 = -1;
     v8_answer_parms.call_function = V8_CALL_V_SERIES;
     v8_answer_parms.modulations = answerer_available_modulations;
     v8_answer_parms.protocol = V8_PROTOCOL_LAPM_V42;
@@ -440,6 +445,8 @@ static int v8_calls_non_v8_tests(SNDFILE *outhandle)
     negotiations_ok = 0;
 
     v8_call_parms.modem_connect_tone = MODEM_CONNECT_TONES_NONE;
+    v8_call_parms.send_ci = TRUE;
+    v8_call_parms.v92 = -1;
     v8_call_parms.call_function = V8_CALL_V_SERIES;
     v8_call_parms.modulations = caller_available_modulations;
     v8_call_parms.protocol = V8_PROTOCOL_LAPM_V42;
@@ -514,7 +521,6 @@ int main(int argc, char *argv[])
 {
     int16_t amp[SAMPLES_PER_CHUNK];
     int samples;
-    int remnant;
     int caller_available_modulations;
     int answerer_available_modulations;
     SNDFILE *inhandle;
@@ -580,6 +586,8 @@ int main(int argc, char *argv[])
 
         printf("Decode file '%s'\n", decode_test_file);
         v8_call_parms.modem_connect_tone = MODEM_CONNECT_TONES_NONE;
+        v8_call_parms.send_ci = TRUE;
+        v8_call_parms.v92 = -1;
         v8_call_parms.call_function = V8_CALL_V_SERIES;
         v8_call_parms.modulations = caller_available_modulations;
         v8_call_parms.protocol = V8_PROTOCOL_LAPM_V42;
@@ -597,6 +605,8 @@ int main(int argc, char *argv[])
         span_log_set_tag(logging, "caller");
 
         v8_answer_parms.modem_connect_tone = MODEM_CONNECT_TONES_ANSAM_PR;
+        v8_answer_parms.send_ci = TRUE;
+        v8_answer_parms.v92 = -1;
         v8_answer_parms.call_function = V8_CALL_V_SERIES;
         v8_answer_parms.modulations = answerer_available_modulations;
         v8_answer_parms.protocol = V8_PROTOCOL_LAPM_V42;
@@ -622,16 +632,16 @@ int main(int argc, char *argv[])
 
         while ((samples = sf_readf_short(inhandle, amp, SAMPLES_PER_CHUNK)))
         {
-            remnant = v8_rx(v8_caller, amp, samples);
-            remnant = v8_rx(v8_answerer, amp, samples);
-            remnant = v8_tx(v8_caller, amp, samples);
-            remnant = v8_tx(v8_answerer, amp, samples);
+            v8_rx(v8_caller, amp, samples);
+            v8_rx(v8_answerer, amp, samples);
+            v8_tx(v8_caller, amp, samples);
+            v8_tx(v8_answerer, amp, samples);
         }
         /*endwhile*/
 
         v8_free(v8_caller);
         v8_free(v8_answerer);
-        if (sf_close(inhandle) != 0)
+        if (sf_close_telephony(inhandle))
         {
             fprintf(stderr, "    Cannot close speech file '%s'\n", decode_test_file);
             exit(2);
@@ -663,7 +673,7 @@ int main(int argc, char *argv[])
 
         if (outhandle)
         {
-            if (sf_close(outhandle))
+            if (sf_close_telephony(outhandle))
             {
                 fprintf(stderr, "    Cannot close audio file '%s'\n", OUTPUT_FILE_NAME);
                 exit(2);

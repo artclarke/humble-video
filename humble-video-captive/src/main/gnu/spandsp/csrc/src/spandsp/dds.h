@@ -28,10 +28,19 @@
 #if !defined(_SPANDSP_DDS_H_)
 #define _SPANDSP_DDS_H_
 
+#define DDS_PHASE_RATE(frequency) (int32_t) ((frequency)*65536.0f*65536.0f/SAMPLE_RATE)
+#define DDS_PHASE(angle) (int32_t) ((uint32_t) (((angle < 0.0f)  ?  (360.0f + angle)  :  angle)*65536.0f*65536.0f/360.0f))
+
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
+
+/*! \brief Convert a 32 bit phase angle to an angle in radians, between 0 and 2*PI
+    \param phase The angle to convert.
+    \return The angle in radians.
+*/
+SPAN_DECLARE(float) dds_phase_to_radians(uint32_t phase);
 
 /*! \brief Find the phase rate value to achieve a particular frequency.
     \param frequency The desired frequency, in Hz.

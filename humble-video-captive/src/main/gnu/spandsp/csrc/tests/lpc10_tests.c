@@ -29,7 +29,7 @@
 \section lpc10_tests_page_sec_1 What does it do?
 
 \section lpc10_tests_page_sec_2 How is it used?
-To perform a general audio quality test, lpc10 should be run. The file ../test-data/local/short_nb_voice.wav
+To perform a general audio quality test, lpc10 should be run. The file ../test-data/local/dam9.wav
 will be compressed to LPC10 data, decompressed, and the resulting audio stored in post_lpc10.wav.
 */
 
@@ -69,7 +69,6 @@ int main(int argc, char *argv[])
     SNDFILE *refhandle;
     SNDFILE *outhandle;
     int frames;
-    int outframes;
     double pre_energy;
     double post_energy;
     double ref_energy;
@@ -186,7 +185,7 @@ int main(int argc, char *argv[])
         while ((len = read(decompress_file, lpc10_data, BLOCKS_PER_READ*7)) > 0)
         {
             lpc10_decode(lpc10_dec_state, post_amp, lpc10_data, len/7);
-            outframes = sf_writef_short(outhandle, post_amp, BLOCK_LEN*len/7);
+            sf_writef_short(outhandle, post_amp, BLOCK_LEN*len/7);
         }
     }
     else
@@ -216,23 +215,23 @@ int main(int argc, char *argv[])
             }
             block_no++;
             if (log_error)
-                outframes = sf_writef_short(outhandle, log_amp, dec_len);
+                sf_writef_short(outhandle, log_amp, dec_len);
             else
-                outframes = sf_writef_short(outhandle, post_amp, dec_len);
+                sf_writef_short(outhandle, post_amp, dec_len);
         }
-        if (sf_close(inhandle) != 0)
+        if (sf_close_telephony(inhandle))
         {
             fprintf(stderr, "    Cannot close audio file '%s'\n", in_file_name);
             exit(2);
         }
-        if (sf_close(refhandle) != 0)
+        if (sf_close_telephony(refhandle))
         {
             fprintf(stderr, "    Cannot close audio file '%s'\n", REF_FILE_NAME);
             exit(2);
         }
     }
     
-    if (sf_close(outhandle) != 0)
+    if (sf_close_telephony(outhandle))
     {
         fprintf(stderr, "    Cannot close audio file '%s'\n", OUT_FILE_NAME);
         exit(2);

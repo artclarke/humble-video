@@ -162,6 +162,7 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+<File RelativePath="ademco_contactid.c"></File>
 <File RelativePath="adsi.c"></File>
 <File RelativePath="async.c"></File>
 <File RelativePath="at_interpreter.c"></File>
@@ -200,6 +201,7 @@
 <File RelativePath="lpc10_encode.c"></File>
 <File RelativePath="lpc10_placev.c"></File>
 <File RelativePath="lpc10_voicing.c"></File>
+<File RelativePath="math_fixed.c"></File>
 <File RelativePath="modem_echo.c"></File>
 <File RelativePath="modem_connect_tones.c"></File>
 <File RelativePath="noise.c"></File>
@@ -246,6 +248,7 @@
 <File RelativePath="vector_int.c"></File>
 <File RelativePath=".\msvc\gettimeofday.c"></File>
 </Filter><Filter  Name="Header Files">
+<File RelativePath="spandsp/ademco_contactid.h"></File>
 <File RelativePath="spandsp/adsi.h"></File>
 <File RelativePath="spandsp/async.h"></File>
 <File RelativePath="spandsp/arctan2.h"></File>
@@ -280,6 +283,7 @@
 <File RelativePath="spandsp/image_translate.h"></File>
 <File RelativePath="spandsp/logging.h"></File>
 <File RelativePath="spandsp/lpc10.h"></File>
+<File RelativePath="spandsp/math_fixed.h"></File>
 <File RelativePath="spandsp/modem_echo.h"></File>
 <File RelativePath="spandsp/modem_connect_tones.h"></File>
 <File RelativePath="spandsp/noise.h"></File>
@@ -290,6 +294,7 @@
 <File RelativePath="spandsp/queue.h"></File>
 <File RelativePath="spandsp/saturated.h"></File>
 <File RelativePath="spandsp/schedule.h"></File>
+<File RelativePath="spandsp/stdbool.h"></File>
 <File RelativePath="spandsp/sig_tone.h"></File>
 <File RelativePath="spandsp/silence_gen.h"></File>
 <File RelativePath="spandsp/super_tone_rx.h"></File>
@@ -329,6 +334,7 @@
 <File RelativePath="spandsp/vector_float.h"></File>
 <File RelativePath="spandsp/vector_int.h"></File>
 <File RelativePath="spandsp/version.h"></File>
+<File RelativePath="spandsp/private/ademco_contactid.h"></File>
 <File RelativePath="spandsp/private/adsi.h"></File>
 <File RelativePath="spandsp/private/async.h"></File>
 <File RelativePath="spandsp/private/at_interpreter.h"></File>

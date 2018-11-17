@@ -39,165 +39,167 @@ run_fax_test()
     echo tested ${FILE}
 }
 
+ITUTESTS_DIR=../test-data/itu/fax
+
 OPTS="-e"
 
-FILE="../itutests/fax/R8_385_A4.tif"
+FILE="${ITUTESTS_DIR}/R8_385_A4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R8_385_B4.tif"
+FILE="${ITUTESTS_DIR}/R8_385_B4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R8_385_A3.tif"
-run_fax_test
-
-
-FILE="../itutests/fax/R8_77_A4.tif"
-run_fax_test
-
-FILE="../itutests/fax/R8_77_B4.tif"
-run_fax_test
-
-FILE="../itutests/fax/R8_77_A3.tif"
+FILE="${ITUTESTS_DIR}/R8_385_A3.tif"
 run_fax_test
 
 
-FILE="../itutests/fax/R8_154_A4.tif"
+FILE="${ITUTESTS_DIR}/R8_77_A4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R8_154_B4.tif"
+FILE="${ITUTESTS_DIR}/R8_77_B4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R8_154_A3.tif"
-run_fax_test
-
-
-FILE="../itutests/fax/R300_300_A4.tif"
-run_fax_test
-
-FILE="../itutests/fax/R300_300_B4.tif"
-run_fax_test
-
-FILE="../itutests/fax/R300_300_A3.tif"
+FILE="${ITUTESTS_DIR}/R8_77_A3.tif"
 run_fax_test
 
 
-FILE="../itutests/fax/R300_600_A4.tif"
+FILE="${ITUTESTS_DIR}/R8_154_A4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R300_600_B4.tif"
+FILE="${ITUTESTS_DIR}/R8_154_B4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R300_600_A3.tif"
-run_fax_test
-
-
-FILE="../itutests/fax/R16_154_A4.tif"
-run_fax_test
-
-FILE="../itutests/fax/R16_154_B4.tif"
-run_fax_test
-
-FILE="../itutests/fax/R16_154_A3.tif"
+FILE="${ITUTESTS_DIR}/R8_154_A3.tif"
 run_fax_test
 
 
-FILE="../itutests/fax/R16_800_A4.tif"
+FILE="${ITUTESTS_DIR}/R300_300_A4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R16_800_B4.tif"
+FILE="${ITUTESTS_DIR}/R300_300_B4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R16_800_A3.tif"
-run_fax_test
-
-
-FILE="../itutests/fax/R600_600_A4.tif"
-run_fax_test
-
-FILE="../itutests/fax/R600_600_B4.tif"
-run_fax_test
-
-FILE="../itutests/fax/R600_600_A3.tif"
+FILE="${ITUTESTS_DIR}/R300_300_A3.tif"
 run_fax_test
 
 
-FILE="../itutests/fax/R600_1200_A4.tif"
+FILE="${ITUTESTS_DIR}/R300_600_A4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R600_1200_B4.tif"
+FILE="${ITUTESTS_DIR}/R300_600_B4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R600_1200_A3.tif"
+FILE="${ITUTESTS_DIR}/R300_600_A3.tif"
 run_fax_test
 
 
-FILE="../itutests/fax/R1200_1200_A4.tif"
+FILE="${ITUTESTS_DIR}/R16_154_A4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R1200_1200_B4.tif"
+FILE="${ITUTESTS_DIR}/R16_154_B4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R1200_1200_A3.tif"
+FILE="${ITUTESTS_DIR}/R16_154_A3.tif"
+run_fax_test
+
+
+FILE="${ITUTESTS_DIR}/R16_800_A4.tif"
+run_fax_test
+
+FILE="${ITUTESTS_DIR}/R16_800_B4.tif"
+run_fax_test
+
+FILE="${ITUTESTS_DIR}/R16_800_A3.tif"
+run_fax_test
+
+
+FILE="${ITUTESTS_DIR}/R600_600_A4.tif"
+run_fax_test
+
+FILE="${ITUTESTS_DIR}/R600_600_B4.tif"
+run_fax_test
+
+FILE="${ITUTESTS_DIR}/R600_600_A3.tif"
+run_fax_test
+
+
+FILE="${ITUTESTS_DIR}/R600_1200_A4.tif"
+run_fax_test
+
+FILE="${ITUTESTS_DIR}/R600_1200_B4.tif"
+run_fax_test
+
+FILE="${ITUTESTS_DIR}/R600_1200_A3.tif"
+run_fax_test
+
+
+FILE="${ITUTESTS_DIR}/R1200_1200_A4.tif"
+run_fax_test
+
+FILE="${ITUTESTS_DIR}/R1200_1200_B4.tif"
+run_fax_test
+
+FILE="${ITUTESTS_DIR}/R1200_1200_A3.tif"
 run_fax_test
 
 
 OPTS=""
 
-FILE="../itutests/fax/R8_385_A4.tif"
+FILE="${ITUTESTS_DIR}/R8_385_A4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R8_385_B4.tif"
+FILE="${ITUTESTS_DIR}/R8_385_B4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R8_385_A3.tif"
-run_fax_test
-
-
-FILE="../itutests/fax/R8_77_A4.tif"
-run_fax_test
-
-FILE="../itutests/fax/R8_77_B4.tif"
-run_fax_test
-
-FILE="../itutests/fax/R8_77_A3.tif"
+FILE="${ITUTESTS_DIR}/R8_385_A3.tif"
 run_fax_test
 
 
-FILE="../itutests/fax/R8_154_A4.tif"
+FILE="${ITUTESTS_DIR}/R8_77_A4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R8_154_B4.tif"
+FILE="${ITUTESTS_DIR}/R8_77_B4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R8_154_A3.tif"
+FILE="${ITUTESTS_DIR}/R8_77_A3.tif"
 run_fax_test
 
 
-FILE="../itutests/fax/R16_385_A4.tif"
+FILE="${ITUTESTS_DIR}/R8_154_A4.tif"
+run_fax_test
+
+FILE="${ITUTESTS_DIR}/R8_154_B4.tif"
+run_fax_test
+
+FILE="${ITUTESTS_DIR}/R8_154_A3.tif"
+run_fax_test
+
+
+FILE="${ITUTESTS_DIR}/R16_385_A4.tif"
 #run_fax_test
 
-FILE="../itutests/fax/R16_385_B4.tif"
+FILE="${ITUTESTS_DIR}/R16_385_B4.tif"
 #run_fax_test
 
-FILE="../itutests/fax/R16_385_A3.tif"
-#run_fax_test
-
-
-FILE="../itutests/fax/R16_77_A4.tif"
-#run_fax_test
-
-FILE="../itutests/fax/R16_77_B4.tif"
-#run_fax_test
-
-FILE="../itutests/fax/R16_77_A3.tif"
+FILE="${ITUTESTS_DIR}/R16_385_A3.tif"
 #run_fax_test
 
 
-FILE="../itutests/fax/R16_154_A4.tif"
+FILE="${ITUTESTS_DIR}/R16_77_A4.tif"
+#run_fax_test
+
+FILE="${ITUTESTS_DIR}/R16_77_B4.tif"
+#run_fax_test
+
+FILE="${ITUTESTS_DIR}/R16_77_A3.tif"
+#run_fax_test
+
+
+FILE="${ITUTESTS_DIR}/R16_154_A4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R16_154_B4.tif"
+FILE="${ITUTESTS_DIR}/R16_154_B4.tif"
 run_fax_test
 
-FILE="../itutests/fax/R16_154_A3.tif"
+FILE="${ITUTESTS_DIR}/R16_154_A3.tif"
 run_fax_test

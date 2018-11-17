@@ -70,19 +70,22 @@
 #include "spandsp/private/v22bis.h"
 
 #if defined(SPANDSP_USE_FIXED_POINTx)
-#include "v22bis_rx_1200_floating_rrc.h"
-#include "v22bis_rx_2400_floating_rrc.h"
+#define FP_SHIFT_FACTOR                 10
+#define FP_SCALE                        FP_Q_6_10
+#include "v22bis_rx_1200_fixed_rrc.h"
+#include "v22bis_rx_2400_fixed_rrc.h"
 #else
+#define FP_SCALE(x)                     (x)
 #include "v22bis_rx_1200_floating_rrc.h"
 #include "v22bis_rx_2400_floating_rrc.h"
 #endif
 
-#define ms_to_symbols(t)        (((t)*600)/1000)
+#define ms_to_symbols(t)                (((t)*600)/1000)
 
 /*! The adaption rate coefficient for the equalizer */
-#define EQUALIZER_DELTA         0.25f
+#define EQUALIZER_DELTA                 0.25f
 /*! The number of phase shifted coefficient set for the pulse shaping/bandpass filter */
-#define PULSESHAPER_COEFF_SETS  12
+#define PULSESHAPER_COEFF_SETS          12
 
 /*
 The basic method used by the V.22bis receiver is:
@@ -178,12 +181,16 @@ void v22bis_equalizer_coefficient_reset(v22bis_state_t *s)
 {
     /* Start with an equalizer based on everything being perfect */
 #if defined(SPANDSP_USE_FIXED_POINTx)
+    static const complexi16_t x = {FP_Q_6_10(3.0f), FP_Q_6_10(0.0f)};
+
     cvec_zeroi16(s->rx.eq_coeff, 2*V22BIS_EQUALIZER_LEN + 1);
-    s->rx.eq_coeff[V22BIS_EQUALIZER_LEN] = complex_seti16(3*FP_FACTOR, 0*FP_FACTOR);
+    s->rx.eq_coeff[V22BIS_EQUALIZER_LEN] = x;
     s->rx.eq_delta = 32768.0f*EQUALIZER_DELTA/(2*V22BIS_EQUALIZER_LEN + 1);
 #else
+    static const complexf_t x = {3.0f, 0.0f};
+
     cvec_zerof(s->rx.eq_coeff, 2*V22BIS_EQUALIZER_LEN + 1);
-    s->rx.eq_coeff[V22BIS_EQUALIZER_LEN] = complex_setf(3.0f, 0.0f);
+    s->rx.eq_coeff[V22BIS_EQUALIZER_LEN] = x;
     s->rx.eq_delta = EQUALIZER_DELTA/(2*V22BIS_EQUALIZER_LEN + 1);
 #endif
 }
@@ -417,11 +424,11 @@ static void process_half_baud(v22bis_state_t *s, const complexf_t *sample)
     if (s->rx.sixteen_way_decisions)
     {
         re = (int) (z.re + 3.0f);
+        im = (int) (z.im + 3.0f);
         if (re > 5)
             re = 5;
         else if (re < 0)
             re = 0;
-        im = (int) (z.im + 3.0f);
         if (im > 5)
             im = 5;
         else if (im < 0)
@@ -430,13 +437,13 @@ static void process_half_baud(v22bis_state_t *s, const complexf_t *sample)
     }
     else
     {
-        /* Rotate to 45 degrees, to make the slicing trivial */
+        /* Rotate to 45 degrees, to make the slicing trivial. */
         zz = complex_setf(0.894427, 0.44721f);
         zz = complex_mulf(&z, &zz);
         nearest = 0x01;
-        if (zz.re < 0.0f)
+        if (zz.re < 0)
             nearest |= 0x04;
-        if (zz.im < 0.0f)
+        if (zz.im < 0)
         {
             nearest ^= 0x04;
             nearest |= 0x08;
@@ -490,10 +497,7 @@ static void process_half_baud(v22bis_state_t *s, const complexf_t *sample)
                error could be higher. */
             s->rx.gardner_step = 4;
             s->rx.pattern_repeats = 0;
-            if (s->calling_party)
-                s->rx.training = V22BIS_RX_TRAINING_STAGE_UNSCRAMBLED_ONES;
-            else
-                s->rx.training = V22BIS_RX_TRAINING_STAGE_SCRAMBLED_ONES_AT_1200;
+            s->rx.training = (s->calling_party)  ?  V22BIS_RX_TRAINING_STAGE_UNSCRAMBLED_ONES  :  V22BIS_RX_TRAINING_STAGE_SCRAMBLED_ONES_AT_1200;
             /* Be pessimistic and see what the handshake brings */
             s->negotiated_bit_rate = 1200;
             break;
@@ -527,14 +531,14 @@ static void process_half_baud(v22bis_state_t *s, const complexf_t *sample)
                 /* It looks like the answering machine is sending us a clean unscrambled 11 or 00 */
                 if (s->bit_rate == 2400)
                 {
-                    /* Try to establish at 2400bps */
+                    /* Try to establish at 2400bps. */
                     span_log(&s->logging, SPAN_LOG_FLOW, "+++ starting U0011 (S1) (Caller)\n");
                     s->tx.training = V22BIS_TX_TRAINING_STAGE_U0011;
                     s->tx.training_count = 0;
                 }
                 else
                 {
-                    /* Only try to establish at 1200bps */
+                    /* Only try to establish at 1200bps. */
                     span_log(&s->logging, SPAN_LOG_FLOW, "+++ starting S11 (1200) (Caller)\n");
                     s->tx.training = V22BIS_TX_TRAINING_STAGE_S11;
                     s->tx.training_count = 0;
@@ -546,15 +550,15 @@ static void process_half_baud(v22bis_state_t *s, const complexf_t *sample)
         }
         break;
     case V22BIS_RX_TRAINING_STAGE_UNSCRAMBLED_ONES_SUSTAINING:
-        /* Calling modem only */
-        /* Wait for the end of the unscrambled ones at 1200bps */
+        /* Calling modem only. */
+        /* Wait for the end of the unscrambled ones at 1200bps. */
         target = &v22bis_constellation[nearest];
         track_carrier(s, &z, target);
         raw_bits = phase_steps[((nearest >> 2) - (s->rx.constellation_state >> 2)) & 3];
         s->rx.constellation_state = nearest;
         if (raw_bits != s->rx.last_raw_bits)
         {
-            /* This looks like the end of the sustained initial unscrambled 11 or 00 */
+            /* This looks like the end of the sustained initial unscrambled 11 or 00. */
             s->tx.training_count = 0;
             s->tx.training = V22BIS_TX_TRAINING_STAGE_TIMED_S11;
             s->rx.training_count = 0;
@@ -600,21 +604,21 @@ static void process_half_baud(v22bis_state_t *s, const complexf_t *sample)
             }
             if (s->rx.training_count >= ms_to_symbols(270))
             {
-                /* If we haven't seen the S1 signal by now, we are committed to be in 1200bps mode */
+                /* If we haven't seen the S1 signal by now, we are committed to be in 1200bps mode. */
                 if (s->calling_party)
                 {
                     span_log(&s->logging, SPAN_LOG_FLOW, "+++ Rx normal operation (1200)\n");
-                    /* The transmit side needs to sustain the scrambled ones for a timed period */
+                    /* The transmit side needs to sustain the scrambled ones for a timed period. */
                     s->tx.training_count = 0;
                     s->tx.training = V22BIS_TX_TRAINING_STAGE_TIMED_S11;
-                    /* Normal reception starts immediately */
+                    /* Normal reception starts immediately. */
                     s->rx.training = V22BIS_RX_TRAINING_STAGE_NORMAL_OPERATION;
                     s->rx.carrier_track_i = 8000.0f;
                 }
                 else
                 {
                     span_log(&s->logging, SPAN_LOG_FLOW, "+++ starting S11 (1200) (Answerer)\n");
-                    /* The transmit side needs to sustain the scrambled ones for a timed period */
+                    /* The transmit side needs to sustain the scrambled ones for a timed period. */
                     s->tx.training_count = 0;
                     s->tx.training = V22BIS_TX_TRAINING_STAGE_TIMED_S11;
                     /* The receive side needs to wait a timed period, receiving scrambled ones,
@@ -730,7 +734,7 @@ SPAN_DECLARE_NONSTD(int) v22bis_rx(v22bis_state_t *s, const int16_t amp[], int l
             ii = vec_circular_dot_prodf(s->rx.rrc_filter, rx_pulseshaper_1200_re[6], V22BIS_RX_FILTER_STEPS, s->rx.rrc_filter_step);
 #endif
         }
-        power = power_meter_update(&(s->rx.rx_power), (int16_t) ii);
+        power = power_meter_update(&s->rx.rx_power, (int16_t) ii);
         if (s->rx.signal_present)
         {
             /* Look for power below the carrier off point */
@@ -844,7 +848,7 @@ int v22bis_rx_restart(v22bis_state_t *s)
 
     s->rx.carrier_phase_rate = dds_phase_ratef((s->calling_party)  ?  2400.0f  :  1200.0f);
     s->rx.carrier_phase = 0;
-    power_meter_init(&(s->rx.rx_power), 5);
+    power_meter_init(&s->rx.rx_power, 5);
     v22bis_rx_signal_cutoff(s, -45.5f);
     s->rx.agc_scaling = 0.0005f*0.025f;
 

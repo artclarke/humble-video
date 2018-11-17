@@ -360,8 +360,11 @@ SPAN_DECLARE(void) at_display_call_info(at_state_t *s)
 
     while (call_id)
     {
-        snprintf(buf, sizeof(buf), "%s=%s", 
-                 call_id->id ? call_id->id : "NULL", call_id->value ? call_id->value : "<NONE>");
+        snprintf(buf,
+                 sizeof(buf),
+                 "%s=%s", 
+                 (call_id->id)  ?  call_id->id  :  "NULL",
+                 (call_id->value)  ?  call_id->value  :  "<NONE>");
         at_put_response(s, buf);
         call_id = call_id->next;
     }
@@ -845,7 +848,6 @@ static const char *at_cmd_D(at_state_t *s, const char *t)
 {
     int ok;
     char *u;
-    const char *w;
     char num[100 + 1];
     char ch;
 
@@ -858,7 +860,6 @@ static const char *at_cmd_D(at_state_t *s, const char *t)
     ok = FALSE;
     /* There are a numbers of options in a dial command string.
        Many are completely irrelevant in this application. */
-    w = t;
     u = num;
     for (  ;  (ch = *t);  t++)
     {
@@ -924,11 +925,13 @@ static const char *at_cmd_D(at_state_t *s, const char *t)
             case 'G':
             case 'g':
                 /* GSM07.07 6.2 - Control the CUG supplementary service for this call */
+                /* Uses index and info values set with command +CCUG. See +CCUG */
                 /* TODO: */
                 break;
             case 'I':
             case 'i':
                 /* GSM07.07 6.2 - Override Calling Line Identification Restriction (CLIR) */
+                /* I=invocation (restrict CLI presentation), i=suppression (allow CLI presentation). See +CLIR */
                 /* TODO: */
                 break;
             case ';':
@@ -2326,6 +2329,10 @@ static const char *at_cmd_plus_CLIR(at_state_t *s, const char *t)
 {
     /* 3GPP TS 27.007 7.7 - Calling line identification restriction */
     /* TODO: */
+    /* Parameter sets the adjustment for outgoing calls:
+        0 presentation indicator is used according to the subscription of the CLIR service
+        1 CLIR invocation
+        2 CLIR suppression */
     t += 5;
     if (!parse_out(s, &t, NULL, 1, "+CLIR:", ""))
         return NULL;
@@ -5311,7 +5318,7 @@ static const char *at_cmd_plus_WSTL(at_state_t *s, const char *t)
 
 #include "at_interpreter_dictionary.h"
 
-static int command_search(const char *u, int len, int *matched)
+static int command_search(const char *u, int *matched)
 {
     int i;
     int index;
@@ -5445,7 +5452,7 @@ SPAN_DECLARE(void) at_interpreter(at_state_t *s, const char *cmd, int len)
                     t = s->line + 2;
                     while (t  &&  *t)
                     {
-                        if ((entry = command_search(t, 15, &matched)) <= 0)
+                        if ((entry = command_search(t, &matched)) <= 0)
                             break;
                         if ((t = at_commands[entry - 1](s, t)) == NULL)
                             break;

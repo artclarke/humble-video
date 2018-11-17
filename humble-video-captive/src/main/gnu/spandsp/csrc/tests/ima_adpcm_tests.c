@@ -68,7 +68,6 @@ int main(int argc, char *argv[])
     SNDFILE *outhandle;
     int frames;
     int dec_frames;
-    int outframes;
     int ima_bytes;
     double pre_energy;
     double post_energy;
@@ -180,14 +179,14 @@ int main(int argc, char *argv[])
                 hist_out = 0;
             diff_energy += (double) xx * (double) xx;
         }
-        outframes = sf_writef_short(outhandle, post_amp, dec_frames);
+        sf_writef_short(outhandle, post_amp, dec_frames);
     }
-    if (sf_close(inhandle) != 0)
+    if (sf_close_telephony(inhandle))
     {
         fprintf(stderr, "    Cannot close audio file '%s'\n", in_file_name);
         exit(2);
     }
-    if (sf_close(outhandle) != 0)
+    if (sf_close_telephony(outhandle))
     {
         fprintf(stderr, "    Cannot close audio file '%s'\n", OUT_FILE_NAME);
         exit(2);

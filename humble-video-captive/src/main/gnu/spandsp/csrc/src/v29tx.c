@@ -240,7 +240,7 @@ SPAN_DECLARE_NONSTD(int) v29_tx(v29_tx_state_t *s, int16_t amp[], int len)
         /* Now create and modulate the carrier */
         x.re >>= 4;
         x.im >>= 4;
-        z = dds_complexi(&(s->carrier_phase), s->carrier_phase_rate);
+        z = dds_complexi(&s->carrier_phase, s->carrier_phase_rate);
         /* Don't bother saturating. We should never clip. */
         i = (x.re*z.re - x.im*z.im) >> 15;
         amp[sample] = (int16_t) ((i*s->gain) >> 15);
@@ -252,7 +252,7 @@ SPAN_DECLARE_NONSTD(int) v29_tx(v29_tx_state_t *s, int16_t amp[], int len)
             x.im += tx_pulseshaper[TX_PULSESHAPER_COEFF_SETS - 1 - s->baud_phase][i]*s->rrc_filter[i + s->rrc_filter_step].im;
         }
         /* Now create and modulate the carrier */
-        z = dds_complexf(&(s->carrier_phase), s->carrier_phase_rate);
+        z = dds_complexf(&s->carrier_phase, s->carrier_phase_rate);
         /* Don't bother saturating. We should never clip. */
         amp[sample] = (int16_t) lfastrintf((x.re*z.re - x.im*z.im)*s->gain);
 #endif
@@ -316,7 +316,7 @@ SPAN_DECLARE(void) v29_tx_set_get_bit(v29_tx_state_t *s, get_bit_func_t get_bit,
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) v29_tx_set_modem_status_handler(v29_tx_state_t *s, modem_tx_status_func_t handler, void *user_data)
+SPAN_DECLARE(void) v29_tx_set_modem_status_handler(v29_tx_state_t *s, modem_status_func_t handler, void *user_data)
 {
     s->status_handler = handler;
     s->status_user_data = user_data;
@@ -387,7 +387,7 @@ SPAN_DECLARE(v29_tx_state_t *) v29_tx_init(v29_tx_state_t *s, int bit_rate, int 
     span_log_set_protocol(&s->logging, "V.29 TX");
     s->get_bit = get_bit;
     s->get_bit_user_data = user_data;
-    s->carrier_phase_rate = dds_phase_ratef(CARRIER_NOMINAL_FREQ);
+    s->carrier_phase_rate = DDS_PHASE_RATE(CARRIER_NOMINAL_FREQ);
     v29_tx_power(s, -14.0f);
     v29_tx_restart(s, bit_rate, tep);
     return s;
