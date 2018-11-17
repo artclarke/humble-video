@@ -404,10 +404,10 @@ countAMF(AMFObject *obj, int *argc)
 static char *
 dumpAMF(AMFObject *obj, char *ptr, AVal *argv, int *argc)
 {
-  int i, len, ac = *argc;
+  int i, ac = *argc;
   const char opt[] = "NBSO Z";
 
-  for (i=0, len=0; i < obj->o_num; i++)
+  for (i=0; i < obj->o_num; i++)
     {
       AMFObjectProperty *p = &obj->o_props[i];
       argv[ac].av_val = ptr+1;
@@ -595,6 +595,8 @@ ServeInvoke(STREAMING_SERVER *server, RTMP * r, RTMPPacket *packet, unsigned int
       uint32_t now;
       RTMPPacket pc = {0};
       AMFProp_GetString(AMF_GetProp(&obj, NULL, 3), &r->Link.playpath);
+      if (!r->Link.playpath.av_len)
+        return 0;
       /*
       r->Link.seekTime = AMFProp_GetNumber(AMF_GetProp(&obj, NULL, 4));
       if (obj.o_num > 5)
