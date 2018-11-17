@@ -1,0 +1,8 @@
+voGetAACEncAPI
+cmnMemAlloc
+cmnMemFree
+cmnMemSet
+cmnMemCopy
+cmnMemCheck
+cmnMemCompare
+cmnMemMove
