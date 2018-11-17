@@ -156,8 +156,11 @@ static int allocate_buffers(ShortenContext *s)
 
 static inline unsigned int get_uint(ShortenContext *s, int k)
 {
-    if (s->version != 0)
+    if (s->version != 0) {
         k = get_ur_golomb_shorten(&s->gb, ULONGSIZE);
+        if (k > 31U)
+            return AVERROR_INVALIDDATA;
+    }
     return get_ur_golomb_shorten(&s->gb, k);
 }
 
@@ -310,7 +313,7 @@ static int decode_subframe_lpc(ShortenContext *s, int command, int channel,
     for (i = 0; i < s->blocksize; i++) {
         sum = init_sum;
         for (j = 0; j < pred_order; j++)
-            sum += coeffs[j] * s->decoded[channel][i - j - 1];
+            sum += coeffs[j] * (unsigned)s->decoded[channel][i - j - 1];
         s->decoded[channel][i] = get_sr_golomb_shorten(&s->gb, residual_size) +
                                  (sum >> qshift);
     }
@@ -366,7 +369,15 @@ static int read_header(ShortenContext *s)
         s->blocksize = blocksize;
 
         maxnlpc  = get_uint(s, LPCQSIZE);
+        if (maxnlpc > 1024U) {
+            av_log(s->avctx, AV_LOG_ERROR, "maxnlpc is: %d\n", maxnlpc);
+            return AVERROR_INVALIDDATA;
+        }
         s->nmean = get_uint(s, 0);
+        if (s->nmean > 32768U) {
+            av_log(s->avctx, AV_LOG_ERROR, "nmean is: %d\n", s->nmean);
+            return AVERROR_INVALIDDATA;
+        }
 
         skip_bytes = get_uint(s, NSKIPSIZE);
         if ((unsigned)skip_bytes > get_bits_left(&s->gb)/8) {
@@ -564,7 +575,7 @@ static int shorten_decode_frame(AVCodecContext *avctx, void *data,
             else {
                 int32_t sum = (s->version < 2) ? 0 : s->nmean / 2;
                 for (i = 0; i < s->nmean; i++)
-                    sum += s->offset[channel][i];
+                    sum += (unsigned)s->offset[channel][i];
                 coffset = sum / s->nmean;
                 if (s->version >= 2)
                     coffset = s->bitshift == 0 ? coffset : coffset >> s->bitshift - 1 >> 1;
@@ -582,7 +593,7 @@ static int shorten_decode_frame(AVCodecContext *avctx, void *data,
 
             /* update means with info from the current block */
             if (s->nmean > 0) {
-                int32_t sum = (s->version < 2) ? 0 : s->blocksize / 2;
+                int64_t sum = (s->version < 2) ? 0 : s->blocksize / 2;
                 for (i = 0; i < s->blocksize; i++)
                     sum += s->decoded[channel][i];
 

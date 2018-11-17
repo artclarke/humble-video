@@ -132,6 +132,10 @@ static void smc_decode_stream(SmcContext *s)
                 row_ptr, image_size);
             return;
         }
+        if (bytestream2_get_bytes_left(&s->gb) < 1) {
+            av_log(s->avctx, AV_LOG_ERROR, "input too small\n");
+            return;
+        }
 
         opcode = bytestream2_get_byte(&s->gb);
         switch (opcode & 0xF0) {
@@ -433,6 +437,10 @@ static int smc_decode_frame(AVCodecContext *avctx,
     SmcContext *s = avctx->priv_data;
     const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, NULL);
     int ret;
+    int total_blocks = ((s->avctx->width + 3) / 4) * ((s->avctx->height + 3) / 4);
+
+    if (total_blocks / 1024 > avpkt->size)
+        return AVERROR_INVALIDDATA;
 
     bytestream2_init(&s->gb, buf, buf_size);
 
