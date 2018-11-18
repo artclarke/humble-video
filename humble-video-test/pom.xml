@@ -71,12 +71,7 @@
       <dependencies>
         <dependency>
           <groupId>io.humble</groupId>
-          <artifactId>humble-video-arch-i686-apple-darwin12-debug</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>io.humble</groupId>
-          <artifactId>humble-video-arch-x86_64-apple-darwin12-debug</artifactId>
+          <artifactId>humble-video-arch-x86_64-apple-darwin18-debug</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>

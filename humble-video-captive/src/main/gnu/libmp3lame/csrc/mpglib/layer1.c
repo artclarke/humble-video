@@ -21,7 +21,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: layer1.c,v 1.30 2010/03/22 14:30:19 robert Exp $ */
+/* $Id: layer1.c,v 1.31 2017/08/23 13:22:23 robert Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -54,12 +54,14 @@ typedef struct sideinfo_layer_I_struct
     unsigned char scalefactor[SBLIMIT][2];
 } sideinfo_layer_I;
 
-static void
+static int
 I_step_one(PMPSTR mp, sideinfo_layer_I* si)
 {
     struct frame *fr = &(mp->fr);
     int     jsbound = (fr->mode == MPG_MD_JOINT_STEREO) ? (fr->mode_ext << 2) + 4 : 32;
     int     i;
+    int     illegal_value_detected = 0;
+    unsigned char const ba15 = 15; /* bit pattern not allowed, looks like sync(?) */
     memset(si, 0, sizeof(*si));
     assert(fr->stereo == 1 || fr->stereo == 2);
 
@@ -69,11 +71,15 @@ I_step_one(PMPSTR mp, sideinfo_layer_I* si)
             unsigned char b1 = get_leq_8_bits(mp, 4);       /* values 0-15 */
             si->allocation[i][0] = b0;
             si->allocation[i][1] = b1;
+            if (b0 == ba15 || b1 == ba15)
+                illegal_value_detected = 1;
         }
         for (i = jsbound; i < SBLIMIT; i++) {
             unsigned char b = get_leq_8_bits(mp, 4);        /* values 0-15 */
             si->allocation[i][0] = b;
             si->allocation[i][1] = b;
+            if (b == ba15)
+                illegal_value_detected =  1;
         }
         for (i = 0; i < SBLIMIT; i++) {
             unsigned char n0 = si->allocation[i][0];
@@ -88,6 +94,8 @@ I_step_one(PMPSTR mp, sideinfo_layer_I* si)
         for (i = 0; i < SBLIMIT; i++) {
             unsigned char b0 =  get_leq_8_bits(mp, 4);          /* values 0-15 */
             si->allocation[i][0] = b0;
+            if (b0 == ba15)
+                illegal_value_detected = 1;
         }
         for (i = 0; i < SBLIMIT; i++) {
             unsigned char n0 = si->allocation[i][0];
@@ -95,6 +103,7 @@ I_step_one(PMPSTR mp, sideinfo_layer_I* si)
             si->scalefactor[i][0] = b0;
         }
     }
+    return illegal_value_detected;
 }
 
 static void
@@ -196,8 +205,10 @@ decode_layer1_frame(PMPSTR mp, unsigned char *pcm_sample, int *pcm_point)
     int     single = fr->single;
     int     i, clip = 0;
 
-    I_step_one(mp, &si);
-
+    if (I_step_one(mp, &si)) {
+        lame_report_fnc(mp->report_err, "hip: Aborting layer 1 decode, illegal bit allocation value\n");
+        return -1;
+    }
     if (fr->stereo == 1 || single == 3)
         single = 0;
 

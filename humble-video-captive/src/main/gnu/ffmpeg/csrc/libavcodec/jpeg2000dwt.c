@@ -305,22 +305,22 @@ static void dwt_encode97_int(DWTContext *s, int *t)
         t[i] = (t[i] + ((1<<I_PRESHIFT)>>1)) >> I_PRESHIFT;
 }
 
-static void sr_1d53(int *p, int i0, int i1)
+static void sr_1d53(unsigned *p, int i0, int i1)
 {
     int i;
 
     if (i1 <= i0 + 1) {
         if (i0 == 1)
-            p[1] >>= 1;
+            p[1] = (int)p[1] >> 1;
         return;
     }
 
     extend53(p, i0, i1);
 
     for (i = (i0 >> 1); i < (i1 >> 1) + 1; i++)
-        p[2 * i] -= (p[2 * i - 1] + p[2 * i + 1] + 2) >> 2;
+        p[2 * i] -= (int)(p[2 * i - 1] + p[2 * i + 1] + 2) >> 2;
     for (i = (i0 >> 1); i < (i1 >> 1); i++)
-        p[2 * i + 1] += (p[2 * i] + p[2 * i + 2]) >> 1;
+        p[2 * i + 1] += (int)(p[2 * i] + p[2 * i + 2]) >> 1;
 }
 
 static void dwt_decode53(DWTContext *s, int *t)
@@ -488,7 +488,7 @@ static void dwt_decode97_int(DWTContext *s, int32_t *t)
     line += 5;
 
     for (i = 0; i < w * h; i++)
-        data[i] <<= I_PRESHIFT;
+        data[i] *= 1LL << I_PRESHIFT;
 
     for (lev = 0; lev < s->ndeclevels; lev++) {
         int lh = s->linelen[lev][0],

@@ -20,6 +20,10 @@
 
 *******************************************************************************/
 
+/* Include system headers before local headers - the local headers
+ * redefine __inline, which can mess up definitions in libc headers if
+ * they happen to use __inline. */
+#include <string.h>
 #include "basic_op.h"
 #include "oper_32b.h"
 #include "adj_thr_data.h"
@@ -437,7 +441,7 @@ static void correctThresh(PSY_OUT_CHANNEL  psyOutChannel[MAX_CHANNELS],
 	  for (sfb=0; sfb<psyOutChan->maxSfbPerGroup; sfb++) {
         Word32 redThrExp = thrExp[ch][sfbGrp+sfb] + redVal;
 
-        if (((*pahFlag < AH_ACTIVE) || (deltaPe > 0)) && (redThrExp > 0) ) {
+        if (((*pahFlag < AH_ACTIVE) || (deltaPe > 0)) && (redThrExp > 0) && (redThrExp >= *psfbNActiveLines)) {
 
           *psfbPeFactors = (*psfbNActiveLines) * (0x7fffffff / redThrExp);
           normFactor = L_add(normFactor, *psfbPeFactors);
@@ -465,7 +469,7 @@ static void correctThresh(PSY_OUT_CHANNEL  psyOutChannel[MAX_CHANNELS],
         deltaSfbPe = *psfbPeFactors * deltaPe;
 
 		/* thr3(n) = thr2(n)*2^deltaSfbPe/b(n) */
-        if (*psfbNActiveLines > 0) {
+        if (*psfbNActiveLines > 0 && (normFactor* (*psfbNActiveLines)) != 0) {
           /* new threshold */
           Word32 thrFactor;
           sfbEn  = psyOutChan->sfbEnergy[sfbGrp+sfb];
@@ -1039,7 +1043,7 @@ void AdjThrInit(ADJ_THR_STATE *hAdjThr,
 
   /* minSnr adaptation */
   /* maximum reduction of minSnr goes down to minSnr^maxRed */
-  msaParam->maxRed = 0x20000000;     /* *0.25f /
+  msaParam->maxRed = 0x20000000;     /* *0.25f */
   /* start adaptation of minSnr for avgEn/sfbEn > startRatio */
   msaParam->startRatio = 0x0ccccccd; /* 10 */
   /* maximum minSnr reduction to minSnr^maxRed is reached for
@@ -1129,7 +1133,7 @@ void AdjustThresholds(ADJ_THR_STATE   *adjThrState,
 					  const Word16     nChannels,
                       const Word16     maxBitFac)
 {
-  PE_DATA peData = { 0 };
+  PE_DATA peData;
   Word16 noRedPe, grantedPe, grantedPeCorr;
   Word16 curWindowSequence;
   Word16 bitFactor;
@@ -1138,6 +1142,7 @@ void AdjustThresholds(ADJ_THR_STATE   *adjThrState,
   Word16 maxBitresBits = elBits->maxBits;
   Word16 sideInfoBits = (qcOE->staticBitsUsed + qcOE->ancBitsUsed);
   Word16 ch;
+  memset(&peData, 0, sizeof(peData));
 
   prepareSfbPe(&peData, psyOutChannel, logSfbEnergy, sfbNRelevantLines, nChannels, AdjThrStateElement->peOffset);
 

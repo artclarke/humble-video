@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Logged.\n");
     else
         fprintf(stderr, "Not logged.\n");
-    
+
     /* Test logging of buffer contents */
     for (i = 0;  i < 1000;  i++)
         buf[i] = i;
@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
             break;
         }
     }
-    
+
     /* Check timestamping by samples */
     span_log_set_level(&log, SPAN_LOG_SHOW_SEVERITY | SPAN_LOG_SHOW_PROTOCOL | SPAN_LOG_SHOW_TAG | SPAN_LOG_FLOW | SPAN_LOG_SHOW_SAMPLE_TIME);
     for (i = 0;  i < 10;  i++)
@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
         printf("Tests failed - %d %d %d.\n", tests_failed, msg_done, error_done);
         return 2;
     }
-    
+
     span_log_set_message_handler(&log, &message_handler);
 
     printf("Tests passed.\n");

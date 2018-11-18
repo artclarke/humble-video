@@ -647,14 +647,19 @@ void mime_unsorting(uint8 unsorted_bits[],
         }
     }
 
-    if (unpacked_size[*mode] % 4)
+    temp = *unsorted_bits_ptr; /* convert the remaining 0 to 7 bits */
+    for (i = unpacked_size[*mode] % 8; i != 0; i--)
     {
-        temp <<= 1;
-
         if (temp & 0x80)
         {
             sorted_bits_into_int16[*(pt_AmrWbSortingTables++)] = BIT_1;
         }
+        else
+        {
+            pt_AmrWbSortingTables++;
+        }
+
+        temp <<= 1;
     }
 
     /* set frame type */

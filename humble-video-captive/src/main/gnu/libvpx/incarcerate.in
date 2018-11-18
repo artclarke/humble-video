@@ -18,17 +18,11 @@ if [ "@VS_CROSS_COMPILE@" = "1" -o "${HOST_TYPE}" = "Mac" ]; then
   case ${HOST_OS} in
     *darwin*)
       case ${HOST_OS} in
-        *ppc64*|*powerpc64*)
-        VPX_HOST=ppc64-darwin10-gcc
-        ;;
-        *ppc*|*powerpc*)
-        VPX_HOST=ppc32-darwin10-gcc
-        ;;
         *x86_64*|*amd64*)
-        VPX_HOST=x86_64-darwin10-gcc
+        VPX_HOST=x86_64-darwin16-gcc
         ;;
         *)
-        VPX_HOST=x86-darwin10-gcc
+        VPX_HOST=x86-darwin16-gcc
         ;;
       esac
     ;;
@@ -46,7 +40,7 @@ if [ "@VS_CROSS_COMPILE@" = "1" -o "${HOST_TYPE}" = "Mac" ]; then
       VPX_OPTIONS="$VPX_OPTIONS --enable-pic"
       case ${HOST_OS} in
         *x86_64*|*amd64*)
-        VPX_HOST=generic-gnu
+        VPX_HOST=x86_64-linux-gcc
         ;;
         *)
         VPX_HOST=x86-linux-gcc

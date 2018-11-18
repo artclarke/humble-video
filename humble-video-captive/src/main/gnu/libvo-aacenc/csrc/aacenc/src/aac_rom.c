@@ -1367,7 +1367,7 @@ const Word16 sideInfoTabShort[MAX_SFB_SHORT + 1] = {
   10, 10, 10, 10, 10, 13, 13
 };
 
-Word32 specExpMantTableComb_enc[4][14] =
+const Word32 specExpMantTableComb_enc[4][14] =
 {
   {0x40000000,  0x50a28be6,  0x6597fa95,  0x40000000,
    0x50a28be6,  0x6597fa95,  0x40000000,  0x50a28be6,

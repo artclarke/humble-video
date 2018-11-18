@@ -1,5 +1,3 @@
-/* $Id: tiffmedian.c,v 1.10 2010-03-10 18:56:50 bfriesen Exp $ */
-
 /*
  * Apply median cut on an image.
  *
@@ -123,8 +121,10 @@ main(int argc, char* argv[])
 	float floatv;
 	uint32 longv;
 	int c;
+#if !HAVE_DECL_OPTARG
 	extern int optind;
 	extern char* optarg;
+#endif
 
 	num_colors = MAX_CMAP_SIZE;
 	while ((c = getopt(argc, argv, "c:C:r:f")) != -1)
@@ -371,9 +371,15 @@ get_histogram(TIFF* in, Colorbox* box)
 			break;
 		inptr = inputline;
 		for (j = imagewidth; j-- > 0;) {
-			red = *inptr++ >> COLOR_SHIFT;
-			green = *inptr++ >> COLOR_SHIFT;
-			blue = *inptr++ >> COLOR_SHIFT;
+			red = (*inptr++) & 0xff >> COLOR_SHIFT;
+			green = (*inptr++) & 0xff >> COLOR_SHIFT;
+			blue = (*inptr++) & 0xff >> COLOR_SHIFT;
+                        if ((red | green | blue) >= B_LEN) {
+                                fprintf(stderr,
+                                        "Logic error. "
+                                        "Histogram array overflow!\n");
+                                exit(-6);
+                        }
 			if (red < box->rmin)
 				box->rmin = red;
 		        if (red > box->rmax)
@@ -779,24 +785,28 @@ quant(TIFF* in, TIFF* out)
 
 #define	SWAP(type,a,b)	{ type p; p = a; a = b; b = p; }
 
-#define	GetInputLine(tif, row, bad)				\
-	if (TIFFReadScanline(tif, inputline, row, 0) <= 0)	\
-		bad;						\
-	inptr = inputline;					\
-	nextptr = nextline;					\
-	for (j = 0; j < imagewidth; ++j) {			\
-		*nextptr++ = *inptr++;				\
-		*nextptr++ = *inptr++;				\
-		*nextptr++ = *inptr++;				\
-	}
+#define	GetInputLine(tif, row, bad)                                     \
+        do {                                                            \
+                if (TIFFReadScanline(tif, inputline, row, 0) <= 0)	\
+                        bad;						\
+                inptr = inputline;					\
+                nextptr = nextline;					\
+                for (j = 0; j < imagewidth; ++j) {			\
+                        *nextptr++ = *inptr++;				\
+                        *nextptr++ = *inptr++;				\
+                        *nextptr++ = *inptr++;				\
+                }                                                       \
+        } while (0);
 #define	GetComponent(raw, cshift, c)				\
-	cshift = raw;						\
-	if (cshift < 0)						\
-		cshift = 0;					\
-	else if (cshift >= MAX_COLOR)				\
-		cshift = MAX_COLOR-1;				\
-	c = cshift;						\
-	cshift >>= COLOR_SHIFT;
+        do {                                                    \
+                cshift = raw;                                   \
+                if (cshift < 0)                                 \
+                        cshift = 0;                             \
+                else if (cshift >= MAX_COLOR)                   \
+                        cshift = MAX_COLOR-1;                   \
+                c = cshift;                                     \
+                cshift >>= COLOR_SHIFT;                         \
+        } while (0);
 
 static void
 quant_fsdither(TIFF* in, TIFF* out)

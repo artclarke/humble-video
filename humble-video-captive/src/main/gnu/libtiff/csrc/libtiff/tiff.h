@@ -1,5 +1,3 @@
-/* $Id: tiff.h,v 1.67 2011-01-24 21:06:32 olivier Exp $ */
-
 /*
  * Copyright (c) 1988-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.
@@ -166,6 +164,8 @@ typedef enum {
 #define	    COMPRESSION_LZW		5       /* Lempel-Ziv  & Welch */
 #define	    COMPRESSION_OJPEG		6	/* !6.0 JPEG */
 #define	    COMPRESSION_JPEG		7	/* %JPEG DCT compression */
+#define     COMPRESSION_T85			9	/* !TIFF/FX T.85 JBIG compression */
+#define     COMPRESSION_T43			10	/* !TIFF/FX T.43 colour by layered JBIG compression */
 #define	    COMPRESSION_NEXT		32766	/* NeXT 2-bit RLE */
 #define	    COMPRESSION_CCITTRLEW	32771	/* #1 w/ word alignment */
 #define	    COMPRESSION_PACKBITS	32773	/* Macintosh RLE */
@@ -187,7 +187,11 @@ typedef enum {
 #define     COMPRESSION_SGILOG		34676	/* SGI Log Luminance RLE */
 #define     COMPRESSION_SGILOG24	34677	/* SGI Log 24-bit packed */
 #define     COMPRESSION_JP2000          34712   /* Leadtools JPEG2000 */
+#define     COMPRESSION_LERC            34887   /* ESRI Lerc codec: https://github.com/Esri/lerc */
+/* compression codes 34887-34889 are reserved for ESRI */
 #define	    COMPRESSION_LZMA		34925	/* LZMA2 */
+#define	    COMPRESSION_ZSTD		50000	/* ZSTD: WARNING not registered in Adobe-maintained registry */
+#define	    COMPRESSION_WEBP		50001	/* WEBP: WARNING not registered in Adobe-maintained registry */
 #define	TIFFTAG_PHOTOMETRIC		262	/* photometric interpretation */
 #define	    PHOTOMETRIC_MINISWHITE	0	/* min value is white */
 #define	    PHOTOMETRIC_MINISBLACK	1	/* min value is black */
@@ -199,6 +203,7 @@ typedef enum {
 #define	    PHOTOMETRIC_CIELAB		8	/* !1976 CIE L*a*b* */
 #define	    PHOTOMETRIC_ICCLAB		9	/* ICC L*a*b* [Adobe TIFF Technote 4] */
 #define	    PHOTOMETRIC_ITULAB		10	/* ITU L*a*b* */
+#define	    PHOTOMETRIC_CFA		32803	/* color filter array */
 #define     PHOTOMETRIC_LOGL		32844	/* CIE Log2(L) */
 #define     PHOTOMETRIC_LOGLUV		32845	/* CIE Log2(L) (u',v') */
 #define	TIFFTAG_THRESHHOLDING		263	/* +thresholding used on data */
@@ -276,7 +281,7 @@ typedef enum {
 #define     PREDICTOR_FLOATINGPOINT	3	/* floating point predictor */
 #define	TIFFTAG_WHITEPOINT		318	/* image white point */
 #define	TIFFTAG_PRIMARYCHROMATICITIES	319	/* !primary chromaticities */
-#define	TIFFTAG_COLORMAP		320	/* RGB map for pallette image */
+#define	TIFFTAG_COLORMAP		320	/* RGB map for palette image */
 #define	TIFFTAG_HALFTONEHINTS		321	/* !highlight+shadow info */
 #define	TIFFTAG_TILEWIDTH		322	/* !tile width in pixels */
 #define	TIFFTAG_TILELENGTH		323	/* !tile height in pixels */
@@ -319,6 +324,30 @@ typedef enum {
 						   [Adobe TIFF Technote 3] */
 #define	TIFFTAG_JPEGTABLES		347	/* %JPEG table stream */
 #define	TIFFTAG_OPIPROXY		351	/* %OPI Proxy [Adobe TIFF technote] */
+/* Tags 400-435 are from the TIFF/FX spec */
+#define TIFFTAG_GLOBALPARAMETERSIFD	400	/* ! */
+#define TIFFTAG_PROFILETYPE			401	/* ! */
+#define     PROFILETYPE_UNSPECIFIED	0	/* ! */
+#define     PROFILETYPE_G3_FAX		1	/* ! */
+#define TIFFTAG_FAXPROFILE			402	/* ! */
+#define     FAXPROFILE_S			1	/* !TIFF/FX FAX profile S */
+#define     FAXPROFILE_F			2	/* !TIFF/FX FAX profile F */
+#define     FAXPROFILE_J			3	/* !TIFF/FX FAX profile J */
+#define     FAXPROFILE_C			4	/* !TIFF/FX FAX profile C */
+#define     FAXPROFILE_L			5	/* !TIFF/FX FAX profile L */
+#define     FAXPROFILE_M			6	/* !TIFF/FX FAX profile LM */
+#define TIFFTAG_CODINGMETHODS		403	/* !TIFF/FX coding methods */
+#define     CODINGMETHODS_T4_1D		(1 << 1)	/* !T.4 1D */
+#define     CODINGMETHODS_T4_2D		(1 << 2)	/* !T.4 2D */
+#define     CODINGMETHODS_T6		(1 << 3)	/* !T.6 */
+#define     CODINGMETHODS_T85 		(1 << 4)	/* !T.85 JBIG */
+#define     CODINGMETHODS_T42 		(1 << 5)	/* !T.42 JPEG */
+#define     CODINGMETHODS_T43		(1 << 6)	/* !T.43 colour by layered JBIG */
+#define TIFFTAG_VERSIONYEAR			404	/* !TIFF/FX version year */
+#define TIFFTAG_MODENUMBER			405	/* !TIFF/FX mode number */
+#define TIFFTAG_DECODE				433	/* !TIFF/FX decode */
+#define TIFFTAG_IMAGEBASECOLOR		434	/* !TIFF/FX image base colour */
+#define TIFFTAG_T82OPTIONS			435	/* !TIFF/FX T.82 options */
 /*
  * Tags 512-521 are obsoleted by Technical Note #2 which specifies a
  * revised JPEG-in-TIFF scheme.
@@ -331,7 +360,7 @@ typedef enum {
 #define	TIFFTAG_JPEGRESTARTINTERVAL	515	/* !restart interval length */
 #define	TIFFTAG_JPEGLOSSLESSPREDICTORS	517	/* !lossless proc predictor */
 #define	TIFFTAG_JPEGPOINTTRANSFORM	518	/* !lossless point transform */
-#define	TIFFTAG_JPEGQTABLES		519	/* !Q matrice offsets */
+#define	TIFFTAG_JPEGQTABLES		519	/* !Q matrix offsets */
 #define	TIFFTAG_JPEGDCTABLES		520	/* !DCT table offsets */
 #define	TIFFTAG_JPEGACTABLES		521	/* !AC coefficient offsets */
 #define	TIFFTAG_YCBCRCOEFFICIENTS	529	/* !RGB -> YCbCr transform */
@@ -340,6 +369,7 @@ typedef enum {
 #define	    YCBCRPOSITION_CENTERED	1	/* !as in PostScript Level 2 */
 #define	    YCBCRPOSITION_COSITED	2	/* !as in CCIR 601-1 */
 #define	TIFFTAG_REFERENCEBLACKWHITE	532	/* !colorimetry info */
+#define TIFFTAG_STRIPROWCOUNTS		559 /* !TIFF/FX strip row counts */
 #define	TIFFTAG_XMLPACKET		700	/* %XML packet
 						   [Adobe XMP Specification,
 						   January 2004 */
@@ -375,6 +405,8 @@ typedef enum {
 #define TIFFTAG_PIXAR_MATRIX_WORLDTOCAMERA 33306
 /* tag 33405 is a private tag registered to Eastman Kodak */
 #define TIFFTAG_WRITERSERIALNUMBER      33405   /* device serial number */
+#define TIFFTAG_CFAREPEATPATTERNDIM	33421	/* dimensions of CFA pattern */
+#define TIFFTAG_CFAPATTERN		33422	/* color filter array pattern */
 /* tag 33432 is listed in the 6.0 spec w/ unknown ownership */
 #define	TIFFTAG_COPYRIGHT		33432	/* copyright string */
 /* IPTC TAG from RichTIFF specifications */
@@ -406,6 +438,7 @@ typedef enum {
 #define TIFFTAG_EXIFIFD			34665	/* Pointer to EXIF private directory */
 /* tag 34750 is a private tag registered to Adobe? */
 #define TIFFTAG_ICCPROFILE		34675	/* ICC profile data */
+#define TIFFTAG_IMAGELAYER		34732	/* !TIFF/FX image layer information */
 /* tag 34750 is a private tag registered to Pixel Magic */
 #define	TIFFTAG_JBIGOPTIONS		34750	/* JBIG options */
 #define TIFFTAG_GPSIFD			34853	/* Pointer to GPS private directory */
@@ -419,6 +452,8 @@ typedef enum {
 /* tag 34929 is a private tag registered to FedEx */
 #define	TIFFTAG_FEDEX_EDR		34929	/* unknown use */
 #define TIFFTAG_INTEROPERABILITYIFD	40965	/* Pointer to Interoperability private directory */
+/* tags 50674 to 50677 are reserved for ESRI */
+#define TIFFTAG_LERC_PARAMETERS         50674   /* Stores LERC version and additional compression method */
 /* Adobe Digital Negative (DNG) format tags */
 #define TIFFTAG_DNGVERSION		50706	/* &DNG version number */
 #define TIFFTAG_DNGBACKWARDVERSION	50707	/* &DNG compatibility version */
@@ -572,6 +607,16 @@ typedef enum {
 #define TIFFTAG_PERSAMPLE       65563	/* interface for per sample tags */
 #define     PERSAMPLE_MERGED        0	/* present as a single value */
 #define     PERSAMPLE_MULTI         1	/* present as multiple values */
+#define TIFFTAG_ZSTD_LEVEL      65564    /* ZSTD compression level */
+#define TIFFTAG_LERC_VERSION            65565 /* LERC version */
+#define     LERC_VERSION_2_4            4
+#define TIFFTAG_LERC_ADD_COMPRESSION    65566 /* LERC additional compression */
+#define     LERC_ADD_COMPRESSION_NONE    0
+#define     LERC_ADD_COMPRESSION_DEFLATE 1
+#define     LERC_ADD_COMPRESSION_ZSTD    2
+#define TIFFTAG_LERC_MAXZERROR          65567    /* LERC maximum error */
+#define TIFFTAG_WEBP_LEVEL		  65568	/* WebP compression level: WARNING not registered in Adobe-maintained registry */
+#define TIFFTAG_WEBP_LOSSLESS		65569	/* WebP lossless/lossy : WARNING not registered in Adobe-maintained registry */
 
 /*
  * EXIF tags

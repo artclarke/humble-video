@@ -20,7 +20,7 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-/* $Id: tabinit.c,v 1.16 2010/03/22 14:30:19 robert Exp $ */
+/* $Id: tabinit.c,v 1.17 2017/09/06 15:07:30 robert Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -33,6 +33,8 @@
 #ifdef WITH_DMALLOC
 #include <dmalloc.h>
 #endif
+
+static int table_init_called = 0;
 
 real    decwin[512 + 32];
 static real cos64[16], cos32[8], cos16[4], cos8[2], cos4[1];
@@ -115,6 +117,10 @@ make_decode_tables(long scaleval)
     int     i, j, k, kr, divv;
     real   *table, *costab;
 
+    if (table_init_called)
+        return;
+
+    table_init_called = 1;
 
     for (i = 0; i < 5; i++) {
         kr = 0x10 >> i;

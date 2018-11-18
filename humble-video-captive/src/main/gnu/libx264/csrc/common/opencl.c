@@ -1,7 +1,7 @@
 /*****************************************************************************
  * opencl.c: OpenCL initialization and kernel compilation
  *****************************************************************************
- * Copyright (C) 2012-2014 x264 project
+ * Copyright (C) 2012-2018 x264 project
  *
  * Authors: Steve Borho <sborho@multicorewareinc.com>
  *          Anton Mitrofanov <BugMaster@narod.ru>
@@ -115,11 +115,11 @@ void x264_opencl_close_library( x264_opencl_function_t *ocl )
 /* Requires full include path in case of out-of-tree builds */
 #include "common/oclobj.h"
 
-static int x264_detect_switchable_graphics( void );
+static int detect_switchable_graphics( void );
 
 /* Try to load the cached compiled program binary, verify the device context is
  * still valid before reuse */
-static cl_program x264_opencl_cache_load( x264_t *h, const char *dev_name, const char *dev_vendor, const char *driver_version )
+static cl_program opencl_cache_load( x264_t *h, const char *dev_name, const char *dev_vendor, const char *driver_version )
 {
     /* try to load cached program binary */
     FILE *fp = x264_fopen( h->param.psz_clbin_file, "rb" );
@@ -135,7 +135,7 @@ static cl_program x264_opencl_cache_load( x264_t *h, const char *dev_name, const
     rewind( fp );
     CHECKED_MALLOC( binary, size );
 
-    if ( fread( binary, 1, size, fp ) != size )
+    if( fread( binary, 1, size, fp ) != size )
         goto fail;
     const uint8_t *ptr = (const uint8_t*)binary;
 
@@ -168,7 +168,7 @@ fail:
 
 /* Save the compiled program binary to a file for later reuse.  Device context
  * is also saved in the cache file so we do not reuse stale binaries */
-static void x264_opencl_cache_save( x264_t *h, cl_program program, const char *dev_name, const char *dev_vendor, const char *driver_version )
+static void opencl_cache_save( x264_t *h, cl_program program, const char *dev_name, const char *dev_vendor, const char *driver_version )
 {
     FILE *fp = x264_fopen( h->param.psz_clbin_file, "wb" );
     if( !fp )
@@ -216,7 +216,7 @@ fail:
  * the Makefile. It defines a x264_opencl_source byte array which we will pass
  * to clCreateProgramWithSource().  We also attempt to use a cache file for the
  * compiled binary, stored in the current working folder. */
-static cl_program x264_opencl_compile( x264_t *h )
+static cl_program opencl_compile( x264_t *h )
 {
     x264_opencl_function_t *ocl = h->opencl.ocl;
     cl_program program = NULL;
@@ -239,7 +239,7 @@ static cl_program x264_opencl_compile( x264_t *h )
     if( vectorize )
     {
         /* Disable OpenCL on Intel/AMD switchable graphics devices */
-        if( x264_detect_switchable_graphics() )
+        if( detect_switchable_graphics() )
         {
             x264_log( h, X264_LOG_INFO, "OpenCL acceleration disabled, switchable graphics detected\n" );
             return NULL;
@@ -257,7 +257,7 @@ static cl_program x264_opencl_compile( x264_t *h )
 
     x264_log( h, X264_LOG_INFO, "OpenCL acceleration enabled with %s %s %s\n", dev_vendor, dev_name, h->opencl.b_device_AMD_SI ? "(SI)" : "" );
 
-    program = x264_opencl_cache_load( h, dev_name, dev_vendor, driver_version );
+    program = opencl_cache_load( h, dev_name, dev_vendor, driver_version );
     if( !program )
     {
         /* clCreateProgramWithSource() requires a pointer variable, you cannot just use &x264_opencl_source */
@@ -277,7 +277,7 @@ static cl_program x264_opencl_compile( x264_t *h )
     status = ocl->clBuildProgram( program, 1, &h->opencl.device, buildopts, NULL, NULL );
     if( status == CL_SUCCESS )
     {
-        x264_opencl_cache_save( h, program, dev_name, dev_vendor, driver_version );
+        opencl_cache_save( h, program, dev_name, dev_vendor, driver_version );
         return program;
     }
 
@@ -322,7 +322,7 @@ fail:
     return NULL;
 }
 
-static int x264_opencl_lookahead_alloc( x264_t *h )
+static int opencl_lookahead_alloc( x264_t *h )
 {
     if( !h->param.rc.i_lookahead )
         return -1;
@@ -360,11 +360,11 @@ static int x264_opencl_lookahead_alloc( x264_t *h )
     x264_opencl_function_t *ocl = h->opencl.ocl;
     cl_int status;
 
-    h->opencl.lookahead_program = x264_opencl_compile( h );
+    h->opencl.lookahead_program = opencl_compile( h );
     if( !h->opencl.lookahead_program )
         goto fail;
 
-    for( int i = 0; i < ARRAY_SIZE(kernelnames); i++ )
+    for( int i = 0; i < ARRAY_ELEMS(kernelnames); i++ )
     {
         *kernels[i] = ocl->clCreateKernel( h->opencl.lookahead_program, kernelnames[i], &status );
         if( status != CL_SUCCESS )
@@ -394,7 +394,7 @@ fail:
     return -1;
 }
 
-static void CL_CALLBACK x264_opencl_error_notify( const char *errinfo, const void *private_info, size_t cb, void *user_data )
+static void CL_CALLBACK opencl_error_notify( const char *errinfo, const void *private_info, size_t cb, void *user_data )
 {
     /* Any error notification can be assumed to be fatal to the OpenCL context.
      * We need to stop using it immediately to prevent further damage. */
@@ -470,7 +470,7 @@ int x264_opencl_lookahead_init( x264_t *h )
 
             if( context )
                 ocl->clReleaseContext( context );
-            context = ocl->clCreateContext( NULL, 1, &h->opencl.device, (void*)x264_opencl_error_notify, (void*)h, &status );
+            context = ocl->clCreateContext( NULL, 1, &h->opencl.device, (void*)opencl_error_notify, (void*)h, &status );
             if( status != CL_SUCCESS || !context )
                 continue;
 
@@ -540,7 +540,7 @@ int x264_opencl_lookahead_init( x264_t *h )
     if( ret )
         x264_log( h, X264_LOG_WARNING, "OpenCL: Unable to find a compatible device\n" );
     else
-        ret = x264_opencl_lookahead_alloc( h );
+        ret = opencl_lookahead_alloc( h );
 
 fail:
     if( context )
@@ -551,7 +551,7 @@ fail:
     return ret;
 }
 
-static void x264_opencl_lookahead_free( x264_t *h )
+static void opencl_lookahead_free( x264_t *h )
 {
     x264_opencl_function_t *ocl = h->opencl.ocl;
 
@@ -600,7 +600,7 @@ void x264_opencl_lookahead_delete( x264_t *h )
     if( h->opencl.queue )
         ocl->clFinish( h->opencl.queue );
 
-    x264_opencl_lookahead_free( h );
+    opencl_lookahead_free( h );
 
     if( h->opencl.queue )
     {
@@ -663,7 +663,7 @@ static void* ADL_CALLBACK adl_malloc_wrapper( int iSize )
     return x264_malloc( iSize );
 }
 
-static int x264_detect_switchable_graphics( void )
+static int detect_switchable_graphics( void )
 {
     void *hDLL;
     ADL_MAIN_CONTROL_CREATE          ADL_Main_Control_Create;

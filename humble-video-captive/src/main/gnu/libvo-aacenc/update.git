@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# This script is here to update the branch to the latest version
+git subtree pull --prefix=humble-video-captive/src/main/gnu/libvo-aacenc/csrc --squash https://git.code.sf.net/p/opencore-amr/vo-aacenc v0.1.3

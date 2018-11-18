@@ -37,13 +37,13 @@ struct t30_state_s
     /*! \brief T.4 context for reading or writing image data. */
     union
     {
-        t4_state_t rx;
-        t4_state_t tx;
+        t4_rx_state_t rx;
+        t4_tx_state_t tx;
     } t4;
     /*! \brief The type of FAX operation currently in progress */
     int operation_in_progress;
 
-    /*! \brief TRUE if behaving as the calling party */
+    /*! \brief True if behaving as the calling party */
     int calling_party;
     
     /*! \brief Internet aware FAX mode bit mask. */
@@ -58,9 +58,9 @@ struct t30_state_s
     int supported_image_sizes;
     /*! \brief A bit mask of the currently supported T.30 special features. */
     int supported_t30_features;
-    /*! \brief TRUE is ECM mode handling is enabled. */
+    /*! \brief True is ECM mode handling is enabled. */
     int ecm_allowed;
-    /*! \brief TRUE if we are capable of retransmitting pages */
+    /*! \brief True if we are capable of retransmitting pages */
     int retransmit_capable;
 
     /*! \brief The received DCS, formatted as an ASCII string, for inclusion
@@ -69,11 +69,16 @@ struct t30_state_s
     /*! \brief The text which will be used in FAX page header. No text results
                in no header line. */
     char header_info[T30_MAX_PAGE_HEADER_INFO + 1];
-    /*! \brief TRUE for FAX page headers to overlay (i.e. replace) the beginning of the
-               page image. FALSE for FAX page headers to add to the overall length of
+    /*! \brief True for FAX page headers to overlay (i.e. replace) the beginning of the
+               page image. False for FAX page headers to add to the overall length of
                the page. */
     int header_overlays_image;
-    /*! \brief TRUE if remote T.30 procedural interrupts are allowed. */
+    /*! \brief Use private timezone if true */
+    int use_own_tz;
+    /*! \brief Optional per instance time zone for the FAX page header timestamp. */
+    tz_t tz;
+
+    /*! \brief True if remote T.30 procedural interrupts are allowed. */
     int remote_interrupts_allowed;
 
     /*! \brief The information fields received. */
@@ -154,11 +159,15 @@ struct t30_state_s
     uint8_t far_dis_dtc_frame[T30_MAX_DIS_DTC_DCS_LEN];
     /*! \brief The length of the last DIS or DTC message received form the far end. */
     int far_dis_dtc_len;
-    /*! \brief TRUE if a valid DIS has been received from the far end. */
+    /*! \brief True if a valid DIS has been received from the far end. */
     int dis_received;
 
-    /*! \brief TRUE if the short training sequence should be used. */
+    /*! \brief True if the short training sequence should be used. */
     int short_train;
+
+    /*! \brief True if an image carrier appears to have been received, even if it did not successfully
+        train. */
+    int image_carrier_attempted;
 
     /*! \brief A count of the number of bits in the trainability test. This counts down to zero when
         sending TCF, and counts up when receiving it. */
@@ -172,11 +181,11 @@ struct t30_state_s
     int current_fallback;
     /*! \brief The subset of supported modems allowed at the current time, allowing for negotiation. */
     int current_permitted_modems;
-    /*! \brief TRUE if a carrier is present. Otherwise FALSE. */
+    /*! \brief True if a carrier is present. Otherwise false. */
     int rx_signal_present;
-    /*! \brief TRUE if a modem has trained correctly. */
+    /*! \brief True if a modem has trained correctly. */
     int rx_trained;
-    /*! \brief TRUE if a valid HDLC frame has been received in the current reception period. */
+    /*! \brief True if a valid HDLC frame has been received in the current reception period. */
     int rx_frame_received;
 
     /*! \brief Current reception mode. */
@@ -205,10 +214,13 @@ struct t30_state_s
     /*! \brief This is only used in full duplex (e.g. ISDN) modes. */
     int timer_t8;
 
-    /*! \brief TRUE once the far end FAX entity has been detected. */
+    /*! \brief True once the far end FAX entity has been detected. */
     int far_end_detected;
 
-    /*! \brief TRUE if a local T.30 interrupt is pending. */
+    /*! \brief True once the end of procedure condition has been detected. */
+    int end_of_procedure_detected;
+
+    /*! \brief True if a local T.30 interrupt is pending. */
     int local_interrupt_pending;
     /*! \brief The image coding being used on the line. */
     int line_encoding;
@@ -224,7 +236,7 @@ struct t30_state_s
     t4_image_width_t image_width;
     /*! \brief Current number of retries of the action in progress. */
     int retries;
-    /*! \brief TRUE if error correcting mode is used. */
+    /*! \brief True if error correcting mode is used. */
     int error_correcting_mode;
     /*! \brief The number of HDLC frame retries, if error correcting mode is used. */
     int error_correcting_mode_retries;
@@ -240,7 +252,7 @@ struct t30_state_s
     int16_t ecm_len[256];
     /*! \brief A bit map of the OK ECM frames, constructed as a PPR frame. */
     uint8_t ecm_frame_map[3 + 32];
-    
+
     /*! \brief The current page number for receiving, in ECM or non-ECM mode. This is reset at the start of a call. */
     int rx_page_number;
     /*! \brief The current page number for sending, in ECM or non-ECM mode. This is reset at the start of a call. */
@@ -253,9 +265,12 @@ struct t30_state_s
     int ecm_frames_this_tx_burst;
     /*! \brief The current ECM frame, during ECM transmission. */
     int ecm_current_tx_frame;
-    /*! \brief TRUE if we are at the end of an ECM page to se sent - i.e. there are no more
+    /*! \brief True if we are at the end of an ECM page to se sent - i.e. there are no more
         partial pages still to come. */
     int ecm_at_page_end;
+
+    /*! \brief The last result for a received non-ECM page - T30_MPS, T30_RTP, or T30_RTN. */
+    int last_rx_page_result;
 
     /*! \brief The transmission step queued to follow the one in progress. */
     int next_tx_step;
@@ -274,18 +289,18 @@ struct t30_state_s
     /*! \brief The current completion status. */
     int current_status;
 
-    /*! \brief The number of RTP events */
-    int rtp_events;
-    /*! \brief The number of RTN events */
-    int rtn_events;
-
     /*! \brief the FCF2 field of the last PPS message we received. */
     uint8_t last_pps_fcf2;
-    /*! \brief TRUE if all frames of the current received ECM block are now OK */
+    /*! \brief True if all frames of the current received ECM block are now OK */
     int rx_ecm_block_ok;
     /*! \brief A count of successfully received ECM frames, to assess progress as a basis for
         deciding whether to continue error correction when PPRs keep repeating. */
     int ecm_progress;
+
+    /*! \brief The number of RTP events */
+    int rtp_events;
+    /*! \brief The number of RTN events */
+    int rtn_events;
 
     /*! \brief Error and flow logging control */
     logging_state_t logging;

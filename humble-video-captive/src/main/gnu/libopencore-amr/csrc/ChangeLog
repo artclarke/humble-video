@@ -1,3 +1,11 @@
+0.1.5
+ - Fix an autotools issue with cross compiling from the 0.1.4 release
+
+0.1.4
+ - Autotools cleanups
+ - Fixes for SID/DTX in the AMR-WB decoder, fixes for handling of bad
+   frames in both AMR-WB and AMR-NB
+
 0.1.3
  - Adjusted libtool flags for building DLLs for windows
  - Update to the latest upstream opencore source

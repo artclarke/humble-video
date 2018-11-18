@@ -76,15 +76,6 @@ typedef char VO_CHAR;
 /** VO_U16 is a 16 bit unsigned quantity that is 16 bit word aligned */
 typedef unsigned short VO_U16;
 
-/** VO_WCHAR is a 16 bit unsigned quantity that is 16 bit word aligned */
-#if defined _WIN32
-typedef unsigned short VO_WCHAR;
-typedef unsigned short* VO_PWCHAR;
-#elif defined LINUX
-typedef unsigned char VO_WCHAR;
-typedef unsigned char* VO_PWCHAR;
-#endif
-
 /** VO_S16 is a 16 bit signed quantity that is 16 bit word aligned */
 typedef signed short VO_S16;
 
@@ -149,21 +140,6 @@ typedef char* VO_PCHAR;
     aligned and the string is byte aligned.
  */
 typedef unsigned char* VO_PBYTE;
-
-/** The VO_PTCHAR type is intended to be used to pass arrays of wchar such as
-    unicode char between the application and the component and core.  The VO_PTCHAR
-    type is a 32 bit pointer to a zero terminated string.  The  pointer is word
-    aligned and the string is byte aligned.
- */
-/*
-#if !defined LINUX
-typedef unsigned short* VO_PTCHAR;
-typedef unsigned short* VO_TCHAR;
-#else
-typedef char* VO_PTCHAR;
-typedef char VO_TCHAR;
-#endif
-*/
 
 #ifndef NULL
 #ifdef __cplusplus

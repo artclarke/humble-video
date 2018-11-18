@@ -1,7 +1,7 @@
 /*****************************************************************************
  * quant.h: quantization and level-run
  *****************************************************************************
- * Copyright (C) 2005-2014 x264 project
+ * Copyright (C) 2005-2018 x264 project
  *
  * Authors: Loren Merritt <lorenm@u.washington.edu>
  *          Fiona Glaser <fiona@x264.com>
@@ -69,6 +69,7 @@ typedef struct
     int (*trellis_cabac_chroma_422_dc)( TRELLIS_PARAMS );
 } x264_quant_function_t;
 
+#define x264_quant_init x264_template(quant_init)
 void x264_quant_init( x264_t *h, int cpu, x264_quant_function_t *pf );
 
 #endif

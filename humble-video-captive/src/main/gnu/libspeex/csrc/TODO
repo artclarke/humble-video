@@ -1,10 +1,7 @@
 For 1.2:
 Major points:
-- Make documentation match the actual code (especially jitter buffer, AEC and preprocessor)
-- Get AGC to work in fixed-point even if not totally converted
+- Make documentation match the actual code
 - Stabilise all APIs (need feedback)
-- Short-term estimate in jitter buffer
-- Control delay in new AEC API.
 - NaN checks?
 - Better error reporting
 - Make kiss-fft 32-bit safe
@@ -19,7 +16,6 @@ split encoder and decoder?
 Merge TriMedia stuff
 packet dump
 Do VAD properly
---enable-{aec,preprocessor,jitter,resampler}
 
 Optimisations
 - Add restrict in a few places?
@@ -32,12 +28,6 @@ Implement wideband split as IIR instead of QMF?
 Allocator override (speex_lib_ctl?)
 Fixed-point:
   - VBR
-  - Jitter buffer
-  - AGC
-Denoiser:
-  - Better noise adaptation
-AGC:
-  - Use median filtering instead of "non-linear mean"?
 
 Standards
 -Complete Speex RTP profile

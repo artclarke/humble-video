@@ -186,9 +186,12 @@ RTMPPacket_Reset(RTMPPacket *p)
 }
 
 int
-RTMPPacket_Alloc(RTMPPacket *p, int nSize)
+RTMPPacket_Alloc(RTMPPacket *p, uint32_t nSize)
 {
-  char *ptr = calloc(1, nSize + RTMP_MAX_HEADER_SIZE);
+  char *ptr;
+  if (nSize > SIZE_MAX - RTMP_MAX_HEADER_SIZE)
+    return FALSE;
+  ptr = calloc(1, nSize + RTMP_MAX_HEADER_SIZE);
   if (!ptr)
     return FALSE;
   p->m_body = ptr + RTMP_MAX_HEADER_SIZE;
@@ -1180,7 +1183,7 @@ RTMP_GetNextMediaPacket(RTMP *r, RTMPPacket *packet)
   while (!bHasMediaPacket && RTMP_IsConnected(r)
 	 && RTMP_ReadPacket(r, packet))
     {
-      if (!RTMPPacket_IsReady(packet))
+      if (!RTMPPacket_IsReady(packet) || !packet->m_nBodySize)
 	{
 	  continue;
 	}
@@ -3643,7 +3646,6 @@ RTMP_ReadPacket(RTMP *r, RTMPPacket *packet)
 	{
 	  packet->m_nBodySize = AMF_DecodeInt24(header + 3);
 	  packet->m_nBytesRead = 0;
-	  RTMPPacket_Free(packet);
 
 	  if (nSize > 6)
 	    {
@@ -3965,10 +3967,11 @@ RTMP_SendPacket(RTMP *r, RTMPPacket *packet, int queue)
       hSize += cSize;
     }
 
-  if (nSize > 1 && t >= 0xffffff)
+  if (t >= 0xffffff)
     {
       header -= 4;
       hSize += 4;
+      RTMP_Log(RTMP_LOGWARNING, "Larger timestamp than 24-bit: 0x%x", t);
     }
 
   hptr = header;
@@ -4007,7 +4010,7 @@ RTMP_SendPacket(RTMP *r, RTMPPacket *packet, int queue)
   if (nSize > 8)
     hptr += EncodeInt32LE(hptr, packet->m_nInfoField2);
 
-  if (nSize > 1 && t >= 0xffffff)
+  if (t >= 0xffffff)
     hptr = AMF_EncodeInt32(hptr, hend, t);
 
   nSize = packet->m_nBodySize;
@@ -4062,6 +4065,11 @@ RTMP_SendPacket(RTMP *r, RTMPPacket *packet, int queue)
 	      header -= cSize;
 	      hSize += cSize;
 	    }
+          if (t >= 0xffffff)
+            {
+              header -= 4;
+              hSize += 4;
+            }
 	  *header = (0xc0 | c);
 	  if (cSize)
 	    {
@@ -4070,6 +4078,11 @@ RTMP_SendPacket(RTMP *r, RTMPPacket *packet, int queue)
 	      if (cSize == 2)
 		header[2] = tmp >> 8;
 	    }
+          if (t >= 0xffffff)
+            {
+              char* extendedTimestamp = header + 1 + cSize;
+              AMF_EncodeInt32(extendedTimestamp, extendedTimestamp + 4, t);
+            }
 	}
     }
   if (tbuf)

@@ -14,15 +14,15 @@
 /* write an ogg_page to a file pointer */
 int write_ogg_page_to_file(ogg_page *og, FILE *out) {
    int written;
-   
+
    written = fwrite(og->header,1, og->header_len, out);
    written += fwrite(og->body,1, og->body_len, out);
 
    return written;
 }
 
-int add_message_header_field(fisbone_packet *fp, 
-                                        char *header_key, 
+int add_message_header_field(fisbone_packet *fp,
+                                        char *header_key,
                                         char *header_value) {
 
     /* size of both key and value + ': ' + CRLF */
@@ -33,10 +33,10 @@ int add_message_header_field(fisbone_packet *fp,
         int new_size = (fp->current_header_size + this_message_size) * sizeof(char);
         fp->message_header_fields = _ogg_realloc(fp->message_header_fields, new_size);
     }
-    snprintf(fp->message_header_fields + fp->current_header_size, 
-                this_message_size+1, 
-                "%s: %s\r\n", 
-                header_key, 
+    snprintf(fp->message_header_fields + fp->current_header_size,
+                this_message_size+1,
+                "%s: %s\r\n",
+                header_key,
                 header_value);
     fp->current_header_size += this_message_size;
 
@@ -68,16 +68,16 @@ ogg_packet ogg_from_fishead(fishead_packet *fp) {
     return op;
 }
 
-/* create a ogg_packet from a fisbone_packet structure. 
+/* create a ogg_packet from a fisbone_packet structure.
  * call this method after the fisbone_packet is filled and all message header fields are added
  * by calling add_message_header_field method.
  */
 ogg_packet ogg_from_fisbone(fisbone_packet *fp) {
-    
+
     ogg_packet op;
     int packet_size = FISBONE_SIZE + fp->current_header_size;
 
-    memset (&op, 0, sizeof (op));       
+    memset (&op, 0, sizeof (op));
     op.packet = _ogg_calloc (packet_size, sizeof(unsigned char));
     memset (op.packet, 0, packet_size);
     memcpy (op.packet, FISBONE_IDENTIFIER, 8); /* identifier */
@@ -100,11 +100,11 @@ ogg_packet ogg_from_fisbone(fisbone_packet *fp) {
 
 /* fills up a fishead_packet from a fishead ogg_packet of a skeleton bistream */
 fishead_packet fishead_from_ogg(ogg_packet *op) {
-	
+
     fishead_packet fp;
 
     if (memcmp(op->packet, FISHEAD_IDENTIFIER, 8))
-	; /* invalid packet what do we do? */
+        ; /* invalid packet what do we do? */
 
     fp.version_major = *((ogg_uint16_t*)(op->packet+8)); /* version major */
     fp.version_minor = *((ogg_uint16_t*)(op->packet+10)); /* version minor */
@@ -121,9 +121,9 @@ fishead_packet fishead_from_ogg(ogg_packet *op) {
 fisbone_packet fisbone_from_ogg(ogg_packet *op) {
 
     fisbone_packet fp;
-    
+
     if (memcmp(op->packet, FISBONE_IDENTIFIER, 8))
-	; /* invalid value, what do we do? */
+        ; /* invalid value, what do we do? */
     fp.serial_no = *((ogg_uint32_t*)(op->packet+12)); /* serialno of the stream represented by this fisbone packet */
     fp.nr_header_packet = *((ogg_uint32_t*)(op->packet+16)); /* number of header packets */
     fp.granule_rate_n = *((ogg_int64_t*)(op->packet+20)); /* granulrate numerator */

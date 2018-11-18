@@ -1,7 +1,7 @@
 /*****************************************************************************
  * frame.c: frame handling
  *****************************************************************************
- * Copyright (C) 2003-2014 x264 project
+ * Copyright (C) 2003-2018 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -42,17 +42,20 @@ static int align_plane_size( int x, int disalign )
     return x;
 }
 
-static int x264_frame_internal_csp( int external_csp )
+static int frame_internal_csp( int external_csp )
 {
     switch( external_csp & X264_CSP_MASK )
     {
         case X264_CSP_NV12:
+        case X264_CSP_NV21:
         case X264_CSP_I420:
         case X264_CSP_YV12:
             return X264_CSP_NV12;
         case X264_CSP_NV16:
         case X264_CSP_I422:
         case X264_CSP_YV16:
+        case X264_CSP_YUYV:
+        case X264_CSP_UYVY:
         case X264_CSP_V210:
             return X264_CSP_NV16;
         case X264_CSP_I444:
@@ -66,18 +69,18 @@ static int x264_frame_internal_csp( int external_csp )
     }
 }
 
-static x264_frame_t *x264_frame_new( x264_t *h, int b_fdec )
+static x264_frame_t *frame_new( x264_t *h, int b_fdec )
 {
     x264_frame_t *frame;
-    int i_csp = x264_frame_internal_csp( h->param.i_csp );
+    int i_csp = frame_internal_csp( h->param.i_csp );
     int i_mb_count = h->mb.i_mb_count;
     int i_stride, i_width, i_lines, luma_plane_count;
     int i_padv = PADV << PARAM_INTERLACED;
     int align = 16;
 #if ARCH_X86 || ARCH_X86_64
-    if( h->param.cpu&X264_CPU_CACHELINE_64 )
+    if( h->param.cpu&X264_CPU_CACHELINE_64 || h->param.cpu&X264_CPU_AVX512 )
         align = 64;
-    else if( h->param.cpu&X264_CPU_CACHELINE_32 || h->param.cpu&X264_CPU_AVX2 )
+    else if( h->param.cpu&X264_CPU_CACHELINE_32 || h->param.cpu&X264_CPU_AVX )
         align = 32;
 #endif
 #if ARCH_PPC
@@ -220,11 +223,13 @@ static x264_frame_t *x264_frame_new( x264_t *h, int b_fdec )
                     PREALLOC( frame->lowres_mvs[j][i], 2*h->mb.i_mb_count*sizeof(int16_t) );
                     PREALLOC( frame->lowres_mv_costs[j][i], h->mb.i_mb_count*sizeof(int) );
                 }
-            PREALLOC( frame->i_propagate_cost, (i_mb_count+7) * sizeof(uint16_t) );
+            PREALLOC( frame->i_propagate_cost, i_mb_count * sizeof(uint16_t) );
             for( int j = 0; j <= h->param.i_bframe+1; j++ )
                 for( int i = 0; i <= h->param.i_bframe+1; i++ )
-                    PREALLOC( frame->lowres_costs[j][i], (i_mb_count+3) * sizeof(uint16_t) );
+                    PREALLOC( frame->lowres_costs[j][i], i_mb_count * sizeof(uint16_t) );
 
+            /* mbtree asm can overread the input buffers, make sure we don't read outside of allocated memory. */
+            prealloc_size += NATIVE_ALIGN;
         }
         if( h->param.rc.i_aq_mode )
         {
@@ -356,12 +361,12 @@ static int get_plane_ptr( x264_t *h, x264_picture_t *src, uint8_t **pix, int *st
     return 0;
 }
 
-#define get_plane_ptr(...) do{ if( get_plane_ptr(__VA_ARGS__) < 0 ) return -1; }while(0)
+#define get_plane_ptr(...) do { if( get_plane_ptr(__VA_ARGS__) < 0 ) return -1; } while( 0 )
 
 int x264_frame_copy_picture( x264_t *h, x264_frame_t *dst, x264_picture_t *src )
 {
     int i_csp = src->img.i_csp & X264_CSP_MASK;
-    if( dst->i_csp != x264_frame_internal_csp( i_csp ) )
+    if( dst->i_csp != frame_internal_csp( i_csp ) )
     {
         x264_log( h, X264_LOG_ERROR, "Invalid input colorspace\n" );
         return -1;
@@ -387,7 +392,15 @@ int x264_frame_copy_picture( x264_t *h, x264_frame_t *dst, x264_picture_t *src )
         return -1;
     }
 
-    dst->i_type     = src->i_type;
+    if( src->i_type < X264_TYPE_AUTO || src->i_type > X264_TYPE_KEYFRAME )
+    {
+        x264_log( h, X264_LOG_WARNING, "forced frame type (%d) at %d is unknown\n", src->i_type, h->frames.i_input );
+        dst->i_forced_type = X264_TYPE_AUTO;
+    }
+    else
+        dst->i_forced_type = src->i_type;
+
+    dst->i_type     = dst->i_forced_type;
     dst->i_qpplus1  = src->i_qpplus1;
     dst->i_pts      = dst->i_reordered_pts = src->i_pts;
     dst->param      = src->param;
@@ -399,7 +412,13 @@ int x264_frame_copy_picture( x264_t *h, x264_frame_t *dst, x264_picture_t *src )
 
     uint8_t *pix[3];
     int stride[3];
-    if( i_csp == X264_CSP_V210 )
+    if( i_csp == X264_CSP_YUYV || i_csp == X264_CSP_UYVY )
+    {
+        int p = i_csp == X264_CSP_UYVY;
+        h->mc.plane_copy_deinterleave_yuyv( dst->plane[p], dst->i_stride[p], dst->plane[p^1], dst->i_stride[p^1],
+                                            (pixel*)src->img.plane[0], src->img.i_stride[0], h->param.i_width, h->param.i_height );
+    }
+    else if( i_csp == X264_CSP_V210 )
     {
          stride[0] = src->img.i_stride[0];
          pix[0] = src->img.plane[0];
@@ -434,6 +453,12 @@ int x264_frame_copy_picture( x264_t *h, x264_frame_t *dst, x264_picture_t *src )
             get_plane_ptr( h, src, &pix[1], &stride[1], 1, 0, v_shift );
             h->mc.plane_copy( dst->plane[1], dst->i_stride[1], (pixel*)pix[1],
                               stride[1]/sizeof(pixel), h->param.i_width, h->param.i_height>>v_shift );
+        }
+        else if( i_csp == X264_CSP_NV21 )
+        {
+            get_plane_ptr( h, src, &pix[1], &stride[1], 1, 0, v_shift );
+            h->mc.plane_copy_swap( dst->plane[1], dst->i_stride[1], (pixel*)pix[1],
+                                   stride[1]/sizeof(pixel), h->param.i_width>>1, h->param.i_height>>v_shift );
         }
         else if( i_csp == X264_CSP_I420 || i_csp == X264_CSP_I422 || i_csp == X264_CSP_YV12 || i_csp == X264_CSP_YV16 )
         {
@@ -759,7 +784,7 @@ x264_frame_t *x264_frame_pop_unused( x264_t *h, int b_fdec )
     if( h->frames.unused[b_fdec][0] )
         frame = x264_frame_pop( h->frames.unused[b_fdec] );
     else
-        frame = x264_frame_new( h, b_fdec );
+        frame = frame_new( h, b_fdec );
     if( !frame )
         return NULL;
     frame->b_last_minigop_bframe = 0;

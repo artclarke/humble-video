@@ -5,4 +5,4 @@
 
 SUBDIRS = libspeex speexenc speexdec VS2003 VS2005 VS2008
 
-EXTRA_DIST = speex.iss config.h libspeex.def libspeexdsp.def
+EXTRA_DIST = speex.iss config.h libspeex.def

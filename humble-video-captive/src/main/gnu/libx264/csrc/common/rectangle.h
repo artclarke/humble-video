@@ -1,7 +1,7 @@
 /*****************************************************************************
  * rectangle.h: rectangle filling
  *****************************************************************************
- * Copyright (C) 2003-2014 x264 project
+ * Copyright (C) 2003-2018 x264 project
  *
  * Authors: Fiona Glaser <fiona@x264.com>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -118,9 +118,12 @@ static ALWAYS_INLINE void x264_macroblock_cache_rect( void *dst, int w, int h, i
         assert(0);
 }
 
-extern void (*x264_cache_mv_func_table[10])(void *, uint32_t);\
-extern void (*x264_cache_mvd_func_table[10])(void *, uint32_t);\
-extern void (*x264_cache_ref_func_table[10])(void *, uint32_t);\
+#define x264_cache_mv_func_table x264_template(cache_mv_func_table)
+extern void (*x264_cache_mv_func_table[10])(void *, uint32_t);
+#define x264_cache_mvd_func_table x264_template(cache_mvd_func_table)
+extern void (*x264_cache_mvd_func_table[10])(void *, uint32_t);
+#define x264_cache_ref_func_table x264_template(cache_ref_func_table)
+extern void (*x264_cache_ref_func_table[10])(void *, uint32_t);
 
 #define x264_macroblock_cache_mv_ptr( a, x, y, w, h, l, mv ) x264_macroblock_cache_mv( a, x, y, w, h, l, M32( mv ) )
 static ALWAYS_INLINE void x264_macroblock_cache_mv( x264_t *h, int x, int y, int width, int height, int i_list, uint32_t mv )

@@ -1,5 +1,3 @@
-/* $Id: tiffsplit.c,v 1.22 2011-10-22 17:03:01 bfriesen Exp $ */
-
 /*
  * Copyright (c) 1992-1997 Sam Leffler
  * Copyright (c) 1992-1997 Silicon Graphics, Inc.
@@ -239,6 +237,7 @@ cpStrips(TIFF* in, TIFF* out)
 
 		if (!TIFFGetField(in, TIFFTAG_STRIPBYTECOUNTS, &bytecounts)) {
 			fprintf(stderr, "tiffsplit: strip byte counts are missing\n");
+                        _TIFFfree(buf);
 			return (0);
 		}
 		for (s = 0; s < ns; s++) {
@@ -272,6 +271,7 @@ cpTiles(TIFF* in, TIFF* out)
 
 		if (!TIFFGetField(in, TIFFTAG_TILEBYTECOUNTS, &bytecounts)) {
 			fprintf(stderr, "tiffsplit: tile byte counts are missing\n");
+                        _TIFFfree(buf);
 			return (0);
 		}
 		for (t = 0; t < nt; t++) {

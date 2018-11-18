@@ -21,7 +21,7 @@ pkgconfig_DATA = vo-aacenc.pc
 
 lib_LTLIBRARIES = libvo-aacenc.la
 
-libvo_aacenc_la_LDFLAGS = -version-info @VO_AACENC_VERSION@ -no-undefined
+libvo_aacenc_la_LDFLAGS = -version-info @VO_AACENC_VERSION@ -no-undefined -export-symbols $(top_srcdir)/vo-aacenc.sym
 
 libvo_aacenc_la_SOURCES = \
     $(VO_COMMON)/cmnMemory.c \
@@ -87,8 +87,13 @@ endif
 
 
 EXTRA_DIST = $(top_srcdir)/NOTICE \
-             $(top_srcdir)/aacenc/*.cpp $(top_srcdir)/aacenc/*.mk \
-             $(top_srcdir)/aacenc/SampleCode $(top_srcdir)/aacenc/Tools \
-             $(top_srcdir)/aacenc/build $(top_srcdir)/aacenc/doc \
-             $(top_srcdir)/aacenc/*.txt $(top_srcdir)/common/*.mk
+             $(top_srcdir)/vo-aacenc.sym \
+             $(top_srcdir)/aacenc/NOTICE \
+             $(top_srcdir)/aacenc/MODULE_LICENSE_APACHE2 \
+             $(top_srcdir)/aacenc/*.cpp $(top_srcdir)/aacenc/*.h \
+             $(top_srcdir)/aacenc/*.mk \
+             $(top_srcdir)/aacenc/SampleCode $(top_srcdir)/aacenc/doc \
+             $(top_srcdir)/aacenc/*.txt $(top_srcdir)/common/*.mk \
+             $(top_srcdir)/common/NOTICE \
+             $(top_srcdir)/common/MODULE_LICENSE_APACHE2
 

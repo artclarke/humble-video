@@ -1,7 +1,7 @@
 /*****************************************************************************
  * internal.h: video filter utilities
  *****************************************************************************
- * Copyright (C) 2010-2014 x264 project
+ * Copyright (C) 2010-2018 x264 project
  *
  * Authors: Steven Walters <kemuri9@gmail.com>
  *
@@ -25,6 +25,7 @@
 
 #ifndef X264_FILTER_VIDEO_INTERNAL_H
 #define X264_FILTER_VIDEO_INTERNAL_H
+
 #include "video.h"
 
 void x264_cli_plane_copy( uint8_t *dst, int i_dst, uint8_t *src, int i_src, int w, int h );

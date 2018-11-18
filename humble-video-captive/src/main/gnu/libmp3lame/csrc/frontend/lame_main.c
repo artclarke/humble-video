@@ -3,7 +3,7 @@
  *
  *      Copyright (c) 1999 Mark Taylor
  *                    2000 Takehiro TOMINAGA
- *                    2010-2011 Robert Hegemann
+ *                    2010-2017 Robert Hegemann
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: lame_main.c,v 1.9.2.1 2011/11/18 08:38:04 robert Exp $ */
+/* $Id: lame_main.c,v 1.18 2017/08/31 14:14:46 robert Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -92,41 +92,6 @@ char   *strchr(), *strrchr();
 * psychoacoustic model.
 *
 ************************************************************************/
-
-
-static int
-parse_args_from_string(lame_global_flags * const gfp, const char *p, char *inPath, char *outPath)
-{                       /* Quick & very Dirty */
-    char   *q;
-    char   *f;
-    char   *r[128];
-    int     c = 0;
-    int     ret;
-
-    if (p == NULL || *p == '\0')
-        return 0;
-
-    f = q = malloc(strlen(p) + 1);
-    strcpy(q, p);
-
-    r[c++] = "lhama";
-    for (;;) {
-        r[c++] = q;
-        while (*q != ' ' && *q != '\0')
-            q++;
-        if (*q == '\0')
-            break;
-        *q++ = '\0';
-    }
-    r[c] = NULL;
-
-    ret = parse_args(gfp, c, r, inPath, outPath, NULL, NULL);
-    free(f);
-    return ret;
-}
-
-
-
 
 
 static FILE *
@@ -202,7 +167,7 @@ printInputFormat(lame_t gfp)
  * samples to skip, to (for example) compensate for the encoder delay */
 
 static int
-lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath)
+lame_decoder_loop(lame_t gfp, FILE * outf, char *inPath, char *outPath)
 {
     short int Buffer[2][1152];
     int     i, iread;
@@ -214,7 +179,7 @@ lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath)
 
     if (!(tmp_num_channels >= 1 && tmp_num_channels <= 2)) {
         error_printf("Internal error.  Aborting.");
-        exit(-1);
+        return -1;
     }
 
     if (global_ui_config.silent < 9) {
@@ -287,14 +252,22 @@ lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath)
     if (!global_decoder.disable_wav_header && strcmp("-", outPath)
         && !fseek(outf, 0l, SEEK_SET))
         WriteWaveHeader(outf, (int) wavsize, lame_get_in_samplerate(gfp), tmp_num_channels, 16);
-    fclose(outf);
-    close_infile();
 
     if (dp != 0)
         decoder_progress_finish(dp);
     return 0;
 }
 
+static int
+lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath)
+{
+    int     ret;
+
+    ret = lame_decoder_loop(gfp, outf, inPath, outPath);
+    fclose(outf);       /* close the output file */
+    close_infile();     /* close the input file */
+    return ret;
+}
 
 
 static void
@@ -323,7 +296,7 @@ print_trailing_info(lame_global_flags * gf)
 
             /* advice the user on the scale factor */
             if (noclipScale > 0) {
-                console_printf("using  --scale %.2f\n", noclipScale);
+                console_printf("using  --scale %.2f\n", noclipScale * lame_get_scale(gf));
                 console_printf("         or less (the value under --scale is approximate).\n");
             }
             else {
@@ -370,11 +343,12 @@ write_xing_frame(lame_global_flags * gf, FILE * outf, size_t offset)
              sizeof(mp3buffer), imp3);
         return -1;
     }
-    if (fseek(outf, offset, SEEK_SET) != 0) {
+    assert( offset <= LONG_MAX );
+    if (fseek(outf, (long) offset, SEEK_SET) != 0) {
         error_printf("fatal error: can't update LAME-tag frame!\n");
         return -1;
     }
-    owrite = (int) fwrite(mp3buffer, 1, imp3, outf);
+    owrite = fwrite(mp3buffer, 1, imp3, outf);
     if (owrite != imp3) {
         error_printf("Error writing LAME-tag \n");
         return -1;
@@ -382,7 +356,8 @@ write_xing_frame(lame_global_flags * gf, FILE * outf, size_t offset)
     if (global_ui_config.silent <= 0) {
         console_printf("done\n");
     }
-    return imp3;
+    assert( imp3 <= INT_MAX );
+    return (int) imp3;
 }
 
 
@@ -390,18 +365,18 @@ static int
 write_id3v1_tag(lame_t gf, FILE * outf)
 {
     unsigned char mp3buffer[128];
-    int     imp3, owrite;
+    size_t  imp3, owrite;
 
     imp3 = lame_get_id3v1_tag(gf, mp3buffer, sizeof(mp3buffer));
     if (imp3 <= 0) {
         return 0;
     }
-    if ((size_t) imp3 > sizeof(mp3buffer)) {
+    if (imp3 > sizeof(mp3buffer)) {
         error_printf("Error writing ID3v1 tag: buffer too small: buffer size=%d  ID3v1 size=%d\n",
                      sizeof(mp3buffer), imp3);
         return 0;       /* not critical */
     }
-    owrite = (int) fwrite(mp3buffer, 1, imp3, outf);
+    owrite = fwrite(mp3buffer, 1, imp3, outf);
     if (owrite != imp3) {
         error_printf("Error writing ID3v1 tag \n");
         return 1;
@@ -415,7 +390,7 @@ lame_encoder_loop(lame_global_flags * gf, FILE * outf, int nogap, char *inPath, 
 {
     unsigned char mp3buffer[LAME_MAXMP3BUFFER];
     int     Buffer[2][1152];
-    int     iread, imp3, owrite;
+    int     iread, imp3, owrite, in_limit=0;
     size_t  id3v2_size;
 
     encoder_progress_begin(gf, inPath, outPath);
@@ -424,10 +399,10 @@ lame_encoder_loop(lame_global_flags * gf, FILE * outf, int nogap, char *inPath, 
     if (id3v2_size > 0) {
         unsigned char *id3v2tag = malloc(id3v2_size);
         if (id3v2tag != 0) {
-            imp3 = lame_get_id3v2_tag(gf, id3v2tag, id3v2_size);
-            owrite = (int) fwrite(id3v2tag, 1, imp3, outf);
+            size_t  n_bytes = lame_get_id3v2_tag(gf, id3v2tag, id3v2_size);
+            size_t  written = fwrite(id3v2tag, 1, n_bytes, outf);
             free(id3v2tag);
-            if (owrite != imp3) {
+            if (written != n_bytes) {
                 encoder_progress_end(gf);
                 error_printf("Error writing ID3v2 tag \n");
                 return 1;
@@ -450,31 +425,48 @@ lame_encoder_loop(lame_global_flags * gf, FILE * outf, int nogap, char *inPath, 
         fflush(outf);
     }
 
+    /* do not feed more than in_limit PCM samples in one encode call
+       otherwise the mp3buffer is likely too small
+     */
+    in_limit = lame_get_maximum_number_of_samples(gf, sizeof(mp3buffer));
+    if (in_limit < 1)
+        in_limit = 1;
+
     /* encode until we hit eof */
     do {
         /* read in 'iread' samples */
         iread = get_audio(gf, Buffer);
 
         if (iread >= 0) {
-            encoder_progress(gf);
+            const int* buffer_l = Buffer[0];
+            const int* buffer_r = Buffer[1];
+            int     rest = iread;
+            do {
+                int const chunk = rest < in_limit ? rest : in_limit;
+                encoder_progress(gf);
 
-            /* encode */
-            imp3 = lame_encode_buffer_int(gf, Buffer[0], Buffer[1], iread,
-                                          mp3buffer, sizeof(mp3buffer));
+                /* encode */
 
-            /* was our output buffer big enough? */
-            if (imp3 < 0) {
-                if (imp3 == -1)
-                    error_printf("mp3 buffer is not big enough... \n");
-                else
-                    error_printf("mp3 internal error:  error code=%i\n", imp3);
-                return 1;
-            }
-            owrite = (int) fwrite(mp3buffer, 1, imp3, outf);
-            if (owrite != imp3) {
-                error_printf("Error writing mp3 output \n");
-                return 1;
-            }
+                imp3 = lame_encode_buffer_int(gf, buffer_l, buffer_r, chunk,
+                                              mp3buffer, sizeof(mp3buffer));
+                buffer_l += chunk;
+                buffer_r += chunk;
+                rest -= chunk;
+
+                /* was our output buffer big enough? */
+                if (imp3 < 0) {
+                    if (imp3 == -1)
+                        error_printf("mp3 buffer is not big enough... \n");
+                    else
+                        error_printf("mp3 internal error:  error code=%i\n", imp3);
+                    return 1;
+                }
+                owrite = (int) fwrite(mp3buffer, 1, imp3, outf);
+                if (owrite != imp3) {
+                    error_printf("Error writing mp3 output \n");
+                    return 1;
+                }
+            } while (rest > 0);
         }
         if (global_writer.flush_write == 1) {
             fflush(outf);
@@ -535,79 +527,6 @@ lame_encoder(lame_global_flags * gf, FILE * outf, int nogap, char *inPath, char 
 }
 
 
-static void
-parse_nogap_filenames(int nogapout, char const *inPath, char *outPath, char *outdir)
-{
-    char const *slasher;
-    size_t  n;
-
-    /* FIXME: replace strcpy by safer strncpy */
-    strcpy(outPath, outdir);
-    if (!nogapout) {
-        strncpy(outPath, inPath, PATH_MAX + 1 - 4);
-        n = strlen(outPath);
-        /* nuke old extension, if one  */
-        if (outPath[n - 3] == 'w'
-            && outPath[n - 2] == 'a' && outPath[n - 1] == 'v' && outPath[n - 4] == '.') {
-            outPath[n - 3] = 'm';
-            outPath[n - 2] = 'p';
-            outPath[n - 1] = '3';
-        }
-        else {
-            outPath[n + 0] = '.';
-            outPath[n + 1] = 'm';
-            outPath[n + 2] = 'p';
-            outPath[n + 3] = '3';
-            outPath[n + 4] = 0;
-        }
-    }
-    else {
-        slasher = inPath;
-        slasher += PATH_MAX + 1 - 4;
-
-        /* backseek to last dir delemiter */
-        while (*slasher != '/' && *slasher != '\\' && slasher != inPath && *slasher != ':') {
-            slasher--;
-        }
-
-        /* skip one foward if needed */
-        if (slasher != inPath
-            && (outPath[strlen(outPath) - 1] == '/'
-                || outPath[strlen(outPath) - 1] == '\\' || outPath[strlen(outPath) - 1] == ':'))
-            slasher++;
-        else if (slasher == inPath
-                 && (outPath[strlen(outPath) - 1] != '/'
-                     &&
-                     outPath[strlen(outPath) - 1] != '\\' && outPath[strlen(outPath) - 1] != ':'))
-            /* FIXME: replace strcat by safer strncat */
-#ifdef _WIN32
-            strncat(outPath, "\\", PATH_MAX + 1 - 4);
-#elif __OS2__
-            strncat(outPath, "\\", PATH_MAX + 1 - 4);
-#else
-            strncat(outPath, "/", PATH_MAX + 1 - 4);
-#endif
-
-        strncat(outPath, slasher, PATH_MAX + 1 - 4);
-        n = strlen(outPath);
-        /* nuke old extension  */
-        if (outPath[n - 3] == 'w'
-            && outPath[n - 2] == 'a' && outPath[n - 1] == 'v' && outPath[n - 4] == '.') {
-            outPath[n - 3] = 'm';
-            outPath[n - 2] = 'p';
-            outPath[n - 1] = '3';
-        }
-        else {
-            outPath[n + 0] = '.';
-            outPath[n + 1] = 'm';
-            outPath[n + 2] = 'p';
-            outPath[n + 3] = '3';
-            outPath[n + 4] = 0;
-        }
-    }
-}
-
-
 int
 lame_main(lame_t gf, int argc, char **argv)
 {
@@ -620,10 +539,12 @@ lame_main(lame_t gf, int argc, char **argv)
     int     max_nogap = MAX_NOGAP;
     char    nogap_inPath_[MAX_NOGAP][PATH_MAX + 1];
     char   *nogap_inPath[MAX_NOGAP];
+    char    nogap_outPath_[MAX_NOGAP][PATH_MAX + 1];
+    char   *nogap_outPath[MAX_NOGAP];
 
     int     ret;
     int     i;
-    FILE   *outf;
+    FILE   *outf = NULL;
 
     lame_set_msgf(gf, &frontend_msgf);
     lame_set_errorf(gf, &frontend_errorf);
@@ -638,6 +559,10 @@ lame_main(lame_t gf, int argc, char **argv)
     for (i = 0; i < MAX_NOGAP; ++i) {
         nogap_inPath[i] = &nogap_inPath_[i][0];
     }
+    memset(nogap_outPath_, 0, sizeof(nogap_outPath_));
+    for (i = 0; i < MAX_NOGAP; ++i) {
+        nogap_outPath[i] = &nogap_outPath_[i][0];
+    }
 
     /* parse the command line arguments, setting various flags in the
      * struct 'gf'.  If you want to parse your own arguments,
@@ -645,11 +570,6 @@ lame_main(lame_t gf, int argc, char **argv)
      * skip this call and set the values of interest in the gf struct.
      * (see the file API and lame.h for documentation about these parameters)
      */
-    {
-        char   *str = lame_getenv("LAMEOPT");
-        parse_args_from_string(gf, str, inPath, outPath);
-        free(str);
-    }
     ret = parse_args(gf, argc, argv, inPath, outPath, nogap_inPath, &max_nogap);
     if (ret < 0) {
         return ret == -2 ? 0 : 1;
@@ -659,21 +579,29 @@ lame_main(lame_t gf, int argc, char **argv)
 
     if (outPath[0] != '\0' && max_nogap > 0) {
         strncpy(nogapdir, outPath, PATH_MAX + 1);
+        nogapdir[PATH_MAX] = '\0';
         nogapout = 1;
     }
 
     /* initialize input file.  This also sets samplerate and as much
        other data on the input file as available in the headers */
     if (max_nogap > 0) {
-        /* for nogap encoding of multiple input files, it is not possible to
-         * specify the output file name, only an optional output directory. */
-        parse_nogap_filenames(nogapout, nogap_inPath[0], outPath, nogapdir);
-        outf = init_files(gf, nogap_inPath[0], outPath);
+          /* for nogap encoding of multiple input files, it is not possible to
+           * specify the output file name, only an optional output directory. */
+          for (i = 0; i < max_nogap; ++i) {
+              char const* outdir = nogapout ? nogapdir : "";
+              if (generateOutPath(nogap_inPath[i], outdir, ".mp3", nogap_outPath[i]) != 0) {
+                  error_printf("processing nogap file %d: %s\n", i+1, nogap_inPath[i]);
+                  return -1;
+              }
+          }
+          outf = init_files(gf, nogap_inPath[0], nogap_outPath[0]);
     }
     else {
         outf = init_files(gf, inPath, outPath);
     }
     if (outf == NULL) {
+        close_infile();
         return -1;
     }
     /* turn off automatic writing of ID3 tag data into mp3 stream 
@@ -691,6 +619,8 @@ lame_main(lame_t gf, int argc, char **argv)
             display_bitrates(stderr);
         }
         error_printf("fatal error during initialization\n");
+        fclose(outf);
+        close_infile();
         return ret;
     }
 
@@ -711,17 +641,20 @@ lame_main(lame_t gf, int argc, char **argv)
         for (i = 0; i < max_nogap; ++i) {
             int     use_flush_nogap = (i != (max_nogap - 1));
             if (i > 0) {
-                parse_nogap_filenames(nogapout, nogap_inPath[i], outPath, nogapdir);
                 /* note: if init_files changes anything, like
                    samplerate, num_channels, etc, we are screwed */
-                outf = init_files(gf, nogap_inPath[i], outPath);
+                outf = init_files(gf, nogap_inPath[i], nogap_outPath[i]);
+                if (outf == NULL) {
+                    close_infile();
+                    return -1;
+                }
                 /* reinitialize bitstream for next encoding.  this is normally done
                  * by lame_init_params(), but we cannot call that routine twice */
                 lame_init_bitstream(gf);
             }
             lame_set_nogap_total(gf, max_nogap);
             lame_set_nogap_currentindex(gf, i);
-            ret = lame_encoder(gf, outf, use_flush_nogap, nogap_inPath[i], outPath);
+            ret = lame_encoder(gf, outf, use_flush_nogap, nogap_inPath[i], nogap_outPath[i]);
         }
     }
     return ret;

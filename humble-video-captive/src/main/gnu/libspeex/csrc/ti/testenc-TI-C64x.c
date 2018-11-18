@@ -1,5 +1,5 @@
 /* Copyright (C) 2005 Psi Systems, Inc.
-   Author:  Jean-Marc Valin 
+   Author:  Jean-Marc Valin
    File: testenc-TI-C64x.c
    Encoder/Decoder Loop Main file for TI TMS320C64xx processor
    for use with TI Code Composer (TM) DSP development tools.
@@ -9,18 +9,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -50,7 +50,7 @@
 //#define TESTENC_BYTES_PER_FRAME 28  /* 11kbps */
 //#define TESTENC_QUALITY 5	      /* 11 kbps */
 
-/* For narrowband, QUALITY maps to these bit rates (see modes.c, manual.pdf) 
+/* For narrowband, QUALITY maps to these bit rates (see modes.c, manual.pdf)
  *   {1, 8, 2, 3, 3, 4, 4, 5, 5, 6, 7}
  * 0 -> 2150
  * 1 -> 3950
@@ -69,12 +69,12 @@ extern long long spx_mips;
 #endif
 
 #ifdef MANUAL_ALLOC
-/* Take all Speex space from this private heap */ 
+/* Take all Speex space from this private heap */
 /* This is useful for multichannel applications */
-#pragma DATA_SECTION(spxHeap, ".myheap"); 
+#pragma DATA_SECTION(spxHeap, ".myheap");
 static char spxHeap[SPEEX_PERSIST_STACK_SIZE];
 
-#pragma DATA_SECTION(spxScratch, ".myheap"); 
+#pragma DATA_SECTION(spxScratch, ".myheap");
 static char spxScratch[SPEEX_SCRATCH_STACK_SIZE];
 
 char *spxGlobalHeapPtr, *spxGlobalHeapEnd;
@@ -171,7 +171,7 @@ void main()
 #endif
    outFile = "c:\\speextrunktest\\samples\\maleout6x.snd";
    fout = fopen(outFile, "wb+");
- 
+
    speex_bits_init(&bits);
 #ifndef DECODE_ONLY
    while (!feof(fin))
@@ -200,7 +200,7 @@ void main()
 //      bitCount+=160;  /* only correct for 8kbps, but just for the printf */
       bitCount+=bits.nbBits;
 #endif
-      
+
       speex_decode_int(dec, &bits, out_short);
       speex_bits_reset(&bits);
 
@@ -214,11 +214,11 @@ void main()
    speex_encoder_destroy(st);
    speex_decoder_destroy(dec);
 
-#ifdef CHECK_RESULT 
+#ifdef CHECK_RESULT
    rewind(fin);
    rewind(fout);
 
-   while ( FRAME_SIZE == fread(in_short, sizeof(short), FRAME_SIZE, fin) 
+   while ( FRAME_SIZE == fread(in_short, sizeof(short), FRAME_SIZE, fin)
            &&
            FRAME_SIZE ==  fread(out_short, sizeof(short), FRAME_SIZE,fout) )
    {

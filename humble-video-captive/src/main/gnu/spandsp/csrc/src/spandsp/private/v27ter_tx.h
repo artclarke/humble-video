@@ -43,7 +43,7 @@ struct v27ter_tx_state_s
     void *get_bit_user_data;
 
     /*! \brief The callback function used to report modem status changes. */
-    modem_tx_status_func_t status_handler;
+    modem_status_func_t status_handler;
     /*! \brief A user specified opaque pointer passed to the status function. */
     void *status_user_data;
 
@@ -52,23 +52,21 @@ struct v27ter_tx_state_s
     int32_t gain_2400;
     /*! \brief The gain factor needed to achieve the specified output power at 4800bps. */
     int32_t gain_4800;
+    /*! \brief The root raised cosine (RRC) pulse shaping filter buffer. */
+    complexi16_t rrc_filter[2*V27TER_TX_FILTER_STEPS];
 #else
     /*! \brief The gain factor needed to achieve the specified output power at 2400bps. */
     float gain_2400;
     /*! \brief The gain factor needed to achieve the specified output power at 4800bps. */
     float gain_4800;
-#endif
-    /*! \brief The route raised cosine (RRC) pulse shaping filter buffer. */
-#if defined(SPANDSP_USE_FIXED_POINT)
-    complexi16_t rrc_filter[2*V27TER_TX_FILTER_STEPS];
-#else
+    /*! \brief The root raised cosine (RRC) pulse shaping filter buffer. */
     complexf_t rrc_filter[2*V27TER_TX_FILTER_STEPS];
 #endif
     /*! \brief Current offset into the RRC pulse shaping filter buffer. */
     int rrc_filter_step;
     
     /*! \brief The register for the training and data scrambler. */
-    unsigned int scramble_reg;
+    uint32_t scramble_reg;
     /*! \brief A counter for the number of consecutive bits of repeating pattern through
                the scrambler. */
     int scrambler_pattern_count;

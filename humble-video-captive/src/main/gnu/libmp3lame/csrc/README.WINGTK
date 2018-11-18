@@ -1,4 +1,4 @@
-            Installation notes on MP3X (the LAME frame analyzer) for WIN32
+       Installation notes on MP3X (the LAME frame analyzer) for WIN32
 
 ===========================================================================
 Document History:
@@ -30,7 +30,7 @@ You first need to get hold of the latest GTK and GLIB include files and lib
 files. You can download them freely from the WINGTK project WEB site.
 (see http://www.gtk.org, and click on the WINGTK link.)
 
-Download:  glib-dev-VERSION.zip, gtk+-dev-VERSION.zip and extralibs-dev-VERSION.zip
+Download: glib-dev-VERSION.zip, gtk+-dev-VERSION.zip and extralibs-dev-VERSION.zip
 where VERSION indicates the release data, so it will look something like 20000805
 
 unzip all three zip files in a WinGTK subdirectory, which is created from the lame
@@ -43,15 +43,12 @@ You will end up with the following directory tree
 
 Set Mp3x as your current active project, recompile everything, and you're done.
 
-
 ===========================================================================
 How to run and use the MP3 Frame analyzer
 ===========================================================================
 
-To run MP3x.exe, you need
-the GTK DLL files:  Either instal them on your system,
-or put them in the same directory as mp3x.exe resides.
-
+To run MP3x.exe, you need the GTK DLL files: Either instal them on your system,
+or put them in the same directory mp3x.exe resides.
 
 
 Example:
@@ -60,8 +57,4 @@ mp3x.exe myfile
 myfile can be a mp3 file, or a wav file.
 
 
-
                                 === End of Document ===
-
-
-

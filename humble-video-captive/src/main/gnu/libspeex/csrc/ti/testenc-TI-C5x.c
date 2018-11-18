@@ -8,18 +8,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -52,7 +52,7 @@
 //#define TESTENC_BYTES_PER_FRAME 28  /* 11kbps */
 //#define TESTENC_QUALITY 5	      /* 11 kbps */
 
-/* For narrowband, QUALITY maps to these bit rates (see modes.c, manual.pdf) 
+/* For narrowband, QUALITY maps to these bit rates (see modes.c, manual.pdf)
  *   {1, 8, 2, 3, 3, 4, 4, 5, 5, 6, 7}
  * 0 -> 2150
  * 1 -> 3950
@@ -72,12 +72,12 @@ extern long long spx_mips;
 #include <math.h>
 
 #ifdef MANUAL_ALLOC
-/* Take all Speex space from this private heap */ 
+/* Take all Speex space from this private heap */
 /* This is useful for multichannel applications */
-#pragma DATA_SECTION(spxHeap, ".myheap"); 
+#pragma DATA_SECTION(spxHeap, ".myheap");
 static char spxHeap[SPEEX_PERSIST_STACK_SIZE];
 
-#pragma DATA_SECTION(spxScratch, ".myheap"); 
+#pragma DATA_SECTION(spxScratch, ".myheap");
 static char spxScratch[SPEEX_SCRATCH_STACK_SIZE];
 
 char *spxGlobalHeapPtr, *spxGlobalHeapEnd;
@@ -88,7 +88,7 @@ void byte2word(short* pInBuf, short* pOutBuf, int nWords)
 {
    short *pIn, *pOut, sNext;
    int i;
-   
+
    pIn = pInBuf;
    pOut = pOutBuf;
    for(i=0;i<nWords;i++)
@@ -97,12 +97,12 @@ void byte2word(short* pInBuf, short* pOutBuf, int nWords)
       *pOut++ = (sNext & 0x00ff) | (*pIn++ << 8);	// insert high byte
    }
 }
-   
+
 void word2byte(short* pInBuf, short* pOutBuf, int nWords)
 {
    short *pIn, *pOut;
    int i;
-   
+
    pIn = pInBuf;
    pOut = pOutBuf;
    for(i=0;i<nWords;i++)
@@ -111,7 +111,7 @@ void word2byte(short* pInBuf, short* pOutBuf, int nWords)
       *pOut++ = (short) ((unsigned short) *pIn++ >> 8);
    }
 }
-   
+
 void main()
 {
    char *outFile, *bitsFile;
@@ -140,7 +140,7 @@ void main()
    spx_int32_t skip_group_delay;
    SpeexCallback callback;
 
-   /* C54xx defaults to max wait states, even for parts like C5416 with 
+   /* C54xx defaults to max wait states, even for parts like C5416 with
       larger internal memory.  Need to force the wait state register to zero */
 
 #ifdef CONFIG_TI_C54X
@@ -209,7 +209,7 @@ void main()
 #endif
    outFile = "c:\\speextrunktest\\samples\\maleout5x.snd";
    fout = fopen(outFile, "wb+");
- 
+
    speex_bits_init(&bits);
 #ifndef DECODE_ONLY
    while (!feof(fin))
@@ -222,7 +222,7 @@ void main()
       speex_bits_reset(&bits);
 
       speex_encode_int(st, in_short, &bits);
-      nbChars = speex_bits_write(&bits, cbits, 
+      nbChars = speex_bits_write(&bits, cbits,
                          sizeof(cbits)*BYTES_PER_CHAR) /BYTES_PER_CHAR;
       bitCount+=bits.nbBits;
 
@@ -260,7 +260,7 @@ void main()
    rewind(fin);
    rewind(fout);
 
-   while ( FRAME_SIZE == fread(inout_byte, 2, FRAME_SIZE, fin)) 
+   while ( FRAME_SIZE == fread(inout_byte, 2, FRAME_SIZE, fin))
    {
 	float s=0, e=0;
 

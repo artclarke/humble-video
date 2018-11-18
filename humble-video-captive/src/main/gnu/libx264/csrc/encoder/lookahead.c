@@ -1,7 +1,7 @@
 /*****************************************************************************
  * lookahead.c: high-level lookahead functions
  *****************************************************************************
- * Copyright (C) 2010-2014 Avail Media and x264 project
+ * Copyright (C) 2010-2018 Avail Media and x264 project
  *
  * Authors: Michael Kazmier <mkazmier@availmedia.com>
  *          Alex Giladi <agiladi@availmedia.com>
@@ -39,7 +39,7 @@
 #include "common/common.h"
 #include "analyse.h"
 
-static void x264_lookahead_shift( x264_sync_frame_list_t *dst, x264_sync_frame_list_t *src, int count )
+static void lookahead_shift( x264_sync_frame_list_t *dst, x264_sync_frame_list_t *src, int count )
 {
     int i = count;
     while( i-- )
@@ -56,7 +56,7 @@ static void x264_lookahead_shift( x264_sync_frame_list_t *dst, x264_sync_frame_l
     }
 }
 
-static void x264_lookahead_update_last_nonb( x264_t *h, x264_frame_t *new_nonb )
+static void lookahead_update_last_nonb( x264_t *h, x264_frame_t *new_nonb )
 {
     if( h->lookahead->last_nonb )
         x264_frame_push_unused( h, h->lookahead->last_nonb );
@@ -65,11 +65,11 @@ static void x264_lookahead_update_last_nonb( x264_t *h, x264_frame_t *new_nonb )
 }
 
 #if HAVE_THREAD
-static void x264_lookahead_slicetype_decide( x264_t *h )
+static void lookahead_slicetype_decide( x264_t *h )
 {
-    x264_stack_align( x264_slicetype_decide, h );
+    x264_slicetype_decide( h );
 
-    x264_lookahead_update_last_nonb( h, h->lookahead->next.list[0] );
+    lookahead_update_last_nonb( h, h->lookahead->next.list[0] );
     int shift_frames = h->lookahead->next.list[0]->i_bframes + 1;
 
     x264_pthread_mutex_lock( &h->lookahead->ofbuf.mutex );
@@ -77,24 +77,24 @@ static void x264_lookahead_slicetype_decide( x264_t *h )
         x264_pthread_cond_wait( &h->lookahead->ofbuf.cv_empty, &h->lookahead->ofbuf.mutex );
 
     x264_pthread_mutex_lock( &h->lookahead->next.mutex );
-    x264_lookahead_shift( &h->lookahead->ofbuf, &h->lookahead->next, shift_frames );
+    lookahead_shift( &h->lookahead->ofbuf, &h->lookahead->next, shift_frames );
     x264_pthread_mutex_unlock( &h->lookahead->next.mutex );
 
     /* For MB-tree and VBV lookahead, we have to perform propagation analysis on I-frames too. */
     if( h->lookahead->b_analyse_keyframe && IS_X264_TYPE_I( h->lookahead->last_nonb->i_type ) )
-        x264_stack_align( x264_slicetype_analyse, h, shift_frames );
+        x264_slicetype_analyse( h, shift_frames );
 
     x264_pthread_mutex_unlock( &h->lookahead->ofbuf.mutex );
 }
 
-static void *x264_lookahead_thread( x264_t *h )
+static void *lookahead_thread_internal( x264_t *h )
 {
     while( !h->lookahead->b_exit_thread )
     {
         x264_pthread_mutex_lock( &h->lookahead->ifbuf.mutex );
         x264_pthread_mutex_lock( &h->lookahead->next.mutex );
         int shift = X264_MIN( h->lookahead->next.i_max_size - h->lookahead->next.i_size, h->lookahead->ifbuf.i_size );
-        x264_lookahead_shift( &h->lookahead->next, &h->lookahead->ifbuf, shift );
+        lookahead_shift( &h->lookahead->next, &h->lookahead->ifbuf, shift );
         x264_pthread_mutex_unlock( &h->lookahead->next.mutex );
         if( h->lookahead->next.i_size <= h->lookahead->i_slicetype_length + h->param.b_vfr_input )
         {
@@ -105,21 +105,26 @@ static void *x264_lookahead_thread( x264_t *h )
         else
         {
             x264_pthread_mutex_unlock( &h->lookahead->ifbuf.mutex );
-            x264_lookahead_slicetype_decide( h );
+            lookahead_slicetype_decide( h );
         }
     }   /* end of input frames */
     x264_pthread_mutex_lock( &h->lookahead->ifbuf.mutex );
     x264_pthread_mutex_lock( &h->lookahead->next.mutex );
-    x264_lookahead_shift( &h->lookahead->next, &h->lookahead->ifbuf, h->lookahead->ifbuf.i_size );
+    lookahead_shift( &h->lookahead->next, &h->lookahead->ifbuf, h->lookahead->ifbuf.i_size );
     x264_pthread_mutex_unlock( &h->lookahead->next.mutex );
     x264_pthread_mutex_unlock( &h->lookahead->ifbuf.mutex );
     while( h->lookahead->next.i_size )
-        x264_lookahead_slicetype_decide( h );
+        lookahead_slicetype_decide( h );
     x264_pthread_mutex_lock( &h->lookahead->ofbuf.mutex );
     h->lookahead->b_thread_active = 0;
     x264_pthread_cond_broadcast( &h->lookahead->ofbuf.cv_fill );
     x264_pthread_mutex_unlock( &h->lookahead->ofbuf.mutex );
     return NULL;
+}
+
+static void *lookahead_thread( x264_t *h )
+{
+    return (void*)x264_stack_align( lookahead_thread_internal, h );
 }
 #endif
 
@@ -152,7 +157,7 @@ int x264_lookahead_init( x264_t *h, int i_slicetype_length )
     if( x264_macroblock_thread_allocate( look_h, 1 ) < 0 )
         goto fail;
 
-    if( x264_pthread_create( &look->thread_handle, NULL, (void*)x264_lookahead_thread, look_h ) )
+    if( x264_pthread_create( &look->thread_handle, NULL, (void*)lookahead_thread, look_h ) )
         goto fail;
     look->b_thread_active = 1;
 
@@ -201,7 +206,7 @@ int x264_lookahead_is_empty( x264_t *h )
     return b_empty;
 }
 
-static void x264_lookahead_encoder_shift( x264_t *h )
+static void lookahead_encoder_shift( x264_t *h )
 {
     if( !h->lookahead->ofbuf.i_size )
         return;
@@ -221,7 +226,7 @@ void x264_lookahead_get_frames( x264_t *h )
         x264_pthread_mutex_lock( &h->lookahead->ofbuf.mutex );
         while( !h->lookahead->ofbuf.i_size && h->lookahead->b_thread_active )
             x264_pthread_cond_wait( &h->lookahead->ofbuf.cv_fill, &h->lookahead->ofbuf.mutex );
-        x264_lookahead_encoder_shift( h );
+        lookahead_encoder_shift( h );
         x264_pthread_mutex_unlock( &h->lookahead->ofbuf.mutex );
     }
     else
@@ -230,15 +235,15 @@ void x264_lookahead_get_frames( x264_t *h )
         if( h->frames.current[0] || !h->lookahead->next.i_size )
             return;
 
-        x264_stack_align( x264_slicetype_decide, h );
-        x264_lookahead_update_last_nonb( h, h->lookahead->next.list[0] );
+        x264_slicetype_decide( h );
+        lookahead_update_last_nonb( h, h->lookahead->next.list[0] );
         int shift_frames = h->lookahead->next.list[0]->i_bframes + 1;
-        x264_lookahead_shift( &h->lookahead->ofbuf, &h->lookahead->next, shift_frames );
+        lookahead_shift( &h->lookahead->ofbuf, &h->lookahead->next, shift_frames );
 
         /* For MB-tree and VBV lookahead, we have to perform propagation analysis on I-frames too. */
         if( h->lookahead->b_analyse_keyframe && IS_X264_TYPE_I( h->lookahead->last_nonb->i_type ) )
-            x264_stack_align( x264_slicetype_analyse, h, shift_frames );
+            x264_slicetype_analyse( h, shift_frames );
 
-        x264_lookahead_encoder_shift( h );
+        lookahead_encoder_shift( h );
     }
 }

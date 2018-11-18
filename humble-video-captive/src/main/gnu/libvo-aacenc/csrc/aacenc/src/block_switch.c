@@ -51,7 +51,7 @@ CalcWindowEnergy(BLOCK_SWITCHING_CONTROL *blockSwitchingControl,
 /*
   IIR high pass coeffs
 */
-Word32 hiPassCoeff[BLOCK_SWITCHING_IIR_LEN] = {
+const Word32 hiPassCoeff[BLOCK_SWITCHING_IIR_LEN] = {
   0xbec8b439, 0x609d4952  /* -0.5095f, 0.7548f */
 };
 

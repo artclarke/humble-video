@@ -37,7 +37,7 @@ public class MuxerFormatTest extends TestCase {
     assertNotNull(f);
     
     final Collection<Codec.ID> l = f.getSupportedCodecs();
-    assertEquals(21, l.size());
+    assertTrue(l.size() > 21);
   }
 
   @Test

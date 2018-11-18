@@ -2100,6 +2100,12 @@ static const float sine_table[SINELEN] =
     -0.00306796f
 };
 
+SPAN_DECLARE(float) dds_phase_to_radians(uint32_t phase)
+{
+    return phase*2.0f*3.1415926f/(65536.0f*65536.0f);
+}
+/*- End of function --------------------------------------------------------*/
+
 SPAN_DECLARE(int32_t) dds_phase_ratef(float frequency)
 {
     return (int32_t) (frequency*65536.0f*65536.0f/SAMPLE_RATE);

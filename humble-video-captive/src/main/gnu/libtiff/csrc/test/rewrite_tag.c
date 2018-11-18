@@ -1,5 +1,3 @@
-/* $Id: rewrite_tag.c,v 1.4 2008-12-31 03:06:27 bfriesen Exp $ */
-
 /*
  * Copyright (c) 2007, Frank Warmerdam <warmerdam@pobox.com>
  *
@@ -122,7 +120,7 @@ int test_packbits()
 
     TIFFClose(tif);
 
-    /* unlink(filename); */
+    unlink(filename);
 
     return 0;
 
@@ -191,7 +189,7 @@ int rewrite_test( const char *filename, int length, int bigtiff,
 
     for (i = 0; i < length; i++ )
     {
-        if( !TIFFWriteScanline( tif, buf, i, 0 ) )
+        if( TIFFWriteScanline( tif, buf, i, 0 ) == -1 )
         {
             fprintf (stderr, "Can't write image data.\n");
             goto failure;
@@ -320,10 +318,8 @@ int rewrite_test( const char *filename, int length, int bigtiff,
 /*                                main()                                */
 /************************************************************************/
 int
-main(int argc, char **argv)
+main(void)
 {
-    (void) argc;
-    (void) argv;
     int failure = 0;
 
     failure |= test_packbits();

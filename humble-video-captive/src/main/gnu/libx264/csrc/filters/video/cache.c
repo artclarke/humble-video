@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cache.c: cache video filter
  *****************************************************************************
- * Copyright (C) 2010-2014 x264 project
+ * Copyright (C) 2010-2018 x264 project
  *
  * Authors: Steven Walters <kemuri9@gmail.com>
  *
@@ -25,7 +25,15 @@
 
 #include "video.h"
 #include "internal.h"
-#define NAME "cache"
+#include "common/common.h"
+
+#define cache_filter x264_glue3(cache, BIT_DEPTH, filter)
+#if BIT_DEPTH == 8
+#define NAME "cache_8"
+#else
+#define NAME "cache_10"
+#endif
+
 #define LAST_FRAME (h->first_frame + h->cur_size - 1)
 
 typedef struct

@@ -80,6 +80,7 @@ typedef struct {
     int     slen[4];
 
     int     max_nonzero_coeff;
+    char    energy_above_cutoff[SFBMAX];
 } gr_info;
 
 typedef struct {

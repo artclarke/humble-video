@@ -1,8 +1,8 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
-include frameworks/base/media/libstagefright/codecs/common/Config.mk
+include frameworks/av/media/libstagefright/codecs/common/Config.mk
 
-LOCAL_PRELINK_MODULE := false
+AAC_LIBRARY = fraunhofer
 
 LOCAL_SRC_FILES := basic_op/basicop2.c basic_op/oper_32b.c
 
@@ -64,14 +64,12 @@ LOCAL_STATIC_LIBRARIES :=
 LOCAL_SHARED_LIBRARIES :=
 
 LOCAL_C_INCLUDES := \
-	frameworks/base/media/libstagefright/include \
-	frameworks/base/media/libstagefright/codecs/common/include \
-	frameworks/base/include \
+	frameworks/av/include \
+	frameworks/av/media/libstagefright/include \
+	frameworks/av/media/libstagefright/codecs/common/include \
 	$(LOCAL_PATH)/src \
 	$(LOCAL_PATH)/inc \
 	$(LOCAL_PATH)/basic_op
-
-LOCAL_CFLAGS := $(VO_CFLAGS)
 
 ifeq ($(VOTT), v5)
 LOCAL_CFLAGS += -DARMV5E -DARM_INASM -DARMV5_INASM
@@ -85,3 +83,61 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)/src/asm/ARMV7
 endif
 
 include $(BUILD_STATIC_LIBRARY)
+
+################################################################################
+
+include $(CLEAR_VARS)
+
+ifeq ($(AAC_LIBRARY), fraunhofer)
+
+  include $(CLEAR_VARS)
+
+  LOCAL_SRC_FILES := \
+          SoftAACEncoder2.cpp
+
+  LOCAL_C_INCLUDES := \
+          frameworks/av/media/libstagefright/include \
+          frameworks/native/include/media/openmax \
+          external/aac/libAACenc/include \
+          external/aac/libFDK/include \
+          external/aac/libMpegTPEnc/include \
+          external/aac/libSBRenc/include \
+          external/aac/libSYS/include
+
+  LOCAL_CFLAGS :=
+
+  LOCAL_STATIC_LIBRARIES := libFraunhoferAAC
+
+  LOCAL_SHARED_LIBRARIES := \
+          libstagefright_omx libstagefright_foundation libutils liblog
+
+  LOCAL_MODULE := libstagefright_soft_aacenc
+  LOCAL_MODULE_TAGS := optional
+
+  include $(BUILD_SHARED_LIBRARY)
+
+else # visualon
+
+  LOCAL_SRC_FILES := \
+          SoftAACEncoder.cpp
+
+  LOCAL_C_INCLUDES := \
+          frameworks/av/media/libstagefright/include \
+          frameworks/av/media/libstagefright/codecs/common/include \
+          frameworks/native/include/media/openmax
+
+  LOCAL_CFLAGS := -DOSCL_IMPORT_REF=
+
+  LOCAL_STATIC_LIBRARIES := \
+          libstagefright_aacenc
+
+  LOCAL_SHARED_LIBRARIES := \
+          libstagefright_omx libstagefright_foundation libutils liblog \
+          libstagefright_enc_common
+
+  LOCAL_MODULE := libstagefright_soft_aacenc
+  LOCAL_MODULE_TAGS := optional
+
+  include $(BUILD_SHARED_LIBRARY)
+
+endif # $(AAC_LIBRARY)

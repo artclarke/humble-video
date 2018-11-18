@@ -36,10 +36,7 @@ Source: "libspeex\Release\libspeex.dll"; DestDir: "{app}\libspeex"; Flags: ignor
 Source: "..\include\speex\speex.h"; DestDir: "{app}\libspeex\include"; Flags: ignoreversion
 Source: "..\include\speex\speex_bits.h"; DestDir: "{app}\libspeex\include"; Flags: ignoreversion
 Source: "..\include\speex\speex_callbacks.h"; DestDir: "{app}\libspeex\include"; Flags: ignoreversion
-Source: "..\include\speex\speex_echo.h"; DestDir: "{app}\libspeex\include"; Flags: ignoreversion
 Source: "..\include\speex\speex_header.h"; DestDir: "{app}\libspeex\include"; Flags: ignoreversion
-Source: "..\include\speex\speex_jitter.h"; DestDir: "{app}\libspeex\include"; Flags: ignoreversion
-Source: "..\include\speex\speex_preprocess.h"; DestDir: "{app}\libspeex\include"; Flags: ignoreversion
 Source: "..\include\speex\speex_stereo.h"; DestDir: "{app}\libspeex\include"; Flags: ignoreversion
 Source: "..\doc\manual.pdf"; DestDir: "{app}\doc"; Flags: ignoreversion
 

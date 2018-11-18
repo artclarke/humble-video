@@ -1,7 +1,7 @@
 /*****************************************************************************
  * osdep.h: platform-specific code
  *****************************************************************************
- * Copyright (C) 2007-2014 x264 project
+ * Copyright (C) 2007-2018 x264 project
  *
  * Authors: Loren Merritt <lorenm@u.washington.edu>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -52,20 +52,31 @@
 #define inline __inline
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
-#define snprintf _snprintf
 #define strtok_r strtok_s
 #define S_ISREG(x) (((x) & S_IFMT) == S_IFREG)
+#if _MSC_VER < 1900
+int x264_snprintf( char *s, size_t n, const char *fmt, ... );
+int x264_vsnprintf( char *s, size_t n, const char *fmt, va_list arg );
+#define snprintf  x264_snprintf
+#define vsnprintf x264_vsnprintf
+#endif
+#else
+#include <strings.h>
+#endif
+
+#if !defined(va_copy) && defined(__INTEL_COMPILER)
+#define va_copy(dst, src) ((dst) = (src))
 #endif
 
 #if !defined(isfinite) && (SYS_OPENBSD || SYS_SunOS)
 #define isfinite finite
 #endif
 
-#ifdef _WIN32
-#ifndef strtok_r
+#if !HAVE_STRTOK_R && !defined(strtok_r)
 #define strtok_r(str,delim,save) strtok(str,delim)
 #endif
 
+#ifdef _WIN32
 #define utf8_to_utf16( utf8, utf16 )\
     MultiByteToWideChar( CP_UTF8, MB_ERR_INVALID_CHARS, utf8, -1, utf16, sizeof(utf16)/sizeof(wchar_t) )
 FILE *x264_fopen( const char *filename, const char *mode );
@@ -73,27 +84,37 @@ int x264_rename( const char *oldname, const char *newname );
 #define x264_struct_stat struct _stati64
 #define x264_fstat _fstati64
 int x264_stat( const char *path, x264_struct_stat *buf );
-int x264_vfprintf( FILE *stream, const char *format, va_list arg );
-int x264_is_pipe( const char *path );
 #else
 #define x264_fopen       fopen
 #define x264_rename      rename
 #define x264_struct_stat struct stat
 #define x264_fstat       fstat
 #define x264_stat        stat
-#define x264_vfprintf    vfprintf
-#define x264_is_pipe(x)  0
 #endif
+
+/* mdate: return the current date in microsecond */
+int64_t x264_mdate( void );
+
+#if defined(_WIN32) && !HAVE_WINRT
+int x264_vfprintf( FILE *stream, const char *format, va_list arg );
+int x264_is_pipe( const char *path );
+#else
+#define x264_vfprintf vfprintf
+#define x264_is_pipe(x) 0
+#endif
+
+#define x264_glue3_expand(x,y,z) x##_##y##_##z
+#define x264_glue3(x,y,z) x264_glue3_expand(x,y,z)
 
 #ifdef _MSC_VER
 #define DECLARE_ALIGNED( var, n ) __declspec(align(n)) var
 #else
 #define DECLARE_ALIGNED( var, n ) var __attribute__((aligned(n)))
 #endif
-#define ALIGNED_32( var ) DECLARE_ALIGNED( var, 32 )
-#define ALIGNED_16( var ) DECLARE_ALIGNED( var, 16 )
-#define ALIGNED_8( var )  DECLARE_ALIGNED( var, 8 )
+
 #define ALIGNED_4( var )  DECLARE_ALIGNED( var, 4 )
+#define ALIGNED_8( var )  DECLARE_ALIGNED( var, 8 )
+#define ALIGNED_16( var ) DECLARE_ALIGNED( var, 16 )
 
 // ARM compiliers don't reliably align stack variables
 // - EABI requires only 8 byte stack alignment to be maintained
@@ -107,42 +128,40 @@ int x264_is_pipe( const char *path );
     type (*name) __VA_ARGS__ = (void*)((intptr_t)(name##_u+mask) & ~mask)
 
 #if ARCH_ARM && SYS_MACOSX
-#define ALIGNED_ARRAY_8( ... ) ALIGNED_ARRAY_EMU( 7, __VA_ARGS__ )
+#define ALIGNED_ARRAY_8( ... ) EXPAND( ALIGNED_ARRAY_EMU( 7, __VA_ARGS__ ) )
 #else
-#define ALIGNED_ARRAY_8( type, name, sub1, ... )\
-    ALIGNED_8( type name sub1 __VA_ARGS__ )
+#define ALIGNED_ARRAY_8( type, name, sub1, ... ) ALIGNED_8( type name sub1 __VA_ARGS__ )
 #endif
 
 #if ARCH_ARM
-#define ALIGNED_ARRAY_16( ... ) ALIGNED_ARRAY_EMU( 15, __VA_ARGS__ )
+#define ALIGNED_ARRAY_16( ... ) EXPAND( ALIGNED_ARRAY_EMU( 15, __VA_ARGS__ ) )
 #else
-#define ALIGNED_ARRAY_16( type, name, sub1, ... )\
-    ALIGNED_16( type name sub1 __VA_ARGS__ )
+#define ALIGNED_ARRAY_16( type, name, sub1, ... ) ALIGNED_16( type name sub1 __VA_ARGS__ )
 #endif
 
 #define EXPAND(x) x
 
+#if ARCH_X86 || ARCH_X86_64
+#define NATIVE_ALIGN 64
+#define ALIGNED_32( var ) DECLARE_ALIGNED( var, 32 )
+#define ALIGNED_64( var ) DECLARE_ALIGNED( var, 64 )
 #if STACK_ALIGNMENT >= 32
-#define ALIGNED_ARRAY_32( type, name, sub1, ... )\
-    ALIGNED_32( type name sub1 __VA_ARGS__ )
+#define ALIGNED_ARRAY_32( type, name, sub1, ... ) ALIGNED_32( type name sub1 __VA_ARGS__ )
 #else
 #define ALIGNED_ARRAY_32( ... ) EXPAND( ALIGNED_ARRAY_EMU( 31, __VA_ARGS__ ) )
 #endif
-
+#if STACK_ALIGNMENT >= 64
+#define ALIGNED_ARRAY_64( type, name, sub1, ... ) ALIGNED_64( type name sub1 __VA_ARGS__ )
+#else
 #define ALIGNED_ARRAY_64( ... ) EXPAND( ALIGNED_ARRAY_EMU( 63, __VA_ARGS__ ) )
-
-/* For AVX2 */
-#if ARCH_X86 || ARCH_X86_64
-#define NATIVE_ALIGN 32
-#define ALIGNED_N ALIGNED_32
-#define ALIGNED_ARRAY_N ALIGNED_ARRAY_32
+#endif
 #else
 #define NATIVE_ALIGN 16
-#define ALIGNED_N ALIGNED_16
-#define ALIGNED_ARRAY_N ALIGNED_ARRAY_16
+#define ALIGNED_32 ALIGNED_16
+#define ALIGNED_64 ALIGNED_16
+#define ALIGNED_ARRAY_32 ALIGNED_ARRAY_16
+#define ALIGNED_ARRAY_64 ALIGNED_ARRAY_16
 #endif
-
-#define UNINIT(x) x=x
 
 #if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
 #define UNUSED __attribute__((unused))
@@ -236,7 +255,7 @@ int x264_threading_init( void );
 static ALWAYS_INLINE int x264_pthread_fetch_and_add( int *val, int add, x264_pthread_mutex_t *mutex )
 {
 #if HAVE_THREAD
-#if defined(__GNUC__) && (__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ > 0) && ARCH_X86
+#if defined(__GNUC__) && (__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ > 0) && (ARCH_X86 || ARCH_X86_64)
     return __sync_fetch_and_add( val, add );
 #else
     x264_pthread_mutex_lock( mutex );
@@ -365,6 +384,10 @@ static ALWAYS_INLINE void x264_prefetch( void *p )
     sp.sched_priority -= p;\
     pthread_setschedparam( handle, policy, &sp );\
 }
+#elif SYS_HAIKU
+#include <OS.h>
+#define x264_lower_thread_priority(p)\
+    { UNUSED status_t nice_ret = set_thread_priority( find_thread( NULL ), B_LOW_PRIORITY ); }
 #else
 #include <unistd.h>
 #define x264_lower_thread_priority(p) { UNUSED int nice_ret = nice(p); }

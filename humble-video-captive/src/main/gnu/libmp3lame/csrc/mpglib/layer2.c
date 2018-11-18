@@ -20,7 +20,7 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-/* $Id: layer2.c,v 1.32 2011/05/24 20:40:56 robert Exp $ */
+/* $Id: layer2.c,v 1.34 2017/08/22 23:31:07 robert Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -138,20 +138,21 @@ II_step_one(PMPSTR mp, sideinfo_layer_II *si, struct frame *fr)
     int     i, ch;
 
     memset(si, 0, sizeof(*si));
-
+    if (jsbound > sblimit)
+        jsbound = sblimit;
     if (nch == 2) {
         for (i = 0; i < jsbound; ++i) {
             short   step = alloc1->bits;
             unsigned char b0 = get_leq_8_bits(mp, step);
             unsigned char b1 = get_leq_8_bits(mp, step);
-            alloc1 += (1 << step);
+            alloc1 += ((size_t)1 << step);
             si->allocation[i][0] = b0;
             si->allocation[i][1] = b1;
         }
         for (i = jsbound; i < sblimit; ++i) {
             short   step = alloc1->bits;
             unsigned char b0 = get_leq_8_bits(mp, step);
-            alloc1 += (1 << step);
+            alloc1 += ((size_t)1 << step);
             si->allocation[i][0] = b0;
             si->allocation[i][1] = b0;
         }
@@ -168,7 +169,7 @@ II_step_one(PMPSTR mp, sideinfo_layer_II *si, struct frame *fr)
         for (i = 0; i < sblimit; ++i) {
             short   step = alloc1->bits;
             unsigned char b0 = get_leq_8_bits(mp, step);
-            alloc1 += (1 << step);
+            alloc1 += ((size_t)1 << step);
             si->allocation[i][0] = b0;
         }
         for (i = 0; i < sblimit; ++i) {
@@ -222,6 +223,8 @@ II_step_two(PMPSTR mp, sideinfo_layer_II* si, struct frame *fr, int gr, real fra
     int     i, ch, nch = fr->stereo;
     double  cm, r0, r1, r2;
 
+    if (jsbound > sblimit)
+        jsbound = sblimit;
     for (i = 0; i < jsbound; ++i) {
         short   step = alloc1->bits;
         for (ch = 0; ch < nch; ++ch) {
@@ -262,7 +265,7 @@ II_step_two(PMPSTR mp, sideinfo_layer_II* si, struct frame *fr, int gr, real fra
                 fraction[ch][0][i] = fraction[ch][1][i] = fraction[ch][2][i] = 0.0;
             }
         }
-        alloc1 += (1 << step);
+        alloc1 += ((size_t)1 << step);
     }
 
     for (i = jsbound; i < sblimit; i++) {
@@ -314,7 +317,7 @@ II_step_two(PMPSTR mp, sideinfo_layer_II* si, struct frame *fr, int gr, real fra
             fraction[0][0][i] = fraction[0][1][i] = fraction[0][2][i] = 0.0;
             fraction[1][0][i] = fraction[1][1][i] = fraction[1][2][i] = 0.0;
         }
-        alloc1 += (1 << step);
+        alloc1 += ((size_t)1 << step);
     }
     if (sblimit > fr->down_sample_sblimit) {
         sblimit = fr->down_sample_sblimit; 

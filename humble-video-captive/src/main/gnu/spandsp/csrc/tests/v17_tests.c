@@ -119,20 +119,28 @@ static void reporter(void *user_data, int reason, bert_results_t *results)
 
 static void v17_rx_status(void *user_data, int status)
 {
-    v17_rx_state_t *rx;
+    v17_rx_state_t *s;
     int i;
     int len;
+#if defined(SPANDSP_USE_FIXED_POINTx)
+    complexi16_t *coeffs;
+#else
     complexf_t *coeffs;
-    
+#endif
+
     printf("V.17 rx status is %s (%d)\n", signal_status_to_str(status), status);
-    rx = (v17_rx_state_t *) user_data;
+    s = (v17_rx_state_t *) user_data;
     switch (status)
     {
     case SIG_STATUS_TRAINING_SUCCEEDED:
-        len = v17_rx_equalizer_state(rx, &coeffs);
+        len = v17_rx_equalizer_state(s, &coeffs);
         printf("Equalizer:\n");
         for (i = 0;  i < len;  i++)
+#if defined(SPANDSP_USE_FIXED_POINTx)
+            printf("%3d (%15.5f, %15.5f)\n", i, coeffs[i].re/4096.0f, coeffs[i].im/4096.0f);
+#else
             printf("%3d (%15.5f, %15.5f) -> %15.5f\n", i, coeffs[i].re, coeffs[i].im, powerf(&coeffs[i]));
+#endif
         break;
     }
 }
@@ -140,15 +148,12 @@ static void v17_rx_status(void *user_data, int status)
 
 static void v17putbit(void *user_data, int bit)
 {
-    v17_rx_state_t *rx;
-
     if (bit < 0)
     {
         v17_rx_status(user_data, bit);
         return;
     }
 
-    rx = (v17_rx_state_t *) user_data;
     if (decode_test_file)
         printf("Rx bit %d - %d\n", rx_bits++, bit);
     else
@@ -168,11 +173,20 @@ static int v17getbit(void *user_data)
 }
 /*- End of function --------------------------------------------------------*/
 
+#if defined(SPANDSP_USE_FIXED_POINTx)
+static void qam_report(void *user_data, const complexi16_t *constel, const complexi16_t *target, int symbol)
+#else
 static void qam_report(void *user_data, const complexf_t *constel, const complexf_t *target, int symbol)
+#endif
 {
     int i;
     int len;
+#if defined(SPANDSP_USE_FIXED_POINTx)
+    complexi16_t *coeffs;
+    complexf_t constel_point;
+#else
     complexf_t *coeffs;
+#endif
     float fpower;
     v17_rx_state_t *rx;
     static float smooth_power = 0.0f;
@@ -181,23 +195,39 @@ static void qam_report(void *user_data, const complexf_t *constel, const complex
     rx = (v17_rx_state_t *) user_data;
     if (constel)
     {
+        fpower = (constel->re - target->re)*(constel->re - target->re)
+               + (constel->im - target->im)*(constel->im - target->im);
+#if defined(SPANDSP_USE_FIXED_POINTx)
+        fpower /= 4096.0*4096.0;
+#endif
+        smooth_power = 0.95f*smooth_power + 0.05f*fpower;
 #if defined(ENABLE_GUI)
         if (use_gui)
         {
+#if defined(SPANDSP_USE_FIXED_POINTx)
+            constel_point.re = constel->re/4096.0;
+            constel_point.im = constel->im/4096.0;
+            qam_monitor_update_constel(qam_monitor, &constel_point);
+#else
             qam_monitor_update_constel(qam_monitor, constel);
+#endif
             qam_monitor_update_carrier_tracking(qam_monitor, v17_rx_carrier_frequency(rx));
             qam_monitor_update_symbol_tracking(qam_monitor, v17_rx_symbol_timing_correction(rx));
         }
 #endif
-        fpower = (constel->re - target->re)*(constel->re - target->re)
-               + (constel->im - target->im)*(constel->im - target->im);
-        smooth_power = 0.95f*smooth_power + 0.05f*fpower;
         printf("%8d [%8.4f, %8.4f] [%8.4f, %8.4f] %2x %8.4f %8.4f %9.4f %7.3f %7.4f\n",
                symbol_no,
+#if defined(SPANDSP_USE_FIXED_POINTx)
+               constel->re/4096.0,
+               constel->im/4096.0,
+               target->re/4096.0,
+               target->im/4096.0,
+#else
                constel->re,
                constel->im,
                target->re,
                target->im,
+#endif
                symbol,
                fpower,
                smooth_power,
@@ -211,10 +241,20 @@ static void qam_report(void *user_data, const complexf_t *constel, const complex
             len = v17_rx_equalizer_state(rx, &coeffs);
             printf("Equalizer A:\n");
             for (i = 0;  i < len;  i++)
+#if defined(SPANDSP_USE_FIXED_POINTx)
+                printf("%3d (%15.5f, %15.5f)\n", i, coeffs[i].re/4096.0f, coeffs[i].im/4096.0f);
+#else
                 printf("%3d (%15.5f, %15.5f) -> %15.5f\n", i, coeffs[i].re, coeffs[i].im, powerf(&coeffs[i]));
+#endif
 #if defined(ENABLE_GUI)
             if (use_gui)
+            {
+#if defined(SPANDSP_USE_FIXED_POINTx)
+                qam_monitor_update_int_equalizer(qam_monitor, coeffs, len);
+#else
                 qam_monitor_update_equalizer(qam_monitor, coeffs, len);
+#endif
+            }
 #endif
             update_interval = 100;
         }
@@ -408,7 +448,7 @@ int main(int argc, char *argv[])
         tx = v17_tx_init(NULL, test_bps, tep, v17getbit, NULL);
         logging = v17_tx_get_logging_state(tx);
         span_log_set_level(logging, SPAN_LOG_SHOW_SEVERITY | SPAN_LOG_SHOW_PROTOCOL | SPAN_LOG_FLOW);
-        span_log_set_tag(logging, "V.17 tx");
+        span_log_set_tag(logging, "V.17-tx");
         v17_tx_power(tx, signal_level);
         v17_tx_set_modem_status_handler(tx, v17_tx_status, (void *) tx);
 #if defined(WITH_SPANDSP_INTERNALS)
@@ -432,11 +472,11 @@ int main(int argc, char *argv[])
     }
 
     rx = v17_rx_init(NULL, test_bps, v17putbit, NULL);
-    v17_rx_set_modem_status_handler(rx, v17_rx_status, (void *) rx);
-    v17_rx_set_qam_report_handler(rx, qam_report, (void *) rx);
     logging = v17_rx_get_logging_state(rx);
     span_log_set_level(logging, SPAN_LOG_SHOW_SEVERITY | SPAN_LOG_SHOW_PROTOCOL | SPAN_LOG_FLOW);
-    span_log_set_tag(logging, "V.17 rx");
+    span_log_set_tag(logging, "V.17-rx");
+    v17_rx_set_modem_status_handler(rx, v17_rx_status, (void *) rx);
+    v17_rx_set_qam_report_handler(rx, qam_report, (void *) rx);
 
 #if defined(ENABLE_GUI)
     if (use_gui)
@@ -553,7 +593,7 @@ int main(int argc, char *argv[])
 #endif
     if (decode_test_file)
     {
-        if (sf_close(inhandle))
+        if (sf_close_telephony(inhandle))
         {
             fprintf(stderr, "    Cannot close audio file '%s'\n", decode_test_file);
             exit(2);
@@ -561,7 +601,7 @@ int main(int argc, char *argv[])
     }
     if (log_audio)
     {
-        if (sf_close(outhandle))
+        if (sf_close_telephony(outhandle))
         {
             fprintf(stderr, "    Cannot close audio file '%s'\n", OUT_FILE_NAME);
             exit(2);

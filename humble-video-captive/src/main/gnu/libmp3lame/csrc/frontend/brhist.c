@@ -19,7 +19,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: brhist.c,v 1.57 2011/05/07 16:05:17 rbrito Exp $ */
+/* $Id: brhist.c,v 1.58 2013/06/11 08:41:31 rbrito Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -193,7 +193,7 @@ progress_line(const lame_global_flags * gf, int full, int frames)
     sec = (unsigned int)time_in_sec;
     if (full != 0) {
         if (hour > 0) {
-            sprintf(rst, "%*d:%02u:%02u", digits(hour), hour, min, sec);
+            sprintf(rst, "%*u:%02u:%02u", digits(hour), hour, min, sec);
             res += digits(hour) + 1 + 5;
         }
         else {

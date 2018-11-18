@@ -52,8 +52,8 @@ in ITU specifications T.4 and T.6.
 
 #define XSIZE           1728
 
-t4_state_t send_state;
-t4_state_t receive_state;
+t4_tx_state_t send_state;
+t4_rx_state_t receive_state;
 
 /* The following are some test cases from T.4 */
 #define FILL_70      "                                                                      "
@@ -62,7 +62,7 @@ t4_state_t receive_state;
 #define FILL_670     FILL_100 FILL_100 FILL_100 FILL_100 FILL_100 FILL_100 FILL_70
 #define FILL_980     FILL_100 FILL_100 FILL_100 FILL_100 FILL_100 FILL_100 FILL_100 FILL_100 FILL_100 FILL_80
 
-static const char t4_test_patterns[][1728 + 1] =
+static const char t4_t6_test_patterns[][1728 + 1] =
 {
     "XXXXXX              " FILL_980 "  XXX  XXX X                  " FILL_670 "                        XXXX",
     "XXXXXX              " FILL_980 "     XXX   X                  " FILL_670 "                        XXXX",
@@ -100,16 +100,15 @@ static const char t4_test_patterns[][1728 + 1] =
 int rows_written = 0;
 int rows_read = 0;
 
-static void dump_image_as_xxx(t4_state_t *state)
+static void dump_image_as_xxx(t4_rx_state_t *state)
 {
-    uint8_t *s;
+#if 1
     int i;
     int j;
     int k;
 
     /* Dump the entire image as text 'X's and spaces */
-    printf("Image (%d x %d):\n", receive_state.image_width, receive_state.image_length);
-    s = state->image_buffer;
+    printf("Image (%d x %d):\n", state->image_width, state->image_length);
     for (i = 0;  i < state->image_length;  i++)
     {
         for (j = 0;  j < state->bytes_per_row;  j++)
@@ -119,10 +118,11 @@ static void dump_image_as_xxx(t4_state_t *state)
         }
         printf("\n");
     }
+#endif
 }
 /*- End of function --------------------------------------------------------*/
 
-static void display_page_stats(t4_state_t *s)
+static void display_page_stats(t4_rx_state_t *s)
 {
     t4_stats_t stats;
 
@@ -147,7 +147,7 @@ static int row_read_handler(void *user_data, uint8_t buf[], size_t len)
     /* Send the test pattern. */
     if (rows_read >= 16)
         return 0;
-    s = t4_test_patterns[rows_read++];
+    s = t4_t6_test_patterns[rows_read++];
     memset(buf, 0, len);
     for (i = 0;  i < len;  i++)
     {
@@ -173,7 +173,7 @@ static int row_write_handler(void *user_data, const uint8_t buf[], size_t len)
     /* Verify that what is received matches the test pattern. */
     if (len == 0)
         return 0;
-    s = t4_test_patterns[rows_written++];
+    s = t4_t6_test_patterns[rows_written++];
     memset(ref, 0, len);
     for (i = 0;  i < len;  i++)
     {
@@ -283,18 +283,21 @@ int main(int argc, char *argv[])
         T4_COMPRESSION_ITU_T4_1D,
         T4_COMPRESSION_ITU_T4_2D,
         T4_COMPRESSION_ITU_T6,
+#if defined(SPANDSP_SUPPORT_T42x)
+        T4_COMPRESSION_ITU_T42,
+        T4_COMPRESSION_ITU_SYCC_T42,
+#endif 
+#if defined(SPANDSP_SUPPORT_T43x)
+        T4_COMPRESSION_ITU_T43,
+#endif          
 #if defined(SPANDSP_SUPPORT_T85)
         T4_COMPRESSION_ITU_T85,
         T4_COMPRESSION_ITU_T85_L0,
 #endif
-        //T4_COMPRESSION_ITU_T43,
         //T4_COMPRESSION_ITU_T45,
-        //T4_COMPRESSION_ITU_T42,
-        //T4_COMPRESSION_ITU_SYCC_T42,
         -1
     };
     int sends;
-    int page_no;
     int bit;
     int end_of_page;
     int end_marks;
@@ -302,7 +305,7 @@ int main(int argc, char *argv[])
     int compression;
     int compression_step;
     int add_page_headers;
-    int overlay_page_headers;
+    //int overlay_page_headers;
     int min_row_bits;
     int restart_pages;
     int block_size;
@@ -311,6 +314,7 @@ int main(int argc, char *argv[])
     const char *in_file_name;
     const char *decode_file_name;
     const char *page_header_tz;
+    tz_t tz;
     int opt;
     int i;
     int bit_error_rate;
@@ -325,7 +329,7 @@ int main(int argc, char *argv[])
     compression = -1;
     compression_step = 0;
     add_page_headers = FALSE;
-    overlay_page_headers = FALSE;
+    //overlay_page_headers = FALSE;
     restart_pages = FALSE;
     in_file_name = IN_FILE_NAME;
     decode_file_name = NULL;
@@ -336,32 +340,52 @@ int main(int argc, char *argv[])
     block_size = 1;
     bit_error_rate = 0;
     dump_as_xxx = FALSE;
-    while ((opt = getopt(argc, argv, "1268b:d:ehHri:m:t:x")) != -1)
+    while ((opt = getopt(argc, argv, "b:c:d:ehHri:m:t:x")) != -1)
     {
         switch (opt)
         {
-        case '1':
-            compression = T4_COMPRESSION_ITU_T4_1D;
-            compression_step = -1;
-            break;
-        case '2':
-            compression = T4_COMPRESSION_ITU_T4_2D;
-            compression_step = -1;
-            break;
-        case '6':
-            compression = T4_COMPRESSION_ITU_T6;
-            compression_step = -1;
-            break;
-#if defined(SPANDSP_SUPPORT_T85)
-        case '8':
-            compression = T4_COMPRESSION_ITU_T85;
-            compression_step = -1;
-            break;
-#endif
         case 'b':
             block_size = atoi(optarg);
             if (block_size > 1024)
                 block_size = 1024;
+            break;
+        case 'c':
+            if (strcmp(optarg, "T41D") == 0)
+            {
+                compression = T4_COMPRESSION_ITU_T4_1D;
+                compression_step = -1;
+            }
+            else if (strcmp(optarg, "T42D") == 0)
+            {
+                compression = T4_COMPRESSION_ITU_T4_2D;
+                compression_step = -1;
+            }
+            else if (strcmp(optarg, "T6") == 0)
+            {
+                compression = T4_COMPRESSION_ITU_T6;
+                compression_step = -1;
+            }
+#if defined(SPANDSP_SUPPORT_T42)
+            else if (strcmp(optarg, "T42") == 0)
+            {
+                compression = T4_COMPRESSION_ITU_T42;
+                compression_step = -1;
+            }
+#endif
+#if defined(SPANDSP_SUPPORT_T43)
+            else if (strcmp(optarg, "T43") == 0)
+            {
+                compression = T4_COMPRESSION_ITU_T43;
+                compression_step = -1;
+            }
+#endif
+#if defined(SPANDSP_SUPPORT_T85)
+            else if (strcmp(optarg, "T85") == 0)
+            {
+                compression = T4_COMPRESSION_ITU_T85;
+                compression_step = -1;
+            }
+#endif
             break;
         case 'd':
             decode_file_name = optarg;
@@ -371,11 +395,11 @@ int main(int argc, char *argv[])
             break;
         case 'h':
             add_page_headers = TRUE;
-            overlay_page_headers = FALSE;
+            //overlay_page_headers = FALSE;
             break;
         case 'H':
             add_page_headers = TRUE;
-            overlay_page_headers = TRUE;
+            //overlay_page_headers = TRUE;
             break;
         case 'r':
             restart_pages = TRUE;
@@ -420,7 +444,6 @@ int main(int argc, char *argv[])
         t4_rx_set_y_resolution(&receive_state, T4_Y_RESOLUTION_STANDARD);
         t4_rx_set_image_width(&receive_state, XSIZE);
 
-        page_no = 1;
         t4_rx_start_page(&receive_state);
         last_pkt_no = 0;
         file = fopen(decode_file_name, "r");
@@ -448,7 +471,7 @@ int main(int argc, char *argv[])
                         break;
                 }
             }
-            else if (strlen(buf) > 62  &&  sscanf(buf + 57, "Rx %d: IFP %x %x", &pkt_no, (unsigned int *) &bit, (unsigned int *) &bit) == 3)
+            else if (sscanf(buf, "%*d:%*d:%*d.%*d T.38 Rx %d: IFP %x %x", &pkt_no, (unsigned int *) &bit, (unsigned int *) &bit) == 3)
             {
                 /* Useful for breaking up T.38 non-ECM logs */
                 if (pkt_no != last_pkt_no + 1)
@@ -456,7 +479,7 @@ int main(int argc, char *argv[])
                 last_pkt_no = pkt_no;
                 for (i = 0;  i < 256;  i++)
                 {
-                    if (sscanf(&buf[57 + 29 + 3*i], "%x", (unsigned int *) &bit) != 1)
+                    if (sscanf(&buf[47 + 3*i], "%x", (unsigned int *) &bit) != 1)
                         break;
                     bit = bit_reverse8(bit);
                     if ((end_of_page = t4_rx_put_byte(&receive_state, bit)))
@@ -544,7 +567,6 @@ int main(int argc, char *argv[])
         t4_rx_set_y_resolution(&receive_state, t4_tx_get_y_resolution(&send_state));
 
         /* Now send and receive the test data with all compression modes. */
-        page_no = 1;
         /* If we are stepping around the compression schemes, reset to the start of the sequence. */
         if (compression_step > 0)
             compression_step = 0;
@@ -664,7 +686,6 @@ int main(int argc, char *argv[])
         t4_rx_set_image_width(&receive_state, t4_tx_get_image_width(&send_state));
 
         /* Now send and receive all the pages in the source TIFF file */
-        page_no = 1;
         sends = 0;
         /* If we are stepping around the compression schemes, reset to the start of the sequence. */
         if (compression_step > 0)
@@ -678,7 +699,10 @@ int main(int argc, char *argv[])
             else
                 t4_tx_set_header_info(&send_state, NULL);
             if (page_header_tz  &&  page_header_tz[0])
-                t4_tx_set_header_tz(&send_state, page_header_tz);
+            {
+                if (tz_init(&tz, page_header_tz))
+                    t4_tx_set_header_tz(&send_state, &tz);
+            }
             //t4_tx_set_header_overlays_image(&send_state, overlay_page_headers);
             if (restart_pages  &&  (sends & 1))
             {

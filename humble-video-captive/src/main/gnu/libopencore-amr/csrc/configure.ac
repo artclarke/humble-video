@@ -1,19 +1,14 @@
-#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
+dnl                                               -*- Autoconf -*-
+dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([opencore-amr], [0.1.3], [http://sourceforge.net/projects/opencore-amr/])
+AC_INIT([opencore-amr], [0.1.5], [http://sourceforge.net/projects/opencore-amr/])
 AC_CONFIG_AUX_DIR(.)
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([tar-ustar])
+AM_INIT_AUTOMAKE([tar-ustar foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
-AC_CONFIG_HEADERS([config.h])
 AM_MAINTAINER_MODE
 
-# Cross compiling support
-AC_CANONICAL_BUILD
-AC_CANONICAL_HOST
-
-# Various options for configure
+dnl Various options for configure
 AC_ARG_ENABLE([compile-c],
             [AS_HELP_STRING([--enable-compile-c],
                [enable compiling as C program (default is yes)])],
@@ -36,31 +31,30 @@ AC_ARG_ENABLE([examples],
                [enable example encoding/decoding programs (default is no)])],
             [examples=$enableval], [examples=no])
 
-# Automake conditionals to set
+dnl Automake conditionals to set
 AM_CONDITIONAL(COMPILE_AS_C, test x$compile_as_c = xyes)
 AM_CONDITIONAL(GCC_ARMV5, test x$gcc_armv5 = xyes)
 AM_CONDITIONAL(AMRNB_ENCODER, test x$amrnb_encoder = xyes)
 AM_CONDITIONAL(AMRNB_DECODER, test x$amrnb_decoder = xyes)
 AM_CONDITIONAL(EXAMPLES, test x$examples = xyes)
 
-# Checks for programs.
+dnl Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
-# Setup for libtool
-AC_PROG_LIBTOOL
-AC_SUBST(LIBTOOL_DEPS)
+dnl Setup for libtool
+LT_INIT
 
-# Checks for libraries.
+dnl Checks for libraries.
 AC_CHECK_LIB([m], [main])
 
-# Checks for header files.
+dnl Checks for header files.
 AC_CHECK_HEADERS([stdint.h stdlib.h string.h])
 
-# Checks for typedefs, structures, and compiler characteristics.
+dnl Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_INT16_T
@@ -72,13 +66,12 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
 
-# Checks for library functions.
-AC_FUNC_MALLOC
+dnl Checks for library functions.
 AC_CHECK_FUNCS([memset])
 
-# OpenCORE AMR soname version to use
-# goes by ‘current[:revision[:age]]’ with the soname ending up as
-# current.age.revision.
+dnl OpenCORE AMR soname version to use
+dnl goes by ‘current[:revision[:age]]’ with the soname ending up as
+dnl current.age.revision.
 OPENCORE_AMRNB_VERSION=0:3:0
 OPENCORE_AMRWB_VERSION=0:3:0
 AC_SUBST(OPENCORE_AMRNB_VERSION)

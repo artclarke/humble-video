@@ -58,26 +58,24 @@ while 9.999 is the lowest one.
 </ul>
 <h3>Hydrogenaudio recommended settings</h3>
 <ul>
-<li>
-<strong>Best quality</strong>, "archiving"<a href="#note2"><sup>2</sup></a> : 
-<span class="hilight">-b 320</span>
-<p>CBR 320 is the strongest setting for MP3, with
-the lowest risk of artifacts. With the exception of a few situations, quality is
-rarely better than the highest VBR profiles described below.
-</p>
-</li>
-<li><strong>High quality</strong>, HiFi, home or quiet listening : 
+<strong>Very high quality</strong>, HiFi, home, or quiet listening, with best file size<a href="#note2"></a> : 
 <span class="hilight">-V0</span> (avg. 245 kbps) or <span class="hilight">-V1</span>
- (avg. 225 kbps) or <span class="hilight">-V2</span> (avg. 190 kbps) or <span class="hilight">
- -V3</span> (avg. 175 kbps).
- <p>These settings are considered to produce
- transparent encoding (transparent = most people can't distinguish the MP3 from
- the original in an ABX blind test). Audible differences between these presets
- exist, but are rare.
+ (avg. 225 kbps) or <span class="hilight">-V2</span> (avg. 190 kbps) or <span class="hilight">-V3</span> (avg. 175 kbps).
+ <p>VBR settings will normally produce transparent results.
+ Audible differences between these presets may exist, but are rare.
 </p>
 </li>
-<li><strong>Portable</strong>, background noise and low bitrate requirement, small sizes : 
-
+<li>
+<strong>Very high quality</strong>, HiFi, home, or quiet listening, with maximum file size<a href="#note2"><sup>2</sup></a> : 
+<span class="hilight">-b 320</span>
+<p>This CBR mode will maximize the MP3's bitrate and overall file 
+size. The extra space may allow for some parts of the audio to be 
+compressed with fewer sacrifices, but to date, no one has produced
+ABX test results demonstrating that perceived quality is ever better
+than the highest VBR profiles described above.
+</p>
+</li>
+<li><strong>Portable</strong>, listening in noisy conditions, lower bitrate, smaller file size: 
 <span class="hilight">-V4</span> (avg. 160 kbps) or <span class="hilight">-V5</span>
 (avg. 130 kbps) or <span class="hilight"> -V6</span> (avg. 115 kbps)
 <p>
@@ -88,6 +86,10 @@ rarely better than the highest VBR profiles described below.
 <span class="hilight">--abr 80</span> (stereo) or <span class="hilight">--abr 56 -m m</span> (mono)
 <p>
 For very low bitrates, up to 100kbps, ABR is most often the best solution.
+--preset voice is only available in the command line front-end, and 
+is there for compatibility. It is currently mapped to --abr 56 -mm,
+ so that means that the recommendation would be to encode in mono, 
+ and use ABR. 
 </p>
 </li>
 </ul>

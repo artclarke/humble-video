@@ -227,13 +227,17 @@ static void equalizer_reset(v29_rx_state_t *s)
 {
     /* Start with an equalizer based on everything being perfect */
 #if defined(SPANDSP_USE_FIXED_POINT)
+    static const complexi16_t x = {3*FP_FACTOR, 0*FP_FACTOR};
+
     cvec_zeroi16(s->eq_coeff, V29_EQUALIZER_LEN);
-    s->eq_coeff[V29_EQUALIZER_PRE_LEN] = complex_seti16(3*FP_FACTOR, 0*FP_FACTOR);
+    s->eq_coeff[V29_EQUALIZER_PRE_LEN] = x;
     cvec_zeroi16(s->eq_buf, V29_EQUALIZER_LEN);
     s->eq_delta = 32768.0f*EQUALIZER_DELTA/V29_EQUALIZER_LEN;
 #else
+    static const complexf_t x = {3.0f, 0.0f};
+
     cvec_zerof(s->eq_coeff, V29_EQUALIZER_LEN);
-    s->eq_coeff[V29_EQUALIZER_PRE_LEN] = complex_setf(3.0f, 0.0f);
+    s->eq_coeff[V29_EQUALIZER_PRE_LEN] = x;
     cvec_zerof(s->eq_buf, V29_EQUALIZER_LEN);
     s->eq_delta = EQUALIZER_DELTA/V29_EQUALIZER_LEN;
 #endif
@@ -629,7 +633,7 @@ static void process_half_baud(v29_rx_state_t *s, complexf_t *sample)
            signal the start of the scrambled CDCD segment */
         ang = angle - s->angles[(s->training_count - 1) & 0xF];
         s->angles[(s->training_count + 1) & 0xF] = angle;
-        if ((ang > 0x20000000  ||  ang < -0x20000000)  &&  s->training_count >= 13)
+        if ((ang > DDS_PHASE(45.0f)  ||  ang < DDS_PHASE(-45.0f))  &&  s->training_count >= 13)
         {
             /* We seem to have a phase reversal */
             /* Slam the carrier frequency into line, based on the total phase drift over the last
@@ -648,9 +652,9 @@ static void process_half_baud(v29_rx_state_t *s, complexf_t *sample)
             }
             span_log(&s->logging, SPAN_LOG_FLOW, "Coarse carrier frequency %7.2f\n", dds_frequencyf(s->carrier_phase_rate));
             /* Check if the carrier frequency is plausible */
-            if (s->carrier_phase_rate < dds_phase_ratef(CARRIER_NOMINAL_FREQ - 20.0f)
+            if (s->carrier_phase_rate < DDS_PHASE_RATE(CARRIER_NOMINAL_FREQ - 20.0f)
                 ||
-                s->carrier_phase_rate > dds_phase_ratef(CARRIER_NOMINAL_FREQ + 20.0f))
+                s->carrier_phase_rate > DDS_PHASE_RATE(CARRIER_NOMINAL_FREQ + 20.0f))
             {
                 span_log(&s->logging, SPAN_LOG_FLOW, "Training failed (sequence failed)\n");
                 /* Park this modem */
@@ -853,7 +857,7 @@ static __inline__ int signal_detect(v29_rx_state_t *s, int16_t amp)
     /* There could be overflow here, but it isn't a problem in practice */
     diff = x - s->last_sample;
     s->last_sample = x;
-    power = power_meter_update(&(s->power), diff);
+    power = power_meter_update(&s->power, diff);
 #if defined(IAXMODEM_STUFF)
     /* Quick power drop fudge */
     diff = abs(diff);
@@ -861,7 +865,7 @@ static __inline__ int signal_detect(v29_rx_state_t *s, int16_t amp)
     {
         if (++s->low_samples > 120)
         {
-            power_meter_init(&(s->power), 4);
+            power_meter_init(&s->power, 4);
             s->high_sample = 0;
             s->low_samples = 0;
         }
@@ -1052,7 +1056,7 @@ SPAN_DECLARE(void) v29_rx_set_put_bit(v29_rx_state_t *s, put_bit_func_t put_bit,
 }
 /*- End of function --------------------------------------------------------*/
 
-SPAN_DECLARE(void) v29_rx_set_modem_status_handler(v29_rx_state_t *s, modem_tx_status_func_t handler, void *user_data)
+SPAN_DECLARE(void) v29_rx_set_modem_status_handler(v29_rx_state_t *s, modem_status_func_t handler, void *user_data)
 {
     s->status_handler = handler;
     s->status_user_data = user_data;
@@ -1106,7 +1110,7 @@ SPAN_DECLARE(int) v29_rx_restart(v29_rx_state_t *s, int bit_rate, int old_train)
 
     s->carrier_phase = 0;
 
-    power_meter_init(&(s->power), 4);
+    power_meter_init(&s->power, 4);
 
     s->constellation_state = 0;
 
@@ -1118,7 +1122,7 @@ SPAN_DECLARE(int) v29_rx_restart(v29_rx_state_t *s, int bit_rate, int old_train)
     }
     else
     {
-        s->carrier_phase_rate = dds_phase_ratef(CARRIER_NOMINAL_FREQ);
+        s->carrier_phase_rate = DDS_PHASE_RATE(CARRIER_NOMINAL_FREQ);
         equalizer_reset(s);
 #if defined(SPANDSP_USE_FIXED_POINT)
         s->agc_scaling_save = 0;

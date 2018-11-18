@@ -38,6 +38,9 @@ void Decoder_Interface_exit(void* state) {
 void Decoder_Interface_Decode(void* state, const unsigned char* in, short* out, int bfi) {
 	unsigned char type = (in[0] >> 3) & 0x0f;
 	in++;
+	if (bfi) {
+		type = AMR_NO_DATA;
+	}
 	AMRDecode(state, (enum Frame_Type_3GPP) type, (UWord8*) in, out, MIME_IETF);
 }
 #endif

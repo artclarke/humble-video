@@ -36,12 +36,6 @@ modem control commands.
 \section at_page_sec_2 How does it work?
 */
 
-typedef struct at_state_s at_state_t;
-
-typedef int (at_modem_control_handler_t)(at_state_t *s, void *user_data, int op, const char *num);
-typedef int (at_tx_handler_t)(at_state_t *s, void *user_data, const uint8_t *buf, size_t len);
-typedef int (at_class1_handler_t)(at_state_t *s, void *user_data, int direction, int operation, int val);
-
 enum at_rx_mode_e
 {
     AT_MODE_ONHOOK_COMMAND,
@@ -109,6 +103,12 @@ enum
     AT_RESPONSE_CODE_FCERROR,
     AT_RESPONSE_CODE_FRH3
 };
+
+typedef struct at_state_s at_state_t;
+
+typedef int (at_modem_control_handler_t)(at_state_t *s, void *user_data, int op, const char *num);
+typedef int (at_tx_handler_t)(at_state_t *s, void *user_data, const uint8_t *buf, size_t len);
+typedef int (at_class1_handler_t)(at_state_t *s, void *user_data, int direction, int operation, int val);
 
 /*!
     AT profile.

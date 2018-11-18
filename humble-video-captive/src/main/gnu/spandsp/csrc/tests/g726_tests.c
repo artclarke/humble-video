@@ -62,7 +62,7 @@ decompressed, and the resulting audio stored in post_g726.wav.
 //#define WITH_SPANDSP_INTERNALS
 
 #if defined(HAVE_CONFIG_H)
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -1083,7 +1083,6 @@ static void itu_compliance_tests(void)
     int len3;
     int i;
     int test;
-    int bits_per_code;
     int bad_samples;
     int conditioning_samples;
     int samples;
@@ -1106,22 +1105,6 @@ static void itu_compliance_tests(void)
                itu_test_sets[test].rate,
                itu_test_sets[test].compression_law,
                itu_test_sets[test].decompression_law);
-        switch (itu_test_sets[test].rate)
-        {
-        case 16000:
-            bits_per_code = 2;
-            break;
-        case 24000:
-            bits_per_code = 3;
-            break;
-        case 32000:
-        default:
-            bits_per_code = 4;
-            break;
-        case 40000:
-            bits_per_code = 5;
-            break;
-        }
         if (itu_test_sets[test].compression_law != G726_ENCODING_NONE)
         {
             /* Test the encode side */
@@ -1226,7 +1209,6 @@ int main(int argc, char *argv[])
     SNDFILE *outhandle;
     int16_t amp[1024];
     int frames;
-    int outframes;
     int adpcm;
     int packing;
 
@@ -1283,14 +1265,14 @@ int main(int argc, char *argv[])
         {
             adpcm = g726_encode(&enc_state, adpcmdata, amp, frames);
             frames = g726_decode(&dec_state, amp, adpcmdata, adpcm);
-            outframes = sf_writef_short(outhandle, amp, frames);
+            sf_writef_short(outhandle, amp, frames);
         }
-        if (sf_close(inhandle) != 0)
+        if (sf_close_telephony(inhandle))
         {
             printf("    Cannot close audio file '%s'\n", IN_FILE_NAME);
             exit(2);
         }
-        if (sf_close(outhandle) != 0)
+        if (sf_close_telephony(outhandle))
         {
             printf("    Cannot close audio file '%s'\n", OUT_FILE_NAME);
             exit(2);

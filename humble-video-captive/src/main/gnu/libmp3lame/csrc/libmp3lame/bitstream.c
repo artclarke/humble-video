@@ -19,7 +19,7 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id: bitstream.c,v 1.97 2011/05/07 16:05:17 rbrito Exp $
+ * $Id: bitstream.c,v 1.99 2017/08/31 14:14:46 robert Exp $
  */
 
 
@@ -1059,7 +1059,7 @@ do_copy_buffer(lame_internal_flags * gfc, unsigned char *buffer, int size)
     int const minimum = bs->buf_byte_idx + 1;
     if (minimum <= 0)
         return 0;
-    if (size != 0 && minimum > size)
+    if (minimum > size)
         return -1;      /* buffer is too small */
     memcpy(buffer, bs->buf, minimum);
     bs->buf_byte_idx = -1;
@@ -1101,7 +1101,7 @@ init_bit_stream_w(lame_internal_flags * gfc)
     esv->h_ptr = esv->w_ptr = 0;
     esv->header[esv->h_ptr].write_timing = 0;
 
-    gfc->bs.buf = (unsigned char *) malloc(BUFFER_SIZE);
+    gfc->bs.buf = lame_calloc(unsigned char, BUFFER_SIZE);
     gfc->bs.buf_size = BUFFER_SIZE;
     gfc->bs.buf_byte_idx = -1;
     gfc->bs.buf_bit_idx = 0;

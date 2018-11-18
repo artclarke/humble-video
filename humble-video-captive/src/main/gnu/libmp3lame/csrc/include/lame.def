@@ -247,9 +247,11 @@ lame_encode_buffer_ieee_float	@169
 lame_encode_buffer_interleaved_ieee_float	@170
 lame_encode_buffer_ieee_double	@171
 lame_encode_buffer_interleaved_ieee_double	@172
+lame_encode_buffer_interleaved_int	@173
 
 lame_get_bitrate	@502
 lame_get_samplerate	@503
+lame_get_maximum_number_of_samples	@504
 
 lame_decode_init	@1000
 lame_decode		@1001

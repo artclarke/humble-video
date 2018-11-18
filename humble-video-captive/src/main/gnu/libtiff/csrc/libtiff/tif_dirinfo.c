@@ -1,5 +1,3 @@
-/* $Id: tif_dirinfo.c,v 1.114 2011-05-17 00:21:17 fwarmerdam Exp $ */
-
 /*
  * Copyright (c) 1988-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.
@@ -37,15 +35,23 @@
  *
  * NOTE: The second field (field_readcount) and third field (field_writecount)
  *       sometimes use the values TIFF_VARIABLE (-1), TIFF_VARIABLE2 (-3)
- *       and TIFFTAG_SPP (-2). The macros should be used but would throw off
- *       the formatting of the code, so please interprete the -1, -2 and -3
+ *       and TIFF_SPP (-2). The macros should be used but would throw off
+ *       the formatting of the code, so please interpret the -1, -2 and -3
  *       values accordingly.
  */
 
-static TIFFFieldArray tiffFieldArray;
-static TIFFFieldArray exifFieldArray;
+/* const object should be initialized */
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4132 )
+#endif
+static const TIFFFieldArray tiffFieldArray;
+static const TIFFFieldArray exifFieldArray;
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 
-static TIFFField
+static const TIFFField
 tiffFields[] = {
 	{ TIFFTAG_SUBFILETYPE, 1, 1, TIFF_LONG, 0, TIFF_SETGET_UINT32, TIFF_SETGET_UNDEFINED, FIELD_SUBFILETYPE, 1, 0, "SubfileType", NULL },
 	{ TIFFTAG_OSUBFILETYPE, 1, 1, TIFF_SHORT, 0, TIFF_SETGET_UNDEFINED, TIFF_SETGET_UNDEFINED, FIELD_SUBFILETYPE, 1, 0, "OldSubfileType", NULL },
@@ -95,7 +101,7 @@ tiffFields[] = {
 	{ TIFFTAG_TILELENGTH, 1, 1, TIFF_LONG, 0, TIFF_SETGET_UINT32, TIFF_SETGET_UNDEFINED, FIELD_TILEDIMENSIONS, 0, 0, "TileLength", NULL },
 	{ TIFFTAG_TILEOFFSETS, -1, 1, TIFF_LONG8, 0, TIFF_SETGET_UNDEFINED, TIFF_SETGET_UNDEFINED, FIELD_STRIPOFFSETS, 0, 0, "TileOffsets", NULL },
 	{ TIFFTAG_TILEBYTECOUNTS, -1, 1, TIFF_LONG8, 0, TIFF_SETGET_UNDEFINED, TIFF_SETGET_UNDEFINED, FIELD_STRIPBYTECOUNTS, 0, 0, "TileByteCounts", NULL },
-	{ TIFFTAG_SUBIFD, -1, -1, TIFF_IFD8, 0, TIFF_SETGET_C16_IFD8, TIFF_SETGET_UNDEFINED, FIELD_SUBIFD, 1, 1, "SubIFD", &tiffFieldArray },
+	{ TIFFTAG_SUBIFD, -1, -1, TIFF_IFD8, 0, TIFF_SETGET_C16_IFD8, TIFF_SETGET_UNDEFINED, FIELD_SUBIFD, 1, 1, "SubIFD", (TIFFFieldArray*) &tiffFieldArray },
 	{ TIFFTAG_INKSET, 1, 1, TIFF_SHORT, 0, TIFF_SETGET_UINT16, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "InkSet", NULL },
 	{ TIFFTAG_INKNAMES, -1, -1, TIFF_ASCII, 0, TIFF_SETGET_C16_ASCII, TIFF_SETGET_UNDEFINED, FIELD_INKNAMES, 1, 1, "InkNames", NULL },
 	{ TIFFTAG_NUMBEROFINKS, 1, 1, TIFF_SHORT, 0, TIFF_SETGET_UINT16, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 1, 0, "NumberOfInks", NULL },
@@ -128,11 +134,13 @@ tiffFields[] = {
 	{ TIFFTAG_PIXAR_FOVCOT, 1, 1, TIFF_FLOAT, 0, TIFF_SETGET_FLOAT, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 1, 0, "FieldOfViewCotangent", NULL },
 	{ TIFFTAG_PIXAR_MATRIX_WORLDTOSCREEN, 16, 16, TIFF_FLOAT, 0, TIFF_SETGET_C0_FLOAT, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 1, 0, "MatrixWorldToScreen", NULL },
 	{ TIFFTAG_PIXAR_MATRIX_WORLDTOCAMERA, 16, 16, TIFF_FLOAT, 0, TIFF_SETGET_C0_FLOAT, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 1, 0, "MatrixWorldToCamera", NULL },
+	{ TIFFTAG_CFAREPEATPATTERNDIM, 2, 2, TIFF_SHORT, 0, TIFF_SETGET_C0_UINT16, TIFF_SETGET_UNDEFINED,	FIELD_CUSTOM, 0,	0,	"CFARepeatPatternDim", NULL },
+	{ TIFFTAG_CFAPATTERN,	4, 4,	TIFF_BYTE, 0, TIFF_SETGET_C0_UINT8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0,	0,	"CFAPattern" , NULL},
 	{ TIFFTAG_COPYRIGHT, -1, -1, TIFF_ASCII, 0, TIFF_SETGET_ASCII, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 1, 0, "Copyright", NULL },
 	/* end Pixar tags */
 	{ TIFFTAG_RICHTIFFIPTC, -3, -3, TIFF_LONG, 0, TIFF_SETGET_C32_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "RichTIFFIPTC", NULL },
 	{ TIFFTAG_PHOTOSHOP, -3, -3, TIFF_BYTE, 0, TIFF_SETGET_C32_UINT8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "Photoshop", NULL },
-	{ TIFFTAG_EXIFIFD, 1, 1, TIFF_IFD8, 0, TIFF_SETGET_IFD8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "EXIFIFDOffset", &exifFieldArray },
+	{ TIFFTAG_EXIFIFD, 1, 1, TIFF_IFD8, 0, TIFF_SETGET_IFD8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "EXIFIFDOffset", (TIFFFieldArray*) &exifFieldArray },
 	{ TIFFTAG_ICCPROFILE, -3, -3, TIFF_UNDEFINED, 0, TIFF_SETGET_C32_UINT8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "ICC Profile", NULL },
 	{ TIFFTAG_GPSIFD, 1, 1, TIFF_IFD8, 0, TIFF_SETGET_IFD8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "GPSIFDOffset", NULL },
 	{ TIFFTAG_FAXRECVPARAMS, 1, 1, TIFF_LONG, 0, TIFF_SETGET_UINT32, TIFF_SETGET_UINT32, FIELD_CUSTOM, TRUE, FALSE, "FaxRecvParams", NULL },
@@ -190,12 +198,26 @@ tiffFields[] = {
 	{ TIFFTAG_ASSHOTPREPROFILEMATRIX, -1, -1, TIFF_SRATIONAL, 0, TIFF_SETGET_C16_FLOAT, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "AsShotPreProfileMatrix", NULL },
 	{ TIFFTAG_CURRENTICCPROFILE, -1, -1, TIFF_UNDEFINED, 0, TIFF_SETGET_C16_UINT8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "CurrentICCProfile", NULL },
 	{ TIFFTAG_CURRENTPREPROFILEMATRIX, -1, -1, TIFF_SRATIONAL, 0, TIFF_SETGET_C16_FLOAT, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "CurrentPreProfileMatrix", NULL },
-	/* end DNG tags */
-	/* begin pseudo tags */
 	{ TIFFTAG_PERSAMPLE, 0, 0, TIFF_SHORT, 0, TIFF_SETGET_UNDEFINED, TIFF_SETGET_UNDEFINED, FIELD_PSEUDO, TRUE, FALSE, "PerSample", NULL},
+	/* end DNG tags */
+	/* begin TIFF/FX tags */
+        { TIFFTAG_INDEXED, 1, 1, TIFF_SHORT, 0, TIFF_SETGET_UINT16, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "Indexed", NULL },
+        { TIFFTAG_GLOBALPARAMETERSIFD, 1, 1, TIFF_IFD8, 0, TIFF_SETGET_IFD8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "GlobalParametersIFD", NULL },
+        { TIFFTAG_PROFILETYPE, 1, 1, TIFF_LONG, 0, TIFF_SETGET_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "ProfileType", NULL },
+        { TIFFTAG_FAXPROFILE, 1, 1, TIFF_BYTE, 0, TIFF_SETGET_UINT8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "FaxProfile", NULL },
+        { TIFFTAG_CODINGMETHODS, 1, 1, TIFF_LONG, 0, TIFF_SETGET_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "CodingMethods", NULL },
+        { TIFFTAG_VERSIONYEAR, 4, 4, TIFF_BYTE, 0, TIFF_SETGET_C0_UINT8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "VersionYear", NULL },
+        { TIFFTAG_MODENUMBER, 1, 1, TIFF_BYTE, 0, TIFF_SETGET_UINT8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "ModeNumber", NULL },
+        { TIFFTAG_DECODE, -1, -1, TIFF_SRATIONAL, 0, TIFF_SETGET_C16_FLOAT, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "Decode", NULL },
+        { TIFFTAG_IMAGEBASECOLOR, -1, -1, TIFF_SHORT, 0, TIFF_SETGET_C16_UINT16, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "ImageBaseColor", NULL },
+        { TIFFTAG_T82OPTIONS, 1, 1, TIFF_LONG, 0, TIFF_SETGET_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "T82Options", NULL },
+        { TIFFTAG_STRIPROWCOUNTS, -1, -1, TIFF_LONG, 0, TIFF_SETGET_C16_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "StripRowCounts", NULL },
+        { TIFFTAG_IMAGELAYER, 2, 2, TIFF_LONG, 0, TIFF_SETGET_C0_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "ImageLayer", NULL },
+	/* end TIFF/FX tags */
+	/* begin pseudo tags */
 };
 
-static TIFFField
+static const TIFFField
 exifFields[] = {
 	{ EXIFTAG_EXPOSURETIME, 1, 1, TIFF_RATIONAL, 0, TIFF_SETGET_DOUBLE, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 1, 0, "ExposureTime", NULL },
 	{ EXIFTAG_FNUMBER, 1, 1, TIFF_RATIONAL, 0, TIFF_SETGET_DOUBLE, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 1, 0, "FNumber", NULL },
@@ -255,13 +277,13 @@ exifFields[] = {
 	{ EXIFTAG_IMAGEUNIQUEID, 33, 33, TIFF_ASCII, 0, TIFF_SETGET_ASCII, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 1, 0, "ImageUniqueID", NULL }
 };
 
-static TIFFFieldArray
-tiffFieldArray = { tfiatImage, 0, TIFFArrayCount(tiffFields), tiffFields };
-static TIFFFieldArray
-exifFieldArray = { tfiatExif, 0, TIFFArrayCount(exifFields), exifFields };
+static const TIFFFieldArray
+tiffFieldArray = { tfiatImage, 0, TIFFArrayCount(tiffFields), (TIFFField*) tiffFields };
+static const TIFFFieldArray
+exifFieldArray = { tfiatExif, 0, TIFFArrayCount(exifFields), (TIFFField*) exifFields };
 
 /*
- *  We have our own local lfind() equivelent to avoid subtle differences
+ *  We have our own local lfind() equivalent to avoid subtle differences
  *  in types passed to lfind() on different systems. 
  */
 
@@ -348,7 +370,7 @@ _TIFFMergeFields(TIFF* tif, const TIFFField info[], uint32 n)
 {
 	static const char module[] = "_TIFFMergeFields";
 	static const char reason[] = "for fields array";
-	TIFFField** tp;
+	/* TIFFField** tp; */
 	uint32 i;
 
         tif->tif_foundfield = NULL;
@@ -369,7 +391,7 @@ _TIFFMergeFields(TIFF* tif, const TIFFField info[], uint32 n)
 		return 0;
 	}
 
-	tp = tif->tif_fields + tif->tif_nfields;
+	/* tp = tif->tif_fields + tif->tif_nfields; */
 	for (i = 0; i < n; i++) {
 		const TIFFField *fip =
 			TIFFFindField(tif, info[i].field_tag, TIFF_ANY);
@@ -505,7 +527,7 @@ TIFFFindField(TIFF* tif, uint32 tag, TIFFDataType dt)
 	return tif->tif_foundfield = (ret ? *ret : NULL);
 }
 
-const TIFFField*
+static const TIFFField*
 _TIFFFindFieldByName(TIFF* tif, const char *field_name, TIFFDataType dt)
 {
 	TIFFField key = {0, 0, 0, TIFF_NOTYPE, 0, 0, 0, 0, 0, 0, NULL, NULL};
@@ -554,6 +576,42 @@ TIFFFieldWithName(TIFF* tif, const char *field_name)
 			     "Internal error, unknown tag %s", field_name);
 	}
 	return (fip);
+}
+
+uint32
+TIFFFieldTag(const TIFFField* fip)
+{
+	return fip->field_tag;
+}
+
+const char *
+TIFFFieldName(const TIFFField* fip)
+{
+	return fip->field_name;
+}
+
+TIFFDataType
+TIFFFieldDataType(const TIFFField* fip)
+{
+	return fip->field_type;
+}
+
+int
+TIFFFieldPassCount(const TIFFField* fip)
+{
+	return fip->field_passcount;
+}
+
+int
+TIFFFieldReadCount(const TIFFField* fip)
+{
+	return fip->field_readcount;
+}
+
+int
+TIFFFieldWriteCount(const TIFFField* fip)
+{
+	return fip->field_writecount;
 }
 
 const TIFFField*
@@ -661,7 +719,7 @@ _TIFFCreateAnonField(TIFF *tif, uint32 tag, TIFFDataType field_type)
 	 * note that this name is a special sign to TIFFClose() and
 	 * _TIFFSetupFields() to free the field
 	 */
-	sprintf(fld->field_name, "Tag %d", (int) tag);
+	(void) snprintf(fld->field_name, 32, "Tag %d", (int) tag);
 
 	return fld;    
 }
@@ -893,6 +951,122 @@ TIFFMergeFieldInfo(TIFF* tif, const TIFFFieldInfo info[], uint32 n)
 		return -1;
 	}
 
+	return 0;
+}
+
+int
+_TIFFCheckFieldIsValidForCodec(TIFF *tif, ttag_t tag)
+{
+	/* Filter out non-codec specific tags */
+	switch (tag) {
+	    /* Shared tags */
+	    case TIFFTAG_PREDICTOR:
+	    /* JPEG tags */
+	    case TIFFTAG_JPEGTABLES:
+	    /* OJPEG tags */
+	    case TIFFTAG_JPEGIFOFFSET:
+	    case TIFFTAG_JPEGIFBYTECOUNT:
+	    case TIFFTAG_JPEGQTABLES:
+	    case TIFFTAG_JPEGDCTABLES:
+	    case TIFFTAG_JPEGACTABLES:
+	    case TIFFTAG_JPEGPROC:
+	    case TIFFTAG_JPEGRESTARTINTERVAL:
+	    /* CCITT* */
+	    case TIFFTAG_BADFAXLINES:
+	    case TIFFTAG_CLEANFAXDATA:
+	    case TIFFTAG_CONSECUTIVEBADFAXLINES:
+	    case TIFFTAG_GROUP3OPTIONS:
+	    case TIFFTAG_GROUP4OPTIONS:
+	    /* LERC */
+	    case TIFFTAG_LERC_PARAMETERS:
+		break;
+	    default:
+		return 1;
+	}
+	/* Check if codec specific tags are allowed for the current
+	 * compression scheme (codec) */
+	switch (tif->tif_dir.td_compression) {
+	    case COMPRESSION_LZW:
+		if (tag == TIFFTAG_PREDICTOR)
+		    return 1;
+		break;
+	    case COMPRESSION_PACKBITS:
+		/* No codec-specific tags */
+		break;
+	    case COMPRESSION_THUNDERSCAN:
+		/* No codec-specific tags */
+		break;
+	    case COMPRESSION_NEXT:
+		/* No codec-specific tags */
+		break;
+	    case COMPRESSION_JPEG:
+		if (tag == TIFFTAG_JPEGTABLES)
+		    return 1;
+		break;
+	    case COMPRESSION_OJPEG:
+		switch (tag) {
+		    case TIFFTAG_JPEGIFOFFSET:
+		    case TIFFTAG_JPEGIFBYTECOUNT:
+		    case TIFFTAG_JPEGQTABLES:
+		    case TIFFTAG_JPEGDCTABLES:
+		    case TIFFTAG_JPEGACTABLES:
+		    case TIFFTAG_JPEGPROC:
+		    case TIFFTAG_JPEGRESTARTINTERVAL:
+			return 1;
+		}
+		break;
+	    case COMPRESSION_CCITTRLE:
+	    case COMPRESSION_CCITTRLEW:
+	    case COMPRESSION_CCITTFAX3:
+	    case COMPRESSION_CCITTFAX4:
+		switch (tag) {
+		    case TIFFTAG_BADFAXLINES:
+		    case TIFFTAG_CLEANFAXDATA:
+		    case TIFFTAG_CONSECUTIVEBADFAXLINES:
+			return 1;
+		    case TIFFTAG_GROUP3OPTIONS:
+			if (tif->tif_dir.td_compression == COMPRESSION_CCITTFAX3)
+			    return 1;
+			break;
+		    case TIFFTAG_GROUP4OPTIONS:
+			if (tif->tif_dir.td_compression == COMPRESSION_CCITTFAX4)
+			    return 1;
+			break;
+		}
+		break;
+	    case COMPRESSION_JBIG:
+		/* No codec-specific tags */
+		break;
+	    case COMPRESSION_DEFLATE:
+	    case COMPRESSION_ADOBE_DEFLATE:
+		if (tag == TIFFTAG_PREDICTOR)
+		    return 1;
+		break;
+	   case COMPRESSION_PIXARLOG:
+		if (tag == TIFFTAG_PREDICTOR)
+		    return 1;
+		break;
+	    case COMPRESSION_SGILOG:
+	    case COMPRESSION_SGILOG24:
+		/* No codec-specific tags */
+		break;
+	    case COMPRESSION_LZMA:
+		if (tag == TIFFTAG_PREDICTOR)
+		    return 1;
+		break;
+	    case COMPRESSION_ZSTD:
+		if (tag == TIFFTAG_PREDICTOR)
+		    return 1;
+		break;
+	    case COMPRESSION_LERC:
+		if (tag == TIFFTAG_LERC_PARAMETERS)
+		    return 1;
+		break;
+		  case COMPRESSION_WEBP:
+		if (tag == TIFFTAG_PREDICTOR)
+				return 1;
+		break;
+	}
 	return 0;
 }
 

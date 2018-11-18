@@ -94,7 +94,7 @@ static int phase_b_handler(t30_state_t *s, void *user_data, int result)
     i = (int) (intptr_t) user_data;
     snprintf(tag, sizeof(tag), "%c: Phase B", i);
     printf("%c: Phase B handler on channel %c - (0x%X) %s\n", i, i, result, t30_frametype(result));
-    log_rx_parameters(s, tag);
+    fax_log_rx_parameters(s, tag);
     return T30_ERR_OK;
 }
 /*- End of function --------------------------------------------------------*/
@@ -107,9 +107,9 @@ static int phase_d_handler(t30_state_t *s, void *user_data, int result)
     i = (int) (intptr_t) user_data;
     snprintf(tag, sizeof(tag), "%c: Phase D", i);
     printf("%c: Phase D handler on channel %c - (0x%X) %s\n", i, i, result, t30_frametype(result));
-    log_transfer_statistics(s, tag);
-    log_tx_parameters(s, tag);
-    log_rx_parameters(s, tag);
+    fax_log_page_transfer_statistics(s, tag);
+    fax_log_tx_parameters(s, tag);
+    fax_log_rx_parameters(s, tag);
     return T30_ERR_OK;
 }
 /*- End of function --------------------------------------------------------*/
@@ -123,9 +123,9 @@ static void phase_e_handler(t30_state_t *s, void *user_data, int result)
     i = (int) (intptr_t) user_data;
     snprintf(tag, sizeof(tag), "%c: Phase E", i);
     printf("%c: Phase E handler on channel %c - (%d) %s\n", i, i, result, t30_completion_code_to_str(result));
-    log_transfer_statistics(s, tag);
-    log_tx_parameters(s, tag);
-    log_rx_parameters(s, tag);
+    fax_log_final_transfer_statistics(s, tag);
+    fax_log_tx_parameters(s, tag);
+    fax_log_rx_parameters(s, tag);
     t30_get_transfer_statistics(s, &t);
     succeeded[i - 'A'] = (result == T30_ERR_OK)  &&  (t.pages_tx == 12  ||  t.pages_rx == 12);
     done[i - 'A'] = TRUE;
@@ -134,12 +134,10 @@ static void phase_e_handler(t30_state_t *s, void *user_data, int result)
 
 static int tx_packet_handler_a(t38_core_state_t *s, void *user_data, const uint8_t *buf, int len, int count)
 {
-    t38_terminal_state_t *t;
     int i;
     static int subst_seq = 0;
 
     /* This routine queues messages between two instances of T.38 processing */
-    t = (t38_terminal_state_t *) user_data;
     if (simulate_incrementing_repeats)
     {
         for (i = 0;  i < count;  i++)
@@ -163,12 +161,10 @@ static int tx_packet_handler_a(t38_core_state_t *s, void *user_data, const uint8
 
 static int tx_packet_handler_b(t38_core_state_t *s, void *user_data, const uint8_t *buf, int len, int count)
 {
-    t38_terminal_state_t *t;
     int i;
     static int subst_seq = 0;
 
     /* This routine queues messages between two instances of T.38 processing */
-    t = (t38_terminal_state_t *) user_data;
     if (simulate_incrementing_repeats)
     {
         for (i = 0;  i < count;  i++)

@@ -26,6 +26,8 @@
 #if !defined(_SPANDSP_PRIVATE_T4_TX_H_)
 #define _SPANDSP_PRIVATE_T4_TX_H_
 
+#define t4_tx_state_s t4_state_s
+
 /*!
     T.4 FAX compression/decompression descriptor. This defines the working state
     for a single instance of a T.4 FAX compression or decompression channel.
@@ -45,7 +47,7 @@ struct t4_state_s
     /*! \brief The text which will be used in FAX page header. No text results
                in no header line. */
     const char *header_info;
-    /*! \brief Optional per instance time zone for the FAX pager header timestamp. */
+    /*! \brief Optional per instance time zone for the FAX page header timestamp. */
     struct tz_s *tz;
 
     /*! \brief The size of the compressed image on the line side, in bits. */

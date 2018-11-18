@@ -27,7 +27,7 @@ Humble Video's Maven Central artifacts contain native (i.e. non-Java) code and a
 | Operating System | Architecture |
 | ------ | ------------------- |
 | Microsoft Windows XP or later | i686 and x86_64 intel processors |
-| Apple OS X | i686 and x86_64 intel processors |
+| Apple OS X | x86_64 intel processors |
 | Ubuntu 12.04 LTS and later | i686 and x86_64 intel processors |
 
 If you are running on other platforms, the Maven Central artifacts may not work and you'll have to build your own version. And beware ... building Humble takes a very long time.
@@ -81,7 +81,8 @@ that use the native code.
 To build the native code the autotools stack is required:
 
 * GNU c++ compilers
-* YASM (for assembly)
+* autotool (autoreconf, automake, autoconf, etc.)
+* YASM and NASM (for assembly)
 * pkg-config
 * The Humble-Swig version of Swig (Use https://github.com/artclarke/humble-swig to get JavaDoc generated).
 * Doxygen & DOT (for C++ documentation)
@@ -100,6 +101,7 @@ The 'brew' utility is your on Mac OS X friend. Use it often. You can install yas
 
     brew install pkg-config
     brew install yasm
+    brew install nasm
     brew install valgrind
 
 To install the Humble-Swig version of Swig:

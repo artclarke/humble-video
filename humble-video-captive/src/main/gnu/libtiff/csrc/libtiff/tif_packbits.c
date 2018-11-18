@@ -1,5 +1,3 @@
-/* $Id: tif_packbits.c,v 1.20 2010-03-10 18:56:49 bfriesen Exp $ */
-
 /*
  * Copyright (c) 1988-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.
@@ -38,7 +36,8 @@ PackBitsPreEncode(TIFF* tif, uint16 s)
 {
 	(void) s;
 
-	if (!(tif->tif_data = (uint8*)_TIFFmalloc(sizeof(tmsize_t))))
+        tif->tif_data = (uint8*)_TIFFmalloc(sizeof(tmsize_t));
+	if (tif->tif_data == NULL)
 		return (0);
 	/*
 	 * Calculate the scanline/tile-width size in bytes.
@@ -81,7 +80,9 @@ PackBitsEncode(TIFF* tif, uint8* buf, tmsize_t cc, uint16 s)
 		/*
 		 * Find the longest string of identical bytes.
 		 */
-		b = *bp++, cc--, n = 1;
+		b = *bp++;
+		cc--;
+		n = 1;
 		for (; cc > 0 && b == *bp; cc--, bp++)
 			n++;
 	again:
@@ -96,7 +97,7 @@ PackBitsEncode(TIFF* tif, uint8* buf, tmsize_t cc, uint16 s)
 				slop = (long)(op - lastliteral);
 				tif->tif_rawcc += (tmsize_t)(lastliteral - tif->tif_rawcp);
 				if (!TIFFFlushData1(tif))
-					return (-1);
+					return (0);
 				op = tif->tif_rawcp;
 				while (slop-- > 0)
 					*op++ = *lastliteral++;
@@ -104,7 +105,7 @@ PackBitsEncode(TIFF* tif, uint8* buf, tmsize_t cc, uint16 s)
 			} else {
 				tif->tif_rawcc += (tmsize_t)(op - tif->tif_rawcp);
 				if (!TIFFFlushData1(tif))
-					return (-1);
+					return (0);
 				op = tif->tif_rawcp;
 			}
 		}
@@ -222,7 +223,8 @@ PackBitsDecode(TIFF* tif, uint8* op, tmsize_t occ, uint16 s)
 	bp = (char*) tif->tif_rawcp;
 	cc = tif->tif_rawcc;
 	while (cc > 0 && occ > 0) {
-		n = (long) *bp++, cc--;
+		n = (long) *bp++;
+		cc--;
 		/*
 		 * Watch out for compilers that
 		 * don't sign extend chars...
@@ -240,8 +242,15 @@ PackBitsDecode(TIFF* tif, uint8* op, tmsize_t occ, uint16 s)
 				    (unsigned long) ((tmsize_t)n - occ));
 				n = (long)occ;
 			}
+			if( cc == 0 )
+			{
+				TIFFWarningExt(tif->tif_clientdata, module,
+					       "Terminating PackBitsDecode due to lack of data.");
+				break;
+			}
 			occ -= n;
-			b = *bp++, cc--;      /* TODO: may be reading past input buffer here when input data is corrupt or ends prematurely */
+			b = *bp++;
+			cc--;
 			while (n-- > 0)
 				*op++ = (uint8) b;
 		} else {		/* copy next n+1 bytes literally */
@@ -252,7 +261,13 @@ PackBitsDecode(TIFF* tif, uint8* op, tmsize_t occ, uint16 s)
 				    (unsigned long) ((tmsize_t)n - occ + 1));
 				n = (long)occ - 1;
 			}
-			_TIFFmemcpy(op, bp, ++n);  /* TODO: may be reading past input buffer here when input data is corrupt or ends prematurely */
+			if (cc < (tmsize_t) (n+1)) 
+			{
+				TIFFWarningExt(tif->tif_clientdata, module,
+					       "Terminating PackBitsDecode due to lack of data.");
+				break;
+			}
+			_TIFFmemcpy(op, bp, ++n);
 			op += n; occ -= n;
 			bp += n; cc -= n;
 		}

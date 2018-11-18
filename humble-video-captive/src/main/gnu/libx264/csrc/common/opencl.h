@@ -1,7 +1,7 @@
 /*****************************************************************************
  * opencl.h: OpenCL structures and defines
  *****************************************************************************
- * Copyright (C) 2012-2014 x264 project
+ * Copyright (C) 2012-2018 x264 project
  *
  * Authors: Steve Borho <sborho@multicorewareinc.com>
  *          Anton Mitrofanov <BugMaster@narod.ru>
@@ -793,12 +793,17 @@ typedef struct
 
 typedef struct x264_frame x264_frame;
 
+#define x264_opencl_load_library x264_template(opencl_load_library)
 x264_opencl_function_t *x264_opencl_load_library( void );
+#define x264_opencl_close_library x264_template(opencl_close_library)
 void x264_opencl_close_library( x264_opencl_function_t *ocl );
 
+#define x264_opencl_lookahead_init x264_template(opencl_lookahead_init)
 int x264_opencl_lookahead_init( x264_t *h );
+#define x264_opencl_lookahead_delete x264_template(opencl_lookahead_delete)
 void x264_opencl_lookahead_delete( x264_t *h );
 
+#define x264_opencl_frame_delete x264_template(opencl_frame_delete)
 void x264_opencl_frame_delete( x264_frame *frame );
 
 #endif

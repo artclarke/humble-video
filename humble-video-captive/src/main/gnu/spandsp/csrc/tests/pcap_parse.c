@@ -34,19 +34,21 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#if defined(HAVE_PCAP_H)
 #include <pcap.h>
+#endif
 #include <netinet/in.h>
 #include <netinet/udp.h>
-#if defined(__HPUX)  ||  defined(__CYGWIN)  ||  defined(__FreeBSD__)
+#if defined(__HPUX)  ||  defined(__CYGWIN__)  ||  defined(__FreeBSD__)
 #include <netinet/in_systm.h>
 #endif
 #include <netinet/ip.h>
-#ifndef __CYGWIN
+#if !defined(__CYGWIN__)
 #include <netinet/ip6.h>
 #endif
 #include <string.h>
 
-#include <pcap.h>
 #include <netinet/in.h>
 #include <netinet/udp.h>
 #include <time.h>
@@ -55,7 +57,7 @@
 #include "spandsp.h"
 #include "pcap_parse.h"
 
-#if defined(__HPUX) || defined(__DARWIN) || defined(__CYGWIN) || defined(__FreeBSD__)
+#if defined(__HPUX)  ||  defined(__DARWIN)  ||  defined(__CYGWIN__)  ||  defined(__FreeBSD__)
 
 struct iphdr
 {
@@ -90,20 +92,31 @@ typedef struct _ether_hdr
 {
     char ether_dst[6];
     char ether_src[6];
-    u_int16_t ether_type;
+    uint16_t ether_type;
 } ether_hdr;
+
+typedef struct _linux_sll_hdr
+{
+    uint16_t packet_type;
+    uint16_t arphrd;
+    uint16_t slink_length;
+    uint8_t bytes[8];
+    uint16_t ether_type;
+} linux_sll_hdr;
 
 typedef struct _null_hdr
 {
     uint32_t pf_type;
 } null_hdr;
 
+#if !defined(__CYGWIN__)
 typedef struct _ipv6_hdr
 {
     char dontcare[6];
     u_int8_t nxt_header; /* we only need the next header, so we can determine, if the next header is UDP or not */
     char dontcare2[33];
 } ipv6_hdr;
+#endif
 
 char errbuf[PCAP_ERRBUF_SIZE];
 
@@ -124,9 +137,12 @@ int pcap_scan_pkts(const char *file,
     int total_pkts;
     uint32_t pktlen;
     ether_hdr *ethhdr;
+    linux_sll_hdr *sllhdr;
     null_hdr *nullhdr;
     struct iphdr *iphdr;
+#if !defined(__CYGWIN__)
     ipv6_hdr *ip6hdr;
+#endif
     struct udphdr *udphdr;
     int datalink;
     int packet_type;
@@ -139,13 +155,22 @@ int pcap_scan_pkts(const char *file,
     }
     datalink = pcap_datalink(pcap);
     /* DLT_EN10MB seems to apply to all forms of ethernet, not just the 10MB kind. */
-    if (datalink != DLT_EN10MB  &&  datalink != DLT_NULL)
+    switch (datalink)
     {
+    case DLT_EN10MB:
+        printf("Datalink type ethernet\n");
+        break;
+    case DLT_LINUX_SLL:
+        printf("Datalink type cooked Linux socket\n");
+        break;
+    case DLT_NULL:
+        printf("Datalink type NULL\n");
+        break;
+    default:
         fprintf(stderr, "Unsupported data link type %d\n", datalink);
         return -1;
     }
 
-    printf("Datalink type %d\n", datalink);
     pkthdr = NULL;
     pktdata = NULL;
 #if defined(HAVE_PCAP_NEXT_EX)
@@ -160,24 +185,46 @@ int pcap_scan_pkts(const char *file,
     while ((pktdata = (uint8_t *) pcap_next(pcap, pkthdr)) != NULL)
     {
 #endif
-        if (datalink == DLT_EN10MB)
+        switch (datalink)
         {
+        case DLT_EN10MB:
             ethhdr = (ether_hdr *) pktdata;
             packet_type = ntohs(ethhdr->ether_type);
+#if !defined(__CYGWIN__)
             if (packet_type != 0x0800     /* IPv4 */
                 &&
-                packet_type != 0x86dd)    /* IPv6 */
+                packet_type != 0x86DD)    /* IPv6 */
+#else
+            if (packet_type != 0x0800)    /* IPv4 */
+#endif
             {
                 continue;
             }
             iphdr = (struct iphdr *) ((uint8_t *) ethhdr + sizeof(*ethhdr));
-        }
-        else if (datalink == DLT_NULL)
-        {
+            break;
+        case DLT_LINUX_SLL:
+            sllhdr = (linux_sll_hdr *) pktdata;
+            packet_type = ntohs(sllhdr->ether_type);
+#if !defined(__CYGWIN__)
+            if (packet_type != 0x0800     /* IPv4 */
+                &&
+                packet_type != 0x86DD)    /* IPv6 */
+#else
+            if (packet_type != 0x0800)    /* IPv4 */
+#endif
+            {
+                continue;
+            }
+            iphdr = (struct iphdr *) ((uint8_t *) sllhdr + sizeof(*sllhdr));
+            break;
+        case DLT_NULL:
             nullhdr = (null_hdr *) pktdata;
             if (nullhdr->pf_type != PF_INET  &&  nullhdr->pf_type != PF_INET6)
                 continue;
             iphdr = (struct iphdr *) ((uint8_t *) nullhdr + sizeof(*nullhdr));
+            break;
+        default:
+            continue;
         }
 #if 0
         {
@@ -188,6 +235,7 @@ int pcap_scan_pkts(const char *file,
             printf("\n");
         }
 #endif
+#if !defined(__CYGWIN__)
         if (iphdr  &&  iphdr->version == 6)
         {
             /* ipv6 */
@@ -198,11 +246,12 @@ int pcap_scan_pkts(const char *file,
             udphdr = (struct udphdr *) ((uint8_t *) ip6hdr + sizeof(*ip6hdr));
         }
         else
+#endif
         {
             /* ipv4 */
             if (iphdr->protocol != IPPROTO_UDP)
                 continue;
-#if defined(__DARWIN)  ||  defined(__CYGWIN)  ||  defined(__FreeBSD__)
+#if defined(__DARWIN)  ||  defined(__CYGWIN__)  ||  defined(__FreeBSD__)
             udphdr = (struct udphdr *) ((uint8_t *) iphdr + (iphdr->ihl << 2) + 4);
             pktlen = (uint32_t) ntohs(udphdr->uh_ulen);
 #elif defined ( __HPUX)
@@ -218,11 +267,19 @@ int pcap_scan_pkts(const char *file,
 
         if (src_addr  &&  ntohl(iphdr->saddr) != src_addr)
             continue;
+#if defined(__DARWIN)  ||  defined(__CYGWIN__)  ||  defined(__FreeBSD__)
+        if (src_port  &&  ntohs(udphdr->uh_sport) != src_port)
+#else
         if (src_port  &&  ntohs(udphdr->source) != src_port)
+#endif
             continue;
         if (dest_addr  &&  ntohl(iphdr->daddr) != dest_addr)
             continue;
+#if defined(__DARWIN)  ||  defined(__CYGWIN__)  ||  defined(__FreeBSD__)
+        if (dest_port  &&  ntohs(udphdr->uh_dport) != dest_port)
+#else
         if (dest_port  &&  ntohs(udphdr->dest) != dest_port)
+#endif
             continue;
 
         if (pkthdr->len != pkthdr->caplen)

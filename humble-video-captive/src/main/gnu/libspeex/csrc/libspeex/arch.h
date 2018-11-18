@@ -38,9 +38,9 @@
 #ifndef SPEEX_VERSION
 #define SPEEX_MAJOR_VERSION 1         /**< Major Speex version. */
 #define SPEEX_MINOR_VERSION 1         /**< Minor Speex version. */
-#define SPEEX_MICRO_VERSION 15        /**< Micro Speex version. */
+#define SPEEX_MICRO_VERSION 16        /**< Micro Speex version. */
 #define SPEEX_EXTRA_VERSION ""        /**< Extra Speex version. */
-#define SPEEX_VERSION "speex-1.2beta3"  /**< Speex version string. */
+#define SPEEX_VERSION "speex-1.2.0"   /**< Speex version string. */
 #endif
 
 /* A couple test to catch stupid option combinations */
@@ -74,9 +74,7 @@
 
 #endif
 
-#ifndef OUTSIDE_SPEEX
 #include "speex/speex_types.h"
-#endif
 
 #define ABS(x) ((x) < 0 ? (-(x)) : (x))      /**< Absolute integer value. */
 #define ABS16(x) ((x) < 0 ? (-(x)) : (x))    /**< Absolute 16-bit value.  */
@@ -89,7 +87,7 @@
 #ifdef FIXED_POINT
 
 typedef spx_int16_t spx_word16_t;
-typedef spx_int32_t   spx_word32_t;
+typedef spx_int32_t spx_word32_t;
 typedef spx_word32_t spx_mem_t;
 typedef spx_word16_t spx_coef_t;
 typedef spx_word16_t spx_lsp_t;

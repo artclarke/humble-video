@@ -51,8 +51,15 @@ static const FLOAT costab[TRI_SIZE * 2] = {
 };
 
 
+/* make sure functions with SSE instructions maintain their own properly aligned stack */
+#if defined (__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
+#define SSE_FUNCTION __attribute__((force_align_arg_pointer))
+#else
+#define SSE_FUNCTION
+#endif
 
-void
+
+SSE_FUNCTION void
 init_xrpow_core_sse(gr_info * const cod_info, FLOAT xrpow[576], int upper, FLOAT * sum)
 {
     int     i;
@@ -113,7 +120,8 @@ init_xrpow_core_sse(gr_info * const cod_info, FLOAT xrpow[576], int upper, FLOAT
 }
 
 
-static void store4(__m128 v, float* f0, float* f1, float* f2, float* f3)
+SSE_FUNCTION static void
+store4(__m128 v, float* f0, float* f1, float* f2, float* f3)
 {
     vecfloat_union r;
     r._m128 = v;
@@ -124,7 +132,7 @@ static void store4(__m128 v, float* f0, float* f1, float* f2, float* f3)
 }
 
 
-void
+SSE_FUNCTION void
 fht_SSE2(FLOAT * fz, int n)
 {
     const FLOAT *tri = costab;

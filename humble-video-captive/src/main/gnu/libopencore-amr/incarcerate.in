@@ -25,6 +25,11 @@ cp -r @abs_srcdir@/csrc/* @abs_builddir@/csrc/
 # and make everything user writeable so distcheck will pass
 chmod -R u+w @abs_builddir@/csrc/*
 
+if [ ! -f @abs_builddir@/csrc/configure ]; then
+    # sigh... looks like they don't check in with configure. Rebuild it.
+    (cd @abs_builddir@/csrc/ && autoreconf --install --force)
+fi
+
 LIBRARY_OPTIONS="--disable-dependency-tracking \
    --with-pic \
    --disable-shared \

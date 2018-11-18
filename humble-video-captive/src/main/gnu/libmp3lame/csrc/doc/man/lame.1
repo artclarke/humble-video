@@ -1,4 +1,4 @@
-.TH lame 1 "July 08, 2008" "LAME 3.99" "LAME audio compressor"
+.TH lame 1 "December 08, 2013" "LAME 3.99" "LAME audio compressor"
 .SH NAME
 lame \- create mp3 audio files
 .SH SYNOPSIS
@@ -19,7 +19,7 @@ Assume the input file is raw pcm.
 Sampling rate and mono/stereo/jstereo must be specified on the command line.
 For each stereo sample, LAME expects the input data to be ordered left channel
 first, then right channel. By default, LAME expects them to be signed integers
-with a bitwidth of 16.
+with a bitwidth of 16 and stored in little-endian.
 Without
 .B \-r,
 LAME will perform several
@@ -29,8 +29,8 @@ on the input file looking for WAV and AIFF headers.
 Might not be available on your release. 
 .TP
 .B \-x
-Swap bytes in the input file or output file when using
-.B \-\-decode.
+Swap bytes in the input file (or output file when using
+.B \-\-decode).
 .br
 For sorting out little endian/big endian type problems.
 If your encodings sounds like static,
@@ -82,6 +82,13 @@ Instructs LAME that the samples from the input are in big-endian form.
 
 Required only for raw PCM input files.
 .TP
+.B \-\-mp1input
+Assume the input file is a MPEG Layer I (ie MP1) file.
+.br
+If the filename ends in ".mp1" LAME will assume it is a MPEG Layer I file.
+For stdin or Layer I files which do not end in .mp1 you need to use
+this switch. 
+.TP
 .B \-\-mp2input
 Assume the input file is a MPEG Layer II (ie MP2) file.
 .br
@@ -104,6 +111,10 @@ gapless encoding for a set of contiguous files
 .TP
 .BI \-\-nogapout " dir"
 output dir for gapless encoding (must precede \-\-nogap)
+.TP
+.BI \-\-out-dir " dir"
+If no explicit output file is specified, a file will be written at given path.
+Ignored when using piped/streamed input
 
 .PP
 Operational options:
@@ -112,13 +123,9 @@ Operational options:
 .I mode
 = s, j, f, d, m, l, r
 
-Joint-stereo is the default mode for stereo files with VBR when
-.B \-V
-is more than 4 or fixed bitrates of 160kbs or less.
-At higher fixed bitrates or higher VBR settings,
-the default is stereo. 
+Joint-stereo is the default mode for stereo files. 
 
-.B (s)imple stereo 
+.B (s)imple stereo (Forced LR)
 .br
 In this mode,
 the encoder makes no use of potentially existing correlations between
@@ -131,34 +138,24 @@ less bits because of a lower complexity.
 
 .B (j)oint stereo
 .br
-In this mode,
-the encoder will make use of a correlation between both channels.
-The signal will be matrixed into a sum ("mid"),
-computed by L+R,
-and difference ("side") signal,
-computed by L\-R,
-and more bits are allocated to the mid channel.
-This will effectively increase the bandwidth if the signal does not
-have too much stereo separation,
-thus giving a significant gain in encoding quality.
+In this mode, 
+the encoder can use (on a frame by frame basis) either L/R stereo or mid/side stereo.
+In mid/side stereo,
+the mid (L+R) and side (L-R) channels are encoded,
+and more bits are allocated to the mid channel than the side channel.
+When there isn't too much stereo separation, this effectively increases the bandwidth,
+so having higher quality with the same amount of bits.
 
-Using mid/side stereo inappropriately can result in audible
-compression artifacts.
-To much switching between mid/side and regular stereo can also
-sound bad.
+Using mid/side stereo inappropriately can result in audible compression artifacts.
+Too much switching between mid/side and regular stereo can also sound bad.
 To determine when to switch to mid/side stereo,
-LAME uses a much more sophisticated algorithm than that described
-in the ISO documentation, and thus is safe to use in joint
-stereo mode.
+LAME uses a much more sophisticated algorithm than the one described in the ISO documentation.
 
 .B (f)orced MS stereo 
 .br
-This mode will force MS stereo on all frames.
-It is slightly faster than joint stereo,
-but it should be used only if you are sure that every frame of the
-input file has very little stereo separation.
+Forces all frames to be encoded with mid/side stereo. It should be used only if you are sure that every frame of the input file has very little stereo separation.
 
-.B (d)ual mono
+.B (d)ual channel
 .br
 In this mode,
 the 2 channels will be totally independently encoded.
@@ -175,6 +172,7 @@ If it was a stereo signal,
 it will be downsampled to mono.
 The downmix is calculated as the sum of the left and right channel,
 attenuated by 6 dB.
+Also note that, if using a stereo RAW PCM stream, you need to use the -a parameter.
 
 .B (l)eft channel only
 .br
@@ -197,19 +195,14 @@ attenuated by 6 dB.
 
 This option is only needed in the case of raw PCM stereo input
 (because LAME cannot determine the number of channels in the input file).
-To encode a stereo PCM input file as mono,
+To encode a stereo RAW PCM input file as mono,
 use
-.B lame \-m
-.I s
-.B \-a.
+.B lame \-a \-m m
 
 For WAV and AIFF input files,
 using
-.B \-m
+.B \-m m
 will always produce a mono .mp3 file from both mono and stereo input. 
-.TP
-.B \-d
-Allows the left and right channels to use different block size types. 
 .TP
 .B \-\-freeformat
 Produces a free format bitstream.
@@ -225,9 +218,6 @@ many players are unable to deal with it.
 
 Tests have shown that the following decoders support free format:
 .br
-.B FreeAmp
-up to 440 kbps
-.br
 .B in_mpg123
 up to 560 kbps
 .br
@@ -235,7 +225,7 @@ up to 560 kbps
 up to 310 kbps
 .br
 .B LAME
-up to 560 kbps
+up to 640 kbps
 .br
 .B MAD
 up to 640 kbps
@@ -244,7 +234,7 @@ up to 640 kbps
 Uses LAME for decoding to a wav file.
 The input file can be any input type supported by encoding,
 including layer II files.
-LAME uses a bugfixed version of mpglib for decoding.
+LAME uses a fork of mpglib known as HIP for decoding.
 
 If
 .B \-t
@@ -261,7 +251,7 @@ disabled in the build of LAME.
 .BI \-t
 Disable writing of the INFO Tag on encoding.
 .br
-This tag in embedded in frame 0 of the MP3 file.
+This tag is embedded in frame 0 of the MP3 file.
 It includes some information about the encoding options of the file,
 and in VBR it lets VBR aware players correctly seek and compute
 playing times of VBR files.
@@ -336,9 +326,8 @@ See also:
 .B \-\-replaygain\-accurate
 Compute ReplayGain more accurately and find the peak sample.
 
-This enables decoding on the fly, computes "Radio" ReplayGain on the
-decoded data stream,
-finds the peak sample of the decoded data stream and stores it in the file.
+This computes "Radio" ReplayGain on the decoded data stream,
+finds the peak sample by decoding on the fly the encoded data stream and stores it in the file. 
  
 The ReplayGain analysis does
 .I not
@@ -433,9 +422,6 @@ Have a look at the PRESETS section below.
 .B \-\-preset help
 gives more infos about the the used options in these presets.
 .TP
-.B \-\-preset " type | [cbr] kbps"
-Use one of the built-in  presets.
-.TP
 .B \-\-noasm " type"
 Disable specific assembly optimizations (
 .B mmx
@@ -491,60 +477,48 @@ But for a given bitrate,
 we have a choice of algorithms to determine the best scalefactors
 and Huffman encoding (noise shaping).
 
+For CBR and ABR, the following table applies:
+
 .B -q 0:
 .br
-use slowest & best possible version of all algorithms.
-.B -q 0
-and
-.B -q 1
-are slow and may not produce significantly higher quality.
+Use the best algorithms (Best Huffman coding search, full outer loop, and the highest precision of several parameters).
 
-.B -q 2:
+.B -q 1 to q 4:
 .br
-recommended.
-Same as
-.B -h.
+Similar to -q 0 without the full outer loop and decreasing precision of parameters the further from q0. -q 3 is the default.
 
-.B -q 5:
+.B -q 5 and -q 6:
 .br
-default value.
-Good speed,
-reasonable quality.
+Same as -q 7, but enables noise shaping and increases subblock gain
 
-.B -q 7:
+.B -q 7 to -q 9:
 .br
-same as
-.B -f.
-Very fast,
-ok quality.
-Psycho acoustics are used for pre-echo & M/S,
-but no noise shaping is done.
+Same as -f. Very fast, OK quality. Psychoacoustics are used for pre-echo and mid/side stereo, but no noise-shaping is done.
 
-.B -q 9:
+For the default VBR mode since LAME 3.98, the following table applies :
+
+.B -q 0 to -q 4:
 .br
-disables almost all algorithms including psy-model.
-Poor quality.
+include all features of the other modes and additionally use the best search when applying Huffman coding.
+
+.B -q 5 and -q 6:
+.br
+include all features of -q7, calculate and consider actual quantisation noise, and additionally enable subblock gain.
+
+.B -q 7 to -q 9
+.br
+This level uses a psymodel but does not calculate quantisation noise when encoding: it takes a quick guess.
+
+
 .TP
 .B -h
-Use some quality improvements.
-Encoding will be slower,
-but the result will be of higher quality.
-The behavior is the same as the
+Alias of 
 .B -q 2
-switch.
-.br
-This switch is always enabled when using VBR. 
 .TP
 .B -f
-This switch forces the encoder to use a faster encoding mode,
-but with a lower quality.
-The behavior is the same as the
+Alias of
 .B -q 7
-switch.
 
-Noise shaping will be disabled,
-but psycho acoustics will still be computed for bit allocation
-and pre-echo detection. 
 
 .PP
 CBR (constant bitrate, the default) options:
@@ -565,10 +539,12 @@ For MPEG-2.5 (sampling frequencies of 8, 11.025 and 12 kHz)
 .I n
 = 8, 16, 24, 32, 40, 48, 56, 64
 
-Default is 128 for MPEG1 and 64 for MPEG2. 
+Default is 128 for MPEG1 and 64 for MPEG2 and 32 for MPEG2.5
+ (64, 32 and 16 respectively in case of mono). 
 .TP
 .BI \-\-cbr
-enforce use of constant bitrate
+enforce use of constant bitrate. Used to disable VBR or ABR encoding even if their settings
+are enabled.
 
 .PP
 ABR (average bitrate) options:
@@ -627,15 +603,17 @@ considerable tuning was done on this algorithm,
 and it is now considered to be on par with the original
 .B \-\-vbr-old. 
 It has the added advantage of being very fast (over twice as fast as
-.B \-\-vbr-old).
+.B \-\-vbr-old
+). This is the default since 3.98.
 .TP
 .BI -V " n"
 0 <=
 .I n
-<= 9
+<= 9.999
 .br
 Enable VBR (Variable BitRate) and specifies the value of VBR quality
-(default = 4).
+(default = 4). Decimal values can be specified, like 4.51.
+.br
 0 = highest quality.
 
 .PP
@@ -883,6 +861,9 @@ just the track number creates v1.1 tag, providing a total forces v2.0).
 .BI \-\-tg " genre"
 audio/song genre (name or number in list)
 .TP
+.BI \-\-tv " id=value"
+Text or URL frame specified by id and value (v2.3 tag). User defined frame. Syntax: \-\-tv "TXXX=description=content"
+.TP
 .B \-\-add-id3v2
 force addition of version 2 tag
 .TP
@@ -1015,13 +996,6 @@ this preset will determine the optimal settings for that particular situation.
 While this approach works,
 it is not nearly as flexible as VBR,
 and usually will not attain the same level of quality as VBR at higher bitrates.
-.PP
-The following options are also available for the corresponding profiles:
-.PP
-.B standard|extreme
-.br
-.B cbr " kbps"
-.PP
 .TP
 .B cbr
 If you use the ABR mode (read above) with a significant bitrate such as 80,
@@ -1034,7 +1008,7 @@ If you use the ABR mode (read above) with a significant bitrate such as 80,
 256,
 320,
 you can use the
-.B cbr
+.B \-\-preset cbr " kbps"
 option to force CBR mode encoding instead of the standard ABR mode.
 ABR does provide higher quality but CBR may be useful in situations such as when
 streaming an MP3 over the Internet may be important.
@@ -1044,20 +1018,14 @@ streaming an MP3 over the Internet may be important.
 .LP
 Fixed bit rate jstereo 128kbs encoding:
 .IP
-.B lame
-.I sample.wav sample.mp3
-
-.LP
-Fixed bit rate jstereo 128 kbps encoding, highest quality (recommended):
-.IP
-.B lame \-h
-.I sample.wav sample.mp3
-
-.LP
-Fixed bit rate jstereo 112 kbps encoding:
-.IP
 .B lame \-b
-.I 112 sample.wav sample.mp3
+.I 128 sample.wav sample.mp3
+
+.LP
+Fixed bit rate jstereo 128 kbps encoding, highest quality:
+.IP
+.B lame \-q 0 \-b
+.I 128 sample.wav sample.mp3
 
 .LP
 To disable joint stereo encoding (slightly faster,
@@ -1067,17 +1035,10 @@ but less quality at bitrates <= 128 kbps):
 .I s sample.wav sample.mp3
 
 .LP
-Fast encode,
-low quality (no psycho-acoustics):
-.IP
-.B lame \-f
-.I sample.wav sample.mp3
-
-.LP
 Variable bitrate (use \-V n to adjust quality/filesize):
 .IP
-.B lame \-h \-V
-.I 6 sample.wav sample.mp3
+.B lame \-V
+.I 2 sample.wav sample.mp3
 
 .LP
 Streaming mono 22.05 kHz raw pcm, 24 kbps output:

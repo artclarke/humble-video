@@ -57,6 +57,12 @@ extern "C"
 {
 #endif
 
+/*! Convert a FAX modem type to a short text description.
+    \brief Convert a FAX modem type to a short text description.
+    \param modem The modem code.
+    \return A pointer to the description. */
+SPAN_DECLARE(const char *) fax_modem_to_str(int modem);
+
 /* N.B. the following are currently a work in progress */
 SPAN_DECLARE_NONSTD(int) fax_modems_v17_v21_rx(void *user_data, const int16_t amp[], int len);
 SPAN_DECLARE_NONSTD(int) fax_modems_v27ter_v21_rx(void *user_data, const int16_t amp[], int len);
@@ -64,11 +70,21 @@ SPAN_DECLARE_NONSTD(int) fax_modems_v29_v21_rx(void *user_data, const int16_t am
 SPAN_DECLARE_NONSTD(int) fax_modems_v17_v21_rx_fillin(void *user_data, int len);
 SPAN_DECLARE_NONSTD(int) fax_modems_v27ter_v21_rx_fillin(void *user_data, int len);
 SPAN_DECLARE_NONSTD(int) fax_modems_v29_v21_rx_fillin(void *user_data, int len);
+
+SPAN_DECLARE_NONSTD(void) fax_modems_hdlc_tx_frame(void *user_data, const uint8_t *msg, int len);
+
 SPAN_DECLARE(void) fax_modems_start_rx_modem(fax_modems_state_t *s, int which);
 
 SPAN_DECLARE(void) fax_modems_set_tep_mode(fax_modems_state_t *s, int use_tep);
 
 SPAN_DECLARE(int) fax_modems_restart(fax_modems_state_t *s);
+
+/*! Get a pointer to the logging context associated with a FAX modems context.
+    \brief Get a pointer to the logging context associated with a FAX modems context.
+    \param s The FAX modems context.
+    \return A pointer to the logging context, or NULL.
+*/
+SPAN_DECLARE(logging_state_t *) fax_modems_get_logging_state(fax_modems_state_t *s);
 
 SPAN_DECLARE(fax_modems_state_t *) fax_modems_init(fax_modems_state_t *s,
                                                    int use_tep,

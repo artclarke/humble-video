@@ -77,10 +77,10 @@ static void picmemset(PicContext *s, AVFrame *frame, int value, int run,
                 if (*y < 0) {
                    *y = s->height - 1;
                    *plane += 1;
+                   if (*plane >= s->nb_planes)
+                       return;
                    value <<= bits_per_plane;
                    mask  <<= bits_per_plane;
-                   if (*plane >= s->nb_planes)
-                       break;
                 }
             }
         }
@@ -142,7 +142,7 @@ static int decode_frame(AVCodecContext *avctx,
 
     if (av_image_check_size(s->width, s->height, 0, avctx) < 0)
         return -1;
-    if (s->width != avctx->width && s->height != avctx->height) {
+    if (s->width != avctx->width || s->height != avctx->height) {
         ret = ff_set_dimensions(avctx, s->width, s->height);
         if (ret < 0)
             return ret;
@@ -236,7 +236,7 @@ static int decode_frame(AVCodecContext *avctx,
             }
         }
 
-        if (x < avctx->width) {
+        if (plane < s->nb_planes && x < avctx->width) {
             int run = (y + 1) * avctx->width - x;
             if (bits_per_plane == 8)
                 picmemset_8bpp(s, frame, val, run, &x, &y);

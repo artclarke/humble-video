@@ -57,7 +57,7 @@ extern const Word32 mTab_4_3[512];
 /*! $2^{-\frac{n}{16}}$ table */
 extern const Word16 pow2tominusNover16[17] ;
 
-extern Word32 specExpMantTableComb_enc[4][14];
+extern const Word32 specExpMantTableComb_enc[4][14];
 extern const UWord8 specExpTableComb_enc[4][14];
 
 extern const Word16 quantBorders[4][4];

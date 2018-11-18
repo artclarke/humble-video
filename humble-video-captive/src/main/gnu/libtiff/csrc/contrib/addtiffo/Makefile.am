@@ -25,12 +25,15 @@
 
 LIBTIFF = $(top_builddir)/libtiff/libtiff.la
 
-EXTRA_DIST = README Makefile.vc
+EXTRA_DIST = \
+	CMakeLists.txt \
+	Makefile.vc \
+	README
 
 noinst_PROGRAMS = addtiffo
 
 addtiffo_SOURCES = addtiffo.c tif_overview.c tif_ovrcache.c tif_ovrcache.h
 addtiffo_LDADD = $(LIBTIFF)
 
-INCLUDES = -I$(top_srcdir)/libtiff
+AM_CPPFLAGS = -I$(top_srcdir)/libtiff
 

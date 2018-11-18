@@ -93,6 +93,10 @@ LINK32=link.exe
 # Begin Group "Source Files"
 # Begin Source File
 
+SOURCE=.\ademco_contactid.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\adsi.c
 # End Source File
 # Begin Source File
@@ -242,6 +246,10 @@ SOURCE=.\lpc10_placev.c
 # Begin Source File
 
 SOURCE=.\lpc10_voicing.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\math_fixed.c
 # End Source File
 # Begin Source File
 
@@ -427,6 +435,10 @@ SOURCE=.\.\msvc\gettimeofday.c
 # Begin Group "Header Files"
 # Begin Source File
 
+SOURCE=.\spandsp/ademco_contactid.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\spandsp/adsi.h
 # End Source File
 # Begin Source File
@@ -563,6 +575,10 @@ SOURCE=.\spandsp/lpc10.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\spandsp/math_fixed.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\spandsp/modem_echo.h
 # End Source File
 # Begin Source File
@@ -600,6 +616,10 @@ SOURCE=.\spandsp/saturated.h
 # Begin Source File
 
 SOURCE=.\spandsp/schedule.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\spandsp/stdbool.h
 # End Source File
 # Begin Source File
 
@@ -756,6 +776,10 @@ SOURCE=.\spandsp/vector_int.h
 # Begin Source File
 
 SOURCE=.\spandsp/version.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\spandsp/private/ademco_contactid.h
 # End Source File
 # Begin Source File
 

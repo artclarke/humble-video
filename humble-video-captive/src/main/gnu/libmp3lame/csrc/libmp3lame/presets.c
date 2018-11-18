@@ -2,7 +2,7 @@
  * presets.c -- Apply presets
  *
  *	Copyright (c) 2002-2008 Gabriel Bouvigne
- *	Copyright (c) 2007-2011 Robert Hegemann
+ *	Copyright (c) 2007-2012 Robert Hegemann
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -205,7 +205,11 @@ apply_vbr_preset(lame_global_flags * gfp, int a, int enforce)
         gfp->VBR_q_frac = x;
     }
     gfp->internal_flags->cfg.minval = set->minval;
-    gfp->internal_flags->cfg.ATHfixpoint = set->ath_fixpoint;
+    {   /* take care of gain adjustments */
+        double const x = fabs(gfp->scale);
+        double const y = (x > 0.f) ? (10.f * log10(x)) : 0.f;
+        gfp->internal_flags->cfg.ATHfixpoint = set->ath_fixpoint - y;
+    }
 }
 
 static int

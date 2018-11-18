@@ -22,6 +22,7 @@ AM_LDFLAGS = $(COMP_VENDOR_LDFLAGS)
 MAINTAINERCLEANFILES = Makefile.in
 
 DISTCLEANFILES = $(srcdir)/at_interpreter_dictionary.h \
+                 $(srcdir)/math_fixed_tables.h \
                  $(srcdir)/v17_v32bis_rx_fixed_rrc.h \
                  $(srcdir)/v17_v32bis_rx_floating_rrc.h \
                  $(srcdir)/v17_v32bis_tx_fixed_rrc.h \
@@ -55,6 +56,7 @@ EXTRA_DIST = floating_fudge.h \
              libtiff.2008.vcproj \
              filter_tools.c \
              make_at_dictionary.c \
+             make_math_fixed_tables.c \
              make_modem_filter.c \
              msvc/config.h \
              msvc/Download_TIFF.2005.vcproj \
@@ -81,11 +83,12 @@ EXTRA_DIST = floating_fudge.h \
              spandsp/private/README \
              spandsp/version.h.in
 
-INCLUDES = -I$(top_builddir)
+AM_CPPFLAGS = -I$(top_builddir)
 
 lib_LTLIBRARIES = libspandsp.la
 
-libspandsp_la_SOURCES = adsi.c \
+libspandsp_la_SOURCES = ademco_contactid.c \
+                        adsi.c \
                         async.c \
                         at_interpreter.c \
                         awgn.c \
@@ -123,6 +126,7 @@ libspandsp_la_SOURCES = adsi.c \
                         lpc10_encode.c \
                         lpc10_placev.c \
                         lpc10_voicing.c \
+                        math_fixed.c \
                         modem_echo.c \
                         modem_connect_tones.c \
                         noise.c \
@@ -170,7 +174,8 @@ libspandsp_la_SOURCES = adsi.c \
 
 libspandsp_la_LDFLAGS = -version-info @SPANDSP_LT_CURRENT@:@SPANDSP_LT_REVISION@:@SPANDSP_LT_AGE@ $(COMP_VENDOR_LDFLAGS)
 
-nobase_include_HEADERS = spandsp/adsi.h \
+nobase_include_HEADERS = spandsp/ademco_contactid.h \
+                         spandsp/adsi.h \
                          spandsp/async.h \
                          spandsp/arctan2.h \
                          spandsp/at_interpreter.h \
@@ -204,6 +209,7 @@ nobase_include_HEADERS = spandsp/adsi.h \
                          spandsp/image_translate.h \
                          spandsp/logging.h \
                          spandsp/lpc10.h \
+                         spandsp/math_fixed.h \
                          spandsp/modem_echo.h \
                          spandsp/modem_connect_tones.h \
                          spandsp/noise.h \
@@ -214,6 +220,7 @@ nobase_include_HEADERS = spandsp/adsi.h \
                          spandsp/queue.h \
                          spandsp/saturated.h \
                          spandsp/schedule.h \
+                         spandsp/stdbool.h \
                          spandsp/sig_tone.h \
                          spandsp/silence_gen.h \
                          spandsp/super_tone_rx.h \
@@ -253,6 +260,7 @@ nobase_include_HEADERS = spandsp/adsi.h \
                          spandsp/vector_float.h \
                          spandsp/vector_int.h \
                          spandsp/version.h \
+                         spandsp/private/ademco_contactid.h \
                          spandsp/private/adsi.h \
                          spandsp/private/async.h \
                          spandsp/private/at_interpreter.h \
@@ -315,19 +323,23 @@ nobase_include_HEADERS = spandsp/adsi.h \
 
 nodist_include_HEADERS = spandsp.h
 
-noinst_HEADERS =         faxfont.h \
-                         filter_tools.h \
-                         gsm0610_local.h \
-                         lpc10_encdecs.h \
-                         mmx_sse_decs.h \
-                         t30_local.h \
-                         t4_t6_decode_states.h \
-                         v17_v32bis_rx_constellation_maps.h \
-                         v17_v32bis_tx_constellation_maps.h \
-                         v29tx_constellation_maps.h
+noinst_HEADERS = cielab_luts.h \
+                 faxfont.h \
+                 filter_tools.h \
+                 gsm0610_local.h \
+                 lpc10_encdecs.h \
+                 mmx_sse_decs.h \
+                 t30_local.h \
+                 t4_t6_decode_states.h \
+                 v17_v32bis_rx_constellation_maps.h \
+                 v17_v32bis_tx_constellation_maps.h \
+                 v29tx_constellation_maps.h
 
 make_at_dictionary$(EXEEXT): $(top_srcdir)/src/make_at_dictionary.c
 	$(CC_FOR_BUILD) -o make_at_dictionary$(EXEEXT) $(top_srcdir)/src/make_at_dictionary.c  -DHAVE_CONFIG_H -I$(top_builddir)/src
+
+make_math_fixed_tables$(EXEEXT): $(top_srcdir)/src/make_math_fixed_tables.c
+	$(CC_FOR_BUILD) -o make_math_fixed_tables$(EXEEXT) $(top_srcdir)/src/make_math_fixed_tables.c  -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
 
 make_modem_filter$(EXEEXT): $(top_srcdir)/src/make_modem_filter.c $(top_srcdir)/src/filter_tools.c
 	$(CC_FOR_BUILD) -o make_modem_filter$(EXEEXT) $(top_srcdir)/src/make_modem_filter.c $(top_srcdir)/src/filter_tools.c -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
@@ -341,6 +353,13 @@ at_interpreter.lo: at_interpreter_dictionary.h
 
 at_interpreter_dictionary.h: make_at_dictionary$(EXEEXT)
 	./make_at_dictionary$(EXEEXT) >at_interpreter_dictionary.h
+
+math_fixed.$(OBJEXT): math_fixed_tables.h
+
+math_fixed.lo: math_fixed_tables.h
+
+math_fixed_tables.h: make_math_fixed_tables$(EXEEXT)
+	./make_math_fixed_tables$(EXEEXT) >math_fixed_tables.h
 
 t4_rx.$(OBJEXT): spandsp/version.h
 

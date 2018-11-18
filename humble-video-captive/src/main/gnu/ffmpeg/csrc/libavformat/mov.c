@@ -635,6 +635,8 @@ static int mov_read_hdlr(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 
     title_size = atom.size - 24;
     if (title_size > 0) {
+        if (title_size > FFMIN(INT_MAX, SIZE_MAX-1))
+            return AVERROR_INVALIDDATA;
         title_str = av_malloc(title_size + 1); /* Add null terminator */
         if (!title_str)
             return AVERROR(ENOMEM);
@@ -2204,6 +2206,8 @@ static int mov_read_stsc(MOVContext *c, AVIOContext *pb, MOVAtom atom)
     avio_rb24(pb); /* flags */
 
     entries = avio_rb32(pb);
+    if ((uint64_t)entries * 12 + 4 > atom.size)
+        return AVERROR_INVALIDDATA;
 
     av_log(c->fc, AV_LOG_TRACE, "track[%i].stsc.entries = %i\n", c->fc->nb_streams-1, entries);
 
@@ -2224,6 +2228,29 @@ static int mov_read_stsc(MOVContext *c, AVIOContext *pb, MOVAtom atom)
     }
 
     sc->stsc_count = i;
+    for (i = sc->stsc_count - 1; i < UINT_MAX; i--) {
+        int64_t first_min = i + 1;
+        if ((i+1 < sc->stsc_count && sc->stsc_data[i].first >= sc->stsc_data[i+1].first) ||
+            (i > 0 && sc->stsc_data[i].first <= sc->stsc_data[i-1].first) ||
+            sc->stsc_data[i].first < first_min ||
+            sc->stsc_data[i].count < 1 ||
+            sc->stsc_data[i].id < 1) {
+            av_log(c->fc, AV_LOG_WARNING, "STSC entry %d is invalid (first=%d count=%d id=%d)\n", i, sc->stsc_data[i].first, sc->stsc_data[i].count, sc->stsc_data[i].id);
+            if (i+1 >= sc->stsc_count) {
+                sc->stsc_data[i].first = FFMAX(sc->stsc_data[i].first, first_min);
+                if (i > 0 && sc->stsc_data[i].first <= sc->stsc_data[i-1].first)
+                    sc->stsc_data[i].first = FFMIN(sc->stsc_data[i-1].first + 1LL, INT_MAX);
+                sc->stsc_data[i].count = FFMAX(sc->stsc_data[i].count, 1);
+                sc->stsc_data[i].id    = FFMAX(sc->stsc_data[i].id, 1);
+                continue;
+            }
+            av_assert0(sc->stsc_data[i+1].first >= 2);
+            // We replace this entry by the next valid
+            sc->stsc_data[i].first = sc->stsc_data[i+1].first - 1;
+            sc->stsc_data[i].count = sc->stsc_data[i+1].count;
+            sc->stsc_data[i].id    = sc->stsc_data[i+1].id;
+        }
+    }
 
     if (pb->eof_reached)
         return AVERROR_EOF;
@@ -2450,14 +2477,19 @@ static int mov_read_stts(MOVContext *c, AVIOContext *pb, MOVAtom atom)
             && total_sample_count > 100
             && sample_duration/10 > duration / total_sample_count)
             sample_duration = duration / total_sample_count;
-        duration+=(int64_t)sample_duration*sample_count;
+        duration+=(int64_t)sample_duration*(uint64_t)sample_count;
         total_sample_count+=sample_count;
     }
 
     sc->stts_count = i;
 
-    sc->duration_for_fps  += duration;
-    sc->nb_frames_for_fps += total_sample_count;
+    if (duration > 0 &&
+        duration <= INT64_MAX - sc->duration_for_fps &&
+        total_sample_count <= INT64_MAX - sc->nb_frames_for_fps
+    ) {
+        sc->duration_for_fps  += duration;
+        sc->nb_frames_for_fps += total_sample_count;
+    }
 
     if (pb->eof_reached)
         return AVERROR_EOF;
@@ -2759,6 +2791,9 @@ static void mov_build_index(MOVContext *mov, AVStream *st)
     } else {
         unsigned chunk_samples, total = 0;
 
+        if (!sc->chunk_count)
+            return;
+
         // compute total chunk count
         for (i = 0; i < sc->stsc_count; i++) {
             unsigned count, chunk_count;
@@ -3001,6 +3036,11 @@ static int mov_read_trak(MOVContext *c, AVIOContext *pb, MOVAtom atom)
         av_log(c->fc, AV_LOG_ERROR, "stream %d, missing mandatory atoms, broken header\n",
                st->index);
         return 0;
+    }
+    if (sc->chunk_count && sc->stsc_count && sc->stsc_data[ sc->stsc_count - 1 ].first > sc->chunk_count) {
+        av_log(c->fc, AV_LOG_ERROR, "stream %d, contradictionary STSC and STCO\n",
+               st->index);
+        return AVERROR_INVALIDDATA;
     }
 
     fix_timescale(c, sc);
@@ -3558,8 +3598,13 @@ static int mov_read_trun(MOVContext *c, AVIOContext *pb, MOVAtom atom)
         dts += sample_duration;
         offset += sample_size;
         sc->data_size += sample_size;
-        sc->duration_for_fps += sample_duration;
-        sc->nb_frames_for_fps ++;
+
+        if (sample_duration <= INT64_MAX - sc->duration_for_fps &&
+            1 <= INT64_MAX - sc->nb_frames_for_fps
+        ) {
+            sc->duration_for_fps += sample_duration;
+            sc->nb_frames_for_fps ++;
+        }
     }
 
     if (pb->eof_reached)
@@ -3808,7 +3853,7 @@ static int mov_read_uuid(MOVContext *c, AVIOContext *pb, MOVAtom atom)
         0xba, 0x2f, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66
     };
 
-    if (atom.size < sizeof(uuid) || atom.size == INT64_MAX)
+    if (atom.size < sizeof(uuid) || atom.size >= FFMIN(INT_MAX, SIZE_MAX))
         return AVERROR_INVALIDDATA;
 
     ret = avio_read(pb, uuid, sizeof(uuid));
@@ -3977,7 +4022,7 @@ static int mov_read_default(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 
     if (atom.size < 0)
         atom.size = INT64_MAX;
-    while (total_size + 8 <= atom.size && !avio_feof(pb)) {
+    while (total_size <= atom.size - 8 && !avio_feof(pb)) {
         int (*parse)(MOVContext*, AVIOContext*, MOVAtom) = NULL;
         a.size = atom.size;
         a.type=0;
@@ -4406,6 +4451,13 @@ static int read_tfra(MOVContext *mov, AVIOContext *f)
     }
     for (i = 0; i < index->item_count; i++) {
         int64_t time, offset;
+
+        if (avio_feof(f)) {
+            index->item_count = 0;
+            av_freep(&index->items);
+            return AVERROR_INVALIDDATA;
+        }
+
         if (version == 1) {
             time   = avio_rb64(f);
             offset = avio_rb64(f);
@@ -4663,6 +4715,7 @@ static int should_retry(AVIOContext *pb, int error_code) {
 
 static int mov_switch_root(AVFormatContext *s, int64_t target)
 {
+    int ret;
     MOVContext *mov = s->priv_data;
     int i, j;
     int already_read = 0;
@@ -4699,8 +4752,10 @@ static int mov_switch_root(AVFormatContext *s, int64_t target)
 
     mov->found_mdat = 0;
 
-    if (mov_read_default(mov, s->pb, (MOVAtom){ AV_RL32("root"), INT64_MAX }) < 0 ||
-        avio_feof(s->pb))
+    ret = mov_read_default(mov, s->pb, (MOVAtom){ AV_RL32("root"), INT64_MAX });
+    if (ret < 0)
+        return ret;
+    if (avio_feof(s->pb))
         return AVERROR_EOF;
     av_log(s, AV_LOG_TRACE, "read fragments, offset 0x%"PRIx64"\n", avio_tell(s->pb));
 
@@ -4785,7 +4840,9 @@ static int mov_read_packet(AVFormatContext *s, AVPacket *pkt)
     } else {
         int64_t next_dts = (sc->current_sample < st->nb_index_entries) ?
             st->index_entries[sc->current_sample].timestamp : st->duration;
-        pkt->duration = next_dts - pkt->dts;
+
+        if (next_dts >= pkt->dts)
+            pkt->duration = next_dts - pkt->dts;
         pkt->pts = pkt->dts;
     }
     if (st->discard == AVDISCARD_ALL)

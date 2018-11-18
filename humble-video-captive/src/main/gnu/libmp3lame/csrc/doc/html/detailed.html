@@ -59,7 +59,8 @@ There is also support for RAW PCM data and and piped input</td></tr>
 ) by number</td></tr>
 <tr><td><a href="#scale-r">--scale-r</a> number</td><td>Scale channel 1 (right) input (multiply PCM data)
  by number</td></tr>
-<tr><td>--swap-channel</td><td>Swap input channels</td></tr>
+<tr><td><a href="#gain">--gain</a> number</td><td>apply Gain adjustment in decibels, range -20.0 to +12.0.</td></tr>
+<tr><td>--swap-channel</td><td>Swap Left and Right channels</td></tr>
 <tr><td><a href="#nogap">--nogap</a> file1 file2 ...</td><td>Gapless encoding for a set of contiguous
  files</td></tr>
 <tr><td><a href="#nogapout">--nogapout</a> dir</td><td>Output dir for gapless encoding (must precede
@@ -68,13 +69,13 @@ There is also support for RAW PCM data and and piped input</td></tr>
 
 <tr><th colspan="2">Input options for RAW PCM</th></tr>
 <tr><td><a href="#r">-r</a></td><td>Assume input file is raw PCM.</td></tr>
-<tr><td><a href="#s">-s</a> number</td><td>Input sampling frequency in kHz</td></tr>
-<tr><td><a href="#x">-x</a></td><td> Force byte-swapping of input</td></tr>
-<tr><td><a href="#bitwidth">--bitwidth</a> w</td><td> Input bit width is w (default 16)</td></tr>
+<tr><td><a href="#s">-s</a> number</td><td>Input sampling frequency in kHz (Default is 44.1Khz)</td></tr>
 <tr><td><a href="#signed">--signed</a> / <a href="#unsigned">--unsigned</a></td><td> Input is signed (default) or unsigned</td></tr>
+<tr><td><a href="#bitwidth">--bitwidth</a> w</td><td> Input bit width is w (default 16)</td></tr>
+<tr><td><a href="#x">-x</a></td><td> Force byte-swapping of input stream</td></tr>
 <tr><td><a href="#little-endian">--little-endian</a> / <a href="#big-endian">--big-endian</a></td><td> Input is little-endian (default)
  or big-endian</td></tr>
-<tr><td><a href="#a">-a</a></td><td>Downmix from stereo to mono file for mono encoding</td></tr>
+<tr><td><a href="#a">-a</a></td><td>Downmix from stereo to mono file for mono encoding. Needed with RAW input for the -mm mode to do the downmix.</td></tr>
 
 <tr><th colspan="2">Constant Bit Rate (CBR)</th></tr>
 <tr><td><a href="#b">-b</a>  number</td><td>Set the bitrate in kbps, default 128 kbps</td></tr>
@@ -105,8 +106,6 @@ decoders.</td></tr>
 <tr><th colspan="2">Operational options</th></tr>
 <tr><td><a href="#preset">--preset</a> type</td><td>Enables some preconfigured settings. Check below
 for each of the valid values</td></tr>
-<tr><td><a href="#resample">--resample</a> sfreq</td><td>Sampling frequency of output file(kHz)- 
-default=automatic</td></tr>
 <tr><td><a href="#priority">--priority</a> number</td><td>Sets the process priority:<br/>
                          0,1 = Low priority <br/>
                          2 = normal priority (default)<br/>
@@ -129,7 +128,9 @@ the input .mp3 file</td></tr>
                     simple = force LR stereo on all frames<br/>
                     force  = force MS stereo on all frames.</td></tr>
 
-<tr><th colspan="2">Filter options:</th></tr>
+<tr><th colspan="2">Filter and resampling options:</th></tr>
+<tr><td><a href="#resample">--resample</a> sfreq</td><td>Sampling frequency of output file(kHz)- 
+default=automatic</td></tr>
 <tr><td><a href="#lowpass">--lowpass</a> number</td><td>Frequency(kHz), lowpass filter cutoff above freq.
  Range [0.001..50]kHz or [50..50000]Hz</td></tr>
 <tr><td><a href="#lowpass">--lowpass</a>-width number</td><td>Frequency(kHz), lowpass window width. Range [0.001..16]kHz or
@@ -150,7 +151,7 @@ the input .mp3 file</td></tr>
                            creates v1.1 tag, providing a total forces v2.0).</td></tr>
 <tr><td><a href="#tg">--tg</a> genre</td><td>Audio/song genre (name or number in list)</td></tr>
 <tr><td><a href="#ti">--ti</a> file</td><td>Audio/song albumArt (jpeg/png/gif file, 128KB max, v2.3)</td></tr>
-<tr><td><a href="#tv">--tv</a> id=value</td><td>Text or URL frame specified by id and value (v2.3 tag), user defined text frame syntax: --tv "TXXX=description=content"</td></tr>
+<tr><td><a href="#tv">--tv</a> id=value</td><td>Text or URL frame specified by id and value (v2.3 tag). User defined frame. Syntax: --tv "TXXX=description=content"</td></tr>
 <tr><td><a href="#add-id3v2">--add-id3v2</a></td><td>Force addition of version 2 tag</td></tr>
 <tr><td><a href="#id3v1-only">--id3v1-only</a></td><td>Add only a version 1 tag</td></tr>
 <tr><td><a href="#id3v2-only">--id3v2-only</a></td><td>Add only a version 2 tag</td></tr>
@@ -191,47 +192,50 @@ the input .mp3 file</td></tr>
 <tr><td><a href="#longhelp">--longhelp</a></td><td>Shows the complete list of switches</td></tr>
 
 <tr><th colspan="2">Experimental switches for developers. Only enabled in alpha/debug 
-versions:</th></tr>
-<tr><td>--nores</td><td>Each frame will then become independent from previous ones, but the quality will be lower. </td></tr>
-<tr><td>--noshort</td><td>Disable use of short blocks</td></tr>
+versions. Can change from version to version</th></tr>
+<tr><td>--nores</td><td>Disables the bit reservour. Each frame will become independent from previous ones, but the quality will be lower.</td></tr>
+<tr><td>--buffer-constraint <i>x</i></td><td>available values for <i>x</i>: default, strict, maximum</td></tr>
+<tr><td>--noath</td><td>turns ATH down to a flat noise floor</td></tr>
+<tr><td>--athshort</td><td>ignore GPSYCHO for short blocks, use ATH only</td></tr>
+<tr><td>--athonly</td><td>ignore GPSYCHO completely, use ATH only</td></tr>
+<tr><td>--athtype x</td><td>selects between different ATH types [0-4]</td></tr>
+<tr><td>--athlower x</td><td>Lower the ATH by x.x dB's</td></tr>
+<tr><td>--athaa-type n</td><td>ATH auto adjust: 0 'no' else 'loudness based'</td></tr>
+<tr><td>--athaa-sensitivity x</td><td>activation offset in -/+ dB for ATH auto-adjustment</td></tr>
 <tr><td>--short</td><td>Allow the use of short blocs (default)</td></tr>
+<tr><td>--noshort</td><td>Disable use of short blocks</td></tr>
 <tr><td>--allshort</td><td>Use only short blocks</td></tr>
-<tr><td>--shortthreshold x[,y]</td><td></td></tr>
-<tr><td>--temporal-masking x</td><td>x=0 disables, x=1 enables temporal masking
- effect</td></tr>
+<tr><td>--shortthreshold x[,y]</td><td>short block switching threshold, x for L/R/M channel, y for S channel</td></tr>
+<tr><td>--temporal-masking x</td><td>x=0 disables, x=1 enables temporal masking effect</td></tr>
 <tr><td>--notemp</td><td>Alias of --temporal-masking 0</td></tr>
 <tr><td>--nssafejoint</td><td>M/S switching criterion</td></tr>
 <tr><td>--nsmsfix x</td><td>M/S switching tuning [effective 0-3.5]</td></tr>
-<tr><td>--interch x</td><td>Adjust inter-channel masking ratio (default 0.0). Range [0.0..1.0]</td></tr>
 <tr><td>--ns-bass x</td><td>Adjust masking for sfbs  0 -  6 (long)  0 -  5 (short)</td></tr>
 <tr><td>--ns-alto x</td><td>Adjust masking for sfbs  7 - 13 (long)  6 - 10 (short)</td></tr>
 <tr><td>--ns-treble x</td><td>Adjust masking for sfbs 14 - 21 (long) 11 - 12 (short)</td></tr>
 <tr><td>--ns-sfb21 x</td><td>Change ns-treble by x dB for sfb21</td></tr>
-<tr><td>--substep</td><td></td></tr>
-<tr><td>--noath</td><td>Disable the use of ATH</td></tr>
-<tr><td>--athonly</td><td>Use only ATH</td></tr>
-<tr><td>--athshort</td><td>ATH only for short blocks</td></tr>
-<tr><td>--athlower x</td><td>Lower the ATH by x.x dB's</td></tr>
-<tr><td>--athtype x</td><td>Select ATH type curve</td></tr>
-<tr><td>--vbr-new</td><td>In LAME 3.98, the new VBR was made default, and this switch is now used for experimental tweaks</td></tr>
-<tr><td>--buffer-constraint <i>x</i></td><td>available values for <i>x</i>: default, strict, maximum</td></tr>
+<tr><td>-Z [n]</td><td>always do calculate short block maskings</td></tr>
+<tr><td>--substep</td><td>use pseudo substep noise shaping method types 0-2</td></tr>
+<tr><td>-X n[,m]</td><td>selects between different noise measurements n for long block, m for short. if m is omitted, m = n</td></tr>                    
+<tr><td>--vbr-new</td><td>In LAME 3.98, the new VBR was made default, and this switch may be used for experimental tweaks.</td></tr>
+
 
 <tr><th colspan="2">Aliases and removed settings</th></tr>
-<tr><td>-f</td><td>Alias of -q 7.</td></tr>
-<tr><td>-h</td><td>Alias of -q 2.</td></tr>
-<tr><td>-v</td><td>Alias of -V 4</td></tr>
-<tr><td>-S</td><td>Alias of --silent</td></tr>
-<tr><td>--alt-preset</td><td>Alias of --preset</td></tr>
-<tr><td>--r3mix</td><td>Alias of -V 3</td></tr>
+<tr><td>-f</td><td>Alias of <a href="#q">-q 7</a>.</td></tr>
+<tr><td>-h</td><td>Alias of <a href="#q">-q 2</a>.</td></tr>
+<tr><td>-v</td><td>Alias of <a href="#V">-V 4</a></td></tr>
+<tr><td>-S</td><td>Alias of <a href="#silent">--silent</a></td></tr>
+<tr><td>--alt-preset</td><td>Alias of <a href="#preset">--preset</a></td></tr>
+<tr><td>--r3mix</td><td>Alias of <a href="#V">-V 3</a></td></tr>
 <tr><td>--vbr-mtrh</td><td>Alias of LAME 3.98 default vbr mode</td></tr>
-<tr><td>--pad-id3v2</td><td>Alias of --pad-id3v2-size 128</td></tr>
+<tr><td>--pad-id3v2</td><td>Alias of <a href="#pad-id3v2-size">--pad-id3v2-size 128</a></td></tr>
 <tr><td>-d</td><td>No longer supported</td></tr>
 <tr><td>-k</td><td>No longer supported</td></tr>
 <tr><td>--cwlimit</td><td>No longer supported</td></tr>
 <tr><td>--ogginput</td><td>No longer supported. Compile with 
 <a href="http://www.mega-nerd.com/libsndfile/">libsndfile</a> instead</td></tr>
-<tr><td>-Z</td><td>Currently unused</td></tr>
 <tr><td>--brief</td><td>Currently unused</td></tr>
+<tr><td>--interch x</td><td>Currently unused</td></tr>
 <tr><td style="border-bottom:0px;">--nspsytune</td><td style="border-bottom:0px;">Currently unused</td></tr>
 </table>
 
@@ -246,7 +250,7 @@ mix the stereo input file to mono and encode as mono.<br/>
 <p>
 This option is only needed in the case of raw PCM stereo input 
 (because LAME cannot determine the number of channels in the input file).
-To encode a stereo PCM input file as mono, use "lame -m s -a"<br/>
+To encode a stereo PCM input file as mono, use "lame -m m -a"<br/>
 </p>
 <p>
 For WAV and AIFF input files, using "-m m" will always produce a
@@ -287,7 +291,8 @@ and a version 2 tag, if the values fit on a version 1 tag. See --id3v1-only and
 <td style="border-bottom:0px;">8 16 24 32 40 48 56 64</td></tr>
 </table>
 <p>
-The bitrate to be used. Default for CBR is 128 kbps MPEG1, 80 kbps MPEG2.
+The bitrate to be used. Default is 128kbps in MPEG1 (64 for mono),
+64kbps in MPEG2 (32 for mono) and 32kbps in MPEG2.5 (16 for mono).
 </p>
 <p>
 When used with variable bitrate encodings (VBR), -b specifies the
@@ -457,7 +462,7 @@ Not supported by most decoders.  Compliant decoders (of which there
 are few) are only required to support up to 320 kbps.  
 </p>
 <p>
-Decoders which can handle free format:
+Decoders knwon to handle free format:
 </p>
 <table cellpadding="4">
 <tr><th></th><th>Supports up to</th></tr>
@@ -465,6 +470,13 @@ Decoders which can handle free format:
 <tr><td>"lame --decode"</td><td>640 kbps</td></tr>
 <tr><td style="border-bottom:0px;">l3dec</td><td style="border-bottom:0px;">310 kbps</td></tr>
 </table>
+
+<p class="settingtitle">
+<a name="gain"><span class="hilight">--gain</span></a> Apply gain in decibels.
+</p>
+<p>
+Apply Gain adjustment in decibels, range -20.0 to +12.0. 0dBFS means no amplification.
+</p>
 
 <p class="settingtitle">
 <a name="genre-list"><span class="hilight">--genre-list</span></a> Print alphabetical ordered list of
@@ -731,16 +743,18 @@ The minimum (and default) width is 75% of a band's width (which is 1/64th of the
 <a name="m"><span class="hilight">-m x</span></a> Channel modes
 </p>
 <table cellpadding="4">
-<tr><td>-m m</td><td>mono</td></tr>
+<tr><td width="35px">-m m</td><td>mono</td></tr>
+<tr><td>-m l</td><td>get only the left channel of a stereo signal for a mono output</td></tr>
+<tr><td>-m r</td><td>get only the right channel of a stereo signal for a mono output</td></tr>
 <tr><td>-m s</td><td>forced L/R stereo</td></tr>
-<tr><td>-m j</td><td>automatic switch between L/R and M/S stereo</td></tr>
+<tr><td>-m j /<br/>-m a</td><td>automatic switch between L/R and M/S stereo</td></tr>
 <tr><td>-m f</td><td>forced mid/side stereo</td></tr>
-<tr><td style="border-bottom:0px;">-m d</td><td style="border-bottom:0px;">dual (independent) channels</td></tr>
+<tr><td style="border-bottom:0px;">-m d</td><td style="border-bottom:0px;">dual (independent) channels.</td></tr>
 </table>
 <p>
 MONO is the default mode for mono input files.  If "-m m" is specified
 for a stereo input file, the two channels will be averaged into a mono
-signal.
+signal.  (Note: See comments about the -a switch for RAW PCM streams)
 </p>
 <p>
 FORCED L/R STEREO encodes the left and the right signals independently, and
@@ -766,7 +780,8 @@ has very little stereo seperation.
 </p>
 <p>
 DUAL CHANNEL mode is similar to encode the left and right as two mono signals.
-The main use of Dual channel is to encode content in two languages. 
+Its purpose was meant for Dual language streams where only one of them should be decoded.
+Most decoders just decode them as a stereo stream
 </p>
 
 <p class="settingtitle">
@@ -883,7 +898,7 @@ Pads the ID3v2 tag with extra 128bytes to allow it to expand.
 <tr><td>--preset standard</td><td>-V 2 --vbr-old</td></tr>
 <tr><td>--preset extreme</td><td>-V 0 --vbr-old</td></tr>
 <tr><td>--preset insane</td><td>-b 320 --vbr-old</td></tr>
-<tr><td>--preset fast xxx</td><td>Adding the "fast" keyword before the mentioned presets enables the LAME 3.98 default vbr routine.</td></tr>
+<tr><td>--preset fast xxx</td><td>In versions older than LAME 3.98, "fast" was needed to enable the vbr-new routine. It is no longer needed.</td></tr>
 <tr><td colspan="2">&nbsp;</td></tr>
 <tr><td>--preset number</td><td>--abr number</td></tr>
 <tr><td>--preset cbr number</td><td>-b number</td></tr>
@@ -944,18 +959,18 @@ to determine the best scalefactors and Huffman coding (noise shaping).
 For CBR, ABR and --vbr-old modes, the following table applies
 </p>
 <table cellpadding="4">
-<tr><td>-q 0</td><td>Use slowest &amp; best possible version of all algorithms.</td></tr>
-<tr><td>-q 3</td><td>Default value.  Good speed, good quality</td></tr>
-<tr><td>-q 7</td><td>Very fast, ok quality.  (psycho acoustics are
-      used for pre-echo &amp; M/S, but no noise shaping is done.</td></tr>
-<tr><td style="border-bottom:0px;">-q 9</td><td style="border-bottom:0px;">Disables almost all algorithms including psy-model. Poor quality.</td></tr>
+<tr><td>-q 0</td><td>Use the best algorithms (Best Huffman coding search, full outer loop, and the highest precision of several parameters).</td></tr>
+<tr><td>-q 1 to -q 4</td><td>Similar to -q 0 without the full outer loop and with decreasing precision of parameters the further from -q 0. -q 3 is the default</td></tr>
+<tr><td>-q 5 and -q 6</td><td>Same as -q 7, but enables noise shaping and increases subblock gain</td></tr>
+<tr><td style="border-bottom:0px;">-q 7 to -q 9</td><td style="border-bottom:0px;">Same as -f. Very fast, OK quality. Psychoacoustics are used for pre-echo and mid/side stereo, but no noise-shaping is done.</td></tr>
 </table>
 <p>
 For the default VBR mode since LAME 3.98, the following table applies
 </p>
 <table cellpadding="4">
-<tr><td>-q 0 to -q 4</td><td>Use the best algorithm.</td></tr>
-<tr><td style="border-bottom:0px;">-q 5 to -q 9</td><td style="border-bottom:0px;">Use the not so good algorithm</td></tr>
+<tr><td>-q 0 to -q 4</td><td>include all features of the other modes and additionally use the best search when applying Huffman coding.</td></tr>
+<tr><td>-q 5 and -q 6</td><td> include all features of -q7, calculate and consider actual quantisation noise, and additionally enable subblock gain.</td></tr>
+<tr><td style="border-bottom:0px;">-q 7 to -q 9</td><td style="border-bottom:0px;">This level uses a psymodel but does not calculate quantisation noise when encoding: it takes a quick guess.</td></tr>
 </table>
 <p class="settingtitle">
 <a name="quiet"><span class="hilight">--quiet</span></a> Don't print any output in the screen  
@@ -982,9 +997,8 @@ Not supported if LAME is compiled to use LIBSNDFILE.
  ReplayGain analysis and finding the peak sample
 </p>
 <p>
-Enable decoding on the fly. Compute "Radio" ReplayGain on the decoded 
-data stream. Find the peak sample of the decoded data stream and store 
-it in the file.
+Compute "Radio" ReplayGain on the decoded data stream. Find the peak sample
+by decoding on the fly the encoded data stream and store it in the file.
 </p>
 <p>
 ReplayGain analysis does _not_ affect the content of a compressed data
@@ -1191,8 +1205,21 @@ Print the short command line help and exit.
 </p>       
 <p>
 Encodes using the VBR algorithm, at the indicated quality.<br/>
-Decimal values can be specified, like: 4.51<br/>
-0=highest quality, bigger files. 9.999=lowest quality, smaller files
+0=highest quality, bigger files. 9.999=lowest quality, smaller files. Decimal values can be specified, like: 4.51<br/>
+On average, the resulting bitrates are as follows:
+<table cellpadding="4">
+<thead>
+<tr><th>Setting</th><th>Average bitrate (kbps)</th></tr>
+</thead>
+<tbody>
+<tr><td align="right">0</td><td align="right">245</td></tr>
+<tr><td align="right">2</td><td align="right">190</td></tr>
+<tr><td align="right">3</td><td align="right">175</td></tr>
+<tr><td align="right">4</td><td align="right">165</td></tr>
+<tr><td style="border-bottom:0px;" align="right">5</td><td style="border-bottom:0px;" align="right">130</td></tr>
+</tbody>
+</table>
+
 </p>
 <p>
 Using -V 7 or higher (lower quality) is not recommended.  
@@ -1233,7 +1260,7 @@ encodings sound like static, try this first.
 <a name="Y"><span class="hilight">-Y</span></a> Ignore noise in sbf21, like CBR mode does
 </p>
 <p>
-Allows -V2, -V1 and -V0 to not to encode the highest frequencies accurately,
+Allows -V2, -V1 and -V0 to not encode the highest frequencies accurately,
 if doing so causes disproportional increases in bitrate. This is the same that
 CBR and ABR modes do.<br/>
 Due to the design of the MP3 format, to keep precision in the last scalefactor
@@ -1241,7 +1268,7 @@ band, an encoder needs to increase the precision in all the bands (not only in
 this one).<br/>
 The consequence is an increase of bitrate (+60kbps in some cases) compared to
 not keeping that precision. Generally, this band should allow for distortions,
-so using it shouldn't cause harm.
+so using this switch shouldn't cause harm.
 </p>
 
 <p>&nbsp;

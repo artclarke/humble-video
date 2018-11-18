@@ -1,7 +1,7 @@
 /*****************************************************************************
  * depth.c: bit-depth conversion video filter
  *****************************************************************************
- * Copyright (C) 2010-2014 x264 project
+ * Copyright (C) 2010-2018 x264 project
  *
  * Authors: Oskar Arvidsson <oskar@irock.se>
  *
@@ -24,7 +24,15 @@
  *****************************************************************************/
 
 #include "video.h"
-#define NAME "depth"
+#include "common/common.h"
+
+#define depth_filter x264_glue3(depth, BIT_DEPTH, filter)
+#if BIT_DEPTH == 8
+#define NAME "depth_8"
+#else
+#define NAME "depth_10"
+#endif
+
 #define FAIL_IF_ERROR( cond, ... ) FAIL_IF_ERR( cond, NAME, __VA_ARGS__ )
 
 cli_vid_filter_t depth_filter;
@@ -50,6 +58,7 @@ static int depth_filter_csp_is_supported( int csp )
            csp_mask == X264_CSP_YV16 ||
            csp_mask == X264_CSP_YV24 ||
            csp_mask == X264_CSP_NV12 ||
+           csp_mask == X264_CSP_NV21 ||
            csp_mask == X264_CSP_NV16 ||
            csp_mask == X264_CSP_BGR ||
            csp_mask == X264_CSP_RGB ||
@@ -59,7 +68,7 @@ static int depth_filter_csp_is_supported( int csp )
 static int csp_num_interleaved( int csp, int plane )
 {
     int csp_mask = csp & X264_CSP_MASK;
-    return (csp_mask == X264_CSP_NV12 || csp_mask == X264_CSP_NV16) && plane == 1 ? 2 :
+    return (csp_mask == X264_CSP_NV12 || csp_mask == X264_CSP_NV21 || csp_mask == X264_CSP_NV16) && plane == 1 ? 2 :
            csp_mask == X264_CSP_BGR || csp_mask == X264_CSP_RGB ? 3 :
            csp_mask == X264_CSP_BGRA ? 4 :
            1;
@@ -199,7 +208,7 @@ static int init( hnd_t *handle, cli_vid_filter_t *filter, video_info_t *info,
 
     if( opt_string )
     {
-        static const char *optlist[] = { "bit_depth", NULL };
+        static const char * const optlist[] = { "bit_depth", NULL };
         char **opts = x264_split_options( opt_string, optlist );
 
         if( opts )
@@ -210,19 +219,19 @@ static int init( hnd_t *handle, cli_vid_filter_t *filter, video_info_t *info,
             ret = bit_depth < 8 || bit_depth > 16;
             csp = bit_depth > 8 ? csp | X264_CSP_HIGH_DEPTH : csp & ~X264_CSP_HIGH_DEPTH;
             change_fmt = (info->csp ^ csp) & X264_CSP_HIGH_DEPTH;
-            x264_free_string_array( opts );
+            free( opts );
         }
         else
             ret = 1;
     }
 
-    FAIL_IF_ERROR( bit_depth != BIT_DEPTH, "this build supports only bit depth %d\n", BIT_DEPTH )
-    FAIL_IF_ERROR( ret, "unsupported bit depth conversion.\n" )
+    FAIL_IF_ERROR( bit_depth != BIT_DEPTH, "this filter supports only bit depth %d\n", BIT_DEPTH );
+    FAIL_IF_ERROR( ret, "unsupported bit depth conversion.\n" );
 
     /* only add the filter to the chain if it's needed */
     if( change_fmt || bit_depth != 8 * x264_cli_csp_depth_factor( csp ) )
     {
-        FAIL_IF_ERROR( !depth_filter_csp_is_supported(csp), "unsupported colorspace.\n" )
+        FAIL_IF_ERROR( !depth_filter_csp_is_supported(csp), "unsupported colorspace.\n" );
         depth_hnd_t *h = x264_malloc( sizeof(depth_hnd_t) + (info->width+1)*sizeof(int16_t) );
 
         if( !h )

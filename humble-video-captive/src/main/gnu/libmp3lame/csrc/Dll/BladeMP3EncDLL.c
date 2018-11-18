@@ -331,15 +331,15 @@ __declspec(dllexport) BE_ERR	beInitStream(PBE_CONFIG pbeConfig, PDWORD dwSamples
             break;
         case BE_MP3_MODE_JSTEREO:
             lame_set_mode( gfp, JOINT_STEREO );
+            //lame_set_force_ms( gfp, bForceMS ); // no check box to force this?
             lame_set_num_channels( gfp, 2 );
             break;
         case BE_MP3_MODE_MONO:
             lame_set_mode( gfp, MONO );
             lame_set_num_channels( gfp, 1 );
             break;
-        case BE_MP3_MODE_DUALCHANNEL: //warning: there is NO dual channel option working in Lame
-            lame_set_force_ms( gfp, 1 );
-            lame_set_mode( gfp, STEREO );
+        case BE_MP3_MODE_DUALCHANNEL:
+            lame_set_mode( gfp, DUAL_CHANNEL );
             lame_set_num_channels( gfp, 2 );
             break;
         default:

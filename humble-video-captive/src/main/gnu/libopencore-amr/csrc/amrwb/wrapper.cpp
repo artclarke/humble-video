@@ -74,6 +74,9 @@ void D_IF_decode(void* s, const unsigned char* in, short* out, int bfi) {
 
 	state->mode = (in[0] >> 3) & 0x0f;
 	in++;
+	if (bfi) {
+		state->mode = 15; // NO_DATA
+	}
 
 	state->quality = 1; /* ? */
 	mime_unsorting((uint8*) in, state->iInputSampleBuf, &state->frame_type, &state->mode, state->quality, &state->rx_state);

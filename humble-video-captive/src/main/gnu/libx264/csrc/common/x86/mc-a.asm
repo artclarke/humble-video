@@ -1,7 +1,7 @@
 ;*****************************************************************************
 ;* mc-a.asm: x86 motion compensation
 ;*****************************************************************************
-;* Copyright (C) 2003-2014 x264 project
+;* Copyright (C) 2003-2018 x264 project
 ;*
 ;* Authors: Loren Merritt <lorenm@u.washington.edu>
 ;*          Fiona Glaser <fiona@x264.com>
@@ -83,11 +83,11 @@ cextern deinterleave_shufd
     %endmacro
 %endif
 
-%macro AVG_END 0
-    lea  t4, [t4+t5*2*SIZEOF_PIXEL]
+%macro AVG_END 0-1 2 ; rows
     lea  t2, [t2+t3*2*SIZEOF_PIXEL]
+    lea  t4, [t4+t5*2*SIZEOF_PIXEL]
     lea  t0, [t0+t1*2*SIZEOF_PIXEL]
-    sub eax, 2
+    sub eax, %1
     jg .height_loop
     RET
 %endmacro
@@ -147,17 +147,24 @@ cextern deinterleave_shufd
 %endmacro
 
 %macro BIWEIGHT_START_SSSE3 0
-    movzx  t6d, byte r6m ; FIXME x86_64
-    mov    t7d, 64
-    sub    t7d, t6d
-    shl    t7d, 8
-    add    t6d, t7d
-    mova    m4, [pw_512]
-    movd   xm3, t6d
-%if cpuflag(avx2)
-    vpbroadcastw m3, xm3
+    movzx         t6d, byte r6m ; FIXME x86_64
+%if mmsize > 16
+    vbroadcasti128 m4, [pw_512]
 %else
-    SPLATW  m3, m3   ; weight_dst,src
+    mova           m4, [pw_512]
+%endif
+    lea           t7d, [t6+(64<<8)]
+    shl           t6d, 8
+    sub           t7d, t6d
+%if cpuflag(avx512)
+    vpbroadcastw   m3, t7d
+%else
+    movd          xm3, t7d
+%if cpuflag(avx2)
+    vpbroadcastw   m3, xm3
+%else
+    SPLATW         m3, m3   ; weight_dst,src
+%endif
 %endif
 %endmacro
 
@@ -268,6 +275,66 @@ cglobal pixel_avg_weight_w16
     mova    [t0], xm0
     vextracti128 [t0+t1], m0, 1
     AVG_END
+
+INIT_YMM avx512
+cglobal pixel_avg_weight_w8
+    BIWEIGHT_START
+    kxnorb         k1, k1, k1
+    kaddb          k1, k1, k1
+    AVG_START 5
+.height_loop:
+    movq          xm0, [t2]
+    movq          xm2, [t4]
+    movq          xm1, [t2+t3]
+    movq          xm5, [t4+t5]
+    lea            t2, [t2+t3*2]
+    lea            t4, [t4+t5*2]
+    vpbroadcastq   m0 {k1}, [t2]
+    vpbroadcastq   m2 {k1}, [t4]
+    vpbroadcastq   m1 {k1}, [t2+t3]
+    vpbroadcastq   m5 {k1}, [t4+t5]
+    punpcklbw      m0, m2
+    punpcklbw      m1, m5
+    pmaddubsw      m0, m3
+    pmaddubsw      m1, m3
+    pmulhrsw       m0, m4
+    pmulhrsw       m1, m4
+    packuswb       m0, m1
+    vextracti128 xmm1, m0, 1
+    movq         [t0], xm0
+    movhps    [t0+t1], xm0
+    lea            t0, [t0+t1*2]
+    movq         [t0], xmm1
+    movhps    [t0+t1], xmm1
+    AVG_END 4
+
+INIT_ZMM avx512
+cglobal pixel_avg_weight_w16
+    BIWEIGHT_START
+    AVG_START 5
+.height_loop:
+    movu        xm0, [t2]
+    movu        xm1, [t4]
+    vinserti128 ym0, [t2+t3], 1
+    vinserti128 ym1, [t4+t5], 1
+    lea          t2, [t2+t3*2]
+    lea          t4, [t4+t5*2]
+    vinserti32x4 m0, [t2], 2
+    vinserti32x4 m1, [t4], 2
+    vinserti32x4 m0, [t2+t3], 3
+    vinserti32x4 m1, [t4+t5], 3
+    SBUTTERFLY   bw, 0, 1, 2
+    pmaddubsw    m0, m3
+    pmaddubsw    m1, m3
+    pmulhrsw     m0, m4
+    pmulhrsw     m1, m4
+    packuswb     m0, m1
+    mova       [t0], xm0
+    vextracti128 [t0+t1], ym0, 1
+    lea          t0, [t0+t1*2]
+    vextracti32x4 [t0], m0, 2
+    vextracti32x4 [t0+t1], m0, 3
+    AVG_END 4
 %endif ;HIGH_BIT_DEPTH
 
 ;=============================================================================
@@ -738,6 +805,12 @@ INIT_XMM avx2
 AVG_FUNC 16, movdqu, movdqa
 AVGH 16, 16
 AVGH 16,  8
+INIT_XMM avx512
+AVGH 16, 16
+AVGH 16,  8
+AVGH  8, 16
+AVGH  8,  8
+AVGH  8,  4
 
 %endif ;HIGH_BIT_DEPTH
 
@@ -1244,10 +1317,10 @@ cglobal pixel_avg2_w16_cache64_ssse3
     mov   eax, r2m
     and   eax, 0x3f
     cmp   eax, 0x30
-    jb x264_pixel_avg2_w16_sse2
+    jb pixel_avg2_w16_sse2
     or    eax, r4m
     and   eax, 7
-    jz x264_pixel_avg2_w16_sse2
+    jz pixel_avg2_w16_sse2
 %endif
     PROLOGUE 6, 8
     lea    r6, [r4+r2]
@@ -1912,11 +1985,7 @@ ALIGN 4
 
 %macro MC_CHROMA_SSSE3 0
 cglobal mc_chroma
-%if cpuflag(avx2)
-    MC_CHROMA_START 9
-%else
-    MC_CHROMA_START 10
-%endif
+    MC_CHROMA_START 10-cpuflag(avx2)
     and       r5d, 7
     and       t2d, 7
     mov       t0d, r5d
@@ -2020,7 +2089,7 @@ cglobal mc_chroma
     movhps [r1+r2], xm2
 %else
     movu       m0, [r3]
-    pshufb     m0, xm5
+    pshufb     m0, m5
 .loop4:
     movu       m1, [r3+r4]
     pshufb     m1, m5
@@ -2037,13 +2106,19 @@ cglobal mc_chroma
     pmulhrsw   m3, shiftround
     mova       m0, m4
     packuswb   m1, m3
+    movd     [r0], m1
+%if cpuflag(sse4)
+    pextrd    [r1], m1, 1
+    pextrd [r0+r2], m1, 2
+    pextrd [r1+r2], m1, 3
+%else
     movhlps    m3, m1
-    movd     [r0], xm1
     movd  [r0+r2], m3
     psrldq     m1, 4
     psrldq     m3, 4
     movd     [r1], m1
     movd  [r1+r2], m3
+%endif
     lea        r3, [r3+r4*2]
     lea        r0, [r0+r2*2]
     lea        r1, [r1+r2*2]
@@ -2123,7 +2198,7 @@ INIT_XMM sse2
 MC_CHROMA
 INIT_XMM ssse3
 MC_CHROMA_SSSE3
-INIT_XMM ssse3, cache64
+INIT_XMM cache64, ssse3
 MC_CHROMA_SSSE3
 INIT_XMM avx
 MC_CHROMA_SSSE3 ; No known AVX CPU will trigger CPU_CACHELINE_64

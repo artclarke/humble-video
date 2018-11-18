@@ -32,6 +32,101 @@ affect speed</font> <br>
 black = usability, portability, other
 
 <hr>
+<h3>LAME 3.100&nbsp; &nbsp;2017 (in preparation)</h3>
+<ul>
+  <li>Rog&eacute;rio Brito
+    <ul>
+      <li>
+	Don't include the debian directory as one that is needed during
+	builds.  Patch taken from Debian's packaging of lame.
+      </li>
+      <li>
+	Resurrect Owen Taylor's code dated from 97-11-3 to properly deal
+	with GTK1.  This was transplanted back from aclocal.m4 with a patch
+	provided by Andres Mejia. This change makes it easy to regenerate
+	autotools' files with a simple invocation of <code>autoconf -vfi</code>.
+      </li>
+      <li>
+	Fix possible race condition causing build failures in libmp3lame.
+	Discovered in automated builds by the Debian project with patch
+	provided by Andres Mejia.
+      </li>
+    </ul>
+  </li>
+  <li>Robert Hegemann
+    <ul>
+      <li>Improved detection of MPEG audio data in RIFF WAVE files. Tracker item <i>[ 3545112 ] Invalid sampling detection</i>
+      </li>
+      <li>New switch <b>--gain &lt;decibel&gt;</b>, range -20.0 to +12.0, a more convenient way to apply Gain adjustment in decibels,
+      than the use of <i>--scale &lt;factor&gt;</i>.
+      </li>
+      <li>Fix for tracker item <i>[ 3558466 ] Bug in path handling</i>
+      </li>
+      <li>Fix for tracker item <i>[ 3567844 ] problem with Tag genre</i>
+      </li>
+      <li>Fix for tracker item <i>[ 3565659 ] no progress indication with pipe input</i>
+      </li>
+      <li>Fix for tracker item <i>[ 3544957 ] scale (empty) silent encode without warning</i>
+      </li>
+      <li>Fix for tracker item <i>[ 3580176 ] environment variable LAMEOPT doesn't work anymore</i>
+      </li>
+      <li>Fix for tracker item <i>[ 3608583 ] input file name displayed with wrong character encoding (on windows console with CP_UTF8)</i>
+      </li>
+      <li>Fix for bug ticket <i>[ #447 ] Fix dereference NULL and Buffer not NULL terminated issues. Thanks to Surabhi Mishra</i>
+      </li>
+      <li>Fix for bug ticket <i>[ #445 ] dereference of a null pointer possible in loop. Thanks to Renu Tyagi</i>
+      </li>
+      <li>Fix for bug ticket <i>[ #449 ] Make sure functions with SSE instructions maintain their own properly aligned stack. Thanks to Fabian Greffrath</i>
+      </li>
+      <li>Fix for bug ticket <i>[ #458 ] Multiple Stack and Heap Corruptions from Malicious File. Thanks to Gareth Evans and Elio Blanca</i>
+      </li>
+      <li>Fix for bug ticket <i>[ #460 ] A division by zero vulnerability. Thanks to Wang Shiyang, Liu Bingchang</i>
+      </li>
+      <li>Fix for bug ticket <i>[ #461 ] CVE-2017-9410 fill_buffer_resample function in libmp3lame/util.c heap-based buffer over-read and ap</i>
+      </li>
+      <li>Fix for bug ticket <i>[ #462 ] CVE-2017-9411 fill_buffer_resample function in libmp3lame/util.c invalid memory read and application crash</i>
+      </li>
+      <li>Fix for bug ticket <i>[ #463 ] CVE-2017-9412 unpack_read_samples function in frontend/get_audio.c invalid memory read and application crash</i>
+      </li>
+      <li>Fix for bug ticket <i>[ #434 ] clip detect scale suggestion unaware of scale input value</i>
+      </li>
+      <li>HIP decoder bug fixed: decoding mixed blocks of lower sample frequency Layer3 data resulted in internal buffer overflow (write). Thanks to Henri Salo</i>
+      </li>
+    </ul>
+  </li>
+  <li>Alexander Leidinger
+    <ul>
+      <li>Feature request, patch ticket <i>[ #27 ] Add lame_encode_buffer_interleaved_int() by Michael Fink</i>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<br>
+<hr>
+<h3>LAME 3.99.5&nbsp; &nbsp;February 28 2012</h3>
+<ul>
+  <li>Rog&eacute;rio Brito
+    <ul>
+      <li>autotools: Fix compilation on alpha using proper ifdef guards. Thanks to Andres Mejia.
+      </li>
+      <li>Small correction of the documentation.
+      </li>
+    </ul>
+  </li>
+  <li>Robert Hegemann
+    <ul>
+      <li>Workaround for cygwin build problem. Tracker item <i>[ 3480692 ] mingw-w64 compilation error</i>
+      </li>
+      <li>Fix for a problem when LAME is compiled with <i>fast floating point math</i>. It could result in <i>bitrate bloat</i> with silent input data.
+      </li>
+      <li><font color="#ff0000">Bug fix for tracker item <i>[ 3486753 ] Artifacts at the beginning of <b>decoded</b> file</i></font>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<br>
 <h3>LAME 3.99.4&nbsp; &nbsp;January 25 2012</h3>
 <ul>
   <li>Robert Hegemann
@@ -75,7 +170,7 @@ black = usability, portability, other
 </ul>
 
 <br>
-<h3>LAME 3.99.1&nbsp; &nbsp;November 05 2011</h3>
+<h3>LAME 3.99.1&nbsp; &nbsp;November 5 2011</h3>
 <ul>
   <li>Robert Hegemann
     <ul>
@@ -121,7 +216,7 @@ black = usability, portability, other
     <ul>
       <li>Improve Debian packaging.
 	<ul>
-	  <li>Include suggestions made by Fabian Greffrat</li>
+	  <li>Include suggestions made by Fabian Greffrath</li>
 	  <li>Update version of the Debian package to reflect that it is taken from CVS.</li>
 	  <li>Get rid of a transitional package</li>
 	  <li>Much more to come...</li>

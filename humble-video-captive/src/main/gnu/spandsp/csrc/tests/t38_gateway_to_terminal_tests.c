@@ -103,7 +103,7 @@ static int phase_b_handler(t30_state_t *s, void *user_data, int result)
     i = (int) (intptr_t) user_data;
     snprintf(tag, sizeof(tag), "%c: Phase B", i);
     printf("%c: Phase B handler on channel %c - (0x%X) %s\n", i, i, result, t30_frametype(result));
-    log_rx_parameters(s, tag);
+    fax_log_rx_parameters(s, tag);
     return T30_ERR_OK;
 }
 /*- End of function --------------------------------------------------------*/
@@ -116,9 +116,9 @@ static int phase_d_handler(t30_state_t *s, void *user_data, int result)
     i = (int) (intptr_t) user_data;
     snprintf(tag, sizeof(tag), "%c: Phase D", i);
     printf("%c: Phase D handler on channel %c - (0x%X) %s\n", i, i, result, t30_frametype(result));
-    log_transfer_statistics(s, tag);
-    log_tx_parameters(s, tag);
-    log_rx_parameters(s, tag);
+    fax_log_page_transfer_statistics(s, tag);
+    fax_log_tx_parameters(s, tag);
+    fax_log_rx_parameters(s, tag);
     return T30_ERR_OK;
 }
 /*- End of function --------------------------------------------------------*/
@@ -132,9 +132,9 @@ static void phase_e_handler(t30_state_t *s, void *user_data, int result)
     i = (int) (intptr_t) user_data;
     snprintf(tag, sizeof(tag), "%c: Phase E", i);
     printf("%c: Phase E handler on channel %c - (%d) %s\n", i, i, result, t30_completion_code_to_str(result));
-    log_transfer_statistics(s, tag);
-    log_tx_parameters(s, tag);
-    log_rx_parameters(s, tag);
+    fax_log_final_transfer_statistics(s, tag);
+    fax_log_tx_parameters(s, tag);
+    fax_log_rx_parameters(s, tag);
     t30_get_transfer_statistics(s, &t);
     succeeded[i - 'A'] = (result == T30_ERR_OK)  &&  (t.pages_tx == 12  ||  t.pages_rx == 12);
     done[i - 'A'] = TRUE;
@@ -143,12 +143,10 @@ static void phase_e_handler(t30_state_t *s, void *user_data, int result)
 
 static int tx_packet_handler_a(t38_core_state_t *s, void *user_data, const uint8_t *buf, int len, int count)
 {
-    t38_terminal_state_t *t;
     int i;
     static int subst_seq = 0;
 
     /* This routine queues messages between two instances of T.38 processing */
-    t = (t38_terminal_state_t *) user_data;
     if (simulate_incrementing_repeats)
     {
         for (i = 0;  i < count;  i++)
@@ -172,12 +170,10 @@ static int tx_packet_handler_a(t38_core_state_t *s, void *user_data, const uint8
 
 static int tx_packet_handler_b(t38_core_state_t *s, void *user_data, const uint8_t *buf, int len, int count)
 {
-    t38_terminal_state_t *t;
     int i;
     static int subst_seq = 0;
 
     /* This routine queues messages between two instances of T.38 processing */
-    t = (t38_terminal_state_t *) user_data;
     if (simulate_incrementing_repeats)
     {
         for (i = 0;  i < count;  i++)
@@ -255,7 +251,7 @@ static int decode_test(const char *decode_test_file)
     span_log_set_level(logging, SPAN_LOG_DEBUG | SPAN_LOG_SHOW_TAG | SPAN_LOG_SHOW_SAMPLE_TIME);
     span_log_set_tag(logging, "T.38-A");
 
-    logging = &t38_state_a->audio.modems.v17_rx.logging;
+    logging = &t38_state_a->audio.modems.fast_modems.v17_rx.logging;
     span_log_set_level(logging, SPAN_LOG_DEBUG | SPAN_LOG_SHOW_TAG | SPAN_LOG_SHOW_SAMPLE_TIME);
     span_log_set_tag(logging, "V.17-A");
 
@@ -305,7 +301,7 @@ static int decode_test(const char *decode_test_file)
         t38_core = t38_gateway_get_t38_core_state(t38_state_a);
         logging = t38_core_get_logging_state(t38_core);
         span_log_bump_samples(logging, t30_len_a);
-        logging = &t38_state_a->audio.modems.v17_rx.logging;
+        logging = &t38_state_a->audio.modems.fast_modems.v17_rx.logging;
         span_log_bump_samples(logging, t30_len_a);
 
         logging = t38_terminal_get_logging_state(t38_state_b);
@@ -540,7 +536,7 @@ int main(int argc, char *argv[])
     span_log_set_level(logging, SPAN_LOG_DEBUG | SPAN_LOG_SHOW_TAG | SPAN_LOG_SHOW_SAMPLE_TIME);
     span_log_set_tag(logging, "T.38-A");
 
-    logging = &t38_state_a->audio.modems.v17_rx.logging;
+    logging = &t38_state_a->audio.modems.fast_modems.v17_rx.logging;
     span_log_set_level(logging, SPAN_LOG_DEBUG | SPAN_LOG_SHOW_TAG | SPAN_LOG_SHOW_SAMPLE_TIME);
     span_log_set_tag(logging, "V.17-A");
 
@@ -594,7 +590,7 @@ int main(int argc, char *argv[])
         t38_core = t38_gateway_get_t38_core_state(t38_state_a);
         logging = t38_core_get_logging_state(t38_core);
         span_log_bump_samples(logging, SAMPLES_PER_CHUNK);
-        logging = &t38_state_a->audio.modems.v17_rx.logging;
+        logging = &t38_state_a->audio.modems.fast_modems.v17_rx.logging;
         span_log_bump_samples(logging, SAMPLES_PER_CHUNK);
 
         logging = t38_terminal_get_logging_state(t38_state_b);

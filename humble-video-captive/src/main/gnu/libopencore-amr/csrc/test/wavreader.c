@@ -109,6 +109,7 @@ void* wav_read_open(const char *filename) {
 				wr->byte_rate       = read_int32(wr);
 				wr->block_align     = read_int16(wr);
 				wr->bits_per_sample = read_int16(wr);
+				fseek(wr->wav, sublength - 16, SEEK_CUR);
 			} else if (subtag == TAG('d', 'a', 't', 'a')) {
 				data_pos = ftell(wr->wav);
 				wr->data_length = sublength;

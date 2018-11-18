@@ -58,13 +58,10 @@ export DLLTOOL=@DLLTOOL@
 # This rule makes sure the captive Makefile is created,
 # and is regenerated if the captive configure script
 # changes
-# This rule makes sure the captive Makefile is created,
-# and is regenerated if the captive configure script
-# changes
 ifndef VS_CONFIGURE
 VS_CONFIGURE=$(srcdir)/csrc/configure
 endif
-$(abs_builddir)/csrc/Makefile : $(VS_CONFIGURE)
+$(abs_builddir)/csrc/Makefile : $(wildcard $(VS_CONFIGURE))
 	@echo "Incarcerated package must be reconfigured; regenerating out of date captive Makefile from: $(srcdir)/csrc/configure"
 	$(MKDIR_P) csrc
 	cd csrc && sh ../incarcerate

@@ -1,5 +1,8 @@
-Librtmp Version Tip of Tree
+Librtmp Version: v2.4
 Software Homepage: http://rtmpdump.mplayerhq.hu/
-Source Download URL: svn://svn.mplayerhq.hu/rtmpdump/trunk
-Patches Applied: see patches directory
+Source Download URL: See clone.git and update.git
 
+librtmp doesn't build with automake and really isn't actively maintained.
+To get it to build with openssl 1.1 some patching is required:
+
+https://github.com/xbmc/inputstream.rtmp/blob/master/depends/common/librtmp/0003-openssl-1.1.patch

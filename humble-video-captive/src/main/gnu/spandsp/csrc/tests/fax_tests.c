@@ -82,7 +82,7 @@ static int phase_b_handler(t30_state_t *s, void *user_data, int result)
     i = (int) (intptr_t) user_data;
     snprintf(tag, sizeof(tag), "%c: Phase B", i);
     printf("%c: Phase B handler on channel %c - (0x%X) %s\n", i, i, result, t30_frametype(result));
-    log_rx_parameters(s, tag);
+    fax_log_rx_parameters(s, tag);
     return T30_ERR_OK;
 }
 /*- End of function --------------------------------------------------------*/
@@ -95,9 +95,9 @@ static int phase_d_handler(t30_state_t *s, void *user_data, int result)
     i = (int) (intptr_t) user_data;
     snprintf(tag, sizeof(tag), "%c: Phase D", i);
     printf("%c: Phase D handler on channel %c - (0x%X) %s\n", i, i, result, t30_frametype(result));
-    log_transfer_statistics(s, tag);
-    log_tx_parameters(s, tag);
-    log_rx_parameters(s, tag);
+    fax_log_page_transfer_statistics(s, tag);
+    fax_log_tx_parameters(s, tag);
+    fax_log_rx_parameters(s, tag);
 
     if (use_receiver_not_ready)
         t30_set_receiver_not_ready(s, 3);
@@ -138,9 +138,9 @@ static void phase_e_handler(t30_state_t *s, void *user_data, int result)
     i = (intptr_t) user_data;
     snprintf(tag, sizeof(tag), "%c: Phase E", i);
     printf("%c: Phase E handler on channel %c - (%d) %s\n", i, i, result, t30_completion_code_to_str(result));    
-    log_transfer_statistics(s, tag);
-    log_tx_parameters(s, tag);
-    log_rx_parameters(s, tag);
+    fax_log_final_transfer_statistics(s, tag);
+    fax_log_tx_parameters(s, tag);
+    fax_log_rx_parameters(s, tag);
     t30_get_transfer_statistics(s, &t);
     machines[i - 'A'].succeeded = (result == T30_ERR_OK)  &&  (t.pages_tx == 12  ||  t.pages_rx == 12);
     machines[i - 'A'].done = TRUE;
@@ -194,7 +194,9 @@ int main(int argc, char *argv[])
     int use_ecm;
     int use_tep;
     int use_transmit_on_idle;
+#if defined(WITH_SPANDSP_INTERNALS)
     int use_line_hits;
+#endif
     int polled_mode;
     int reverse_flow;
     int use_page_limits;
@@ -214,7 +216,9 @@ int main(int argc, char *argv[])
     input_tiff_file_name = INPUT_TIFF_FILE_NAME;
     input_audio_file_name = NULL;
     use_ecm = FALSE;
+#if defined(WITH_SPANDSP_INTERNALS)
     use_line_hits = FALSE;
+#endif
     use_tep = FALSE;
     polled_mode = FALSE;
     page_header_info = NULL;
@@ -233,9 +237,11 @@ int main(int argc, char *argv[])
         case 'e':
             use_ecm = TRUE;
             break;
+#if defined(WITH_SPANDSP_INTERNALS)
         case 'h':
             use_line_hits = TRUE;
             break;
+#endif
         case 'H':
             page_header_info = optarg;
             break;

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mp4.c: mp4 muxer
  *****************************************************************************
- * Copyright (C) 2003-2014 x264 project
+ * Copyright (C) 2003-2018 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -169,8 +169,9 @@ static int open_file( char *psz_filename, hnd_t *p_handle, cli_output_opt_t *opt
     FILE *fh = x264_fopen( psz_filename, "w" );
     if( !fh )
         return -1;
-    FAIL_IF_ERR( !x264_is_regular_file( fh ), "mp4", "MP4 output is incompatible with non-regular file `%s'\n", psz_filename )
+    int b_regular = x264_is_regular_file( fh );
     fclose( fh );
+    FAIL_IF_ERR( !b_regular, "mp4", "MP4 output is incompatible with non-regular file `%s'\n", psz_filename );
 
     mp4_hnd_t *p_mp4 = calloc( 1, sizeof(mp4_hnd_t) );
     if( !p_mp4 )
@@ -179,7 +180,7 @@ static int open_file( char *psz_filename, hnd_t *p_handle, cli_output_opt_t *opt
 #ifdef _WIN32
     /* GPAC doesn't support Unicode filenames. */
     char ansi_filename[MAX_PATH];
-    FAIL_IF_ERR( !x264_ansi_filename( psz_filename, ansi_filename, MAX_PATH, 1 ), "mp4", "invalid ansi filename\n" )
+    FAIL_IF_ERR( !x264_ansi_filename( psz_filename, ansi_filename, MAX_PATH, 1 ), "mp4", "invalid ansi filename\n" );
     p_mp4->p_file = gf_isom_open( ansi_filename, GF_ISOM_OPEN_WRITE, NULL );
 #else
     p_mp4->p_file = gf_isom_open( psz_filename, GF_ISOM_OPEN_WRITE, NULL );
@@ -209,7 +210,7 @@ static int set_param( hnd_t handle, x264_param_t *p_param )
 
     p_mp4->i_time_res = (uint64_t)p_param->i_timebase_den * p_mp4->i_dts_compress_multiplier;
     p_mp4->i_time_inc = (uint64_t)p_param->i_timebase_num * p_mp4->i_dts_compress_multiplier;
-    FAIL_IF_ERR( p_mp4->i_time_res > UINT32_MAX, "mp4", "MP4 media timescale %"PRIu64" exceeds maximum\n", p_mp4->i_time_res )
+    FAIL_IF_ERR( p_mp4->i_time_res > UINT32_MAX, "mp4", "MP4 media timescale %"PRIu64" exceeds maximum\n", p_mp4->i_time_res );
 
     p_mp4->i_track = gf_isom_new_track( p_mp4->p_file, 0, GF_ISOM_MEDIA_VISUAL,
                                         p_mp4->i_time_res );
@@ -229,7 +230,7 @@ static int set_param( hnd_t handle, x264_param_t *p_param )
         uint64_t dh = p_param->i_height << 16;
         double sar = (double)p_param->vui.i_sar_width / p_param->vui.i_sar_height;
         if( sar > 1.0 )
-            dw *= sar ;
+            dw *= sar;
         else
             dh /= sar;
         gf_isom_set_pixel_aspect_ratio( p_mp4->p_file, p_mp4->i_track, p_mp4->i_descidx, p_param->vui.i_sar_width, p_param->vui.i_sar_height );

@@ -54,6 +54,7 @@
 #include "spandsp/fast_convert.h"
 #include "spandsp/logging.h"
 #include "spandsp/saturated.h"
+#include "spandsp/timezone.h"
 #include "spandsp/t4_rx.h"
 #include "spandsp/t4_tx.h"
 #if defined(SPANDSP_SUPPORT_T85)
@@ -144,14 +145,14 @@ static int image_resize_row(image_translate_state_t *s, uint8_t buf[], size_t le
     int output_length;
     int input_width;
     int input_length;
+    int x;
     double c1;
     double c2;
-    double int_part;
-    int x;
 #if defined(SPANDSP_USE_FIXED_POINT)
     int frac_row;
     int frac_col;
 #else
+    double int_part;
     double frac_row;
     double frac_col;
 #endif
@@ -198,7 +199,7 @@ static int image_resize_row(image_translate_state_t *s, uint8_t buf[], size_t le
         x = i*input_width/output_width;
         frac_col = x - x*output_width;
         c1 = s->raw_pixel_row[0][x] + (s->raw_pixel_row[0][x + 1] - s->raw_pixel_row[0][x])*frac_col;
-        c1 = s->raw_pixel_row[1][x] + (s->raw_pixel_row[1][x + 1] - s->raw_pixel_row[1][x])*frac_col;
+        c2 = s->raw_pixel_row[1][x] + (s->raw_pixel_row[1][x + 1] - s->raw_pixel_row[1][x])*frac_col;
         buf[i] = saturateu8(c1 + (c2 - c1)*frac_row);
     }
 #else
