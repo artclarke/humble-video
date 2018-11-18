@@ -78,7 +78,7 @@ AC_CHECK_FUNCS([gethostbyname inet_ntoa memchr memset select socket strcasecmp s
 
 case $host_os in
   *mingw*|*cygwin*)
-  LIBS+="-lssl -lcrypto -lz -lws2_32 -lwinmm -lgdi32"
+  LIBS+="-lssl -lcrypto -lz -lcrypt32 -lws2_32 -lwinmm -lgdi32"
   ;;
 esac
 PRIVATE_LIBS="${LIBS}"
