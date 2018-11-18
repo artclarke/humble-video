@@ -18,11 +18,7 @@
   <dependencies>
     <dependency>
       <groupId>io.humble</groupId>
-      <artifactId>humble-video-arch-i686-apple-darwin12</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.humble</groupId>
-      <artifactId>humble-video-arch-x86_64-apple-darwin12</artifactId>
+      <artifactId>humble-video-arch-x86_64-apple-darwin18</artifactId>
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>
