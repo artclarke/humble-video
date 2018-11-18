@@ -28,7 +28,9 @@ extern "C"
 // WARNING: This is GCC specific and is to fix a build issue
 // in FFmpeg where UINT64_C is not always defined.  The
 // __WORDSIZE value is a GCC constant
+#ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS 1
+#endif // __STDC_CONSTANT_MACROS
 #include <stdint.h>
 #ifndef UINT64_C
 # if __WORDSIZE == 64
@@ -37,7 +39,6 @@ extern "C"
 #  define UINT64_C(c)	c ## ULL
 # endif
 #endif
-
 
 #include <libavutil/avutil.h>
 #include <libavutil/common.h>
