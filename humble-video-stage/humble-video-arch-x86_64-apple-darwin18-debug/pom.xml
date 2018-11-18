@@ -9,10 +9,10 @@
     <relativePath>../../humble-video-parent/pom.xml</relativePath>
   </parent>
 
-  <artifactId>humble-video-arch-i686-apple-darwin12-debug</artifactId>
+  <artifactId>humble-video-arch-x86_64-apple-darwin18-debug</artifactId>
   <packaging>jar</packaging>
 
-  <name>humble-video-arch-i686-apple-darwin12-debug</name>
+  <name>humble-video-arch-x86_64-apple-darwin18-debug</name>
   <url>http://www.humble.io</url>
 
   <properties>
@@ -40,7 +40,9 @@
               <Humble-Native-App>humble-video</Humble-Native-App>
               <Humble-Native-Root>.</Humble-Native-Root>
               <Humble-Native-Paths>.</Humble-Native-Paths>
-              <Humble-Native-Bundles>i686-apple-darwin12-debug</Humble-Native-Bundles>
+                <Humble-Native-Bundles>
+                    x86_64-apple-darwin18-debug
+                </Humble-Native-Bundles>
             </manifestEntries>
           </archive>
         </configuration>

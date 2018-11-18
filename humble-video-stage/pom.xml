@@ -17,10 +17,7 @@
 
   <modules>
     <module>
-      humble-video-arch-x86_64-apple-darwin12
-    </module>
-    <module>
-      humble-video-arch-i686-apple-darwin12
+      humble-video-arch-x86_64-apple-darwin18
     </module>
     <module>
       humble-video-arch-x86_64-w64-mingw32
@@ -35,10 +32,7 @@
       humble-video-arch-x86_64-pc-linux-gnu6
     </module>
     <module>
-      humble-video-arch-x86_64-apple-darwin12-debug
-    </module>
-    <module>
-      humble-video-arch-i686-apple-darwin12-debug
+      humble-video-arch-x86_64-apple-darwin18-debug
     </module>
     <module>
       humble-video-arch-x86_64-w64-mingw32-debug
