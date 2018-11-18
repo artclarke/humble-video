@@ -19,10 +19,10 @@ if [ "@VS_CROSS_COMPILE@" = "1" -o "${HOST_TYPE}" = "Mac" ]; then
     *darwin*)
       case ${HOST_OS} in
         *x86_64*|*amd64*)
-        VPX_HOST=x86_64-darwin14-gcc
+        VPX_HOST=x86_64-darwin16-gcc
         ;;
         *)
-        VPX_HOST=x86-darwin14-gcc
+        VPX_HOST=x86-darwin16-gcc
         ;;
       esac
     ;;
