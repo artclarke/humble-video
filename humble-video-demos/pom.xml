@@ -121,5 +121,20 @@
         </dependency>
       </dependencies>
     </profile>
+    <profile>
+      <id>Linux-amd64</id>
+      <activation>
+        <os>
+          <family>Linux</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>io.humble</groupId>
+          <artifactId>humble-video-arch-x86_64-pc-linux-gnu6</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
   </profiles>
 </project>
