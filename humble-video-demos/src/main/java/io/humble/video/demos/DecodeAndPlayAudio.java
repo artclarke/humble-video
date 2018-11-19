@@ -31,6 +31,7 @@ import io.humble.video.Muxer;
 import io.humble.video.javaxsound.AudioFrame;
 import io.humble.video.javaxsound.MediaAudioConverter;
 import io.humble.video.javaxsound.MediaAudioConverterFactory;
+import javax.sound.sampled.LineUnavailableException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -66,8 +67,9 @@ public class DecodeAndPlayAudio {
   /**
    * Opens a file, and plays the audio from it on the speakers.
    * @param filename The file or URL to play.
+   * @throws LineUnavailableException 
    */
-  private static void playSound(String filename) throws InterruptedException, IOException {
+  private static void playSound(String filename) throws InterruptedException, IOException, LineUnavailableException {
     /*
      * Start by creating a container object, in this case a demuxer since
      * we are reading, to get audio data from.
@@ -139,6 +141,8 @@ public class DecodeAndPlayAudio {
      * some stuff. Go read the source code if you want -- it's not very complicated.
      */
     final AudioFrame audioFrame = AudioFrame.make(converter.getJavaFormat());
+    if (audioFrame == null)
+      throw new LineUnavailableException();
 
     /* We will use this to cache the raw-audio we pass to and from
      * the java sound system.
@@ -209,8 +213,9 @@ public class DecodeAndPlayAudio {
    * @param args Must contain one string which represents a filename
    * @throws IOException 
    * @throws InterruptedException 
+   * @throws LineUnavailableException 
    */
-  public static void main(String[] args) throws InterruptedException, IOException
+  public static void main(String[] args) throws InterruptedException, IOException, LineUnavailableException
   {
     final Options options = new Options();
     options.addOption("h", "help", false, "displays help");
