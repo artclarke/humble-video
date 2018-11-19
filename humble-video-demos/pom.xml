@@ -76,12 +76,42 @@
       </dependencies>
     </profile>
     <profile>
+      <id>Windows-amd64</id>
+      <activation>
+        <os>
+          <family>Windows</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>io.humble</groupId>
+          <artifactId>humble-video-arch-x86_64-w64-mingw32</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
       <id>Mac-x86_64</id>
       <!--  as of Humble Video 0.3.0 x86/i686 versions of MacOS X are no longer supported -->
       <activation>
         <os>
           <family>Mac</family>
           <arch>x86_64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>io.humble</groupId>
+          <artifactId>humble-video-arch-x86_64-apple-darwin18</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>Mac-amd64</id>
+      <activation>
+        <os>
+          <family>Mac</family>
+          <arch>amd64</arch>
         </os>
       </activation>
       <dependencies>
