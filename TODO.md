@@ -2,10 +2,10 @@
 * [ ] Saner build systems for eventual CI
     * [x] File Issue for Docker-based build system
     * [x] Make Ubuntu:12.04 docker container to build Ubuntu & Windows binaries
-    * [ ] Change os-designation to come from Maven rather than intelligently inside the GNU folders.
-    * [ ] Change debug vs not designation to come from Maven
-    * [ ] Change LGPL vs GPL for dependencies to come from Maven
-    * [ ] Change memcheck designation to come from Maven
+    * [x] Change os-designation to come from Maven rather than intelligently inside the GNU folders.
+    * [x] Change debug vs not designation to come from Maven
+    * [x] Change LGPL vs GPL for dependencies to come from Maven
+    * [x] Change memcheck designation to come from Maven
     * [ ] Create script to invoke all supported build matrix combinations from Maven
     * [ ] Remove `humble-video-chef` and update README to require Docker
 

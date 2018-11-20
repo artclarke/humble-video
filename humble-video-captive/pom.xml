@@ -21,13 +21,14 @@
         <version>1.2.1</version>
         <executions>
           <execution>
+            <!-- Use this to create all the output directories we need -->
             <id>exec-one</id>
             <phase>validate</phase>
             <configuration>
               <executable>mkdir</executable>
               <arguments>
                 <argument>-p</argument>
-                <argument>${project.basedir}/target/native</argument>
+                <argument>${project.basedir}/target/native/${io.humble.build.host_os_directory}</argument>
               </arguments>
             </configuration>
             <goals>
@@ -35,20 +36,36 @@
             </goals>
           </execution>
           <execution>
+            <!-- Use this to configure all the native builds -->
             <id>exec-two</id>
             <phase>validate</phase>
             <configuration>
               <executable>bash</executable>
               <arguments>
-                <argument>${project.basedir}/src/main/gnu/cross-configure.sh</argument>
+                  <argument>
+                      ${project.basedir}/../humble-video-parent/src/main/gnu/configure_wrapper.sh
+                  </argument>
+                  <argument> <!-- the configure script to run -->
+                      ${project.basedir}/src/main/gnu/configure
+                  </argument>
+                  <argument> <!-- the staging area -->
+                      ${project.basedir}/../humble-video-stage/humble-video-arch-${io.humble.build.host_os_name}/target/native
+                  </argument>
+                  <argument> <!-- the GNU host triplet -->
+                      ${io.humble.build.host_os_name}
+                  </argument>
+                  <argument> <!-- yes or no for whether debug -->
+                      ${io.humble.build.debug}
+                  </argument>
+                  <argument> <!-- yes or no for whether GPL -->
+                      ${io.humble.build.include_gpl_dependencies}
+                  </argument>
+                  <argument> <!-- the maven package name -->
+                      ${io.humble.build.host_os_directory}
+                  </argument>
               </arguments>
-              <environmentVariables>
-                <HUMBLE_HOME>
-                  ${project.basedir}/../humble-video-stage
-                </HUMBLE_HOME>
-              </environmentVariables>
               <workingDirectory>
-                ${project.basedir}/target/native
+                ${project.basedir}/target/native/${io.humble.build.host_os_directory}
               </workingDirectory>
             </configuration>
             <goals>
@@ -56,15 +73,16 @@
             </goals>
           </execution>
           <execution>
+            <!-- Use this to compile all the native builds -->
             <id>exec-three</id>
             <phase>compile</phase>
             <configuration>
-              <executable>bash</executable>
+              <executable>make</executable>
               <arguments>
-                <argument>${project.basedir}/src/main/gnu/cross-make.sh</argument>
+                  <argument>-j1</argument>
               </arguments>
               <workingDirectory>
-                ${project.basedir}/target/native
+                ${project.basedir}/target/native/${io.humble.build.host_os_directory}
               </workingDirectory>
             </configuration>
             <goals>

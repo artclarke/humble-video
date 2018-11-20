@@ -865,6 +865,7 @@ enable_doxygen_pdf
 with_javaincl
 enable_assert
 enable_warningerrors
+enable_gpl
 '
       ac_precious_vars='build_alias
 host_alias
@@ -879,6 +880,7 @@ CXX
 CXXFLAGS
 CCC
 CXXCPP
+VS_MVN_HOST
 PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
@@ -1532,6 +1534,8 @@ Optional Features:
   --disable-assert        turn off assertions
   --enable-warningerrors  treat warnings as errors that stop the build
                           (default is $enable_warningerrors)
+  --enable-gpl            build assuming dependencies can contain GPL code
+                          (default is yes)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1555,6 +1559,8 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
+  VS_MVN_HOST Location of the 'valgrind' program; if found, then "ant
+              run-tests-memcheck" will do full memory and error checking
   PKG_CONFIG  path to pkg-config utility
   PKG_CONFIG_PATH
               directories to add to pkg-config's search path
@@ -16947,8 +16953,6 @@ $as_echo_n "checking whether to enable compiler optimizations... " >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_optimizations" >&5
 $as_echo "$enable_optimizations" >&6; }
 
-# default name we use for the Maven bundle
-VS_MVN_HOST=$host
  if  test "$x$enable_optimizations" = xno ; then
   VS_DEBUG_TRUE=
   VS_DEBUG_FALSE='#'
@@ -16960,10 +16964,9 @@ fi
 if test "x$enable_optimizations" = xno; then
   VS_DEBUG=1
 
-  # If debug, we have a separate MVN name
-  VS_MVN_HOST="$host-debug"
 fi
-# This will be used to build our MVN pom file.
+
+# default name we use for the Maven bundle
 
 
 
@@ -20288,7 +20291,17 @@ $as_echo_n "checking if you smiled... " >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: let us know: info@humble.io" >&5
 $as_echo "let us know: info@humble.io" >&6; }
 
-enable_gpl=yes
+# Check whether --enable-gpl was given.
+if test "${enable_gpl+set}" = set; then :
+  enableval=$enable_gpl;
+else
+  enable_gpl=yes
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable GPL dependencies " >&5
+$as_echo_n "checking whether to enable GPL dependencies ... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_gpl" >&5
+$as_echo "$enable_gpl" >&6; }
 VS_ENABLE_GPL=$enable_gpl
 
 $as_echo "#define VS_ENABLE_GPL 1" >>confdefs.h
