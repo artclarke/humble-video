@@ -1,19 +1,30 @@
+# Dockerfile for Humble Video Linux & Windows binary build containers.
+#
+# Alas, we cannot do this for MacOSX, but for other operating systems
+# these containers should let us build the native code needed for
+# Humble Video to work.
+#
+# A few rules/conventions followed here:
+#
+# * Absolutely NO installation of packages without explicit versions.
+# * Try to minimize software downloads that do not peg to an explicit
+#   version. That way it can be repeatable (the one exception is humble-swig
+#   which I maintain).
+# * Did I mention no installation of packages without explicit versions?
+# * Try not to artibrarily reorder installations of packages... that will
+#   bust people's docker build caches, make them have to rebuild a lot, and
+#   be sad. Add to the end unless you need to add earlier.
+
 # Yes, we're deliberately using a VERY old Ubuntu
 FROM ubuntu:12.04
 
 # Turn off some warnings
-
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 # Let's get all those pre-reqs installed
 RUN apt-get update
 RUN apt-get install -y apt-utils=0.8.16~exp12ubuntu10.27
 
-#RUN apt-get install -y software-properties-common=0.82.7.7
-#RUN apt-get install -y python-software-properties=0.82.7.7
-#RUN add-apt-repository http://ubuntu.mirror.cambrium.nl/ubuntu/
-
 # C++ Pre-Reqs
-#RUN apt-get install -y build-essential=11.5ubuntu2.1
 RUN apt-get install -y coreutils=8.13-3ubuntu3.3
 RUN apt-get install -y autoconf=2.68-1ubuntu2
 RUN apt-get install -y libtool=2.4.2-1ubuntu1
@@ -40,12 +51,29 @@ RUN apt-get install -y flex=2.5.35-10ubuntu3
 RUN apt-get install -y openjdk-6-jdk=6b41-1.13.13-0ubuntu0.12.04.1
 RUN apt-get install -y maven=3.0.4-2
 
+# Humble's version of Swig that makes Javadoc from C++ code
 RUN git clone https://github.com/artclarke/humble-swig.git && \
     cd humble-swig && \
     ./autogen.sh && \
     ./configure && \
     make && make install && \
     cd .. && rm -rf humble-swig
+
+# x264 requires NASM 2.13, and Precise (12.04) only has 2.09. Eventually
+# this will force us to move to Xenial or later, but for now, making
+# my own NASM
+RUN apt-get install -y asciidoc=8.6.6-1ubuntu1
+RUN git clone https://repo.or.cz/nasm.git && \
+    cd nasm && \
+    git checkout nasm-2.13.03 && \
+    autoreconf --force && \
+    bash ./configure && make && make manpages && make install && \
+    cd .. && rm -rf nasm
+
+# Finally, I like to edit files in containers, so I'm adding vi
+RUN apt-get install -y vim=2:7.3.429-2ubuntu2.2
+
+######## All package installations should be above this line ###########
 
 RUN apt-get clean -y
 
