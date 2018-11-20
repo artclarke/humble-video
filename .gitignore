@@ -12,9 +12,10 @@ Makefile
 config.log
 config.status
 libtool
-/mvn*.out
-/*/mvn*.out
-/*/test.log
+mvn*.out
+mvn*.out
+test.log
+docker.out
 .libs/
 *.lo
 *.o
@@ -33,3 +34,8 @@ io.humble.*
 ###
 .chef/*.pem
 .chef/encrypted_data_bag_secret
+
+###
+# Ignore ccache and bash settings
+###
+/humble-video-cache

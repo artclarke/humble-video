@@ -1,6 +1,0 @@
-<Location /secure>
-  AuthUserFile "<%= @params[:secure_dir] %>/.htpasswd"
-  AuthType basic
-  AuthName "private area"
-  Require user <%= @params[:username] %>
-</Location>
