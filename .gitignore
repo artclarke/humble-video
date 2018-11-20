@@ -33,3 +33,9 @@ io.humble.*
 ###
 .chef/*.pem
 .chef/encrypted_data_bag_secret
+
+###
+# Ignore ccache and bash settings
+###
+.ccache
+.bash_history
