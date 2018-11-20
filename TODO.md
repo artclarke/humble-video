@@ -6,7 +6,7 @@
     * [x] Change debug vs not designation to come from Maven
     * [x] Change LGPL vs GPL for dependencies to come from Maven
     * [x] Change memcheck designation to come from Maven
-    * [ ] Create script to invoke all supported build matrix combinations from Maven
+    * [x] Create script to invoke all supported build matrix combinations from Maven
     * [ ] Remove `humble-video-chef` and update README to require Docker
 
 * [ ] Upgrade to FFMpeg 4.1 with current dependencies and get all Humble tests to pass

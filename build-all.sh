@@ -41,8 +41,14 @@ maven_args() {
 # set this to echo to see all the commands but not execute them
 DEBUG=
 NATIVE_RUN=
+
+# We use the cache directory for Maven and CC Cache to cache their
+# content
+mkdir -p $(pwd)/humble-video-cache/.m2
+mkdir -p $(pwd)/humble-video-cache/.ccache
 UBUNTU_1204_RUN="docker run --rm -it --name humble-video-docker \
-    -v $(pwd)/humble-video-cache:/caches \
+    -v $(pwd)/humble-video-cache/.ccache:/root/.ccache \
+    -v $(pwd)/humble-video-cache/.m2:/root/.m2 \
     -v $(pwd):/source \
     humble-video-docker:latest"
 
