@@ -87,16 +87,29 @@ the `humble-video-docker` directory.
 
 Mac OS X is the preferred environment for building Humble Video because it allows you
 to build all supported environments (Mac, Linux and Darwin) if you install Docker.
-Oracle's
 
-You must install the JDK on your mac, and also Apple's xCode developer tools.
+You must install Docker on your mac.
 
-The 'brew' utility is your on Mac OS X friend. Use it often. You can install yasm using that.
+You must install the JDK on your mac. Any JDK should work, but we require 1.6
+support to build this library.
+
+You must install Apple's xCode developer tools.
+
+You should install homebrea.
+
+The 'brew' utility is your on Mac OS X friend. Use it often.
 
     brew install pkg-config
     brew install yasm
     brew install nasm
     brew install valgrind
+
+If you're going to be building a lot, I recommend installing ccache
+
+    brew install ccache
+
+This can speed up native code compilation significantly if you install
+it to front-end all compiler calls.
 
 To install the Humble-Swig version of Swig:
 ```bash
@@ -108,22 +121,17 @@ make
 make install
 ```
 
-Also, on Mac OS X the Valgrind test suite only works for 64-bit builds.
-
-To cross-compile for linux and windows in addition to Mac OS X, run:
-
-    # to build mac binaries
-    ```bash
-    mvn install
-    ```
-
+To build mac binaries:
+```bash
+mvn install 2>&1 | tee mvn-darwin.out
+```
 
 ## Linux Build Notes
-Build a Docker container to Build Humble-Video
+Build a Docker container to build Humble-Video:
 ```bash
 docker build -t humble-video-docker -f humble-video-docker/Dockerfile.ubuntu-12.04 humble-video-docker
 ```
-Set up a Cache directory for CCache, because the build takes a really long time.
+Set up a Cache directory for CCache, because the build takes a really long time:
 ```bash
 mkdir -p ./humble-video-cache
 ```
@@ -146,21 +154,21 @@ That said, I've attempted to automate as much of it as possible. The biggest cha
 
 All steps should be done from a OS X machine, and we'll build the other binaries in docker containers.
 
-### Check out a fresh copy of the repo. Do NOT re-use your development branch.
+1. Check out a fresh copy of the repo. Do NOT re-use your development branch.
 
-### Start a git flow release
+2. Start a git flow release
 
 ```bash
 git flow release start v<version-number>
 ```
 
-### Do a full Mac build and test.
+3. Do a full Mac build and test.
 
 ```bash
 mvn install 2>&1 | tee mvn-darwin.out
 ```
 
-### Build and run on Linux. This is the longest single step -- takes about 12 hours.
+4. Build and run on Linux. This is the longest single step -- takes about 12 hours.
 
 ```bash
 docker build -t humble-video-docker -f humble-video-docker/Dockerfile.ubuntu-12.04 humble-video-docker
@@ -171,29 +179,29 @@ docker run --name humble-video-docker \
   mvn install 2>&1 | tee mvn-linux.out
 ```
 
-### If successful, you now have binaries for all supported OSes staged in the humble-video-stage directory. Well done. Now let's test deploying a snapshot.
+5. If successful, you now have binaries for all supported OSes staged in the humble-video-stage directory. Well done. Now let's test deploying a snapshot.
 
 ```bash
 mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
 ```
 
-### At this stage you should have successfully deployed a fresh snapshot to Sonatype. Let's check.
+6. At this stage you should have successfully deployed a fresh snapshot to Sonatype. Let's check.
 
     https://oss.sonatype.org/content/repositories/snapshots/io/humble/
 
-### If successful, it's time to PEG the snapshots to a specific release. Now things get hairy.
+7. If successful, it's time to PEG the snapshots to a specific release. Now things get hairy.
 
 Edit humble-video-parent/pom.xml BY HAND to set the humble.version
 ```bash
 cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number>
 ```
-### Now, rebuild all Java Source
+8. Now, rebuild all Java Source
 
 ```bash
 (cd humble-video-noarch && mvn clean) && (cd humble-video-test && mvn clean) && (cd humble-video-demos && mvn clean)
 ```
 
-### Do one last rebuild (you do not need to rebuild native sources) and deploy
+9. Do one last rebuild (you do not need to rebuild native sources) and deploy
 
 ```bash
 (mvn install && \
@@ -204,17 +212,17 @@ docker run --name humble-video-docker \
 mvn -P\!build,deploy deploy) 2>&1 | tee mvn.out
 ```
 
-### Log into oss.sonatype.org look for your staging repo and approve the builds.
+10. Log into oss.sonatype.org look for your staging repo and approve the builds.
 
-### Check the OSS snapshot page to see if we got deployed correctly. It can take up to an hour for Sonatype to clear the release.
+11. Check the OSS snapshot page to see if we got deployed correctly. It can take up to an hour for Sonatype to clear the release.
 
     https://oss.sonatype.org/content/repositories/releases/io/humble/
 
-### Check Maven central to make sure it gets copied there. This can take up to 24-hours.
+12. Check Maven central to make sure it gets copied there. This can take up to 24-hours.
 
     https://repo.maven.apache.org/maven2/io/humble/humble-video-noarch/
 
-### Make sure it was done correctly by deleting all your m2 artifacts, and forcing a redownload.
+13. Make sure it was done correctly by deleting all your m2 artifacts, and forcing a redownload.
 
 ```bash
 rm -rf $HOME/.m2/repository/io/humble/humble-video-*
@@ -222,13 +230,13 @@ rm -rf $HOME/.m2/repository/io/humble/humble-video-*
 (cd humble-video-demos && mvn test)
 ```
 
-### Merge your changes back into Develop
+14. Merge your changes back into Develop
 
 ```bash
 git flow release finish v<version-number>
 ```
 
-### Peg your develop tree to the next snapshot.
+15. Peg your develop tree to the next snapshot.
 
 Edit humble-video-parent/pom.xml BY HAND to set the humble.version
 ```bash
@@ -239,7 +247,7 @@ cd humble-video-native/src/main/gnu
 <from the linux container, re-run autoreconf for the captive and native directories>
 ```
 
-### Done!
+16. Done!
 
 Enjoy!
 
