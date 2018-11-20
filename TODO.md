@@ -1,7 +1,7 @@
 ## Task List
 * [] Saner build systems for eventual CI
-    * [] File Issue for Docker-based build system
-    * [] Make Ubuntu:12.04 docker container to build Ubuntu & Windows binaries
+    * [x] File Issue for Docker-based build system
+    * [x] Make Ubuntu:12.04 docker container to build Ubuntu & Windows binaries
     * [] Change os-designation to come from Maven rather than intelligently inside the GNU folders.
     * [] Change debug vs not designation to come from Maven
     * [] Change LGPL vs GPL for dependencies to come from Maven
