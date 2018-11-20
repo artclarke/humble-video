@@ -146,21 +146,21 @@ That said, I've attempted to automate as much of it as possible. The biggest cha
 
 All steps should be done from a OS X machine, and we'll build the other binaries in the Vagrant VM running on that OS X machine.
 
-0. Check out a fresh copy of the repo. Do NOT re-use your development branch.
+### Check out a fresh copy of the repo. Do NOT re-use your development branch.
 
-0. Start a git flow release
+### Start a git flow release
 
 ```bash
 git flow release start v<version-number>
 ```
 
-0. Do a full Mac build and test (can be safely done in parallel with 5). Note that we have to build the native code 4 times for each operating system (x86_64 and i686 versions / debug and release versions), so this takes a long time.
+### Do a full Mac build and test (can be safely done in parallel with 5). Note that we have to build the native code 4 times for each operating system (x86_64 and i686 versions / debug and release versions), so this takes a long time.
 
 ```bash
 mvn install 2>&1 | tee mvn-darwin.out
 ```
 
-0. Build and run on Linux. This is the longest single step -- takes about 12 hours.
+### Build and run on Linux. This is the longest single step -- takes about 12 hours.
 
 ```bash
 docker build -t humble-video-docker -f humble-video-docker/Dockerfile.ubuntu-12.04 humble-video-docker
@@ -170,51 +170,51 @@ docker run --name humble-video-docker \
   -v $(pwd):/source humble-video-docker:latest \
   mvn install 2>&1 | tee mvn-linux.out
 ```
-0. If successful, you now have binaries for all supported OSes staged in the humble-video-stage directory. Well done. Now let's test deploying a snapshot.
+
+### If successful, you now have binaries for all supported OSes staged in the humble-video-stage directory. Well done. Now let's test deploying a snapshot.
 
 ```bash
 mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
 ```
 
-0. At this stage you should have successfully deployed a fresh snapshot to Sonatype. Let's check.
+### At this stage you should have successfully deployed a fresh snapshot to Sonatype. Let's check.
 
     https://oss.sonatype.org/content/repositories/snapshots/io/humble/
 
-0. If successful, it's time to PEG the snapshots to a specific release. Now things get hairy.
+### If successful, it's time to PEG the snapshots to a specific release. Now things get hairy.
 
 Edit humble-video-parent/pom.xml BY HAND to set the humble.version
 ```bash
 cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number>
 ```
-0. Now, rebuild all Java Source
+### Now, rebuild all Java Source
 
 ```bash
 (cd humble-video-noarch && mvn clean) && (cd humble-video-test && mvn clean) && (cd humble-video-demos && mvn clean)
 ```
 
-0. Do one last rebuild (you do not need to rebuild native sources) and deploy
+### Do one last rebuild (you do not need to rebuild native sources) and deploy
 
 ```bash
-mvn install && \
+(mvn install && \
 docker run --name humble-video-docker \
   -v $(pwd)/humble-video-cache:/caches \
   -v $(pwd):/source humble-video-docker:latest \
-  mvn install 2>&1 | tee mvn-linux.out &&
-mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
+  mvn install &&
+mvn -P\!build,deploy deploy) 2>&1 | tee mvn.out
 ```
-0. Log into oss.sonatype.org look for your staging repo and approve the builds.
 
-0. Check the OSS snapshot page to see if we got deployed correctly. It
-can take up to an hour for Sonatype to clear the release.
+### Log into oss.sonatype.org look for your staging repo and approve the builds.
+
+### Check the OSS snapshot page to see if we got deployed correctly. It can take up to an hour for Sonatype to clear the release.
 
     https://oss.sonatype.org/content/repositories/releases/io/humble/
 
-0. Check Maven central to make sure it gets copied there. This can
-take up to 24-hours.
+### Check Maven central to make sure it gets copied there. This can take up to 24-hours.
 
     https://repo.maven.apache.org/maven2/io/humble/humble-video-noarch/
 
-0. Make sure it was done correctly by deleting all your m2 artifacts, and forcing a redownload.
+### Make sure it was done correctly by deleting all your m2 artifacts, and forcing a redownload.
 
 ```bash
 rm -rf $HOME/.m2/repository/io/humble/humble-video-*
@@ -222,13 +222,13 @@ rm -rf $HOME/.m2/repository/io/humble/humble-video-*
 (cd humble-video-demos && mvn test)
 ```
 
-0. Merge your changes back into Develop
+### Merge your changes back into Develop
 
 ```bash
 git flow release finish v<version-number>
 ```
 
-0. Peg your develop tree to the next snapshot.
+### Peg your develop tree to the next snapshot.
 
 Edit humble-video-parent/pom.xml BY HAND to set the humble.version
 ```bash
@@ -239,7 +239,7 @@ cd humble-video-native/src/main/gnu
 vagrant ssh --command "cd /vagrant/humble-video-native/src/main/gnu && autoreconf"
 ```
 
-0. Done!
+### Done!
 
 Enjoy!
 
