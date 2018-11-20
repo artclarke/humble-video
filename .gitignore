@@ -12,9 +12,10 @@ Makefile
 config.log
 config.status
 libtool
-/mvn*.out
-/*/mvn*.out
-/*/test.log
+mvn*.out
+mvn*.out
+test.log
+docker.out
 .libs/
 *.lo
 *.o
@@ -39,3 +40,4 @@ io.humble.*
 ###
 .ccache
 .bash_history
+.vim*
