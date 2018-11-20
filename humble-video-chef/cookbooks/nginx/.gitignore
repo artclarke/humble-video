@@ -1,9 +1,0 @@
-.bundle
-.cache
-.kitchen
-bin
-*.sw*
-.Vagrantfile
-Gemfile.lock
-.kitchen/
-.kitchen.local.yml

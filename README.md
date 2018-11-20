@@ -49,7 +49,7 @@ It requires accesss to a Mac OS X development environment (Mountain Lion or late
 It consists of several sub-projects which are detailed below:
 
 * `humble-video-parent/`: The parent pom to all projects, where global defaults (like version numbers) are set.
-* `humble-video-chef/`: A collection of chef-solo recipes for configuring a Vagrant Ubuntu-64-bit box to build Linux and Windows versions.
+* `humble-video-docker/`: A collection of Docker files for building containers that can be used to build Humble-Video for different operating systems.
 * `humble-video-captive/`: All open-source libraries incorporated into humble-video. These are built with a custom build system.
 * `humble-video-native/`: All native (C/C++/Assembly) code for Humble-Video. These are built with a custom build system that generates
      many Maven artifacts containing native code. and generate Java files. The maven artifacts generated are of the form:
@@ -76,24 +76,18 @@ That will clean out all the staged binaries in addition to the intermediate file
 
 This project builds native code that can be used for Humble Software, and
 also generates Java files that can be compiled into Maven libraries
-that use the native code.
+that use the native code. This makes this an unusual Java build process -
+it is *not* pure Java.
 
-To build the native code the autotools stack is required:
-
-* GNU c++ compilers
-* autotool (autoreconf, automake, autoconf, etc.)
-* YASM and NASM (for assembly)
-* pkg-config
-* The Humble-Swig version of Swig (Use https://github.com/artclarke/humble-swig to get JavaDoc generated).
-* Doxygen & DOT (for C++ documentation)
-* Valgrind (for auto memory leak detection -- try 'make memcheck')
-* Java JDK 1.6 or higher
+We try to abstract that away for non Mac-Platforms by using Docker. To see
+what's required to build for Linux (Ubuntu) and Windows (on Ubuntu) see
+the `humble-video-docker` directory.
 
 ## Mac OS X Notes
 
 Mac OS X is the preferred environment for building Humble Video because it allows you
-to build all supported environments (Mac, Linux and Darwin) if you install Oracle's
-VirtualBox software and the excellent [Vagrant](http://vagrantup.com) program.
+to build all supported environments (Mac, Linux and Darwin) if you install Docker.
+Oracle's
 
 You must install the JDK on your mac, and also Apple's xCode developer tools.
 
@@ -118,113 +112,109 @@ Also, on Mac OS X the Valgrind test suite only works for 64-bit builds.
 
 To cross-compile for linux and windows in addition to Mac OS X, run:
 
-    # On your Mac OS X terminal
+    # to build mac binaries
+    ```bash
     mvn install
-    vagrant up
+    ```
 
-    # Once your vagrant box is provisioned
-    vagrant ssh
-
-    # From the Vagrant shell
-    cd /vagrant
-    mvn install
 
 ## Linux Build Notes
-
-You need to make sure the Chef recipes that are in `./Vagrantfile` get installed on your Linux box. Those recipes are in the humble-video-chef project. 
-
-I've only tested on Ubuntu 12.04 LTS, so that's all that supported to build on, and it's a work in progress so hang tight..
-
-To build, once the chef recipes have run on a clean box, just run:
-
-    mvn install
+Build a Docker container to Build Humble-Video
+```bash
+docker build -t humble-video-docker -f humble-video-docker/Dockerfile.ubuntu-12.04 humble-video-docker
+```
+Set up a Cache directory for CCache, because the build takes a really long time.
+```bash
+mkdir -p ./humble-video-cache
+```
+Then we use the container to run the build.
+```bash
+docker run --name humble-video-docker \
+  -v $(pwd)/humble-video-cache:/caches \
+  -v $(pwd):/source humble-video-docker:latest \
+  mvn install 2>&1 | tee mvn-linux.out
+```
 
 ## Windows Build Notes
 Don't do it. It's not supported. Instead you have to cross-compile for Windows from a Linux box. Sorry.
 
 # Steps Required To Release.
 
-Release is a long process. The builds take hours on a 2012 MacBook Pro. You really want to be highly confident before you kick it off.
+Release is a long process. The full build takes over 12 hours on a 2012 MacBook Pro. You really want to be highly confident before you kick it off.
 
 That said, I've attempted to automate as much of it as possible. The biggest challenge is patience.
 
 All steps should be done from a OS X machine, and we'll build the other binaries in the Vagrant VM running on that OS X machine.
 
-1. Start a git flow release
+0. Check out a fresh copy of the repo. Do NOT re-use your development branch.
+
+0. Start a git flow release
 
 ```bash
 git flow release start v<version-number>
 ```
 
-2. Publish that release branch
+0. Do a full Mac build and test (can be safely done in parallel with 5). Note that we have to build the native code 4 times for each operating system (x86_64 and i686 versions / debug and release versions), so this takes a long time.
 
 ```bash
-git push origin release/v<version-number>
+mvn install 2>&1 | tee mvn-darwin.out
 ```
 
-3. **Checkout a branch new copy of the repository -- no cheating**
+0. Build and run on Linux. This is the longest single step -- takes about 12 hours.
 
 ```bash
-git clone git@github.com:artclarke/humble-video.git humble-video-v<version-number>
+docker build -t humble-video-docker -f humble-video-docker/Dockerfile.ubuntu-12.04 humble-video-docker
+mkdir -p ./humble-video-cache
+docker run --name humble-video-docker \
+  -v $(pwd)/humble-video-cache:/caches \
+  -v $(pwd):/source humble-video-docker:latest \
+  mvn install 2>&1 | tee mvn-linux.out
 ```
-
-4. Start up the VM that will build the linux/windows stuff.
-
-```bash
-cd humble-video-v<version-number>
-vagrant up
-```
-
-5. Wait a long time for it to download and provision itself (can be safely done in parallel with 6).
-
-6. Do a full Mac build and test (can be safely done in parallel with 5). Note that we have to build the native code 4 times for each operating system (x86_64 and i686 versions / debug and release versions), so this takes a long time.
-
-```bash
-mvn install 2>&1 | tee mvn.out
-```
-
-7. If both 5 and 6 completed successfully, build and run on Linux. This is the longest single step -- takes about 3 hours on my MacBook pro. Grab coffee.
-
-```bash
-vagrant ssh --command "cd /vagrant && mvn install 2>&1 | tee mvn-linux.out"
-```
-
-
-8. If successful, you now have binaries for all supported OSes staged in the humble-video-stage directory. Well done. Now let's test deploying a snapshot.
+0. If successful, you now have binaries for all supported OSes staged in the humble-video-stage directory. Well done. Now let's test deploying a snapshot.
 
 ```bash
 mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
 ```
 
-Note: to do all of those (steps 4 through 8):
+0. At this stage you should have successfully deployed a fresh snapshot to Sonatype. Let's check.
 
-```bash
-vagrant up && mvn install && vagrant ssh --command "cd /vagrant && mvn install" && mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
-```
-  
-9. If successful, it's time to PEG the snapshots to a specific release. Now things get hairy.
+    https://oss.sonatype.org/content/repositories/snapshots/io/humble/
+
+0. If successful, it's time to PEG the snapshots to a specific release. Now things get hairy.
 
 Edit humble-video-parent/pom.xml BY HAND to set the humble.version
 ```bash
 cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number>
 ```
-10. Now, rebuild all Java Source
+0. Now, rebuild all Java Source
 
 ```bash
 (cd humble-video-noarch && mvn clean) && (cd humble-video-test && mvn clean) && (cd humble-video-demos && mvn clean)
 ```
 
-11. Do one last rebuild (you do not need to rebuild native sources) and deploy
+0. Do one last rebuild (you do not need to rebuild native sources) and deploy
 
 ```bash
-vagrant up && mvn install && vagrant ssh --command "cd /vagrant && mvn install" && mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
+mvn install && \
+docker run --name humble-video-docker \
+  -v $(pwd)/humble-video-cache:/caches \
+  -v $(pwd):/source humble-video-docker:latest \
+  mvn install 2>&1 | tee mvn-linux.out &&
+mvn -P\!build,deploy deploy 2>&1 | tee mvn.out
 ```
+0. Log into oss.sonatype.org look for your staging repo and approve the builds.
 
-12. Check the OSS snapshot page to see if we got deployed correctly:
+0. Check the OSS snapshot page to see if we got deployed correctly. It
+can take up to an hour for Sonatype to clear the release.
 
-    https://oss.sonatype.org/content/repositories/snapshots/io/humble/
+    https://oss.sonatype.org/content/repositories/releases/io/humble/
 
-13. Make sure it was done correctly by deleting all your m2 artifacts, and forcing a redownload.
+0. Check Maven central to make sure it gets copied there. This can
+take up to 24-hours.
+
+    https://repo.maven.apache.org/maven2/io/humble/humble-video-noarch/
+
+0. Make sure it was done correctly by deleting all your m2 artifacts, and forcing a redownload.
 
 ```bash
 rm -rf $HOME/.m2/repository/io/humble/humble-video-*
@@ -232,23 +222,24 @@ rm -rf $HOME/.m2/repository/io/humble/humble-video-*
 (cd humble-video-demos && mvn test)
 ```
 
-14. Merge your changes back into Develop
+0. Merge your changes back into Develop
 
 ```bash
 git flow release finish v<version-number>
 ```
 
-15. Peg your develop tree to the next snapshot.
+0. Peg your develop tree to the next snapshot.
 
 Edit humble-video-parent/pom.xml BY HAND to set the humble.version
 ```bash
 cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number>-SNAPSHOT
+<edit humble-video-parent/pom.xml to set the version property to the same number>
 cd humble-video-native/src/main/gnu
 <edit configure.ac to update version numbers in an editor of your choice>
 vagrant ssh --command "cd /vagrant/humble-video-native/src/main/gnu && autoreconf"
 ```
 
-16. Done!
+0. Done!
 
 Enjoy!
 

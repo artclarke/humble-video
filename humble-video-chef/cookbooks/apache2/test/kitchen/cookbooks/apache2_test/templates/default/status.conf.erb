@@ -1,9 +1,0 @@
-<IfModule mod_status.c>
-  <Location /server-status>
-    SetHandler server-status
-    Order deny,allow
-    Deny from all
-    Allow from localhost ip6-localhost
-    Allow from <%= @remote_host %>
-  </Location>
-</IfModule>

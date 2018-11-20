@@ -1,7 +1,0 @@
-<Location /secure>
-  AuthUserFile "<%= @params[:auth_user_file] %>"
-  AuthType digest
-  AuthDigestDomain /secure/
-  AuthName "private area"
-  Require valid-user
-</Location>
