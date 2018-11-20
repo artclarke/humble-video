@@ -38,6 +38,4 @@ io.humble.*
 ###
 # Ignore ccache and bash settings
 ###
-.ccache
-.bash_history
-.vim*
+/humble-video-cache
