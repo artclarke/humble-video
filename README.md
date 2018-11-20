@@ -144,7 +144,7 @@ Release is a long process. The full build takes over 12 hours on a 2012 MacBook 
 
 That said, I've attempted to automate as much of it as possible. The biggest challenge is patience.
 
-All steps should be done from a OS X machine, and we'll build the other binaries in the Vagrant VM running on that OS X machine.
+All steps should be done from a OS X machine, and we'll build the other binaries in docker containers.
 
 ### Check out a fresh copy of the repo. Do NOT re-use your development branch.
 
@@ -154,7 +154,7 @@ All steps should be done from a OS X machine, and we'll build the other binaries
 git flow release start v<version-number>
 ```
 
-### Do a full Mac build and test (can be safely done in parallel with 5). Note that we have to build the native code 4 times for each operating system (x86_64 and i686 versions / debug and release versions), so this takes a long time.
+### Do a full Mac build and test.
 
 ```bash
 mvn install 2>&1 | tee mvn-darwin.out
@@ -236,7 +236,7 @@ cd humble-video-parent && mvn -Pdeploy versions:set -DnewVersion=<version-number
 <edit humble-video-parent/pom.xml to set the version property to the same number>
 cd humble-video-native/src/main/gnu
 <edit configure.ac to update version numbers in an editor of your choice>
-vagrant ssh --command "cd /vagrant/humble-video-native/src/main/gnu && autoreconf"
+<from the linux container, re-run autoreconf for the captive and native directories>
 ```
 
 ### Done!
