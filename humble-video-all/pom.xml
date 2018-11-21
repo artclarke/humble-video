@@ -28,7 +28,8 @@
       <id>Windows-x86</id>
       <activation>
         <property>
-          <name>!io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
         </property>
         <os>
           <family>Windows</family>
@@ -46,7 +47,8 @@
       <id>Windows-x86_64</id>
       <activation>
         <property>
-          <name>!io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
         </property>
         <os>
           <family>Windows</family>
@@ -64,7 +66,8 @@
       <id>Windows-amd64</id>
       <activation>
         <property>
-          <name>!io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
         </property>
         <os>
           <family>Windows</family>
@@ -83,7 +86,8 @@
       <!--  as of Humble Video 0.3.0 x86/i686 versions of MacOS X are no longer supported -->
       <activation>
         <property>
-          <name>!io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
         </property>
         <os>
           <family>Mac</family>
@@ -101,7 +105,8 @@
       <id>Mac-amd64</id>
       <activation>
         <property>
-          <name>!io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
         </property>
         <os>
           <family>Mac</family>
@@ -119,7 +124,8 @@
       <id>Linux-x86</id>
       <activation>
         <property>
-          <name>!io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
         </property>
         <os>
           <family>Linux</family>
@@ -137,7 +143,8 @@
       <id>Linux-x86_64</id>
       <activation>
         <property>
-          <name>!io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
         </property>
         <os>
           <family>Linux</family>
@@ -155,7 +162,8 @@
       <id>Linux-amd64</id>
       <activation>
         <property>
-          <name>!io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
         </property>
         <os>
           <family>Linux</family>
@@ -174,7 +182,8 @@
       <id>Windows-x86-debug</id>
       <activation>
         <property>
-          <name>io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
         </property>
         <os>
           <family>Windows</family>
@@ -192,7 +201,8 @@
       <id>Windows-x86_64-debug</id>
       <activation>
         <property>
-          <name>io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
         </property>
         <os>
           <family>Windows</family>
@@ -210,7 +220,8 @@
       <id>Windows-amd64-debug</id>
       <activation>
         <property>
-          <name>io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
         </property>
         <os>
           <family>Windows</family>
@@ -229,7 +240,8 @@
       <!--  as of Humble Video 0.3.0 x86/i686 versions of MacOS X are no longer supported -->
       <activation>
         <property>
-          <name>io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
         </property>
         <os>
           <family>Mac</family>
@@ -247,7 +259,8 @@
       <id>Mac-amd64-debug</id>
       <activation>
         <property>
-          <name>io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
         </property>
         <os>
           <family>Mac</family>
@@ -265,7 +278,8 @@
       <id>Linux-x86-debug</id>
       <activation>
         <property>
-          <name>io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
         </property>
         <os>
           <family>Linux</family>
@@ -283,7 +297,8 @@
       <id>Linux-x86_64-debug</id>
       <activation>
         <property>
-          <name>io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
         </property>
         <os>
           <family>Linux</family>
@@ -301,7 +316,8 @@
       <id>Linux-amd64-debug</id>
       <activation>
         <property>
-          <name>io.humble.debug</name>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
         </property>
         <os>
           <family>Linux</family>
