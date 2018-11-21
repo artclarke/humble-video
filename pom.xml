@@ -31,6 +31,7 @@
         <module>humble-video-parent</module>
         <module>humble-video-captive</module>
         <module>humble-video-native</module>
+        <module>humble-video-arch</module>
         <module>humble-video-noarch</module>
         <module>humble-video-test</module>
       </modules>
@@ -50,7 +51,7 @@
            of them to deploy to Maven Central -->
       <modules>
         <module>humble-video-parent</module>
-        <module>humble-video-stage</module>
+        <module>humble-video-arch</module>
         <module>humble-video-noarch</module>
         <module>humble-video-all</module>
         <module>humble-video-demos</module>

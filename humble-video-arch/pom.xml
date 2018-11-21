@@ -26,6 +26,16 @@
 
   <build>
     <plugins>
+      <!-- this is a VERY expensive project to build and 
+           by default we don't clean. you must remove the 
+           target directory by hand -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+          <configuration>
+            <skip>true</skip>
+          </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
