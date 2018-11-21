@@ -48,7 +48,9 @@ RUN apt-get install -y build-essential=11.5ubuntu2.1
 RUN apt-get install -y bison=1:2.5.dfsg-2.1
 RUN apt-get install -y flex=2.5.35-10ubuntu3
 # Java Pre-Reqs
-RUN apt-get install -y openjdk-6-jdk=6b41-1.13.13-0ubuntu0.12.04.1
+#RUN apt-get install -y openjdk-6-jdk=6b41-1.13.13-0ubuntu0.12.04.1
+# We need Java 7 for Maven to work fully
+RUN apt-get install -y openjdk-7-jdk=7u121-2.6.8-1ubuntu0.12.04.3
 RUN apt-get install -y maven=3.0.4-2
 
 # Humble's version of Swig that makes Javadoc from C++ code

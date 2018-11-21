@@ -7,7 +7,6 @@ PREFIX=$2 # The absolute path we will install into.
 HOST=$3   # The cross compilation host string
 DEBUG=$4  # A 'yes' or 'no' flag for if we build debug versions or not
 GPL=$5    # A 'yes' or 'no' flag for if we build debug versions or not.
-MVN_NAME=$6 # The maven package name
 
 # Convert the prefix into an absolute path because configure needs that
 ABS_PREFIX="$(cd "$(dirname "$PREFIX")"; pwd)/$(basename "$PREFIX")"
@@ -27,9 +26,9 @@ else
     CONFIGURE_FLAGS="--enable-optimizations=yes ${CONFIGURE_FLAGS}"
 fi
 
-echo ${CONFIGURE} VS_MVN_HOST=${MVN_NAME} ${CONFIGURE_FLAGS}
+echo ${CONFIGURE} ${CONFIGURE_FLAGS}
 if [ -e Makefile ]; then
     echo "Makefile appears to be up-to-date in $(pwd). Skipping configure."
 else
-    ${CONFIGURE} VS_MVN_HOST=${MVN_NAME} ${CONFIGURE_FLAGS}
+    ${CONFIGURE} ${CONFIGURE_FLAGS}
 fi

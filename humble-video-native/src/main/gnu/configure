@@ -700,7 +700,6 @@ SWIG
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
-VS_MVN_HOST
 VS_DEBUG
 VS_DEBUG_FALSE
 VS_DEBUG_TRUE
@@ -880,7 +879,6 @@ CXX
 CXXFLAGS
 CCC
 CXXCPP
-VS_MVN_HOST
 PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
@@ -1559,8 +1557,6 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
-  VS_MVN_HOST Location of the 'valgrind' program; if found, then "ant
-              run-tests-memcheck" will do full memory and error checking
   PKG_CONFIG  path to pkg-config utility
   PKG_CONFIG_PATH
               directories to add to pkg-config's search path
@@ -16965,9 +16961,6 @@ if test "x$enable_optimizations" = xno; then
   VS_DEBUG=1
 
 fi
-
-# default name we use for the Maven bundle
-
 
 
 

@@ -49,7 +49,7 @@
                       ${project.basedir}/src/main/gnu/configure
                   </argument>
                   <argument> <!-- the staging area -->
-                      ${project.basedir}/../humble-video-stage/humble-video-arch-${io.humble.build.host_os_name}/target/native
+                      ${project.basedir}/../humble-video-arch/target/native/${io.humble.build.host_os_directory}
                   </argument>
                   <argument> <!-- the GNU host triplet -->
                       ${io.humble.build.host_os_name}
@@ -59,9 +59,6 @@
                   </argument>
                   <argument> <!-- yes or no for whether GPL -->
                       ${io.humble.build.include_gpl_dependencies}
-                  </argument>
-                  <argument> <!-- the maven package name -->
-                      ${io.humble.build.host_os_directory}
                   </argument>
               </arguments>
               <workingDirectory>

@@ -126,10 +126,6 @@ if test "x$enable_optimizations" = xno; then
   AC_SUBST([VS_DEBUG])
 fi
 
-# default name we use for the Maven bundle
-AC_ARG_VAR(VS_MVN_HOST,
-          [Location of the 'valgrind' program; if found, then "ant run-tests-memcheck" will do full memory and error checking])
-
 PKG_PROG_PKG_CONFIG
 AC_PATH_PROG([SWIG],[swig])
 AC_ARG_VAR(SWIG,
