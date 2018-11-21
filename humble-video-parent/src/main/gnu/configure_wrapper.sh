@@ -8,6 +8,8 @@ HOST=$3   # The cross compilation host string
 DEBUG=$4  # A 'yes' or 'no' flag for if we build debug versions or not
 GPL=$5    # A 'yes' or 'no' flag for if we build debug versions or not.
 
+# And make sure the Prefix directory exists
+mkdir -p "${PREFIX}"
 # Convert the prefix into an absolute path because configure needs that
 ABS_PREFIX="$(cd "$(dirname "$PREFIX")"; pwd)/$(basename "$PREFIX")"
 
