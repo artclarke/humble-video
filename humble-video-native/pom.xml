@@ -89,6 +89,22 @@
               <goal>exec</goal>
             </goals>
           </execution>
+          <execution>
+            <id>exec-five</id>
+            <phase>package</phase>
+            <configuration>
+              <executable>make</executable>
+              <arguments>
+                <argument>install</argument>
+              </arguments>
+              <workingDirectory>
+                ${project.basedir}/target/native/${io.humble.build.host_os_directory}
+              </workingDirectory>
+            </configuration>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
     </plugins>
