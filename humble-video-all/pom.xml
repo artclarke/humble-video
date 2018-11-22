@@ -9,10 +9,15 @@
     <relativePath>../humble-video-parent/pom.xml</relativePath>
   </parent>
 
-  <artifactId>humble-video-all</artifactId>
+  <!--
+  The humble-video.jar jar takes the architecture-independent (noarch)
+  and the architeture-dependent (arch) parts of humble-video as
+  dependencies. This is the jar that most people should take as a dependency.
+  -->
+  <artifactId>humble-video</artifactId>
   <packaging>jar</packaging>
 
-  <name>humble-video-all</name>
+  <name>humble-video</name>
   <url>http://maven.apache.org</url>
 
   <dependencies>
@@ -23,6 +28,9 @@
     <dependency>
       <groupId>io.humble</groupId>
       <artifactId>humble-video-arch</artifactId>
+      <!-- the parent pom tries to determine the right OS classifier,
+           but you can override with -Dio.humble.build.arch_jar_classifier
+           when you run maven if you want. -->
       <classifier>${io.humble.build.arch_jar_classifier}</classifier>
     </dependency>
   </dependencies>
