@@ -1,4 +1,4 @@
-#Welcome to the Humble Video uber project.#
+# Welcome to the Humble Video uber project.
 
 Humble-Video allows Java Virtual Machine developers (Java, Scala, Clojure, JRuby, etc.) to decode, analyze/modify and encode audio and video data into 100s of different formats (e.g. H264, AAC, MP3, FLV, etc.).
 
