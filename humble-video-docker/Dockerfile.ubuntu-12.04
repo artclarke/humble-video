@@ -48,8 +48,6 @@ RUN apt-get install -y build-essential=11.5ubuntu2.1
 RUN apt-get install -y bison=1:2.5.dfsg-2.1
 RUN apt-get install -y flex=2.5.35-10ubuntu3
 # Java Pre-Reqs
-#RUN apt-get install -y openjdk-6-jdk=6b41-1.13.13-0ubuntu0.12.04.1
-# We need Java 7 for Maven to work fully
 RUN apt-get install -y openjdk-7-jdk=7u121-2.6.8-1ubuntu0.12.04.3
 RUN apt-get install -y maven=3.0.4-2
 
@@ -72,8 +70,12 @@ RUN git clone https://repo.or.cz/nasm.git && \
     bash ./configure && make && make manpages && make install && \
     cd .. && rm -rf nasm
 
-# Finally, I like to edit files in containers, so I'm adding vi
+# I like to edit files in containers, so I'm adding vi
 RUN apt-get install -y vim=2:7.3.429-2ubuntu2.2
+
+# And we still support 32-bit on some operating systems, so
+# RUN apt-get install -y ia32-libs=20090808ubuntu36
+# RUN apt-get install -y openjdk-7-jdk:i386=7u121-2.6.8-1ubuntu0.12.04.3
 
 ######## All package installations should be above this line ###########
 

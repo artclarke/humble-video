@@ -75,10 +75,13 @@ ${DEBUG} ${UBUNTU_1204_RUN} mvn $(maven_args x86_64-pc-linux-gnu6 yes yes yes) i
 # release build of 64-bit linux
 ${DEBUG} ${UBUNTU_1204_RUN} mvn $(maven_args x86_64-pc-linux-gnu6 no yes no) install || exit $?
 
+# note -- right now our docker container can't really run a 32-bit JVM, so
+# we skip these tests.
+
 # release build of 32-bit linux
-${DEBUG} ${UBUNTU_1204_RUN} mvn $(maven_args i686-pc-linux-gnu6 no yes no) install || exit $?
+${DEBUG} ${UBUNTU_1204_RUN} mvn $(maven_args i686-pc-linux-gnu6 no yes no) -DskipTests install || exit $?
 # debug build of 32-bit linux
-${DEBUG} ${UBUNTU_1204_RUN} mvn $(maven_args i686-pc-linux-gnu6 yes yes no) install || exit $?
+${DEBUG} ${UBUNTU_1204_RUN} mvn $(maven_args i686-pc-linux-gnu6 yes yes no) -DskipTests install || exit $?
 
 ## WINDOWS!!!
 

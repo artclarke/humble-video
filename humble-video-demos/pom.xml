@@ -44,7 +44,7 @@
     </dependency>
     <dependency>
       <groupId>io.humble</groupId>
-      <artifactId>humble-video-all</artifactId>
+      <artifactId>humble-video</artifactId>
     </dependency>
   </dependencies>
 </project>

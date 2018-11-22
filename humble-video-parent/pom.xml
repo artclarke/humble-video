@@ -616,12 +616,7 @@
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-all</artifactId>
-        <version>${io.humble.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.humble</groupId>
-        <artifactId>humble-video-all</artifactId>
+        <artifactId>humble-video</artifactId>
         <version>${io.humble.version}</version>
       </dependency>
     </dependencies>
