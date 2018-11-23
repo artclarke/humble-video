@@ -166,11 +166,6 @@ EXTRA_DIST= \
   mk/memcheck \
   mk/lib
 
-install-exec-hook:
-	@$(MKDIR_P) $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST}/src/main/java/io/humble/video_native
-	@cp -f $(abs_top_srcdir)/mk/Version.java $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST}/src/main/java/io/humble/video_native
-	@(cd $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST} && mvn install)
-
 doc: doxygen-doc
 
 dist-hook:

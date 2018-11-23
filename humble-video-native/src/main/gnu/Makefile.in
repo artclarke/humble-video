@@ -240,7 +240,6 @@ VS_LDFLAGS = @VS_LDFLAGS@
 VS_LIBGCC = @VS_LIBGCC@
 VS_LIBGCC_EH = @VS_LIBGCC_EH@
 VS_LIBSTDCXX = @VS_LIBSTDCXX@
-VS_MVN_HOST = @VS_MVN_HOST@
 VS_OS_WINDOWS = @VS_OS_WINDOWS@
 VS_PROJECT_NAME = @VS_PROJECT_NAME@
 VS_SWIG = @VS_SWIG@
@@ -775,8 +774,7 @@ install-dvi: install-dvi-recursive
 install-dvi-am:
 
 install-exec-am:
-	@$(NORMAL_INSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
+
 install-html: install-html-recursive
 
 install-html-am:
@@ -818,7 +816,7 @@ ps-am:
 uninstall-am:
 
 .MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) ctags-recursive \
-	install-am install-exec-am install-strip tags-recursive
+	install-am install-strip tags-recursive
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am am--refresh check check-am clean clean-generic \
@@ -829,13 +827,13 @@ uninstall-am:
 	distcleancheck distdir distuninstallcheck dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-exec-hook install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am
 
 include $(abs_top_builddir)/mk/Makefile.global
 
@@ -884,11 +882,6 @@ include $(abs_top_builddir)/mk/Makefile.global
 @DX_COND_doc_TRUE@@DX_DOCDIR@/@PACKAGE@.tag: $(DX_CONFIG) $(pkginclude_HEADERS)
 @DX_COND_doc_TRUE@	rm -rf @DX_DOCDIR@
 @DX_COND_doc_TRUE@	$(DX_ENV) $(DX_DOXYGEN) $(srcdir)/$(DX_CONFIG)
-
-install-exec-hook:
-	@$(MKDIR_P) $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST}/src/main/java/io/humble/video_native
-	@cp -f $(abs_top_srcdir)/mk/Version.java $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST}/src/main/java/io/humble/video_native
-	@(cd $(abs_top_srcdir)/../../../../humble-video-stage/humble-video-arch-${VS_MVN_HOST} && mvn install)
 
 doc: doxygen-doc
 

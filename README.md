@@ -1,6 +1,10 @@
+Humble-Video allows Java Virtual Machine developers (Java, Scala, Clojure, JRuby, etc.) to decode, analyze/modify and encode audio and video data into 100s of different formats (e.g. H264, AAC, MP3, FLV, etc.).
+
+It uses the <a href="http://ffmpeg.org">FFmpeg</a> project under the covers.
+
 # How To Use In Your Code
 
-If using Maven, Humble is deployed to the Maven Central Repository. To include it in your project (note: this will include artifacts for all operating systems), add this to your pom.xml:
+Humble is deployed to the [Maven Central](https://repo.maven.apache.org/maven2/io/humble/) Repository. To include it in your Maven project (note: this will include artifacts for all operating systems), add this to your pom.xml:
 ```xml
 <project>
   ...
@@ -8,20 +12,24 @@ If using Maven, Humble is deployed to the Maven Central Repository. To include i
     ...
     <dependency>
       <groupId>io.humble</groupId>
-      <artifactId>humble-video-all</artifactId>
-      <version>0.3.0</version>
+      <artifactId>humble-video</artifactId>
+      <version>1.0.0</version>
     </dependency>
+    ...
   </dependencies>
+  ...
 </project>
 ```
 
+*Important note about dependencies*: Humble-Video is a combination of pure-java and platform-dependent code. The `humble-video.jar` file depends on `humble-video-noarch.jar` which is platform independent, and `humble-video-arch.jar` which has many different jars (with different classifiers) depending on the platform. If you build your own platform dependent jar, then just depend on `humble-video-noarch.jar` and make sure your platform dependent jar is somewhere in your classpath. Humble-Video will then find it automatically.
+
 # Demoes of the API in action.
 
-To see how to use the API, go to the [humble-video-demos](humble-video-demos/) package.
+To see how to use the API, go to the [humble-video-demos](humble-video-demos/) package. The [README.md](humble-video-demos/README.md) there is a good place to start.
 
 # Supported Platforms
 
-Humble Video's Maven Central artifacts contain native (i.e. non-Java) code and are tests to run on the following platforms:
+Humble Video's [Maven Central](https://repo.maven.apache.org/maven2/io/humble/) artifacts contain native (i.e. non-Java) code and are tested to run on the following platforms:
 
 
 | Operating System | Architecture |
@@ -30,47 +38,36 @@ Humble Video's Maven Central artifacts contain native (i.e. non-Java) code and a
 | Apple OS X | x86_64 intel processors |
 | Ubuntu 12.04 LTS and later | i686 and x86_64 intel processors |
 
-If you are running on other platforms, the Maven Central artifacts may not work and you'll have to build your own version. And beware ... building Humble takes a very long time.
+If you are running on other platforms, the [Maven Central](https://repo.maven.apache.org/maven2/io/humble/) artifacts may not work and you'll have to build your own version. And beware ... building Humble takes a very long time.
 
 # Building Humble Video
 
 ## Please read this BEFORE running 'mvn install'.
 
-Welcome to the Humble Video uber project.
-
-HumbleVideo allows Java Virtual Machine developers (Java, Scala, Clojure, JRuby, etc.) to decode, analyze/modify
-and encode audio and video data into 100s of different formats (e.g. H264, AAC, MP3, FLV, etc.). It uses the
-<a href="http://ffmpeg.org">FFmpeg</a> project under the covers.
-
-Humble Video is a mix of Java and native code, and the native code is written in C++, C and Assembly. Most users
-are **strongly** encouraged to use the maven artifacts in a central repository, as building the system is complicated.
-It requires accesss to a Mac OS X development environment (Mountain Lion or later).
+Humble Video is a mix of Java and native code, and the native code is written in C++, C and Assembly. Most users are **strongly** encouraged to use the maven artifacts in a central repository, as building the system is complicated.  It requires accesss to a Mac OS X development environment (Mountain Sierra or later).
 
 It consists of several sub-projects which are detailed below:
 
-* `humble-video-parent/`: The parent pom to all projects, where global defaults (like version numbers) are set.
+* `humble-video-demos/`: A series of demo programs showing the Humble API in action. It's a great place to start.
+* `humble-video-all/`: This creates the `humble-video.jar` jar, which depends on `humble-video-noarch` and `humble-video-arch` jars.
+* `humble-video-noarch/`: All platform-independent Java code. This contains all the classes you call.
+* `humble-video-arch/`: This builds a jar for each platform we support (using classifiers on the jar name to tell you what platform). These jars contain a native shared-object implemented via JNI -- i.e. all native (non-Java) code. 
+* `humble-video-test/`: All integration (very long running) tests for humble-video.
+* `humble-video-native/`: This package builds all the Humble Video native (C/C++/Assembly) code.
+* `humble-video-captive/`: This package builds all open-source libraries incorporated into humble-video (e.g. ffmpeg, libmp3lame, libvpx, etc.).
 * `humble-video-docker/`: A collection of Docker files for building containers that can be used to build Humble-Video for different operating systems.
-* `humble-video-captive/`: All open-source libraries incorporated into humble-video. These are built with a custom build system.
-* `humble-video-native/`: All native (C/C++/Assembly) code for Humble-Video. These are built with a custom build system that generates
-     many Maven artifacts containing native code. and generate Java files. The maven artifacts generated are of the form:
-     `humble-video-arch-${architecture-specifier}.jar` and the architecture-specifier looks like `i686-gnu-linux` for 32-bit linux, etc.
-     For users who do not want to always download artifacts that contain all architectures, these are valid POMs to be depended on.
-  that are inserted into `humble-video-all`.
-* `humble-video-noarch/`: All Java code (and only Java code), including some generated Java code from `humble-video-native`. Unit tests run from here.  These are built with maven. 
-* `humble-video-test/`: All integration (very long running) tests for humble-video. Depends on humble-video-noarch and (via maven profiles) whatever architecture specific versions of the native code Jars it needs.
-* `humble-video-demos/`: A series of demo programs showing the Humble API in action.
-* `humble-video-all/`: A pom that depends on humble-video-noarch and humble-video-arch-all. This will only successfully build on build machines that have all architecture files required staged (i.e. probably not your box).
-* `humble-video-stage/`: Where all the native code's final artifacts (DLLs and the like) end up being place so that all the rest of the maven build system knows where to find them
+* `humble-video-parent/`: The parent pom to all projects, where global defaults (like version numbers) are set.
 
 To build, assuming you have all the prerequisites installed for your OS (see below), run:
 
     mvn install
 
-To clean out a build tree, you need to do:
+In general the build system should 'guess' the right platform to build for.
 
-    (cd humble-video-stage && mvn clean) && mvn clean
-
-That will clean out all the staged binaries in addition to the intermediate files built for each operating system.
+*But warning: Humble Video contains both Java and platform-dependent
+code, so usually running `mvn install` will fail if you don't have
+all the prerequisites installed. We strongly recommend using our
+Maven Central jars.*
 
 # Pre-requisites on build machines
 
@@ -85,17 +82,15 @@ the `humble-video-docker` directory.
 
 ## Mac OS X Notes
 
-Mac OS X is the preferred environment for building Humble Video because it allows you
-to build all supported environments (Mac, Linux and Darwin) if you install Docker.
+Mac OS X is the preferred environment for building Humble Video because it allows you to build all supported environments (Mac, Linux and Darwin) if you install Docker.
 
 You must install Docker on your mac.
 
-You must install the JDK on your mac. Any JDK should work, but we require 1.6
-support to build this library.
+You must install the JDK on your mac. Any JDK should work, but we require 1.6 support to build this library.
 
 You must install Apple's xCode developer tools.
 
-You should install homebrea.
+You should install homebrew. It will make your life much easier for the rest of these dependencies.
 
 The 'brew' utility is your on Mac OS X friend. Use it often.
 
@@ -123,7 +118,7 @@ make install
 
 To build mac binaries:
 ```bash
-mvn install 2>&1 | tee mvn-darwin.out
+mvn install
 ```
 
 ## Linux Build Notes
@@ -165,21 +160,16 @@ git flow release start v<version-number>
 3. Do a full Mac build and test.
 
 ```bash
-mvn install 2>&1 | tee mvn-darwin.out
+mvn install 2>&1 | tee mvn.out
 ```
 
-4. Build and run on Linux. This is the longest single step -- takes about 12 hours.
+4. Build and run on all operating systems.
 
 ```bash
-docker build -t humble-video-docker -f humble-video-docker/Dockerfile.ubuntu-12.04 humble-video-docker
-mkdir -p ./humble-video-cache
-docker run --name humble-video-docker \
-  -v $(pwd)/humble-video-cache:/caches \
-  -v $(pwd):/source humble-video-docker:latest \
-  mvn install 2>&1 | tee mvn-linux.out
+bash ./build-all.sh 2>&1 | tee mvn.out
 ```
 
-5. If successful, you now have binaries for all supported OSes staged in the humble-video-stage directory. Well done. Now let's test deploying a snapshot.
+5. If successful, you now have binaries for all supported OSes staged in the humble-video-arch directory. Well done. Now let's test deploying a snapshot.
 
 ```bash
 mvn -P\!build,deploy deploy 2>&1 | tee mvn.out

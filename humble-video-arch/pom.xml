@@ -6,18 +6,17 @@
     <groupId>io.humble</groupId>
     <artifactId>humble-video-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../../humble-video-parent/pom.xml</relativePath>
+    <relativePath>../humble-video-parent/pom.xml</relativePath>
   </parent>
 
-  <artifactId>humble-video-arch-x86_64-apple-darwin18</artifactId>
+  <artifactId>humble-video-arch</artifactId>
   <packaging>jar</packaging>
 
-  <name>humble-video-arch-x86_64-apple-darwin18</name>
+  <name>humble-video-arch</name>
   <url>http://www.humble.io</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jarsigner.keystore>../../humble-video-parent/src/main/resources/development.keystore</jarsigner.keystore>
   </properties>
 
   <dependencies>
@@ -25,6 +24,16 @@
 
   <build>
     <plugins>
+      <!-- this is a VERY expensive project to build and 
+           by default we don't clean. you must remove the 
+           target directory by hand -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+          <configuration>
+            <skip>true</skip>
+          </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -40,18 +49,17 @@
               <Humble-Native-App>humble-video</Humble-Native-App>
               <Humble-Native-Root>.</Humble-Native-Root>
               <Humble-Native-Paths>.</Humble-Native-Paths>
-                <Humble-Native-Bundles>
-                    x86_64-apple-darwin18
-                </Humble-Native-Bundles>
+              <Humble-Native-Bundles>${io.humble.build.arch_jar_classifier}</Humble-Native-Bundles>
             </manifestEntries>
           </archive>
+          <classifier>${io.humble.build.arch_jar_classifier}</classifier>
         </configuration>
       </plugin>
     </plugins>
     <resources>
       <!-- Add all the shared objects per OS -->
       <resource>
-        <directory>target/native/bin</directory>
+        <directory>target/native/${io.humble.build.host_os_directory}/bin</directory>
         <includes>
           <include>**/*.dll</include>
         </includes>
@@ -60,7 +68,7 @@
         </excludes>
       </resource>
       <resource>
-        <directory>target/native/lib</directory>
+        <directory>target/native/${io.humble.build.host_os_directory}/lib</directory>
         <includes>
           <include>**/*.so</include>
           <include>**/*.dylib</include>

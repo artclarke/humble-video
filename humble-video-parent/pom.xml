@@ -8,7 +8,29 @@
   <url>http://www.humble.io</url>
 
   <properties>
-    <humble.version>1.0.0-SNAPSHOT</humble.version>
+    <io.humble.version>1.0.0-SNAPSHOT</io.humble.version>
+
+    <!-- These properties can all be overriden with "-D<property-name>=..." from
+        the maven command line. -->
+    <!-- override if you want to build and depend on debug binaries -->
+    <io.humble.build.debug>no</io.humble.build.debug>
+    <!-- override if you want to build with GPL dependencies -->
+    <io.humble.build.include_gpl_dependencies>yes</io.humble.build.include_gpl_dependencies>
+    <!-- set this to 'mem' if you want to do native memory leak/error detection -->
+    <io.humble.build.memcheck></io.humble.build.memcheck>
+    <!-- the host os name to pass to configure when building, in
+    GNU Build Triplet form. -->
+    <!-- override to specify an exact cross-os build string you want to build.
+    Don't worry... we'll override it in the Profiles sections
+    below to give it intelligent values. But if you're building
+    on an OS we haven't seen before you'll have to specify the GNU
+    triplet here.-->
+    <io.humble.build.host_os_name>unknown</io.humble.build.host_os_name>
+    <io.humble.build.host_os_directory>${io.humble.build.host_os_name}</io.humble.build.host_os_directory>
+    <!-- the host_os_directory will tag on debug or nogpl for us, which is
+    a good jar classifier -->
+    <io.humble.build.arch_jar_classifier>${io.humble.build.host_os_directory}</io.humble.build.arch_jar_classifier>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
     <humble.build.timestamp>${maven.build.timestamp}</humble.build.timestamp>
@@ -262,6 +284,281 @@
         </plugins>
       </build>
     </profile>
+  <!-- Choose the OS-dependent version -->
+    <!-- let's do release versions first -->
+    <profile>
+      <id>Windows-x86</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
+        </property>
+        <os>
+          <family>Windows</family>
+          <arch>x86</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>i686-w64-mingw32</io.humble.build.host_os_name>
+      </properties>
+    </profile>
+    <profile>
+      <id>Windows-x86_64</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
+        </property>
+        <os>
+          <family>Windows</family>
+          <arch>x86_64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-w64-mingw32</io.humble.build.host_os_name>
+      </properties>
+    </profile>
+    <profile>
+      <id>Windows-amd64</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
+        </property>
+        <os>
+          <family>Windows</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-w64-mingw32</io.humble.build.host_os_name>
+      </properties>
+    </profile>
+    <profile>
+      <id>Mac-x86_64</id>
+      <!--  as of Humble Video 0.3.0 x86/i686 versions of MacOS X are no longer supported -->
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
+        </property>
+        <os>
+          <family>Mac</family>
+          <arch>x86_64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-apple-darwin18</io.humble.build.host_os_name>
+      </properties>
+    </profile>
+    <profile>
+      <id>Mac-amd64</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
+        </property>
+        <os>
+          <family>Mac</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-apple-darwin18</io.humble.build.host_os_name>
+      </properties>
+    </profile>
+    <profile>
+      <id>Linux-x86</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
+        </property>
+        <os>
+          <family>unix</family>
+          <name>Linux</name>
+          <arch>x86</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>i686-pc-linux-gnu6</io.humble.build.host_os_name>
+      </properties>
+    </profile>
+    <profile>
+      <id>Linux-x86_64</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
+        </property>
+        <os>
+          <family>unix</family>
+          <name>Linux</name>
+          <arch>x86_64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-pc-linux-gnu6</io.humble.build.host_os_name>
+      </properties>
+    </profile>
+    <profile>
+      <id>Linux-amd64</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>!yes</value>
+        </property>
+        <os>
+          <family>unix</family>
+          <name>Linux</name>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-pc-linux-gnu6</io.humble.build.host_os_name>
+      </properties>
+    </profile>
+    <!-- now let's do debug versions. -->
+    <profile>
+      <id>Windows-x86-debug</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
+        </property>
+        <os>
+          <family>Windows</family>
+          <arch>x86</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>i686-w64-mingw32</io.humble.build.host_os_name>
+       <io.humble.build.host_os_directory>${io.humble.build.host_os_name}-debug</io.humble.build.host_os_directory>
+      </properties>
+    </profile>
+    <profile>
+      <id>Windows-x86_64-debug</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
+        </property>
+        <os>
+          <family>Windows</family>
+          <arch>x86_64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-w64-mingw32</io.humble.build.host_os_name>
+       <io.humble.build.host_os_directory>${io.humble.build.host_os_name}-debug</io.humble.build.host_os_directory>
+      </properties>
+    </profile>
+    <profile>
+      <id>Windows-amd64-debug</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
+        </property>
+        <os>
+          <family>Windows</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-w64-mingw32</io.humble.build.host_os_name>
+       <io.humble.build.host_os_directory>${io.humble.build.host_os_name}-debug</io.humble.build.host_os_directory>
+      </properties>
+    </profile>
+    <profile>
+      <id>Mac-x86_64-debug</id>
+      <!--  as of Humble Video 0.3.0 x86/i686 versions of MacOS X are no longer supported -->
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
+        </property>
+        <os>
+          <family>Mac</family>
+          <arch>x86_64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-apple-darwin18</io.humble.build.host_os_name>
+       <io.humble.build.host_os_directory>${io.humble.build.host_os_name}-debug</io.humble.build.host_os_directory>
+      </properties>
+    </profile>
+    <profile>
+      <id>Mac-amd64-debug</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
+        </property>
+        <os>
+          <family>Mac</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-apple-darwin18</io.humble.build.host_os_name>
+       <io.humble.build.host_os_directory>${io.humble.build.host_os_name}-debug</io.humble.build.host_os_directory>
+      </properties>
+    </profile>
+    <profile>
+      <id>Linux-x86-debug</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
+        </property>
+        <os>
+          <family>unix</family>
+          <name>Linux</name>
+          <arch>x86</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>i686-pc-linux-gnu6</io.humble.build.host_os_name>
+       <io.humble.build.host_os_directory>${io.humble.build.host_os_name}-debug</io.humble.build.host_os_directory>
+      </properties>
+    </profile>
+    <profile>
+      <id>Linux-x86_64-debug</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
+        </property>
+        <os>
+          <family>unix</family>
+          <name>Linux</name>
+          <arch>x86_64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-pc-linux-gnu6</io.humble.build.host_os_name>
+       <io.humble.build.host_os_directory>${io.humble.build.host_os_name}-debug</io.humble.build.host_os_directory>
+      </properties>
+    </profile>
+    <profile>
+      <id>Linux-amd64-debug</id>
+      <activation>
+        <property>
+          <name>io.humble.build.debug</name>
+          <value>yes</value>
+        </property>
+        <os>
+          <family>unix</family>
+          <name>Linux</name>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+       <io.humble.build.host_os_name>x86_64-pc-linux-gnu6</io.humble.build.host_os_name>
+       <io.humble.build.host_os_directory>${io.humble.build.host_os_name}-debug</io.humble.build.host_os_directory>
+      </properties>
+    </profile>
   </profiles>
 
   <reporting>
@@ -309,67 +606,18 @@
       <dependency>
         <groupId>io.humble</groupId>
         <artifactId>humble-video-noarch</artifactId>
-        <version>${humble.version}</version>
+        <version>${io.humble.version}</version>
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-x86_64-apple-darwin18</artifactId>
-        <version>${humble.version}</version>
+        <artifactId>humble-video-arch</artifactId>
+        <version>${io.humble.version}</version>
+        <classifier>${io.humble.build.arch_jar_classifier}</classifier>
       </dependency>
       <dependency>
         <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-i686-pc-linux-gnu6</artifactId>
-        <version>${humble.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-x86_64-pc-linux-gnu6</artifactId>
-        <version>${humble.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-i686-w64-mingw32</artifactId>
-        <version>${humble.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-x86_64-w64-mingw32</artifactId>
-        <version>${humble.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-x86_64-apple-darwin18-debug</artifactId>
-        <version>${humble.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-i686-pc-linux-gnu6-debug</artifactId>
-        <version>${humble.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-x86_64-pc-linux-gnu6-debug</artifactId>
-        <version>${humble.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-i686-w64-mingw32-debug</artifactId>
-        <version>${humble.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-x86_64-w64-mingw32-debug</artifactId>
-        <version>${humble.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.humble</groupId>
-        <artifactId>humble-video-arch-all</artifactId>
-        <version>${humble.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.humble</groupId>
-        <artifactId>humble-video-all</artifactId>
-        <version>${humble.version}</version>
+        <artifactId>humble-video</artifactId>
+        <version>${io.humble.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

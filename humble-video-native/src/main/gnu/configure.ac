@@ -120,17 +120,11 @@ AC_ARG_ENABLE([optimizations],
 AC_MSG_CHECKING([whether to enable compiler optimizations])
 AC_MSG_RESULT([$enable_optimizations])
 
-# default name we use for the Maven bundle
-VS_MVN_HOST=$host
 AM_CONDITIONAL([VS_DEBUG], [ test "$x$enable_optimizations" = xno ])
 if test "x$enable_optimizations" = xno; then
   VS_DEBUG=1
   AC_SUBST([VS_DEBUG])
-  # If debug, we have a separate MVN name
-  VS_MVN_HOST="$host-debug"
 fi
-# This will be used to build our MVN pom file.
-AC_SUBST(VS_MVN_HOST)
 
 PKG_PROG_PKG_CONFIG
 AC_PATH_PROG([SWIG],[swig])
@@ -356,7 +350,13 @@ fi
 AC_MSG_CHECKING([if you smiled])
 AC_MSG_RESULT([let us know: info@humble.io])
 
-enable_gpl=yes
+AC_ARG_ENABLE([gpl],
+              [AS_HELP_STRING([--enable-gpl],
+                              [build assuming dependencies can contain GPL code (default is yes)])],
+                              [],
+                              [enable_gpl=yes])
+AC_MSG_CHECKING([whether to enable GPL dependencies ])
+AC_MSG_RESULT([$enable_gpl])
 VS_ENABLE_GPL=$enable_gpl
 AC_DEFINE(VS_ENABLE_GPL, 1, AC_PACKAGE_NAME [ will enable any code that depends on GPL code ])
 AC_SUBST(VS_ENABLE_GPL)

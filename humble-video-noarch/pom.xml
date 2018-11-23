@@ -23,6 +23,12 @@
      <groupId>org.slf4j</groupId>
      <artifactId>slf4j-api</artifactId>
    </dependency>
+    <dependency>
+      <groupId>io.humble</groupId>
+      <artifactId>humble-video-arch</artifactId>
+      <classifier>${io.humble.build.arch_jar_classifier}</classifier>
+      <scope>test</scope>
+    </dependency>
    <dependency>
      <groupId>junit</groupId>
      <artifactId>junit</artifactId>
@@ -34,61 +40,4 @@
      <scope>test</scope>
    </dependency>
  </dependencies>
- <profiles>
-   <profile>
-     <id>Windows</id>
-     <activation>
-       <os>
-         <family>Windows</family>
-       </os>
-     </activation>
-     <dependencies>
-       <dependency>
-         <groupId>io.humble</groupId>
-         <artifactId>humble-video-arch-i686-w64-mingw32</artifactId>
-         <scope>test</scope>
-       </dependency>
-       <dependency>
-         <groupId>io.humble</groupId>
-         <artifactId>humble-video-arch-x86_64-w64-mingw32</artifactId>
-         <scope>test</scope>
-       </dependency>
-     </dependencies>
-   </profile>
-   <profile>
-     <id>Mac</id>
-     <activation>
-       <os>
-         <family>Mac</family>
-       </os>
-     </activation>
-     <dependencies>
-       <dependency>
-         <groupId>io.humble</groupId>
-         <artifactId>humble-video-arch-x86_64-apple-darwin18</artifactId>
-         <scope>test</scope>
-       </dependency>
-     </dependencies>
-   </profile>
-   <profile>
-     <id>Linux</id>
-     <activation>
-       <os>
-         <family>Linux</family>
-       </os>
-     </activation>
-     <dependencies>
-       <dependency>
-         <groupId>io.humble</groupId>
-         <artifactId>humble-video-arch-i686-pc-linux-gnu6</artifactId>
-         <scope>test</scope>
-       </dependency>
-       <dependency>
-         <groupId>io.humble</groupId>
-         <artifactId>humble-video-arch-x86_64-pc-linux-gnu6</artifactId>
-         <scope>test</scope>
-       </dependency>
-     </dependencies>
-   </profile>
- </profiles>
 </project>
