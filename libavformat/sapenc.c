@@ -84,7 +84,7 @@ static int sap_write_header(AVFormatContext *s)
 
     /* extract hostname and port */
     av_url_split(NULL, 0, NULL, 0, host, sizeof(host), &base_port,
-                 path, sizeof(path), s->filename);
+                 path, sizeof(path), s->url);
     if (base_port < 0)
         base_port = 5004;
 
@@ -144,12 +144,15 @@ static int sap_write_header(AVFormatContext *s)
         s->start_time_realtime = av_gettime();
     for (i = 0; i < s->nb_streams; i++) {
         URLContext *fd;
+        char *new_url;
 
         ff_url_join(url, sizeof(url), "rtp", NULL, host, base_port,
                     "?ttl=%d", ttl);
         if (!same_port)
             base_port += 2;
-        ret = ffurl_open(&fd, url, AVIO_FLAG_WRITE, &s->interrupt_callback, NULL);
+        ret = ffurl_open_whitelist(&fd, url, AVIO_FLAG_WRITE,
+                                   &s->interrupt_callback, NULL,
+                                   s->protocol_whitelist, s->protocol_blacklist, NULL);
         if (ret) {
             ret = AVERROR(EIO);
             goto fail;
@@ -159,7 +162,12 @@ static int sap_write_header(AVFormatContext *s)
             goto fail;
         s->streams[i]->priv_data = contexts[i];
         s->streams[i]->time_base = contexts[i]->streams[0]->time_base;
-        av_strlcpy(contexts[i]->filename, url, sizeof(contexts[i]->filename));
+        new_url = av_strdup(url);
+        if (!new_url) {
+            ret = AVERROR(ENOMEM);
+            goto fail;
+        }
+        ff_format_set_url(contexts[i], new_url);
     }
 
     if (s->nb_streams > 0 && title)
@@ -167,8 +175,9 @@ static int sap_write_header(AVFormatContext *s)
 
     ff_url_join(url, sizeof(url), "udp", NULL, announce_addr, port,
                 "?ttl=%d&connect=1", ttl);
-    ret = ffurl_open(&sap->ann_fd, url, AVIO_FLAG_WRITE,
-                     &s->interrupt_callback, NULL);
+    ret = ffurl_open_whitelist(&sap->ann_fd, url, AVIO_FLAG_WRITE,
+                               &s->interrupt_callback, NULL,
+                               s->protocol_whitelist, s->protocol_blacklist, NULL);
     if (ret) {
         ret = AVERROR(EIO);
         goto fail;

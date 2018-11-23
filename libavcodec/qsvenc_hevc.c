@@ -31,6 +31,8 @@
 #include "bytestream.h"
 #include "get_bits.h"
 #include "hevc.h"
+#include "hevcdec.h"
+#include "h2645_parse.h"
 #include "internal.h"
 #include "qsv.h"
 #include "qsv_internal.h"
@@ -54,7 +56,8 @@ static int generate_fake_vps(QSVEncContext *q, AVCodecContext *avctx)
     PutByteContext pbc;
 
     GetBitContext gb;
-    HEVCNAL sps_nal = { NULL };
+    H2645RBSP sps_rbsp = { NULL };
+    H2645NAL sps_nal = { NULL };
     HEVCSPS sps = { 0 };
     HEVCVPS vps = { 0 };
     uint8_t vps_buf[128], vps_rbsp_buf[128];
@@ -67,8 +70,12 @@ static int generate_fake_vps(QSVEncContext *q, AVCodecContext *avctx)
         return AVERROR_UNKNOWN;
     }
 
+    av_fast_padded_malloc(&sps_rbsp.rbsp_buffer, &sps_rbsp.rbsp_buffer_alloc_size, avctx->extradata_size);
+    if (!sps_rbsp.rbsp_buffer)
+        return AVERROR(ENOMEM);
+
     /* parse the SPS */
-    ret = ff_hevc_extract_rbsp(NULL, avctx->extradata + 4, avctx->extradata_size - 4, &sps_nal);
+    ret = ff_h2645_extract_rbsp(avctx->extradata + 4, avctx->extradata_size - 4, &sps_rbsp, &sps_nal, 1);
     if (ret < 0) {
         av_log(avctx, AV_LOG_ERROR, "Error unescaping the SPS buffer\n");
         return ret;
@@ -76,22 +83,22 @@ static int generate_fake_vps(QSVEncContext *q, AVCodecContext *avctx)
 
     ret = init_get_bits8(&gb, sps_nal.data, sps_nal.size);
     if (ret < 0) {
-        av_freep(&sps_nal.rbsp_buffer);
+        av_freep(&sps_rbsp.rbsp_buffer);
         return ret;
     }
 
     get_bits(&gb, 1);
     type = get_bits(&gb, 6);
-    if (type != NAL_SPS) {
+    if (type != HEVC_NAL_SPS) {
         av_log(avctx, AV_LOG_ERROR, "Unexpected NAL type in the extradata: %d\n",
                type);
-        av_freep(&sps_nal.rbsp_buffer);
+        av_freep(&sps_rbsp.rbsp_buffer);
         return AVERROR_INVALIDDATA;
     }
     get_bits(&gb, 9);
 
     ret = ff_hevc_parse_sps(&sps, &gb, &sps_id, 0, NULL, avctx);
-    av_freep(&sps_nal.rbsp_buffer);
+    av_freep(&sps_rbsp.rbsp_buffer);
     if (ret < 0) {
         av_log(avctx, AV_LOG_ERROR, "Error parsing the SPS\n");
         return ret;
@@ -102,7 +109,7 @@ static int generate_fake_vps(QSVEncContext *q, AVCodecContext *avctx)
     vps.vps_max_sub_layers = sps.max_sub_layers;
     memcpy(&vps.ptl, &sps.ptl, sizeof(vps.ptl));
     vps.vps_sub_layer_ordering_info_present_flag = 1;
-    for (i = 0; i < MAX_SUB_LAYERS; i++) {
+    for (i = 0; i < HEVC_MAX_SUB_LAYERS; i++) {
         vps.vps_max_dec_pic_buffering[i] = sps.temporal_layer[i].max_dec_pic_buffering;
         vps.vps_num_reorder_pics[i]      = sps.temporal_layer[i].num_reorder_pics;
         vps.vps_max_latency_increase[i]  = sps.temporal_layer[i].max_latency_increase;
@@ -126,9 +133,9 @@ static int generate_fake_vps(QSVEncContext *q, AVCodecContext *avctx)
     bytestream2_init(&gbc, vps_rbsp_buf, ret);
     bytestream2_init_writer(&pbc, vps_buf, sizeof(vps_buf));
 
-    bytestream2_put_be32(&pbc, 1);              // startcode
-    bytestream2_put_byte(&pbc, NAL_VPS << 1);   // NAL
-    bytestream2_put_byte(&pbc, 1);              // header
+    bytestream2_put_be32(&pbc, 1);                 // startcode
+    bytestream2_put_byte(&pbc, HEVC_NAL_VPS << 1); // NAL
+    bytestream2_put_byte(&pbc, 1);                 // header
 
     while (bytestream2_get_bytes_left(&gbc)) {
         uint32_t b = bytestream2_peek_be24(&gbc);
@@ -159,8 +166,8 @@ static av_cold int qsv_enc_init(AVCodecContext *avctx)
     int ret;
 
     if (q->load_plugin != LOAD_PLUGIN_NONE) {
-        static const char *uid_hevcenc_sw = "2fca99749fdb49aeb121a5b63ef568f7";
-        static const char *uid_hevcenc_hw = "6fadc791a0c2eb479ab6dcd5ea9da347";
+        static const char * const uid_hevcenc_sw = "2fca99749fdb49aeb121a5b63ef568f7";
+        static const char * const uid_hevcenc_hw = "6fadc791a0c2eb479ab6dcd5ea9da347";
 
         if (q->qsv.load_plugins[0]) {
             av_log(avctx, AV_LOG_WARNING,
@@ -178,6 +185,9 @@ static av_cold int qsv_enc_init(AVCodecContext *avctx)
                 return AVERROR(ENOMEM);
         }
     }
+
+    // HEVC and H264 meaning of the value is shifted by 1, make it consistent
+    q->qsv.idr_interval++;
 
     ret = ff_qsv_enc_init(avctx, &q->qsv);
     if (ret < 0)
@@ -207,14 +217,20 @@ static av_cold int qsv_enc_close(AVCodecContext *avctx)
     return ff_qsv_enc_close(avctx, &q->qsv);
 }
 
+#if defined(_WIN32)
+#define LOAD_PLUGIN_DEFAULT LOAD_PLUGIN_HEVC_SW
+#else
+#define LOAD_PLUGIN_DEFAULT LOAD_PLUGIN_HEVC_HW
+#endif
+
 #define OFFSET(x) offsetof(QSVHEVCEncContext, x)
 #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "async_depth", "Maximum processing parallelism", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = ASYNC_DEPTH_DEFAULT }, 0, INT_MAX, VE },
-    { "avbr_accuracy",    "Accuracy of the AVBR ratecontrol",    OFFSET(qsv.avbr_accuracy),    AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, VE },
-    { "avbr_convergence", "Convergence of the AVBR ratecontrol", OFFSET(qsv.avbr_convergence), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, VE },
+    QSV_COMMON_OPTS
 
-    { "load_plugin", "A user plugin to load in an internal session", OFFSET(load_plugin), AV_OPT_TYPE_INT, { .i64 = LOAD_PLUGIN_HEVC_SW }, LOAD_PLUGIN_NONE, LOAD_PLUGIN_HEVC_HW, VE, "load_plugin" },
+    { "idr_interval", "Distance (in I-frames) between IDR frames", OFFSET(qsv.idr_interval), AV_OPT_TYPE_INT, { .i64 = 0 }, -1, INT_MAX, VE, "idr_interval" },
+    { "begin_only", "Output an IDR-frame only at the beginning of the stream", 0, AV_OPT_TYPE_CONST, { .i64 = -1 }, 0, 0, VE, "idr_interval" },
+    { "load_plugin", "A user plugin to load in an internal session", OFFSET(load_plugin), AV_OPT_TYPE_INT, { .i64 = LOAD_PLUGIN_DEFAULT }, LOAD_PLUGIN_NONE, LOAD_PLUGIN_HEVC_HW, VE, "load_plugin" },
     { "none",     NULL, 0, AV_OPT_TYPE_CONST, { .i64 = LOAD_PLUGIN_NONE },    0, 0, VE, "load_plugin" },
     { "hevc_sw",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = LOAD_PLUGIN_HEVC_SW }, 0, 0, VE, "load_plugin" },
     { "hevc_hw",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = LOAD_PLUGIN_HEVC_HW }, 0, 0, VE, "load_plugin" },
@@ -227,11 +243,6 @@ static const AVOption options[] = {
     { "main",    NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_HEVC_MAIN    }, INT_MIN, INT_MAX,     VE, "profile" },
     { "main10",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_HEVC_MAIN10  }, INT_MIN, INT_MAX,     VE, "profile" },
     { "mainsp",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_HEVC_MAINSP  }, INT_MIN, INT_MAX,     VE, "profile" },
-
-    { "preset", NULL, OFFSET(qsv.preset), AV_OPT_TYPE_INT, { .i64 = MFX_TARGETUSAGE_BALANCED }, 0, 7,   VE, "preset" },
-    { "fast",   NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_TARGETUSAGE_BEST_SPEED  },   INT_MIN, INT_MAX, VE, "preset" },
-    { "medium", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_TARGETUSAGE_BALANCED  },     INT_MIN, INT_MAX, VE, "preset" },
-    { "slow",   NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_TARGETUSAGE_BEST_QUALITY  }, INT_MIN, INT_MAX, VE, "preset" },
 
     { NULL },
 };
@@ -247,10 +258,13 @@ static const AVCodecDefault qsv_enc_defaults[] = {
     { "b",         "1M"    },
     { "refs",      "0"     },
     // same as the x264 default
-    { "g",         "250"   },
-    { "bf",        "3"     },
+    { "g",         "248"   },
+    { "bf",        "8"     },
 
     { "flags",     "+cgop" },
+#if FF_API_PRIVATE_OPT
+    { "b_strategy", "-1"   },
+#endif
     { NULL },
 };
 
@@ -263,10 +277,13 @@ AVCodec ff_hevc_qsv_encoder = {
     .init           = qsv_enc_init,
     .encode2        = qsv_enc_frame,
     .close          = qsv_enc_close,
-    .capabilities   = AV_CODEC_CAP_DELAY,
+    .capabilities   = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HYBRID,
     .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_NV12,
+                                                    AV_PIX_FMT_P010,
                                                     AV_PIX_FMT_QSV,
                                                     AV_PIX_FMT_NONE },
     .priv_class     = &class,
     .defaults       = qsv_enc_defaults,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
+    .wrapper_name   = "qsv",
 };

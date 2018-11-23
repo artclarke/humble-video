@@ -54,7 +54,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     bytestream2_skipu(&s->gb, 16 * 8);
     for (i = 0; i < 256; i++)
-        s->palette[i] = bytestream2_get_le32u(&s->gb);
+        s->palette[i] = (0xFFU << 24) | bytestream2_get_le32u(&s->gb);
 
     return 0;
 }
@@ -199,4 +199,5 @@ AVCodec ff_anm_decoder = {
     .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

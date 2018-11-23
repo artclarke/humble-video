@@ -94,7 +94,7 @@ static int parse_string(AVIOContext *pb, int *cur_byte, AVBPrint *bp, int full)
 {
     int ret;
 
-    av_bprint_init(bp, 0, full ? -1 : 1);
+    av_bprint_init(bp, 0, full ? AV_BPRINT_SIZE_UNLIMITED : AV_BPRINT_SIZE_AUTOMATIC);
     ret = expect_byte(pb, cur_byte, '"');
     if (ret < 0)
         goto fail;
@@ -287,7 +287,7 @@ static av_cold int tedcaptions_read_header(AVFormatContext *avf)
         ff_subtitles_queue_clean(&tc->subs);
         return ret;
     }
-    ff_subtitles_queue_finalize(&tc->subs);
+    ff_subtitles_queue_finalize(avf, &tc->subs);
     for (i = 0; i < tc->subs.nb_subs; i++)
         tc->subs.subs[i].pts += tc->start_time;
 
@@ -295,8 +295,8 @@ static av_cold int tedcaptions_read_header(AVFormatContext *avf)
     st = avformat_new_stream(avf, NULL);
     if (!st)
         return AVERROR(ENOMEM);
-    st->codec->codec_type     = AVMEDIA_TYPE_SUBTITLE;
-    st->codec->codec_id       = AV_CODEC_ID_TEXT;
+    st->codecpar->codec_type     = AVMEDIA_TYPE_SUBTITLE;
+    st->codecpar->codec_id       = AV_CODEC_ID_TEXT;
     avpriv_set_pts_info(st, 64, 1, 1000);
     st->probe_packets = 0;
     st->start_time    = 0;

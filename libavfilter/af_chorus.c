@@ -96,7 +96,8 @@ static void fill_items(char *item_str, int *nb_items, float *items)
     for (i = 0; i < *nb_items; i++) {
         char *tstr = av_strtok(p, "|", &saveptr);
         p = NULL;
-        new_nb_items += sscanf(tstr, "%f", &items[i]) == 1;
+        if (tstr)
+            new_nb_items += sscanf(tstr, "%f", &items[new_nb_items]) == 1;
     }
 
     *nb_items = new_nb_items;
@@ -162,7 +163,7 @@ static int query_formats(AVFilterContext *ctx)
     };
     int ret;
 
-    layouts = ff_all_channel_layouts();
+    layouts = ff_all_channel_counts();
     if (!layouts)
         return AVERROR(ENOMEM);
     ret = ff_set_common_channel_layouts(ctx, layouts);
@@ -246,9 +247,11 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     if (av_frame_is_writable(frame)) {
         out_frame = frame;
     } else {
-        out_frame = ff_get_audio_buffer(inlink, frame->nb_samples);
-        if (!out_frame)
+        out_frame = ff_get_audio_buffer(ctx->outputs[0], frame->nb_samples);
+        if (!out_frame) {
+            av_frame_free(&frame);
             return AVERROR(ENOMEM);
+        }
         av_frame_copy_props(out_frame, frame);
     }
 

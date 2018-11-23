@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/crc.h"
+
 #include "libavcodec/bytestream.h"
 #include "libavcodec/dca.h"
 #include "libavcodec/dca_syncwords.h"
@@ -32,22 +34,49 @@ static int dts_probe(AVProbeData *p)
     const uint8_t *buf, *bufp;
     uint32_t state = -1;
     int markers[4*16] = {0};
-    int sum, max, i;
+    int exss_markers = 0, exss_nextpos = 0;
+    int sum, max, pos, ret, i;
     int64_t diff = 0;
-    uint8_t hdr[12 + AV_INPUT_BUFFER_PADDING_SIZE] = { 0 };
+    uint8_t hdr[DCA_CORE_FRAME_HEADER_SIZE + AV_INPUT_BUFFER_PADDING_SIZE] = { 0 };
 
-    buf = p->buf + FFMIN(4096, p->buf_size);
-
-    for(; buf < (p->buf+p->buf_size)-2; buf+=2) {
-        int marker, sample_blocks, sample_rate, sr_code, framesize;
-        int lfe;
+    for (pos = FFMIN(4096, p->buf_size); pos < p->buf_size - 2; pos += 2) {
+        int marker, wide_hdr, hdr_size, framesize;
+        DCACoreFrameHeader h;
         GetBitContext gb;
 
-        bufp = buf;
+        bufp = buf = p->buf + pos;
         state = (state << 16) | bytestream_get_be16(&bufp);
 
-        if (buf - p->buf >= 4)
+        if (pos >= 4)
             diff += FFABS(((int16_t)AV_RL16(buf)) - (int16_t)AV_RL16(buf-4));
+
+        /* extension substream (EXSS) */
+        if (state == DCA_SYNCWORD_SUBSTREAM) {
+            if (pos < exss_nextpos)
+                continue;
+
+            init_get_bits(&gb, buf - 2, 96);
+            skip_bits_long(&gb, 42);
+
+            wide_hdr  = get_bits1(&gb);
+            hdr_size  = get_bits(&gb,  8 + 4 * wide_hdr) + 1;
+            framesize = get_bits(&gb, 16 + 4 * wide_hdr) + 1;
+            if (hdr_size & 3 || framesize & 3)
+                continue;
+            if (hdr_size < 16 || framesize < hdr_size)
+                continue;
+            if (pos - 2 + hdr_size > p->buf_size)
+                continue;
+            if (av_crc(av_crc_get_table(AV_CRC_16_CCITT), 0xffff, buf + 3, hdr_size - 5))
+                continue;
+
+            if (pos == exss_nextpos)
+                exss_markers++;
+            else
+                exss_markers = FFMAX(1, exss_markers - 1);
+            exss_nextpos = pos + framesize;
+            continue;
+        }
 
         /* regular bitstream */
         if (state == DCA_SYNCWORD_CORE_BE &&
@@ -69,39 +98,19 @@ static int dts_probe(AVProbeData *p)
         else
             continue;
 
-        if (avpriv_dca_convert_bitstream(buf-2, 12, hdr, 12) < 0)
+        if ((ret = avpriv_dca_convert_bitstream(buf - 2, DCA_CORE_FRAME_HEADER_SIZE,
+                                                hdr,     DCA_CORE_FRAME_HEADER_SIZE)) < 0)
+            continue;
+        if (avpriv_dca_parse_core_frame_header(&h, hdr, ret) < 0)
             continue;
 
-        init_get_bits(&gb, hdr, 96);
-        skip_bits_long(&gb, 39);
-
-        sample_blocks = get_bits(&gb, 7) + 1;
-        if (sample_blocks < 8)
-            continue;
-
-        framesize = get_bits(&gb, 14) + 1;
-        if (framesize < 95)
-            continue;
-
-        skip_bits(&gb, 6);
-        sr_code = get_bits(&gb, 4);
-        sample_rate = avpriv_dca_sample_rates[sr_code];
-        if (sample_rate == 0)
-            continue;
-
-        get_bits(&gb, 5);
-        if (get_bits(&gb, 1))
-            continue;
-
-        skip_bits_long(&gb, 9);
-        lfe = get_bits(&gb, 2);
-        if (lfe > 2)
-            continue;
-
-        marker += 4* sr_code;
+        marker += 4 * h.sr_code;
 
         markers[marker] ++;
     }
+
+    if (exss_markers > 3)
+        return AVPROBE_SCORE_EXTENSION + 1;
 
     sum = max = 0;
     for (i=0; i<FF_ARRAY_ELEMS(markers); i++) {

@@ -96,7 +96,7 @@ static int query_formats(AVFilterContext *ctx)
     };
     int ret;
 
-    layouts = ff_all_channel_layouts();
+    layouts = ff_all_channel_counts();
     if (!layouts)
         return AVERROR(ENOMEM);
     ret = ff_set_common_channel_layouts(ctx, layouts);
@@ -247,14 +247,16 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inbuf)
     if (av_frame_is_writable(inbuf)) {
         outbuf = inbuf;
     } else {
-        outbuf = ff_get_audio_buffer(inlink, inbuf->nb_samples);
-        if (!outbuf)
+        outbuf = ff_get_audio_buffer(outlink, inbuf->nb_samples);
+        if (!outbuf) {
+            av_frame_free(&inbuf);
             return AVERROR(ENOMEM);
+        }
         av_frame_copy_props(outbuf, inbuf);
     }
 
     s->phaser(s, inbuf->extended_data, outbuf->extended_data,
-              outbuf->nb_samples, av_frame_get_channels(outbuf));
+              outbuf->nb_samples, outbuf->channels);
 
     if (inbuf != outbuf)
         av_frame_free(&inbuf);

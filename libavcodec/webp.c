@@ -33,20 +33,21 @@
  *
  * @author James Almer <jamrial@gmail.com>
  * Exif metadata
+ * ICC profile
  *
  * Unimplemented:
  *   - Animation
- *   - ICC profile
  *   - XMP metadata
  */
 
-#define BITSTREAM_READER_LE
 #include "libavutil/imgutils.h"
+
+#define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "bytestream.h"
 #include "exif.h"
-#include "internal.h"
 #include "get_bits.h"
+#include "internal.h"
 #include "thread.h"
 #include "vp8.h"
 
@@ -196,7 +197,7 @@ typedef struct WebPContext {
     uint8_t *alpha_data;                /* alpha chunk data */
     int alpha_data_size;                /* alpha chunk data size */
     int has_exif;                       /* set after an EXIF chunk has been processed */
-    AVDictionary *exif_metadata;        /* EXIF chunk data */
+    int has_iccp;                       /* set after an ICCP chunk has been processed */
     int width;                          /* image width */
     int height;                         /* image height */
     int lossless;                       /* indicates lossless or lossy */
@@ -1334,6 +1335,7 @@ static int vp8_lossy_decode_frame(AVCodecContext *avctx, AVFrame *p,
     if (!s->initialized) {
         ff_vp8_decode_init(avctx);
         s->initialized = 1;
+        s->v.actually_webp = 1;
     }
     avctx->pix_fmt = s->has_alpha ? AV_PIX_FMT_YUVA420P : AV_PIX_FMT_YUV420P;
     s->lossless = 0;
@@ -1381,6 +1383,7 @@ static int webp_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     *got_frame   = 0;
     s->has_alpha = 0;
     s->has_exif  = 0;
+    s->has_iccp  = 0;
     bytestream2_init(&gb, avpkt->data, avpkt->size);
 
     if (bytestream2_get_bytes_left(&gb) < 12)
@@ -1400,7 +1403,6 @@ static int webp_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         return AVERROR_INVALIDDATA;
     }
 
-    av_dict_free(&s->exif_metadata);
     while (bytestream2_get_bytes_left(&gb) > 8) {
         char chunk_str[5] = { 0 };
 
@@ -1436,6 +1438,10 @@ static int webp_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
             bytestream2_skip(&gb, chunk_size);
             break;
         case MKTAG('V', 'P', '8', 'X'):
+            if (s->width || s->height || *got_frame) {
+                av_log(avctx, AV_LOG_ERROR, "Canvas dimensions are already set\n");
+                return AVERROR_INVALIDDATA;
+            }
             vp8x_flags = bytestream2_get_byte(&gb);
             bytestream2_skip(&gb, 3);
             s->width  = bytestream2_get_le24(&gb) + 1;
@@ -1477,6 +1483,7 @@ static int webp_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         }
         case MKTAG('E', 'X', 'I', 'F'): {
             int le, ifd_offset, exif_offset = bytestream2_tell(&gb);
+            AVDictionary *exif_metadata = NULL;
             GetByteContext exif_gb;
 
             if (s->has_exif) {
@@ -1498,24 +1505,44 @@ static int webp_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
             }
 
             bytestream2_seek(&exif_gb, ifd_offset, SEEK_SET);
-            if (avpriv_exif_decode_ifd(avctx, &exif_gb, le, 0, &s->exif_metadata) < 0) {
+            if (ff_exif_decode_ifd(avctx, &exif_gb, le, 0, &exif_metadata) < 0) {
                 av_log(avctx, AV_LOG_ERROR, "error decoding Exif data\n");
                 goto exif_end;
             }
 
-            av_dict_copy(avpriv_frame_get_metadatap(data), s->exif_metadata, 0);
+            av_dict_copy(&((AVFrame *) data)->metadata, exif_metadata, 0);
 
 exif_end:
-            av_dict_free(&s->exif_metadata);
+            av_dict_free(&exif_metadata);
             bytestream2_skip(&gb, chunk_size);
             break;
         }
-        case MKTAG('I', 'C', 'C', 'P'):
+        case MKTAG('I', 'C', 'C', 'P'): {
+            AVFrameSideData *sd;
+
+            if (s->has_iccp) {
+                av_log(avctx, AV_LOG_VERBOSE, "Ignoring extra ICCP chunk\n");
+                bytestream2_skip(&gb, chunk_size);
+                break;
+            }
+            if (!(vp8x_flags & VP8X_FLAG_ICC))
+                av_log(avctx, AV_LOG_WARNING,
+                       "ICCP chunk present, but ICC Profile bit not set in the "
+                       "VP8X header\n");
+
+            s->has_iccp = 1;
+            sd = av_frame_new_side_data(p, AV_FRAME_DATA_ICC_PROFILE, chunk_size);
+            if (!sd)
+                return AVERROR(ENOMEM);
+
+            bytestream2_get_buffer(&gb, sd->data, chunk_size);
+            break;
+        }
         case MKTAG('A', 'N', 'I', 'M'):
         case MKTAG('A', 'N', 'M', 'F'):
         case MKTAG('X', 'M', 'P', ' '):
             AV_WL32(chunk_str, chunk_type);
-            av_log(avctx, AV_LOG_VERBOSE, "skipping unsupported chunk: %s\n",
+            av_log(avctx, AV_LOG_WARNING, "skipping unsupported chunk: %s\n",
                    chunk_str);
             bytestream2_skip(&gb, chunk_size);
             break;

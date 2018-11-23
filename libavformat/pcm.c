@@ -28,13 +28,20 @@
 
 int ff_pcm_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
+    AVCodecParameters *par = s->streams[0]->codecpar;
     int ret, size;
 
-    size= RAW_SAMPLES*s->streams[0]->codec->block_align;
-    if (size <= 0)
+    if (par->block_align <= 0)
         return AVERROR(EINVAL);
 
-    ret= av_get_packet(s->pb, pkt, size);
+    /*
+     * Compute read size to complete a read every 62ms.
+     * Clamp to RAW_SAMPLES if larger.
+     */
+    size = FFMAX(par->sample_rate/25, 1);
+    size = FFMIN(size, RAW_SAMPLES) * par->block_align;
+
+    ret = av_get_packet(s->pb, pkt, size);
 
     pkt->flags &= ~AV_PKT_FLAG_CORRUPT;
     pkt->stream_index = 0;
@@ -51,10 +58,10 @@ int ff_pcm_read_seek(AVFormatContext *s,
 
     st = s->streams[0];
 
-    block_align = st->codec->block_align ? st->codec->block_align :
-        (av_get_bits_per_sample(st->codec->codec_id) * st->codec->channels) >> 3;
-    byte_rate = st->codec->bit_rate ? st->codec->bit_rate >> 3 :
-        block_align * st->codec->sample_rate;
+    block_align = st->codecpar->block_align ? st->codecpar->block_align :
+        (av_get_bits_per_sample(st->codecpar->codec_id) * st->codecpar->channels) >> 3;
+    byte_rate = st->codecpar->bit_rate ? st->codecpar->bit_rate >> 3 :
+        block_align * st->codecpar->sample_rate;
 
     if (block_align <= 0 || byte_rate <= 0)
         return -1;

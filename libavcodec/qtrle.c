@@ -1,6 +1,6 @@
 /*
  * Quicktime Animation (RLE) Video Decoder
- * Copyright (c) 2004 The FFmpeg Project
+ * Copyright (C) 2004 The FFmpeg project
  *
  * This file is part of FFmpeg.
  *
@@ -83,9 +83,9 @@ static void qtrle_decode_1bpp(QtrleContext *s, int row_ptr, int lines_to_change)
         if(skip & 0x80) {
             lines_to_change--;
             row_ptr += row_inc;
-            pixel_ptr = row_ptr + 2 * (skip & 0x7f);
+            pixel_ptr = row_ptr + 2 * 8 * (skip & 0x7f);
         } else
-            pixel_ptr += 2 * skip;
+            pixel_ptr += 2 * 8 * skip;
         CHECK_PIXEL_PTR(0);  /* make sure pixel_ptr is positive */
 
         if(rle_code == -1)
@@ -99,19 +99,42 @@ static void qtrle_decode_1bpp(QtrleContext *s, int row_ptr, int lines_to_change)
 
             pi0 = bytestream2_get_byte(&s->g);
             pi1 = bytestream2_get_byte(&s->g);
-            CHECK_PIXEL_PTR(rle_code * 2);
+            CHECK_PIXEL_PTR(rle_code * 2 * 8);
 
             while (rle_code--) {
-                rgb[pixel_ptr++] = pi0;
-                rgb[pixel_ptr++] = pi1;
+                rgb[pixel_ptr++] = (pi0 >> 7) & 0x01;
+                rgb[pixel_ptr++] = (pi0 >> 6) & 0x01;
+                rgb[pixel_ptr++] = (pi0 >> 5) & 0x01;
+                rgb[pixel_ptr++] = (pi0 >> 4) & 0x01;
+                rgb[pixel_ptr++] = (pi0 >> 3) & 0x01;
+                rgb[pixel_ptr++] = (pi0 >> 2) & 0x01;
+                rgb[pixel_ptr++] = (pi0 >> 1) & 0x01;
+                rgb[pixel_ptr++] =  pi0       & 0x01;
+                rgb[pixel_ptr++] = (pi1 >> 7) & 0x01;
+                rgb[pixel_ptr++] = (pi1 >> 6) & 0x01;
+                rgb[pixel_ptr++] = (pi1 >> 5) & 0x01;
+                rgb[pixel_ptr++] = (pi1 >> 4) & 0x01;
+                rgb[pixel_ptr++] = (pi1 >> 3) & 0x01;
+                rgb[pixel_ptr++] = (pi1 >> 2) & 0x01;
+                rgb[pixel_ptr++] = (pi1 >> 1) & 0x01;
+                rgb[pixel_ptr++] =  pi1       & 0x01;
             }
         } else {
             /* copy the same pixel directly to output 2 times */
             rle_code *= 2;
-            CHECK_PIXEL_PTR(rle_code);
+            CHECK_PIXEL_PTR(rle_code * 8);
 
-            bytestream2_get_buffer(&s->g, &rgb[pixel_ptr], rle_code);
-            pixel_ptr += rle_code;
+            while (rle_code--) {
+                int x = bytestream2_get_byte(&s->g);
+                rgb[pixel_ptr++] = (x >> 7) & 0x01;
+                rgb[pixel_ptr++] = (x >> 6) & 0x01;
+                rgb[pixel_ptr++] = (x >> 5) & 0x01;
+                rgb[pixel_ptr++] = (x >> 4) & 0x01;
+                rgb[pixel_ptr++] = (x >> 3) & 0x01;
+                rgb[pixel_ptr++] = (x >> 2) & 0x01;
+                rgb[pixel_ptr++] = (x >> 1) & 0x01;
+                rgb[pixel_ptr++] =  x       & 0x01;
+            }
         }
     }
 }
@@ -132,6 +155,8 @@ static inline void qtrle_decode_2n4bpp(QtrleContext *s, int row_ptr,
         CHECK_PIXEL_PTR(0);
 
         while ((rle_code = (int8_t)bytestream2_get_byte(&s->g)) != -1) {
+            if (bytestream2_get_bytes_left(&s->g) < 1)
+                return;
             if (rle_code == 0) {
                 /* there's another skip code in the stream */
                 pixel_ptr += (num_pixels * (bytestream2_get_byte(&s->g) - 1));
@@ -187,6 +212,8 @@ static void qtrle_decode_8bpp(QtrleContext *s, int row_ptr, int lines_to_change)
         CHECK_PIXEL_PTR(0);
 
         while ((rle_code = (int8_t)bytestream2_get_byte(&s->g)) != -1) {
+            if (bytestream2_get_bytes_left(&s->g) < 1)
+                return;
             if (rle_code == 0) {
                 /* there's another skip code in the stream */
                 pixel_ptr += (4 * (bytestream2_get_byte(&s->g) - 1));
@@ -236,6 +263,8 @@ static void qtrle_decode_16bpp(QtrleContext *s, int row_ptr, int lines_to_change
         CHECK_PIXEL_PTR(0);
 
         while ((rle_code = (int8_t)bytestream2_get_byte(&s->g)) != -1) {
+            if (bytestream2_get_bytes_left(&s->g) < 1)
+                return;
             if (rle_code == 0) {
                 /* there's another skip code in the stream */
                 pixel_ptr += (bytestream2_get_byte(&s->g) - 1) * 2;
@@ -280,6 +309,8 @@ static void qtrle_decode_24bpp(QtrleContext *s, int row_ptr, int lines_to_change
         CHECK_PIXEL_PTR(0);
 
         while ((rle_code = (int8_t)bytestream2_get_byte(&s->g)) != -1) {
+            if (bytestream2_get_bytes_left(&s->g) < 1)
+                return;
             if (rle_code == 0) {
                 /* there's another skip code in the stream */
                 pixel_ptr += (bytestream2_get_byte(&s->g) - 1) * 3;
@@ -327,6 +358,8 @@ static void qtrle_decode_32bpp(QtrleContext *s, int row_ptr, int lines_to_change
         CHECK_PIXEL_PTR(0);
 
         while ((rle_code = (int8_t)bytestream2_get_byte(&s->g)) != -1) {
+            if (bytestream2_get_bytes_left(&s->g) < 1)
+                return;
             if (rle_code == 0) {
                 /* there's another skip code in the stream */
                 pixel_ptr += (bytestream2_get_byte(&s->g) - 1) * 4;
@@ -364,13 +397,10 @@ static av_cold int qtrle_decode_init(AVCodecContext *avctx)
     s->avctx = avctx;
     switch (avctx->bits_per_coded_sample) {
     case 1:
-    case 33:
-        avctx->pix_fmt = AV_PIX_FMT_MONOWHITE;
-        break;
-
     case 2:
     case 4:
     case 8:
+    case 33:
     case 34:
     case 36:
     case 40:
@@ -413,12 +443,10 @@ static int qtrle_decode_frame(AVCodecContext *avctx,
     int ret;
 
     bytestream2_init(&s->g, avpkt->data, avpkt->size);
-    if ((ret = ff_reget_buffer(avctx, s->frame)) < 0)
-        return ret;
 
     /* check if this frame is even supposed to change */
     if (avpkt->size < 8)
-        goto done;
+        return avpkt->size;
 
     /* start after the chunk size */
     bytestream2_seek(&s->g, 4, SEEK_SET);
@@ -429,23 +457,27 @@ static int qtrle_decode_frame(AVCodecContext *avctx,
     /* if a header is present, fetch additional decoding parameters */
     if (header & 0x0008) {
         if (avpkt->size < 14)
-            goto done;
+            return avpkt->size;
         start_line = bytestream2_get_be16(&s->g);
         bytestream2_skip(&s->g, 2);
         height     = bytestream2_get_be16(&s->g);
         bytestream2_skip(&s->g, 2);
         if (height > s->avctx->height - start_line)
-            goto done;
+            return avpkt->size;
     } else {
         start_line = 0;
         height     = s->avctx->height;
     }
+    if ((ret = ff_reget_buffer(avctx, s->frame)) < 0)
+        return ret;
+
     row_ptr = s->frame->linesize[0] * start_line;
 
     switch (avctx->bits_per_coded_sample) {
     case 1:
     case 33:
         qtrle_decode_1bpp(s, row_ptr, height);
+        has_palette = 1;
         break;
 
     case 2:
@@ -499,7 +531,6 @@ static int qtrle_decode_frame(AVCodecContext *avctx,
         memcpy(s->frame->data[1], s->pal, AVPALETTE_SIZE);
     }
 
-done:
     if ((ret = av_frame_ref(data, s->frame)) < 0)
         return ret;
     *got_frame      = 1;

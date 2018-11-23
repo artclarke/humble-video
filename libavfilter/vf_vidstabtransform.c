@@ -30,7 +30,7 @@
 
 #include "vidstabutils.h"
 
-typedef struct {
+typedef struct TransformContext {
     const AVClass *class;
 
     VSTransformData td;
@@ -96,9 +96,9 @@ static const AVOption vidstabtransform_options[] = {
                    AV_OPT_TYPE_CONST,  {.i64 = VS_BiCubic },0, 0,  FLAGS, "interpol"},
 
     {"tripod",    "enable virtual tripod mode (same as relative=0:smoothing=0)", OFFSET(tripod),
-                   AV_OPT_TYPE_INT,    {.i64 = 0},        0, 1,    FLAGS},
+                   AV_OPT_TYPE_BOOL,   {.i64 = 0},        0, 1,    FLAGS},
     {"debug",     "enable debug mode and writer global motions information to file", OFFSET(debug),
-                   AV_OPT_TYPE_INT,    {.i64 = 0},        0, 1,    FLAGS},
+                   AV_OPT_TYPE_BOOL,   {.i64 = 0},        0, 1,    FLAGS},
     {NULL}
 };
 
@@ -146,6 +146,7 @@ static int config_input(AVFilterLink *inlink)
     FILE *f;
 
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(inlink->format);
+    int is_planar = desc->flags & AV_PIX_FMT_FLAG_PLANAR;
 
     VSTransformData *td = &(tc->td);
 
@@ -161,7 +162,7 @@ static int config_input(AVFilterLink *inlink)
         return AVERROR(EINVAL);
     }
 
-    if (fi_src.bytesPerPixel != av_get_bits_per_pixel(desc)/8 ||
+    if ((!is_planar && fi_src.bytesPerPixel != av_get_bits_per_pixel(desc)/8) ||
         fi_src.log2ChromaW != desc->log2_chroma_w ||
         fi_src.log2ChromaH != desc->log2_chroma_h) {
         av_log(ctx, AV_LOG_ERROR, "pixel-format error: bpp %i<>%i  ",

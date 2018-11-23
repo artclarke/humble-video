@@ -35,20 +35,34 @@
 #include "swscale_internal.h"
 #include "libavutil/pixdesc.h"
 
-const int32_t ff_yuv2rgb_coeffs[8][4] = {
-    { 117504, 138453, 13954, 34903 }, /* no sequence_display_extension */
-    { 117504, 138453, 13954, 34903 }, /* ITU-R Rec. 709 (1990) */
+/* Color space conversion coefficients for YCbCr -> RGB mapping.
+ *
+ * Entries are {crv, cbu, cgu, cgv}
+ *
+ *   crv = (255 / 224) * 65536 * (1 - cr) / 0.5
+ *   cbu = (255 / 224) * 65536 * (1 - cb) / 0.5
+ *   cgu = (255 / 224) * 65536 * (cb / cg) * (1 - cb) / 0.5
+ *   cgv = (255 / 224) * 65536 * (cr / cg) * (1 - cr) / 0.5
+ *
+ * where Y = cr * R + cg * G + cb * B and cr + cg + cb = 1.
+ */
+const int32_t ff_yuv2rgb_coeffs[11][4] = {
+    { 117489, 138438, 13975, 34925 }, /* no sequence_display_extension */
+    { 117489, 138438, 13975, 34925 }, /* ITU-R Rec. 709 (1990) */
     { 104597, 132201, 25675, 53279 }, /* unspecified */
     { 104597, 132201, 25675, 53279 }, /* reserved */
     { 104448, 132798, 24759, 53109 }, /* FCC */
     { 104597, 132201, 25675, 53279 }, /* ITU-R Rec. 624-4 System B, G */
     { 104597, 132201, 25675, 53279 }, /* SMPTE 170M */
-    { 117579, 136230, 16907, 35559 }  /* SMPTE 240M (1987) */
+    { 117579, 136230, 16907, 35559 }, /* SMPTE 240M (1987) */
+    {      0                       }, /* YCgCo */
+    { 110013, 140363, 12277, 42626 }, /* Bt-2020-NCL */
+    { 110013, 140363, 12277, 42626 }, /* Bt-2020-CL */
 };
 
 const int *sws_getCoefficients(int colorspace)
 {
-    if (colorspace > 7 || colorspace < 0)
+    if (colorspace > 10 || colorspace < 0 || colorspace == 8)
         colorspace = SWS_CS_DEFAULT;
     return ff_yuv2rgb_coeffs[colorspace];
 }
@@ -253,7 +267,11 @@ ENDYUV2RGBLINE(8, 1)
     PUTRGB(dst_2, py_2, 0);
 ENDYUV2RGBFUNC()
 
+#if HAVE_BIGENDIAN
+YUV2RGBFUNC(yuva2argb_c, uint32_t, 1)
+#else
 YUV2RGBFUNC(yuva2rgba_c, uint32_t, 1)
+#endif
     LOADCHROMA(0);
     PUTRGBA(dst_1, py_1, pa_1, 0, 24);
     PUTRGBA(dst_2, py_2, pa_2, 0, 24);
@@ -287,7 +305,11 @@ ENDYUV2RGBLINE(8, 1)
     PUTRGBA(dst_2, py_2, pa_2, 0, 24);
 ENDYUV2RGBFUNC()
 
+#if HAVE_BIGENDIAN
+YUV2RGBFUNC(yuva2rgba_c, uint32_t, 1)
+#else
 YUV2RGBFUNC(yuva2argb_c, uint32_t, 1)
+#endif
     LOADCHROMA(0);
     PUTRGBA(dst_1, py_1, pa_1, 0, 0);
     PUTRGBA(dst_2, py_2, pa_2, 0, 0);
@@ -806,25 +828,25 @@ av_cold int ff_yuv2rgb_c_init_tables(SwsContext *c, const int inv_table[4],
 
     c->uOffset = 0x0400040004000400LL;
     c->vOffset = 0x0400040004000400LL;
-    c->yCoeff  = roundToInt16(cy  * 8192) * 0x0001000100010001ULL;
-    c->vrCoeff = roundToInt16(crv * 8192) * 0x0001000100010001ULL;
-    c->ubCoeff = roundToInt16(cbu * 8192) * 0x0001000100010001ULL;
-    c->vgCoeff = roundToInt16(cgv * 8192) * 0x0001000100010001ULL;
-    c->ugCoeff = roundToInt16(cgu * 8192) * 0x0001000100010001ULL;
-    c->yOffset = roundToInt16(oy  *    8) * 0x0001000100010001ULL;
+    c->yCoeff  = roundToInt16(cy  * (1 << 13)) * 0x0001000100010001ULL;
+    c->vrCoeff = roundToInt16(crv * (1 << 13)) * 0x0001000100010001ULL;
+    c->ubCoeff = roundToInt16(cbu * (1 << 13)) * 0x0001000100010001ULL;
+    c->vgCoeff = roundToInt16(cgv * (1 << 13)) * 0x0001000100010001ULL;
+    c->ugCoeff = roundToInt16(cgu * (1 << 13)) * 0x0001000100010001ULL;
+    c->yOffset = roundToInt16(oy  * (1 <<  3)) * 0x0001000100010001ULL;
 
-    c->yuv2rgb_y_coeff   = (int16_t)roundToInt16(cy  << 13);
-    c->yuv2rgb_y_offset  = (int16_t)roundToInt16(oy  <<  9);
-    c->yuv2rgb_v2r_coeff = (int16_t)roundToInt16(crv << 13);
-    c->yuv2rgb_v2g_coeff = (int16_t)roundToInt16(cgv << 13);
-    c->yuv2rgb_u2g_coeff = (int16_t)roundToInt16(cgu << 13);
-    c->yuv2rgb_u2b_coeff = (int16_t)roundToInt16(cbu << 13);
+    c->yuv2rgb_y_coeff   = (int16_t)roundToInt16(cy  * (1 << 13));
+    c->yuv2rgb_y_offset  = (int16_t)roundToInt16(oy  * (1 <<  9));
+    c->yuv2rgb_v2r_coeff = (int16_t)roundToInt16(crv * (1 << 13));
+    c->yuv2rgb_v2g_coeff = (int16_t)roundToInt16(cgv * (1 << 13));
+    c->yuv2rgb_u2g_coeff = (int16_t)roundToInt16(cgu * (1 << 13));
+    c->yuv2rgb_u2b_coeff = (int16_t)roundToInt16(cbu * (1 << 13));
 
     //scale coefficients by cy
-    crv = ((crv << 16) + 0x8000) / FFMAX(cy, 1);
-    cbu = ((cbu << 16) + 0x8000) / FFMAX(cy, 1);
-    cgu = ((cgu << 16) + 0x8000) / FFMAX(cy, 1);
-    cgv = ((cgv << 16) + 0x8000) / FFMAX(cy, 1);
+    crv = ((crv * (1 << 16)) + 0x8000) / FFMAX(cy, 1);
+    cbu = ((cbu * (1 << 16)) + 0x8000) / FFMAX(cy, 1);
+    cgu = ((cgu * (1 << 16)) + 0x8000) / FFMAX(cy, 1);
+    cgv = ((cgv * (1 << 16)) + 0x8000) / FFMAX(cy, 1);
 
     av_freep(&c->yuvTable);
 

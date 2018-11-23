@@ -22,7 +22,6 @@
 /**
  * @file
  * VC-1 and WMV3 decoder
- *
  */
 
 #include "libavutil/avassert.h"
@@ -108,12 +107,13 @@ static void vc1_v_s_overlap_c(int16_t *top, int16_t *bottom)
     }
 }
 
-static void vc1_h_s_overlap_c(int16_t *left, int16_t *right)
+static void vc1_h_s_overlap_c(int16_t *left, int16_t *right, int left_stride, int right_stride, int flags)
 {
     int i;
     int a, b, c, d;
     int d1, d2;
-    int rnd1 = 4, rnd2 = 3;
+    int rnd1 = flags & 2 ? 3 : 4;
+    int rnd2 = 7 - rnd1;
     for (i = 0; i < 8; i++) {
         a  = left[6];
         b  = left[7];
@@ -127,10 +127,12 @@ static void vc1_h_s_overlap_c(int16_t *left, int16_t *right)
         right[0] = ((c << 3) + d2 + rnd1) >> 3;
         right[1] = ((d << 3) + d1 + rnd2) >> 3;
 
-        right += 8;
-        left  += 8;
-        rnd2   = 7 - rnd2;
-        rnd1   = 7 - rnd1;
+        right += right_stride;
+        left  += left_stride;
+        if (flags & 1) {
+            rnd2   = 7 - rnd2;
+            rnd1   = 7 - rnd1;
+        }
     }
 }
 
@@ -239,7 +241,7 @@ static void vc1_h_loop_filter16_c(uint8_t *src, int stride, int pq)
 }
 
 /* Do inverse transform on 8x8 block */
-static void vc1_inv_trans_8x8_dc_c(uint8_t *dest, int linesize, int16_t *block)
+static void vc1_inv_trans_8x8_dc_c(uint8_t *dest, ptrdiff_t stride, int16_t *block)
 {
     int i;
     int dc = block[0];
@@ -256,7 +258,7 @@ static void vc1_inv_trans_8x8_dc_c(uint8_t *dest, int linesize, int16_t *block)
         dest[5] = av_clip_uint8(dest[5] + dc);
         dest[6] = av_clip_uint8(dest[6] + dc);
         dest[7] = av_clip_uint8(dest[7] + dc);
-        dest += linesize;
+        dest += stride;
     }
 }
 
@@ -330,7 +332,7 @@ static void vc1_inv_trans_8x8_c(int16_t block[64])
 }
 
 /* Do inverse transform on 8x4 part of block */
-static void vc1_inv_trans_8x4_dc_c(uint8_t *dest, int linesize, int16_t *block)
+static void vc1_inv_trans_8x4_dc_c(uint8_t *dest, ptrdiff_t stride, int16_t *block)
 {
     int i;
     int dc = block[0];
@@ -347,11 +349,11 @@ static void vc1_inv_trans_8x4_dc_c(uint8_t *dest, int linesize, int16_t *block)
         dest[5] = av_clip_uint8(dest[5] + dc);
         dest[6] = av_clip_uint8(dest[6] + dc);
         dest[7] = av_clip_uint8(dest[7] + dc);
-        dest += linesize;
+        dest += stride;
     }
 }
 
-static void vc1_inv_trans_8x4_c(uint8_t *dest, int linesize, int16_t *block)
+static void vc1_inv_trans_8x4_c(uint8_t *dest, ptrdiff_t stride, int16_t *block)
 {
     int i;
     register int t1, t2, t3, t4, t5, t6, t7, t8;
@@ -396,10 +398,10 @@ static void vc1_inv_trans_8x4_c(uint8_t *dest, int linesize, int16_t *block)
         t3 = 22 * src[ 8] + 10 * src[24];
         t4 = 22 * src[24] - 10 * src[ 8];
 
-        dest[0 * linesize] = av_clip_uint8(dest[0 * linesize] + ((t1 + t3) >> 7));
-        dest[1 * linesize] = av_clip_uint8(dest[1 * linesize] + ((t2 - t4) >> 7));
-        dest[2 * linesize] = av_clip_uint8(dest[2 * linesize] + ((t2 + t4) >> 7));
-        dest[3 * linesize] = av_clip_uint8(dest[3 * linesize] + ((t1 - t3) >> 7));
+        dest[0 * stride] = av_clip_uint8(dest[0 * stride] + ((t1 + t3) >> 7));
+        dest[1 * stride] = av_clip_uint8(dest[1 * stride] + ((t2 - t4) >> 7));
+        dest[2 * stride] = av_clip_uint8(dest[2 * stride] + ((t2 + t4) >> 7));
+        dest[3 * stride] = av_clip_uint8(dest[3 * stride] + ((t1 - t3) >> 7));
 
         src++;
         dest++;
@@ -407,7 +409,7 @@ static void vc1_inv_trans_8x4_c(uint8_t *dest, int linesize, int16_t *block)
 }
 
 /* Do inverse transform on 4x8 parts of block */
-static void vc1_inv_trans_4x8_dc_c(uint8_t *dest, int linesize, int16_t *block)
+static void vc1_inv_trans_4x8_dc_c(uint8_t *dest, ptrdiff_t stride, int16_t *block)
 {
     int i;
     int dc = block[0];
@@ -420,11 +422,11 @@ static void vc1_inv_trans_4x8_dc_c(uint8_t *dest, int linesize, int16_t *block)
         dest[1] = av_clip_uint8(dest[1] + dc);
         dest[2] = av_clip_uint8(dest[2] + dc);
         dest[3] = av_clip_uint8(dest[3] + dc);
-        dest += linesize;
+        dest += stride;
     }
 }
 
-static void vc1_inv_trans_4x8_c(uint8_t *dest, int linesize, int16_t *block)
+static void vc1_inv_trans_4x8_c(uint8_t *dest, ptrdiff_t stride, int16_t *block)
 {
     int i;
     register int t1, t2, t3, t4, t5, t6, t7, t8;
@@ -465,14 +467,14 @@ static void vc1_inv_trans_4x8_c(uint8_t *dest, int linesize, int16_t *block)
         t3 =  9 * src[ 8] - 16 * src[24] +  4 * src[40] + 15 * src[56];
         t4 =  4 * src[ 8] -  9 * src[24] + 15 * src[40] - 16 * src[56];
 
-        dest[0 * linesize] = av_clip_uint8(dest[0 * linesize] + ((t5 + t1)     >> 7));
-        dest[1 * linesize] = av_clip_uint8(dest[1 * linesize] + ((t6 + t2)     >> 7));
-        dest[2 * linesize] = av_clip_uint8(dest[2 * linesize] + ((t7 + t3)     >> 7));
-        dest[3 * linesize] = av_clip_uint8(dest[3 * linesize] + ((t8 + t4)     >> 7));
-        dest[4 * linesize] = av_clip_uint8(dest[4 * linesize] + ((t8 - t4 + 1) >> 7));
-        dest[5 * linesize] = av_clip_uint8(dest[5 * linesize] + ((t7 - t3 + 1) >> 7));
-        dest[6 * linesize] = av_clip_uint8(dest[6 * linesize] + ((t6 - t2 + 1) >> 7));
-        dest[7 * linesize] = av_clip_uint8(dest[7 * linesize] + ((t5 - t1 + 1) >> 7));
+        dest[0 * stride] = av_clip_uint8(dest[0 * stride] + ((t5 + t1)     >> 7));
+        dest[1 * stride] = av_clip_uint8(dest[1 * stride] + ((t6 + t2)     >> 7));
+        dest[2 * stride] = av_clip_uint8(dest[2 * stride] + ((t7 + t3)     >> 7));
+        dest[3 * stride] = av_clip_uint8(dest[3 * stride] + ((t8 + t4)     >> 7));
+        dest[4 * stride] = av_clip_uint8(dest[4 * stride] + ((t8 - t4 + 1) >> 7));
+        dest[5 * stride] = av_clip_uint8(dest[5 * stride] + ((t7 - t3 + 1) >> 7));
+        dest[6 * stride] = av_clip_uint8(dest[6 * stride] + ((t6 - t2 + 1) >> 7));
+        dest[7 * stride] = av_clip_uint8(dest[7 * stride] + ((t5 - t1 + 1) >> 7));
 
         src++;
         dest++;
@@ -480,7 +482,7 @@ static void vc1_inv_trans_4x8_c(uint8_t *dest, int linesize, int16_t *block)
 }
 
 /* Do inverse transform on 4x4 part of block */
-static void vc1_inv_trans_4x4_dc_c(uint8_t *dest, int linesize, int16_t *block)
+static void vc1_inv_trans_4x4_dc_c(uint8_t *dest, ptrdiff_t stride, int16_t *block)
 {
     int i;
     int dc = block[0];
@@ -493,11 +495,11 @@ static void vc1_inv_trans_4x4_dc_c(uint8_t *dest, int linesize, int16_t *block)
         dest[1] = av_clip_uint8(dest[1] + dc);
         dest[2] = av_clip_uint8(dest[2] + dc);
         dest[3] = av_clip_uint8(dest[3] + dc);
-        dest += linesize;
+        dest += stride;
     }
 }
 
-static void vc1_inv_trans_4x4_c(uint8_t *dest, int linesize, int16_t *block)
+static void vc1_inv_trans_4x4_c(uint8_t *dest, ptrdiff_t stride, int16_t *block)
 {
     int i;
     register int t1, t2, t3, t4;
@@ -527,10 +529,10 @@ static void vc1_inv_trans_4x4_c(uint8_t *dest, int linesize, int16_t *block)
         t3 = 22 * src[8] + 10 * src[24];
         t4 = 22 * src[24] - 10 * src[8];
 
-        dest[0 * linesize] = av_clip_uint8(dest[0 * linesize] + ((t1 + t3) >> 7));
-        dest[1 * linesize] = av_clip_uint8(dest[1 * linesize] + ((t2 - t4) >> 7));
-        dest[2 * linesize] = av_clip_uint8(dest[2 * linesize] + ((t2 + t4) >> 7));
-        dest[3 * linesize] = av_clip_uint8(dest[3 * linesize] + ((t1 - t3) >> 7));
+        dest[0 * stride] = av_clip_uint8(dest[0 * stride] + ((t1 + t3) >> 7));
+        dest[1 * stride] = av_clip_uint8(dest[1 * stride] + ((t2 - t4) >> 7));
+        dest[2 * stride] = av_clip_uint8(dest[2 * stride] + ((t2 + t4) >> 7));
+        dest[3 * stride] = av_clip_uint8(dest[3 * stride] + ((t1 - t3) >> 7));
 
         src++;
         dest++;
@@ -783,7 +785,7 @@ PUT_VC1_MSPEL(3, 3)
       C * src[stride + a] + D * src[stride + a + 1] + 32 - 4) >> 6)
 static void put_no_rnd_vc1_chroma_mc8_c(uint8_t *dst /* align 8 */,
                                         uint8_t *src /* align 1 */,
-                                        int stride, int h, int x, int y)
+                                        ptrdiff_t stride, int h, int x, int y)
 {
     const int A = (8 - x) * (8 - y);
     const int B =     (x) * (8 - y);
@@ -808,7 +810,7 @@ static void put_no_rnd_vc1_chroma_mc8_c(uint8_t *dst /* align 8 */,
 }
 
 static void put_no_rnd_vc1_chroma_mc4_c(uint8_t *dst, uint8_t *src,
-                                        int stride, int h, int x, int y)
+                                        ptrdiff_t stride, int h, int x, int y)
 {
     const int A = (8 - x) * (8 - y);
     const int B =     (x) * (8 - y);
@@ -831,7 +833,7 @@ static void put_no_rnd_vc1_chroma_mc4_c(uint8_t *dst, uint8_t *src,
 #define avg2(a, b) (((a) + (b) + 1) >> 1)
 static void avg_no_rnd_vc1_chroma_mc8_c(uint8_t *dst /* align 8 */,
                                         uint8_t *src /* align 1 */,
-                                        int stride, int h, int x, int y)
+                                        ptrdiff_t stride, int h, int x, int y)
 {
     const int A = (8 - x) * (8 - y);
     const int B =     (x) * (8 - y);
@@ -857,7 +859,7 @@ static void avg_no_rnd_vc1_chroma_mc8_c(uint8_t *dst /* align 8 */,
 
 static void avg_no_rnd_vc1_chroma_mc4_c(uint8_t *dst /* align 8 */,
                                         uint8_t *src /* align 1 */,
-                                        int stride, int h, int x, int y)
+                                        ptrdiff_t stride, int h, int x, int y)
 {
     const int A = (8 - x) * (8 - y);
     const int B = (    x) * (8 - y);
@@ -1035,4 +1037,6 @@ av_cold void ff_vc1dsp_init(VC1DSPContext *dsp)
         ff_vc1dsp_init_ppc(dsp);
     if (ARCH_X86)
         ff_vc1dsp_init_x86(dsp);
+    if (ARCH_MIPS)
+        ff_vc1dsp_init_mips(dsp);
 }

@@ -141,6 +141,21 @@ int ff_wmv2_decode_picture_header(MpegEncContext *s)
     if (s->qscale <= 0)
         return AVERROR_INVALIDDATA;
 
+    if (s->pict_type != AV_PICTURE_TYPE_I && show_bits(&s->gb, 1)) {
+        GetBitContext gb = s->gb;
+        int skip_type = get_bits(&gb, 2);
+        int run = skip_type == SKIP_TYPE_COL ? s->mb_width : s->mb_height;
+
+        while (run > 0) {
+            int block = FFMIN(run, 25);
+            if (get_bits(&gb, block) + 1 != 1<<block)
+                break;
+            run -= block;
+        }
+        if (!run)
+            return FRAME_SKIPPED;
+    }
+
     return 0;
 }
 
@@ -229,7 +244,14 @@ int ff_wmv2_decode_secondary_picture_header(MpegEncContext *s)
     s->picture_number++; // FIXME ?
 
     if (w->j_type) {
-        ff_intrax8_decode_picture(&w->x8, 2 * s->qscale, (s->qscale - 1) | 1);
+        ff_intrax8_decode_picture(&w->x8, &s->current_picture,
+                                  &s->gb, &s->mb_x, &s->mb_y,
+                                  2 * s->qscale, (s->qscale - 1) | 1,
+                                  s->loop_filter, s->low_delay);
+
+        ff_er_add_slice(&w->s.er, 0, 0,
+                        (w->s.mb_x >> 1) - 1, (w->s.mb_y >> 1) - 1,
+                        ER_MB_END);
         return 1;
     }
 
@@ -467,18 +489,14 @@ static av_cold int wmv2_decode_init(AVCodecContext *avctx)
     Wmv2Context *const w = avctx->priv_data;
     int ret;
 
-#if FF_API_EMU_EDGE
-    avctx->flags |= CODEC_FLAG_EMU_EDGE;
-#endif
-
     if ((ret = ff_msmpeg4_decode_init(avctx)) < 0)
         return ret;
 
     ff_wmv2_common_init(w);
 
-    ff_intrax8_common_init(&w->x8, &w->s);
-
-    return 0;
+    return ff_intrax8_common_init(avctx, &w->x8, &w->s.idsp,
+                                  w->s.block, w->s.block_last_index,
+                                  w->s.mb_width, w->s.mb_height);
 }
 
 static av_cold int wmv2_decode_end(AVCodecContext *avctx)

@@ -25,6 +25,7 @@
 
 #include "avcodec.h"
 #include "canopus.h"
+#include "get_bits.h"
 #include "internal.h"
 
 #include "hq_hqa.h"
@@ -154,7 +155,7 @@ static int hq_decode_frame(HQContext *ctx, AVFrame *pic,
             slice_off[slice] >= slice_off[slice + 1] ||
             slice_off[slice + 1] > data_size) {
             av_log(ctx->avctx, AV_LOG_ERROR,
-                   "Invalid slice size %zu.\n", data_size);
+                   "Invalid slice size %"SIZE_SPECIFIER".\n", data_size);
             break;
         }
         init_get_bits(&gb, src + slice_off[slice],
@@ -179,6 +180,9 @@ static int hqa_decode_mb(HQContext *c, AVFrame *pic, int qgroup,
 {
     int flag = 0;
     int i, ret, cbp;
+
+    if (get_bits_left(gb) < 1)
+        return AVERROR_INVALIDDATA;
 
     cbp = get_vlc2(gb, c->hqa_cbp_vlc.table, 5, 1);
 
@@ -277,7 +281,7 @@ static int hqa_decode_frame(HQContext *ctx, AVFrame *pic, size_t data_size)
             slice_off[slice] >= slice_off[slice + 1] ||
             slice_off[slice + 1] > data_size) {
             av_log(ctx->avctx, AV_LOG_ERROR,
-                   "Invalid slice size %zu.\n", data_size);
+                   "Invalid slice size %"SIZE_SPECIFIER".\n", data_size);
             break;
         }
         init_get_bits(&gb, src + slice_off[slice],

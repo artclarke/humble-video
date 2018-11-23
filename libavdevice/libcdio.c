@@ -60,9 +60,9 @@ static av_cold int read_header(AVFormatContext *ctx)
 
     if (!(st = avformat_new_stream(ctx, NULL)))
         return AVERROR(ENOMEM);
-    s->drive = cdio_cddap_identify(ctx->filename, CDDA_MESSAGE_LOGIT, &err);
+    s->drive = cdio_cddap_identify(ctx->url, CDDA_MESSAGE_LOGIT, &err);
     if (!s->drive) {
-        av_log(ctx, AV_LOG_ERROR, "Could not open drive %s.\n", ctx->filename);
+        av_log(ctx, AV_LOG_ERROR, "Could not open drive %s.\n", ctx->url);
         return AVERROR(EINVAL);
     }
     if (err) {
@@ -70,7 +70,7 @@ static av_cold int read_header(AVFormatContext *ctx)
         free(err);
     }
     if ((ret = cdio_cddap_open(s->drive)) < 0 || !s->drive->opened) {
-        av_log(ctx, AV_LOG_ERROR, "Could not open disk in drive %s.\n", ctx->filename);
+        av_log(ctx, AV_LOG_ERROR, "Could not open disk in drive %s.\n", ctx->url);
         return AVERROR(EINVAL);
     }
 
@@ -85,19 +85,19 @@ static av_cold int read_header(AVFormatContext *ctx)
     }
     cdio_paranoia_modeset(s->paranoia, s->paranoia_mode);
 
-    st->codec->codec_type      = AVMEDIA_TYPE_AUDIO;
+    st->codecpar->codec_type      = AVMEDIA_TYPE_AUDIO;
     if (s->drive->bigendianp)
-        st->codec->codec_id    = AV_CODEC_ID_PCM_S16BE;
+        st->codecpar->codec_id    = AV_CODEC_ID_PCM_S16BE;
     else
-        st->codec->codec_id    = AV_CODEC_ID_PCM_S16LE;
-    st->codec->sample_rate     = 44100;
-    st->codec->channels        = 2;
+        st->codecpar->codec_id    = AV_CODEC_ID_PCM_S16LE;
+    st->codecpar->sample_rate     = 44100;
+    st->codecpar->channels        = 2;
     if (s->drive->audio_last_sector != CDIO_INVALID_LSN &&
         s->drive->audio_first_sector != CDIO_INVALID_LSN)
         st->duration           = s->drive->audio_last_sector - s->drive->audio_first_sector;
     else if (s->drive->tracks)
         st->duration = s->drive->disc_toc[s->drive->tracks].dwStartSector;
-    avpriv_set_pts_info(st, 64, CDIO_CD_FRAMESIZE_RAW, 2*st->codec->channels*st->codec->sample_rate);
+    avpriv_set_pts_info(st, 64, CDIO_CD_FRAMESIZE_RAW, 2 * st->codecpar->channels * st->codecpar->sample_rate);
 
     for (i = 0; i < s->drive->tracks; i++) {
         char title[16];

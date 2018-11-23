@@ -27,12 +27,15 @@
 
 #include "libavutil/internal.h"
 #include "libavutil/samplefmt.h"
-#include "tak.h"
+
+#define BITSTREAM_READER_LE
 #include "audiodsp.h"
 #include "thread.h"
 #include "avcodec.h"
 #include "internal.h"
 #include "unary.h"
+#include "tak.h"
+#include "takdsp.h"
 
 #define MAX_SUBFRAMES     8                         ///< max number of subframes per channel
 #define MAX_PREDICTORS  256
@@ -47,6 +50,7 @@ typedef struct MCDParam {
 typedef struct TAKDecContext {
     AVCodecContext *avctx;                          ///< parent AVCodecContext
     AudioDSPContext adsp;
+    TAKDSPContext   tdsp;
     TAKStreamInfo   ti;
     GetBitContext   gb;                             ///< bitstream reader initialized to start at the current frame
 
@@ -161,8 +165,17 @@ static int set_bps_params(AVCodecContext *avctx)
 static void set_sample_rate_params(AVCodecContext *avctx)
 {
     TAKDecContext *s  = avctx->priv_data;
-    int shift         = 3 - (avctx->sample_rate / 11025);
-    shift             = FFMAX(0, shift);
+    int shift;
+
+    if (avctx->sample_rate < 11025) {
+        shift = 3;
+    } else if (avctx->sample_rate < 22050) {
+        shift = 2;
+    } else if (avctx->sample_rate < 44100) {
+        shift = 1;
+    } else {
+        shift = 0;
+    }
     s->uval           = FFALIGN(avctx->sample_rate + 511 >> 9, 4) << shift;
     s->subframe_scale = FFALIGN(avctx->sample_rate + 511 >> 9, 4) << 1;
 }
@@ -172,6 +185,7 @@ static av_cold int tak_decode_init(AVCodecContext *avctx)
     TAKDecContext *s = avctx->priv_data;
 
     ff_audiodsp_init(&s->adsp);
+    ff_takdsp_init(&s->tdsp);
 
     s->avctx = avctx;
     avctx->bits_per_raw_sample = avctx->bits_per_coded_sample;
@@ -189,7 +203,7 @@ static void decode_lpc(int32_t *coeffs, int mode, int length)
         return;
 
     if (mode == 1) {
-        int a1 = *coeffs++;
+        unsigned a1 = *coeffs++;
         for (i = 0; i < length - 1 >> 1; i++) {
             *coeffs   += a1;
             coeffs[1] += (unsigned)*coeffs;
@@ -199,14 +213,14 @@ static void decode_lpc(int32_t *coeffs, int mode, int length)
         if (length - 1 & 1)
             *coeffs += a1;
     } else if (mode == 2) {
-        int a1    = coeffs[1];
-        int a2    = a1 + *coeffs;
+        unsigned a1    = coeffs[1];
+        unsigned a2    = a1 + *coeffs;
         coeffs[1] = a2;
         if (length > 2) {
             coeffs += 2;
             for (i = 0; i < length - 2 >> 1; i++) {
-                int a3    = *coeffs + a1;
-                int a4    = a3 + a2;
+                unsigned a3    = *coeffs + a1;
+                unsigned a4    = a3 + a2;
                 *coeffs   = a4;
                 a1        = coeffs[1] + a3;
                 a2        = a1 + a4;
@@ -217,13 +231,13 @@ static void decode_lpc(int32_t *coeffs, int mode, int length)
                 *coeffs += a1 + a2;
         }
     } else if (mode == 3) {
-        int a1    = coeffs[1];
-        int a2    = a1 + *coeffs;
+        unsigned a1    = coeffs[1];
+        unsigned a2    = a1 + *coeffs;
         coeffs[1] = a2;
         if (length > 2) {
-            int a3  = coeffs[2];
-            int a4  = a3 + a1;
-            int a5  = a4 + a2;
+            unsigned a3  = coeffs[2];
+            unsigned a4  = a3 + a1;
+            unsigned a5  = a4 + a2;
             coeffs[2] = a5;
             coeffs += 3;
             for (i = 0; i < length - 3; i++) {
@@ -433,12 +447,12 @@ static int decode_subframe(TAKDecContext *s, int32_t *decoded,
 
     tfilter[0] = s->predictors[0] * 64;
     for (i = 1; i < filter_order; i++) {
-        int32_t *p1 = &tfilter[0];
-        int32_t *p2 = &tfilter[i - 1];
+        uint32_t *p1 = &tfilter[0];
+        uint32_t *p2 = &tfilter[i - 1];
 
         for (j = 0; j < (i + 1) / 2; j++) {
-            x     = *p1 + (s->predictors[i] * *p2 + 256 >> 9);
-            *p2  += s->predictors[i] * *p1 + 256 >> 9;
+            x     = *p1 + ((int32_t)(s->predictors[i] * *p2 + 256) >> 9);
+            *p2  += (int32_t)(s->predictors[i] * *p1 + 256) >> 9;
             *p1++ = x;
             p2--;
         }
@@ -542,46 +556,32 @@ static int decode_channel(TAKDecContext *s, int chan)
 static int decorrelate(TAKDecContext *s, int c1, int c2, int length)
 {
     GetBitContext *gb = &s->gb;
-    int32_t *p1       = s->decoded[c1] + 1;
-    int32_t *p2       = s->decoded[c2] + 1;
+    int32_t *p1       = s->decoded[c1] + (s->dmode > 5);
+    int32_t *p2       = s->decoded[c2] + (s->dmode > 5);
+    int32_t bp1       = p1[0];
+    int32_t bp2       = p2[0];
     int i;
     int dshift, dfactor;
 
+    length += s->dmode < 6;
+
     switch (s->dmode) {
     case 1: /* left/side */
-        for (i = 0; i < length; i++) {
-            int32_t a = p1[i];
-            int32_t b = p2[i];
-            p2[i]     = a + b;
-        }
+        s->tdsp.decorrelate_ls(p1, p2, length);
         break;
     case 2: /* side/right */
-        for (i = 0; i < length; i++) {
-            int32_t a = p1[i];
-            int32_t b = p2[i];
-            p1[i]     = b - a;
-        }
+        s->tdsp.decorrelate_sr(p1, p2, length);
         break;
     case 3: /* side/mid */
-        for (i = 0; i < length; i++) {
-            int32_t a = p1[i];
-            int32_t b = p2[i];
-            a        -= b >> 1;
-            p1[i]     = a;
-            p2[i]     = a + b;
-        }
+        s->tdsp.decorrelate_sm(p1, p2, length);
         break;
     case 4: /* side/left with scale factor */
         FFSWAP(int32_t*, p1, p2);
+        FFSWAP(int32_t, bp1, bp2);
     case 5: /* side/right with scale factor */
         dshift  = get_bits_esc4(gb);
         dfactor = get_sbits(gb, 10);
-        for (i = 0; i < length; i++) {
-            int32_t a = p1[i];
-            int32_t b = p2[i];
-            b         = dfactor * (b >> dshift) + 128 >> 8 << dshift;
-            p1[i]     = b - a;
-        }
+        s->tdsp.decorrelate_sf(p1, p2, length, dshift, dfactor);
         break;
     case 6:
         FFSWAP(int32_t*, p1, p2);
@@ -653,7 +653,7 @@ static int decorrelate(TAKDecContext *s, int c1, int c2, int length)
                          s->residues[i    ] * s->filter[0];
                 }
 
-                v = (av_clip_intp2(v >> 10, 13) << dshift) - *p1;
+                v = av_clip_intp2(v >> 10, 13) * (1 << dshift) - *p1;
                 *p1++ = v;
             }
 
@@ -663,6 +663,11 @@ static int decorrelate(TAKDecContext *s, int c1, int c2, int length)
         emms_c();
         break;
     }
+    }
+
+    if (s->dmode > 0 && s->dmode < 6) {
+        p1[0] = bp1;
+        p2[0] = bp2;
     }
 
     return 0;
@@ -697,7 +702,7 @@ static int tak_decode_frame(AVCodecContext *avctx, void *data,
 
     if (s->ti.codec != TAK_CODEC_MONO_STEREO &&
         s->ti.codec != TAK_CODEC_MULTICHANNEL) {
-        av_log(avctx, AV_LOG_ERROR, "unsupported codec: %d\n", s->ti.codec);
+        avpriv_report_missing_feature(avctx, "TAK codec type %d", s->ti.codec);
         return AVERROR_PATCHWELCOME;
     }
     if (s->ti.data_type) {
@@ -909,6 +914,7 @@ static int tak_decode_frame(AVCodecContext *avctx, void *data,
     return pkt->size;
 }
 
+#if HAVE_THREADS
 static int init_thread_copy(AVCodecContext *avctx)
 {
     TAKDecContext *s = avctx->priv_data;
@@ -927,6 +933,7 @@ static int update_thread_context(AVCodecContext *dst,
     memcpy(&tdst->ti, &tsrc->ti, sizeof(TAKStreamInfo));
     return 0;
 }
+#endif
 
 static av_cold int tak_decode_close(AVCodecContext *avctx)
 {

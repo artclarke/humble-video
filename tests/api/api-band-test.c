@@ -67,7 +67,8 @@ static void draw_horiz_band(AVCodecContext *ctx, const AVFrame *fr, int offset[4
 static int video_decode(const char *input_filename)
 {
     AVCodec *codec = NULL;
-    AVCodecContext *origin_ctx = NULL, *ctx= NULL;
+    AVCodecContext *ctx= NULL;
+    AVCodecParameters *origin_par = NULL;
     uint8_t *byte_buffer = NULL;
     AVFrame *fr = NULL;
     AVPacket pkt;
@@ -99,9 +100,9 @@ static int video_decode(const char *input_filename)
       return -1;
     }
 
-    origin_ctx = fmt_ctx->streams[video_stream]->codec;
+    origin_par = fmt_ctx->streams[video_stream]->codecpar;
 
-    codec = avcodec_find_decoder(origin_ctx->codec_id);
+    codec = avcodec_find_decoder(origin_par->codec_id);
     if (!codec) {
         av_log(NULL, AV_LOG_ERROR, "Can't find decoder\n");
         return -1;
@@ -113,7 +114,7 @@ static int video_decode(const char *input_filename)
         return AVERROR(ENOMEM);
     }
 
-    result = avcodec_copy_context(ctx, origin_ctx);
+    result = avcodec_parameters_to_context(ctx, origin_par);
     if (result) {
         av_log(NULL, AV_LOG_ERROR, "Can't copy decoder context\n");
         return result;
@@ -190,12 +191,12 @@ static int video_decode(const char *input_filename)
                     return -1;
                 }
             }
-            av_free_packet(&pkt);
+            av_packet_unref(&pkt);
             av_init_packet(&pkt);
         }
     } while (!end_of_stream || got_frame);
 
-    av_free_packet(&pkt);
+    av_packet_unref(&pkt);
     av_frame_free(&fr);
     avcodec_close(ctx);
     avformat_close_input(&fmt_ctx);
@@ -212,8 +213,6 @@ int main(int argc, char **argv)
         av_log(NULL, AV_LOG_ERROR, "Incorrect input: expected %s <name of a video file>\nNote that test works only for huffyuv, flv and mpeg4 decoders\n", argv[0]);
         return 1;
     }
-
-    av_register_all();
 
     if (video_decode(argv[1]) != 0)
         return 1;

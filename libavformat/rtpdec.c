@@ -21,8 +21,9 @@
 
 #include "libavutil/mathematics.h"
 #include "libavutil/avstring.h"
+#include "libavutil/intreadwrite.h"
 #include "libavutil/time.h"
-#include "libavcodec/get_bits.h"
+
 #include "avformat.h"
 #include "network.h"
 #include "srtp.h"
@@ -31,6 +32,12 @@
 #include "rtpdec_formats.h"
 
 #define MIN_FEEDBACK_INTERVAL 200000 /* 200 ms in us */
+
+static RTPDynamicProtocolHandler l24_dynamic_handler = {
+    .enc_name   = "L24",
+    .codec_type = AVMEDIA_TYPE_AUDIO,
+    .codec_id   = AV_CODEC_ID_PCM_S24BE,
+};
 
 static RTPDynamicProtocolHandler gsm_dynamic_handler = {
     .enc_name   = "GSM",
@@ -62,81 +69,104 @@ static RTPDynamicProtocolHandler t140_dynamic_handler = { /* RFC 4103 */
     .codec_id   = AV_CODEC_ID_TEXT,
 };
 
-static RTPDynamicProtocolHandler *rtp_first_dynamic_payload_handler = NULL;
+extern RTPDynamicProtocolHandler ff_rdt_video_handler;
+extern RTPDynamicProtocolHandler ff_rdt_audio_handler;
+extern RTPDynamicProtocolHandler ff_rdt_live_video_handler;
+extern RTPDynamicProtocolHandler ff_rdt_live_audio_handler;
 
-void ff_register_dynamic_payload_handler(RTPDynamicProtocolHandler *handler)
+static const RTPDynamicProtocolHandler *rtp_dynamic_protocol_handler_list[] = {
+    /* rtp */
+    &ff_ac3_dynamic_handler,
+    &ff_amr_nb_dynamic_handler,
+    &ff_amr_wb_dynamic_handler,
+    &ff_dv_dynamic_handler,
+    &ff_g726_16_dynamic_handler,
+    &ff_g726_24_dynamic_handler,
+    &ff_g726_32_dynamic_handler,
+    &ff_g726_40_dynamic_handler,
+    &ff_g726le_16_dynamic_handler,
+    &ff_g726le_24_dynamic_handler,
+    &ff_g726le_32_dynamic_handler,
+    &ff_g726le_40_dynamic_handler,
+    &ff_h261_dynamic_handler,
+    &ff_h263_1998_dynamic_handler,
+    &ff_h263_2000_dynamic_handler,
+    &ff_h263_rfc2190_dynamic_handler,
+    &ff_h264_dynamic_handler,
+    &ff_hevc_dynamic_handler,
+    &ff_ilbc_dynamic_handler,
+    &ff_jpeg_dynamic_handler,
+    &ff_mp4a_latm_dynamic_handler,
+    &ff_mp4v_es_dynamic_handler,
+    &ff_mpeg_audio_dynamic_handler,
+    &ff_mpeg_audio_robust_dynamic_handler,
+    &ff_mpeg_video_dynamic_handler,
+    &ff_mpeg4_generic_dynamic_handler,
+    &ff_mpegts_dynamic_handler,
+    &ff_ms_rtp_asf_pfa_handler,
+    &ff_ms_rtp_asf_pfv_handler,
+    &ff_qcelp_dynamic_handler,
+    &ff_qdm2_dynamic_handler,
+    &ff_qt_rtp_aud_handler,
+    &ff_qt_rtp_vid_handler,
+    &ff_quicktime_rtp_aud_handler,
+    &ff_quicktime_rtp_vid_handler,
+    &ff_rfc4175_rtp_handler,
+    &ff_svq3_dynamic_handler,
+    &ff_theora_dynamic_handler,
+    &ff_vc2hq_dynamic_handler,
+    &ff_vorbis_dynamic_handler,
+    &ff_vp8_dynamic_handler,
+    &ff_vp9_dynamic_handler,
+    &gsm_dynamic_handler,
+    &l24_dynamic_handler,
+    &opus_dynamic_handler,
+    &realmedia_mp3_dynamic_handler,
+    &speex_dynamic_handler,
+    &t140_dynamic_handler,
+    /* rdt */
+    &ff_rdt_video_handler,
+    &ff_rdt_audio_handler,
+    &ff_rdt_live_video_handler,
+    &ff_rdt_live_audio_handler,
+    NULL,
+};
+
+const RTPDynamicProtocolHandler *ff_rtp_handler_iterate(void **opaque)
 {
-    handler->next = rtp_first_dynamic_payload_handler;
-    rtp_first_dynamic_payload_handler = handler;
+    uintptr_t i = (uintptr_t)*opaque;
+    const RTPDynamicProtocolHandler *r = rtp_dynamic_protocol_handler_list[i];
+
+    if (r)
+        *opaque = (void*)(i + 1);
+
+    return r;
 }
 
-void ff_register_rtp_dynamic_payload_handlers(void)
-{
-    ff_register_dynamic_payload_handler(&ff_ac3_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_amr_nb_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_amr_wb_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_dv_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_g726_16_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_g726_24_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_g726_32_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_g726_40_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_h261_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_h263_1998_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_h263_2000_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_h263_rfc2190_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_h264_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_hevc_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_ilbc_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_jpeg_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_mp4a_latm_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_mp4v_es_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_mpeg_audio_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_mpeg_audio_robust_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_mpeg_video_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_mpeg4_generic_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_mpegts_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_ms_rtp_asf_pfa_handler);
-    ff_register_dynamic_payload_handler(&ff_ms_rtp_asf_pfv_handler);
-    ff_register_dynamic_payload_handler(&ff_qcelp_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_qdm2_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_qt_rtp_aud_handler);
-    ff_register_dynamic_payload_handler(&ff_qt_rtp_vid_handler);
-    ff_register_dynamic_payload_handler(&ff_quicktime_rtp_aud_handler);
-    ff_register_dynamic_payload_handler(&ff_quicktime_rtp_vid_handler);
-    ff_register_dynamic_payload_handler(&ff_svq3_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_theora_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_vorbis_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_vp8_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_vp9_dynamic_handler);
-    ff_register_dynamic_payload_handler(&gsm_dynamic_handler);
-    ff_register_dynamic_payload_handler(&opus_dynamic_handler);
-    ff_register_dynamic_payload_handler(&realmedia_mp3_dynamic_handler);
-    ff_register_dynamic_payload_handler(&speex_dynamic_handler);
-    ff_register_dynamic_payload_handler(&t140_dynamic_handler);
-}
-
-RTPDynamicProtocolHandler *ff_rtp_handler_find_by_name(const char *name,
+const RTPDynamicProtocolHandler *ff_rtp_handler_find_by_name(const char *name,
                                                        enum AVMediaType codec_type)
 {
-    RTPDynamicProtocolHandler *handler;
-    for (handler = rtp_first_dynamic_payload_handler;
-         handler; handler = handler->next)
+    void *i = 0;
+    const RTPDynamicProtocolHandler *handler;
+    while (handler = ff_rtp_handler_iterate(&i)) {
         if (handler->enc_name &&
             !av_strcasecmp(name, handler->enc_name) &&
             codec_type == handler->codec_type)
             return handler;
+    }
     return NULL;
 }
 
-RTPDynamicProtocolHandler *ff_rtp_handler_find_by_id(int id,
+const RTPDynamicProtocolHandler *ff_rtp_handler_find_by_id(int id,
                                                      enum AVMediaType codec_type)
 {
-    RTPDynamicProtocolHandler *handler;
-    for (handler = rtp_first_dynamic_payload_handler;
-         handler; handler = handler->next)
+    void *i = 0;
+    const RTPDynamicProtocolHandler *handler;
+    while (handler = ff_rtp_handler_iterate(&i)) {
         if (handler->static_payload_id && handler->static_payload_id == id &&
             codec_type == handler->codec_type)
             return handler;
+    }
     return NULL;
 }
 
@@ -150,8 +180,7 @@ static int rtcp_parse_packet(RTPDemuxContext *s, const unsigned char *buf,
         switch (buf[1]) {
         case RTCP_SR:
             if (payload_len < 20) {
-                av_log(NULL, AV_LOG_ERROR,
-                       "Invalid length for RTCP SR packet\n");
+                av_log(s->ic, AV_LOG_ERROR, "Invalid RTCP SR packet length\n");
                 return AVERROR_INVALIDDATA;
             }
 
@@ -504,7 +533,7 @@ int ff_rtp_send_rtcp_feedback(RTPDemuxContext *s, URLContext *fd,
 
 /**
  * open a new RTP parse context for stream 'st'. 'st' can be NULL for
- * MPEG2-TS streams.
+ * MPEG-2 TS streams.
  */
 RTPDemuxContext *ff_rtp_parse_open(AVFormatContext *s1, AVStream *st,
                                    int payload_type, int queue_size)
@@ -520,14 +549,18 @@ RTPDemuxContext *ff_rtp_parse_open(AVFormatContext *s1, AVStream *st,
     s->ic                  = s1;
     s->st                  = st;
     s->queue_size          = queue_size;
+
+    av_log(s->ic, AV_LOG_VERBOSE, "setting jitter buffer size to %d\n",
+           s->queue_size);
+
     rtp_init_statistics(&s->statistics, 0);
     if (st) {
-        switch (st->codec->codec_id) {
+        switch (st->codecpar->codec_id) {
         case AV_CODEC_ID_ADPCM_G722:
             /* According to RFC 3551, the stream clock rate is 8000
              * even if the sample rate is 16000. */
-            if (st->codec->sample_rate == 8000)
-                st->codec->sample_rate = 16000;
+            if (st->codecpar->sample_rate == 8000)
+                st->codecpar->sample_rate = 16000;
             break;
         default:
             break;
@@ -539,7 +572,7 @@ RTPDemuxContext *ff_rtp_parse_open(AVFormatContext *s1, AVStream *st,
 }
 
 void ff_rtp_parse_set_dynamic_protocol(RTPDemuxContext *s, PayloadContext *ctx,
-                                       RTPDynamicProtocolHandler *handler)
+                                       const RTPDynamicProtocolHandler *handler)
 {
     s->dynamic_protocol_context = ctx;
     s->handler                  = handler;
@@ -619,7 +652,7 @@ static int rtp_parse_packet_internal(RTPDemuxContext *s, AVPacket *pkt,
     st = s->st;
     // only do something with this if all the rtp checks pass...
     if (!rtp_valid_packet_in_sequence(&s->statistics, seq)) {
-        av_log(st ? st->codec : NULL, AV_LOG_ERROR,
+        av_log(s->ic, AV_LOG_ERROR,
                "RTP: PT=%02x: bad cseq %04x expected=%04x\n",
                payload_type, seq, ((s->seq + 1) & 0xffff));
         return -1;
@@ -687,7 +720,7 @@ void ff_rtp_reset_packet_queue(RTPDemuxContext *s)
     s->prev_ret  = 0;
 }
 
-static void enqueue_packet(RTPDemuxContext *s, uint8_t *buf, int len)
+static int enqueue_packet(RTPDemuxContext *s, uint8_t *buf, int len)
 {
     uint16_t seq   = AV_RB16(buf + 2);
     RTPPacket **cur = &s->queue, *packet;
@@ -702,7 +735,7 @@ static void enqueue_packet(RTPDemuxContext *s, uint8_t *buf, int len)
 
     packet = av_mallocz(sizeof(*packet));
     if (!packet)
-        return;
+        return AVERROR(ENOMEM);
     packet->recvtime = av_gettime_relative();
     packet->seq      = seq;
     packet->len      = len;
@@ -710,6 +743,8 @@ static void enqueue_packet(RTPDemuxContext *s, uint8_t *buf, int len)
     packet->next     = *cur;
     *cur = packet;
     s->queue_len++;
+
+    return 0;
 }
 
 static int has_next_packet(RTPDemuxContext *s)
@@ -731,7 +766,7 @@ static int rtp_parse_queued_packet(RTPDemuxContext *s, AVPacket *pkt)
         return -1;
 
     if (!has_next_packet(s))
-        av_log(s->st ? s->st->codec : NULL, AV_LOG_WARNING,
+        av_log(s->ic, AV_LOG_WARNING,
                "RTP: missed %d packets\n", s->queue->seq - s->seq - 1);
 
     /* Parse the first packet in the queue, and dequeue it */
@@ -798,7 +833,7 @@ static int rtp_parse_one_packet(RTPDemuxContext *s, AVPacket *pkt,
         int16_t diff = seq - s->seq;
         if (diff < 0) {
             /* Packet older than the previously emitted one, drop */
-            av_log(s->st ? s->st->codec : NULL, AV_LOG_WARNING,
+            av_log(s->ic, AV_LOG_WARNING,
                    "RTP: dropping old packet received too late\n");
             return -1;
         } else if (diff <= 1) {
@@ -807,12 +842,16 @@ static int rtp_parse_one_packet(RTPDemuxContext *s, AVPacket *pkt,
             return rv;
         } else {
             /* Still missing some packet, enqueue this one. */
-            enqueue_packet(s, buf, len);
+            rv = enqueue_packet(s, buf, len);
+            if (rv < 0)
+                return rv;
             *bufptr = NULL;
             /* Return the first enqueued packet if the queue is full,
              * even if we're missing something */
-            if (s->queue_len >= s->queue_size)
+            if (s->queue_len >= s->queue_size) {
+                av_log(s->ic, AV_LOG_WARNING, "jitter buffer full\n");
                 return rtp_parse_queued_packet(s, pkt);
+            }
             return -1;
         }
     }
@@ -835,7 +874,7 @@ int ff_rtp_parse_packet(RTPDemuxContext *s, AVPacket *pkt,
         return -1;
     rv = rtp_parse_one_packet(s, pkt, bufptr, len);
     s->prev_ret = rv;
-    while (rv == AVERROR(EAGAIN) && has_next_packet(s))
+    while (rv < 0 && has_next_packet(s))
         rv = rtp_parse_queued_packet(s, pkt);
     return rv ? rv : has_next_packet(s);
 }
@@ -860,7 +899,7 @@ int ff_parse_fmtp(AVFormatContext *s,
     int value_size = strlen(p) + 1;
 
     if (!(value = av_malloc(value_size))) {
-        av_log(NULL, AV_LOG_ERROR, "Failed to allocate data for FMTP.\n");
+        av_log(s, AV_LOG_ERROR, "Failed to allocate data for FMTP.\n");
         return AVERROR(ENOMEM);
     }
 

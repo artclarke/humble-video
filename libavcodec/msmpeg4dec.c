@@ -28,7 +28,6 @@
 #include "mpegvideo.h"
 #include "msmpeg4.h"
 #include "libavutil/imgutils.h"
-#include "libavutil/x86/asm.h"
 #include "h263.h"
 #include "mpeg4video.h"
 #include "msmpeg4data.h"
@@ -70,7 +69,7 @@ static VLC v2_mb_type_vlc;
 static VLC v2_mv_vlc;
 VLC ff_inter_intra_vlc;
 
-/* This is identical to h263 except that its range is multiplied by 2. */
+/* This is identical to H.263 except that its range is multiplied by 2. */
 static int msmpeg4v2_decode_motion(MpegEncContext * s, int pred, int f_code)
 {
     int code, val, sign, shift;
@@ -208,6 +207,9 @@ static int msmpeg4v34_decode_mb(MpegEncContext *s, int16_t block[6][64])
     int cbp, code, i;
     uint8_t *coded_val;
     uint32_t * const mb_type_ptr = &s->current_picture.mb_type[s->mb_x + s->mb_y*s->mb_stride];
+
+    if (get_bits_left(&s->gb) <= 0)
+        return AVERROR_INVALIDDATA;
 
     if (s->pict_type == AV_PICTURE_TYPE_P) {
         if (s->use_skip_mb_code) {
@@ -426,13 +428,6 @@ int ff_msmpeg4_decode_picture_header(MpegEncContext * s)
         av_log(s->avctx, AV_LOG_ERROR, "invalid picture type\n");
         return -1;
     }
-#if 0
-{
-    static int had_i=0;
-    if(s->pict_type == AV_PICTURE_TYPE_I) had_i=1;
-    if(!had_i) return -1;
-}
-#endif
     s->chroma_qscale= s->qscale = get_bits(&s->gb, 5);
     if(s->qscale==0){
         av_log(s->avctx, AV_LOG_ERROR, "invalid qscale\n");
@@ -583,7 +578,7 @@ int ff_msmpeg4_decode_ext_header(MpegEncContext * s, int buf_size)
     }
     else
     {
-        av_log(s->avctx, AV_LOG_ERROR, "I frame too long, ignoring ext header\n");
+        av_log(s->avctx, AV_LOG_ERROR, "I-frame too long, ignoring ext header\n");
     }
 
     return 0;
@@ -650,7 +645,6 @@ static int msmpeg4_decode_dc(MpegEncContext * s, int n, int *dir_ptr)
     return level;
 }
 
-//#define ERROR_DETAILS
 int ff_msmpeg4_decode_block(MpegEncContext * s, int16_t * block,
                               int n, int coded, const uint8_t *scan_table)
 {
@@ -774,43 +768,11 @@ int ff_msmpeg4_decode_block(MpegEncContext * s, int16_t * block,
                         if(sign) level= -level;
                     }
 
-#if 0 // waste of time / this will detect very few errors
-                    {
-                        const int abs_level= FFABS(level);
-                        const int run1= run - rl->max_run[last][abs_level] - run_diff;
-                        if(abs_level<=MAX_LEVEL && run<=MAX_RUN){
-                            if(abs_level <= rl->max_level[last][run]){
-                                av_log(s->avctx, AV_LOG_ERROR, "illegal 3. esc, vlc encoding possible\n");
-                                return DECODING_AC_LOST;
-                            }
-                            if(abs_level <= rl->max_level[last][run]*2){
-                                av_log(s->avctx, AV_LOG_ERROR, "illegal 3. esc, esc 1 encoding possible\n");
-                                return DECODING_AC_LOST;
-                            }
-                            if(run1>=0 && abs_level <= rl->max_level[last][run1]){
-                                av_log(s->avctx, AV_LOG_ERROR, "illegal 3. esc, esc 2 encoding possible\n");
-                                return DECODING_AC_LOST;
-                            }
-                        }
-                    }
-#endif
                     //level = level * qmul + (level>0) * qadd - (level<=0) * qadd ;
                     if (level>0) level= level * qmul + qadd;
                     else         level= level * qmul - qadd;
-#if 0 // waste of time too :(
-                    if(level>2048 || level<-2048){
-                        av_log(s->avctx, AV_LOG_ERROR, "|level| overflow in 3. esc\n");
-                        return DECODING_AC_LOST;
-                    }
-#endif
                     i+= run + 1;
                     if(last) i+=192;
-#ifdef ERROR_DETAILS
-                if(run==66)
-                    av_log(s->avctx, AV_LOG_ERROR, "illegal vlc code in ESC3 level=%d\n", level);
-                else if((i>62 && i<192) || i>192+63)
-                    av_log(s->avctx, AV_LOG_ERROR, "run overflow in ESC3 i=%d run=%d level=%d\n", i, run, level);
-#endif
                 } else {
                     /* second escape */
                     SKIP_BITS(re, &s->gb, 2);
@@ -818,12 +780,6 @@ int ff_msmpeg4_decode_block(MpegEncContext * s, int16_t * block,
                     i+= run + rl->max_run[run>>7][level/qmul] + run_diff; //FIXME opt indexing
                     level = (level ^ SHOW_SBITS(re, &s->gb, 1)) - SHOW_SBITS(re, &s->gb, 1);
                     LAST_SKIP_BITS(re, &s->gb, 1);
-#ifdef ERROR_DETAILS
-                if(run==66)
-                    av_log(s->avctx, AV_LOG_ERROR, "illegal vlc code in ESC2 level=%d\n", level);
-                else if((i>62 && i<192) || i>192+63)
-                    av_log(s->avctx, AV_LOG_ERROR, "run overflow in ESC2 i=%d run=%d level=%d\n", i, run, level);
-#endif
                 }
             } else {
                 /* first escape */
@@ -833,23 +789,11 @@ int ff_msmpeg4_decode_block(MpegEncContext * s, int16_t * block,
                 level = level + rl->max_level[run>>7][(run-1)&63] * qmul;//FIXME opt indexing
                 level = (level ^ SHOW_SBITS(re, &s->gb, 1)) - SHOW_SBITS(re, &s->gb, 1);
                 LAST_SKIP_BITS(re, &s->gb, 1);
-#ifdef ERROR_DETAILS
-                if(run==66)
-                    av_log(s->avctx, AV_LOG_ERROR, "illegal vlc code in ESC1 level=%d\n", level);
-                else if((i>62 && i<192) || i>192+63)
-                    av_log(s->avctx, AV_LOG_ERROR, "run overflow in ESC1 i=%d run=%d level=%d\n", i, run, level);
-#endif
             }
         } else {
             i+= run;
             level = (level ^ SHOW_SBITS(re, &s->gb, 1)) - SHOW_SBITS(re, &s->gb, 1);
             LAST_SKIP_BITS(re, &s->gb, 1);
-#ifdef ERROR_DETAILS
-                if(run==66)
-                    av_log(s->avctx, AV_LOG_ERROR, "illegal vlc code level=%d\n", level);
-                else if((i>62 && i<192) || i>192+63)
-                    av_log(s->avctx, AV_LOG_ERROR, "run overflow i=%d run=%d level=%d\n", i, run, level);
-#endif
         }
         if (i > 62){
             i-= 192;
@@ -936,6 +880,7 @@ AVCodec ff_msmpeg4v1_decoder = {
     .close          = ff_h263_decode_end,
     .decode         = ff_h263_decode_frame,
     .capabilities   = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .max_lowres     = 3,
     .pix_fmts       = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUV420P,
@@ -953,6 +898,7 @@ AVCodec ff_msmpeg4v2_decoder = {
     .close          = ff_h263_decode_end,
     .decode         = ff_h263_decode_frame,
     .capabilities   = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .max_lowres     = 3,
     .pix_fmts       = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUV420P,
@@ -970,6 +916,7 @@ AVCodec ff_msmpeg4v3_decoder = {
     .close          = ff_h263_decode_end,
     .decode         = ff_h263_decode_frame,
     .capabilities   = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .max_lowres     = 3,
     .pix_fmts       = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUV420P,
@@ -987,6 +934,7 @@ AVCodec ff_wmv1_decoder = {
     .close          = ff_h263_decode_end,
     .decode         = ff_h263_decode_frame,
     .capabilities   = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .max_lowres     = 3,
     .pix_fmts       = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUV420P,
