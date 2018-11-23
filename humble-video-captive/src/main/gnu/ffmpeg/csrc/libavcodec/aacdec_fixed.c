@@ -75,11 +75,12 @@
 #include "aac.h"
 #include "aactab.h"
 #include "aacdectab.h"
-#include "cbrt_tablegen.h"
+#include "adts_header.h"
+#include "cbrt_data.h"
 #include "sbr.h"
 #include "aacsbr.h"
 #include "mpeg4audio.h"
-#include "aacadtsdec.h"
+#include "profiles.h"
 #include "libavutil/intfloat.h"
 
 #include <math.h>
@@ -154,9 +155,9 @@ static void vector_pow43(int *coefs, int len)
     for (i=0; i<len; i++) {
         coef = coefs[i];
         if (coef < 0)
-            coef = -(int)cbrt_tab[-coef];
+            coef = -(int)ff_cbrt_tab_fixed[-coef];
         else
-            coef = (int)cbrt_tab[coef];
+            coef = (int)ff_cbrt_tab_fixed[coef];
         coefs[i] = coef;
     }
 }
@@ -182,7 +183,7 @@ static void subband_scale(int *dst, int *src, int scale, int offset, int len)
         }
     } else if (s > -32) {
         s = s + 32;
-        round = 1 << (s-1);
+        round = 1U << (s-1);
         for (i=0; i<len; i++) {
             out = (int)((int64_t)((int64_t)src[i] * c + round) >> s);
             dst[i] = out * (unsigned)ssign;
@@ -421,7 +422,9 @@ static void apply_independent_coupling_fixed(AACContext *ac,
 
     c = cce_scale_fixed[gain & 7];
     shift = (gain-1024) >> 3;
-    if (shift < 0) {
+    if (shift < -31) {
+        return;
+    } else if (shift < 0) {
         shift = -shift;
         round = 1 << (shift - 1);
 
@@ -453,6 +456,8 @@ AVCodec ff_aac_fixed_decoder = {
         AV_SAMPLE_FMT_S32P, AV_SAMPLE_FMT_NONE
     },
     .capabilities    = AV_CODEC_CAP_CHANNEL_CONF | AV_CODEC_CAP_DR1,
+    .caps_internal   = FF_CODEC_CAP_INIT_THREADSAFE,
     .channel_layouts = aac_channel_layout,
+    .profiles        = NULL_IF_CONFIG_SMALL(ff_aac_profiles),
     .flush = flush,
 };

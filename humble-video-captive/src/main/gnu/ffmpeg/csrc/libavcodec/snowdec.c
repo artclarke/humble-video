@@ -104,8 +104,11 @@ static av_always_inline void predict_slice_buffered(SnowContext *s, slice_buffer
             avmv->h = block_h;
             avmv->dst_x = block_w*mb_x - block_w/2;
             avmv->dst_y = block_h*mb_y - block_h/2;
-            avmv->src_x = avmv->dst_x + (bn->mx * s->mv_scale)/8;
-            avmv->src_y = avmv->dst_y + (bn->my * s->mv_scale)/8;
+            avmv->motion_scale = 8;
+            avmv->motion_x = bn->mx * s->mv_scale;
+            avmv->motion_y = bn->my * s->mv_scale;
+            avmv->src_x = avmv->dst_x + avmv->motion_x / 8;
+            avmv->src_y = avmv->dst_y + avmv->motion_y / 8;
             avmv->source= -1 - bn->ref;
             avmv->flags = 0;
         }
@@ -205,8 +208,8 @@ static int decode_q_branch(SnowContext *s, int level, int x, int y){
                 return AVERROR_INVALIDDATA;
             }
             pred_mv(s, &mx, &my, ref, left, top, tr);
-            mx+= get_symbol(&s->c, &s->block_state[128 + 32*(mx_context + 16*!!ref)], 1);
-            my+= get_symbol(&s->c, &s->block_state[128 + 32*(my_context + 16*!!ref)], 1);
+            mx+= (unsigned)get_symbol(&s->c, &s->block_state[128 + 32*(mx_context + 16*!!ref)], 1);
+            my+= (unsigned)get_symbol(&s->c, &s->block_state[128 + 32*(my_context + 16*!!ref)], 1);
         }
         set_blocks(s, level, x, y, l, cb, cr, mx, my, ref, type);
     }else{
@@ -234,9 +237,9 @@ static void dequantize_slice_buffered(SnowContext *s, slice_buffer * sb, SubBand
         for(x=0; x<w; x++){
             int i= line[x];
             if(i<0){
-                line[x]= -((-i*qmul + qadd)>>(QEXPSHIFT)); //FIXME try different bias
+                line[x]= -((-i*(unsigned)qmul + qadd)>>(QEXPSHIFT)); //FIXME try different bias
             }else if(i>0){
-                line[x]=  (( i*qmul + qadd)>>(QEXPSHIFT));
+                line[x]=  (( i*(unsigned)qmul + qadd)>>(QEXPSHIFT));
             }
         }
     }
@@ -526,13 +529,11 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
             }
         }
 
-        {
         for(level=0; level<s->spatial_decomposition_count; level++){
             for(orientation=level ? 1 : 0; orientation<4; orientation++){
                 SubBand *b= &p->band[level][orientation];
                 unpack_coeffs(s, b, b->parent, orientation);
             }
-        }
         }
 
         {

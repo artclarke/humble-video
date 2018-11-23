@@ -22,7 +22,7 @@
 #include "avfilter.h"
 #include "internal.h"
 
-typedef struct {
+typedef struct ASetRateContext {
     const AVClass *class;
     int sample_rate;
     int rescale_pts;
@@ -39,8 +39,8 @@ typedef struct {
     OPT_GENERIC(name, field, def, min, max, descr, INT, i64, __VA_ARGS__)
 
 static const AVOption asetrate_options[] = {
-    OPT_INT("sample_rate", sample_rate, 44100, 1, INT_MAX, "set the sample rate"),
-    OPT_INT("r",           sample_rate, 44100, 1, INT_MAX, "set the sample rate"),
+    OPT_INT("sample_rate", sample_rate, 44100, 1, INT_MAX, "set the sample rate",),
+    OPT_INT("r",           sample_rate, 44100, 1, INT_MAX, "set the sample rate",),
     {NULL},
 };
 

@@ -64,6 +64,7 @@ FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, ASV1,          AVI)     += asv1
 FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, ASV2,          AVI)     += asv2
 FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, DNXHD,         DNXHD)   += dnxhd-720p
 FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, DNXHD,         DNXHD)   += dnxhd-720p-rd
+FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, DNXHD,         DNXHD)   += dnxhd-4k-hr-lb
 FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, DNXHD,         MOV)     += dnxhd-1080i
 FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, DVVIDEO,       DV)      += dv
 FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, DVVIDEO,       DV)      += dv-411
@@ -79,16 +80,16 @@ FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, JPEGLS,        AVI)     += jpegls
 FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, LJPEG MJPEG,   AVI)     += ljpeg
 FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, MJPEG,         AVI)     += mjpeg
 
-FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, MPEG1VIDEO, MPEG1VIDEO MPEGVIDEO) +=          \
-                                                    mpeg1                      \
+FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, MPEG1VIDEO, MPEG1VIDEO MPEGVIDEO) +=    \
+                                                    mpeg1                    \
                                                     mpeg1b
 
-FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, MPEG2VIDEO, MPEG2VIDEO MPEGVIDEO) +=          \
-                                                    mpeg2-422                  \
-                                                    mpeg2-idct-int             \
-                                                    mpeg2-ilace                \
-                                                    mpeg2-ivlc-qprd            \
-                                                    mpeg2-thread               \
+FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, MPEG2VIDEO, MPEG2VIDEO MPEGVIDEO) +=    \
+                                                    mpeg2-422                \
+                                                    mpeg2-idct-int           \
+                                                    mpeg2-ilace              \
+                                                    mpeg2-ivlc-qprd          \
+                                                    mpeg2-thread             \
                                                     mpeg2-thread-ivlc
 
 FATE_SEEK_VSYNTH_LENA-$(call ENCDEC, MPEG4,         MP4 MOV) += mpeg4
@@ -111,6 +112,7 @@ fate-seek-vsynth_lena-asv2:              SRC = fate/vsynth_lena-asv2.avi
 fate-seek-vsynth_lena-dnxhd-1080i:       SRC = fate/vsynth_lena-dnxhd-1080i.mov
 fate-seek-vsynth_lena-dnxhd-720p:        SRC = fate/vsynth_lena-dnxhd-720p.dnxhd
 fate-seek-vsynth_lena-dnxhd-720p-rd:     SRC = fate/vsynth_lena-dnxhd-720p.dnxhd
+fate-seek-vsynth_lena-dnxhd-4k-hr-lb:    SRC = fate/vsynth_lena-dnxhd-4k-hr-lb.dnxhd
 fate-seek-vsynth_lena-dv:                SRC = fate/vsynth_lena-dv.dv
 fate-seek-vsynth_lena-dv-411:            SRC = fate/vsynth_lena-dv-411.dv
 fate-seek-vsynth_lena-dv-50:             SRC = fate/vsynth_lena-dv-50.dv
@@ -166,7 +168,6 @@ FATE_SEEK_LAVF-$(call ENCDEC,  PCM_S16BE,             AU)          += au
 FATE_SEEK_LAVF-$(call ENCDEC2, MPEG4,      MP2,       AVI)         += avi
 FATE_SEEK_LAVF-$(call ENCDEC,  BMP,                   IMAGE2)      += bmp
 FATE_SEEK_LAVF-$(call ENCDEC2, DVVIDEO,    PCM_S16LE, AVI)         += dv_fmt
-FATE_SEEK_LAVF-$(call ENCDEC2, MPEG1VIDEO, MP2,       FFM)         += ffm
 FATE_SEEK_LAVF-$(call ENCDEC,  FLV,                   FLV)         += flv_fmt
 FATE_SEEK_LAVF-$(call ENCDEC,  GIF,                   IMAGE2)      += gif
 FATE_SEEK_LAVF-$(call ENCDEC2, MPEG2VIDEO, PCM_S16LE, GXF)         += gxf
@@ -178,6 +179,8 @@ FATE_SEEK_LAVF-$(call ENCDEC2, MPEG1VIDEO, MP2,       MPEG1SYSTEM MPEGPS) += mpg
 FATE_SEEK_LAVF-$(call ENCDEC,  PCM_MULAW,             PCM_MULAW)   += mulaw
 FATE_SEEK_LAVF-$(call ENCDEC2, MPEG2VIDEO, PCM_S16LE, MXF)         += mxf
 FATE_SEEK_LAVF-$(call ENCDEC2, MPEG2VIDEO, PCM_S16LE, MXF_D10 MXF) += mxf_d10
+FATE_SEEK_LAVF-$(call ENCDEC2, DVVIDEO,    PCM_S16LE, MXF)         += mxf_dv25
+FATE_SEEK_LAVF-$(call ENCDEC2, DVVIDEO,    PCM_S16LE, MXF)         += mxf_dvcpro50
 FATE_SEEK_LAVF-$(call ENCDEC2, DNXHD,      PCM_S16LE, MXF_OPATOM MXF) += mxf_opatom
 FATE_SEEK_LAVF-$(call ENCDEC2, DNXHD,      PCM_S16LE, MXF_OPATOM MXF) += mxf_opatom_audio
 FATE_SEEK_LAVF-$(call ENCDEC2, MPEG4,      MP2,       NUT)         += nut
@@ -206,7 +209,6 @@ fate-seek-lavf-au:       SRC = lavf/lavf.au
 fate-seek-lavf-avi:      SRC = lavf/lavf.avi
 fate-seek-lavf-bmp:      SRC = images/bmp/%02d.bmp
 fate-seek-lavf-dv_fmt:   SRC = lavf/lavf.dv
-fate-seek-lavf-ffm:      SRC = lavf/lavf.ffm
 fate-seek-lavf-flv_fmt:  SRC = lavf/lavf.flv
 fate-seek-lavf-gif:      SRC = lavf/lavf.gif
 fate-seek-lavf-gxf:      SRC = lavf/lavf.gxf
@@ -218,6 +220,8 @@ fate-seek-lavf-mpg:      SRC = lavf/lavf.mpg
 fate-seek-lavf-mulaw:    SRC = lavf/lavf.ul
 fate-seek-lavf-mxf:      SRC = lavf/lavf.mxf
 fate-seek-lavf-mxf_d10:  SRC = lavf/lavf.mxf_d10
+fate-seek-lavf-mxf_dv25: SRC = lavf/lavf.mxf_dv25
+fate-seek-lavf-mxf_dvcpro50: SRC = lavf/lavf.mxf_dvcpro50
 fate-seek-lavf-mxf_opatom: SRC = lavf/lavf.mxf_opatom
 fate-seek-lavf-mxf_opatom_audio: SRC = lavf/lavf.mxf_opatom_audio
 fate-seek-lavf-nut:      SRC = lavf/lavf.nut
@@ -244,12 +248,26 @@ FATE_SEEK += $(FATE_SEEK_LAVF-yes:%=fate-seek-lavf-%)
 # extra files
 
 FATE_SEEK_EXTRA-$(CONFIG_MP3_DEMUXER)   += fate-seek-extra-mp3
-fate-seek-extra-mp3:  CMD = run libavformat/seek-test$(EXESUF) $(TARGET_SAMPLES)/gapless/gapless.mp3 -usetoc 0
+FATE_SEEK_EXTRA-$(call ALLYES, CACHE_PROTOCOL PIPE_PROTOCOL MP3_DEMUXER) += fate-seek-cache-pipe
+FATE_SEEK_EXTRA-$(CONFIG_MATROSKA_DEMUXER) += fate-seek-mkv-codec-delay
+FATE_SEEK_EXTRA-$(CONFIG_MOV_DEMUXER) += fate-seek-extra-mp4
+FATE_SEEK_EXTRA-$(CONFIG_MOV_DEMUXER) += fate-seek-empty-edit-mp4
+FATE_SEEK_EXTRA-$(CONFIG_MOV_DEMUXER) += fate-seek-test-iibbibb-mp4
+FATE_SEEK_EXTRA-$(CONFIG_MOV_DEMUXER) += fate-seek-test-iibbibb-neg-ctts-mp4
+
+fate-seek-extra-mp3:  CMD = run libavformat/tests/seek$(EXESUF) $(TARGET_SAMPLES)/gapless/gapless.mp3 -fastseek 1
+fate-seek-extra-mp4:  CMD = run libavformat/tests/seek$(EXESUF) $(TARGET_SAMPLES)/mov/buck480p30_na.mp4 -duration 180 -frames 4
+fate-seek-empty-edit-mp4:  CMD = run libavformat/tests/seek$(EXESUF) $(TARGET_SAMPLES)/mov/empty_edit_5s.mp4 -duration 15 -frames 4
+fate-seek-test-iibbibb-mp4:  CMD = run libavformat/tests/seek$(EXESUF) $(TARGET_SAMPLES)/mov/test_iibbibb.mp4 -duration 13 -frames 4
+fate-seek-test-iibbibb-neg-ctts-mp4:  CMD = run libavformat/tests/seek$(EXESUF) $(TARGET_SAMPLES)/mov/test_iibbibb_neg_ctts.mp4 -duration 13 -frames 4
+fate-seek-cache-pipe: CMD = cat $(TARGET_SAMPLES)/gapless/gapless.mp3 | run libavformat/tests/seek$(EXESUF) cache:pipe:0 -read_ahead_limit -1
+fate-seek-mkv-codec-delay:   CMD = run libavformat/tests/seek$(EXESUF) $(TARGET_SAMPLES)/mkv/codec_delay_opus.mkv
+
 FATE_SEEK_EXTRA += $(FATE_SEEK_EXTRA-yes)
 
 
-$(FATE_SEEK) $(FATE_SAMPLES_SEEK) $(FATE_SEEK_EXTRA): libavformat/seek-test$(EXESUF)
-$(FATE_SEEK) $(FATE_SAMPLES_SEEK): CMD = run libavformat/seek-test$(EXESUF) $(TARGET_PATH)/tests/data/$(SRC)
+$(FATE_SEEK) $(FATE_SAMPLES_SEEK) $(FATE_SEEK_EXTRA): libavformat/tests/seek$(EXESUF)
+$(FATE_SEEK) $(FATE_SAMPLES_SEEK): CMD = run libavformat/tests/seek$(EXESUF) $(TARGET_PATH)/tests/data/$(SRC)
 $(FATE_SEEK) $(FATE_SAMPLES_SEEK): fate-seek-%: fate-%
 fate-seek-%: REF = $(SRC_PATH)/tests/ref/seek/$(@:fate-seek-%=%)
 

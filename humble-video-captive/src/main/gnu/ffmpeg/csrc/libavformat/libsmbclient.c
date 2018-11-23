@@ -166,7 +166,7 @@ static int libsmbc_read(URLContext *h, unsigned char *buf, int size)
         return ret;
     }
 
-    return bytes_read;
+    return bytes_read ? bytes_read : AVERROR_EOF;
 }
 
 static int libsmbc_write(URLContext *h, const unsigned char *buf, int size)
@@ -365,7 +365,7 @@ static const AVClass libsmbclient_context_class = {
     .version        = LIBAVUTIL_VERSION_INT,
 };
 
-URLProtocol ff_libsmbclient_protocol = {
+const URLProtocol ff_libsmbclient_protocol = {
     .name                = "smb",
     .url_open            = libsmbc_open,
     .url_read            = libsmbc_read,

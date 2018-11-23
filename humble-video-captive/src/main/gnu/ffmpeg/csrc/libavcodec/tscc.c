@@ -32,7 +32,6 @@
  *  then this coded picture is packed with ZLib
  *
  * Supports: BGR8,BGR555,BGR24 - only BGR8 and BGR555 tested
- *
  */
 
 #include <stdio.h>
@@ -70,9 +69,19 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     CamtasiaContext * const c = avctx->priv_data;
     AVFrame *frame = c->frame;
     int ret;
+    int palette_has_changed = 0;
 
-    if ((ret = ff_reget_buffer(avctx, frame)) < 0)
-        return ret;
+    if (c->avctx->pix_fmt == AV_PIX_FMT_PAL8) {
+        int size;
+        const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, &size);
+
+        if (pal && size == AVPALETTE_SIZE) {
+            palette_has_changed = 1;
+            memcpy(c->pal, pal, AVPALETTE_SIZE);
+        } else if (pal) {
+            av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", size);
+        }
+    }
 
     ret = inflateReset(&c->zstream);
     if (ret != Z_OK) {
@@ -85,29 +94,27 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     c->zstream.avail_out = c->decomp_size;
     ret = inflate(&c->zstream, Z_FINISH);
     // Z_DATA_ERROR means empty picture
+    if (ret == Z_DATA_ERROR && !palette_has_changed) {
+        return buf_size;
+    }
+
     if ((ret != Z_OK) && (ret != Z_STREAM_END) && (ret != Z_DATA_ERROR)) {
         av_log(avctx, AV_LOG_ERROR, "Inflate error: %d\n", ret);
         return AVERROR_UNKNOWN;
     }
 
+    if ((ret = ff_reget_buffer(avctx, frame)) < 0)
+        return ret;
 
     if (ret != Z_DATA_ERROR) {
         bytestream2_init(&c->gb, c->decomp_buf,
                          c->decomp_size - c->zstream.avail_out);
-        ff_msrle_decode(avctx, (AVPicture*)frame, c->bpp, &c->gb);
+        ff_msrle_decode(avctx, frame, c->bpp, &c->gb);
     }
 
     /* make the palette available on the way out */
     if (c->avctx->pix_fmt == AV_PIX_FMT_PAL8) {
-        int size;
-        const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, &size);
-
-        if (pal && size == AVPALETTE_SIZE) {
-            frame->palette_has_changed = 1;
-            memcpy(c->pal, pal, AVPALETTE_SIZE);
-        } else if (pal) {
-            av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", size);
-        }
+        frame->palette_has_changed = palette_has_changed;
         memcpy(frame->data[1], c->pal, AVPALETTE_SIZE);
     }
 
@@ -162,6 +169,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
     }
 
     c->frame = av_frame_alloc();
+    if (!c->frame)
+        return AVERROR(ENOMEM);
 
     return 0;
 }
@@ -188,4 +197,5 @@ AVCodec ff_tscc_decoder = {
     .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

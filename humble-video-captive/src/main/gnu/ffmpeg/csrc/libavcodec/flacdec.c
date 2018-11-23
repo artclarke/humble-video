@@ -109,7 +109,9 @@ static av_cold int flac_decode_init(AVCodecContext *avctx)
         return AVERROR_INVALIDDATA;
 
     /* initialize based on the demuxer-supplied streamdata header */
-    ff_flac_parse_streaminfo(avctx, &s->flac_stream_info, streaminfo);
+    ret = ff_flac_parse_streaminfo(avctx, &s->flac_stream_info, streaminfo);
+    if (ret < 0)
+        return ret;
     ret = allocate_buffers(s);
     if (ret < 0)
         return ret;
@@ -175,7 +177,9 @@ static int parse_streaminfo(FLACContext *s, const uint8_t *buf, int buf_size)
         metadata_size != FLAC_STREAMINFO_SIZE) {
         return AVERROR_INVALIDDATA;
     }
-    ff_flac_parse_streaminfo(s->avctx, &s->flac_stream_info, &buf[8]);
+    ret = ff_flac_parse_streaminfo(s->avctx, &s->flac_stream_info, &buf[8]);
+    if (ret < 0)
+        return ret;
     ret = allocate_buffers(s);
     if (ret < 0)
         return ret;
@@ -216,20 +220,27 @@ static int get_metadata_size(const uint8_t *buf, int buf_size)
 
 static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
 {
+    GetBitContext gb = s->gb;
     int i, tmp, partition, method_type, rice_order;
     int rice_bits, rice_esc;
     int samples;
 
-    method_type = get_bits(&s->gb, 2);
+    method_type = get_bits(&gb, 2);
+    rice_order  = get_bits(&gb, 4);
+
+    samples   = s->blocksize >> rice_order;
+    rice_bits = 4 + method_type;
+    rice_esc  = (1 << rice_bits) - 1;
+
+    decoded += pred_order;
+    i        = pred_order;
+
     if (method_type > 1) {
         av_log(s->avctx, AV_LOG_ERROR, "illegal residual coding method %d\n",
                method_type);
         return AVERROR_INVALIDDATA;
     }
 
-    rice_order = get_bits(&s->gb, 4);
-
-    samples= s->blocksize >> rice_order;
     if (samples << rice_order != s->blocksize) {
         av_log(s->avctx, AV_LOG_ERROR, "invalid rice order: %i blocksize %i\n",
                rice_order, s->blocksize);
@@ -242,24 +253,28 @@ static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
         return AVERROR_INVALIDDATA;
     }
 
-    rice_bits = 4 + method_type;
-    rice_esc  = (1 << rice_bits) - 1;
-
-    decoded += pred_order;
-    i= pred_order;
     for (partition = 0; partition < (1 << rice_order); partition++) {
-        tmp = get_bits(&s->gb, rice_bits);
+        tmp = get_bits(&gb, rice_bits);
         if (tmp == rice_esc) {
-            tmp = get_bits(&s->gb, 5);
+            tmp = get_bits(&gb, 5);
             for (; i < samples; i++)
-                *decoded++ = get_sbits_long(&s->gb, tmp);
+                *decoded++ = get_sbits_long(&gb, tmp);
         } else {
+            int real_limit = tmp ? (INT_MAX >> tmp) + 2 : INT_MAX;
             for (; i < samples; i++) {
-                *decoded++ = get_sr_golomb_flac(&s->gb, tmp, INT_MAX, 0);
+                int v = get_sr_golomb_flac(&gb, tmp, real_limit, 0);
+                if (v == 0x80000000){
+                    av_log(s->avctx, AV_LOG_ERROR, "invalid residual\n");
+                    return AVERROR_INVALIDDATA;
+                }
+
+                *decoded++ = v;
             }
         }
         i= 0;
     }
+
+    s->gb = gb;
 
     return 0;
 }
@@ -316,7 +331,7 @@ static int decode_subframe_fixed(FLACContext *s, int32_t *decoded,
     return 0;
 }
 
-static void lpc_analyze_remodulate(int32_t *decoded, const int coeffs[32],
+static void lpc_analyze_remodulate(SUINT32 *decoded, const int coeffs[32],
                                    int order, int qlevel, int len, int bps)
 {
     int i, j;
@@ -332,7 +347,7 @@ static void lpc_analyze_remodulate(int32_t *decoded, const int coeffs[32],
     for (i = len - 1; i >= order; i--) {
         int64_t p = 0;
         for (j = 0; j < order; j++)
-            p += coeffs[j] * (int64_t)decoded[i-order+j];
+            p += coeffs[j] * (int64_t)(int32_t)decoded[i-order+j];
         decoded[i] -= p >> qlevel;
     }
     for (i = order; i < len; i++, decoded++) {
@@ -624,6 +639,7 @@ static int flac_decode_frame(AVCodecContext *avctx, void *data,
     return bytes_read;
 }
 
+#if HAVE_THREADS
 static int init_thread_copy(AVCodecContext *avctx)
 {
     FLACContext *s = avctx->priv_data;
@@ -634,6 +650,7 @@ static int init_thread_copy(AVCodecContext *avctx)
         return allocate_buffers(s);
     return 0;
 }
+#endif
 
 static av_cold int flac_decode_close(AVCodecContext *avctx)
 {
@@ -645,7 +662,7 @@ static av_cold int flac_decode_close(AVCodecContext *avctx)
 }
 
 static const AVOption options[] = {
-{ "use_buggy_lpc", "emulate old buggy lavc behavior", offsetof(FLACContext, buggy_lpc), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, 1, AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_AUDIO_PARAM },
+{ "use_buggy_lpc", "emulate old buggy lavc behavior", offsetof(FLACContext, buggy_lpc), AV_OPT_TYPE_BOOL, {.i64 = 0 }, 0, 1, AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_AUDIO_PARAM },
 { NULL },
 };
 

@@ -29,22 +29,26 @@
 #define BIT_0      0x7f
 #define BIT_1      0x81
 
+#if CONFIG_BIT_DEMUXER
 static int probe(AVProbeData *p)
 {
-    int i, j;
+    int i = 0, j, valid = 0;
 
-    if(p->buf_size < 0x40)
-        return 0;
-
-    for(i=0; i+3<p->buf_size && i< 10*0x50; ){
-        if(AV_RL16(&p->buf[0]) != SYNC_WORD)
+    while (2 * i + 3 < p->buf_size){
+        if (AV_RL16(&p->buf[2 * i++]) != SYNC_WORD)
             return 0;
-        j=AV_RL16(&p->buf[2]);
-        if(j!=0x40 && j!=0x50)
+        j = AV_RL16(&p->buf[2 * i++]);
+        if (j != 0 && j != 0x10 && j != 0x40 && j != 0x50 && j != 0x76)
             return 0;
-        i+=j;
+        if (j)
+            valid++;
+        i += j;
     }
-    return AVPROBE_SCORE_EXTENSION;
+    if (valid > 10)
+        return AVPROBE_SCORE_MAX;
+    if (valid > 2)
+        return AVPROBE_SCORE_EXTENSION - 1;
+    return 0;
 }
 
 static int read_header(AVFormatContext *s)
@@ -55,11 +59,11 @@ static int read_header(AVFormatContext *s)
     if (!st)
         return AVERROR(ENOMEM);
 
-    st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
-    st->codec->codec_id=AV_CODEC_ID_G729;
-    st->codec->sample_rate=8000;
-    st->codec->block_align = 16;
-    st->codec->channels=1;
+    st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
+    st->codecpar->codec_id=AV_CODEC_ID_G729;
+    st->codecpar->sample_rate=8000;
+    st->codecpar->block_align = 16;
+    st->codecpar->channels=1;
 
     avpriv_set_pts_info(st, 64, 1, 100);
     return 0;
@@ -113,20 +117,21 @@ AVInputFormat ff_bit_demuxer = {
     .read_packet = read_packet,
     .extensions  = "bit",
 };
+#endif
 
-#if CONFIG_MUXERS
+#if CONFIG_BIT_MUXER
 static int write_header(AVFormatContext *s)
 {
-    AVCodecContext *enc = s->streams[0]->codec;
+    AVCodecParameters *par = s->streams[0]->codecpar;
 
-    if ((enc->codec_id != AV_CODEC_ID_G729) || enc->channels != 1) {
+    if ((par->codec_id != AV_CODEC_ID_G729) || par->channels != 1) {
         av_log(s, AV_LOG_ERROR,
                "only codec g729 with 1 channel is supported by this format\n");
         return AVERROR(EINVAL);
     }
 
-    enc->bits_per_coded_sample = 16;
-    enc->block_align = (enc->bits_per_coded_sample * enc->channels) >> 3;
+    par->bits_per_coded_sample = 16;
+    par->block_align = (par->bits_per_coded_sample * par->channels) >> 3;
 
     return 0;
 }
@@ -141,10 +146,10 @@ static int write_packet(AVFormatContext *s, AVPacket *pkt)
         return AVERROR(EINVAL);
 
     avio_wl16(pb, SYNC_WORD);
-    avio_wl16(pb, 8 * 10);
+    avio_wl16(pb, 8 * pkt->size);
 
-    init_get_bits(&gb, pkt->data, 8*10);
-    for(i=0; i< 8 * 10; i++)
+    init_get_bits(&gb, pkt->data, 8 * pkt->size);
+    for (i = 0; i < 8 * pkt->size; i++)
         avio_wl16(pb, get_bits1(&gb) ? BIT_1 : BIT_0);
 
     return 0;

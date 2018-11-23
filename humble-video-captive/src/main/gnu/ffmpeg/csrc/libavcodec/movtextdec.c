@@ -99,6 +99,7 @@ typedef struct {
     uint64_t tracksize;
     int size_var;
     int count_s, count_f;
+    int readorder;
 } MovTextContext;
 
 typedef struct {
@@ -333,9 +334,24 @@ static const Box box_types[] = {
 
 const static size_t box_count = FF_ARRAY_ELEMS(box_types);
 
-static int text_to_ass(AVBPrint *buf, const char *text, const char *text_end,
-                        MovTextContext *m)
+// Return byte length of the UTF-8 sequence starting at text[0]. 0 on error.
+static int get_utf8_length_at(const char *text, const char *text_end)
 {
+    const char *start = text;
+    int err = 0;
+    uint32_t c;
+    GET_UTF8(c, text < text_end ? (uint8_t)*text++ : (err = 1, 0), goto error;);
+    if (err)
+        goto error;
+    return text - start;
+error:
+    return 0;
+}
+
+static int text_to_ass(AVBPrint *buf, const char *text, const char *text_end,
+                       AVCodecContext *avctx)
+{
+    MovTextContext *m = avctx->priv_data;
     int i = 0;
     int j = 0;
     int text_pos = 0;
@@ -349,6 +365,8 @@ static int text_to_ass(AVBPrint *buf, const char *text, const char *text_end,
     }
 
     while (text < text_end) {
+        int len;
+
         if (m->box_flags & STYL_BOX) {
             for (i = 0; i < m->style_entries; i++) {
                 if (m->s[i]->style_flag && text_pos == m->s[i]->style_end) {
@@ -395,17 +413,24 @@ static int text_to_ass(AVBPrint *buf, const char *text, const char *text_end,
             }
         }
 
-        switch (*text) {
-        case '\r':
-            break;
-        case '\n':
-            av_bprintf(buf, "\\N");
-            break;
-        default:
-            av_bprint_chars(buf, *text, 1);
-            break;
+        len = get_utf8_length_at(text, text_end);
+        if (len < 1) {
+            av_log(avctx, AV_LOG_ERROR, "invalid UTF-8 byte in subtitle\n");
+            len = 1;
         }
-        text++;
+        for (i = 0; i < len; i++) {
+            switch (*text) {
+            case '\r':
+                break;
+            case '\n':
+                av_bprintf(buf, "\\N");
+                break;
+            default:
+                av_bprint_chars(buf, *text, 1);
+                break;
+            }
+            text++;
+        }
         text_pos++;
     }
 
@@ -425,7 +450,8 @@ static int mov_text_init(AVCodecContext *avctx) {
     if (ret == 0) {
         return ff_ass_subtitle_header(avctx, m->d.font, m->d.fontsize, m->d.color,
                                 m->d.back_color, m->d.bold, m->d.italic,
-                                m->d.underline, m->d.alignment);
+                                m->d.underline, ASS_DEFAULT_BORDERSTYLE,
+                                m->d.alignment);
     } else
         return ff_ass_subtitle_header_default(avctx);
 }
@@ -435,13 +461,14 @@ static int mov_text_decode_frame(AVCodecContext *avctx,
 {
     AVSubtitle *sub = data;
     MovTextContext *m = avctx->priv_data;
-    int ret, ts_start, ts_end;
+    int ret;
     AVBPrint buf;
     char *ptr = avpkt->data;
     char *end;
     int text_length, tsmb_type, ret_tsmb;
     uint64_t tsmb_size;
     const uint8_t *tsmb;
+    size_t i;
 
     if (!ptr || avpkt->size < 2)
         return AVERROR_INVALIDDATA;
@@ -465,12 +492,7 @@ static int mov_text_decode_frame(AVCodecContext *avctx,
     end = ptr + FFMIN(2 + text_length, avpkt->size);
     ptr += 2;
 
-    ts_start = av_rescale_q(avpkt->pts,
-                            avctx->time_base,
-                            (AVRational){1,100});
-    ts_end   = av_rescale_q(avpkt->pts + avpkt->duration,
-                            avctx->time_base,
-                            (AVRational){1,100});
+    mov_text_cleanup(m);
 
     tsmb_size = 0;
     m->tracksize = 2 + text_length;
@@ -506,7 +528,7 @@ static int mov_text_decode_frame(AVCodecContext *avctx,
             if (tsmb_size > avpkt->size - m->tracksize)
                 break;
 
-            for (size_t i = 0; i < box_count; i++) {
+            for (i = 0; i < box_count; i++) {
                 if (tsmb_type == box_types[i].type) {
                     if (m->tracksize + m->size_var + box_types[i].base_size > avpkt->size)
                         break;
@@ -517,12 +539,12 @@ static int mov_text_decode_frame(AVCodecContext *avctx,
             }
             m->tracksize = m->tracksize + tsmb_size;
         }
-        text_to_ass(&buf, ptr, end, m);
+        text_to_ass(&buf, ptr, end, avctx);
         mov_text_cleanup(m);
     } else
-        text_to_ass(&buf, ptr, end, m);
+        text_to_ass(&buf, ptr, end, avctx);
 
-    ret = ff_ass_add_rect_bprint(sub, &buf, ts_start, ts_end - ts_start);
+    ret = ff_ass_add_rect(sub, buf.str, m->readorder++, 0, NULL, NULL);
     av_bprint_finalize(&buf, NULL);
     if (ret < 0)
         return ret;
@@ -534,7 +556,15 @@ static int mov_text_decode_close(AVCodecContext *avctx)
 {
     MovTextContext *m = avctx->priv_data;
     mov_text_cleanup_ftab(m);
+    mov_text_cleanup(m);
     return 0;
+}
+
+static void mov_text_flush(AVCodecContext *avctx)
+{
+    MovTextContext *m = avctx->priv_data;
+    if (!(avctx->flags2 & AV_CODEC_FLAG2_RO_FLUSH_NOOP))
+        m->readorder = 0;
 }
 
 AVCodec ff_movtext_decoder = {
@@ -546,4 +576,5 @@ AVCodec ff_movtext_decoder = {
     .init         = mov_text_init,
     .decode       = mov_text_decode_frame,
     .close        = mov_text_decode_close,
+    .flush        = mov_text_flush,
 };

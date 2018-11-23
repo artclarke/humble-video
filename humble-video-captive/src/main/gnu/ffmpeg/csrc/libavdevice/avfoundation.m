@@ -35,6 +35,7 @@
 #include "libavutil/internal.h"
 #include "libavutil/parseutils.h"
 #include "libavutil/time.h"
+#include "libavutil/imgutils.h"
 #include "avdevice.h"
 
 static const int avf_time_base = 1000000;
@@ -259,7 +260,7 @@ static void destroy_context(AVFContext* ctx)
 static void parse_device_name(AVFormatContext *s)
 {
     AVFContext *ctx = (AVFContext*)s->priv_data;
-    char *tmp = av_strdup(s->filename);
+    char *tmp = av_strdup(s->url);
     char *save;
 
     if (tmp[0] != ':') {
@@ -560,11 +561,11 @@ static int get_video_config(AVFormatContext *s)
     image_buffer      = CMSampleBufferGetImageBuffer(ctx->current_frame);
     image_buffer_size = CVImageBufferGetEncodedSize(image_buffer);
 
-    stream->codec->codec_id   = AV_CODEC_ID_RAWVIDEO;
-    stream->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-    stream->codec->width      = (int)image_buffer_size.width;
-    stream->codec->height     = (int)image_buffer_size.height;
-    stream->codec->pix_fmt    = ctx->pixel_format;
+    stream->codecpar->codec_id   = AV_CODEC_ID_RAWVIDEO;
+    stream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
+    stream->codecpar->width      = (int)image_buffer_size.width;
+    stream->codecpar->height     = (int)image_buffer_size.height;
+    stream->codecpar->format     = ctx->pixel_format;
 
     CFRelease(ctx->current_frame);
     ctx->current_frame = nil;
@@ -603,10 +604,10 @@ static int get_audio_config(AVFormatContext *s)
         return 1;
     }
 
-    stream->codec->codec_type     = AVMEDIA_TYPE_AUDIO;
-    stream->codec->sample_rate    = basic_desc->mSampleRate;
-    stream->codec->channels       = basic_desc->mChannelsPerFrame;
-    stream->codec->channel_layout = av_get_default_channel_layout(stream->codec->channels);
+    stream->codecpar->codec_type     = AVMEDIA_TYPE_AUDIO;
+    stream->codecpar->sample_rate    = basic_desc->mSampleRate;
+    stream->codecpar->channels       = basic_desc->mChannelsPerFrame;
+    stream->codecpar->channel_layout = av_get_default_channel_layout(stream->codecpar->channels);
 
     ctx->audio_channels        = basic_desc->mChannelsPerFrame;
     ctx->audio_bits_per_sample = basic_desc->mBitsPerChannel;
@@ -620,22 +621,22 @@ static int get_audio_config(AVFormatContext *s)
         ctx->audio_float &&
         ctx->audio_bits_per_sample == 32 &&
         ctx->audio_packed) {
-        stream->codec->codec_id = ctx->audio_be ? AV_CODEC_ID_PCM_F32BE : AV_CODEC_ID_PCM_F32LE;
+        stream->codecpar->codec_id = ctx->audio_be ? AV_CODEC_ID_PCM_F32BE : AV_CODEC_ID_PCM_F32LE;
     } else if (basic_desc->mFormatID == kAudioFormatLinearPCM &&
         ctx->audio_signed_integer &&
         ctx->audio_bits_per_sample == 16 &&
         ctx->audio_packed) {
-        stream->codec->codec_id = ctx->audio_be ? AV_CODEC_ID_PCM_S16BE : AV_CODEC_ID_PCM_S16LE;
+        stream->codecpar->codec_id = ctx->audio_be ? AV_CODEC_ID_PCM_S16BE : AV_CODEC_ID_PCM_S16LE;
     } else if (basic_desc->mFormatID == kAudioFormatLinearPCM &&
         ctx->audio_signed_integer &&
         ctx->audio_bits_per_sample == 24 &&
         ctx->audio_packed) {
-        stream->codec->codec_id = ctx->audio_be ? AV_CODEC_ID_PCM_S24BE : AV_CODEC_ID_PCM_S24LE;
+        stream->codecpar->codec_id = ctx->audio_be ? AV_CODEC_ID_PCM_S24BE : AV_CODEC_ID_PCM_S24LE;
     } else if (basic_desc->mFormatID == kAudioFormatLinearPCM &&
         ctx->audio_signed_integer &&
         ctx->audio_bits_per_sample == 32 &&
         ctx->audio_packed) {
-        stream->codec->codec_id = ctx->audio_be ? AV_CODEC_ID_PCM_S32BE : AV_CODEC_ID_PCM_S32LE;
+        stream->codecpar->codec_id = ctx->audio_be ? AV_CODEC_ID_PCM_S32BE : AV_CODEC_ID_PCM_S32LE;
     } else {
         av_log(s, AV_LOG_ERROR, "audio format is not supported\n");
         return 1;
@@ -892,6 +893,49 @@ fail:
     return AVERROR(EIO);
 }
 
+static int copy_cvpixelbuffer(AVFormatContext *s,
+                               CVPixelBufferRef image_buffer,
+                               AVPacket *pkt)
+{
+    AVFContext *ctx = s->priv_data;
+    int src_linesize[4];
+    const uint8_t *src_data[4];
+    int width  = CVPixelBufferGetWidth(image_buffer);
+    int height = CVPixelBufferGetHeight(image_buffer);
+    int status;
+
+    memset(src_linesize, 0, sizeof(src_linesize));
+    memset(src_data, 0, sizeof(src_data));
+
+    status = CVPixelBufferLockBaseAddress(image_buffer, 0);
+    if (status != kCVReturnSuccess) {
+        av_log(s, AV_LOG_ERROR, "Could not lock base address: %d\n", status);
+        return AVERROR_EXTERNAL;
+    }
+
+    if (CVPixelBufferIsPlanar(image_buffer)) {
+        size_t plane_count = CVPixelBufferGetPlaneCount(image_buffer);
+        int i;
+        for(i = 0; i < plane_count; i++){
+            src_linesize[i] = CVPixelBufferGetBytesPerRowOfPlane(image_buffer, i);
+            src_data[i] = CVPixelBufferGetBaseAddressOfPlane(image_buffer, i);
+        }
+    } else {
+        src_linesize[0] = CVPixelBufferGetBytesPerRow(image_buffer);
+        src_data[0] = CVPixelBufferGetBaseAddress(image_buffer);
+    }
+
+    status = av_image_copy_to_buffer(pkt->data, pkt->size,
+                                     src_data, src_linesize,
+                                     ctx->pixel_format, width, height, 1);
+
+
+
+    CVPixelBufferUnlockBaseAddress(image_buffer, 0);
+
+    return status;
+}
+
 static int avf_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
     AVFContext* ctx = (AVFContext*)s->priv_data;
@@ -903,7 +947,7 @@ static int avf_read_packet(AVFormatContext *s, AVPacket *pkt)
         image_buffer = CMSampleBufferGetImageBuffer(ctx->current_frame);
 
         if (ctx->current_frame != nil) {
-            void *data;
+            int status;
             if (av_new_packet(pkt, (int)CVPixelBufferGetDataSize(image_buffer)) < 0) {
                 return AVERROR(EIO);
             }
@@ -919,14 +963,12 @@ static int avf_read_packet(AVFormatContext *s, AVPacket *pkt)
             pkt->stream_index  = ctx->video_stream_index;
             pkt->flags        |= AV_PKT_FLAG_KEY;
 
-            CVPixelBufferLockBaseAddress(image_buffer, 0);
-
-            data = CVPixelBufferGetBaseAddress(image_buffer);
-            memcpy(pkt->data, data, pkt->size);
-
-            CVPixelBufferUnlockBaseAddress(image_buffer, 0);
+            status = copy_cvpixelbuffer(s, image_buffer, pkt);
             CFRelease(ctx->current_frame);
             ctx->current_frame = nil;
+
+            if (status < 0)
+                return status;
         } else if (ctx->current_audio_frame != nil) {
             CMBlockBufferRef block_buffer = CMSampleBufferGetDataBuffer(ctx->current_audio_frame);
             int block_buffer_size         = CMBlockBufferGetDataLength(block_buffer);
@@ -1021,7 +1063,7 @@ static const AVOption options[] = {
     { "video_device_index", "select video device by index for devices with same name (starts at 0)", offsetof(AVFContext, video_device_index), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, AV_OPT_FLAG_DECODING_PARAM },
     { "audio_device_index", "select audio device by index for devices with same name (starts at 0)", offsetof(AVFContext, audio_device_index), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, AV_OPT_FLAG_DECODING_PARAM },
     { "pixel_format", "set pixel format", offsetof(AVFContext, pixel_format), AV_OPT_TYPE_PIXEL_FMT, {.i64 = AV_PIX_FMT_YUV420P}, 0, INT_MAX, AV_OPT_FLAG_DECODING_PARAM},
-    { "framerate", "set frame rate", offsetof(AVFContext, framerate), AV_OPT_TYPE_VIDEO_RATE, {.str = "ntsc"}, 0, 0, AV_OPT_FLAG_DECODING_PARAM },
+    { "framerate", "set frame rate", offsetof(AVFContext, framerate), AV_OPT_TYPE_VIDEO_RATE, {.str = "ntsc"}, 0, INT_MAX, AV_OPT_FLAG_DECODING_PARAM },
     { "video_size", "set video size", offsetof(AVFContext, width), AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL}, 0, 0, AV_OPT_FLAG_DECODING_PARAM },
     { "capture_cursor", "capture the screen cursor", offsetof(AVFContext, capture_cursor), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, AV_OPT_FLAG_DECODING_PARAM },
     { "capture_mouse_clicks", "capture the screen mouse clicks", offsetof(AVFContext, capture_mouse_clicks), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, AV_OPT_FLAG_DECODING_PARAM },

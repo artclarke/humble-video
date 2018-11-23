@@ -106,11 +106,7 @@ static const struct {
     { "downmix",     2,  AV_CH_LAYOUT_STEREO_DOWNMIX, },
 };
 
-#if FF_API_GET_CHANNEL_LAYOUT_COMPAT
-static uint64_t get_channel_layout_single(const char *name, int name_len, int compat)
-#else
 static uint64_t get_channel_layout_single(const char *name, int name_len)
-#endif
 {
     int i;
     char *end;
@@ -130,27 +126,8 @@ static uint64_t get_channel_layout_single(const char *name, int name_len)
     errno = 0;
     i = strtol(name, &end, 10);
 
-#if FF_API_GET_CHANNEL_LAYOUT_COMPAT
-    if (compat) {
-        if (end - name == name_len ||
-            (end + 1 - name == name_len && *end  == 'c')) {
-            layout = av_get_default_channel_layout(i);
-            if (end - name == name_len) {
-                av_log(NULL, AV_LOG_WARNING,
-                       "Single channel layout '%.*s' is interpreted as a number of channels, "
-                       "switch to the syntax '%.*sc' otherwise it will be interpreted as a "
-                       "channel layout number in a later version\n",
-                       name_len, name, name_len, name);
-            }
-            return layout;
-        }
-    } else {
-#endif
     if (!errno && (end + 1 - name == name_len && *end  == 'c'))
         return av_get_default_channel_layout(i);
-#if FF_API_GET_CHANNEL_LAYOUT_COMPAT
-    }
-#endif
 
     errno = 0;
     layout = strtoll(name, &end, 0);
@@ -159,11 +136,7 @@ static uint64_t get_channel_layout_single(const char *name, int name_len)
     return 0;
 }
 
-#if FF_API_GET_CHANNEL_LAYOUT_COMPAT
-uint64_t ff_get_channel_layout(const char *name, int compat)
-#else
 uint64_t av_get_channel_layout(const char *name)
-#endif
 {
     const char *n, *e;
     const char *name_end = name + strlen(name);
@@ -171,11 +144,7 @@ uint64_t av_get_channel_layout(const char *name)
 
     for (n = name; n < name_end; n = e + 1) {
         for (e = n; e < name_end && *e != '+' && *e != '|'; e++);
-#if FF_API_GET_CHANNEL_LAYOUT_COMPAT
-        layout_single = get_channel_layout_single(n, e - n, compat);
-#else
         layout_single = get_channel_layout_single(n, e - n);
-#endif
         if (!layout_single)
             return 0;
         layout |= layout_single;
@@ -183,12 +152,27 @@ uint64_t av_get_channel_layout(const char *name)
     return layout;
 }
 
-#if FF_API_GET_CHANNEL_LAYOUT_COMPAT
-uint64_t av_get_channel_layout(const char *name)
+int av_get_extended_channel_layout(const char *name, uint64_t* channel_layout, int* nb_channels)
 {
-    return ff_get_channel_layout(name, 1);
+    int nb = 0;
+    char *end;
+    uint64_t layout = av_get_channel_layout(name);
+
+    if (layout) {
+        *channel_layout = layout;
+        *nb_channels = av_get_channel_layout_nb_channels(layout);
+        return 0;
+    }
+
+    nb = strtol(name, &end, 10);
+    if (!errno && *end  == 'C' && *(end + 1) == '\0' && nb > 0 && nb < 64) {
+        *channel_layout = 0;
+        *nb_channels = nb;
+        return 0;
+    }
+
+    return AVERROR(EINVAL);
 }
-#endif
 
 void av_bprint_channel_layout(struct AVBPrint *bp,
                               int nb_channels, uint64_t channel_layout)

@@ -30,10 +30,11 @@
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "get_bits.h"
-#include "ivi.h"
-#include "ivi_dsp.h"
+#include "libavutil/imgutils.h"
 #include "indeo4data.h"
 #include "internal.h"
+#include "ivi.h"
+#include "ivi_dsp.h"
 
 #define IVI4_PIC_SIZE_ESC   7
 
@@ -119,17 +120,10 @@ static int decode_pic_hdr(IVI45DecContext *ctx, AVCodecContext *avctx)
         return AVERROR_INVALIDDATA;
     }
 
-#if IVI4_STREAM_ANALYSER
     if (ctx->frame_type == IVI4_FRAMETYPE_BIDIR)
         ctx->has_b_frames = 1;
-#endif
 
-    ctx->transp_status = get_bits1(&ctx->gb);
-#if IVI4_STREAM_ANALYSER
-    if (ctx->transp_status) {
-        ctx->has_transp = 1;
-    }
-#endif
+    ctx->has_transp = get_bits1(&ctx->gb);
 
     /* unknown bit: Mac decoder ignores this bit, XANIM returns error */
     if (get_bits1(&ctx->gb)) {
@@ -163,12 +157,10 @@ static int decode_pic_hdr(IVI45DecContext *ctx, AVCodecContext *avctx)
     }
 
     /* Decode tile dimensions. */
-    if (get_bits1(&ctx->gb)) {
+    ctx->uses_tiling = get_bits1(&ctx->gb);
+    if (ctx->uses_tiling) {
         pic_conf.tile_height = scale_tile_size(pic_conf.pic_height, get_bits(&ctx->gb, 4));
         pic_conf.tile_width  = scale_tile_size(pic_conf.pic_width,  get_bits(&ctx->gb, 4));
-#if IVI4_STREAM_ANALYSER
-        ctx->uses_tiling = 1;
-#endif
     } else {
         pic_conf.tile_height = pic_conf.pic_height;
         pic_conf.tile_width  = pic_conf.pic_width;
@@ -187,6 +179,13 @@ static int decode_pic_hdr(IVI45DecContext *ctx, AVCodecContext *avctx)
     pic_conf.chroma_bands = 0;
     if (pic_conf.luma_bands)
         pic_conf.chroma_bands = decode_plane_subdivision(&ctx->gb);
+
+    if (av_image_check_size2(pic_conf.pic_width, pic_conf.pic_height, avctx->max_pixels, AV_PIX_FMT_YUV410P, 0, avctx) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "picture dimensions %d %d cannot be decoded\n",
+               pic_conf.pic_width, pic_conf.pic_height);
+        return AVERROR_INVALIDDATA;
+    }
+
     ctx->is_scalable = pic_conf.luma_bands != 1 || pic_conf.chroma_bands != 1;
     if (ctx->is_scalable && (pic_conf.luma_bands != 4 || pic_conf.chroma_bands != 1)) {
         av_log(avctx, AV_LOG_ERROR, "Scalability: unsupported subdivision! Luma bands: %d, chroma bands: %d\n",
@@ -196,7 +195,7 @@ static int decode_pic_hdr(IVI45DecContext *ctx, AVCodecContext *avctx)
 
     /* check if picture layout was changed and reallocate buffers */
     if (ivi_pic_config_cmp(&pic_conf, &ctx->pic_conf)) {
-        if (ff_ivi_init_planes(ctx->planes, &pic_conf, 1)) {
+        if (ff_ivi_init_planes(avctx, ctx->planes, &pic_conf, 1)) {
             av_log(avctx, AV_LOG_ERROR, "Couldn't reallocate color planes!\n");
             ctx->pic_conf.luma_bands = 0;
             return AVERROR(ENOMEM);
@@ -299,10 +298,8 @@ static int decode_band_hdr(IVI45DecContext *ctx, IVIBandDesc *arg_band,
                    band->is_halfpel);
             return AVERROR_INVALIDDATA;
         }
-#if IVI4_STREAM_ANALYSER
         if (!band->is_halfpel)
             ctx->uses_fullpel = 1;
-#endif
 
         band->checksum_present = get_bits1(&ctx->gb);
         if (band->checksum_present)
@@ -338,10 +335,8 @@ static int decode_band_hdr(IVI45DecContext *ctx, IVIBandDesc *arg_band,
                 av_log(avctx, AV_LOG_ERROR, "wrong transform size!\n");
                 return AVERROR_INVALIDDATA;
             }
-#if IVI4_STREAM_ANALYSER
             if ((transform_id >= 0 && transform_id <= 2) || transform_id == 10)
                 ctx->uses_haar = 1;
-#endif
 
             band->inv_transform = transforms[transform_id].inv_trans;
             band->dc_transform  = transforms[transform_id].dc_trans;
@@ -695,6 +690,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     ctx->is_nonnull_frame = is_nonnull_frame;
 
     ctx->is_indeo4 = 1;
+    ctx->show_indeo4_info = 1;
 
     ctx->dst_buf   = 0;
     ctx->ref_buf   = 1;

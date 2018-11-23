@@ -31,13 +31,6 @@
 #endif
 #include "url.h"
 
-static URLProtocol *first_protocol = NULL;
-
-URLProtocol *ffurl_protocol_next(const URLProtocol *prev)
-{
-    return prev ? prev->next : first_protocol;
-}
-
 /** @name Logging context. */
 /*@{*/
 static const char *urlcontext_to_name(void *ptr)
@@ -57,56 +50,27 @@ static void *urlcontext_child_next(void *obj, void *prev)
     return NULL;
 }
 
-static const AVClass *urlcontext_child_class_next(const AVClass *prev)
-{
-    URLProtocol *p = NULL;
+#define OFFSET(x) offsetof(URLContext,x)
+#define E AV_OPT_FLAG_ENCODING_PARAM
+#define D AV_OPT_FLAG_DECODING_PARAM
+static const AVOption options[] = {
+    {"protocol_whitelist", "List of protocols that are allowed to be used", OFFSET(protocol_whitelist), AV_OPT_TYPE_STRING, { .str = NULL },  CHAR_MIN, CHAR_MAX, D },
+    {"protocol_blacklist", "List of protocols that are not allowed to be used", OFFSET(protocol_blacklist), AV_OPT_TYPE_STRING, { .str = NULL },  CHAR_MIN, CHAR_MAX, D },
+    {"rw_timeout", "Timeout for IO operations (in microseconds)", offsetof(URLContext, rw_timeout), AV_OPT_TYPE_INT64, { .i64 = 0 }, 0, INT64_MAX, AV_OPT_FLAG_ENCODING_PARAM | AV_OPT_FLAG_DECODING_PARAM },
+    { NULL }
+};
 
-    /* find the protocol that corresponds to prev */
-    while (prev && (p = ffurl_protocol_next(p)))
-        if (p->priv_data_class == prev)
-            break;
-
-    /* find next protocol with priv options */
-    while (p = ffurl_protocol_next(p))
-        if (p->priv_data_class)
-            return p->priv_data_class;
-    return NULL;
-}
-
-static const AVOption options[] = { { NULL } };
 const AVClass ffurl_context_class = {
     .class_name       = "URLContext",
     .item_name        = urlcontext_to_name,
     .option           = options,
     .version          = LIBAVUTIL_VERSION_INT,
     .child_next       = urlcontext_child_next,
-    .child_class_next = urlcontext_child_class_next,
+    .child_class_next = ff_urlcontext_child_class_next,
 };
 /*@}*/
 
-const char *avio_enum_protocols(void **opaque, int output)
-{
-    URLProtocol *p;
-    *opaque = ffurl_protocol_next(*opaque);
-    if (!(p = *opaque))
-        return NULL;
-    if ((output && p->url_write) || (!output && p->url_read))
-        return p->name;
-    return avio_enum_protocols(opaque, output);
-}
-
-int ffurl_register_protocol(URLProtocol *protocol)
-{
-    URLProtocol **p;
-    p = &first_protocol;
-    while (*p)
-        p = &(*p)->next;
-    *p             = protocol;
-    protocol->next = NULL;
-    return 0;
-}
-
-static int url_alloc_for_protocol(URLContext **puc, struct URLProtocol *up,
+static int url_alloc_for_protocol(URLContext **puc, const URLProtocol *up,
                                   const char *filename, int flags,
                                   const AVIOInterruptCB *int_cb)
 {
@@ -201,12 +165,53 @@ fail:
 
 int ffurl_connect(URLContext *uc, AVDictionary **options)
 {
-    int err =
+    int err;
+    AVDictionary *tmp_opts = NULL;
+    AVDictionaryEntry *e;
+
+    if (!options)
+        options = &tmp_opts;
+
+    // Check that URLContext was initialized correctly and lists are matching if set
+    av_assert0(!(e=av_dict_get(*options, "protocol_whitelist", NULL, 0)) ||
+               (uc->protocol_whitelist && !strcmp(uc->protocol_whitelist, e->value)));
+    av_assert0(!(e=av_dict_get(*options, "protocol_blacklist", NULL, 0)) ||
+               (uc->protocol_blacklist && !strcmp(uc->protocol_blacklist, e->value)));
+
+    if (uc->protocol_whitelist && av_match_list(uc->prot->name, uc->protocol_whitelist, ',') <= 0) {
+        av_log(uc, AV_LOG_ERROR, "Protocol '%s' not on whitelist '%s'!\n", uc->prot->name, uc->protocol_whitelist);
+        return AVERROR(EINVAL);
+    }
+
+    if (uc->protocol_blacklist && av_match_list(uc->prot->name, uc->protocol_blacklist, ',') > 0) {
+        av_log(uc, AV_LOG_ERROR, "Protocol '%s' on blacklist '%s'!\n", uc->prot->name, uc->protocol_blacklist);
+        return AVERROR(EINVAL);
+    }
+
+    if (!uc->protocol_whitelist && uc->prot->default_whitelist) {
+        av_log(uc, AV_LOG_DEBUG, "Setting default whitelist '%s'\n", uc->prot->default_whitelist);
+        uc->protocol_whitelist = av_strdup(uc->prot->default_whitelist);
+        if (!uc->protocol_whitelist) {
+            return AVERROR(ENOMEM);
+        }
+    } else if (!uc->protocol_whitelist)
+        av_log(uc, AV_LOG_DEBUG, "No default whitelist set\n"); // This should be an error once all declare a default whitelist
+
+    if ((err = av_dict_set(options, "protocol_whitelist", uc->protocol_whitelist, 0)) < 0)
+        return err;
+    if ((err = av_dict_set(options, "protocol_blacklist", uc->protocol_blacklist, 0)) < 0)
+        return err;
+
+    err =
         uc->prot->url_open2 ? uc->prot->url_open2(uc,
                                                   uc->filename,
                                                   uc->flags,
                                                   options) :
         uc->prot->url_open(uc, uc->filename, uc->flags);
+
+    av_dict_set(options, "protocol_whitelist", NULL, 0);
+    av_dict_set(options, "protocol_blacklist", NULL, 0);
+
     if (err)
         return err;
     uc->is_connected = 1;
@@ -243,11 +248,12 @@ int ffurl_handshake(URLContext *c)
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"                \
     "0123456789+-."
 
-static struct URLProtocol *url_find_protocol(const char *filename)
+static const struct URLProtocol *url_find_protocol(const char *filename)
 {
-    URLProtocol *up = NULL;
+    const URLProtocol **protocols;
     char proto_str[128], proto_nested[128], *ptr;
     size_t proto_len = strspn(filename, URL_SCHEME_CHARS);
+    int i;
 
     if (filename[proto_len] != ':' &&
         (strncmp(filename, "subfile,", 8) || !strchr(filename + proto_len + 1, ':')) ||
@@ -257,63 +263,100 @@ static struct URLProtocol *url_find_protocol(const char *filename)
         av_strlcpy(proto_str, filename,
                    FFMIN(proto_len + 1, sizeof(proto_str)));
 
-    if ((ptr = strchr(proto_str, ',')))
-        *ptr = '\0';
     av_strlcpy(proto_nested, proto_str, sizeof(proto_nested));
     if ((ptr = strchr(proto_nested, '+')))
         *ptr = '\0';
 
-    while (up = ffurl_protocol_next(up)) {
-        if (!strcmp(proto_str, up->name))
-            break;
+    protocols = ffurl_get_protocols(NULL, NULL);
+    if (!protocols)
+        return NULL;
+    for (i = 0; protocols[i]; i++) {
+            const URLProtocol *up = protocols[i];
+        if (!strcmp(proto_str, up->name)) {
+            av_freep(&protocols);
+            return up;
+        }
         if (up->flags & URL_PROTOCOL_FLAG_NESTED_SCHEME &&
-            !strcmp(proto_nested, up->name))
-            break;
+            !strcmp(proto_nested, up->name)) {
+            av_freep(&protocols);
+            return up;
+        }
     }
+    av_freep(&protocols);
 
-    return up;
+    return NULL;
 }
 
 int ffurl_alloc(URLContext **puc, const char *filename, int flags,
                 const AVIOInterruptCB *int_cb)
 {
-    URLProtocol *p = NULL;
-
-    if (!first_protocol) {
-        av_log(NULL, AV_LOG_WARNING, "No URL Protocols are registered. "
-                                     "Missing call to av_register_all()?\n");
-    }
+    const URLProtocol *p = NULL;
 
     p = url_find_protocol(filename);
     if (p)
        return url_alloc_for_protocol(puc, p, filename, flags, int_cb);
 
     *puc = NULL;
-    if (av_strstart(filename, "https:", NULL))
+    if (av_strstart(filename, "https:", NULL) || av_strstart(filename, "tls:", NULL))
         av_log(NULL, AV_LOG_WARNING, "https protocol not found, recompile FFmpeg with "
-                                     "openssl, gnutls,\n"
+                                     "openssl, gnutls "
                                      "or securetransport enabled.\n");
     return AVERROR_PROTOCOL_NOT_FOUND;
 }
 
-int ffurl_open(URLContext **puc, const char *filename, int flags,
-               const AVIOInterruptCB *int_cb, AVDictionary **options)
+int ffurl_open_whitelist(URLContext **puc, const char *filename, int flags,
+                         const AVIOInterruptCB *int_cb, AVDictionary **options,
+                         const char *whitelist, const char* blacklist,
+                         URLContext *parent)
 {
+    AVDictionary *tmp_opts = NULL;
+    AVDictionaryEntry *e;
     int ret = ffurl_alloc(puc, filename, flags, int_cb);
     if (ret < 0)
         return ret;
+    if (parent)
+        av_opt_copy(*puc, parent);
+    if (options &&
+        (ret = av_opt_set_dict(*puc, options)) < 0)
+        goto fail;
     if (options && (*puc)->prot->priv_data_class &&
         (ret = av_opt_set_dict((*puc)->priv_data, options)) < 0)
         goto fail;
+
+    if (!options)
+        options = &tmp_opts;
+
+    av_assert0(!whitelist ||
+               !(e=av_dict_get(*options, "protocol_whitelist", NULL, 0)) ||
+               !strcmp(whitelist, e->value));
+    av_assert0(!blacklist ||
+               !(e=av_dict_get(*options, "protocol_blacklist", NULL, 0)) ||
+               !strcmp(blacklist, e->value));
+
+    if ((ret = av_dict_set(options, "protocol_whitelist", whitelist, 0)) < 0)
+        goto fail;
+
+    if ((ret = av_dict_set(options, "protocol_blacklist", blacklist, 0)) < 0)
+        goto fail;
+
     if ((ret = av_opt_set_dict(*puc, options)) < 0)
         goto fail;
+
     ret = ffurl_connect(*puc, options);
+
     if (!ret)
         return 0;
 fail:
     ffurl_close(*puc);
     *puc = NULL;
     return ret;
+}
+
+int ffurl_open(URLContext **puc, const char *filename, int flags,
+               const AVIOInterruptCB *int_cb, AVDictionary **options)
+{
+    return ffurl_open_whitelist(puc, filename, flags,
+                                int_cb, options, NULL, NULL, NULL);
 }
 
 static inline int retry_transfer_wrapper(URLContext *h, uint8_t *buf,
@@ -348,10 +391,14 @@ static inline int retry_transfer_wrapper(URLContext *h, uint8_t *buf,
                 }
                 av_usleep(1000);
             }
-        } else if (ret < 1)
-            return (ret < 0 && ret != AVERROR_EOF) ? ret : len;
-        if (ret)
+        } else if (ret == AVERROR_EOF)
+            return (len > 0) ? len : AVERROR_EOF;
+        else if (ret < 0)
+            return ret;
+        if (ret) {
             fast_retries = FFMAX(fast_retries, 2);
+            wait_since = 0;
+        }
         len += ret;
     }
     return len;
@@ -412,6 +459,7 @@ int ffurl_closep(URLContext **hh)
             av_opt_free(h->priv_data);
         av_freep(&h->priv_data);
     }
+    av_opt_free(h);
     av_freep(hh);
     return ret;
 }
@@ -424,7 +472,7 @@ int ffurl_close(URLContext *h)
 
 const char *avio_find_protocol_name(const char *url)
 {
-    URLProtocol *p = url_find_protocol(url);
+    const URLProtocol *p = url_find_protocol(url);
 
     return p ? p->name : NULL;
 }
@@ -577,13 +625,15 @@ int64_t ffurl_size(URLContext *h)
 
 int ffurl_get_file_handle(URLContext *h)
 {
-    if (!h->prot->url_get_file_handle)
+    if (!h || !h->prot || !h->prot->url_get_file_handle)
         return -1;
     return h->prot->url_get_file_handle(h);
 }
 
 int ffurl_get_multi_file_handle(URLContext *h, int **handles, int *numhandles)
 {
+    if (!h || !h->prot)
+        return AVERROR(ENOSYS);
     if (!h->prot->url_get_multi_file_handle) {
         if (!h->prot->url_get_file_handle)
             return AVERROR(ENOSYS);
@@ -597,17 +647,23 @@ int ffurl_get_multi_file_handle(URLContext *h, int **handles, int *numhandles)
     return h->prot->url_get_multi_file_handle(h, handles, numhandles);
 }
 
+int ffurl_get_short_seek(URLContext *h)
+{
+    if (!h || !h->prot || !h->prot->url_get_short_seek)
+        return AVERROR(ENOSYS);
+    return h->prot->url_get_short_seek(h);
+}
+
 int ffurl_shutdown(URLContext *h, int flags)
 {
-    if (!h->prot->url_shutdown)
-        return AVERROR(EINVAL);
+    if (!h || !h->prot || !h->prot->url_shutdown)
+        return AVERROR(ENOSYS);
     return h->prot->url_shutdown(h, flags);
 }
 
 int ff_check_interrupt(AVIOInterruptCB *cb)
 {
-    int ret;
-    if (cb && cb->callback && (ret = cb->callback(cb->opaque)))
-        return ret;
+    if (cb && cb->callback)
+        return cb->callback(cb->opaque);
     return 0;
 }

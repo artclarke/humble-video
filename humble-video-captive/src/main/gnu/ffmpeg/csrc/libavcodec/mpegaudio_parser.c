@@ -23,6 +23,7 @@
 #include "parser.h"
 #include "mpegaudiodecheader.h"
 #include "libavutil/common.h"
+#include "libavformat/apetag.h" // for APE tag.
 #include "libavformat/id3v1.h" // for ID3v1_TAG_SIZE
 
 typedef struct MpegAudioParseContext {
@@ -35,7 +36,7 @@ typedef struct MpegAudioParseContext {
 
 #define MPA_HEADER_SIZE 4
 
-/* header + layer + bitrate + freq + lsf/mpeg25 */
+/* header + layer + freq + lsf/mpeg25 */
 #define SAME_HEADER_MASK \
    (0xffe00000 | (3 << 17) | (3 << 10) | (3 << 19))
 
@@ -69,7 +70,7 @@ static int mpegaudio_parse(AVCodecParserContext *s1,
 
                 state= (state<<8) + buf[i++];
 
-                ret = avpriv_mpa_decode_header2(state, &sr, &channels, &frame_size, &bit_rate, &codec_id);
+                ret = ff_mpa_decode_header(state, &sr, &channels, &frame_size, &bit_rate, &codec_id);
                 if (ret < 4) {
                     if (i > 4)
                         s->header_count = -2;
@@ -98,7 +99,9 @@ static int mpegaudio_parse(AVCodecParserContext *s1,
                     } else if (codec_id == AV_CODEC_ID_MP3ADU) {
                         avpriv_report_missing_feature(avctx,
                             "MP3ADU full parser");
-                        return 0; /* parsers must not return error codes */
+                        *poutbuf = NULL;
+                        *poutbuf_size = 0;
+                        return buf_size; /* parsers must not return error codes */
                     }
 
                     break;
@@ -115,6 +118,12 @@ static int mpegaudio_parse(AVCodecParserContext *s1,
     }
 
     if (flush && buf_size >= ID3v1_TAG_SIZE && memcmp(buf, "TAG", 3) == 0) {
+        *poutbuf = NULL;
+        *poutbuf_size = 0;
+        return next;
+    }
+
+    if (flush && buf_size >= APE_TAG_FOOTER_BYTES && memcmp(buf, APE_TAG_PREAMBLE, 8) == 0) {
         *poutbuf = NULL;
         *poutbuf_size = 0;
         return next;

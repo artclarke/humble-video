@@ -28,6 +28,7 @@
 #include "get_bits.h"
 #include "golomb.h"
 #include "idctdsp.h"
+#include "thread.h"
 #include "unary.h"
 
 #define AIC_HDR_SIZE    24
@@ -307,6 +308,8 @@ static int aic_decode_slice(AICContext *ctx, int mb_x, int mb_y,
     GetBitContext gb;
     int ret, i, mb, blk;
     int slice_width = FFMIN(ctx->slice_width, ctx->mb_width - mb_x);
+    int last_row = mb_y && mb_y == ctx->mb_height - 1;
+    int y_pos, c_pos;
     uint8_t *Y, *C[2];
     uint8_t *dst;
     int16_t *base_y = ctx->data_ptr[COEFF_LUMA];
@@ -315,10 +318,18 @@ static int aic_decode_slice(AICContext *ctx, int mb_x, int mb_y,
     int16_t *ext_c  = ctx->data_ptr[COEFF_CHROMA_EXT];
     const int ystride = ctx->frame->linesize[0];
 
-    Y = ctx->frame->data[0] + mb_x * 16 + mb_y * 16 * ystride;
+    if (last_row) {
+        y_pos = (ctx->avctx->height - 16);
+        c_pos = ((ctx->avctx->height+1)/2 - 8);
+    } else {
+        y_pos = mb_y * 16;
+        c_pos = mb_y * 8;
+    }
+
+    Y = ctx->frame->data[0] + mb_x * 16 + y_pos * ystride;
     for (i = 0; i < 2; i++)
         C[i] = ctx->frame->data[i + 1] + mb_x * 8
-               + mb_y * 8 * ctx->frame->linesize[i + 1];
+               + c_pos * ctx->frame->linesize[i + 1];
     init_get_bits(&gb, src, src_size * 8);
 
     memset(ctx->slice_data, 0,
@@ -375,6 +386,7 @@ static int aic_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     uint32_t off;
     int x, y, ret;
     int slice_size;
+    ThreadFrame frame = { .f = data };
 
     ctx->frame            = data;
     ctx->frame->pict_type = AV_PICTURE_TYPE_I;
@@ -393,7 +405,7 @@ static int aic_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         return ret;
     }
 
-    if ((ret = ff_get_buffer(avctx, ctx->frame, 0)) < 0)
+    if ((ret = ff_thread_get_buffer(avctx, &frame, 0)) < 0)
         return ret;
 
     bytestream2_init(&gb, buf + AIC_HDR_SIZE,
@@ -447,7 +459,7 @@ static av_cold int aic_decode_init(AVCodecContext *avctx)
 
     ctx->num_x_slices = (ctx->mb_width + 15) >> 4;
     ctx->slice_width  = 16;
-    for (i = 1; i < 32; i++) {
+    for (i = 1; i < ctx->mb_width; i++) {
         if (!(ctx->mb_width % i) && (ctx->mb_width / i <= 32)) {
             ctx->slice_width  = ctx->mb_width / i;
             ctx->num_x_slices = i;
@@ -488,5 +500,7 @@ AVCodec ff_aic_decoder = {
     .init           = aic_decode_init,
     .close          = aic_decode_close,
     .decode         = aic_decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1,
+    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
+    .init_thread_copy = ONLY_IF_THREADS_ENABLED(aic_decode_init),
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

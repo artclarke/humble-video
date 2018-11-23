@@ -82,6 +82,17 @@ static void v210_planar_pack_10_c(const uint16_t *y, const uint16_t *u,
     }
 }
 
+av_cold void ff_v210enc_init(V210EncContext *s)
+{
+    s->pack_line_8  = v210_planar_pack_8_c;
+    s->pack_line_10 = v210_planar_pack_10_c;
+    s->sample_factor_8  = 1;
+    s->sample_factor_10 = 1;
+
+    if (ARCH_X86)
+        ff_v210enc_init_x86(s);
+}
+
 static av_cold int encode_init(AVCodecContext *avctx)
 {
     V210EncContext *s = avctx->priv_data;
@@ -97,11 +108,10 @@ FF_DISABLE_DEPRECATION_WARNINGS
 FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 
-    s->pack_line_8  = v210_planar_pack_8_c;
-    s->pack_line_10 = v210_planar_pack_10_c;
+    ff_v210enc_init(s);
 
-    if (ARCH_X86)
-        ff_v210enc_init_x86(s);
+    avctx->bits_per_coded_sample = 20;
+    avctx->bit_rate = ff_guess_coded_bitrate(avctx) * 16 / 15;
 
     return 0;
 }
@@ -113,6 +123,7 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     int aligned_width = ((avctx->width + 47) / 48) * 48;
     int stride = aligned_width * 8 / 3;
     int line_padding = stride - ((avctx->width * 8 + 11) / 12) * 4;
+    AVFrameSideData *side_data;
     int h, w, ret;
     uint8_t *dst;
 
@@ -127,15 +138,26 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         const uint16_t *y = (const uint16_t *)pic->data[0];
         const uint16_t *u = (const uint16_t *)pic->data[1];
         const uint16_t *v = (const uint16_t *)pic->data[2];
+
+        const int sample_size = 6 * s->sample_factor_10;
+        const int sample_w    = avctx->width / sample_size;
+
         for (h = 0; h < avctx->height; h++) {
             uint32_t val;
-            w = (avctx->width / 6) * 6;
+            w = sample_w * sample_size;
             s->pack_line_10(y, u, v, dst, w);
 
             y += w;
             u += w >> 1;
             v += w >> 1;
-            dst += (w / 6) * 16;
+            dst += sample_w * 16 * s->sample_factor_10;
+
+            for (; w < avctx->width - 5; w += 6) {
+                WRITE_PIXELS(u, y, v);
+                WRITE_PIXELS(y, u, y);
+                WRITE_PIXELS(v, y, u);
+                WRITE_PIXELS(y, v, y);
+            }
             if (w < avctx->width - 1) {
                 WRITE_PIXELS(u, y, v);
 
@@ -165,15 +187,19 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         const uint8_t *y = pic->data[0];
         const uint8_t *u = pic->data[1];
         const uint8_t *v = pic->data[2];
+
+        const int sample_size = 12 * s->sample_factor_8;
+        const int sample_w    = avctx->width / sample_size;
+
         for (h = 0; h < avctx->height; h++) {
             uint32_t val;
-            w = (avctx->width / 12) * 12;
+            w = sample_w * sample_size;
             s->pack_line_8(y, u, v, dst, w);
 
             y += w;
             u += w >> 1;
             v += w >> 1;
-            dst += (w / 12) * 32;
+            dst += sample_w * 32 * s->sample_factor_8;
 
             for (; w < avctx->width - 5; w += 6) {
                 WRITE_PIXELS8(u, y, v);
@@ -206,6 +232,22 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
             u += pic->linesize[1] - avctx->width / 2;
             v += pic->linesize[2] - avctx->width / 2;
         }
+    }
+
+    side_data = av_frame_get_side_data(pic, AV_FRAME_DATA_A53_CC);
+    if (side_data && side_data->size) {
+        uint8_t *buf = av_packet_new_side_data(pkt, AV_PKT_DATA_A53_CC, side_data->size);
+        if (!buf)
+            return AVERROR(ENOMEM);
+        memcpy(buf, side_data->data, side_data->size);
+    }
+
+    side_data = av_frame_get_side_data(pic, AV_FRAME_DATA_AFD);
+    if (side_data && side_data->size) {
+        uint8_t *buf = av_packet_new_side_data(pkt, AV_PKT_DATA_AFD, side_data->size);
+        if (!buf)
+            return AVERROR(ENOMEM);
+        memcpy(buf, side_data->data, side_data->size);
     }
 
     pkt->flags |= AV_PKT_FLAG_KEY;

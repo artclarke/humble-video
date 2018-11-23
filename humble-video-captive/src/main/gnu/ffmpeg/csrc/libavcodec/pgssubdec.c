@@ -166,9 +166,9 @@ static int decode_rle(AVCodecContext *avctx, AVSubtitleRect *rect,
 
     rle_bitmap_end = buf + buf_size;
 
-    rect->pict.data[0] = av_malloc_array(rect->w, rect->h);
+    rect->data[0] = av_malloc_array(rect->w, rect->h);
 
-    if (!rect->pict.data[0])
+    if (!rect->data[0])
         return AVERROR(ENOMEM);
 
     pixel_count = 0;
@@ -190,7 +190,7 @@ static int decode_rle(AVCodecContext *avctx, AVSubtitleRect *rect,
         }
 
         if (run > 0 && pixel_count + run <= rect->w * rect->h) {
-            memset(rect->pict.data[0] + pixel_count, color, run);
+            memset(rect->data[0] + pixel_count, color, run);
             pixel_count += run;
         } else if (!run) {
             /*
@@ -290,8 +290,8 @@ static int parse_object_segment(AVCodecContext *avctx,
     height = bytestream_get_be16(&buf);
 
     /* Make sure the bitmap is not too large */
-    if (avctx->width < width || avctx->height < height) {
-        av_log(avctx, AV_LOG_ERROR, "Bitmap dimensions larger than video.\n");
+    if (avctx->width < width || avctx->height < height || !width || !height) {
+        av_log(avctx, AV_LOG_ERROR, "Bitmap dimensions (%dx%d) invalid.\n", width, height);
         return AVERROR_INVALIDDATA;
     }
 
@@ -357,7 +357,7 @@ static int parse_palette_segment(AVCodecContext *avctx,
         cb        = bytestream_get_byte(&buf);
         alpha     = bytestream_get_byte(&buf);
 
-        /* Default to BT.709 colorimetry. In case of <= 576 height use BT.601 */
+        /* Default to BT.709 colorspace. In case of <= 576 height use BT.601 */
         if (avctx->height <= 0 || avctx->height > 576) {
             YUV_TO_RGB1_CCIR_BT709(cb, cr);
         } else {
@@ -559,12 +559,13 @@ static int display_end_segment(AVCodecContext *avctx, void *data,
 
         sub->rects[i]->x    = ctx->presentation.objects[i].x;
         sub->rects[i]->y    = ctx->presentation.objects[i].y;
-        sub->rects[i]->w    = object->w;
-        sub->rects[i]->h    = object->h;
-
-        sub->rects[i]->pict.linesize[0] = object->w;
 
         if (object->rle) {
+            sub->rects[i]->w    = object->w;
+            sub->rects[i]->h    = object->h;
+
+            sub->rects[i]->linesize[0] = object->w;
+
             if (object->rle_remaining_len) {
                 av_log(avctx, AV_LOG_ERROR, "RLE data length %u is %u bytes shorter than expected\n",
                        object->rle_data_len, object->rle_remaining_len);
@@ -587,15 +588,28 @@ static int display_end_segment(AVCodecContext *avctx, void *data,
         }
         /* Allocate memory for colors */
         sub->rects[i]->nb_colors    = 256;
-        sub->rects[i]->pict.data[1] = av_mallocz(AVPALETTE_SIZE);
-        if (!sub->rects[i]->pict.data[1]) {
+        sub->rects[i]->data[1] = av_mallocz(AVPALETTE_SIZE);
+        if (!sub->rects[i]->data[1]) {
             avsubtitle_free(sub);
             return AVERROR(ENOMEM);
         }
 
         if (!ctx->forced_subs_only || ctx->presentation.objects[i].composition_flag & 0x40)
-        memcpy(sub->rects[i]->pict.data[1], palette->clut, sub->rects[i]->nb_colors * sizeof(uint32_t));
+        memcpy(sub->rects[i]->data[1], palette->clut, sub->rects[i]->nb_colors * sizeof(uint32_t));
 
+#if FF_API_AVPICTURE
+FF_DISABLE_DEPRECATION_WARNINGS
+{
+        AVSubtitleRect *rect;
+        int j;
+        rect = sub->rects[i];
+        for (j = 0; j < 4; j++) {
+            rect->pict.data[j] = rect->data[j];
+            rect->pict.linesize[j] = rect->linesize[j];
+        }
+}
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
     }
     return 1;
 }
@@ -684,7 +698,7 @@ static int decode(AVCodecContext *avctx, void *data, int *data_size,
 #define OFFSET(x) offsetof(PGSSubContext, x)
 #define SD AV_OPT_FLAG_SUBTITLE_PARAM | AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
-    {"forced_subs_only", "Only show forced subtitles", OFFSET(forced_subs_only), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 1, SD},
+    {"forced_subs_only", "Only show forced subtitles", OFFSET(forced_subs_only), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, SD},
     { NULL },
 };
 

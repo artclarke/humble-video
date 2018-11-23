@@ -65,13 +65,13 @@ static inline void smv_img_pnt(uint8_t *dst_data[4], uint8_t *src_data[4],
     for (i = 0; i < planes_nb; i++) {
         int h = height;
         if (i == 1 || i == 2) {
-            h = FF_CEIL_RSHIFT(height, desc->log2_chroma_h);
+            h = AV_CEIL_RSHIFT(height, desc->log2_chroma_h);
         }
         smv_img_pnt_plane(&dst_data[i], src_data[i],
             src_linesizes[i], h, nlines);
     }
     if (desc->flags & AV_PIX_FMT_FLAG_PAL ||
-        desc->flags & AV_PIX_FMT_FLAG_PSEUDOPAL)
+        desc->flags & FF_PSEUDOPAL)
         dst_data[1] = src_data[1];
 }
 
@@ -193,16 +193,17 @@ static int smvjpeg_decode_frame(AVCodecContext *avctx, void *data, int *data_siz
         s->picture[1]->width         = avctx->width;
         s->picture[1]->height        = avctx->height;
         s->picture[1]->format        = avctx->pix_fmt;
-        /* ff_init_buffer_info(avctx, &s->picture[1]); */
         smv_img_pnt(s->picture[1]->data, mjpeg_data->data, mjpeg_data->linesize,
                     avctx->pix_fmt, avctx->width, avctx->height, cur_frame);
         for (i = 0; i < AV_NUM_DATA_POINTERS; i++)
             s->picture[1]->linesize[i] = mjpeg_data->linesize[i];
 
         ret = av_frame_ref(data, s->picture[1]);
+        if (ret < 0)
+            return ret;
     }
 
-    return ret;
+    return avpkt->size;
 }
 
 static const AVClass smvjpegdec_class = {

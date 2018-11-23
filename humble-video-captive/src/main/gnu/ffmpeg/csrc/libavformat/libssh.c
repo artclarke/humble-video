@@ -295,7 +295,7 @@ static int libssh_read(URLContext *h, unsigned char *buf, int size)
         av_log(libssh, AV_LOG_ERROR, "Read error.\n");
         return AVERROR(EIO);
     }
-    return bytes_read;
+    return bytes_read ? bytes_read : AVERROR_EOF;
 }
 
 static int libssh_write(URLContext *h, const unsigned char *buf, int size)
@@ -489,7 +489,7 @@ static const AVClass libssh_context_class = {
     .version        = LIBAVUTIL_VERSION_INT,
 };
 
-URLProtocol ff_libssh_protocol = {
+const URLProtocol ff_libssh_protocol = {
     .name                = "sftp",
     .url_open            = libssh_open,
     .url_read            = libssh_read,

@@ -151,7 +151,7 @@ static inline int rtsp_read_request(AVFormatContext *s,
             return ret;
         if (rbuflen > 1) {
             av_log(s, AV_LOG_TRACE, "Parsing[%d]: %s\n", rbuflen, rbuf);
-            ff_rtsp_parse_line(request, rbuf, rt, method);
+            ff_rtsp_parse_line(s, request, rbuf, rt, method);
         }
     } while (rbuflen > 0);
     if (request->seq != rt->seq + 1) {
@@ -294,8 +294,9 @@ static int rtsp_read_setup(AVFormatContext *s, char* host, char *controlurl)
             av_dict_set(&opts, "buffer_size", buf, 0);
             ff_url_join(url, sizeof(url), "rtp", NULL, host, localport, NULL);
             av_log(s, AV_LOG_TRACE, "Opening: %s", url);
-            ret = ffurl_open(&rtsp_st->rtp_handle, url, AVIO_FLAG_READ_WRITE,
-                             &s->interrupt_callback, &opts);
+            ret = ffurl_open_whitelist(&rtsp_st->rtp_handle, url, AVIO_FLAG_READ_WRITE,
+                                       &s->interrupt_callback, &opts,
+                                       s->protocol_whitelist, s->protocol_blacklist, NULL);
             av_dict_free(&opts);
             if (ret)
                 localport += 2;
@@ -497,7 +498,6 @@ int ff_rtsp_parse_streaming_commands(AVFormatContext *s)
     } else if (methodcode == TEARDOWN) {
         rt->state = RTSP_STATE_IDLE;
         ret       = rtsp_send_reply(s, RTSP_STATUS_OK, NULL , request.seq);
-        return 0;
     }
     return ret;
 }
@@ -644,7 +644,7 @@ static int rtsp_listen(AVFormatContext *s)
 
     /* extract hostname and port */
     av_url_split(proto, sizeof(proto), auth, sizeof(auth), host, sizeof(host),
-                 &port, path, sizeof(path), s->filename);
+                 &port, path, sizeof(path), s->url);
 
     /* ff_url_join. No authorization by now (NULL) */
     ff_url_join(rt->control_uri, sizeof(rt->control_uri), proto, NULL, host,
@@ -662,8 +662,9 @@ static int rtsp_listen(AVFormatContext *s)
     ff_url_join(tcpname, sizeof(tcpname), lower_proto, NULL, host, port,
                 "?listen&listen_timeout=%d", rt->initial_timeout * 1000);
 
-    if (ret = ffurl_open(&rt->rtsp_hd, tcpname, AVIO_FLAG_READ_WRITE,
-                         &s->interrupt_callback, NULL)) {
+    if (ret = ffurl_open_whitelist(&rt->rtsp_hd, tcpname, AVIO_FLAG_READ_WRITE,
+                                   &s->interrupt_callback, NULL,
+                                   s->protocol_whitelist, s->protocol_blacklist, NULL)) {
         av_log(s, AV_LOG_ERROR, "Unable to open RTSP for listening\n");
         return ret;
     }
@@ -696,7 +697,6 @@ static int rtsp_listen(AVFormatContext *s)
             return AVERROR_INVALIDDATA;
         }
     }
-    return 0;
 }
 
 static int rtsp_probe(AVProbeData *p)
@@ -804,7 +804,7 @@ static int resetup_tcp(AVFormatContext *s)
     int port;
 
     av_url_split(NULL, 0, NULL, 0, host, sizeof(host), &port, NULL, 0,
-                 s->filename);
+                 s->url);
     ff_rtsp_undo_setup(s, 0);
     return ff_rtsp_make_setup_request(s, host, port, RTSP_LOWER_TRANSPORT_TCP,
                                       rt->real_challenge);

@@ -36,6 +36,7 @@
 #include "simple_idct.h"
 #include "proresdec.h"
 #include "proresdata.h"
+#include "thread.h"
 
 static void permute(uint8_t *dst, const uint8_t *src, const uint8_t permutation[64])
 {
@@ -117,6 +118,11 @@ static int decode_frame_header(ProresContext *ctx, const uint8_t *buf,
         avctx->pix_fmt = (buf[12] & 0xC0) == 0xC0 ? AV_PIX_FMT_YUV444P10 : AV_PIX_FMT_YUV422P10;
     }
 
+    avctx->color_primaries = buf[14];
+    avctx->color_trc       = buf[15];
+    avctx->colorspace      = buf[16];
+    avctx->color_range     = AVCOL_RANGE_MPEG;
+
     ptr   = buf + 20;
     flags = buf[19];
     ff_dlog(avctx, "flags %x\n", flags);
@@ -180,7 +186,10 @@ static int decode_picture_header(AVCodecContext *avctx, const uint8_t *buf, cons
     else
         ctx->mb_height = (avctx->height + 15) >> 4;
 
-    slice_count = AV_RB16(buf + 5);
+    // QT ignores the written value
+    // slice_count = AV_RB16(buf + 5);
+    slice_count = ctx->mb_height * ((ctx->mb_width >> log2_slice_mb_width) +
+                                    av_popcount(ctx->mb_width & (1 << log2_slice_mb_width) - 1));
 
     if (ctx->slice_count != slice_count || !ctx->slices) {
         av_freep(&ctx->slices);
@@ -247,7 +256,7 @@ static int decode_picture_header(AVCodecContext *avctx, const uint8_t *buf, cons
     return pic_data_size;
 }
 
-#define DECODE_CODEWORD(val, codebook)                                  \
+#define DECODE_CODEWORD(val, codebook, SKIP)                            \
     do {                                                                \
         unsigned int rice_order, exp_order, switch_bits;                \
         unsigned int q, buf, bits;                                      \
@@ -268,14 +277,14 @@ static int decode_picture_header(AVCodecContext *avctx, const uint8_t *buf, cons
                 return AVERROR_INVALIDDATA;                             \
             val = SHOW_UBITS(re, gb, bits) - (1 << exp_order) +         \
                 ((switch_bits + 1) << rice_order);                      \
-            SKIP_BITS(re, gb, bits);                                    \
+            SKIP(re, gb, bits);                                         \
         } else if (rice_order) {                                        \
             SKIP_BITS(re, gb, q+1);                                     \
             val = (q << rice_order) + SHOW_UBITS(re, gb, rice_order);   \
-            SKIP_BITS(re, gb, rice_order);                              \
+            SKIP(re, gb, rice_order);                                   \
         } else {                                                        \
             val = q;                                                    \
-            SKIP_BITS(re, gb, q+1);                                     \
+            SKIP(re, gb, q+1);                                          \
         }                                                               \
     } while (0)
 
@@ -293,7 +302,7 @@ static av_always_inline int decode_dc_coeffs(GetBitContext *gb, int16_t *out,
 
     OPEN_READER(re, gb);
 
-    DECODE_CODEWORD(code, FIRST_DC_CB);
+    DECODE_CODEWORD(code, FIRST_DC_CB, LAST_SKIP_BITS);
     prev_dc = TOSIGNED(code);
     out[0] = prev_dc;
 
@@ -302,7 +311,7 @@ static av_always_inline int decode_dc_coeffs(GetBitContext *gb, int16_t *out,
     code = 5;
     sign = 0;
     for (i = 1; i < blocks_per_slice; i++, out += 64) {
-        DECODE_CODEWORD(code, dc_codebook[FFMIN(code, 6U)]);
+        DECODE_CODEWORD(code, dc_codebook[FFMIN(code, 6U)], LAST_SKIP_BITS);
         if(code) sign ^= -(code & 1);
         else     sign  = 0;
         prev_dc += (((code + 1) >> 1) ^ sign) - sign;
@@ -338,14 +347,14 @@ static av_always_inline int decode_ac_coeffs(AVCodecContext *avctx, GetBitContex
         if (!bits_left || (bits_left < 32 && !SHOW_UBITS(re, gb, bits_left)))
             break;
 
-        DECODE_CODEWORD(run, run_to_cb[FFMIN(run,  15)]);
+        DECODE_CODEWORD(run, run_to_cb[FFMIN(run,  15)], LAST_SKIP_BITS);
         pos += run + 1;
         if (pos >= max_coeffs) {
             av_log(avctx, AV_LOG_ERROR, "ac tex damaged %d, %d\n", pos, max_coeffs);
             return AVERROR_INVALIDDATA;
         }
 
-        DECODE_CODEWORD(level, lev_to_cb[FFMIN(level, 9)]);
+        DECODE_CODEWORD(level, lev_to_cb[FFMIN(level, 9)], SKIP_BITS);
         level += 1;
 
         i = pos >> log2_block_count;
@@ -365,7 +374,7 @@ static int decode_slice_luma(AVCodecContext *avctx, SliceContext *slice,
                              const int16_t *qmat)
 {
     ProresContext *ctx = avctx->priv_data;
-    LOCAL_ALIGNED_16(int16_t, blocks, [8*4*64]);
+    LOCAL_ALIGNED_32(int16_t, blocks, [8*4*64]);
     int16_t *block;
     GetBitContext gb;
     int i, blocks_per_slice = slice->mb_count<<2;
@@ -399,7 +408,7 @@ static int decode_slice_chroma(AVCodecContext *avctx, SliceContext *slice,
                                const int16_t *qmat, int log2_blocks_per_mb)
 {
     ProresContext *ctx = avctx->priv_data;
-    LOCAL_ALIGNED_16(int16_t, blocks, [8*4*64]);
+    LOCAL_ALIGNED_32(int16_t, blocks, [8*4*64]);
     int16_t *block;
     GetBitContext gb;
     int i, j, blocks_per_slice = slice->mb_count << log2_blocks_per_mb;
@@ -482,7 +491,7 @@ static void decode_slice_alpha(ProresContext *ctx,
 {
     GetBitContext gb;
     int i;
-    LOCAL_ALIGNED_16(int16_t, blocks, [8*4*64]);
+    LOCAL_ALIGNED_32(int16_t, blocks, [8*4*64]);
     int16_t *block;
 
     for (i = 0; i < blocks_per_slice<<2; i++)
@@ -514,8 +523,8 @@ static int decode_slice_thread(AVCodecContext *avctx, void *arg, int jobnr, int 
     int luma_stride, chroma_stride;
     int y_data_size, u_data_size, v_data_size, a_data_size;
     uint8_t *dest_y, *dest_u, *dest_v, *dest_a;
-    int16_t qmat_luma_scaled[64];
-    int16_t qmat_chroma_scaled[64];
+    LOCAL_ALIGNED_16(int16_t, qmat_luma_scaled,  [64]);
+    LOCAL_ALIGNED_16(int16_t, qmat_chroma_scaled,[64]);
     int mb_x_shift;
     int ret;
 
@@ -580,7 +589,7 @@ static int decode_slice_thread(AVCodecContext *avctx, void *arg, int jobnr, int 
     if (ret < 0)
         return ret;
 
-    if (!(avctx->flags & AV_CODEC_FLAG_GRAY)) {
+    if (!(avctx->flags & AV_CODEC_FLAG_GRAY) && (u_data_size + v_data_size) > 0) {
         ret = decode_slice_chroma(avctx, slice, (uint16_t*)dest_u, chroma_stride,
                                   buf + y_data_size, u_data_size,
                                   qmat_chroma_scaled, log2_chroma_blocks_per_mb);
@@ -593,6 +602,16 @@ static int decode_slice_thread(AVCodecContext *avctx, void *arg, int jobnr, int 
         if (ret < 0)
             return ret;
     }
+    else {
+        size_t mb_max_x = slice->mb_count << (mb_x_shift - 1);
+        size_t i, j;
+        for (i = 0; i < 16; ++i)
+            for (j = 0; j < mb_max_x; ++j) {
+                *(uint16_t*)(dest_u + (i * chroma_stride) + (j << 1)) = 511;
+                *(uint16_t*)(dest_v + (i * chroma_stride) + (j << 1)) = 511;
+            }
+    }
+
     /* decode alpha plane if available */
     if (ctx->alpha_info && pic->data[3] && a_data_size)
         decode_slice_alpha(ctx, (uint16_t*)dest_a, luma_stride,
@@ -607,20 +626,26 @@ static int decode_picture(AVCodecContext *avctx)
 {
     ProresContext *ctx = avctx->priv_data;
     int i;
+    int error = 0;
 
     avctx->execute2(avctx, decode_slice_thread, NULL, NULL, ctx->slice_count);
 
     for (i = 0; i < ctx->slice_count; i++)
-        if (ctx->slices[i].ret < 0)
-            return ctx->slices[i].ret;
+        error += ctx->slices[i].ret < 0;
 
-    return 0;
+    if (error)
+        ctx->frame->decode_error_flags = FF_DECODE_ERROR_INVALID_BITSTREAM;
+    if (error < ctx->slice_count)
+        return 0;
+
+    return ctx->slices[0].ret;
 }
 
 static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
                         AVPacket *avpkt)
 {
     ProresContext *ctx = avctx->priv_data;
+    ThreadFrame tframe = { .f = data };
     AVFrame *frame = data;
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
@@ -646,7 +671,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     buf += frame_hdr_size;
     buf_size -= frame_hdr_size;
 
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((ret = ff_thread_get_buffer(avctx, &tframe, 0)) < 0)
         return ret;
 
  decode_picture:
@@ -674,6 +699,17 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     return avpkt->size;
 }
 
+#if HAVE_THREADS
+static int decode_init_thread_copy(AVCodecContext *avctx)
+{
+    ProresContext *ctx = avctx->priv_data;
+
+    ctx->slices = NULL;
+
+    return 0;
+}
+#endif
+
 static av_cold int decode_close(AVCodecContext *avctx)
 {
     ProresContext *ctx = avctx->priv_data;
@@ -685,12 +721,13 @@ static av_cold int decode_close(AVCodecContext *avctx)
 
 AVCodec ff_prores_decoder = {
     .name           = "prores",
-    .long_name      = NULL_IF_CONFIG_SMALL("ProRes"),
+    .long_name      = NULL_IF_CONFIG_SMALL("ProRes (iCodec Pro)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_PRORES,
     .priv_data_size = sizeof(ProresContext),
     .init           = decode_init,
+    .init_thread_copy = ONLY_IF_THREADS_ENABLED(decode_init_thread_copy),
     .close          = decode_close,
     .decode         = decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS,
+    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_FRAME_THREADS,
 };

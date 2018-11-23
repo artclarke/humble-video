@@ -396,7 +396,7 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
     }
 
     if (compression_types[header.compression].algorithm == ALGO_RGB24H) {
-        new_pix_fmt = AV_PIX_FMT_RGB32;
+        new_pix_fmt = AV_PIX_FMT_0RGB32;
         width_shift = 1;
     } else
         new_pix_fmt = AV_PIX_FMT_RGB555; // RGB565 is supported as well
@@ -489,8 +489,10 @@ static av_cold int truemotion1_decode_init(AVCodecContext *avctx)
     /* there is a vertical predictor for each pixel in a line; each vertical
      * predictor is 0 to start with */
     av_fast_malloc(&s->vert_pred, &s->vert_pred_size, s->avctx->width * sizeof(unsigned int));
-    if (!s->vert_pred)
+    if (!s->vert_pred) {
+        av_frame_free(&s->frame);
         return AVERROR(ENOMEM);
+    }
 
     return 0;
 }
@@ -645,7 +647,8 @@ static void truemotion1_decode_16bit(TrueMotion1Context *s)
         current_pixel_pair = (unsigned int *)current_line;
         vert_pred = s->vert_pred;
         mb_change_index = 0;
-        mb_change_byte = mb_change_bits[mb_change_index++];
+        if (!keyframe)
+            mb_change_byte = mb_change_bits[mb_change_index++];
         mb_change_byte_mask = 0x01;
         pixels_left = s->avctx->width;
 

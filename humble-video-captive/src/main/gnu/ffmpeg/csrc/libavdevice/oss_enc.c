@@ -21,17 +21,12 @@
 
 #include "config.h"
 
-#if HAVE_SOUNDCARD_H
-#include <soundcard.h>
-#else
-#include <sys/soundcard.h>
-#endif
-
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/soundcard.h>
 
 #include "libavutil/internal.h"
 
@@ -49,9 +44,9 @@ static int audio_write_header(AVFormatContext *s1)
     int ret;
 
     st = s1->streams[0];
-    s->sample_rate = st->codec->sample_rate;
-    s->channels = st->codec->channels;
-    ret = ff_oss_audio_open(s1, 1, s1->filename);
+    s->sample_rate = st->codecpar->sample_rate;
+    s->channels = st->codecpar->channels;
+    ret = ff_oss_audio_open(s1, 1, s1->url);
     if (ret < 0) {
         return AVERROR(EIO);
     } else {
