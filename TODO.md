@@ -10,7 +10,7 @@
     * [x] Remove `humble-video-chef` and update README to require Docker
 
 * [ ] Upgrade to FFMpeg 4.1 with current dependencies and get all Humble tests to pass
-    * [ ] File Issue for FFmpeg 4.1 support
+    * [x] File Issue for FFmpeg 4.1 support
     * [ ] Make Ubuntu:18.04 LTS docker container to build Ubuntu & Windows binaries
     * [ ] Get captive FFmpeg 4.1 to build in that container and on Mac
     * [ ] Get native to build with FFmpeg 4.1 and all native tests to pass

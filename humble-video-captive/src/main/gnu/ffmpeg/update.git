@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # This script is here to update the branch to the latest version
-git subtree pull --prefix=humble-video-captive/src/main/gnu/ffmpeg/csrc --squash git://source.ffmpeg.org/ffmpeg.git n2.8.15
+git subtree pull --prefix=humble-video-captive/src/main/gnu/ffmpeg/csrc --squash git://source.ffmpeg.org/ffmpeg.git n4.1

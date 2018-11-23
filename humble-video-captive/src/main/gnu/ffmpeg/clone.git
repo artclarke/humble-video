@@ -4,4 +4,4 @@
 # a developer and integrate from upstream projects.  It's purpose
 # is to add all remote origins; each captive library will
 # have its own pull.git script which will be used to pull the
-git subtree add --prefix=humble-video-captive/src/main/gnu/ffmpeg/csrc --squash git://source.ffmpeg.org/ffmpeg.git n2.8.15
+git subtree add --prefix=humble-video-captive/src/main/gnu/ffmpeg/csrc --squash git://source.ffmpeg.org/ffmpeg.git n4.1
