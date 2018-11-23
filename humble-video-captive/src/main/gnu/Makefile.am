@@ -9,8 +9,8 @@ EXTRA_DIST=COPYING
 #    |                                                        |            |
 #  -----                                             -------------------  spandsp
 #  |   |                                            |      |     |      |  |
-#  | rtmp vo-aacenc opencore-amr mp3lame x264 vpx speex vorbis theora   |  |
-#  |   |      |          |          |     |    |    |      |     |      |  |
+#  | rtmp           opencore-amr mp3lame x264 vpx speex vorbis theora   |  |
+#  |   |                 |          |     |    |    |      |     |      |  |
 #  ---------------------------------------------------------------------   |
 #                                   |                                      |
 #                               ffmpeg     liboil                          |
@@ -30,7 +30,7 @@ SUBDIRS+= zlib
 #SUBDIRS+= liboil
 
 SUBDIRS+= \
-  libvpx openssl libvo-aacenc libopencore-amr \
+  libvpx openssl libopencore-amr \
   libogg libspeex libvorbis libtheora libmp3lame \
   librtmp
 

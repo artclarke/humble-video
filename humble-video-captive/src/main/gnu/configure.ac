@@ -212,8 +212,6 @@ AC_CONFIG_FILES([Makefile
                  librtmp/incarcerate
                  librtmp/install.sh
                  librtmp/uninstall.sh
-                 libvo-aacenc/Makefile
-                 libvo-aacenc/incarcerate
                  libopencore-amr/Makefile
                  libopencore-amr/incarcerate
                  libogg/Makefile

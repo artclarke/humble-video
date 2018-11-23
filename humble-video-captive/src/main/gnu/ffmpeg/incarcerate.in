@@ -69,7 +69,6 @@ FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libmp3lame"
 FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libvorbis"
 FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libtheora"
 FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libspeex"
-FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libvo-aacenc"
 FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-libopencore-amrnb --enable-libopencore-amrwb"
 FFMPEG_OPTIONS="$FFMPEG_OPTIONS --enable-librtmp"
 case $HOST_OS in
@@ -95,8 +94,8 @@ cp -r @abs_srcdir@/csrc/* @abs_builddir@/csrc/
 chmod -R u+w @abs_builddir@/csrc/*
 
 # apply all the patches
-echo "Applying patches to @abs_builddir@/csrc/src"
-(cd @abs_builddir@/csrc && for f in @abs_srcdir@/patches/*; do echo "patch -p1 <$f"; patch -p1 <$f; done)
+#echo "Applying patches to @abs_builddir@/csrc/src"
+#(cd @abs_builddir@/csrc && for f in @abs_srcdir@/patches/*; do echo "patch -p1 <$f"; patch -p1 <$f; done)
 
 echo "Configuring FFMPEG with these options: $FFMPEG_OPTIONS"
 cd @abs_builddir@/csrc
