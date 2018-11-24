@@ -44,18 +44,18 @@ namespace io { namespace humble { namespace video {
   class VS_API_HUMBLEVIDEO BitStreamFilterType : public io::humble::ferry::RefCounted
   {
   public:
-    virtual const char* getName() { return mCtx->name; }
+    virtual const char* getName() const { return mCtx->name; }
     static int32_t getNumBitStreamFilterTypes();
     static BitStreamFilterType* getBitStreamFilterType(int32_t i);
     static BitStreamFilterType* getBitStreamFilterType(const char* name);
 #ifndef SWIG
-    static BitStreamFilterType* make(AVBitStreamFilter* c);
+    static BitStreamFilterType* make(const AVBitStreamFilter* c);
 #endif
   private:
     virtual ~BitStreamFilterType() {}
 
-    BitStreamFilterType(AVBitStreamFilter*ctx) : mCtx(ctx) {}
-    AVBitStreamFilter* mCtx;
+    BitStreamFilterType(const AVBitStreamFilter*ctx) : mCtx(ctx) {}
+    const AVBitStreamFilter* mCtx;
   };
 
   /**
@@ -97,7 +97,7 @@ namespace io { namespace humble { namespace video {
     /**
      * Get the name of this filter.
      */
-    virtual const char* getName() { return mType->getName(); }
+    virtual const char* getName() const { return mType->getName(); }
 
     /**
      * Filter the input buffer into the output buffer.

@@ -295,7 +295,7 @@ DecoderTest::testDecodeVideo() {
         bytesRead = decoder->decodeVideo(picture.value(), packet.value(), byteOffset);
         if (picture->isComplete()) {
           TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketDts());
-          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketPts());
+          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPts());
           TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getTimeStamp());
           writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
         }
@@ -390,7 +390,7 @@ DecoderTest::testIssue27()
         bytesRead = decoder->decodeVideo(picture.value(), packet.value(), byteOffset);
         if (picture->isComplete()) {
           TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketDts());
-          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketPts());
+          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPts());
           TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getTimeStamp());
           VS_LOG_DEBUG("Writing frame: %"PRId32, frameNo);
           writePicture("DecoderTest_testIssue27", &frameNo, picture.value());

@@ -42,7 +42,7 @@ BitStreamFilterTypeTest::testGetNumBitStreamFilterTypes() {
   int32_t n = BitStreamFilterType::getNumBitStreamFilterTypes();
   // NOTE: This will break each time a new bit filter type is added to Ffmpeg,
   // but I want that so we re-look at it.
-  TS_ASSERT_EQUALS(14, n);
+  TS_ASSERT_EQUALS(30, n);
 }
 
 void
@@ -96,15 +96,15 @@ BitStreamFilterTest::testNoiseFilter() {
 
   // let's generate a buffer to add noise to.
   const int32_t inSize = 1024;
-  // Annoyingly I have to add FF_INPUT_BUFFER_PADDING_SIZE because the noise
+  // Annoyingly I have to add AVPROBE_PADDING_SIZE because the noise
   // filter incorrectly memcopies an additional 16 bytes, and I want Valgrind to
   // not worry about that.
-  RefPointer<Buffer> inBuf = Buffer::make(0, inSize+FF_INPUT_BUFFER_PADDING_SIZE);
+  RefPointer<Buffer> inBuf = Buffer::make(0, inSize+AVPROBE_PADDING_SIZE);
   uint8_t* in = static_cast<uint8_t*>(inBuf->getBytes(0, inSize));
   int32_t outSize = inSize;
-  RefPointer<Buffer> outBuf = Buffer::make(0, outSize+FF_INPUT_BUFFER_PADDING_SIZE);
+  RefPointer<Buffer> outBuf = Buffer::make(0, outSize+AVPROBE_PADDING_SIZE);
   uint8_t* out = static_cast<uint8_t*>(outBuf->getBytes(0, outSize));
-  for(int32_t i = 0; i < inSize+FF_INPUT_BUFFER_PADDING_SIZE; i++) {
+  for(int32_t i = 0; i < inSize+AVPROBE_PADDING_SIZE; i++) {
     in[i] = static_cast<uint8_t>(i);
     out[i] = in[i];
   }

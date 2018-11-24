@@ -120,19 +120,19 @@ public class PixelComponentDescriptor extends RefCounted {
   }
 
 /**
- * Number of elements between 2 horizontally consecutive pixels minus 1.<br>
+ * Number of elements between 2 horizontally consecutive pixels.<br>
  * Elements are bits for bitstream formats, bytes otherwise.
  */
-  public int getStepMinus1() {
-    return VideoJNI.PixelComponentDescriptor_getStepMinus1(swigCPtr, this);
+  public int getStep() {
+    return VideoJNI.PixelComponentDescriptor_getStep(swigCPtr, this);
   }
 
 /**
- * Number of elements before the component of the first pixel plus 1.<br>
+ * Number of elements before the component of the first pixel.<br>
  * Elements are bits for bitstream formats, bytes otherwise.
  */
-  public int getOffsetPlus1() {
-    return VideoJNI.PixelComponentDescriptor_getOffsetPlus1(swigCPtr, this);
+  public int getOffset() {
+    return VideoJNI.PixelComponentDescriptor_getOffset(swigCPtr, this);
   }
 
 /**
@@ -143,7 +143,7 @@ public class PixelComponentDescriptor extends RefCounted {
   }
 
 /**
- * number of bits in the component minus 1 
+ * number of bits in the component 
  */
   public int getDepthMinus1() {
     return VideoJNI.PixelComponentDescriptor_getDepthMinus1(swigCPtr, this);

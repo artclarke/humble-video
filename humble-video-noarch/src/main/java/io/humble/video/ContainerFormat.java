@@ -281,10 +281,6 @@ public class ContainerFormat extends RefCounted {
    */
     SHOW_IDS(VideoJNI.ContainerFormat_SHOW_IDS_get()),
   /**
-   * Format wants AVPicture structure for raw picture data. 
-   */
-    RAW_PICTURE(VideoJNI.ContainerFormat_RAW_PICTURE_get()),
-  /**
    * Format wants global header. 
    */
     GLOBAL_HEADER(VideoJNI.ContainerFormat_GLOBAL_HEADER_get()),
@@ -332,6 +328,12 @@ public class ContainerFormat extends RefCounted {
    * Format does not require strictly increasing timestamps, but they must still be monotonic 
    */
     NONSTRICT_TIMESTAMPS(VideoJNI.ContainerFormat_NONSTRICT_TIMESTAMPS_get()),
+  /**
+   * Format allows muxing negative timestamps. If not set the timestamp<br>
+   * will be shifted in av_write_frame and av_interleaved_write_frame so they<br>
+   * start from 0. The user or muxer can override this through AVFormatContext.avoid_negative_ts
+   */
+    TS_NEGATIVE(VideoJNI.ContainerFormat_TS_NEGATIVE_get()),
   /**
    * Seeking is based on PTS 
    */

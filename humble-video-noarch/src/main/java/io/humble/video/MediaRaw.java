@@ -165,15 +165,6 @@ public class MediaRaw extends Media {
   }
 
 /**
- * pts copied from the Packet that was decoded to produce this frame<br>
- * - encoding: unused<br>
- * - decoding: Read by user.
- */
-  public long getPacketPts() {
-    return VideoJNI.MediaRaw_getPacketPts(swigCPtr, this);
-  }
-
-/**
  * dts copied from the Packet that triggered returning this frame<br>
  * - encoding: unused<br>
  * - decoding: Read by user.

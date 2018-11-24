@@ -229,7 +229,7 @@ public:
    * There may be slight deviations from the principle due to implementation
    * details.
    *
-   * From Ffmpeg 2.8
+   * From Ffmpeg 4.1
    */
   typedef enum ID
   {
@@ -238,9 +238,6 @@ public:
     /* video codecs */
     CODEC_ID_MPEG1VIDEO = AV_CODEC_ID_MPEG1VIDEO,
     CODEC_ID_MPEG2VIDEO = AV_CODEC_ID_MPEG2VIDEO, ///< preferred ID for MPEG-1/2 video decoding
-#if FF_API_XVMC
-    CODEC_ID_MPEG2VIDEO_XVMC = AV_CODEC_ID_MPEG2VIDEO_XVMC,
-#endif /* FF_API_XVMC */
     CODEC_ID_H261 = AV_CODEC_ID_H261,
     CODEC_ID_H263 = AV_CODEC_ID_H263,
     CODEC_ID_RV10 = AV_CODEC_ID_RV10,
@@ -375,7 +372,7 @@ public:
     CODEC_ID_ANM = AV_CODEC_ID_ANM,
     CODEC_ID_BINKVIDEO = AV_CODEC_ID_BINKVIDEO,
     CODEC_ID_IFF_ILBM = AV_CODEC_ID_IFF_ILBM,
-    CODEC_ID_IFF_BYTERUN1 = AV_CODEC_ID_IFF_BYTERUN1,
+#define AV_CODEC_ID_IFF_BYTERUN1 AV_CODEC_ID_IFF_ILBM
     CODEC_ID_KGV1 = AV_CODEC_ID_KGV1,
     CODEC_ID_YOP = AV_CODEC_ID_YOP,
     CODEC_ID_VP8 = AV_CODEC_ID_VP8,
@@ -408,56 +405,73 @@ public:
     CODEC_ID_MSS2 = AV_CODEC_ID_MSS2,
     CODEC_ID_VP9 = AV_CODEC_ID_VP9,
     CODEC_ID_AIC = AV_CODEC_ID_AIC,
-    CODEC_ID_ESCAPE130_DEPRECATED = AV_CODEC_ID_ESCAPE130_DEPRECATED,
-    CODEC_ID_G2M_DEPRECATED = AV_CODEC_ID_G2M_DEPRECATED,
-    CODEC_ID_WEBP_DEPRECATED = AV_CODEC_ID_WEBP_DEPRECATED,
+    CODEC_ID_ESCAPE130 = AV_CODEC_ID_ESCAPE130,
+    CODEC_ID_G2M = AV_CODEC_ID_G2M,
+    CODEC_ID_WEBP = AV_CODEC_ID_WEBP,
     CODEC_ID_HNM4_VIDEO = AV_CODEC_ID_HNM4_VIDEO,
-    CODEC_ID_HEVC_DEPRECATED = AV_CODEC_ID_HEVC_DEPRECATED,
+    CODEC_ID_HEVC = AV_CODEC_ID_HEVC,
+#define AV_CODEC_ID_H265 AV_CODEC_ID_HEVC
     CODEC_ID_FIC = AV_CODEC_ID_FIC,
     CODEC_ID_ALIAS_PIX = AV_CODEC_ID_ALIAS_PIX,
-    CODEC_ID_BRENDER_PIX_DEPRECATED = AV_CODEC_ID_BRENDER_PIX_DEPRECATED,
-    CODEC_ID_PAF_VIDEO_DEPRECATED = AV_CODEC_ID_PAF_VIDEO_DEPRECATED,
-    CODEC_ID_EXR_DEPRECATED = AV_CODEC_ID_EXR_DEPRECATED,
-    CODEC_ID_VP7_DEPRECATED = AV_CODEC_ID_VP7_DEPRECATED,
-    CODEC_ID_SANM_DEPRECATED = AV_CODEC_ID_SANM_DEPRECATED,
-    CODEC_ID_SGIRLE_DEPRECATED = AV_CODEC_ID_SGIRLE_DEPRECATED,
-    CODEC_ID_MVC1_DEPRECATED = AV_CODEC_ID_MVC1_DEPRECATED,
-    CODEC_ID_MVC2_DEPRECATED = AV_CODEC_ID_MVC2_DEPRECATED,
+    CODEC_ID_BRENDER_PIX = AV_CODEC_ID_BRENDER_PIX,
+    CODEC_ID_PAF_VIDEO = AV_CODEC_ID_PAF_VIDEO,
+    CODEC_ID_EXR = AV_CODEC_ID_EXR,
+    CODEC_ID_VP7 = AV_CODEC_ID_VP7,
+    CODEC_ID_SANM = AV_CODEC_ID_SANM,
+    CODEC_ID_SGIRLE = AV_CODEC_ID_SGIRLE,
+    CODEC_ID_MVC1 = AV_CODEC_ID_MVC1,
+    CODEC_ID_MVC2 = AV_CODEC_ID_MVC2,
     CODEC_ID_HQX = AV_CODEC_ID_HQX,
     CODEC_ID_TDSC = AV_CODEC_ID_TDSC,
     CODEC_ID_HQ_HQA = AV_CODEC_ID_HQ_HQA,
     CODEC_ID_HAP = AV_CODEC_ID_HAP,
     CODEC_ID_DDS = AV_CODEC_ID_DDS,
+    CODEC_ID_DXV = AV_CODEC_ID_DXV,
+    CODEC_ID_SCREENPRESSO = AV_CODEC_ID_SCREENPRESSO,
+    CODEC_ID_RSCC = AV_CODEC_ID_RSCC,
+    CODEC_ID_AVS2 = AV_CODEC_ID_AVS2,
 
-    CODEC_ID_BRENDER_PIX = AV_CODEC_ID_BRENDER_PIX,
     CODEC_ID_Y41P = AV_CODEC_ID_Y41P,
-    CODEC_ID_ESCAPE130 = AV_CODEC_ID_ESCAPE130,
-    CODEC_ID_EXR = AV_CODEC_ID_EXR,
     CODEC_ID_AVRP = AV_CODEC_ID_AVRP,
-
     CODEC_ID_012V = AV_CODEC_ID_012V,
-    CODEC_ID_G2M = AV_CODEC_ID_G2M,
     CODEC_ID_AVUI = AV_CODEC_ID_AVUI,
     CODEC_ID_AYUV = AV_CODEC_ID_AYUV,
     CODEC_ID_TARGA_Y216 = AV_CODEC_ID_TARGA_Y216,
     CODEC_ID_V308 = AV_CODEC_ID_V308,
     CODEC_ID_V408 = AV_CODEC_ID_V408,
     CODEC_ID_YUV4 = AV_CODEC_ID_YUV4,
-    CODEC_ID_SANM = AV_CODEC_ID_SANM,
-    CODEC_ID_PAF_VIDEO = AV_CODEC_ID_PAF_VIDEO,
     CODEC_ID_AVRN = AV_CODEC_ID_AVRN,
     CODEC_ID_CPIA = AV_CODEC_ID_CPIA,
     CODEC_ID_XFACE = AV_CODEC_ID_XFACE,
-    CODEC_ID_SGIRLE = AV_CODEC_ID_SGIRLE,
-    CODEC_ID_MVC1 = AV_CODEC_ID_MVC1,
-    CODEC_ID_MVC2 = AV_CODEC_ID_MVC2,
     CODEC_ID_SNOW = AV_CODEC_ID_SNOW,
-    CODEC_ID_WEBP = AV_CODEC_ID_WEBP,
     CODEC_ID_SMVJPEG = AV_CODEC_ID_SMVJPEG,
-    CODEC_ID_HEVC = AV_CODEC_ID_HEVC,
-#define CODEC_ID_H265 = AV_CODEC_ID_H265 CODEC_ID_HEVC = AV_CODEC_ID_HEVC
-    CODEC_ID_VP7 = AV_CODEC_ID_VP7,
     CODEC_ID_APNG = AV_CODEC_ID_APNG,
+    CODEC_ID_DAALA = AV_CODEC_ID_DAALA,
+    CODEC_ID_CFHD = AV_CODEC_ID_CFHD,
+    CODEC_ID_TRUEMOTION2RT = AV_CODEC_ID_TRUEMOTION2RT,
+    CODEC_ID_M101 = AV_CODEC_ID_M101,
+    CODEC_ID_MAGICYUV = AV_CODEC_ID_MAGICYUV,
+    CODEC_ID_SHEERVIDEO = AV_CODEC_ID_SHEERVIDEO,
+    CODEC_ID_YLC = AV_CODEC_ID_YLC,
+    CODEC_ID_PSD = AV_CODEC_ID_PSD,
+    CODEC_ID_PIXLET = AV_CODEC_ID_PIXLET,
+    CODEC_ID_SPEEDHQ = AV_CODEC_ID_SPEEDHQ,
+    CODEC_ID_FMVC = AV_CODEC_ID_FMVC,
+    CODEC_ID_SCPR = AV_CODEC_ID_SCPR,
+    CODEC_ID_CLEARVIDEO = AV_CODEC_ID_CLEARVIDEO,
+    CODEC_ID_XPM = AV_CODEC_ID_XPM,
+    CODEC_ID_AV1 = AV_CODEC_ID_AV1,
+    CODEC_ID_BITPACKED = AV_CODEC_ID_BITPACKED,
+    CODEC_ID_MSCC = AV_CODEC_ID_MSCC,
+    CODEC_ID_SRGC = AV_CODEC_ID_SRGC,
+    CODEC_ID_SVG = AV_CODEC_ID_SVG,
+    CODEC_ID_GDV = AV_CODEC_ID_GDV,
+    CODEC_ID_FITS = AV_CODEC_ID_FITS,
+    CODEC_ID_IMM4 = AV_CODEC_ID_IMM4,
+    CODEC_ID_PROSUMER = AV_CODEC_ID_PROSUMER,
+    CODEC_ID_MWSC = AV_CODEC_ID_MWSC,
+    CODEC_ID_WCMV = AV_CODEC_ID_WCMV,
+    CODEC_ID_RASC = AV_CODEC_ID_RASC,
 
     /* various PCM "codecs" */
     CODEC_ID_FIRST_AUDIO = AV_CODEC_ID_FIRST_AUDIO,     ///< A dummy id pointing at the start of audio codecs
@@ -489,12 +503,15 @@ public:
     CODEC_ID_PCM_LXF = AV_CODEC_ID_PCM_LXF,
     CODEC_ID_S302M = AV_CODEC_ID_S302M,
     CODEC_ID_PCM_S8_PLANAR = AV_CODEC_ID_PCM_S8_PLANAR,
-    CODEC_ID_PCM_S24LE_PLANAR_DEPRECATED = AV_CODEC_ID_PCM_S24LE_PLANAR_DEPRECATED,
-    CODEC_ID_PCM_S32LE_PLANAR_DEPRECATED = AV_CODEC_ID_PCM_S32LE_PLANAR_DEPRECATED,
-    CODEC_ID_PCM_S16BE_PLANAR_DEPRECATED = AV_CODEC_ID_PCM_S16BE_PLANAR_DEPRECATED,
     CODEC_ID_PCM_S24LE_PLANAR = AV_CODEC_ID_PCM_S24LE_PLANAR,
     CODEC_ID_PCM_S32LE_PLANAR = AV_CODEC_ID_PCM_S32LE_PLANAR,
     CODEC_ID_PCM_S16BE_PLANAR = AV_CODEC_ID_PCM_S16BE_PLANAR,
+
+    CODEC_ID_PCM_S64LE = AV_CODEC_ID_PCM_S64LE,
+    CODEC_ID_PCM_S64BE = AV_CODEC_ID_PCM_S64BE,
+    CODEC_ID_PCM_F16LE = AV_CODEC_ID_PCM_F16LE,
+    CODEC_ID_PCM_F24LE = AV_CODEC_ID_PCM_F24LE,
+    CODEC_ID_PCM_VIDC = AV_CODEC_ID_PCM_VIDC,
 
     /* various ADPCM codecs */
     CODEC_ID_ADPCM_IMA_QT = AV_CODEC_ID_ADPCM_IMA_QT,
@@ -527,17 +544,18 @@ public:
     CODEC_ID_ADPCM_IMA_ISS = AV_CODEC_ID_ADPCM_IMA_ISS,
     CODEC_ID_ADPCM_G722 = AV_CODEC_ID_ADPCM_G722,
     CODEC_ID_ADPCM_IMA_APC = AV_CODEC_ID_ADPCM_IMA_APC,
-    CODEC_ID_ADPCM_VIMA_DEPRECATED = AV_CODEC_ID_ADPCM_VIMA_DEPRECATED,
     CODEC_ID_ADPCM_VIMA = AV_CODEC_ID_ADPCM_VIMA,
-#if FF_API_VIMA_DECODER
-    CODEC_ID_VIMA = AV_CODEC_ID_VIMA,
-#endif
+
     CODEC_ID_ADPCM_AFC = AV_CODEC_ID_ADPCM_AFC,
     CODEC_ID_ADPCM_IMA_OKI = AV_CODEC_ID_ADPCM_IMA_OKI,
     CODEC_ID_ADPCM_DTK = AV_CODEC_ID_ADPCM_DTK,
     CODEC_ID_ADPCM_IMA_RAD = AV_CODEC_ID_ADPCM_IMA_RAD,
     CODEC_ID_ADPCM_G726LE = AV_CODEC_ID_ADPCM_G726LE,
     CODEC_ID_ADPCM_THP_LE = AV_CODEC_ID_ADPCM_THP_LE,
+    CODEC_ID_ADPCM_PSX = AV_CODEC_ID_ADPCM_PSX,
+    CODEC_ID_ADPCM_AICA = AV_CODEC_ID_ADPCM_AICA,
+    CODEC_ID_ADPCM_IMA_DAT4 = AV_CODEC_ID_ADPCM_IMA_DAT4,
+    CODEC_ID_ADPCM_MTAF = AV_CODEC_ID_ADPCM_MTAF,
 
     /* AMR */
     CODEC_ID_AMR_NB = AV_CODEC_ID_AMR_NB,
@@ -552,6 +570,9 @@ public:
     CODEC_ID_INTERPLAY_DPCM = AV_CODEC_ID_INTERPLAY_DPCM,
     CODEC_ID_XAN_DPCM = AV_CODEC_ID_XAN_DPCM,
     CODEC_ID_SOL_DPCM = AV_CODEC_ID_SOL_DPCM,
+
+    CODEC_ID_SDX2_DPCM = AV_CODEC_ID_SDX2_DPCM,
+    CODEC_ID_GREMLIN_DPCM = AV_CODEC_ID_GREMLIN_DPCM,
 
     /* audio codecs */
     CODEC_ID_MP2 = AV_CODEC_ID_MP2,
@@ -586,9 +607,6 @@ public:
     CODEC_ID_MLP = AV_CODEC_ID_MLP,
     CODEC_ID_GSM_MS = AV_CODEC_ID_GSM_MS, /* as found in WAV */
     CODEC_ID_ATRAC3 = AV_CODEC_ID_ATRAC3,
-#if FF_API_VOXWARE
-    CODEC_ID_VOXWARE = AV_CODEC_ID_VOXWARE,
-#endif
     CODEC_ID_APE = AV_CODEC_ID_APE,
     CODEC_ID_NELLYMOSER = AV_CODEC_ID_NELLYMOSER,
     CODEC_ID_MUSEPACK8 = AV_CODEC_ID_MUSEPACK8,
@@ -617,19 +635,18 @@ public:
     CODEC_ID_RALF = AV_CODEC_ID_RALF,
     CODEC_ID_IAC = AV_CODEC_ID_IAC,
     CODEC_ID_ILBC = AV_CODEC_ID_ILBC,
-    CODEC_ID_OPUS_DEPRECATED = AV_CODEC_ID_OPUS_DEPRECATED,
+    CODEC_ID_OPUS = AV_CODEC_ID_OPUS,
     CODEC_ID_COMFORT_NOISE = AV_CODEC_ID_COMFORT_NOISE,
-    CODEC_ID_TAK_DEPRECATED = AV_CODEC_ID_TAK_DEPRECATED,
+    CODEC_ID_TAK = AV_CODEC_ID_TAK,
     CODEC_ID_METASOUND = AV_CODEC_ID_METASOUND,
-    CODEC_ID_PAF_AUDIO_DEPRECATED = AV_CODEC_ID_PAF_AUDIO_DEPRECATED,
+    CODEC_ID_PAF_AUDIO = AV_CODEC_ID_PAF_AUDIO,
     CODEC_ID_ON2AVC = AV_CODEC_ID_ON2AVC,
     CODEC_ID_DSS_SP = AV_CODEC_ID_DSS_SP,
+    CODEC_ID_CODEC2 = AV_CODEC_ID_CODEC2,
+
     CODEC_ID_FFWAVESYNTH = AV_CODEC_ID_FFWAVESYNTH,
     CODEC_ID_SONIC = AV_CODEC_ID_SONIC,
     CODEC_ID_SONIC_LS = AV_CODEC_ID_SONIC_LS,
-    CODEC_ID_PAF_AUDIO = AV_CODEC_ID_PAF_AUDIO,
-    CODEC_ID_OPUS = AV_CODEC_ID_OPUS,
-    CODEC_ID_TAK = AV_CODEC_ID_TAK,
     CODEC_ID_EVRC = AV_CODEC_ID_EVRC,
     CODEC_ID_SMV = AV_CODEC_ID_SMV,
     CODEC_ID_DSD_LSBF = AV_CODEC_ID_DSD_LSBF,
@@ -637,6 +654,17 @@ public:
     CODEC_ID_DSD_LSBF_PLANAR = AV_CODEC_ID_DSD_LSBF_PLANAR,
     CODEC_ID_DSD_MSBF_PLANAR = AV_CODEC_ID_DSD_MSBF_PLANAR,
     CODEC_ID_4GV = AV_CODEC_ID_4GV,
+    CODEC_ID_INTERPLAY_ACM = AV_CODEC_ID_INTERPLAY_ACM,
+    CODEC_ID_XMA1 = AV_CODEC_ID_XMA1,
+    CODEC_ID_XMA2 = AV_CODEC_ID_XMA2,
+    CODEC_ID_DST = AV_CODEC_ID_DST,
+    CODEC_ID_ATRAC3AL = AV_CODEC_ID_ATRAC3AL,
+    CODEC_ID_ATRAC3PAL = AV_CODEC_ID_ATRAC3PAL,
+    CODEC_ID_DOLBY_E = AV_CODEC_ID_DOLBY_E,
+    CODEC_ID_APTX = AV_CODEC_ID_APTX,
+    CODEC_ID_APTX_HD = AV_CODEC_ID_APTX_HD,
+    CODEC_ID_SBC = AV_CODEC_ID_SBC,
+    CODEC_ID_ATRAC9 = AV_CODEC_ID_ATRAC9,
 
     /* subtitle codecs */
     CODEC_ID_FIRST_SUBTITLE = AV_CODEC_ID_FIRST_SUBTITLE,          ///< A dummy ID pointing at the start of subtitle codecs.
@@ -649,6 +677,7 @@ public:
     CODEC_ID_HDMV_PGS_SUBTITLE = AV_CODEC_ID_HDMV_PGS_SUBTITLE,
     CODEC_ID_DVB_TELETEXT = AV_CODEC_ID_DVB_TELETEXT,
     CODEC_ID_SRT = AV_CODEC_ID_SRT,
+
     CODEC_ID_MICRODVD = AV_CODEC_ID_MICRODVD,
     CODEC_ID_EIA_608 = AV_CODEC_ID_EIA_608,
     CODEC_ID_JACOSUB = AV_CODEC_ID_JACOSUB,
@@ -664,10 +693,13 @@ public:
     CODEC_ID_PJS = AV_CODEC_ID_PJS,
     CODEC_ID_ASS = AV_CODEC_ID_ASS,
     CODEC_ID_HDMV_TEXT_SUBTITLE = AV_CODEC_ID_HDMV_TEXT_SUBTITLE,
+    CODEC_ID_TTML = AV_CODEC_ID_TTML,
 
     /* other specific kind of codecs (generally used for attachments) */
     CODEC_ID_FIRST_UNKNOWN = AV_CODEC_ID_FIRST_UNKNOWN,           ///< A dummy ID pointing at the start of various fake codecs.
     CODEC_ID_TTF = AV_CODEC_ID_TTF,
+
+    CODEC_ID_SCTE_35 = AV_CODEC_ID_SCTE_35, ///< Contain timestamp estimated through PCR of program stream.
     CODEC_ID_BINTEXT = AV_CODEC_ID_BINTEXT,
     CODEC_ID_XBIN = AV_CODEC_ID_XBIN,
     CODEC_ID_IDF = AV_CODEC_ID_IDF,
@@ -678,13 +710,14 @@ public:
     CODEC_ID_BIN_DATA = AV_CODEC_ID_BIN_DATA,
 
 
-    CODEC_ID_PROBE = AV_CODEC_ID_PROBE, ///< codec_id is not known (like CODEC_ID_NONE = AV_CODEC_ID_NONE) but lavf should attempt to identify it
+    CODEC_ID_PROBE = AV_CODEC_ID_PROBE, ///< codec_id is not known (like AV_CODEC_ID_NONE) but lavf should attempt to identify it
 
     CODEC_ID_MPEG2TS = AV_CODEC_ID_MPEG2TS, /**< _FAKE_ codec to indicate a raw MPEG-2 TS
                                 * stream (only used by libavformat) */
     CODEC_ID_MPEG4SYSTEMS = AV_CODEC_ID_MPEG4SYSTEMS, /**< _FAKE_ codec to indicate a MPEG-4 Systems
                                 * stream (only used by libavformat) */
     CODEC_ID_FFMETADATA = AV_CODEC_ID_FFMETADATA,   ///< Dummy codec for streams containing only metadata information.
+    CODEC_ID_WRAPPED_AVFRAME = AV_CODEC_ID_WRAPPED_AVFRAME, ///< Passthrough codec, AVFrames wrapped in AVPacket
 
   } ID;
 
@@ -694,16 +727,15 @@ public:
   typedef enum CodecCapability
   {
     /** Decoder can use draw_horiz_band callback. */
-    CAP_DRAW_HORIZ_BAND = CODEC_CAP_DRAW_HORIZ_BAND,
+    CAP_DRAW_HORIZ_BAND = AV_CODEC_CAP_DRAW_HORIZ_BAND,
     /**
      * Codec uses get_buffer() for allocating buffers and supports custom allocators.
      * If not set, it might not use get_buffer() at all or use operations that
      * assume the buffer was allocated by avcodec_default_get_buffer.
      */
-    CAP_DR1 = CODEC_CAP_DR1,
-    CAP_TRUNCATED = CODEC_CAP_TRUNCATED,
-    /* Codec can export data for HW decoding (XvMC). */
-    CAP_HWACCEL = CODEC_CAP_HWACCEL,
+    CAP_DR1 = AV_CODEC_CAP_DR1,
+    CAP_TRUNCATED = AV_CODEC_CAP_TRUNCATED,
+
     /**
      * Encoder or decoder requires flushing with NULL input at the end in order to
      * give the complete and correct output.
@@ -727,16 +759,13 @@ public:
      *       each output packet. If this flag is not set, the pts and duration will
      *       be determined by libavcodec from the input frame.
      */
-    CAP_DELAY = CODEC_CAP_DELAY,
+    CAP_DELAY = AV_CODEC_CAP_DELAY,
     /**
      * Codec can be fed a final frame with a smaller size.
      * This can be used to prevent truncation of the last audio samples.
      */
-    CAP_SMALL_LAST_FRAME = CODEC_CAP_SMALL_LAST_FRAME,
-    /**
-     * Codec can export data for HW decoding (VDPAU).
-     */
-    CAP_HWACCEL_VDPAU = CODEC_CAP_HWACCEL_VDPAU,
+    CAP_SMALL_LAST_FRAME = AV_CODEC_CAP_SMALL_LAST_FRAME,
+
     /**
      * Codec can output multiple frames per AVPacket
      * Normally demuxers return one frame at a time, demuxers which do not do
@@ -748,50 +777,71 @@ public:
      * prohibiting stream copy in many cases thus it should only be considered
      * as a last resort.
      */
-    CAP_SUBFRAMES = CODEC_CAP_SUBFRAMES,
+    CAP_SUBFRAMES = AV_CODEC_CAP_SUBFRAMES,
     /**
      * Codec is experimental and is thus avoided in favor of non experimental
      * encoders
      */
-    CAP_EXPERIMENTAL = CODEC_CAP_EXPERIMENTAL,
+    CAP_EXPERIMENTAL = AV_CODEC_CAP_EXPERIMENTAL,
     /**
      * Codec should fill in channel configuration and samplerate instead of container
      */
-    CAP_CHANNEL_CONF = CODEC_CAP_CHANNEL_CONF,
-
-    /**
-     * Codec is able to deal with negative linesizes
-     */
-    CAP_NEG_LINESIZES = CODEC_CAP_NEG_LINESIZES,
+    CAP_CHANNEL_CONF = AV_CODEC_CAP_CHANNEL_CONF,
 
     /**
      * Codec supports frame-level multithreading.
      */
-    CAP_FRAME_THREADS = CODEC_CAP_FRAME_THREADS,
+    CAP_FRAME_THREADS = AV_CODEC_CAP_FRAME_THREADS,
+
     /**
      * Codec supports slice-based (or partition-based) multithreading.
      */
-    CAP_SLICE_THREADS = CODEC_CAP_SLICE_THREADS,
+    CAP_SLICE_THREADS = AV_CODEC_CAP_SLICE_THREADS,
     /**
      * Codec supports changed parameters at any point.
      */
-    CAP_PARAM_CHANGE = CODEC_CAP_PARAM_CHANGE,
+    CAP_PARAM_CHANGE = AV_CODEC_CAP_PARAM_CHANGE,
     /**
      * Codec supports avctx->thread_count == 0 (auto).
      */
-    CAP_AUTO_THREADS = CODEC_CAP_AUTO_THREADS,
+    CAP_AUTO_THREADS = AV_CODEC_CAP_AUTO_THREADS,
     /**
      * Audio encoder supports receiving a different number of samples in each call.
      */
-    CAP_VARIABLE_FRAME_SIZE = CODEC_CAP_VARIABLE_FRAME_SIZE,
+    CAP_VARIABLE_FRAME_SIZE = AV_CODEC_CAP_VARIABLE_FRAME_SIZE,
+
+    /**
+     * Decoder is not a preferred choice for probing.
+     * This indicates that the decoder is not a good choice for probing.
+     * It could for example be an expensive to spin up hardware decoder,
+     * or it could simply not provide a lot of useful information about
+     * the stream.
+     * A decoder marked with this flag should only be used as last resort
+     * choice for probing.
+     */
+    CAP_AVOID_PROBING = AV_CODEC_CAP_AVOID_PROBING,
     /**
      * Codec is intra only.
      */
-    CAP_INTRA_ONLY = CODEC_CAP_INTRA_ONLY,
+    CAP_INTRA_ONLY = AV_CODEC_CAP_INTRA_ONLY,
     /**
      * Codec is lossless.
      */
-    CAP_LOSSLESS = CODEC_CAP_LOSSLESS,
+    CAP_LOSSLESS = AV_CODEC_CAP_LOSSLESS,
+
+    /**
+     * Codec is backed by a hardware implementation. Typically used to
+     * identify a non-hwaccel hardware decoder. For information about hwaccels, use
+     * avcodec_get_hw_config() instead.
+     */
+    CAP_HARDWARE = AV_CODEC_CAP_HARDWARE,
+
+    /**
+     * Codec is potentially backed by a hardware implementation, but not
+     * necessarily. This is used instead of AV_CODEC_CAP_HARDWARE, if the
+     * implementation provides some sort of internal fallback.
+     */
+    CAP_HYBRID = AV_CODEC_CAP_HYBRID,
   } CodecCapability;
 
   /**

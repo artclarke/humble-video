@@ -478,88 +478,74 @@ public class Coder extends Configurable {
   }
 
   public enum Flag {
+  /**
+   * Allow decoders to produce frames with data planes that are not aligned<br>
+   * to CPU requirements (e.g. due to cropping).
+   */
     FLAG_UNALIGNED(VideoJNI.Coder_FLAG_UNALIGNED_get()),
   /**
-   * Use fixed qscale. 
+   * Use fixed qscale.
    */
     FLAG_QSCALE(VideoJNI.Coder_FLAG_QSCALE_get()),
   /**
-   * 4 MV per MB allowed / advanced prediction for H.263. 
+   * 4 MV per MB allowed / advanced prediction for H.263.
    */
     FLAG_4MV(VideoJNI.Coder_FLAG_4MV_get()),
   /**
-   * Use qpel MC. 
+   * Output even those frames that might be corrupted.
+   */
+    FLAG_OUTPUT_CORRUPT(VideoJNI.Coder_FLAG_OUTPUT_CORRUPT_get()),
+  /**
+   * Use qpel MC.
    */
     FLAG_QPEL(VideoJNI.Coder_FLAG_QPEL_get()),
   /**
-   * Use GMC. 
-   */
-    FLAG_GMC(VideoJNI.Coder_FLAG_GMC_get()),
-  /**
-   * Always try a MB with MV=&lt;0,0&gt;. 
-   */
-    FLAG_MV0(VideoJNI.Coder_FLAG_MV0_get()),
-  /**
-   * The parent program guarantees that the input for B-frames containing<br>
-   * streams is not written to for at least s-&gt;max_b_frames+1 frames, if<br>
-   * this is not set the input will be copied.
-   */
-    FLAG_INPUT_PRESERVED(VideoJNI.Coder_FLAG_INPUT_PRESERVED_get()),
-  /**
-   * Use internal 2pass ratecontrol in first pass mode. 
+   * Use internal 2pass ratecontrol in first pass mode.
    */
     FLAG_PASS1(VideoJNI.Coder_FLAG_PASS1_get()),
   /**
-   * Use internal 2pass ratecontrol in second pass mode. 
+   * Use internal 2pass ratecontrol in second pass mode.
    */
     FLAG_PASS2(VideoJNI.Coder_FLAG_PASS2_get()),
   /**
-   * Only decode/encode grayscale. 
-   */
-    FLAG_GRAY(VideoJNI.Coder_FLAG_GRAY_get()),
-  /**
-   * Don't draw edges. 
-   */
-    FLAG_EMU_EDGE(VideoJNI.Coder_FLAG_EMU_EDGE_get()),
-  /**
-   * error[?] variables will be set during encoding. 
-   */
-    FLAG_PSNR(VideoJNI.Coder_FLAG_PSNR_get()),
-  /**
-   * Input bitstream might be truncated at a random<br>
-   * location instead of only at frame boundaries. 
-   */
-    FLAG_TRUNCATED(VideoJNI.Coder_FLAG_TRUNCATED_get()),
-  /**
-   * Normalize adaptive quantization. 
-   */
-    FLAG_NORMALIZE_AQP(VideoJNI.Coder_FLAG_NORMALIZE_AQP_get()),
-  /**
-   * Use interlaced DCT. 
-   */
-    FLAG_INTERLACED_DCT(VideoJNI.Coder_FLAG_INTERLACED_DCT_get()),
-  /**
-   * Force low delay. 
-   */
-    FLAG_LOW_DELAY(VideoJNI.Coder_FLAG_LOW_DELAY_get()),
-  /**
-   * Place global headers in extradata instead of every keyframe. 
-   */
-    FLAG_GLOBAL_HEADER(VideoJNI.Coder_FLAG_GLOBAL_HEADER_get()),
-  /**
-   * Use only bitexact stuff (except (I)DCT). 
-   */
-    FLAG_BITEXACT(VideoJNI.Coder_FLAG_BITEXACT_get()),
-  /**
-   * H.263 advanced intra coding / MPEG-4 AC prediction 
-   */
-    FLAG_AC_PRED(VideoJNI.Coder_FLAG_AC_PRED_get()),
-  /**
-   * loop filter 
+   * loop filter.
    */
     FLAG_LOOP_FILTER(VideoJNI.Coder_FLAG_LOOP_FILTER_get()),
   /**
-   * interlaced motion estimation 
+   * Only decode/encode grayscale.
+   */
+    FLAG_GRAY(VideoJNI.Coder_FLAG_GRAY_get()),
+  /**
+   * error[?] variables will be set during encoding.
+   */
+    FLAG_PSNR(VideoJNI.Coder_FLAG_PSNR_get()),
+  /**
+   * Input bitstream might be truncated at a random location<br>
+   * instead of only at frame boundaries.
+   */
+    FLAG_TRUNCATED(VideoJNI.Coder_FLAG_TRUNCATED_get()),
+  /**
+   * Use interlaced DCT.
+   */
+    FLAG_INTERLACED_DCT(VideoJNI.Coder_FLAG_INTERLACED_DCT_get()),
+  /**
+   * Force low delay.
+   */
+    FLAG_LOW_DELAY(VideoJNI.Coder_FLAG_LOW_DELAY_get()),
+  /**
+   * Place global headers in extradata instead of every keyframe.
+   */
+    FLAG_GLOBAL_HEADER(VideoJNI.Coder_FLAG_GLOBAL_HEADER_get()),
+  /**
+   * Use only bitexact stuff (except (I)DCT).
+   */
+    FLAG_BITEXACT(VideoJNI.Coder_FLAG_BITEXACT_get()),
+  /**
+   * H.263 advanced intra coding / MPEG-4 AC prediction
+   */
+    FLAG_AC_PRED(VideoJNI.Coder_FLAG_AC_PRED_get()),
+  /**
+   * interlaced motion estimation
    */
     FLAG_INTERLACED_ME(VideoJNI.Coder_FLAG_INTERLACED_ME_get()),
     FLAG_CLOSED_GOP(VideoJNI.Coder_FLAG_CLOSED_GOP_get()),
@@ -605,37 +591,46 @@ public class Coder extends Configurable {
 
   public enum Flag2 {
   /**
-   * Allow non spec compliant speedup tricks. 
+   * Allow non spec compliant speedup tricks.
    */
     FLAG2_FAST(VideoJNI.Coder_FLAG2_FAST_get()),
   /**
-   * Skip bitstream encoding. 
+   * Skip bitstream encoding.
    */
     FLAG2_NO_OUTPUT(VideoJNI.Coder_FLAG2_NO_OUTPUT_get()),
   /**
-   * Place global headers at every keyframe instead of in extradata. 
+   * Place global headers at every keyframe instead of in extradata.
    */
     FLAG2_LOCAL_HEADER(VideoJNI.Coder_FLAG2_LOCAL_HEADER_get()),
   /**
-   * timecode is in drop frame format. DEPRECATED!!!! 
+   * timecode is in drop frame format. DEPRECATED!!!!
    */
     FLAG2_DROP_FRAME_TIMECODE(VideoJNI.Coder_FLAG2_DROP_FRAME_TIMECODE_get()),
   /**
-   * Discard cropping information from SPS. 
-   */
-    FLAG2_IGNORE_CROP(VideoJNI.Coder_FLAG2_IGNORE_CROP_get()),
-  /**
-   * Input bitstream might be truncated at a packet boundaries instead of only at frame boundaries. 
+   * Input bitstream might be truncated at a packet boundaries<br>
+   * instead of only at frame boundaries.
    */
     FLAG2_CHUNKS(VideoJNI.Coder_FLAG2_CHUNKS_get()),
   /**
-   * Show all frames before the first keyframe 
+   * Discard cropping information from SPS.
+   */
+    FLAG2_IGNORE_CROP(VideoJNI.Coder_FLAG2_IGNORE_CROP_get()),
+  /**
+   * Show all frames before the first keyframe
    */
     FLAG2_SHOW_ALL(VideoJNI.Coder_FLAG2_SHOW_ALL_get()),
   /**
-   * Export motion vectors through frame side data 
+   * Export motion vectors through frame side data
    */
     FLAG2_EXPORT_MVS(VideoJNI.Coder_FLAG2_EXPORT_MVS_get()),
+  /**
+   * Do not skip samples and export skip information as frame side data
+   */
+    FLAG2_SKIP_MANUAL(VideoJNI.Coder_FLAG2_SKIP_MANUAL_get()),
+  /**
+   * Do not reset ASS ReadOrder field on flush (subtitles decoding)
+   */
+    FLAG2_RO_FLUSH_NOOP(VideoJNI.Coder_FLAG2_RO_FLUSH_NOOP_get()),
   ;
 
     public final int swigValue() {

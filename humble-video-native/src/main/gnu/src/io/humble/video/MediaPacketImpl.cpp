@@ -225,7 +225,7 @@ namespace io { namespace humble { namespace video {
 
       // we don't just want to reference count the data -- we want
       // to copy it. So we're going to create a new copy.
-      RefPointer<Buffer> copy = Buffer::make(retval.value(), numBytes + FF_INPUT_BUFFER_PADDING_SIZE);
+      RefPointer<Buffer> copy = Buffer::make(retval.value(), numBytes + AVPROBE_PADDING_SIZE);
       uint8_t* data = (uint8_t*)copy->getBytes(0, numBytes);
 
       // copy the data into our Buffer backed data

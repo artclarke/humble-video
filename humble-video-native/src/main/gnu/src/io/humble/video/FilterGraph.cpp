@@ -81,7 +81,7 @@ FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
   if (!timeBase) timeBase = Rational::make(1, sampleRate);
 
   // get a buffer source
-  AVFilter *abuffersrc = avfilter_get_by_name(VS_FILTER_AUDIO_SOURCE);
+  const AVFilter *abuffersrc = avfilter_get_by_name(VS_FILTER_AUDIO_SOURCE);
   if (!abuffersrc)
     VS_THROW(
         HumbleRuntimeError::make(
@@ -131,7 +131,7 @@ FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
   aspectRatio.reset(aPixelAspectRatio, true);
   if (!aspectRatio) aspectRatio = Rational::make(1, 1);
 
-  AVFilter *buffersrc = avfilter_get_by_name(VS_FILTER_VIDEO_SOURCE);
+  const AVFilter *buffersrc = avfilter_get_by_name(VS_FILTER_VIDEO_SOURCE);
   if (!buffersrc)
     VS_THROW(
         HumbleRuntimeError::make(
@@ -172,7 +172,7 @@ FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
     VS_THROW(HumbleInvalidArgument("no sample format specified"));
   }
 
-  AVFilter *abuffersink = avfilter_get_by_name(VS_FILTER_AUDIO_SINK);
+  const AVFilter *abuffersink = avfilter_get_by_name(VS_FILTER_AUDIO_SINK);
   if (!abuffersink)
     VS_THROW(
         HumbleRuntimeError::make(
@@ -214,7 +214,7 @@ FilterGraph::addPictureSink(const char* name,
   if (format == PixelFormat::PIX_FMT_NONE) {
     VS_THROW(HumbleInvalidArgument("no sample format specified"));
   }
-  AVFilter *buffersink = avfilter_get_by_name(VS_FILTER_VIDEO_SINK);
+  const AVFilter *buffersink = avfilter_get_by_name(VS_FILTER_VIDEO_SINK);
   if (!buffersink) {
     VS_THROW(
         HumbleRuntimeError::make(

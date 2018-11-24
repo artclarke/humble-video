@@ -74,13 +74,6 @@ public:
   virtual KeyValueBag* getMetaData();
 
   /**
-   * pts copied from the Packet that was decoded to produce this frame
-   * - encoding: unused
-   * - decoding: Read by user.
-   */
-  virtual int64_t getPacketPts() { return getCtx()->pkt_pts; }
-
-  /**
    * dts copied from the Packet that triggered returning this frame
    * - encoding: unused
    * - decoding: Read by user.
@@ -94,7 +87,7 @@ public:
    * - encoding: unused
    * - decoding: set by libavcodec, read by user.
    */
-  virtual int32_t getPacketSize() { return av_frame_get_pkt_size(getCtx()); };
+  virtual int32_t getPacketSize() { return getCtx()->pkt_size; };
 
   /**
    * duration of the corresponding packet, expressed in
@@ -102,14 +95,14 @@ public:
    * - encoding: unused
    * - decoding: Read by user.
    */
-  virtual int64_t getPacketDuration() { return av_frame_get_pkt_duration(getCtx()); }
+  virtual int64_t getPacketDuration() { return getCtx()->pkt_duration; }
 
   /**
     * frame timestamp estimated using various heuristics, in stream time base
     * - encoding: unused
     * - decoding: set by libavcodec, read by user.
     */
-   virtual int64_t getBestEffortTimeStamp() { return av_frame_get_best_effort_timestamp(getCtx()); }
+   virtual int64_t getBestEffortTimeStamp() { return getCtx()->best_effort_timestamp; }
 
    /**
     * @param value is the object complete or not.

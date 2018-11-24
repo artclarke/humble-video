@@ -53,9 +53,6 @@ public:
     /** Show format stream IDs numbers. */
     SHOW_IDS = AVFMT_SHOW_IDS,
 
-    /** Format wants AVPicture structure for raw picture data. */
-    RAW_PICTURE = AVFMT_RAWPICTURE,
-
     /** Format wants global header. */
     GLOBAL_HEADER = AVFMT_GLOBALHEADER,
 
@@ -91,6 +88,12 @@ public:
 
     /** Format does not require strictly increasing timestamps, but they must still be monotonic */
     NONSTRICT_TIMESTAMPS = AVFMT_TS_NONSTRICT,
+
+    /** Format allows muxing negative timestamps. If not set the timestamp
+         will be shifted in av_write_frame and av_interleaved_write_frame so they
+         start from 0. The user or muxer can override this through AVFormatContext.avoid_negative_ts
+     */
+    TS_NEGATIVE = AVFMT_TS_NEGATIVE,
 
     /** Seeking is based on PTS */
     SEEK_TO_PTS = AVFMT_SEEK_TO_PTS,

@@ -54,7 +54,7 @@ ContainerFormat::getNumSupportedCodecs(const struct AVCodecTag * const * tags)
   for (int i = 0; tags && tags[i]; i++)
   {
     for (const struct AVCodecTag * tag = tags[i];
-        tag && tag->id != (enum AVCodecID) CODEC_ID_NONE; ++tag)
+        tag && tag->id != (enum AVCodecID) AV_CODEC_ID_NONE; ++tag)
     {
       ++numCodecs;
     }

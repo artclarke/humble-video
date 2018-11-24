@@ -37,7 +37,7 @@ VS_LOG_SETUP(VS_CPP_PACKAGE.BitStreamFilter);
 namespace io { namespace humble { namespace video {
 
   BitStreamFilterType*
-  BitStreamFilterType::make(AVBitStreamFilter* f)
+  BitStreamFilterType::make(const AVBitStreamFilter* f)
   {
     if (!f)
       throw HumbleInvalidArgument("no filter passed in");
@@ -50,7 +50,7 @@ namespace io { namespace humble { namespace video {
   BitStreamFilterType::getNumBitStreamFilterTypes() {
     Global::init();
 
-    AVBitStreamFilter* f = 0;
+    const AVBitStreamFilter* f = 0;
     int32_t i = 0;
     while ((f = av_bitstream_filter_next(f)) != 0) {
       ++i;
@@ -62,7 +62,7 @@ namespace io { namespace humble { namespace video {
   BitStreamFilterType::getBitStreamFilterType(int32_t index) {
     Global::init();
 
-    AVBitStreamFilter* f = 0;
+    const AVBitStreamFilter* f = 0;
     int32_t i = 0;
     while ((f = av_bitstream_filter_next(f)) != 0) {
       if (i == index) {
@@ -81,7 +81,7 @@ namespace io { namespace humble { namespace video {
   BitStreamFilterType::getBitStreamFilterType(const char* name) {
     Global::init();
 
-    AVBitStreamFilter* f = 0;
+    const AVBitStreamFilter* f = 0;
     int32_t i = 0;
     while ((f = av_bitstream_filter_next(f)) != 0) {
       if (strcmp(name, f->name)==0) {
@@ -103,6 +103,7 @@ namespace io { namespace humble { namespace video {
       av_bitstream_filter_close(mCtx);
     mCtx = 0;
   }
+
   BitStreamFilter::BitStreamFilter (AVBitStreamFilterContext* ctx,
                                     BitStreamFilterType *type)
   {
