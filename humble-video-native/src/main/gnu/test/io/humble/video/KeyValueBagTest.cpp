@@ -80,8 +80,7 @@ KeyValueBagTest :: testDemuxerGetMetaData()
   RefPointer<KeyValueBag> meta = source->getMetaData();
   TSM_ASSERT("got meta data", meta);
   int32_t numKeys = meta->getNumKeys();
-  TSM_ASSERT("should be right", numKeys >= 5);
-  TSM_ASSERT("should be right", numKeys <= 7);
+  TSM_ASSERT_EQUALS("should be right", numKeys, 9);
   for(int32_t i = 0; i < numKeys; i++)
   {
     const char* key = meta->getKey(i);
