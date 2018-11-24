@@ -70,15 +70,33 @@ public:
     FLAG_CUSTOM_IO = AVFMT_FLAG_CUSTOM_IO,
     /**  Discard frames marked corrupted **/
     FLAG_DISCARD_CORRUPT = AVFMT_FLAG_DISCARD_CORRUPT,
+    /** Flush the Container every packet. */
+    FLAG_FLUSH_PACKETS = AVFMT_FLAG_FLUSH_PACKETS,
+    /**
+     * When muxing, try to avoid writing any random/volatile data to the output.
+     * This includes any random IDs, real-time timestamps/dates, muxer version, etc.
+     *
+     * This flag is mainly intended for testing.
+     */
+    FLAG_BITEXACT = AVFMT_FLAG_BITEXACT,
+#if FF_API_LAVF_MP4A_LATM
     /**  Enable RTP MP4A-LATM payload **/
     FLAG_MP4A_LATM = AVFMT_FLAG_MP4A_LATM,
+#endif
     /**  try to interleave outputted packets by dts (using this flag can slow demuxing down) **/
     FLAG_SORT_DTS = AVFMT_FLAG_SORT_DTS,
     /**  Enable use of private options by delaying codec open (this could be made default once all code is converted) **/
     FLAG_PRIV_OPT = AVFMT_FLAG_PRIV_OPT,
+#if FF_API_LAVF_KEEPSIDE_FLAG
     /**  Don't merge side data but keep it separate. **/
     FLAG_KEEP_SIDE_DATA = AVFMT_FLAG_KEEP_SIDE_DATA,
-
+#endif
+    /** Enable fast, but inaccurate seeks for some formats */
+    FLAG_FAST_SEEK= AVFMT_FLAG_FAST_SEEK,
+    /** Stop muxing when the shortest stream stops. */
+    FLAG_SHORTEST = AVFMT_FLAG_SHORTEST,
+    /** Add bitstream filters as requested by the muxer */
+    FLAG_AUTO_BSF = AVFMT_FLAG_AUTO_BSF,
   } Flag;
 
   /**
