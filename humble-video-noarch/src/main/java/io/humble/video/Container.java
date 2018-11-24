@@ -179,9 +179,16 @@ public class Container extends Configurable {
    */
     FLAG_DISCARD_CORRUPT(VideoJNI.Container_FLAG_DISCARD_CORRUPT_get()),
   /**
-   * Enable RTP MP4A-LATM payload *
+   * Flush the Container every packet. 
    */
-    FLAG_MP4A_LATM(VideoJNI.Container_FLAG_MP4A_LATM_get()),
+    FLAG_FLUSH_PACKETS(VideoJNI.Container_FLAG_FLUSH_PACKETS_get()),
+  /**
+   * When muxing, try to avoid writing any random/volatile data to the output.<br>
+   * This includes any random IDs, real-time timestamps/dates, muxer version, etc.<br>
+   * <br>
+   * This flag is mainly intended for testing.
+   */
+    FLAG_BITEXACT(VideoJNI.Container_FLAG_BITEXACT_get()),
   /**
    * try to interleave outputted packets by dts (using this flag can slow demuxing down) *
    */
@@ -191,9 +198,17 @@ public class Container extends Configurable {
    */
     FLAG_PRIV_OPT(VideoJNI.Container_FLAG_PRIV_OPT_get()),
   /**
-   * Don't merge side data but keep it separate. *
+   * Enable fast, but inaccurate seeks for some formats 
    */
-    FLAG_KEEP_SIDE_DATA(VideoJNI.Container_FLAG_KEEP_SIDE_DATA_get()),
+    FLAG_FAST_SEEK(VideoJNI.Container_FLAG_FAST_SEEK_get()),
+  /**
+   * Stop muxing when the shortest stream stops. 
+   */
+    FLAG_SHORTEST(VideoJNI.Container_FLAG_SHORTEST_get()),
+  /**
+   * Add bitstream filters as requested by the muxer 
+   */
+    FLAG_AUTO_BSF(VideoJNI.Container_FLAG_AUTO_BSF_get()),
   ;
 
     public final int swigValue() {

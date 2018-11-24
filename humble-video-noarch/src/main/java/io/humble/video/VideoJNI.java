@@ -1402,10 +1402,13 @@ public class VideoJNI {
   public final static native int Container_FLAG_NOBUFFER_get();
   public final static native int Container_FLAG_CUSTOM_IO_get();
   public final static native int Container_FLAG_DISCARD_CORRUPT_get();
-  public final static native int Container_FLAG_MP4A_LATM_get();
+  public final static native int Container_FLAG_FLUSH_PACKETS_get();
+  public final static native int Container_FLAG_BITEXACT_get();
   public final static native int Container_FLAG_SORT_DTS_get();
   public final static native int Container_FLAG_PRIV_OPT_get();
-  public final static native int Container_FLAG_KEEP_SIDE_DATA_get();
+  public final static native int Container_FLAG_FAST_SEEK_get();
+  public final static native int Container_FLAG_SHORTEST_get();
+  public final static native int Container_FLAG_AUTO_BSF_get();
   public final static native int Container_getNumStreams(long jarg1, Container jarg1_) throws java.lang.InterruptedException, java.io.IOException;
   public final static native long MuxerStream_getCoder(long jarg1, MuxerStream jarg1_);
   public final static native long MuxerStream_getMuxer(long jarg1, MuxerStream jarg1_);

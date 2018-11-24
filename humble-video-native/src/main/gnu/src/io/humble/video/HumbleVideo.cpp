@@ -30538,13 +30538,25 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1FLAG_1DISCARD_1
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1FLAG_1MP4A_1LATM_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1FLAG_1FLUSH_1PACKETS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::Container::Flag result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Container::Flag)io::humble::video::Container::FLAG_MP4A_LATM;
+  result = (io::humble::video::Container::Flag)io::humble::video::Container::FLAG_FLUSH_PACKETS;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1FLAG_1BITEXACT_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::Container::Flag result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::Container::Flag)io::humble::video::Container::FLAG_BITEXACT;
   jresult = (jint)result; 
   return jresult;
 }
@@ -30574,13 +30586,37 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1FLAG_1PRIV_1OPT
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1FLAG_1KEEP_1SIDE_1DATA_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1FLAG_1FAST_1SEEK_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::Container::Flag result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::Container::Flag)io::humble::video::Container::FLAG_KEEP_SIDE_DATA;
+  result = (io::humble::video::Container::Flag)io::humble::video::Container::FLAG_FAST_SEEK;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1FLAG_1SHORTEST_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::Container::Flag result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::Container::Flag)io::humble::video::Container::FLAG_SHORTEST;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Container_1FLAG_1AUTO_1BSF_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::Container::Flag result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::Container::Flag)io::humble::video::Container::FLAG_AUTO_BSF;
   jresult = (jint)result; 
   return jresult;
 }
