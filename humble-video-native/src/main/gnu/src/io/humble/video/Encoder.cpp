@@ -52,13 +52,7 @@ Encoder::release()
 }
 #endif // 0
 
-Encoder::Encoder(Codec* codec, AVCodecContext* src, bool copySrc) : Coder(codec, src, copySrc) {
-  if (!codec)
-    throw HumbleInvalidArgument("no codec passed in");
-
-  if (!codec->canEncode())
-    throw HumbleInvalidArgument("passed in codec cannot encode");
-
+Encoder::Encoder(const AVCodec* codec, const AVCodecParameters* src) : Coder(codec, src) {
   mNumDroppedFrames = 0;
   mLastPtsEncoded = Global::NO_PTS;
 
@@ -72,7 +66,6 @@ Encoder::~Encoder() {
 Encoder*
 Encoder::make(Codec* codec)
 {
-  RefPointer<Encoder> r;
   if (!codec) {
     VS_THROW(HumbleInvalidArgument("no codec passed in"));
   }
@@ -81,8 +74,8 @@ Encoder::make(Codec* codec)
     VS_THROW(HumbleInvalidArgument("passed in codec cannot encode"));
   }
 
-  r.reset(new Encoder(codec, 0, false), true);
-
+  RefPointer<Encoder> r;
+  r.reset(new Encoder(codec->getCtx(), 0), true);
   return r.get();
 }
 
@@ -93,7 +86,7 @@ Encoder::make(Coder* src)
     VS_THROW(HumbleInvalidArgument("no coder to copy"));
   }
 
-  RefPointer<Encoder> r;
+  RefPointer<Encoder> retval;
   RefPointer<Codec> c = src->getCodec();
   if (!c) {
     VS_THROW(HumbleRuntimeError("coder has no codec"));
@@ -107,21 +100,19 @@ Encoder::make(Coder* src)
       RefPointer<CodecDescriptor> cd = CodecDescriptor::make(id);
       VS_THROW(HumbleRuntimeError::make("cannot find encoder for id: %s", cd ? cd->getName() : "unknown"));
     }
+    retval = make(c.value());
+  } else {
+    AVCodecParameters* pars = avcodec_parameters_alloc();
+    if (!pars)
+      VS_THROW(HumbleBadAlloc());
+    if (avcodec_parameters_from_context(pars, src->getCodecCtx()) < 0)
+    {
+      avcodec_parameters_free(&pars);
+      VS_THROW(HumbleRuntimeError::make("cannot copy parameters from codec"));
+    }
+    retval.reset(new Encoder(c->getCtx(), pars), true);
+    avcodec_parameters_free(&pars);
   }
-  r.reset(new Encoder(c.value(), src->getCodecCtx(), true), true);
-  return r.get();
-}
-
-Encoder*
-Encoder::make(Codec* codec, AVCodecContext* src) {
-  if (!src)
-    throw HumbleInvalidArgument("no Encoder to copy");
-  if (!src->codec_id)
-    throw HumbleRuntimeError("No codec set on coder???");
-
-  RefPointer<Encoder> retval;
-  // new Encoder DOES NOT increment refcount but the reset should catch it.
-  retval.reset(new Encoder(codec, src, false), true);
   return retval.get();
 }
 

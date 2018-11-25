@@ -42,16 +42,9 @@ namespace io {
 namespace humble {
 namespace video {
 
-Decoder::Decoder(Codec* codec, AVCodecContext* src, bool copy) : Coder(codec, src, copy) {
-  if (!codec)
-    throw HumbleInvalidArgument("no codec passed in");
-
-  if (!codec->canDecode())
-    throw HumbleInvalidArgument("passed in codec cannot decode");
-
+Decoder::Decoder(const AVCodec* codec, const AVCodecParameters* src) : Coder(codec, src) {
   mSamplesSinceLastTimeStampDiscontinuity = 0;
   mAudioDiscontinuityStartingTimeStamp = Global::NO_PTS;
-
   VS_LOG_TRACE("Created: %p", this);
 }
 
@@ -416,11 +409,7 @@ Decoder::make(Codec* codec)
 
   if (!codec->canDecode())
     throw HumbleInvalidArgument("passed in codec cannot decode");
-
-  RefPointer<Decoder> retval;
-  // new Decoder DOES NOT increment refcount but the reset should catch it.
-  retval.reset(new Decoder(codec, 0, true), true);
-  return retval.get();
+  return make(codec->getCtx(), 0);
 }
 
 Decoder*
@@ -430,6 +419,7 @@ Decoder::make(Coder* src)
     throw HumbleInvalidArgument("no coder to copy");
 
   RefPointer<Codec> c = src->getCodec();
+  RefPointer<Decoder> retval = 0;
   if (!c) {
     VS_THROW(HumbleRuntimeError("coder has no codec"));
   }
@@ -442,21 +432,30 @@ Decoder::make(Coder* src)
       RefPointer<CodecDescriptor> cd = CodecDescriptor::make(id);
       VS_THROW(HumbleRuntimeError::make("cannot find decoder for id: %s", cd ? cd->getName() : "unknown"));
     }
+    retval = make(c.value());
+  } else {
+    // this codec can decode as well... let's make some parameters
+    AVCodecParameters* pars = avcodec_parameters_alloc();
+    if (!pars)
+      VS_THROW(HumbleBadAlloc());
+    if (avcodec_parameters_from_context(pars, src->getCodecCtx()) < 0)
+    {
+      avcodec_parameters_free(&pars);
+      VS_THROW(HumbleRuntimeError::make("cannot copy parameters from codec"));
+    }
+    retval = make(c->getCtx(), pars);
+    avcodec_parameters_free(&pars);
   }
-  return make(c.value(), src->getCodecCtx(), true);
+  return retval.get();
 }
 
 Decoder*
-Decoder::make(Codec* codec, AVCodecContext* src, bool copy) {
-  if (!src)
-    throw HumbleInvalidArgument("no Decoder to copy");
-  if (!src->codec_id)
-    throw HumbleRuntimeError("No codec set on coder???");
-
+Decoder::make(const AVCodec* codec, const AVCodecParameters *src) {
   RefPointer<Decoder> retval;
   // new Decoder DOES NOT increment refcount but the reset should catch it.
-  retval.reset(new Decoder(codec, src, copy), true);
+  retval.reset(new Decoder(codec, src), true);
   return retval.get();
+
 }
 
 } /* namespace video */

@@ -219,10 +219,8 @@ Muxer::open(KeyValueBag *aInputOptions, KeyValueBag* aOutputOptions) {
       }
     }
 
-    pushCoders();
     /* Write the stream header, if any. */
     retval = avformat_write_header(ctx, &tmp);
-    popCoders();
     if (retval < 0) {
       mState = STATE_ERROR;
       FfmpegException::check(retval, "Could not write header for url: %s. ", url);
@@ -247,9 +245,7 @@ Muxer::close() {
     VS_THROW(HumbleRuntimeError::make("closed container that was not open"));
   }
   AVFormatContext* ctx = getFormatCtx();
-  pushCoders();
   int e = av_write_trailer(ctx);
-  popCoders();
   if (e < 0) {
     mState = STATE_ERROR;
     FfmpegException::check(e, "could not write trailer ");
@@ -314,10 +310,10 @@ Muxer::addNewStream(Coder* aCoder) {
   if (!avStream) {
     VS_THROW(HumbleRuntimeError("Could not add new stream to container"));
   }
-  if (avStream->codec && !avStream->codec->codec) {
-    // fixes a memory leak on closing.
-    avStream->codec->codec = coder->getCodecCtx()->codec;
-  }
+//  if (avStream->codec && !avStream->codec->codec) {
+//    // fixes a memory leak on closing.
+//    avStream->codec->codec = coder->getCodecCtx()->codec;
+//  }
   // tell the container to update all the known streams.
   doSetupStreams();
   // and set the coder for the given stream
@@ -326,7 +322,6 @@ Muxer::addNewStream(Coder* aCoder) {
   stream->setCoder(coder.value());
 
   r.reset(this->getStream(avStream->index), false);
-
 
   // let's log the state of the world.
   VS_LOG_TRACE("addNewStream Muxer@%p[i:%"PRId32";c:%p;tb:%"PRId32"/%"PRId32"]",
@@ -469,12 +464,10 @@ Muxer::write(MediaPacket* aPacket, bool forceInterleave) {
   /// now, do the madness.
   AVPacket* out = outPacket->getCtx();
   int e;
-  pushCoders();
   if (forceInterleave)
     e = av_interleaved_write_frame(getFormatCtx(), out);
   else
     e = av_write_frame(getFormatCtx(), out);
-  popCoders();
   Muxer::logWrite(this, aPacket, outPacket.value(), e);
   FfmpegException::check(e, "Could not write packet to muxer ");
   if (e == 1)

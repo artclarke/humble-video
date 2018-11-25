@@ -69,10 +69,6 @@ public:
    */
   static Encoder* make(Coder* src);
 
-#ifndef SWIG
-  static Encoder* make(Codec* codec, AVCodecContext* src);
-#endif // ! SWIG
-
   /**
    * Open this Coder, using the given bag of Codec-specific options.
    *
@@ -184,7 +180,7 @@ public:
 
 protected:
   virtual void checkOptionsBeforeOpen();
-  Encoder(Codec*, AVCodecContext* src, bool copySrc);
+  Encoder(const AVCodec*, const AVCodecParameters* src);
   virtual
   ~Encoder();
 private:

@@ -124,7 +124,7 @@ public class Decoder extends Coder {
   }
 
 /**
- * Creates a Decoder from a given Coder (either an encoder or a decoder).<br>
+ * Creates a Decoder, copying parameters from a given Coder (either an encoder or a decoder).<br>
  * @return a Decoder<br>
  * @throws InvalidArgument if src is null
  */

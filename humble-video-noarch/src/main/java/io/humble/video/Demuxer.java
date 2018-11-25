@@ -192,10 +192,8 @@ public class Demuxer extends Container {
  *   the system has had a chance to determine what the format is, so this<br>
  *   is the only way to set InputFormat-specific options.<br>
  * @param optionsNotSet If not null, on return this KeyValueBag object will be cleared out, and<br>
- *   replace with any key/value pairs that were in <code>options</code> but could not be set on this<br>
- *   Demuxer.<br>
- * <br>
- * @return &gt;= 0 on success; &lt; 0 on error.
+ *   replaced with any key/value pairs that were in <code>options</code> but could not be set on this<br>
+ *   Demuxer.
  */
   public void open(String url, DemuxerFormat format, boolean streamsCanBeAddedDynamically, boolean queryStreamMetaData, KeyValueBag options, KeyValueBag optionsNotSet) throws java.lang.InterruptedException, java.io.IOException {
     VideoJNI.Demuxer_open(swigCPtr, this, url, DemuxerFormat.getCPtr(format), format, streamsCanBeAddedDynamically, queryStreamMetaData, KeyValueBag.getCPtr(options), options, KeyValueBag.getCPtr(optionsNotSet), optionsNotSet);

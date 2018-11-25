@@ -345,6 +345,32 @@ CodecDescriptor::make(Codec::ID id) {
   const AVCodecDescriptor* d = avcodec_descriptor_get((enum AVCodecID) id);
   return make(d);
 }
+
+CodecParameters::CodecParameters() {
+  mCtx = avcodec_parameters_alloc();
+  if (!mCtx)
+    VS_THROW(HumbleBadAlloc());
+}
+
+CodecParameters*
+CodecParameters::make(AVCodecParameters *ctx) {
+  if (!ctx)
+    VS_THROW(HumbleInvalidArgument("null context not allowed"));
+
+  RefPointer<CodecParameters> retval= CodecParameters::make();
+
+  if (avcodec_parameters_copy(mCtx, ctx) < 0) {
+    VS_THROW(HumbleBadAlloc());
+  }
+
+  return retval.get();
+}
+
+CodecParameters::~CodecParameters() {
+  if (mCtx)
+    avcodec_parameters_free(&mCtx);
+}
+
 }
 }
 }

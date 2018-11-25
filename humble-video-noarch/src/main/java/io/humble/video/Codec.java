@@ -634,6 +634,10 @@ public class Codec extends RefCounted {
    */
     DISCARD_BIDIR(VideoJNI.Codec_DISCARD_BIDIR_get()),
   /**
+   * Discard all non intra frames 
+   */
+    DISCARD_NONINTRA(VideoJNI.Codec_DISCARD_NONINTRA_get()),
+  /**
    * Discard all frames except keyframes 
    */
     DISCARD_NONKEY(VideoJNI.Codec_DISCARD_NONKEY_get()),

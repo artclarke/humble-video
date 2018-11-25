@@ -427,9 +427,8 @@ protected:
   virtual int prepareFrame(AVFrame* frame, int flags) {
     return avcodec_default_get_buffer2(mCtx, frame, flags);
   }
-  Coder(Codec* codec, AVCodecContext* src, bool copySrc);
-  virtual
-  ~Coder();
+  Coder(const AVCodec* codec, const AVCodecParameters* src);
+  virtual ~Coder();
   /**
    * Make sure the audio passed in has parameters that match this coder.
    */

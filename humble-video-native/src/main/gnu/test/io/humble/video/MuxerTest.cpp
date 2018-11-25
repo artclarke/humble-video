@@ -74,7 +74,7 @@ MuxerTest::testRemuxing() {
 //  TS_SKIP("leak fixed but still need to determine right muxing strategy");
   RefPointer<Muxer> muxer;
 
-  muxer = Muxer::make("MuxerTest_testRemuxing.mp4", 0, 0);
+  muxer = Muxer::make("file:MuxerTest_testRemuxing.mp4", 0, 0);
 
   //  TestData::Fixture* fixture=mFixtures.getFixture("testfile_h264_mp4a_tmcd.mov");
   TestData::Fixture* fixture=mFixtures.getFixture("ucl_h264_aac.mp4");
@@ -113,7 +113,7 @@ MuxerTest::testHLSRemuxing() {
 //  TS_SKIP("leak fixed but still need to determine right muxing strategy");
   RefPointer<Muxer> muxer;
 
-  muxer = Muxer::make("MuxerTest_testHLSRemuxing.m3u8", 0, "hls");
+  muxer = Muxer::make("file:MuxerTest_testHLSRemuxing.m3u8", 0, "hls");
   muxer->setProperty("start_number", (int64_t)0LL);
   muxer->setProperty("hls_time", (int64_t)2LL);
   muxer->setProperty("hls_list_size", (int64_t)0LL);

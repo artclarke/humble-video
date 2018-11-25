@@ -41,20 +41,199 @@ class VS_API_HUMBLEVIDEO PixelFormat : public io::humble::ferry::RefCounted
 {
 public:
   /**
-   * Pixel format.
+    * Chromaticity coordinates of the source primaries.
+    * These values match the ones defined by ISO/IEC 23001-8_2013 § 7.1.
+    */
+        typedef enum ColorPrimaries
+        {
+          COL_PRI_RESERVED0 = AVCOL_PRI_RESERVED0,
+          /** also ITU-R BT1361 / IEC 61966-2-4 / SMPTE RP177 Annex B */
+          COL_PRI_BT709 = AVCOL_PRI_BT709,
+          COL_PRI_UNSPECIFIED = AVCOL_PRI_UNSPECIFIED,
+          COL_PRI_RESERVED = AVCOL_PRI_RESERVED,
+          /** also FCC Title 47 Code of Federal Regulations 73.682 (a)(20) */
+          COL_PRI_BT470M = AVCOL_PRI_BT470M,
+
+          /** also ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM */
+          COL_PRI_BT470BG = AVCOL_PRI_BT470BG,
+          /** also ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC */
+          COL_PRI_SMPTE170M = AVCOL_PRI_SMPTE170M,
+          /**  functionally identical to COL_PRI_SMPTE170M */
+          COL_PRI_SMPTE240M = AVCOL_PRI_SMPTE240M,
+          /** colour filters using Illuminant C */
+          COL_PRI_FILM = AVCOL_PRI_FILM,
+          /** ITU-R BT2020 */
+          COL_PRI_BT2020 = AVCOL_PRI_BT2020,
+          /** SMPTE ST 428-1 (CIE 1931 XYZ) */
+          COL_PRI_SMPTE428 = AVCOL_PRI_SMPTE428,
+          COL_PRI_SMPTEST428_1 = AVCOL_PRI_SMPTEST428_1,
+          /** SMPTE ST 431-2 (2011) / DCI P3 */
+          COL_PRI_SMPTE431 = AVCOL_PRI_SMPTE431,
+          /** SMPTE ST 432-1 (2010) / P3 D65 / Display P3 */
+          COL_PRI_SMPTE432 = AVCOL_PRI_SMPTE432,
+          /** JEDEC P22 phosphors */
+          COL_PRI_JEDEC_P22 = AVCOL_PRI_JEDEC_P22,
+        } ColorPrimaries;
+
+  /**
+   * Color Transfer Characteristic.
+   * These values match the ones defined by ISO/IEC 23001-8_2013 § 7.2.
+   */
+  typedef enum ColorTransferCharacteristic {
+    COL_TRC_RESERVED0 = AVCOL_TRC_RESERVED0,
+      /** also ITU-R BT1361 */
+    COL_TRC_BT709 = AVCOL_TRC_BT709,
+    COL_TRC_UNSPECIFIED = AVCOL_TRC_UNSPECIFIED,
+    COL_TRC_RESERVED = AVCOL_TRC_RESERVED,
+      /** also ITU-R BT470M / ITU-R BT1700 625 PAL & SECAM */
+    COL_TRC_GAMMA22 = AVCOL_TRC_GAMMA22,
+      /** also ITU-R BT470BG */
+    COL_TRC_GAMMA28 = AVCOL_TRC_GAMMA28,
+      /** also ITU-R BT601-6 525 or 625 / ITU-R BT1358 525 or 625 / ITU-R BT1700 NTSC */
+    COL_TRC_SMPTE170M = AVCOL_TRC_SMPTE170M,
+    COL_TRC_SMPTE240M = AVCOL_TRC_SMPTE240M,
+      /** "Linear transfer characteristics" */
+    COL_TRC_LINEAR = AVCOL_TRC_LINEAR,
+      /** "Logarithmic transfer characteristic (100:1 range)" */
+    COL_TRC_LOG = AVCOL_TRC_LOG,
+      /** "Logarithmic transfer characteristic (100 * Sqrt(10) : 1 range)" */
+    COL_TRC_LOG_SQRT = AVCOL_TRC_LOG_SQRT,
+      /** IEC 61966-2-4 */
+    COL_TRC_IEC61966_2_4 = AVCOL_TRC_IEC61966_2_4,
+      /** ITU-R BT1361 Extended Colour Gamut */
+    COL_TRC_BT1361_ECG = AVCOL_TRC_BT1361_ECG,
+      /** IEC 61966-2-1 (sRGB or sYCC) */
+    COL_TRC_IEC61966_2_1 = AVCOL_TRC_IEC61966_2_1,
+      /** ITU-R BT2020 for 10-bit system */
+    COL_TRC_BT2020_10 = AVCOL_TRC_BT2020_10,
+      /** ITU-R BT2020 for 12-bit system */
+    COL_TRC_BT2020_12 = AVCOL_TRC_BT2020_12,
+      /** SMPTE ST 2084 for 10-, 12-, 14- and 16-bit systems */
+    COL_TRC_SMPTE2084 = AVCOL_TRC_SMPTE2084,
+    COL_TRC_SMPTEST2084 = AVCOL_TRC_SMPTEST2084,
+      /** SMPTE ST 428-1 */
+    COL_TRC_SMPTE428 = AVCOL_TRC_SMPTE428,
+    COL_TRC_SMPTEST428_1 = AVCOL_TRC_SMPTEST428_1,
+      /** ARIB STD-B67, known as "Hybrid log-gamma" */
+    COL_TRC_ARIB_STD_B67 = AVCOL_TRC_ARIB_STD_B67,
+  } ColorTransferCharacteristic;
+
+  /**
+   * YUV colorspace type.
+   * These values match the ones defined by ISO/IEC 23001-8_2013 § 7.3.
+   */
+  typedef enum ColorSpace {
+    /** order of coefficients is actually GBR, also IEC 61966-2-1 (sRGB) */
+    COL_SPC_RGB = AVCOL_SPC_RGB,
+    /** also ITU-R BT1361 / IEC 61966-2-4 xvYCC709 / SMPTE RP177 Annex B */
+    COL_SPC_BT709 = AVCOL_SPC_BT709,
+    COL_SPC_UNSPECIFIED = AVCOL_SPC_UNSPECIFIED,
+    COL_SPC_RESERVED = AVCOL_SPC_RESERVED,
+    /** FCC Title 47 Code of Federal Regulations 73.682 (a)(20) */
+    COL_SPC_FCC = AVCOL_SPC_FCC,
+    /** also ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM / IEC 61966-2-4 xvYCC601 */
+    COL_SPC_BT470BG = AVCOL_SPC_BT470BG,
+    /** also ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC */
+    COL_SPC_SMPTE170M = AVCOL_SPC_SMPTE170M,
+    /** functionally identical to SMPTE170M */
+    COL_SPC_SMPTE240M = AVCOL_SPC_SMPTE240M,
+    /** Used by Dirac / VC-2 and H.264 FRext, see ITU-T SG16 */
+    COL_SPC_YCGCO = AVCOL_SPC_YCGCO,
+    COL_SPC_YCOCG = AVCOL_SPC_YCOCG,
+    /** ITU-R BT2020 non-constant luminance system */
+    COL_SPC_BT2020_NCL = AVCOL_SPC_BT2020_NCL,
+    /** ITU-R BT2020 constant luminance system */
+    COL_SPC_BT2020_CL = AVCOL_SPC_BT2020_CL,
+    /** SMPTE 2085, Y'D'zD'x */
+    COL_SPC_SMPTE2085 = AVCOL_SPC_SMPTE2085,
+    /** Chromaticity-derived non-constant luminance system */
+    COL_SPC_CHROMA_DERIVED_NCL = AVCOL_SPC_CHROMA_DERIVED_NCL,
+    /** Chromaticity-derived constant luminance system */
+    COL_SPC_CHROMA_DERIVED_CL = AVCOL_SPC_CHROMA_DERIVED_CL,
+    /** ITU-R BT.2100-0, ICtCp */
+    COL_SPC_ICTCP = AVCOL_SPC_ICTCP,
+  } ColorSpace;
+
+  /**
+   * MPEG vs JPEG YUV range.
+   */
+  typedef enum ColorRange {
+    COL_RANGE_UNSPECIFIED = AVCOL_RANGE_UNSPECIFIED,
+    /** the normal 219*2^(n-8) "MPEG" YUV ranges */
+    COL_RANGE_MPEG  = AVCOL_RANGE_MPEG,
+    /** the normal     2^n-1   "JPEG" YUV ranges */
+    COL_RANGE_JPEG = AVCOL_RANGE_JPEG,
+  } ColorRange;
+
+  /**
+   * Location of chroma samples.
+   * <p>
+   * Illustration showing the location of the first (top left) chroma sample of the
+   * image, the left shows only luma, the right
+   * shows the location of the chroma sample, the 2 could be imagined to overlay
+   * each other but are drawn separately due to limitations of ASCII
+   * </p>
+   * <pre>
    *
+   *                1st 2nd       1st 2nd horizontal luma sample positions
+   *                 v   v         v   v
+   *                 ______        ______
+   *1st luma line > |X   X ...    |3 4 X ...     X are luma samples,
+   *                |             |1 2           1-6 are possible chroma positions
+   *2nd luma line > |X   X ...    |5 6 X ...     0 is undefined/unknown position
+   * </pre>
+   */
+  typedef enum ChromaLocation {
+    CHROMA_LOC_UNSPECIFIED = AVCHROMA_LOC_UNSPECIFIED,
+      /** MPEG-2/4 4:2:0, H.264 default for 4:2:0 */
+    CHROMA_LOC_LEFT = AVCHROMA_LOC_LEFT,
+      /** MPEG-1 4:2:0, JPEG 4:2:0, H.263 4:2:0 */
+    CHROMA_LOC_CENTER = AVCHROMA_LOC_CENTER,
+      /** ITU-R 601, SMPTE 274M 296M S314M(DV 4:1:1), mpeg2 4:2:2 */
+    CHROMA_LOC_TOPLEFT = AVCHROMA_LOC_TOPLEFT,
+    CHROMA_LOC_TOP = AVCHROMA_LOC_TOP,
+    CHROMA_LOC_BOTTOMLEFT = AVCHROMA_LOC_BOTTOMLEFT,
+    CHROMA_LOC_BOTTOM = AVCHROMA_LOC_BOTTOM,
+  } ChromaLocation;
+
+  /**
+   * The order of the fields in interlaced video. Video only.
+   */
+  typedef enum FieldOrder {
+    /** Unknown */
+    FIELD_UNKNOWN = AV_FIELD_UNKNOWN,
+    /** Progressive */
+    FIELD_PROGRESSIVE = AV_FIELD_PROGRESSIVE,
+    /** Top coded_first, top displayed first */
+    FIELD_TT = AV_FIELD_TT,
+    /** Bottom coded first, bottom displayed first */
+    FIELD_BB = AV_FIELD_BB,
+    /** Top coded first, bottom displayed first */
+    FIELD_TB = AV_FIELD_TB,
+    /** Bottom coded first, top displayed first */
+    FIELD_BT = AV_FIELD_BT,
+  } FieldOrder;
+
+  /**
+   * Pixel format.
+   * <p>
    * @note
    * PIX_FMT_RGB32 is handled in an endian-specific manner. An RGBA
    * color is put together as:
+   * </p>
+   * <p>
    *  (A << 24) | (R << 16) | (G << 8) | B
+   * </p>
+   * <p>
    * This is stored as BGRA on little-endian CPU architectures and ARGB on
    * big-endian CPUs.
-   *
+   * </p>
+   * <p>
    * @note
    * If the resolution is not a multiple of the chroma subsampling factor
    * then the chroma plane resolution must be rounded up.
-   *
-   * @par
+   * </p>
+   * <p>
    * When the pixel format is palettized RGB32 (PIX_FMT_PAL8), the palettized
    * image data is stored in AVFrame.data[0]. The palette is transported in
    * AVFrame.data[1], is 1024 bytes long (256 4-byte entries) and is
@@ -63,11 +242,12 @@ public:
    * components stored in AVFrame.data[1] should be in the range 0..255.
    * This is important as many custom PAL8 video codecs that were designed
    * to run on the IBM VGA graphics adapter use 6-bit palette components.
-   *
-   * @par
+   * </p>
+   * <p>
    * For all the 8 bits per pixel formats, an RGB32 palette is in data[1] like
    * for pal8. This palette is filled in automatically by the function
    * allocating the picture.
+   * </p>
    */
   typedef enum Type
   {
@@ -523,15 +703,42 @@ public:
      */
     PIX_FMT_FLAG_RGB = AV_PIX_FMT_FLAG_RGB,
     /**
-     * The pixel format is "pseudo-paletted". This means that FFmpeg treats it as
-     * paletted internally, but the palette is generated by the decoder and is not
-     * stored in the file.
+     * The pixel format is "pseudo-paletted". This means that it contains a
+     * fixed palette in the 2nd plane but the palette is fixed/constant for each
+     * PIX_FMT. This allows interpreting the data as if it was PAL8, which can
+     * in some cases be simpler. Or the data can be interpreted purely based on
+     * the pixel format without using the palette.
+     * An example of a pseudo-paletted format is AV_PIX_FMT_GRAY8
+     *
+     * @deprecated This flag is deprecated, and will be removed. When it is removed,
+     * the extra palette allocation in AVFrame.data[1] is removed as well. Only
+     * actual paletted formats (as indicated by AV_PIX_FMT_FLAG_PAL) will have a
+     * palette. Starting with FFmpeg versions which have this flag deprecated, the
+     * extra "pseudo" palette is already ignored, and API users are not required to
+     * allocate a palette for AV_PIX_FMT_FLAG_PSEUDOPAL formats (it was required
+     * before the deprecation, though).
      */
     PIX_FMT_FLAG_PSEUDOPAL = AV_PIX_FMT_FLAG_PSEUDOPAL,
     /**
-     * The pixel format has an alpha channel.
+     * The pixel format has an alpha channel. This is set on all formats that
+     * support alpha in some way, including AV_PIX_FMT_PAL8. The alpha is always
+     * straight, never pre-multiplied.
+     *
+     * If a codec or a filter does not support alpha, it should set all alpha to
+     * opaque, or use the equivalent pixel formats without alpha component, e.g.
+     * AV_PIX_FMT_RGB0 (or AV_PIX_FMT_RGB24 etc.) instead of AV_PIX_FMT_RGBA.
      */
     PIX_FMT_FLAG_ALPHA = AV_PIX_FMT_FLAG_ALPHA,
+    /**
+     * The pixel format is following a Bayer pattern
+     */
+    PIX_FMT_FLAG_BAYER = AV_PIX_FMT_FLAG_BAYER,
+
+    /**
+     * The pixel format contains IEEE-754 floating point values. Precision (double,
+     * single, or half) should be determined by the pixel size (64, 32, or 16 bits).
+     */
+    PIX_FMT_FLAG_FLOAT = AV_PIX_FMT_FLAG_FLOAT,
   } Flag;
 
   /** Get the name of this pixel descriptor */

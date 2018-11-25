@@ -88,11 +88,13 @@ DemuxerTest::openTestHelper(const char* file)
   TS_ASSERT(metadata);
 
   int32_t n = metadata->getNumKeys();
+  VS_LOG_TRACE("num keys: %d", n);
+
   TS_ASSERT_EQUALS(0, n);
   for (int32_t i = 0; i < n; i++) {
     const char* key = metadata->getKey(i);
     const char* val = metadata->getValue(key, KeyValueBag::KVB_NONE);
-    VS_LOG_DEBUG("%s, %s", key, val);
+    VS_LOG_ERROR("%s, %s", key, val);
   }
 
   int32_t duration = (int32_t) source->getDuration();
@@ -235,6 +237,16 @@ DemuxerTest::testRead()
   for(int i = 0; i < n; i++) {
     RefPointer<DemuxerStream> ds = source->getStream(i);
     RefPointer<Decoder> d = ds->getDecoder();
+    // now let's get all the decoder properties
+    int32_t numProperties = d->getNumProperties();
+    for(int j = 0; j < numProperties; j++) {
+      RefPointer<Property> prop = d->getPropertyMetaData(j);
+      const char* name = prop->getName();
+      char* val = d->getPropertyAsString(name);
+      (void) val;
+      VS_LOG_TRACE("Stream: %d. p[%s] = %s", i, name, val);
+      free((void*)val); val = 0;
+    }
     MediaDescriptor::Type t = d->getCodecType();
     streamTypes.push_back(t);
   }
@@ -247,9 +259,9 @@ DemuxerTest::testRead()
     if (pkt->isComplete()) {
       int32_t stream = pkt->getStreamIndex();
       TS_ASSERT(stream >= 0 && stream < n);
+      TSM_ASSERT_DIFFERS("no dts set", Global::NO_PTS, pkt->getDts());
       if (streamTypes[stream] == MediaDescriptor::MEDIA_VIDEO) {
-        // every video stream should have a valid PTS and DTS
-        TSM_ASSERT_DIFFERS("no dts set", Global::NO_PTS, pkt->getDts());
+        // every video stream should have a valid PTS
         TSM_ASSERT_DIFFERS("no pts set", Global::NO_PTS, pkt->getPts());
       }
     }

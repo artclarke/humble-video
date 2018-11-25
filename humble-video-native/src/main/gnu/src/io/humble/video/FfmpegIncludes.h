@@ -22,9 +22,6 @@
 
 extern "C"
 {
-// Hack here to get rid of deprecation compilation warnings
-//#define attribute_deprecated
-
 // WARNING: This is GCC specific and is to fix a build issue
 // in FFmpeg where UINT64_C is not always defined.  The
 // __WORDSIZE value is a GCC constant
@@ -60,6 +57,10 @@ extern "C"
 #include <libavutil/log.h>
 #include <libavutil/mathematics.h>
 
-
+// Hack here to get rid of deprecation compilation warnings
+#ifdef attribute_deprecated
+#undef attribute_deprecated
+#endif
+#define attribute_deprecated
 }
 #endif /*HUMBLEFFMPEGINCLUDES_H_*/

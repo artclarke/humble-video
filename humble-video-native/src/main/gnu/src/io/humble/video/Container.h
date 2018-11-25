@@ -169,16 +169,6 @@ public:
     void setCoder(Coder* coder) {
       mCoder.reset(coder, true);
     }
-    void popCoder() {
-      AVStream* ctx = getCtx();
-      ctx->codec = mCachedCtx;
-      mCachedCtx = 0;
-    }
-    void pushCoder() {
-      AVStream* ctx = getCtx();
-      mCachedCtx = ctx->codec;
-      ctx->codec = mCoder->getCodecCtx();
-    }
 
   private:
     int32_t mIndex;
@@ -187,17 +177,8 @@ public:
     io::humble::ferry::RefPointer<Coder> mCoder;
     Container* mContainer;
     AVStream* mCtx;
-    AVCodecContext *mCachedCtx;
   };
   Stream* getStream(int32_t i);
-  /** Temporarily caches the libavformat managed AVCodecContext objects
-   * and substitutes in our Folgers Crystals versions.
-   */
-  void pushCoders();
-  /**
-   * Puts back the libavformat managed AVCodecContext objects
-   */
-  void popCoders();
 #endif // ! SWIG
 
 protected:

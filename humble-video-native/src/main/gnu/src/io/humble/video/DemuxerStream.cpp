@@ -70,7 +70,7 @@ DemuxerStream::getDecoder() {
         if (!codec) {
           VS_THROW(HumbleRuntimeError("could not find decoding codec"));
         }
-        mDecoder = Decoder::make(codec.value(), stream->codec, true);
+        mDecoder = Decoder::make(codec->getCtx(), stream->codecpar);
       }
     }
   }

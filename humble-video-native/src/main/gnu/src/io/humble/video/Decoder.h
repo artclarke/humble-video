@@ -52,14 +52,15 @@ public:
   static Decoder* make(Codec* codec);
 
   /**
-   * Creates a Decoder from a given Coder (either an encoder or a decoder).
+   * Creates a Decoder, copying parameters from a given Coder (either an encoder or a decoder).
    * @return a Decoder
    * @throws InvalidArgument if src is null
    */
   static Decoder* make(Coder* src);
+
 #ifndef SWIG
-  static Decoder* make(Codec* codec, AVCodecContext* src, bool copy);
-#endif // ! SWIG
+  static Decoder* make(const AVCodec* codec, const AVCodecParameters *src);
+#endif // SWIG
 
   /**
    * Flush this Decoder, getting rid of any cached packets (call after seek).
@@ -153,9 +154,8 @@ public:
 //      MediaPacket *packet, int32_t byteOffset);
 
 protected:
-  Decoder(Codec* codec, AVCodecContext* src, bool copy);
-  virtual
-  ~Decoder();
+  Decoder(const AVCodec* codec, const AVCodecParameters* src);
+  virtual ~Decoder();
 
   virtual int prepareFrame(AVFrame* frame, int flags);
 private:

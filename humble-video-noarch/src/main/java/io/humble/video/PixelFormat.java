@@ -190,31 +190,539 @@ public class PixelFormat extends RefCounted {
   }
 
   /**
-   * Pixel format.<br>
+   * Chromaticity coordinates of the source primaries.<br>
+   * These values match the ones defined by ISO/IEC 23001-8_2013 § 7.1.
+   */
+  public enum ColorPrimaries {
+    COL_PRI_RESERVED0(VideoJNI.PixelFormat_COL_PRI_RESERVED0_get()),
+  /**
+   * also ITU-R BT1361 / IEC 61966-2-4 / SMPTE RP177 Annex B 
+   */
+    COL_PRI_BT709(VideoJNI.PixelFormat_COL_PRI_BT709_get()),
+    COL_PRI_UNSPECIFIED(VideoJNI.PixelFormat_COL_PRI_UNSPECIFIED_get()),
+    COL_PRI_RESERVED(VideoJNI.PixelFormat_COL_PRI_RESERVED_get()),
+  /**
+   * also FCC Title 47 Code of Federal Regulations 73.682 (a)(20) 
+   */
+    COL_PRI_BT470M(VideoJNI.PixelFormat_COL_PRI_BT470M_get()),
+  /**
+   * also ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL &amp; SECAM 
+   */
+    COL_PRI_BT470BG(VideoJNI.PixelFormat_COL_PRI_BT470BG_get()),
+  /**
+   * also ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC 
+   */
+    COL_PRI_SMPTE170M(VideoJNI.PixelFormat_COL_PRI_SMPTE170M_get()),
+  /**
+   * functionally identical to COL_PRI_SMPTE170M 
+   */
+    COL_PRI_SMPTE240M(VideoJNI.PixelFormat_COL_PRI_SMPTE240M_get()),
+  /**
+   * colour filters using Illuminant C 
+   */
+    COL_PRI_FILM(VideoJNI.PixelFormat_COL_PRI_FILM_get()),
+  /**
+   * ITU-R BT2020 
+   */
+    COL_PRI_BT2020(VideoJNI.PixelFormat_COL_PRI_BT2020_get()),
+  /**
+   * SMPTE ST 428-1 (CIE 1931 XYZ) 
+   */
+    COL_PRI_SMPTE428(VideoJNI.PixelFormat_COL_PRI_SMPTE428_get()),
+    COL_PRI_SMPTEST428_1(VideoJNI.PixelFormat_COL_PRI_SMPTEST428_1_get()),
+  /**
+   * SMPTE ST 431-2 (2011) / DCI P3 
+   */
+    COL_PRI_SMPTE431(VideoJNI.PixelFormat_COL_PRI_SMPTE431_get()),
+  /**
+   * SMPTE ST 432-1 (2010) / P3 D65 / Display P3 
+   */
+    COL_PRI_SMPTE432(VideoJNI.PixelFormat_COL_PRI_SMPTE432_get()),
+  /**
+   * JEDEC P22 phosphors 
+   */
+    COL_PRI_JEDEC_P22(VideoJNI.PixelFormat_COL_PRI_JEDEC_P22_get()),
+  ;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static ColorPrimaries swigToEnum(int swigValue) {
+      ColorPrimaries[] swigValues = ColorPrimaries.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (ColorPrimaries swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + ColorPrimaries.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private ColorPrimaries() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private ColorPrimaries(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private ColorPrimaries(ColorPrimaries swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
+  /**
+   * Color Transfer Characteristic.<br>
+   * These values match the ones defined by ISO/IEC 23001-8_2013 § 7.2.
+   */
+  public enum ColorTransferCharacteristic {
+    COL_TRC_RESERVED0(VideoJNI.PixelFormat_COL_TRC_RESERVED0_get()),
+  /**
+   * also ITU-R BT1361 
+   */
+    COL_TRC_BT709(VideoJNI.PixelFormat_COL_TRC_BT709_get()),
+    COL_TRC_UNSPECIFIED(VideoJNI.PixelFormat_COL_TRC_UNSPECIFIED_get()),
+    COL_TRC_RESERVED(VideoJNI.PixelFormat_COL_TRC_RESERVED_get()),
+  /**
+   * also ITU-R BT470M / ITU-R BT1700 625 PAL &amp; SECAM 
+   */
+    COL_TRC_GAMMA22(VideoJNI.PixelFormat_COL_TRC_GAMMA22_get()),
+  /**
+   * also ITU-R BT470BG 
+   */
+    COL_TRC_GAMMA28(VideoJNI.PixelFormat_COL_TRC_GAMMA28_get()),
+  /**
+   * also ITU-R BT601-6 525 or 625 / ITU-R BT1358 525 or 625 / ITU-R BT1700 NTSC 
+   */
+    COL_TRC_SMPTE170M(VideoJNI.PixelFormat_COL_TRC_SMPTE170M_get()),
+    COL_TRC_SMPTE240M(VideoJNI.PixelFormat_COL_TRC_SMPTE240M_get()),
+  /**
+   * "Linear transfer characteristics" 
+   */
+    COL_TRC_LINEAR(VideoJNI.PixelFormat_COL_TRC_LINEAR_get()),
+  /**
+   * "Logarithmic transfer characteristic (100:1 range)" 
+   */
+    COL_TRC_LOG(VideoJNI.PixelFormat_COL_TRC_LOG_get()),
+  /**
+   * "Logarithmic transfer characteristic (100 * Sqrt(10) : 1 range)" 
+   */
+    COL_TRC_LOG_SQRT(VideoJNI.PixelFormat_COL_TRC_LOG_SQRT_get()),
+  /**
+   * IEC 61966-2-4 
+   */
+    COL_TRC_IEC61966_2_4(VideoJNI.PixelFormat_COL_TRC_IEC61966_2_4_get()),
+  /**
+   * ITU-R BT1361 Extended Colour Gamut 
+   */
+    COL_TRC_BT1361_ECG(VideoJNI.PixelFormat_COL_TRC_BT1361_ECG_get()),
+  /**
+   * IEC 61966-2-1 (sRGB or sYCC) 
+   */
+    COL_TRC_IEC61966_2_1(VideoJNI.PixelFormat_COL_TRC_IEC61966_2_1_get()),
+  /**
+   * ITU-R BT2020 for 10-bit system 
+   */
+    COL_TRC_BT2020_10(VideoJNI.PixelFormat_COL_TRC_BT2020_10_get()),
+  /**
+   * ITU-R BT2020 for 12-bit system 
+   */
+    COL_TRC_BT2020_12(VideoJNI.PixelFormat_COL_TRC_BT2020_12_get()),
+  /**
+   * SMPTE ST 2084 for 10-, 12-, 14- and 16-bit systems 
+   */
+    COL_TRC_SMPTE2084(VideoJNI.PixelFormat_COL_TRC_SMPTE2084_get()),
+    COL_TRC_SMPTEST2084(VideoJNI.PixelFormat_COL_TRC_SMPTEST2084_get()),
+  /**
+   * SMPTE ST 428-1 
+   */
+    COL_TRC_SMPTE428(VideoJNI.PixelFormat_COL_TRC_SMPTE428_get()),
+    COL_TRC_SMPTEST428_1(VideoJNI.PixelFormat_COL_TRC_SMPTEST428_1_get()),
+  /**
+   * ARIB STD-B67, known as "Hybrid log-gamma" 
+   */
+    COL_TRC_ARIB_STD_B67(VideoJNI.PixelFormat_COL_TRC_ARIB_STD_B67_get()),
+  ;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static ColorTransferCharacteristic swigToEnum(int swigValue) {
+      ColorTransferCharacteristic[] swigValues = ColorTransferCharacteristic.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (ColorTransferCharacteristic swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + ColorTransferCharacteristic.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private ColorTransferCharacteristic() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private ColorTransferCharacteristic(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private ColorTransferCharacteristic(ColorTransferCharacteristic swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
+  /**
+   * YUV colorspace type.<br>
+   * These values match the ones defined by ISO/IEC 23001-8_2013 § 7.3.
+   */
+  public enum ColorSpace {
+  /**
+   * order of coefficients is actually GBR, also IEC 61966-2-1 (sRGB) 
+   */
+    COL_SPC_RGB(VideoJNI.PixelFormat_COL_SPC_RGB_get()),
+  /**
+   * also ITU-R BT1361 / IEC 61966-2-4 xvYCC709 / SMPTE RP177 Annex B 
+   */
+    COL_SPC_BT709(VideoJNI.PixelFormat_COL_SPC_BT709_get()),
+    COL_SPC_UNSPECIFIED(VideoJNI.PixelFormat_COL_SPC_UNSPECIFIED_get()),
+    COL_SPC_RESERVED(VideoJNI.PixelFormat_COL_SPC_RESERVED_get()),
+  /**
+   * FCC Title 47 Code of Federal Regulations 73.682 (a)(20) 
+   */
+    COL_SPC_FCC(VideoJNI.PixelFormat_COL_SPC_FCC_get()),
+  /**
+   * also ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL &amp; SECAM / IEC 61966-2-4 xvYCC601 
+   */
+    COL_SPC_BT470BG(VideoJNI.PixelFormat_COL_SPC_BT470BG_get()),
+  /**
+   * also ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC 
+   */
+    COL_SPC_SMPTE170M(VideoJNI.PixelFormat_COL_SPC_SMPTE170M_get()),
+  /**
+   * functionally identical to SMPTE170M 
+   */
+    COL_SPC_SMPTE240M(VideoJNI.PixelFormat_COL_SPC_SMPTE240M_get()),
+  /**
+   * Used by Dirac / VC-2 and H.264 FRext, see ITU-T SG16 
+   */
+    COL_SPC_YCGCO(VideoJNI.PixelFormat_COL_SPC_YCGCO_get()),
+    COL_SPC_YCOCG(VideoJNI.PixelFormat_COL_SPC_YCOCG_get()),
+  /**
+   * ITU-R BT2020 non-constant luminance system 
+   */
+    COL_SPC_BT2020_NCL(VideoJNI.PixelFormat_COL_SPC_BT2020_NCL_get()),
+  /**
+   * ITU-R BT2020 constant luminance system 
+   */
+    COL_SPC_BT2020_CL(VideoJNI.PixelFormat_COL_SPC_BT2020_CL_get()),
+  /**
+   * SMPTE 2085, Y'D'zD'x 
+   */
+    COL_SPC_SMPTE2085(VideoJNI.PixelFormat_COL_SPC_SMPTE2085_get()),
+  /**
+   * Chromaticity-derived non-constant luminance system 
+   */
+    COL_SPC_CHROMA_DERIVED_NCL(VideoJNI.PixelFormat_COL_SPC_CHROMA_DERIVED_NCL_get()),
+  /**
+   * Chromaticity-derived constant luminance system 
+   */
+    COL_SPC_CHROMA_DERIVED_CL(VideoJNI.PixelFormat_COL_SPC_CHROMA_DERIVED_CL_get()),
+  /**
+   * ITU-R BT.2100-0, ICtCp 
+   */
+    COL_SPC_ICTCP(VideoJNI.PixelFormat_COL_SPC_ICTCP_get()),
+  ;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static ColorSpace swigToEnum(int swigValue) {
+      ColorSpace[] swigValues = ColorSpace.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (ColorSpace swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + ColorSpace.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private ColorSpace() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private ColorSpace(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private ColorSpace(ColorSpace swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
+  /**
+   * MPEG vs JPEG YUV range.
+   */
+  public enum ColorRange {
+    COL_RANGE_UNSPECIFIED(VideoJNI.PixelFormat_COL_RANGE_UNSPECIFIED_get()),
+  /**
+   * the normal 219*2^(n-8) "MPEG" YUV ranges 
+   */
+    COL_RANGE_MPEG(VideoJNI.PixelFormat_COL_RANGE_MPEG_get()),
+  /**
+   * the normal     2^n-1   "JPEG" YUV ranges 
+   */
+    COL_RANGE_JPEG(VideoJNI.PixelFormat_COL_RANGE_JPEG_get()),
+  ;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static ColorRange swigToEnum(int swigValue) {
+      ColorRange[] swigValues = ColorRange.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (ColorRange swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + ColorRange.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private ColorRange() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private ColorRange(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private ColorRange(ColorRange swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
+  /**
+   * Location of chroma samples.<br>
+   * <p><br>
+   * Illustration showing the location of the first (top left) chroma sample of the<br>
+   * image, the left shows only luma, the right<br>
+   * shows the location of the chroma sample, the 2 could be imagined to overlay<br>
+   * each other but are drawn separately due to limitations of ASCII<br>
+   * </p><br>
+   * <pre><br>
    * <br>
+   *                1st 2nd       1st 2nd horizontal luma sample positions<br>
+   *                 v   v         v   v<br>
+   *                 ______        ______<br>
+   * 1st luma line &gt; |X   X ...    |3 4 X ...     X are luma samples,<br>
+   *                |             |1 2           1-6 are possible chroma positions<br>
+   * 2nd luma line &gt; |X   X ...    |5 6 X ...     0 is undefined/unknown position<br>
+   * </pre>
+   */
+  public enum ChromaLocation {
+    CHROMA_LOC_UNSPECIFIED(VideoJNI.PixelFormat_CHROMA_LOC_UNSPECIFIED_get()),
+  /**
+   * MPEG-2/4 4:2:0, H.264 default for 4:2:0 
+   */
+    CHROMA_LOC_LEFT(VideoJNI.PixelFormat_CHROMA_LOC_LEFT_get()),
+  /**
+   * MPEG-1 4:2:0, JPEG 4:2:0, H.263 4:2:0 
+   */
+    CHROMA_LOC_CENTER(VideoJNI.PixelFormat_CHROMA_LOC_CENTER_get()),
+  /**
+   * ITU-R 601, SMPTE 274M 296M S314M(DV 4:1:1), mpeg2 4:2:2 
+   */
+    CHROMA_LOC_TOPLEFT(VideoJNI.PixelFormat_CHROMA_LOC_TOPLEFT_get()),
+    CHROMA_LOC_TOP(VideoJNI.PixelFormat_CHROMA_LOC_TOP_get()),
+    CHROMA_LOC_BOTTOMLEFT(VideoJNI.PixelFormat_CHROMA_LOC_BOTTOMLEFT_get()),
+    CHROMA_LOC_BOTTOM(VideoJNI.PixelFormat_CHROMA_LOC_BOTTOM_get()),
+  ;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static ChromaLocation swigToEnum(int swigValue) {
+      ChromaLocation[] swigValues = ChromaLocation.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (ChromaLocation swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + ChromaLocation.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private ChromaLocation() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private ChromaLocation(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private ChromaLocation(ChromaLocation swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
+  /**
+   * The order of the fields in interlaced video. Video only.
+   */
+  public enum FieldOrder {
+  /**
+   * Unknown 
+   */
+    FIELD_UNKNOWN(VideoJNI.PixelFormat_FIELD_UNKNOWN_get()),
+  /**
+   * Progressive 
+   */
+    FIELD_PROGRESSIVE(VideoJNI.PixelFormat_FIELD_PROGRESSIVE_get()),
+  /**
+   * Top coded_first, top displayed first 
+   */
+    FIELD_TT(VideoJNI.PixelFormat_FIELD_TT_get()),
+  /**
+   * Bottom coded first, bottom displayed first 
+   */
+    FIELD_BB(VideoJNI.PixelFormat_FIELD_BB_get()),
+  /**
+   * Top coded first, bottom displayed first 
+   */
+    FIELD_TB(VideoJNI.PixelFormat_FIELD_TB_get()),
+  /**
+   * Bottom coded first, top displayed first 
+   */
+    FIELD_BT(VideoJNI.PixelFormat_FIELD_BT_get()),
+  ;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static FieldOrder swigToEnum(int swigValue) {
+      FieldOrder[] swigValues = FieldOrder.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (FieldOrder swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + FieldOrder.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private FieldOrder() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private FieldOrder(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private FieldOrder(FieldOrder swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
+  /**
+   * Pixel format.<br>
+   * <p><br>
    * Note: <br>
    * PIX_FMT_RGB32 is handled in an endian-specific manner. An RGBA<br>
    * color is put together as:<br>
+   * </p><br>
+   * <p><br>
    *  (A &lt;< 24) | (R &lt;< 16) | (G &lt;< 8) | B<br>
+   * </p><br>
+   * <p><br>
    * This is stored as BGRA on little-endian CPU architectures and ARGB on<br>
    * big-endian CPUs.<br>
-   * <br>
+   * </p><br>
+   * <p><br>
    * Note: <br>
    * If the resolution is not a multiple of the chroma subsampling factor<br>
    * then the chroma plane resolution must be rounded up.<br>
-   * <br>
-   * <p alt="">When the pixel format is palettized RGB32 (PIX_FMT_PAL8), the palettized<br>
+   * </p><br>
+   * <p><br>
+   * When the pixel format is palettized RGB32 (PIX_FMT_PAL8), the palettized<br>
    * image data is stored in AVFrame.data[0]. The palette is transported in<br>
    * AVFrame.data[1], is 1024 bytes long (256 4-byte entries) and is<br>
    * formatted the same as in PIX_FMT_RGB32 described above (i.e., it is<br>
    * also endian-specific). Note also that the individual RGB32 palette<br>
    * components stored in AVFrame.data[1] should be in the range 0..255.<br>
    * This is important as many custom PAL8 video codecs that were designed<br>
-   * to run on the IBM VGA graphics adapter use 6-bit palette components.</p><br>
-   * <br>
-   * <p alt="">For all the 8 bits per pixel formats, an RGB32 palette is in data[1] like<br>
+   * to run on the IBM VGA graphics adapter use 6-bit palette components.<br>
+   * </p><br>
+   * <p><br>
+   * For all the 8 bits per pixel formats, an RGB32 palette is in data[1] like<br>
    * for pal8. This palette is filled in automatically by the function<br>
-   * allocating the picture.</p>
+   * allocating the picture.<br>
+   * </p>
    */
   public enum Type {
     PIX_FMT_NONE(VideoJNI.PixelFormat_PIX_FMT_NONE_get()),

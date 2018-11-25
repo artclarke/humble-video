@@ -139,10 +139,9 @@ public:
    *   the system has had a chance to determine what the format is, so this
    *   is the only way to set InputFormat-specific options.
    * @param optionsNotSet If not null, on return this KeyValueBag object will be cleared out, and
-   *   replace with any key/value pairs that were in <code>options</code> but could not be set on this
+   *   replaced with any key/value pairs that were in <code>options</code> but could not be set on this
    *   Demuxer.
    *
-   * @return >= 0 on success; < 0 on error.
    */
   virtual void
   open(const char *url, DemuxerFormat* format, bool streamsCanBeAddedDynamically,

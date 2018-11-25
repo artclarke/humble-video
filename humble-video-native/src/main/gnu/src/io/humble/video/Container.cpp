@@ -96,7 +96,6 @@ Container::Stream::Stream(Container* container, int32_t index) {
   mContainer = container;
   mIndex = index;
   mLastDts = Global::NO_PTS;
-  mCachedCtx = 0;
   mCtx = mContainer->getFormatCtx()->streams[index];
 }
 
@@ -143,11 +142,13 @@ Container::doSetupStreams() {
     if (!avStream)
       VS_THROW(HumbleRuntimeError::make("no FFMPEG allocated stream: %d", i));
     if (!avStream->time_base.num || !avStream->time_base.den) {
-      if (avStream->codec && avStream->codec->sample_rate && avStream->codec->codec_type == AVMEDIA_TYPE_AUDIO)
+      if (avStream->codecpar
+          && avStream->codecpar->sample_rate
+          && avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
       {
         // for audio, 1/sample-rate is a good timebase.
         avStream->time_base.num = 1;
-        avStream->time_base.den = avStream->codec->sample_rate;
+        avStream->time_base.den = avStream->codecpar->sample_rate;
         VS_LOG_DEBUG("No timebase set on audio stream %ld. Setting to 1/sample-rate (1/%ld)",
                      (int32_t)i,
                      (int32_t)avStream->time_base.den
@@ -170,18 +171,18 @@ Container::doSetupStreams() {
     if (ctx->iformat) {
       // if a input format, we try to set up the decoder objects here. Some streams
       // will have no decoder objects available.
-      RefPointer<Codec> codec = Codec::findDecodingCodec((Codec::ID)avStream->codec->codec_id);
+      RefPointer<Codec> codec = Codec::findDecodingCodec((Codec::ID)avStream->codecpar->codec_id);
       RefPointer<Coder> coder;
       if (codec) {
         // make a copy of the decoder so we decouple it from the container
         // completely
-        coder = Decoder::make(codec.value(), avStream->codec, true);
+        coder = Decoder::make(codec->getCtx(), avStream->codecpar);
         stream->setCoder(coder.value());
       } else {
         VS_LOG_DEBUG("noDecoderAvailable Container@%p[i=%"PRId32";codec_id:%"PRId32"];",
                      this,
                      avStream->index,
-                     avStream->codec->codec_id);
+                     avStream->codecpar->codec_id);
       }
 #ifdef VS_DEBUG
       VS_LOG_TRACE("newStreamFound Container@%p[i=%"PRId32";c=%p;tb=%"PRId32"/%"PRId32";]",
@@ -207,23 +208,6 @@ Container::getStream(int32_t index) {
   return mStreams[index];
 }
 
-void
-Container::popCoders() {
-  int32_t n = getNumStreams();
-  for(int32_t i = 0; i < n; i++) {
-    Container::Stream* stream = mStreams[i];
-    stream->popCoder();
-  }
-}
-
-void
-Container::pushCoders() {
-  int32_t n = getNumStreams();
-  for(int32_t i = 0; i < n; i++) {
-    Container::Stream* stream = mStreams[i];
-    stream->pushCoder();
-  }
-}
 int32_t
 Container::getNumStreams()
 {
