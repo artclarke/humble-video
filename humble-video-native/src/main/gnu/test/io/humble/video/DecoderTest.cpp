@@ -344,7 +344,7 @@ DecoderTest::testOpenCloseMP4() {
 void
 DecoderTest::testIssue27()
 {
-  const char* testURL="http://www.nasa.gov/multimedia/nasatv/NTV-Public-IPS.m3u8";
+  const char* testURL="https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8";
   RefPointer<Demuxer> demuxer = Demuxer::make();
 
   RefPointer<Decoder> decoder;
@@ -392,7 +392,7 @@ DecoderTest::testIssue27()
           TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketDts());
           TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPts());
           TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getTimeStamp());
-          VS_LOG_DEBUG("Writing frame: %"PRId32, frameNo);
+          VS_LOG_TRACE("Writing frame: %"PRId32, frameNo);
           writePicture("DecoderTest_testIssue27", &frameNo, picture.value());
           ++frameNo;
         }
