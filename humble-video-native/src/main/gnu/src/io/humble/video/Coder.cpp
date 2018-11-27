@@ -39,9 +39,6 @@ namespace video {
 using namespace io::humble::ferry;
 
 Coder::Coder(const AVCodec* codec, const AVCodecParameters* src) {
-  if (!src)
-    VS_THROW(HumbleInvalidArgument("no parameters passed in"));
-
   mCtx = avcodec_alloc_context3(codec);
   if (!mCtx)
     throw HumbleRuntimeError("could not allocate coder context");

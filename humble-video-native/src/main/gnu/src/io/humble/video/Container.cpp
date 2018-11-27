@@ -126,45 +126,12 @@ Container::doSetupStreams() {
   }
   if (mStreams.size() == ctx->nb_streams) return;
 
-  // loop through and find the first non-zero time base
-  AVRational *goodTimebase = 0;
-  for (uint32_t i = 0; i < ctx->nb_streams; i++) {
-    AVStream *avStream = ctx->streams[i];
-    if (avStream && avStream->time_base.num && avStream->time_base.den) {
-      goodTimebase = &avStream->time_base;
-      break;
-    }
-  }
-
   // Only look for new streams
   for (uint32_t i = mStreams.size(); i < ctx->nb_streams; i++) {
     AVStream *avStream = ctx->streams[i];
     if (!avStream)
       VS_THROW(HumbleRuntimeError::make("no FFMPEG allocated stream: %d", i));
-    if (!avStream->time_base.num || !avStream->time_base.den) {
-      if (avStream->codecpar
-          && avStream->codecpar->sample_rate
-          && avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
-      {
-        // for audio, 1/sample-rate is a good timebase.
-        avStream->time_base.num = 1;
-        avStream->time_base.den = avStream->codecpar->sample_rate;
-        VS_LOG_DEBUG("No timebase set on audio stream %ld. Setting to 1/sample-rate (1/%ld)",
-                     (int32_t)i,
-                     (int32_t)avStream->time_base.den
-                     );
-      } else if(goodTimebase) {
-        VS_LOG_DEBUG("No timebase set on stream %ld. Setting to (%ld/%ld)",
-                     (int32_t)i,
-                     (int32_t)goodTimebase->num,
-                     (int32_t)goodTimebase->den
-                     );
-        avStream->time_base = *goodTimebase;
-      } else {
-        VS_LOG_TRACE("No timebase set on stream %ld. And no good guess for what to set",
-                    (int32_t)i);
-      }
-    }
+
     // now let's initialize our stream object.
     Stream* stream = new Stream(this, i);
     mStreams.push_back(stream);

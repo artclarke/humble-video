@@ -310,6 +310,10 @@ Muxer::addNewStream(Coder* aCoder) {
   if (!avStream) {
     VS_THROW(HumbleRuntimeError("Could not add new stream to container"));
   }
+  // copy the parameters from the coder
+  if (avcodec_parameters_from_context(avStream->codecpar, coder->getCodecCtx()) <0)
+    VS_THROW(HumbleRuntimeError("Could not copy parameters from coder"));
+
 //  if (avStream->codec && !avStream->codec->codec) {
 //    // fixes a memory leak on closing.
 //    avStream->codec->codec = coder->getCodecCtx()->codec;
