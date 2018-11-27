@@ -57,10 +57,5 @@ extern "C"
 #include <libavutil/log.h>
 #include <libavutil/mathematics.h>
 
-// Hack here to get rid of deprecation compilation warnings
-#ifdef attribute_deprecated
-#undef attribute_deprecated
-#endif
-#define attribute_deprecated
 }
 #endif /*HUMBLEFFMPEGINCLUDES_H_*/
