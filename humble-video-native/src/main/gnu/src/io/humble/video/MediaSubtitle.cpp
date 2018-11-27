@@ -79,7 +79,7 @@ int32_t
 MediaSubtitleRectangle::getPictureLinesize(int line) {
   if (line < 0 || line >= 4)
     throw HumbleInvalidArgument("line must be between 0 and 3");
-  return mCtx->pict.linesize[line];
+  return mCtx->linesize[line];
 }
 Buffer*
 MediaSubtitleRectangle::getPictureData(int line)
@@ -89,7 +89,7 @@ MediaSubtitleRectangle::getPictureData(int line)
   // add ref ourselves for the Buffer
   this->acquire();
   // create a buffer
-  RefPointer<Buffer> retval = Buffer::make(this, mCtx->pict.data[line], mCtx->pict.linesize[line],
+  RefPointer<Buffer> retval = Buffer::make(this, mCtx->data[line], mCtx->linesize[line],
       Buffer::refCountedFreeFunc, this);
   if (!retval)
     this->release();
