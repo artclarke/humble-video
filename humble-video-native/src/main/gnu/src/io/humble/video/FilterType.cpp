@@ -51,7 +51,8 @@ int32_t
 FilterType::getNumFilterTypes() {
   Global::init();
   int i = 0;
-  for (const AVFilter* f = 0; (f = avfilter_next(f)) != 0; ++i)
+  void *iterator=0;
+  for (const AVFilter* f = 0; (f = av_filter_iterate(&iterator)) != 0; ++i)
     ;
   return i;
 }
@@ -63,7 +64,9 @@ FilterType::getFilterType(int32_t index) {
   if (index < 0)
     VS_THROW(HumbleInvalidArgument("index must be >= 0"));
 
-  for (const AVFilter* f = 0; (f = avfilter_next(f)) != 0; ++i)
+  void *iterator=0;
+
+  for (const AVFilter* f = 0; (f = av_filter_iterate(&iterator)) != 0; ++i)
     if (i == index) {
       FilterType * retval = FilterType::make(f);
       return retval;
