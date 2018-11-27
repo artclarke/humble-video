@@ -36,23 +36,16 @@ namespace io { namespace humble { namespace video {
 
   MediaPacketImpl::MediaPacketImpl()
   {
-    mPacket = (AVPacket*)av_malloc(sizeof(AVPacket));
+    mPacket = av_packet_alloc();
     if (!mPacket)
       throw std::bad_alloc();
     
-    av_init_packet(mPacket);
-    // initialize because ffmpeg doesn't
-    mPacket->data = 0;
-    mPacket->size = 0;
-    // set this to -1 if it's not set.
-    mPacket->stream_index = -1;
     mIsComplete = false;
   }
 
   MediaPacketImpl::~MediaPacketImpl()
   {
-    av_free_packet(mPacket);
-    av_freep(&mPacket);
+    av_packet_free(&mPacket);
   }
 
   int64_t
@@ -174,11 +167,10 @@ namespace io { namespace humble { namespace video {
     if (!pkt) {
       VS_THROW(HumbleInvalidArgument("no packet"));
     }
-    av_free_packet(mPacket);
-    av_init_packet(mPacket);
-    
-    int32_t retval = av_copy_packet(mPacket, pkt);
-    FfmpegException::check(retval, "Failed to copy packet ");
+    av_packet_free(&mPacket);
+    mPacket = av_packet_clone(pkt);
+    if (!mPacket)
+      VS_THROW(HumbleRuntimeError("Could not clone packet"));
     
     // And assume we're now complete.
     setComplete(true, mPacket->size);
@@ -212,9 +204,9 @@ namespace io { namespace humble { namespace video {
       VS_THROW(HumbleInvalidArgument("no packet"));
     }
 
-    // use the nice copy method.
+    // use the nice add_ref method method.
     retval = make();
-    int32_t r = av_copy_packet(retval->mPacket, packet->mPacket);
+    int32_t r = av_packet_ref(retval->mPacket, packet->mPacket);
     FfmpegException::check(r, "could not copy packet ");
     int32_t numBytes = packet->getSize();
     if (copyData && numBytes > 0)
@@ -265,7 +257,10 @@ namespace io { namespace humble { namespace video {
   MediaPacketImpl::reset(int32_t payloadSize)
   {
     int32_t e=-1;
-    av_free_packet(mPacket);
+    av_packet_free(&mPacket);
+    mPacket = av_packet_alloc();
+    if (!mPacket)
+      VS_THROW(HumbleBadAlloc());
     if (payloadSize > 0)
       e = av_new_packet(mPacket, payloadSize);
     else {
@@ -308,18 +303,6 @@ namespace io { namespace humble { namespace video {
   MediaPacketImpl::isComplete()
   {
     return mIsComplete && mPacket->data && mPacket->size;
-  }
-
-  int64_t
-  MediaPacketImpl::getConvergenceDuration()
-  {
-    return mPacket->convergence_duration;
-  }
-  
-  void
-  MediaPacketImpl::setConvergenceDuration(int64_t duration)
-  {
-    mPacket->convergence_duration = duration;
   }
 
   int32_t

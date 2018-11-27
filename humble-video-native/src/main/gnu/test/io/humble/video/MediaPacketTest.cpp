@@ -74,8 +74,6 @@ MediaPacketTest::testCopyPacket() {
   packet->setStreamIndex(streamIndex);
   int64_t duration = 28387728;
   packet->setDuration(duration);
-  int64_t convergenceDuration = 283;
-  packet->setConvergenceDuration(convergenceDuration);
 
   // let's get access to the data
 
@@ -100,8 +98,6 @@ MediaPacketTest::testCopyPacket() {
     TSM_ASSERT_EQUALS("should equal", dts, newPacket->getDts());
     TSM_ASSERT_EQUALS("should equal", streamIndex, newPacket->getStreamIndex());
     TSM_ASSERT_EQUALS("should equal", duration, newPacket->getDuration());
-    TSM_ASSERT_EQUALS("should equal", convergenceDuration,
-        newPacket->getConvergenceDuration());
     RefPointer<Rational> newBase = newPacket->getTimeBase();
     TSM_ASSERT("should be equal", newBase->compareTo(timeBase.value()) == 0);
 

@@ -41,11 +41,51 @@ class VS_API_HUMBLEVIDEO MediaPacket : public io::humble::video::MediaEncoded
    */
 public:
 
-  typedef enum SideDataType {
-    DATA_UNKNOWN = -1,
+  /**
+   * @see #getFlags(), which is a bit-map of these
+   * individual flags.
+   */
+  typedef enum Flag {
+    /** The packet contains a keyframe */
+    PKT_FLAG_KEY = AV_PKT_FLAG_KEY,
+    /** The packet content is corrupted */
+    PKT_FLAG_CORRUPT = AV_PKT_FLAG_CORRUPT,
+    /**
+     * Flag is used to discard packets which are required to maintain valid
+     * decoder state but are not required for output and should be dropped
+     * after decoding.
+     **/
+    PKT_FLAG_DISCARD = AV_PKT_FLAG_DISCARD,
+    /**
+     * The packet comes from a trusted source.
+     *
+     * Otherwise-unsafe constructs such as arbitrary pointers to data
+     * outside the packet may be followed.
+     */
+    PKT_FLAG_TRUSTED = AV_PKT_FLAG_TRUSTED,
+    /**
+     * Flag is used to indicate packets that contain frames that can
+     * be discarded by the decoder.  I.e. Non-reference frames.
+     */
+    PKT_FLAG_DISPOSABLE = AV_PKT_FLAG_DISPOSABLE,
+  } Flag;
 
-    DATA_PALETTE = AV_PKT_DATA_PALETTE,
-    DATA_NEW_EXTRADATA = AV_PKT_DATA_NEW_EXTRADATA,
+  typedef enum SideDataType {
+    /**
+     * An AV_PKT_DATA_PALETTE side data packet contains exactly AVPALETTE_SIZE
+     * bytes worth of palette. This side data signals that a new palette is
+     * present.
+     */
+    PKT_DATA_PALETTE = AV_PKT_DATA_PALETTE,
+
+    /**
+     * The AV_PKT_DATA_NEW_EXTRADATA is used to notify the codec or the format
+     * that the extradata buffer was changed and the receiving side should
+     * act upon it appropriately. The new extradata is embedded in the side
+     * data buffer and should be immediately used for processing the current
+     * frame or packet.
+     */
+    PKT_DATA_NEW_EXTRADATA = AV_PKT_DATA_NEW_EXTRADATA,
 
     /**
      * An AV_PKT_DATA_PARAM_CHANGE side data packet is laid out as follows:
@@ -62,7 +102,7 @@ public:
      *     s32le height
      * @endcode
      */
-    DATA_PARAM_CHANGE = AV_PKT_DATA_PARAM_CHANGE,
+    PKT_DATA_PARAM_CHANGE = AV_PKT_DATA_PARAM_CHANGE,
 
     /**
      * An AV_PKT_DATA_H263_MB_INFO side data packet contains a number of
@@ -83,7 +123,59 @@ public:
      * u8    vertical MV predictor for block number 3
      * @endcode
      */
-    DATA_H263_MB_INFO = AV_PKT_DATA_H263_MB_INFO,
+    PKT_DATA_H263_MB_INFO = AV_PKT_DATA_H263_MB_INFO,
+
+    /**
+     * This side data should be associated with an audio stream and contains
+     * ReplayGain information in form of the AVReplayGain struct.
+     */
+    PKT_DATA_REPLAYGAIN = AV_PKT_DATA_REPLAYGAIN,
+
+    /**
+     * This side data contains a 3x3 transformation matrix describing an affine
+     * transformation that needs to be applied to the decoded video frames for
+     * correct presentation.
+     *
+     * See libavutil/display.h for a detailed description of the data.
+     */
+    PKT_DATA_DISPLAYMATRIX = AV_PKT_DATA_DISPLAYMATRIX,
+
+    /**
+     * This side data should be associated with a video stream and contains
+     * Stereoscopic 3D information in form of the AVStereo3D struct.
+     */
+    PKT_DATA_STEREO3D = AV_PKT_DATA_STEREO3D,
+
+    /**
+     * This side data should be associated with an audio stream and corresponds
+     * to enum AVAudioServiceType.
+     */
+    PKT_DATA_AUDIO_SERVICE_TYPE = AV_PKT_DATA_AUDIO_SERVICE_TYPE,
+
+    /**
+     * This side data contains quality related information from the encoder.
+     * @code
+     * u32le quality factor of the compressed frame. Allowed range is between 1 (good) and FF_LAMBDA_MAX (bad).
+     * u8    picture type
+     * u8    error count
+     * u16   reserved
+     * u64le[error count] sum of squared differences between encoder in and output
+     * @endcode
+     */
+    PKT_DATA_QUALITY_STATS = AV_PKT_DATA_QUALITY_STATS,
+
+    /**
+     * This side data contains an integer value representing the stream index
+     * of a "fallback" track.  A fallback track indicates an alternate
+     * track to use when the current track can not be decoded for some reason.
+     * e.g. no decoder available for codec.
+     */
+    PKT_DATA_FALLBACK_TRACK = AV_PKT_DATA_FALLBACK_TRACK,
+
+    /**
+     * This side data corresponds to the AVCPBProperties struct.
+     */
+    PKT_DATA_CPB_PROPERTIES = AV_PKT_DATA_CPB_PROPERTIES,
 
     /**
      * Recommmends skipping the specified number of samples
@@ -94,7 +186,7 @@ public:
      * u8    reason for end   skip (0=padding silence, 1=convergence)
      * @endcode
      */
-    DATA_SKIP_SAMPLES = AV_PKT_DATA_SKIP_SAMPLES,
+    PKT_DATA_SKIP_SAMPLES = AV_PKT_DATA_SKIP_SAMPLES,
 
     /**
      * An AV_PKT_DATA_JP_DUALMONO side data packet indicates that
@@ -104,13 +196,13 @@ public:
      * u8    selected channels (0=mail/left, 1=sub/right, 2=both)
      * @endcode
      */
-    DATA_JP_DUALMONO = AV_PKT_DATA_JP_DUALMONO,
+    PKT_DATA_JP_DUALMONO = AV_PKT_DATA_JP_DUALMONO,
 
     /**
      * A list of zero terminated key/value strings. There is no end marker for
      * the list, so it is required to rely on the side data size to stop.
      */
-    DATA_STRINGS_METADATA = AV_PKT_DATA_STRINGS_METADATA,
+    PKT_DATA_STRINGS_METADATA = AV_PKT_DATA_STRINGS_METADATA,
 
     /**
      * Subtitle event position
@@ -121,7 +213,7 @@ public:
      * u32le y2
      * @endcode
      */
-    DATA_SUBTITLE_POSITION = AV_PKT_DATA_SUBTITLE_POSITION,
+    PKT_DATA_SUBTITLE_POSITION = AV_PKT_DATA_SUBTITLE_POSITION,
 
     /**
      * Data found in BlockAdditional element of matroska container. There is
@@ -129,19 +221,77 @@ public:
      * size to recognize the end. 8 byte id (as found in BlockAddId) followed
      * by data.
      */
-    DATA_MATROSKA_BLOCKADDITIONAL = AV_PKT_DATA_MATROSKA_BLOCKADDITIONAL,
+    PKT_DATA_MATROSKA_BLOCKADDITIONAL = AV_PKT_DATA_MATROSKA_BLOCKADDITIONAL,
 
     /**
      * The optional first identifier line of a WebVTT cue.
      */
-    DATA_WEBVTT_IDENTIFIER = AV_PKT_DATA_WEBVTT_IDENTIFIER,
+    PKT_DATA_WEBVTT_IDENTIFIER = AV_PKT_DATA_WEBVTT_IDENTIFIER,
 
     /**
      * The optional settings (rendering instructions) that immediately
      * follow the timestamp specifier of a WebVTT cue.
      */
-    DATA_WEBVTT_SETTINGS = AV_PKT_DATA_WEBVTT_SETTINGS,
+    PKT_DATA_WEBVTT_SETTINGS = AV_PKT_DATA_WEBVTT_SETTINGS,
 
+    /**
+     * A list of zero terminated key/value strings. There is no end marker for
+     * the list, so it is required to rely on the side data size to stop. This
+     * side data includes updated metadata which appeared in the stream.
+     */
+    PKT_DATA_METADATA_UPDATE = AV_PKT_DATA_METADATA_UPDATE,
+
+    /**
+     * MPEGTS stream ID, this is required to pass the stream ID
+     * information from the demuxer to the corresponding muxer.
+     */
+    PKT_DATA_MPEGTS_STREAM_ID = AV_PKT_DATA_MPEGTS_STREAM_ID,
+
+    /**
+     * Mastering display metadata (based on SMPTE-2086:2014). This metadata
+     * should be associated with a video stream and contains data in the form
+     * of the AVMasteringDisplayMetadata struct.
+     */
+    PKT_DATA_MASTERING_DISPLAY_METADATA = AV_PKT_DATA_MASTERING_DISPLAY_METADATA,
+
+    /**
+     * This side data should be associated with a video stream and corresponds
+     * to the AVSphericalMapping structure.
+     */
+    PKT_DATA_SPHERICAL = AV_PKT_DATA_SPHERICAL,
+
+    /**
+     * Content light level (based on CTA-861.3). This metadata should be
+     * associated with a video stream and contains data in the form of the
+     * AVContentLightMetadata struct.
+     */
+    PKT_DATA_CONTENT_LIGHT_LEVEL = AV_PKT_DATA_CONTENT_LIGHT_LEVEL,
+
+    /**
+     * ATSC A53 Part 4 Closed Captions. This metadata should be associated with
+     * a video stream. A53 CC bitstream is stored as uint8_t in AVPacketSideData.data.
+     * The number of bytes of CC data is AVPacketSideData.size.
+     */
+    PKT_DATA_A53_CC = AV_PKT_DATA_A53_CC,
+
+    /**
+     * This side data is encryption initialization data.
+     * The format is not part of ABI, use av_encryption_init_info_* methods to
+     * access.
+     */
+    PKT_DATA_ENCRYPTION_INIT_INFO = AV_PKT_DATA_ENCRYPTION_INIT_INFO,
+
+    /**
+     * This side data contains encryption info for how to decrypt the packet.
+     * The format is not part of ABI, use av_encryption_info_* methods to access.
+     */
+    PKT_DATA_ENCRYPTION_INFO = AV_PKT_DATA_ENCRYPTION_INFO,
+
+    /**
+     * Active Format Description data consisting of a single byte as specified
+     * in ETSI TS 101 154 using AVActiveFormatDescription enum.
+     */
+    PKT_DATA_AFD = AV_PKT_DATA_AFD,
   } SideDataType;
 
   /**
@@ -376,39 +526,6 @@ public:
    */
   virtual void
   setPosition(int64_t position)=0;
-
-  /**
-   * Time difference in IStream#getTimeBase() units
-   * from the presentation time stamp of this
-   * packet to the point at which the output from the decoder has converged
-   * independent from the availability of previous frames. That is, the
-   * frames are virtually identical no matter if decoding started from
-   * the very first frame or from this keyframe.
-   * Is Global#NO_PTS if unknown.
-   * This field is not the display duration of the current packet.
-   * <p>
-   * The purpose of this field is to allow seeking in streams that have no
-   * keyframes in the conventional sense. It corresponds to the
-   * recovery point SEI in H.264 and match_time_delta in NUT. It is also
-   * essential for some types of subtitle streams to ensure that all
-   * subtitles are correctly displayed after seeking.
-   * </p>
-   * <p>
-   * If you didn't follow that, try drinking one to two glasses
-   * of Absinthe.  It won't help, but it'll be more fun.
-   * </p>
-   *
-   * @return the convergence duration
-   */
-  virtual int64_t
-  getConvergenceDuration()=0;
-
-  /**
-   * Set the convergence duration.
-   * @param duration the new duration
-   */
-  virtual void
-  setConvergenceDuration(int64_t duration)=0;
 
   /**
    * Discard the current payload and allocate a new payload.

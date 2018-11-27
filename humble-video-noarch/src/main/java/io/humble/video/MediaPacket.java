@@ -400,41 +400,6 @@ public class MediaPacket extends MediaEncoded {
   }
 
 /**
- * Time difference in IStream#getTimeBase() units<br>
- * from the presentation time stamp of this<br>
- * packet to the point at which the output from the decoder has converged<br>
- * independent from the availability of previous frames. That is, the<br>
- * frames are virtually identical no matter if decoding started from<br>
- * the very first frame or from this keyframe.<br>
- * Is Global#NO_PTS if unknown.<br>
- * This field is not the display duration of the current packet.<br>
- * <p><br>
- * The purpose of this field is to allow seeking in streams that have no<br>
- * keyframes in the conventional sense. It corresponds to the<br>
- * recovery point SEI in H.264 and match_time_delta in NUT. It is also<br>
- * essential for some types of subtitle streams to ensure that all<br>
- * subtitles are correctly displayed after seeking.<br>
- * </p><br>
- * <p><br>
- * If you didn't follow that, try drinking one to two glasses<br>
- * of Absinthe.  It won't help, but it'll be more fun.<br>
- * </p><br>
- * <br>
- * @return the convergence duration
- */
-  public long getConvergenceDuration() {
-    return VideoJNI.MediaPacket_getConvergenceDuration(swigCPtr, this);
-  }
-
-/**
- * Set the convergence duration.<br>
- * @param duration the new duration
- */
-  public void setConvergenceDuration(long duration) {
-    VideoJNI.MediaPacket_setConvergenceDuration(swigCPtr, this, duration);
-  }
-
-/**
  * Discard the current payload and allocate a new payload.<br>
  * <p><br>
  * Note that if any people have access to the old payload using<br>
@@ -452,10 +417,91 @@ public class MediaPacket extends MediaEncoded {
     VideoJNI.MediaPacket_reset(swigCPtr, this, payloadSize);
   }
 
+  /**
+   * @see #getFlags(), which is a bit-map of theseindividual flags.
+   */
+  public enum Flag {
+  /**
+   * The packet contains a keyframe 
+   */
+    PKT_FLAG_KEY(VideoJNI.MediaPacket_PKT_FLAG_KEY_get()),
+  /**
+   * The packet content is corrupted 
+   */
+    PKT_FLAG_CORRUPT(VideoJNI.MediaPacket_PKT_FLAG_CORRUPT_get()),
+  /**
+   * Flag is used to discard packets which are required to maintain valid<br>
+   * decoder state but are not required for output and should be dropped<br>
+   * after decoding.
+   */
+    PKT_FLAG_DISCARD(VideoJNI.MediaPacket_PKT_FLAG_DISCARD_get()),
+  /**
+   * The packet comes from a trusted source.<br>
+   * <br>
+   * Otherwise-unsafe constructs such as arbitrary pointers to data<br>
+   * outside the packet may be followed.
+   */
+    PKT_FLAG_TRUSTED(VideoJNI.MediaPacket_PKT_FLAG_TRUSTED_get()),
+  /**
+   * Flag is used to indicate packets that contain frames that can<br>
+   * be discarded by the decoder.  I.e. Non-reference frames.
+   */
+    PKT_FLAG_DISPOSABLE(VideoJNI.MediaPacket_PKT_FLAG_DISPOSABLE_get()),
+  ;
+
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static Flag swigToEnum(int swigValue) {
+      Flag[] swigValues = Flag.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (Flag swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + Flag.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private Flag() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private Flag(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private Flag(Flag swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
+  }
+
   public enum SideDataType {
-    DATA_UNKNOWN(VideoJNI.MediaPacket_DATA_UNKNOWN_get()),
-    DATA_PALETTE(VideoJNI.MediaPacket_DATA_PALETTE_get()),
-    DATA_NEW_EXTRADATA(VideoJNI.MediaPacket_DATA_NEW_EXTRADATA_get()),
+  /**
+   * An AV_PKT_DATA_PALETTE side data packet contains exactly AVPALETTE_SIZE<br>
+   * bytes worth of palette. This side data signals that a new palette is<br>
+   * present.
+   */
+    PKT_DATA_PALETTE(VideoJNI.MediaPacket_PKT_DATA_PALETTE_get()),
+  /**
+   * The AV_PKT_DATA_NEW_EXTRADATA is used to notify the codec or the format<br>
+   * that the extradata buffer was changed and the receiving side should<br>
+   * act upon it appropriately. The new extradata is embedded in the side<br>
+   * data buffer and should be immediately used for processing the current<br>
+   * frame or packet.
+   */
+    PKT_DATA_NEW_EXTRADATA(VideoJNI.MediaPacket_PKT_DATA_NEW_EXTRADATA_get()),
   /**
    * An AV_PKT_DATA_PARAM_CHANGE side data packet is laid out as follows:<br>
    * {@code 
@@ -471,7 +517,7 @@ public class MediaPacket extends MediaEncoded {
       s32le height
   }
    */
-    DATA_PARAM_CHANGE(VideoJNI.MediaPacket_DATA_PARAM_CHANGE_get()),
+    PKT_DATA_PARAM_CHANGE(VideoJNI.MediaPacket_PKT_DATA_PARAM_CHANGE_get()),
   /**
    * An AV_PKT_DATA_H263_MB_INFO side data packet contains a number of<br>
    * structures with info about macroblocks relevant to splitting the<br>
@@ -491,7 +537,52 @@ public class MediaPacket extends MediaEncoded {
   u8    vertical MV predictor for block number 3
   }
    */
-    DATA_H263_MB_INFO(VideoJNI.MediaPacket_DATA_H263_MB_INFO_get()),
+    PKT_DATA_H263_MB_INFO(VideoJNI.MediaPacket_PKT_DATA_H263_MB_INFO_get()),
+  /**
+   * This side data should be associated with an audio stream and contains<br>
+   * ReplayGain information in form of the AVReplayGain struct.
+   */
+    PKT_DATA_REPLAYGAIN(VideoJNI.MediaPacket_PKT_DATA_REPLAYGAIN_get()),
+  /**
+   * This side data contains a 3x3 transformation matrix describing an affine<br>
+   * transformation that needs to be applied to the decoded video frames for<br>
+   * correct presentation.<br>
+   * <br>
+   * See libavutil/display.h for a detailed description of the data.
+   */
+    PKT_DATA_DISPLAYMATRIX(VideoJNI.MediaPacket_PKT_DATA_DISPLAYMATRIX_get()),
+  /**
+   * This side data should be associated with a video stream and contains<br>
+   * Stereoscopic 3D information in form of the AVStereo3D struct.
+   */
+    PKT_DATA_STEREO3D(VideoJNI.MediaPacket_PKT_DATA_STEREO3D_get()),
+  /**
+   * This side data should be associated with an audio stream and corresponds<br>
+   * to enum AVAudioServiceType.
+   */
+    PKT_DATA_AUDIO_SERVICE_TYPE(VideoJNI.MediaPacket_PKT_DATA_AUDIO_SERVICE_TYPE_get()),
+  /**
+   * This side data contains quality related information from the encoder.<br>
+   * {@code 
+  u32le quality factor of the compressed frame. Allowed range is between 1 (good) and FF_LAMBDA_MAX (bad).
+  u8    picture type
+  u8    error count
+  u16   reserved
+  u64le[error count] sum of squared differences between encoder in and output
+  }
+   */
+    PKT_DATA_QUALITY_STATS(VideoJNI.MediaPacket_PKT_DATA_QUALITY_STATS_get()),
+  /**
+   * This side data contains an integer value representing the stream index<br>
+   * of a "fallback" track.  A fallback track indicates an alternate<br>
+   * track to use when the current track can not be decoded for some reason.<br>
+   * e.g. no decoder available for codec.
+   */
+    PKT_DATA_FALLBACK_TRACK(VideoJNI.MediaPacket_PKT_DATA_FALLBACK_TRACK_get()),
+  /**
+   * This side data corresponds to the AVCPBProperties struct.
+   */
+    PKT_DATA_CPB_PROPERTIES(VideoJNI.MediaPacket_PKT_DATA_CPB_PROPERTIES_get()),
   /**
    * Recommmends skipping the specified number of samples<br>
    * {@code 
@@ -501,7 +592,7 @@ public class MediaPacket extends MediaEncoded {
   u8    reason for end   skip (0=padding silence, 1=convergence)
   }
    */
-    DATA_SKIP_SAMPLES(VideoJNI.MediaPacket_DATA_SKIP_SAMPLES_get()),
+    PKT_DATA_SKIP_SAMPLES(VideoJNI.MediaPacket_PKT_DATA_SKIP_SAMPLES_get()),
   /**
    * An AV_PKT_DATA_JP_DUALMONO side data packet indicates that<br>
    * the packet may contain "dual mono" audio specific to Japanese DTV<br>
@@ -510,12 +601,12 @@ public class MediaPacket extends MediaEncoded {
   u8    selected channels (0=mail/left, 1=sub/right, 2=both)
   }
    */
-    DATA_JP_DUALMONO(VideoJNI.MediaPacket_DATA_JP_DUALMONO_get()),
+    PKT_DATA_JP_DUALMONO(VideoJNI.MediaPacket_PKT_DATA_JP_DUALMONO_get()),
   /**
    * A list of zero terminated key/value strings. There is no end marker for<br>
    * the list, so it is required to rely on the side data size to stop.
    */
-    DATA_STRINGS_METADATA(VideoJNI.MediaPacket_DATA_STRINGS_METADATA_get()),
+    PKT_DATA_STRINGS_METADATA(VideoJNI.MediaPacket_PKT_DATA_STRINGS_METADATA_get()),
   /**
    * Subtitle event position<br>
    * {@code 
@@ -525,23 +616,73 @@ public class MediaPacket extends MediaEncoded {
   u32le y2
   }
    */
-    DATA_SUBTITLE_POSITION(VideoJNI.MediaPacket_DATA_SUBTITLE_POSITION_get()),
+    PKT_DATA_SUBTITLE_POSITION(VideoJNI.MediaPacket_PKT_DATA_SUBTITLE_POSITION_get()),
   /**
    * Data found in BlockAdditional element of matroska container. There is<br>
    * no end marker for the data, so it is required to rely on the side data<br>
    * size to recognize the end. 8 byte id (as found in BlockAddId) followed<br>
    * by data.
    */
-    DATA_MATROSKA_BLOCKADDITIONAL(VideoJNI.MediaPacket_DATA_MATROSKA_BLOCKADDITIONAL_get()),
+    PKT_DATA_MATROSKA_BLOCKADDITIONAL(VideoJNI.MediaPacket_PKT_DATA_MATROSKA_BLOCKADDITIONAL_get()),
   /**
    * The optional first identifier line of a WebVTT cue.
    */
-    DATA_WEBVTT_IDENTIFIER(VideoJNI.MediaPacket_DATA_WEBVTT_IDENTIFIER_get()),
+    PKT_DATA_WEBVTT_IDENTIFIER(VideoJNI.MediaPacket_PKT_DATA_WEBVTT_IDENTIFIER_get()),
   /**
    * The optional settings (rendering instructions) that immediately<br>
    * follow the timestamp specifier of a WebVTT cue.
    */
-    DATA_WEBVTT_SETTINGS(VideoJNI.MediaPacket_DATA_WEBVTT_SETTINGS_get()),
+    PKT_DATA_WEBVTT_SETTINGS(VideoJNI.MediaPacket_PKT_DATA_WEBVTT_SETTINGS_get()),
+  /**
+   * A list of zero terminated key/value strings. There is no end marker for<br>
+   * the list, so it is required to rely on the side data size to stop. This<br>
+   * side data includes updated metadata which appeared in the stream.
+   */
+    PKT_DATA_METADATA_UPDATE(VideoJNI.MediaPacket_PKT_DATA_METADATA_UPDATE_get()),
+  /**
+   * MPEGTS stream ID, this is required to pass the stream ID<br>
+   * information from the demuxer to the corresponding muxer.
+   */
+    PKT_DATA_MPEGTS_STREAM_ID(VideoJNI.MediaPacket_PKT_DATA_MPEGTS_STREAM_ID_get()),
+  /**
+   * Mastering display metadata (based on SMPTE-2086:2014). This metadata<br>
+   * should be associated with a video stream and contains data in the form<br>
+   * of the AVMasteringDisplayMetadata struct.
+   */
+    PKT_DATA_MASTERING_DISPLAY_METADATA(VideoJNI.MediaPacket_PKT_DATA_MASTERING_DISPLAY_METADATA_get()),
+  /**
+   * This side data should be associated with a video stream and corresponds<br>
+   * to the AVSphericalMapping structure.
+   */
+    PKT_DATA_SPHERICAL(VideoJNI.MediaPacket_PKT_DATA_SPHERICAL_get()),
+  /**
+   * Content light level (based on CTA-861.3). This metadata should be<br>
+   * associated with a video stream and contains data in the form of the<br>
+   * AVContentLightMetadata struct.
+   */
+    PKT_DATA_CONTENT_LIGHT_LEVEL(VideoJNI.MediaPacket_PKT_DATA_CONTENT_LIGHT_LEVEL_get()),
+  /**
+   * ATSC A53 Part 4 Closed Captions. This metadata should be associated with<br>
+   * a video stream. A53 CC bitstream is stored as uint8_t in AVPacketSideData.data.<br>
+   * The number of bytes of CC data is AVPacketSideData.size.
+   */
+    PKT_DATA_A53_CC(VideoJNI.MediaPacket_PKT_DATA_A53_CC_get()),
+  /**
+   * This side data is encryption initialization data.<br>
+   * The format is not part of ABI, use av_encryption_init_info_* methods to<br>
+   * access.
+   */
+    PKT_DATA_ENCRYPTION_INIT_INFO(VideoJNI.MediaPacket_PKT_DATA_ENCRYPTION_INIT_INFO_get()),
+  /**
+   * This side data contains encryption info for how to decrypt the packet.<br>
+   * The format is not part of ABI, use av_encryption_info_* methods to access.
+   */
+    PKT_DATA_ENCRYPTION_INFO(VideoJNI.MediaPacket_PKT_DATA_ENCRYPTION_INFO_get()),
+  /**
+   * Active Format Description data consisting of a single byte as specified<br>
+   * in ETSI TS 101 154 using AVActiveFormatDescription enum.
+   */
+    PKT_DATA_AFD(VideoJNI.MediaPacket_PKT_DATA_AFD_get()),
   ;
 
     public final int swigValue() {

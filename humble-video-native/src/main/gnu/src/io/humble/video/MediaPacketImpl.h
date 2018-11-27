@@ -76,8 +76,6 @@ class VS_API_HUMBLEVIDEO MediaPacketImpl : public io::humble::video::MediaPacket
     virtual void setStreamIndex(int32_t streamIndex);
     virtual void setDuration(int64_t duration);
     virtual void setPosition(int64_t position);
-    virtual int64_t getConvergenceDuration();
-    virtual void setConvergenceDuration(int64_t duration);
     virtual void setData(io::humble::ferry::Buffer* buffer);
 
     virtual int32_t getNumSideDataElems();

@@ -13236,145 +13236,385 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaSubtitleRectangle_1g
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1FLAG_1KEY_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::MediaPacket::SideDataType result;
+  io::humble::video::MediaPacket::Flag result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_UNKNOWN;
+  result = (io::humble::video::MediaPacket::Flag)io::humble::video::MediaPacket::PKT_FLAG_KEY;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1PALETTE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1FLAG_1CORRUPT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::MediaPacket::SideDataType result;
+  io::humble::video::MediaPacket::Flag result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_PALETTE;
+  result = (io::humble::video::MediaPacket::Flag)io::humble::video::MediaPacket::PKT_FLAG_CORRUPT;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1NEW_1EXTRADATA_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1FLAG_1DISCARD_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::MediaPacket::SideDataType result;
+  io::humble::video::MediaPacket::Flag result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_NEW_EXTRADATA;
+  result = (io::humble::video::MediaPacket::Flag)io::humble::video::MediaPacket::PKT_FLAG_DISCARD;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1PARAM_1CHANGE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1FLAG_1TRUSTED_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::MediaPacket::SideDataType result;
+  io::humble::video::MediaPacket::Flag result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_PARAM_CHANGE;
+  result = (io::humble::video::MediaPacket::Flag)io::humble::video::MediaPacket::PKT_FLAG_TRUSTED;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1H263_1MB_1INFO_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1FLAG_1DISPOSABLE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  io::humble::video::MediaPacket::SideDataType result;
+  io::humble::video::MediaPacket::Flag result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_H263_MB_INFO;
+  result = (io::humble::video::MediaPacket::Flag)io::humble::video::MediaPacket::PKT_FLAG_DISPOSABLE;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1SKIP_1SAMPLES_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1PALETTE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::MediaPacket::SideDataType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_SKIP_SAMPLES;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_PALETTE;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1JP_1DUALMONO_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1NEW_1EXTRADATA_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::MediaPacket::SideDataType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_JP_DUALMONO;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_NEW_EXTRADATA;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1STRINGS_1METADATA_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1PARAM_1CHANGE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::MediaPacket::SideDataType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_STRINGS_METADATA;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_PARAM_CHANGE;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1SUBTITLE_1POSITION_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1H263_1MB_1INFO_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::MediaPacket::SideDataType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_SUBTITLE_POSITION;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_H263_MB_INFO;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1MATROSKA_1BLOCKADDITIONAL_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1REPLAYGAIN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::MediaPacket::SideDataType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_MATROSKA_BLOCKADDITIONAL;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_REPLAYGAIN;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1WEBVTT_1IDENTIFIER_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1DISPLAYMATRIX_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::MediaPacket::SideDataType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_WEBVTT_IDENTIFIER;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_DISPLAYMATRIX;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1DATA_1WEBVTT_1SETTINGS_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1STEREO3D_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   io::humble::video::MediaPacket::SideDataType result;
   
   (void)jenv;
   (void)jcls;
-  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::DATA_WEBVTT_SETTINGS;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_STEREO3D;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1AUDIO_1SERVICE_1TYPE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_AUDIO_SERVICE_TYPE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1QUALITY_1STATS_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_QUALITY_STATS;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1FALLBACK_1TRACK_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_FALLBACK_TRACK;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1CPB_1PROPERTIES_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_CPB_PROPERTIES;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1SKIP_1SAMPLES_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_SKIP_SAMPLES;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1JP_1DUALMONO_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_JP_DUALMONO;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1STRINGS_1METADATA_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_STRINGS_METADATA;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1SUBTITLE_1POSITION_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_SUBTITLE_POSITION;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1MATROSKA_1BLOCKADDITIONAL_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_MATROSKA_BLOCKADDITIONAL;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1WEBVTT_1IDENTIFIER_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_WEBVTT_IDENTIFIER;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1WEBVTT_1SETTINGS_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_WEBVTT_SETTINGS;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1METADATA_1UPDATE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_METADATA_UPDATE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1MPEGTS_1STREAM_1ID_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_MPEGTS_STREAM_ID;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1MASTERING_1DISPLAY_1METADATA_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_MASTERING_DISPLAY_METADATA;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1SPHERICAL_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_SPHERICAL;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1CONTENT_1LIGHT_1LEVEL_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_CONTENT_LIGHT_LEVEL;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1A53_1CC_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_A53_CC;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1ENCRYPTION_1INIT_1INFO_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_ENCRYPTION_INIT_INFO;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1ENCRYPTION_1INFO_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_ENCRYPTION_INFO;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1PKT_1DATA_1AFD_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  io::humble::video::MediaPacket::SideDataType result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (io::humble::video::MediaPacket::SideDataType)io::humble::video::MediaPacket::PKT_DATA_AFD;
   jresult = (jint)result; 
   return jresult;
 }
@@ -14423,96 +14663,6 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setPosition(J
     try
     {
       (arg1)->setPosition(arg2);
-    }
-    catch(std::exception & e)
-    {
-      io::humble::video::Global::catchException(e);
-      return ;
-    }
-    catch(...)
-    {
-      std::runtime_error e("Unhandled and unknown native exception");
-      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
-      return ;
-    }
-    
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // HumbleVideo.i: End generated code
-    
-    /*@SWIG@*/
-  }
-}
-
-
-SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1getConvergenceDuration(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  io::humble::video::MediaPacket *arg1 = (io::humble::video::MediaPacket *) 0 ;
-  int64_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(io::humble::video::MediaPacket **)&jarg1; 
-  
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
-      "invalid native object; delete() likely already called");
-    return 0;
-  }
-  
-  {
-    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,142,HUMBLE_HANDLE_EXCEPTION@*/
-    // HumbleVideo.i: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      result = (int64_t)(arg1)->getConvergenceDuration();
-    }
-    catch(std::exception & e)
-    {
-      io::humble::video::Global::catchException(e);
-      return 0;
-    }
-    catch(...)
-    {
-      std::runtime_error e("Unhandled and unknown native exception");
-      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
-      return 0;
-    }
-    
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // HumbleVideo.i: End generated code
-    
-    /*@SWIG@*/
-  }
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_MediaPacket_1setConvergenceDuration(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  io::humble::video::MediaPacket *arg1 = (io::humble::video::MediaPacket *) 0 ;
-  int64_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(io::humble::video::MediaPacket **)&jarg1; 
-  arg2 = (int64_t)jarg2; 
-  
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
-      "invalid native object; delete() likely already called");
-    return ;
-  }
-  
-  {
-    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,142,HUMBLE_HANDLE_EXCEPTION@*/
-    // HumbleVideo.i: Start generated code
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    try
-    {
-      (arg1)->setConvergenceDuration(arg2);
     }
     catch(std::exception & e)
     {
