@@ -57,8 +57,9 @@ DemuxerFormat::getNumFormats()
 {
   Global::init();
   int i = 0;
-  for(AVInputFormat* f = 0;
-  (f = av_iformat_next(f))!=0;
+  void *iterator=0;
+  for(const AVInputFormat* f = 0;
+  (f = av_demuxer_iterate(&iterator))!=0;
   ++i)
     ;
   return i;
@@ -69,11 +70,12 @@ DemuxerFormat::getFormat(int32_t index)
 {
   Global::init();
   int i = 0;
-  for(AVInputFormat* f = 0;
-  (f = av_iformat_next(f))!=0;
+  void *iterator=0;
+  for(const AVInputFormat* f = 0;
+  (f = av_demuxer_iterate(&iterator))!=0;
   ++i)
     if (i == index) {
-      DemuxerFormat * retval = DemuxerFormat::make(f);
+      DemuxerFormat * retval = DemuxerFormat::make((AVInputFormat*)f);
       return retval;
     }
   return 0;
