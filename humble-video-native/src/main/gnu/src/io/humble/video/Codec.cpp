@@ -303,8 +303,9 @@ int32_t
 Codec::getNumInstalledCodecs() {
   Global::init();
   int32_t numInstalledCodecs = 0;
-  AVCodec * codec = 0;
-  while ((codec = av_codec_next(codec)) != 0)
+  const AVCodec * codec = 0;
+  void * iterator=0;
+  while ((codec = av_codec_iterate(&iterator)) != 0)
     ++numInstalledCodecs;
   return numInstalledCodecs;
 }
@@ -314,8 +315,9 @@ Codec::getInstalledCodec(int32_t index) {
   Global::init();
   if (index < 0) return 0;
 
-  AVCodec * codec = 0;
-  for (int32_t i = 0; (codec = av_codec_next(codec)) != 0; i++) {
+  const AVCodec * codec = 0;
+  void * iterator = 0;
+  for (int32_t i = 0; (codec = av_codec_iterate(&iterator)) != 0; i++) {
     if (i == index) return Codec::make(codec);
   }
   return 0;
