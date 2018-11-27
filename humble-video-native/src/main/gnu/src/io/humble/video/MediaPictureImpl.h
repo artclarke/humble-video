@@ -105,9 +105,6 @@ public:
   virtual void
   setQuality(int32_t q) { getCtx()->quality = q; }
 
-  virtual int64_t
-  getError(int32_t dataPlane);
-
   virtual int32_t
   getRepeatPicture() { return getCtx()->repeat_pict; }
   virtual void

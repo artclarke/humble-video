@@ -295,14 +295,6 @@ public class MediaPicture extends MediaSampled {
   }
 
 /**
- * Get the error flags (if any) that the decoder set for this image on any given plane.<br>
- * @param dataPlane The plane to search for error flags.
- */
-  public long getError(int dataPlane) {
-    return VideoJNI.MediaPicture_getError(swigCPtr, this, dataPlane);
-  }
-
-/**
  * When decoding, this signals how much the picture must be delayed.<br>
  * extra_delay = repeat_pict / (2*fps)
  */

@@ -552,7 +552,6 @@ public class VideoJNI {
   public final static native void MediaPicture_setDisplayPictureNumber(long jarg1, MediaPicture jarg1_, int jarg2);
   public final static native int MediaPicture_getQuality(long jarg1, MediaPicture jarg1_);
   public final static native void MediaPicture_setQuality(long jarg1, MediaPicture jarg1_, int jarg2);
-  public final static native long MediaPicture_getError(long jarg1, MediaPicture jarg1_, int jarg2);
   public final static native int MediaPicture_getRepeatPicture(long jarg1, MediaPicture jarg1_);
   public final static native void MediaPicture_setRepeatPicture(long jarg1, MediaPicture jarg1_, int jarg2);
   public final static native boolean MediaPicture_isInterlacedFrame(long jarg1, MediaPicture jarg1_);

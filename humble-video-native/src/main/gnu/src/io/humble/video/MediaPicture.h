@@ -200,13 +200,6 @@ public:
   setQuality(int32_t q)=0;
 
   /**
-   * Get the error flags (if any) that the decoder set for this image on any given plane.
-   * @param dataPlane The plane to search for error flags.
-   */
-  virtual int64_t
-  getError(int32_t dataPlane)=0;
-
-  /**
    * When decoding, this signals how much the picture must be delayed.
    * extra_delay = repeat_pict / (2*fps)
    */

@@ -244,12 +244,6 @@ MediaPictureImpl::getLineSize(int32_t plane) {
   return mFrame->linesize[plane];
 }
 
-int64_t
-MediaPictureImpl::getError(int32_t plane) {
-  validatePlane(plane);
-  return mFrame->error[plane];
-}
-
 int32_t
 MediaPictureImpl::getNumDataPlanes() {
   int32_t i = 0;
