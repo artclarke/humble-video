@@ -64,8 +64,9 @@ MuxerFormat::getNumFormats()
 {
   Global::init();
   int i = 0;
-  for(AVOutputFormat* f = 0;
-  (f = av_oformat_next(f))!=0;
+  void * iterator=0;
+  for(const AVOutputFormat* f = 0;
+  (f = av_muxer_iterate(&iterator))!=0;
   ++i)
     ;
   return i;
@@ -76,11 +77,13 @@ MuxerFormat::getFormat(int32_t index)
 {
   Global::init();
   int i = 0;
-  for(AVOutputFormat* f = 0;
-  (f = av_oformat_next(f))!=0;
+  void * iterator=0;
+
+  for(const AVOutputFormat* f = 0;
+  (f = av_muxer_iterate(&iterator))!=0;
   ++i)
     if (i == index) {
-      MuxerFormat * retval = MuxerFormat::make(f);
+      MuxerFormat * retval = MuxerFormat::make((AVOutputFormat*)f);
       return retval;
     }
   return 0;

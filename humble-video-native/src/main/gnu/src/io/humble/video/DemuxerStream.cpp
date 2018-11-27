@@ -62,11 +62,11 @@ DemuxerStream::getDecoder() {
   AVStream* stream = getCtx();
 
   if (!mDecoder) {
-    if (stream->codec) {
+    if (stream->codecpar) {
       // make a copy of the decoder so we decouple it from the container
       // completely
-      if (stream->codec->codec_id != AV_CODEC_ID_NONE) {
-        RefPointer<Codec> codec = Codec::findDecodingCodec((Codec::ID)stream->codec->codec_id);
+      if (stream->codecpar->codec_id != AV_CODEC_ID_NONE) {
+        RefPointer<Codec> codec = Codec::findDecodingCodec((Codec::ID)stream->codecpar->codec_id);
         if (!codec) {
           VS_THROW(HumbleRuntimeError("could not find decoding codec"));
         }

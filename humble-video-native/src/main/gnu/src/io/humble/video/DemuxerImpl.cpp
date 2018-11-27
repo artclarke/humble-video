@@ -401,7 +401,7 @@ DemuxerImpl::setFlag(Flag flag, bool value) {
 
 const char*
 DemuxerImpl::getURL() {
-  return this->getFormatCtx()->filename;
+  return this->getFormatCtx()->url;
 }
 
 int32_t

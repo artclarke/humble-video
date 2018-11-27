@@ -70,7 +70,7 @@ Muxer::Muxer(MuxerFormat* format, const char* filename,
   if (!mCtx) {
     VS_THROW(HumbleBadAlloc());
   }
-  if (!filename || !*filename) mCtx->filename[0] = 0;
+  if (!filename || !*filename) mCtx->url[0] = 0;
   mCtx->interrupt_callback.callback = Global::avioInterruptCB;
   mCtx->interrupt_callback.opaque = this;
 
@@ -88,7 +88,7 @@ Muxer::Muxer(MuxerFormat* format, const char* filename,
 
   // determine if this format NEEDs a file.
   if (!mFormat->getFlag(ContainerFormat::NO_FILE)) {
-    if (!*mCtx->filename) {
+    if (!*mCtx->url) {
       avformat_free_context(mCtx);
       VS_THROW(
           HumbleRuntimeError::make(
@@ -107,9 +107,12 @@ Muxer::~Muxer() {
     (void) this->close();
   }
   if (mCtx) {
-    for(uint32_t i = 0; i < mCtx->nb_streams; i++) {
-      if (mCtx->streams[i]->codec)
-        (void) avcodec_close(mCtx->streams[i]->codec);
+    RefPointer<Coder> coder;
+    for(uint32_t i =0; i < mCtx->nb_streams; i++) {
+      // and set the coder for the given stream
+      Container::Stream* stream = Container::getStream(mCtx->streams[i]->index);
+      // delete the coder
+      stream->setCoder(0);
     }
     avformat_free_context(mCtx);
   }
@@ -157,12 +160,12 @@ Muxer::open(KeyValueBag *aInputOptions, KeyValueBag* aOutputOptions) {
   }
 
   AVDictionary* tmp = 0;
-  const char* url = ctx->filename;
+  const char* url = ctx->url;
   AVOutputFormat* fmt = mFormat ? mFormat->getCtx() : 0;
 
 
   // Let's check for custom IO
-  mIOHandler = URLProtocolManager::findHandler(mCtx->filename,
+  mIOHandler = URLProtocolManager::findHandler(mCtx->url,
       URLProtocolHandler::URL_WRONLY_MODE, 0);
 
   if (mIOHandler) {
@@ -260,7 +263,7 @@ Muxer::close() {
 
 const char*
 Muxer::getURL() {
-  return this->getFormatCtx()->filename;
+  return this->getFormatCtx()->url;
 }
 
 MuxerStream*

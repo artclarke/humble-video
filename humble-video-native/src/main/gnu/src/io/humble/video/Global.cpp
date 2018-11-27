@@ -113,48 +113,13 @@ namespace io { namespace humble { namespace video
     return retval;
   }
   
-  static int humblevideo_lockmgr_cb(void** ctx, enum AVLockOp op)
-  {
-    if (!ctx)
-      return 1;
-    
-    int retval=0;
-    io::humble::ferry::Mutex* mutex=
-      static_cast<io::humble::ferry::Mutex*>(*ctx);
-    switch(op)
-    {
-      case AV_LOCK_CREATE:
-        mutex = io::humble::ferry::Mutex::make();
-        *ctx = mutex;
-        retval = !!mutex;
-        break;
-      case AV_LOCK_DESTROY:
-        if (mutex) mutex->release();
-        *ctx = 0;
-        break;
-      case AV_LOCK_OBTAIN:
-        if (mutex) mutex->lock();
-        break;
-      case AV_LOCK_RELEASE:
-        if (mutex) mutex->unlock();
-        break;
-    }
-    return retval;
-  }
-  
   void
   Global :: init()
   {
     if (!sGlobal) {
-      av_lockmgr_register(humblevideo_lockmgr_cb);
       av_log_set_callback(humblevideo_log_callback);
       av_log_set_level (AV_LOG_ERROR); // Only log errors by default
-      av_register_all();
       avformat_network_init();
-      // and set up filter support
-      avfilter_register_all();
-
-      // turn down logging
       sGlobal = new Global();
     }
   }
@@ -168,7 +133,6 @@ namespace io { namespace humble { namespace video
   {
     Global *val = (Global*)closure;
     if (!vm && val) {
-      av_lockmgr_register(0);
       delete val;
     }
   }
