@@ -119,9 +119,9 @@ MediaAudio::make(io::humble::ferry::Buffer* buffer, int32_t numSamples,
   RefPointer<Rational> tb = Rational::make(1,sampleRate); // a sensible default.
   retval->setTimeBase(tb.value());
   AVFrame* frame = retval->mFrame;
-  av_frame_set_sample_rate(frame, sampleRate);
-  av_frame_set_channels(frame, channels);
-  av_frame_set_channel_layout(frame, layout);
+  frame->sample_rate = sampleRate;
+  frame->channels = channels;
+  frame->channel_layout = layout;
   frame->nb_samples = numSamples;
   frame->format = format;
   // we're going to tell the world this buffer now contains the right kind of data
@@ -267,7 +267,7 @@ MediaAudio::getDataPlaneSize(int32_t plane) {
 
 int32_t
 MediaAudio::getNumDataPlanes() {
-  if (isPlanar()) return av_frame_get_channels(mFrame);
+  if (isPlanar()) return mFrame->channels;
   else return 1;
 }
 
@@ -290,12 +290,12 @@ MediaAudio::setComplete(bool complete) {
 
 int32_t
 MediaAudio::getSampleRate() {
-  return av_frame_get_sample_rate(mFrame);
+  return mFrame->sample_rate;
 }
 
 int32_t
 MediaAudio::getChannels() {
-  return av_frame_get_channels(mFrame);
+  return mFrame->channels;
 }
 
 AudioFormat::Type
@@ -333,7 +333,7 @@ MediaAudio::isPlanar() {
 
 AudioChannel::Layout
 MediaAudio::getChannelLayout() {
-  return (AudioChannel::Layout) av_frame_get_channel_layout(mFrame);
+  return (AudioChannel::Layout) mFrame->channel_layout;
 }
 
 AVFrame*
