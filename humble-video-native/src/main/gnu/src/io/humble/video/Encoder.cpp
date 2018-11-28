@@ -579,6 +579,92 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
   }
 }
 
+ProcessorResult
+Encoder::send(MediaRaw* media) {
+
+  if (STATE_OPENED != getState())
+    VS_THROW(HumbleRuntimeError("Attempt to receive(Media), but Encoder is not opened"));
+
+   // null media is allowed, but we should check if not null that the type is valid.
+  MediaDescriptor::Type type = getCodecType();
+  switch(type) {
+  case MediaDescriptor::MEDIA_AUDIO: {
+    MediaAudio* audio = dynamic_cast<MediaAudio*>(media);
+    if (!audio && media)
+      VS_THROW(HumbleInvalidArgument("passed non-audio Media to an audio encoder"));
+    ensureAudioParamsMatch(audio);
+
+  }
+  break;
+  case MediaDescriptor::MEDIA_VIDEO: {
+    MediaPicture* picture = dynamic_cast<MediaPicture*>(media);
+    if (!picture && media)
+      VS_THROW(HumbleInvalidArgument("passed non-video Media to a video encoder"));
+    ensurePictureParamsMatch(picture);
+
+  }
+  break;
+  case MediaDescriptor::MEDIA_SUBTITLE: {
+      MediaSubtitle* subtitle = dynamic_cast<MediaSubtitle*>(media);
+      if (!subtitle && media)
+        VS_THROW(HumbleInvalidArgument("passed non-subtitle Media to a subtitle encoder"));
+    }
+    break;
+  default:
+    VS_THROW(HumbleInvalidArgument("passed a media type that is not compatible with this encoder"));
+  }
+  // now let's get the avframe
+  const AVFrame* frame = media ? media->getCtx() : 0;
+
+  // if we're dealing with audio, we need to pump through the
+  // filter graph... which is basically add first to the source,
+  // if (filtersource)
+  //   add to filter source
+  // else
+  //   add directly to coder
+  int e = 0;
+    e = avcodec_send_frame(getCodecCtx(), frame);
+#ifdef VS_DEBUG
+  char desc[256]; *desc = 0;
+  if (media) media->logMetadata(desc, sizeof(desc));
+  VS_LOG_TRACE("send Decoder@%p[media:%s]:%" PRIi64,
+               this,
+               desc,
+               (int64_t)e);
+#endif
+  if (e != AVERROR(EAGAIN) && e!= AVERROR_EOF)
+    FfmpegException::check(e, "Error on Decoder.send(Media)");
+
+  return (ProcessorResult) e;
+}
+
+ProcessorResult
+Encoder::receive(MediaEncoded* media) {
+  if (STATE_OPENED != getState())
+    VS_THROW(HumbleRuntimeError("Attempt to send(Media), but Encoder is not opened"));
+
+  MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(media);
+  if (!packet)
+    VS_THROW(HumbleInvalidArgument("Encoders require non-null MediaRaw objects"));
+
+  if (packet && !packet->isComplete()) {
+    VS_THROW(HumbleRuntimeError("Passed in a non-null but not complete packet; this is an error"));
+  }
+  // now reset the packet so we allocate new memory (because encoders sometimes change packet sizes).
+  packet->reset(0);
+
+  // now for this, we
+  // receive from encoder
+  // if need more data && filtersource
+  //   pull data from sink, add to encoder and pull from encoder until
+  //     encoder success OR filtersource needs more data
+  // if filtesource
+  //
+  int e = 0;
+  return (ProcessorResult) e;
+}
+
+
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

@@ -29,6 +29,7 @@
 
 namespace io { namespace humble { namespace video {
 
+  class MediaRaw;
 /**
  * The parent class of all media objects than can be gotten from or added to a Stream.
  */
@@ -105,6 +106,7 @@ protected:
   MediaEncoded() {}
   virtual ~MediaEncoded() {}
 };
+
 }}}
 
 #endif /* MEDIADATA_H_ */

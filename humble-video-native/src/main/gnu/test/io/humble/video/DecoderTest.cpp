@@ -120,6 +120,12 @@ DecoderTest::testOpenWithOptions() {
 void
 DecoderTest::writeAudio(FILE* output, MediaAudio* audio)
 {
+  TS_ASSERT(audio->isComplete());
+  RefPointer<Rational> timeBase = audio->getTimeBase();
+  TS_ASSERT(timeBase);
+  TS_ASSERT_DIFFERS(Global::NO_PTS, audio->getPacketDts());
+  TS_ASSERT_DIFFERS(Global::NO_PTS, audio->getTimeStamp());
+
   RefPointer<Buffer> buf;
 
   // we'll just write out the first channel.
@@ -173,39 +179,44 @@ DecoderTest::testDecodeAudio() {
   );
 
   int64_t oldTimeStamp = Global::NO_PTS;
-  while(source->read(packet.value()) >= 0) {
-    // got a packet; now we try to decode it.
-    if (packet->getStreamIndex() == streamToDecode &&
-        packet->isComplete()) {
-      int32_t bytesRead = 0;
-      int32_t byteOffset=0;
-      do {
-        bytesRead = decoder->decodeAudio(audio.value(), packet.value(), byteOffset);
-        if (audio->isComplete()) {
-          RefPointer<Rational> timeBase = audio->getTimeBase();
-          TS_ASSERT(timeBase);
-          TS_ASSERT_DIFFERS(Global::NO_PTS, audio->getPacketDts());
-          TS_ASSERT_DIFFERS(Global::NO_PTS, audio->getTimeStamp());
-          if (oldTimeStamp != Global::NO_PTS) {
-            // check for monotonically increasing
-            TS_ASSERT(oldTimeStamp < audio->getTimeStamp());
-          }
-          oldTimeStamp = audio->getTimeStamp();
-          writeAudio(output, audio.value());
-        }
-        byteOffset += bytesRead;
-      } while(byteOffset < packet->getSize());
-    }
-  }
-  // now, flush any cached packets
+  Coder::CoderResult r = Coder::RESULT_SUCCESS;
+
+  int retval = 0;
   do {
-    decoder->decodeAudio(audio.value(), 0, 0);
-    if (audio->isComplete()) {
-      writeAudio(output, audio.value());
+    retval = source->read(packet.value());
+    if (retval >= 0 &&
+        (!packet->isComplete() || packet->getStreamIndex() != streamToDecode)
+    )
+      // we read some data, but not the right packet or not enough yet
+      continue;
+
+    MediaPacket* p = packet.value();
+    if (retval <0)
+      p = 0; // force flushing if end of file.
+
+    r = decoder->send(p); // tell the decoder about the packet
+    if (p) {
+      TS_ASSERT_EQUALS(r, Coder::RESULT_SUCCESS);
+    } else {
+      // when flushing, a second call to the decoder should then be END_OF_STREAM
+      r = decoder->send(p); // send again.
+      TS_ASSERT_EQUALS(r, Coder::RESULT_END_OF_STREAM);
     }
-  } while (audio->isComplete());
 
+    while((r = decoder->receive(audio.value())) == Coder::RESULT_SUCCESS) {
+      writeAudio(output, audio.value());
+      if (oldTimeStamp != Global::NO_PTS) {
+        // check for monotonically increasing
+        TS_ASSERT(oldTimeStamp < audio->getTimeStamp());
+      }
+      oldTimeStamp = audio->getTimeStamp();
+    }
+    if (p)
+      TS_ASSERT_EQUALS(r, Coder::RESULT_AWAITING_DATA);
 
+  } while (retval >= 0);
+  // and when exiting the decoder receive loop should have gotten EOS.
+  TS_ASSERT_EQUALS(r, Coder::RESULT_END_OF_STREAM);
   fclose(output);
   source->close();
 }
@@ -214,6 +225,10 @@ DecoderTest::testDecodeAudio() {
 void
 DecoderTest::writePicture(const char* prefix, int32_t* frameNo, MediaPicture* picture)
 {
+  TS_ASSERT(picture->isComplete());
+  TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPts());
+  TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getTimeStamp());
+
   char filename[2048];
   // write data as PGM file.
   snprintf(filename, sizeof(filename), "%s-%06d.pgm", prefix, *frameNo);
@@ -285,38 +300,43 @@ DecoderTest::testDecodeVideo() {
       decoder->getPixelFormat());
 
   int32_t frameNo = 0;
-  while(source->read(packet.value()) >= 0) {
-    // got a packet; now we try to decode it.
-    if (packet->getStreamIndex() == streamToDecode &&
-        packet->isComplete()) {
-      int32_t bytesRead = 0;
-      int32_t byteOffset=0;
-      do {
-        bytesRead = decoder->decodeVideo(picture.value(), packet.value(), byteOffset);
-        if (picture->isComplete()) {
-          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketDts());
-          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPts());
-          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getTimeStamp());
-          writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
-        }
-        byteOffset += bytesRead;
-      } while(byteOffset < packet->getSize());
-    }
-  }
-  source->close();
-  source = 0;
 
-  // this would have been impossible in xuggle, but in humble video
-  // we should be able to flush a decoder after the source is closed.
+  Coder::CoderResult r = Coder::RESULT_SUCCESS;
 
-  // now, handle the case where bytesRead is 0; we need to flush any
-  // cached packets
+  int retval = 0;
   do {
-    decoder->decodeVideo(picture.value(), 0, 0);
-    if (picture->isComplete()) {
+    retval = source->read(packet.value());
+    if (retval >= 0 &&
+        (!packet->isComplete() || packet->getStreamIndex() != streamToDecode)
+    )
+      // we read some data, but not the right packet or not enough yet
+      continue;
+
+    MediaPacket* p = packet.value();
+    if (retval <0)
+      p = 0; // force flushing if end of file.
+
+    r = decoder->send(p); // tell the decoder about the packet
+    if (p) {
+      TS_ASSERT_EQUALS(r, Coder::RESULT_SUCCESS);
+    } else {
+      // when flushing, a second call to the decoder should then be END_OF_STREAM
+      r = decoder->send(p); // send again.
+      TS_ASSERT_EQUALS(r, Coder::RESULT_END_OF_STREAM);
+    }
+
+
+    while((r = decoder->receive(picture.value())) == Coder::RESULT_SUCCESS) {
+      TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketDts());
       writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
     }
-  } while (picture->isComplete());
+    if (p)
+      TS_ASSERT_EQUALS(r, Coder::RESULT_AWAITING_DATA);
+
+  } while (retval >= 0);
+  // and when exiting the decoder receive loop should have gotten EOS.
+  TS_ASSERT_EQUALS(r, Coder::RESULT_END_OF_STREAM);
+  source->close();
 }
 
 void
@@ -380,26 +400,39 @@ DecoderTest::testIssue27()
       decoder->getPixelFormat());
 
   decoder->open(0, 0);
-  while(demuxer->read(packet.value()) >= 0 && frameNo < frames) {
-    // got a packet; now we try to decode it.
-    if (packet->getStreamIndex() == decoderIndex &&
-        packet->isComplete()) {
-      int32_t bytesRead = 0;
-      int32_t byteOffset=0;
-      do {
-        bytesRead = decoder->decodeVideo(picture.value(), packet.value(), byteOffset);
-        if (picture->isComplete()) {
-          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketDts());
-          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPts());
-          TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getTimeStamp());
-          VS_LOG_TRACE("Writing frame: %"PRId32, frameNo);
-          writePicture("DecoderTest_testIssue27", &frameNo, picture.value());
-          ++frameNo;
-        }
-        byteOffset += bytesRead;
-      } while(byteOffset < packet->getSize());
+  Coder::CoderResult r = Coder::RESULT_SUCCESS;
+
+  int retval = 0;
+  do {
+    retval = demuxer->read(packet.value());
+    if (retval >= 0 &&
+        (!packet->isComplete() || packet->getStreamIndex() != decoderIndex)
+    )
+      // we read some data, but not the right packet or not enough yet
+      continue;
+
+    MediaPacket* p = packet.value();
+    if (retval <0 || frameNo >= frames)
+      p = 0; // force flushing if end of file.
+
+    r = decoder->send(p); // tell the decoder about the packet
+    if (p) {
+      TS_ASSERT_EQUALS(r, Coder::RESULT_SUCCESS);
+    } else {
+      // when flushing, r should then be END_OF_STREAM if we flush again
+      r = decoder->send(0);
+      TS_ASSERT_EQUALS(r, Coder::RESULT_END_OF_STREAM);
     }
-  }
+
+    while((r = decoder->receive(picture.value())) == Coder::RESULT_SUCCESS) {
+      writePicture("DecoderTest_testIssue27", &frameNo, picture.value());
+    }
+
+    if (p)
+      // if we are not yet flushing, the encoder should always be awaiting data.
+      TS_ASSERT_EQUALS(r, Coder::RESULT_AWAITING_DATA);
+
+  } while (retval >= 0 && frameNo < frames);
 
   demuxer->close();
 }

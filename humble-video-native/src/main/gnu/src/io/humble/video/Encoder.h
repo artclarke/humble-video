@@ -27,6 +27,7 @@
 #define ENCODER_H_
 
 #include <io/humble/video/Coder.h>
+#include <io/humble/video/Processor.h>
 #include <io/humble/video/MediaPacket.h>
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaPicture.h>
@@ -42,7 +43,9 @@ namespace video {
 /**
  * Encodes MediaAudio, MediaPicture or MediaSubtitle objects into MediaPacket objects.
  */
-class VS_API_HUMBLEVIDEO Encoder : public io::humble::video::Coder
+class VS_API_HUMBLEVIDEO Encoder : virtual public io::humble::video::Coder,
+  virtual public io::humble::video::ProcessorEncodedSource,
+  virtual public io::humble::video::ProcessorRawSink
 {
 public:
 
@@ -171,6 +174,10 @@ public:
    */
   virtual void encode(MediaPacket * output,
       MediaSampled* media);
+
+
+  virtual ProcessorResult send(MediaRaw*);
+  virtual ProcessorResult receive(MediaEncoded*);
 #if 0
 #ifndef SWIG
   virtual int32_t acquire();

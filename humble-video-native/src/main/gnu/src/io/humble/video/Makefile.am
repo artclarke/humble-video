@@ -103,6 +103,8 @@ libhumble_video_la_HEADERS= \
   MediaSubtitle.h \
   MediaSubtitleImpl.h \
   MediaSubtitle.swg \
+  Processor.h \
+  Processor.swg \
   IndexEntry.h \
   IndexEntryImpl.h \
   IndexEntry.swg \

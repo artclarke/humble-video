@@ -28,6 +28,7 @@
 
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/Coder.h>
+#include <io/humble/video/Processor.h>
 #include <io/humble/video/MediaPacket.h>
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaPicture.h>
@@ -40,7 +41,10 @@ namespace video {
 /**
  * Decodes MediaPacket objects into MediaAudio, MediaPicture or MediaSubtitle objects.
  */
-class VS_API_HUMBLEVIDEO Decoder : public io::humble::video::Coder
+class VS_API_HUMBLEVIDEO Decoder :
+  virtual public io::humble::video::Coder,
+  virtual public io::humble::video::ProcessorEncodedSink,
+  virtual public io::humble::video::ProcessorRawSource
 {
 public:
   /**
@@ -62,6 +66,7 @@ public:
   static Decoder* make(const AVCodec* codec, const AVCodecParameters *src);
 #endif // SWIG
 
+#if VS_OLD_DECODE_API
   /**
    * Flush this Decoder, getting rid of any cached packets (call after seek).
    * Next packet given to decode should be a key packet.
@@ -133,15 +138,16 @@ public:
    */
   virtual int32_t decode(MediaSampled * output,
       MediaPacket *packet, int32_t byteOffset);
+#endif // VS_OLD_DECODE_API
 
 
   /**
    * Decode this packet into output.
    *
    * The caller is responsible for allocating the
-   * MediaPicture object.  This function will potentially
+   * MediaSubtitle object.  This function will potentially
    * overwrite any data in the frame object, but
-   * you should pass the same MediaPicture into this function
+   * you should pass the same MediaSubtitle into this function
    * repeatedly until Media.isComplete() is true.
    *
    * @param output The MediaPicture we decode. Caller must check if it is complete on return.
@@ -153,11 +159,19 @@ public:
 //  virtual int32_t decodeSubtitle(MediaSubtitle * output,
 //      MediaPacket *packet, int32_t byteOffset);
 
+
+  virtual ProcessorResult send(MediaEncoded*);
+  virtual ProcessorResult receive(MediaRaw*);
+
+
 protected:
   Decoder(const AVCodec* codec, const AVCodecParameters* src);
   virtual ~Decoder();
 
+#if VS_OLD_DECODE_API
   virtual int prepareFrame(AVFrame* frame, int flags);
+#endif // VS_OLD_DECODE_API
+
 private:
   int64_t rebase(int64_t ts, MediaPacket* packet);
   io::humble::ferry::RefPointer<MediaRaw> mCachedMedia;

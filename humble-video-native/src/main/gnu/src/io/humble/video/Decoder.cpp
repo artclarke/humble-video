@@ -53,13 +53,16 @@ Decoder::~Decoder() {
   VS_LOG_TRACE("Destroyed: %p", this);
 }
 
+#if VS_OLD_DECODE_API
 void
 Decoder::flush() {
   if (getState() != STATE_OPENED)
     throw HumbleRuntimeError("Attempt to flush Decoder when not opened");
   avcodec_flush_buffers(getCodecCtx());
 }
+#endif //  VS_OLD_DECODE_API
 
+#if VS_OLD_DECODE_API
 int
 Decoder::prepareFrame(AVFrame* frame, int flags) {
   if (!mCachedMedia)
@@ -91,6 +94,7 @@ Decoder::prepareFrame(AVFrame* frame, int flags) {
   }
   return 0;
 }
+#endif //  VS_OLD_DECODE_API
 
 int64_t
 Decoder::rebase(int64_t ts, MediaPacket* packet) {
@@ -107,6 +111,8 @@ Decoder::rebase(int64_t ts, MediaPacket* packet) {
     return ts;
   return dstTs->rescale(ts, srcTs.value());
 }
+
+#if VS_OLD_DECODE_API
 int32_t
 Decoder::decodeAudio(MediaAudio* output, MediaPacket* aPacket,
     int32_t byteOffset) {
@@ -401,6 +407,8 @@ Decoder::decode(MediaSampled* output, MediaPacket* packet, int32_t offset) {
   }
   return -1;
 }
+#endif // VS_OLD_DECODE_API
+
 Decoder*
 Decoder::make(Codec* codec)
 {
@@ -457,6 +465,115 @@ Decoder::make(const AVCodec* codec, const AVCodecParameters *src) {
   return retval.get();
 
 }
+
+ProcessorResult
+Decoder::send(MediaEncoded* media) {
+  if (STATE_OPENED != getState())
+    VS_THROW(HumbleRuntimeError("Attempt to send(Media), but Decoder is not opened"));
+
+  MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(media);
+  if (media && !packet)
+    VS_THROW(HumbleInvalidArgument("Decoders require MediaEncoded objects"));
+
+  if (packet && !packet->isComplete()) {
+    VS_THROW(HumbleRuntimeError("Passed in a non-null but not complete packet; this is an error"));
+  }
+
+  const AVPacket* p = packet ?  packet->getCtx() : 0;
+  int e = avcodec_send_packet(getCodecCtx(), p);
+#ifdef VS_DEBUG
+  char desc[256]; *desc = 0;
+  if (packet) packet->logMetadata(desc, sizeof(desc));
+  VS_LOG_TRACE("send Decoder@%p[media:%s]:%" PRIi64,
+               this,
+               desc,
+               (int64_t)e);
+#endif
+  if (e != AVERROR(EAGAIN) && e!= AVERROR_EOF)
+    FfmpegException::check(e, "Error on Decoder.send(Media)");
+
+  return (ProcessorResult) e;
+}
+
+ProcessorResult
+Decoder::receive(MediaRaw* outputMedia) {
+
+  MediaRaw* output = dynamic_cast<MediaRaw*>(outputMedia);
+  if (!output)
+    VS_THROW(HumbleInvalidArgument("receive(Media) needs non null media"));
+
+  if (STATE_OPENED != getState())
+    VS_THROW(HumbleRuntimeError("Attempt to receive(Media), but Decoder is not opened"));
+
+  // First, check that the output type is correct
+  MediaDescriptor::Type type = getCodecType();
+
+  switch(type) {
+  case MediaDescriptor::MEDIA_AUDIO: {
+    MediaAudio* audio = dynamic_cast<MediaAudio*>(output);
+    if (!audio)
+      VS_THROW(HumbleInvalidArgument("passed non-audio Media to an audio decoder"));
+
+    // let's check the audio parameters.
+    ensureAudioParamsMatch(audio);
+  }
+  break;
+  case MediaDescriptor::MEDIA_VIDEO: {
+    MediaPicture* picture = dynamic_cast<MediaPicture*>(output);
+    if (!picture)
+      VS_THROW(HumbleInvalidArgument("passed non-video Media to a video decoder"));
+    ensurePictureParamsMatch(picture);
+  }
+  break;
+  case MediaDescriptor::MEDIA_SUBTITLE: {
+    MediaSubtitle* subtitle = dynamic_cast<MediaSubtitle*>(output);
+    if (!subtitle)
+      VS_THROW(HumbleInvalidArgument("passed non-subtitle Media to a subtitle decoder"));
+    // TODO: create ensureSubtitleParamsMatch(subtitle)
+  }
+  break;
+  default:
+    VS_THROW(HumbleInvalidArgument("passed a media type that is not compatible with this decoder"));
+  }
+  // now that we've validated the output type,
+  AVFrame *frame = av_frame_alloc();
+  if (!frame)
+    VS_THROW(HumbleBadAlloc());
+
+  // DO NOT THROW EXCEPTIONS FROM HERE UNTIL NEXT MARKER
+  int e = avcodec_receive_frame(getCodecCtx(), frame);
+  if (e == 0) {
+    // we got data
+    if (frame->pts == Global::NO_PTS)
+      // never allow a video frame without a guessed best effort timestamp.
+      frame->pts = frame->best_effort_timestamp;
+
+    // copy the output to our frame
+    // release any memory we have
+    av_frame_unref(output->getCtx());
+    // and copy any data in.
+    av_frame_ref(output->getCtx(), frame);
+    RefPointer<Rational> timeBase = getTimeBase();
+    output->setTimeBase(timeBase.value());
+    output->setComplete(true);
+  }
+#ifdef VS_DEBUG
+  char desc[256]; *desc = 0;
+  if (output) output->logMetadata(desc, sizeof(desc));
+  VS_LOG_TRACE("receive Decoder@%p[media:%s]:%" PRIi64,
+               this,
+               desc,
+               (int64_t)e);
+#endif
+  av_frame_free(&frame);
+  // SAFE TO THROW EXCEPTIONS FROM HERE
+  if (e != AVERROR(EAGAIN) && e!= AVERROR_EOF) {
+    FfmpegException::check(e, "Error on Decoder.send(Media)");
+  }
+
+  return (ProcessorResult) e;
+}
+
 
 } /* namespace video */
 } /* namespace humble */

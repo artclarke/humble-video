@@ -29,6 +29,7 @@
 #include <io/humble/video/PixelFormat.h>
 #include <io/humble/video/Media.h>
 #include <io/humble/video/MediaRaw.h>
+#include <io/humble/video/Processor.h>
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaSubtitle.h>
@@ -180,6 +181,7 @@ import io.humble.ferry.Buffer;
 %include <io/humble/video/Global.swg>
 %include <io/humble/video/KeyValueBag.swg>
 %include <io/humble/video/Property.swg>
+%include <io/humble/video/Processor.swg>
 %include <io/humble/video/Media.swg>
 %include <io/humble/video/MediaRaw.swg>
 %include <io/humble/video/MediaAudio.swg>
