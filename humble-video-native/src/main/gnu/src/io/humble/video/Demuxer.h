@@ -22,6 +22,7 @@
 
 #include <io/humble/video/MediaPacket.h>
 #include <io/humble/video/Container.h>
+#include <io/humble/video/Processor.h>
 #include <io/humble/video/DemuxerStream.h>
 #include <io/humble/video/DemuxerFormat.h>
 
@@ -35,7 +36,8 @@ namespace video {
 /**
  * A Container that MediaPacket objects can be read from.
  */
-class VS_API_HUMBLEVIDEO Demuxer : public io::humble::video::Container
+class VS_API_HUMBLEVIDEO Demuxer : public io::humble::video::Container,
+  public virtual ProcessorEncodedSource
 {
   /**
    * Note: This class is a pure-virtual interface. Actual
@@ -442,6 +444,22 @@ public:
    */
   virtual void
   pause()=0;
+
+  /**
+   * gets a new packet
+   */
+  virtual ProcessorResult receivePacket(MediaPacket *packet)=0;
+
+  /**
+   * @{inheritDoc}
+   */
+  virtual ProcessorResult receiveEncoded(MediaEncoded* media) {
+    MediaPacket* m = dynamic_cast<MediaPacket*>(media);
+    if (media && !m)
+      throw io::humble::ferry::HumbleRuntimeError("expected a MediaPacket object");
+    else
+      return receivePacket(m);
+  }
 
 protected:
   Demuxer();

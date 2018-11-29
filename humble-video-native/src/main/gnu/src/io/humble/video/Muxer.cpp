@@ -416,6 +416,15 @@ Muxer::logOpen(Muxer* muxer) {
 #endif
 }
 
+ProcessorResult
+Muxer::sendPacket(MediaPacket *packet) {
+  bool r = write(packet, false);
+  if (r == 1)
+    return RESULT_AWAITING_DATA;
+  else
+    return RESULT_SUCCESS;
+}
+
 bool
 Muxer::write(MediaPacket* aPacket, bool forceInterleave) {
   MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(aPacket);

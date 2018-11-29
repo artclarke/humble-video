@@ -27,6 +27,7 @@
 #define MUXER_H_
 
 #include <io/humble/video/Container.h>
+#include <io/humble/video/Processor.h>
 #include <io/humble/video/MuxerFormat.h>
 #include <io/humble/video/KeyValueBag.h>
 #include <io/humble/video/MuxerStream.h>
@@ -47,7 +48,8 @@ namespace video {
 /**
  * A Container that MediaPacket objects can be written to.
  */
-class VS_API_HUMBLEVIDEO Muxer : public io::humble::video::Container
+class VS_API_HUMBLEVIDEO Muxer : public io::humble::video::Container,
+  public virtual ProcessorEncodedSink
 {
 public:
 
@@ -201,6 +203,15 @@ public:
    */
   virtual bool
   write(MediaPacket* packet, bool forceInterleave);
+
+  virtual ProcessorResult sendPacket(MediaPacket *media);
+  virtual ProcessorResult sendEncoded(MediaEncoded* media) {
+    MediaPacket* m = dynamic_cast<MediaPacket*>(media);
+    if (media && !m)
+      throw io::humble::ferry::HumbleRuntimeError("expected a MediaPacket object");
+    else
+      return sendPacket(m);
+  }
 
 #if 0
 #ifndef SWIG

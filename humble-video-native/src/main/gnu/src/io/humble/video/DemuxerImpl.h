@@ -71,6 +71,12 @@ public:
   virtual int32_t
   read(MediaPacket *packet);
 
+  /**
+   * gets a new packet
+   */
+  virtual ProcessorResult receivePacket(MediaPacket *packet);
+
+
   virtual void
   queryStreamMetaData();
 
