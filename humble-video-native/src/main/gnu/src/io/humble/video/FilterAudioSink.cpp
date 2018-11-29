@@ -39,9 +39,9 @@ FilterAudioSink::FilterAudioSink(FilterGraph* graph, AVFilterContext* ctx) :
     FilterSink(graph, ctx) {
 }
 
-void
-FilterAudioSink::addAudio(MediaAudio* audio) {
-  FilterSink::add(audio);
+ProcessorResult
+FilterAudioSink::sendAudio(MediaAudio* audio) {
+  return FilterSink::sendRaw(audio);
 }
 
 FilterAudioSink*

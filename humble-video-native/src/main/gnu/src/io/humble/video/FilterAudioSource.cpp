@@ -51,9 +51,9 @@ FilterAudioSource::make(FilterGraph* graph, AVFilterContext* ctx) {
   return r.get();
 }
 
-int32_t
-FilterAudioSource::getAudio(MediaAudio* audio) {
-  return FilterSource::get(audio);
+ProcessorResult
+FilterAudioSource::receiveAudio(MediaAudio* audio) {
+  return FilterSource::receiveRaw(audio);
 }
 } /* namespace video */
 } /* namespace humble */

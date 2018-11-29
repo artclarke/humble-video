@@ -27,6 +27,7 @@
 #define FILTERSINK_H_
 
 #include <io/humble/video/FilterEndPoint.h>
+#include <io/humble/video/Processor.h>
 
 namespace io {
 namespace humble {
@@ -36,10 +37,12 @@ namespace video {
  * A sink of MediaRaw objects for a FilterGraph.
  */
 
-class VS_API_HUMBLEVIDEO FilterSink : public io::humble::video::FilterEndPoint
+class VS_API_HUMBLEVIDEO FilterSink : public io::humble::video::FilterEndPoint,
+  virtual public io::humble::video::ProcessorRawSink
 {
+public:
+  virtual ProcessorResult sendRaw(MediaRaw* media);
 protected:
-  void add(MediaRaw* media);
   FilterSink(FilterGraph* graph, AVFilterContext* ctx);
   virtual
   ~FilterSink();

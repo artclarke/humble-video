@@ -27,6 +27,7 @@
 #define FILTERSOURCE_H_
 
 #include <io/humble/video/FilterEndPoint.h>
+#include <io/humble/video/Processor.h>
 #include <io/humble/video/MediaRaw.h>
 
 namespace io {
@@ -36,7 +37,8 @@ namespace video {
 /**
  * A source of MediaRaw objects for a FilterGraph.
  */
-class VS_API_HUMBLEVIDEO FilterSource : public FilterEndPoint
+class VS_API_HUMBLEVIDEO FilterSource : public FilterEndPoint,
+  public virtual ProcessorRawSource
 {
 public:
   /**
@@ -51,7 +53,7 @@ public:
   virtual int32_t getFrameSize();
 
 protected:
-  int32_t get(MediaRaw*);
+  ProcessorResult receiveRaw(MediaRaw*);
   FilterSource(FilterGraph* graph, AVFilterContext* ctx);
   virtual
   ~FilterSource();

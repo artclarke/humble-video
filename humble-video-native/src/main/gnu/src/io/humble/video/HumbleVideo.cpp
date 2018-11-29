@@ -39382,11 +39382,11 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterSource_1getFrameSize
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterAudioSource_1getAudio(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterAudioSource_1receiveAudio(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   io::humble::video::FilterAudioSource *arg1 = (io::humble::video::FilterAudioSource *) 0 ;
   io::humble::video::MediaAudio *arg2 = (io::humble::video::MediaAudio *) 0 ;
-  int32_t result;
+  io::humble::video::ProcessorResult result;
   
   (void)jenv;
   (void)jcls;
@@ -39407,7 +39407,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterAudioSource_1getAudi
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)(arg1)->getAudio(arg2);
+      result = (io::humble::video::ProcessorResult)(arg1)->receiveAudio(arg2);
     }
     catch(std::exception & e)
     {
@@ -39431,11 +39431,60 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterAudioSource_1getAudi
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterPictureSource_1getPicture(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterAudioSource_1receiveRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
+  io::humble::video::FilterAudioSource *arg1 = (io::humble::video::FilterAudioSource *) 0 ;
+  io::humble::video::MediaRaw *arg2 = (io::humble::video::MediaRaw *) 0 ;
+  io::humble::video::ProcessorResult result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(io::humble::video::FilterAudioSource **)&jarg1; 
+  arg2 = *(io::humble::video::MediaRaw **)&jarg2; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,143,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (io::humble::video::ProcessorResult)(arg1)->receiveRaw(arg2);
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return 0;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterPictureSource_1receivePicture(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   io::humble::video::FilterPictureSource *arg1 = (io::humble::video::FilterPictureSource *) 0 ;
   io::humble::video::MediaPicture *arg2 = (io::humble::video::MediaPicture *) 0 ;
-  int32_t result;
+  io::humble::video::ProcessorResult result;
   
   (void)jenv;
   (void)jcls;
@@ -39456,7 +39505,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterPictureSource_1getPi
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (int32_t)(arg1)->getPicture(arg2);
+      result = (io::humble::video::ProcessorResult)(arg1)->receivePicture(arg2);
     }
     catch(std::exception & e)
     {
@@ -39480,9 +39529,109 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterPictureSource_1getPi
 }
 
 
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterAudioSink_1addAudio(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterPictureSource_1receiveRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
+  io::humble::video::FilterPictureSource *arg1 = (io::humble::video::FilterPictureSource *) 0 ;
+  io::humble::video::MediaRaw *arg2 = (io::humble::video::MediaRaw *) 0 ;
+  io::humble::video::ProcessorResult result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(io::humble::video::FilterPictureSource **)&jarg1; 
+  arg2 = *(io::humble::video::MediaRaw **)&jarg2; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,143,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (io::humble::video::ProcessorResult)(arg1)->receiveRaw(arg2);
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return 0;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterSink_1sendRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
+  io::humble::video::FilterSink *arg1 = (io::humble::video::FilterSink *) 0 ;
+  io::humble::video::MediaRaw *arg2 = (io::humble::video::MediaRaw *) 0 ;
+  io::humble::video::ProcessorResult result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(io::humble::video::FilterSink **)&jarg1; 
+  arg2 = *(io::humble::video::MediaRaw **)&jarg2; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,143,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (io::humble::video::ProcessorResult)(arg1)->sendRaw(arg2);
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return 0;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterAudioSink_1sendAudio(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
   io::humble::video::FilterAudioSink *arg1 = (io::humble::video::FilterAudioSink *) 0 ;
   io::humble::video::MediaAudio *arg2 = (io::humble::video::MediaAudio *) 0 ;
+  io::humble::video::ProcessorResult result;
   
   (void)jenv;
   (void)jcls;
@@ -39494,7 +39643,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterAudioSink_1addAudio(
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
       "invalid native object; delete() likely already called");
-    return ;
+    return 0;
   }
   
   {
@@ -39503,18 +39652,18 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterAudioSink_1addAudio(
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      (arg1)->addAudio(arg2);
+      result = (io::humble::video::ProcessorResult)(arg1)->sendAudio(arg2);
     }
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
-      return ;
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
-      return ;
+      return 0;
     }
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -39522,12 +39671,65 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterAudioSink_1addAudio(
     
     /*@SWIG@*/
   }
+  jresult = (jint)result; 
+  return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterPictureSink_1addPicture(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterAudioSink_1sendRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
+  io::humble::video::FilterAudioSink *arg1 = (io::humble::video::FilterAudioSink *) 0 ;
+  io::humble::video::MediaRaw *arg2 = (io::humble::video::MediaRaw *) 0 ;
+  io::humble::video::ProcessorResult result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(io::humble::video::FilterAudioSink **)&jarg1; 
+  arg2 = *(io::humble::video::MediaRaw **)&jarg2; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,143,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (io::humble::video::ProcessorResult)(arg1)->sendRaw(arg2);
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return 0;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterPictureSink_1sendPicture(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
   io::humble::video::FilterPictureSink *arg1 = (io::humble::video::FilterPictureSink *) 0 ;
   io::humble::video::MediaPicture *arg2 = (io::humble::video::MediaPicture *) 0 ;
+  io::humble::video::ProcessorResult result;
   
   (void)jenv;
   (void)jcls;
@@ -39539,7 +39741,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterPictureSink_1addPict
   if (!arg1) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
       "invalid native object; delete() likely already called");
-    return ;
+    return 0;
   }
   
   {
@@ -39548,18 +39750,18 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterPictureSink_1addPict
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      (arg1)->addPicture(arg2);
+      result = (io::humble::video::ProcessorResult)(arg1)->sendPicture(arg2);
     }
     catch(std::exception & e)
     {
       io::humble::video::Global::catchException(e);
-      return ;
+      return 0;
     }
     catch(...)
     {
       std::runtime_error e("Unhandled and unknown native exception");
       io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
-      return ;
+      return 0;
     }
     
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -39567,6 +39769,57 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_FilterPictureSink_1addPict
     
     /*@SWIG@*/
   }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_FilterPictureSink_1sendRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
+  io::humble::video::FilterPictureSink *arg1 = (io::humble::video::FilterPictureSink *) 0 ;
+  io::humble::video::MediaRaw *arg2 = (io::humble::video::MediaRaw *) 0 ;
+  io::humble::video::ProcessorResult result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(io::humble::video::FilterPictureSink **)&jarg1; 
+  arg2 = *(io::humble::video::MediaRaw **)&jarg2; 
+  
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException,
+      "invalid native object; delete() likely already called");
+    return 0;
+  }
+  
+  {
+    /*@SWIG:/Users/aclarke/Work/humble/humble-video/humble-video-native/src/main/gnu/src/io/humble/video/HumbleVideo.i,143,HUMBLE_HANDLE_EXCEPTION@*/
+    // HumbleVideo.i: Start generated code
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
+    try
+    {
+      result = (io::humble::video::ProcessorResult)(arg1)->sendRaw(arg2);
+    }
+    catch(std::exception & e)
+    {
+      io::humble::video::Global::catchException(e);
+      return 0;
+    }
+    catch(...)
+    {
+      std::runtime_error e("Unhandled and unknown native exception");
+      io::humble::ferry::JNIHelper::throwJavaException(jenv, "java/lang/RuntimeException", e);
+      return 0;
+    }
+    
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // HumbleVideo.i: End generated code
+    
+    /*@SWIG@*/
+  }
+  jresult = (jint)result; 
+  return jresult;
 }
 
 

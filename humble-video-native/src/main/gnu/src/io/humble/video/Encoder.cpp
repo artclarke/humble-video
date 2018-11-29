@@ -474,7 +474,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
         if (cachingAudio)
           // this codec requires that the right number of audio samples
           // gets passed in each call.
-          mAudioSink->addAudio(samples);
+          mAudioSink->send(samples);
 
         break;
       case STATE_FLUSHING:
@@ -488,7 +488,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
     switch(getState()) {
       case STATE_OPENED:
         if (cachingAudio)
-          mAudioSink->addAudio(0); // tell the cache we're flushing.
+          mAudioSink->send(0); // tell the cache we're flushing.
         setState(STATE_FLUSHING);
         break;
       case STATE_FLUSHING:
@@ -507,7 +507,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
     case STATE_OPENED:
       if (cachingAudio) {
         // pull the sink.
-        mAudioSource->getAudio(mFilteredAudio.value());
+        mAudioSource->receive(mFilteredAudio.value());
 
 #ifdef VS_DEBUG
         {
@@ -547,7 +547,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
         // pull the sink in a loop to get all the audio out while we're making complete packets.
         // this is a fix for issue: https://github.com/artclarke/humble-video/issues/36
         do {
-          mAudioSource->getAudio(mFilteredAudio.value());
+          mAudioSource->receive(mFilteredAudio.value());
 
 #ifdef VS_DEBUG
           {

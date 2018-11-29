@@ -49,9 +49,9 @@ FilterPictureSink::make(FilterGraph* graph, AVFilterContext* ctx) {
   return r.get();
 }
 
-void
-FilterPictureSink::addPicture(MediaPicture* picture) {
-  FilterSink::add(picture);
+ProcessorResult
+FilterPictureSink::sendPicture(MediaPicture* picture) {
+  return FilterSink::sendRaw(picture);
 }
 
 

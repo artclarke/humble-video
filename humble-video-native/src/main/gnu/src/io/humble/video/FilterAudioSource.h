@@ -43,7 +43,17 @@ public:
    * @param audio The audio to fill if possible.
    * @return >=0 if a successful audio is fetched, or -1 for EOF.
    */
-  virtual int32_t getAudio(MediaAudio* audio);
+  virtual ProcessorResult receiveAudio(MediaAudio* audio);
+  /**
+   * @{inheritDoc}
+   */
+  virtual ProcessorResult receiveRaw(MediaRaw* media) {
+    MediaAudio* m = dynamic_cast<MediaAudio*>(media);
+    if (media && !m)
+      throw io::humble::ferry::HumbleRuntimeError("expected MediaAudio object to be passed in");
+    else
+      return receiveAudio(m);
+  }
 
 #ifndef SWIG
   static FilterAudioSource*

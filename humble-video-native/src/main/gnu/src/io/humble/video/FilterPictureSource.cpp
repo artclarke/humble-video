@@ -55,8 +55,8 @@ FilterPictureSource::make(FilterGraph* graph, AVFilterContext* ctx) {
   return r.get();
 }
 
-int32_t
-FilterPictureSource::getPicture(MediaPicture* picture) {
+ProcessorResult
+FilterPictureSource::receivePicture(MediaPicture* picture) {
   if (!picture) {
     VS_THROW(HumbleInvalidArgument("no picture passed in"));
   }
@@ -80,7 +80,7 @@ FilterPictureSource::getPicture(MediaPicture* picture) {
           ));
     }
   }
-  return FilterSource::get(picture);
+  return FilterSource::receiveRaw(picture);
 }
 } /* namespace video */
 } /* namespace humble */

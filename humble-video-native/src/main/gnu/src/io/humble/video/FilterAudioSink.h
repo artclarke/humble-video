@@ -48,8 +48,17 @@ public:
    * @param audio the audio to add. Must be non-null and complete.
    * @throws InvalidArgument if audio is null or audio is not complete.
    */
-  void
-  addAudio(MediaAudio* audio);
+  virtual ProcessorResult sendAudio(MediaAudio* audio);
+  /**
+   * @{inheritDoc}
+   */
+  virtual ProcessorResult sendRaw(MediaRaw* media) {
+    MediaAudio* m = dynamic_cast<MediaAudio*>(media);
+    if (media && !m)
+      throw io::humble::ferry::HumbleRuntimeError("expected MediaAudio object to be passed in");
+    else
+      return sendAudio(m);
+  }
 
 #ifndef SWIG
   static FilterAudioSink*

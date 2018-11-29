@@ -48,8 +48,18 @@ public:
    * @param picture the picture to add. Must be non-null and complete.
    * @throws InvalidArgument if picture is null or audio is not complete.
    */
-  void
-  addPicture(MediaPicture* picture);
+  virtual ProcessorResult sendPicture(MediaPicture* picture);
+  /**
+   * @{inheritDoc}
+   */
+  virtual ProcessorResult sendRaw(MediaRaw* media) {
+    MediaPicture* m = dynamic_cast<MediaPicture*>(media);
+    if (media && !m)
+      throw io::humble::ferry::HumbleRuntimeError("expected MediaPicture object to be passed in");
+    else
+      return sendPicture(m);
+  }
+
 #ifndef SWIG
   static FilterPictureSink* make(FilterGraph*, AVFilterContext*);
 #endif // ! SWIG.

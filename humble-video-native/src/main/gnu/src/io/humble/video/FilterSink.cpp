@@ -44,8 +44,8 @@ FilterSink::FilterSink(FilterGraph* graph, AVFilterContext* ctx) :
 FilterSink::~FilterSink() {
 }
 
-void
-FilterSink::add(MediaRaw* media) {
+ProcessorResult
+FilterSink::sendRaw(MediaRaw* media) {
   // ok, let's get to work
   AVFilterContext* ctx = getFilterCtx();
   AVFrame* frame = 0;
@@ -57,7 +57,9 @@ FilterSink::add(MediaRaw* media) {
   }
 
   int e = av_buffersrc_write_frame(ctx, frame);
-  FfmpegException::check(e, "could not add frame to filter sink: ");
+  if (e != AVERROR_EOF && e != AVERROR(EAGAIN))
+    FfmpegException::check(e, "could not add frame to filter sink: ");
+  return (ProcessorResult) e;
 }
 
 

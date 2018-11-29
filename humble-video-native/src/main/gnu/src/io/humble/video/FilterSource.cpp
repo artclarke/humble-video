@@ -63,8 +63,8 @@ FilterSource::getFrameSize() {
   return ctx->inputs[0] ? ctx->inputs[0]->min_samples : 0;
 }
 
-int32_t
-FilterSource::get(MediaRaw* media)
+ProcessorResult
+FilterSource::receiveRaw(MediaRaw* media)
 {
   if (!media) {
     VS_THROW(HumbleInvalidArgument("no media passed in"));
@@ -92,14 +92,10 @@ FilterSource::get(MediaRaw* media)
     // if we get here, we're complete
     media->setComplete(true);
   }
-  if (e == AVERROR(EAGAIN))
-    // set to 0 as the media incomplete status signals to caller they should retry.
-    e = 0;
-
   // and free the frame we made
   av_frame_unref(frame);
   av_frame_free(&frame);
-  return e;
+  return (ProcessorResult)e;
 }
 } /* namespace video */
 } /* namespace humble */

@@ -43,7 +43,18 @@ public:
    * @param picture The picture to fill if possible.
    * @return >=0 if a successful picture is fetched, or -1 for EOF.
    */
-  virtual int32_t getPicture(MediaPicture* picture);
+  virtual ProcessorResult receivePicture(MediaPicture* picture);
+  /**
+   * @{inheritDoc}
+   */
+  virtual ProcessorResult receiveRaw(MediaRaw* media) {
+    MediaPicture* m = dynamic_cast<MediaPicture*>(media);
+    if (media && !m)
+      throw io::humble::ferry::HumbleRuntimeError("expected MediaPicture object to be passed in");
+    else
+      return receivePicture(m);
+  }
+
 #ifndef SWIG
   static FilterPictureSource* make(FilterGraph*, AVFilterContext*);
 #endif // ! SWIG
