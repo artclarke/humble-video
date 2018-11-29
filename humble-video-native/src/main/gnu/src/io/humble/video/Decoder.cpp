@@ -467,7 +467,7 @@ Decoder::make(const AVCodec* codec, const AVCodecParameters *src) {
 }
 
 ProcessorResult
-Decoder::send(MediaEncoded* media) {
+Decoder::sendEncoded(MediaEncoded* media) {
   if (STATE_OPENED != getState())
     VS_THROW(HumbleRuntimeError("Attempt to send(Media), but Decoder is not opened"));
 
@@ -496,7 +496,7 @@ Decoder::send(MediaEncoded* media) {
 }
 
 ProcessorResult
-Decoder::receive(MediaRaw* outputMedia) {
+Decoder::receiveRaw(MediaRaw* outputMedia) {
 
   MediaRaw* output = dynamic_cast<MediaRaw*>(outputMedia);
   if (!output)

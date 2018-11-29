@@ -27,8 +27,10 @@
 #ifndef SRC_MAIN_GNU_SRC_IO_HUMBLE_VIDEO_PROCESSOR_H_
 #define SRC_MAIN_GNU_SRC_IO_HUMBLE_VIDEO_PROCESSOR_H_
 
+#include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/MediaRaw.h>
+#include <io/humble/ferry/HumbleException.h>
 
 namespace io { namespace humble { namespace video {
 
@@ -65,18 +67,41 @@ namespace io { namespace humble { namespace video {
    */
   class VS_API_HUMBLEVIDEO ProcessorSource
   {
+  public:
+    virtual ProcessorResult receive(Media*)=0;
   protected:
     ProcessorSource() {}
+    virtual ~ProcessorSource() {}
+  };
+
+  /**
+   * A ProcessorSource object can have Media objects received
+   * from it.
+   */
+  class VS_API_HUMBLEVIDEO ProcessorSink
+  {
+  public:
+    virtual ProcessorResult send(Media*)=0;
+  protected:
+    ProcessorSink() {}
+    virtual ~ProcessorSink() {}
   };
 
   /**
    * A ProcessorRawSink object can have MediaRaw objects sent
    * to it.
    */
-  class VS_API_HUMBLEVIDEO ProcessorRawSink
+  class VS_API_HUMBLEVIDEO ProcessorRawSink: public virtual ProcessorSink
   {
   public:
-    virtual ProcessorResult send(MediaRaw*)=0;
+    virtual ProcessorResult sendRaw(MediaRaw*)=0;
+    virtual ProcessorResult send(Media* media) {
+      MediaRaw*  m = dynamic_cast<MediaRaw*>(media);
+      if (media && !m)
+        throw io::humble::ferry::HumbleRuntimeError("expected MediaRaw class");
+      else
+        return sendRaw(m);
+    }
   protected:
     ProcessorRawSink() {}
     virtual ~ProcessorRawSink() {}
@@ -85,10 +110,17 @@ namespace io { namespace humble { namespace video {
    * A ProcessorRawSink object can have MediaRaw objects received
    * from it.
    */
-  class VS_API_HUMBLEVIDEO ProcessorRawSource
+  class VS_API_HUMBLEVIDEO ProcessorRawSource: public virtual ProcessorSource
   {
   public:
-    virtual ProcessorResult receive(MediaRaw*)=0;
+    virtual ProcessorResult receiveRaw(MediaRaw*)=0;
+    virtual ProcessorResult receive(Media* media) {
+      MediaRaw*  m = dynamic_cast<MediaRaw*>(media);
+      if (media && !m)
+        throw io::humble::ferry::HumbleRuntimeError("expected MediaRaw class");
+      else
+        return receiveRaw(m);
+    }
   protected:
     ProcessorRawSource() {}
     virtual ~ProcessorRawSource() {}
@@ -101,7 +133,14 @@ namespace io { namespace humble { namespace video {
   class VS_API_HUMBLEVIDEO ProcessorEncodedSink
   {
   public:
-    virtual ProcessorResult send(MediaEncoded*)=0;
+    virtual ProcessorResult sendEncoded(MediaEncoded*)=0;
+    virtual ProcessorResult send(Media* media) {
+      MediaEncoded*  m = dynamic_cast<MediaEncoded*>(media);
+      if (media && !m)
+        throw io::humble::ferry::HumbleRuntimeError("expected MediaRaw class");
+      else
+        return sendEncoded(m);
+    }
   protected:
     ProcessorEncodedSink() {}
     virtual ~ProcessorEncodedSink() {}
@@ -113,7 +152,14 @@ namespace io { namespace humble { namespace video {
   class VS_API_HUMBLEVIDEO ProcessorEncodedSource
   {
   public:
-    virtual ProcessorResult receive(MediaEncoded*)=0;
+    virtual ProcessorResult receiveEncoded(MediaEncoded*)=0;
+    virtual ProcessorResult receive(Media* media) {
+          MediaEncoded*  m = dynamic_cast<MediaEncoded*>(media);
+          if (media && !m)
+            throw io::humble::ferry::HumbleRuntimeError("expected MediaRaw class");
+          else
+            return receiveEncoded(m);
+        }
   protected:
     ProcessorEncodedSource() {}
     virtual ~ProcessorEncodedSource() {}

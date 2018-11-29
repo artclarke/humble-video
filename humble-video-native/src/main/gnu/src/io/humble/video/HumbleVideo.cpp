@@ -32182,7 +32182,7 @@ SWIGEXPORT jlong JNICALL Java_io_humble_video_VideoJNI_Decoder_1make_1_1SWIG_11(
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1send(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1sendEncoded(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   io::humble::video::Decoder *arg1 = (io::humble::video::Decoder *) 0 ;
   io::humble::video::MediaEncoded *arg2 = (io::humble::video::MediaEncoded *) 0 ;
@@ -32207,7 +32207,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1send(JNIEnv *jenv
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::ProcessorResult)(arg1)->send(arg2);
+      result = (io::humble::video::ProcessorResult)(arg1)->sendEncoded(arg2);
     }
     catch(std::exception & e)
     {
@@ -32231,7 +32231,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1send(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1receive(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1receiveRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   io::humble::video::Decoder *arg1 = (io::humble::video::Decoder *) 0 ;
   io::humble::video::MediaRaw *arg2 = (io::humble::video::MediaRaw *) 0 ;
@@ -32256,7 +32256,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Decoder_1receive(JNIEnv *j
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::ProcessorResult)(arg1)->receive(arg2);
+      result = (io::humble::video::ProcessorResult)(arg1)->receiveRaw(arg2);
     }
     catch(std::exception & e)
     {
@@ -32596,7 +32596,7 @@ SWIGEXPORT void JNICALL Java_io_humble_video_VideoJNI_Encoder_1encode(JNIEnv *je
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1send(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1sendRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   io::humble::video::Encoder *arg1 = (io::humble::video::Encoder *) 0 ;
   io::humble::video::MediaRaw *arg2 = (io::humble::video::MediaRaw *) 0 ;
@@ -32621,7 +32621,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1send(JNIEnv *jenv
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::ProcessorResult)(arg1)->send(arg2);
+      result = (io::humble::video::ProcessorResult)(arg1)->sendRaw(arg2);
     }
     catch(std::exception & e)
     {
@@ -32645,7 +32645,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1send(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1receive(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1receiveEncoded(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   io::humble::video::Encoder *arg1 = (io::humble::video::Encoder *) 0 ;
   io::humble::video::MediaEncoded *arg2 = (io::humble::video::MediaEncoded *) 0 ;
@@ -32670,7 +32670,7 @@ SWIGEXPORT jint JNICALL Java_io_humble_video_VideoJNI_Encoder_1receive(JNIEnv *j
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
     try
     {
-      result = (io::humble::video::ProcessorResult)(arg1)->receive(arg2);
+      result = (io::humble::video::ProcessorResult)(arg1)->receiveEncoded(arg2);
     }
     catch(std::exception & e)
     {

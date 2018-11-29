@@ -176,8 +176,8 @@ public:
       MediaSampled* media);
 
 
-  virtual ProcessorResult send(MediaRaw*);
-  virtual ProcessorResult receive(MediaEncoded*);
+  virtual ProcessorResult sendRaw(MediaRaw*);
+  virtual ProcessorResult receiveEncoded(MediaEncoded*);
 #if 0
 #ifndef SWIG
   virtual int32_t acquire();

@@ -160,8 +160,8 @@ public:
 //      MediaPacket *packet, int32_t byteOffset);
 
 
-  virtual ProcessorResult send(MediaEncoded*);
-  virtual ProcessorResult receive(MediaRaw*);
+  virtual ProcessorResult sendEncoded(MediaEncoded*);
+  virtual ProcessorResult receiveRaw(MediaRaw*);
 
 
 protected:

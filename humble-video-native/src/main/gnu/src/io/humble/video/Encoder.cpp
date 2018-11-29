@@ -580,7 +580,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
 }
 
 ProcessorResult
-Encoder::send(MediaRaw* media) {
+Encoder::sendRaw(MediaRaw* media) {
 
   if (STATE_OPENED != getState())
     VS_THROW(HumbleRuntimeError("Attempt to receive(Media), but Encoder is not opened"));
@@ -639,7 +639,7 @@ Encoder::send(MediaRaw* media) {
 }
 
 ProcessorResult
-Encoder::receive(MediaEncoded* media) {
+Encoder::receiveEncoded(MediaEncoded* media) {
   if (STATE_OPENED != getState())
     VS_THROW(HumbleRuntimeError("Attempt to send(Media), but Encoder is not opened"));
 
