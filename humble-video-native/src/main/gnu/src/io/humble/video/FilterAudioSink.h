@@ -23,8 +23,8 @@
  *      Author: aclarke
  */
 
-#ifndef FILTERAUDIOSOURCE_H_
-#define FILTERAUDIOSOURCE_H_
+#ifndef FILTERAUDIOSINK_H_
+#define FILTERAUDIOSINK_H_
 
 #include <io/humble/video/FilterSink.h>
 #include <io/humble/video/MediaAudio.h>
@@ -65,4 +65,4 @@ protected:
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
-#endif /* FILTERAUDIOSOURCE_H_ */
+#endif /* FILTERAUDIOSINK_H_ */

@@ -23,8 +23,8 @@
  *      Author: aclarke
  */
 
-#ifndef FILTERSOURCE_H_
-#define FILTERSOURCE_H_
+#ifndef FILTERSINK_H_
+#define FILTERSINK_H_
 
 #include <io/humble/video/FilterEndPoint.h>
 
@@ -48,4 +48,4 @@ protected:
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
-#endif /* FILTERSOURCE_H_ */
+#endif /* FILTERSINK_H_ */
