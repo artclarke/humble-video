@@ -200,19 +200,19 @@ Encoder::open(KeyValueBag * inputOptions, KeyValueBag* unsetOptions) {
          * correctly aligned frames.
          */
         mAudioGraph = FilterGraph::make();
-        mAudioSource = mAudioGraph->addAudioSink("in",
+        mAudioSink = mAudioGraph->addAudioSink("in",
             getSampleRate(),
             getChannelLayout(),
             getSampleFormat(),
             0);
-        mAudioSink = mAudioGraph->addAudioSource("out",
+        mAudioSource = mAudioGraph->addAudioSource("out",
             getSampleRate(),
             getChannelLayout(),
             getSampleFormat());
         // a graph that passes through the audio unmodified.
         mAudioGraph->open("[in]anull[out]");
         // now, fix the output frame size.
-        mAudioSink->setFrameSize(frameSize);
+        mAudioSource->setFrameSize(frameSize);
 
         mFilteredAudio = MediaAudio::make(getFrameSize(),
             getSampleRate(), getChannels(),
@@ -474,7 +474,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
         if (cachingAudio)
           // this codec requires that the right number of audio samples
           // gets passed in each call.
-          mAudioSource->addAudio(samples);
+          mAudioSink->addAudio(samples);
 
         break;
       case STATE_FLUSHING:
@@ -488,7 +488,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
     switch(getState()) {
       case STATE_OPENED:
         if (cachingAudio)
-          mAudioSource->addAudio(0); // tell the cache we're flushing.
+          mAudioSink->addAudio(0); // tell the cache we're flushing.
         setState(STATE_FLUSHING);
         break;
       case STATE_FLUSHING:
@@ -507,7 +507,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
     case STATE_OPENED:
       if (cachingAudio) {
         // pull the sink.
-        mAudioSink->getAudio(mFilteredAudio.value());
+        mAudioSource->getAudio(mFilteredAudio.value());
 
 #ifdef VS_DEBUG
         {
@@ -547,7 +547,7 @@ Encoder::encodeAudio(MediaPacket* aOutput, MediaAudio* samples) {
         // pull the sink in a loop to get all the audio out while we're making complete packets.
         // this is a fix for issue: https://github.com/artclarke/humble-video/issues/36
         do {
-          mAudioSink->getAudio(mFilteredAudio.value());
+          mAudioSource->getAudio(mFilteredAudio.value());
 
 #ifdef VS_DEBUG
           {
