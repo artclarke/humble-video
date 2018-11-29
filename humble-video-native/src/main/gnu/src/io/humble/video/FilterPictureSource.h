@@ -17,49 +17,43 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterPictureSink.h
+ * FilterPictureSource.h
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
  */
 
-#ifndef FILTERPICTURESOURCE_H_
-#define FILTERPICTURESOURCE_H_
+#ifndef FILTERPICTURESINK_H_
+#define FILTERPICTURESINK_H_
 
-#include <io/humble/video/FilterSink.h>
+#include <io/humble/video/FilterSource.h>
 #include <io/humble/video/MediaPicture.h>
-
 
 namespace io {
 namespace humble {
 namespace video {
 
 /**
- * A sink of MediaPicture objects for a FilterGraph.
+ * A Source of MediaPicture objects for a FilterGraph.
  */
-class VS_API_HUMBLEVIDEO FilterPictureSink : public io::humble::video::FilterSink
+class VS_API_HUMBLEVIDEO FilterPictureSource : public io::humble::video::FilterSource
 {
 public:
   /**
-   * Adds a picture to this sink. NOTE: If you add a picture to a FilterSink
-   * be careful with re-using or rewriting the underlying data. Filters will
-   * try hard to avoid copying data, so if you change the data out from under
-   * them unexpected results can occur.
-   * @param picture the picture to add. Must be non-null and complete.
-   * @throws InvalidArgument if picture is null or audio is not complete.
+   * @param picture The picture to fill if possible.
+   * @return >=0 if a successful picture is fetched, or -1 for EOF.
    */
-  void
-  addPicture(MediaPicture* picture);
+  virtual int32_t getPicture(MediaPicture* picture);
 #ifndef SWIG
-  static FilterPictureSink* make(FilterGraph*, AVFilterContext*);
-#endif // ! SWIG.
+  static FilterPictureSource* make(FilterGraph*, AVFilterContext*);
+#endif // ! SWIG
 protected:
-  FilterPictureSink(FilterGraph* graph, AVFilterContext* ctx);
+  FilterPictureSource(FilterGraph* graph, AVFilterContext* ctx);
   virtual
-  ~FilterPictureSink();
+  ~FilterPictureSource();
 };
 
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
-#endif /* FILTERPICTURESOURCE_H_ */
+#endif /* FILTERPICTURESINK_H_ */

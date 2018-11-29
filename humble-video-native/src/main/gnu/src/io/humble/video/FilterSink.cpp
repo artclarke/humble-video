@@ -17,13 +17,13 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterSource.cpp
+ * FilterSink.cpp
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
  */
 
-#include "FilterSource.h"
+#include "FilterSink.h"
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
@@ -31,76 +31,36 @@
 
 using namespace io::humble::ferry;
 
-VS_LOG_SETUP(VS_CPP_PACKAGE.FilterSource);
+VS_LOG_SETUP(VS_CPP_PACKAGE.FilterSink);
 
 namespace io {
 namespace humble {
 namespace video {
 
-FilterSource::FilterSource(FilterGraph* graph, AVFilterContext* ctx) :
+FilterSink::FilterSink(FilterGraph* graph, AVFilterContext* ctx) :
     FilterEndPoint(graph, ctx) {
 }
 
-FilterSource::~FilterSource() {
+FilterSink::~FilterSink() {
 }
 
 void
-FilterSource::setFrameSize(int32_t size) {
-  AVFilterContext* ctx = getFilterCtx();
-  if (!ctx->inputs[0])
-    VS_THROW(HumbleInvalidArgument("Cannot setFrameSize until graph this is added to is opened"));
-
-  av_buffersink_set_frame_size(ctx, size);
-}
-
-int32_t
-FilterSource::getFrameSize() {
-  AVFilterContext* ctx = getFilterCtx();
-
-  // NOTE: This is peaking into the structure, and should
-  // be replaced if when a av_buffersink_get_frame_size method is
-  // implemented.
-  return ctx->inputs[0] ? ctx->inputs[0]->min_samples : 0;
-}
-
-int32_t
-FilterSource::get(MediaRaw* media)
-{
-  if (!media) {
-    VS_THROW(HumbleInvalidArgument("no media passed in"));
-  }
-  // 'empty' media before filling.
-  media->setComplete(false);
+FilterSink::add(MediaRaw* media) {
   // ok, let's get to work
   AVFilterContext* ctx = getFilterCtx();
-  AVFrame* mFrame = media->getCtx();
-  AVFrame *frame = av_frame_alloc();
-  if (!frame) {
-    VS_THROW(HumbleBadAlloc());
+  AVFrame* frame = 0;
+  if (media) {
+    if (!media->isComplete()) {
+      VS_THROW(HumbleInvalidArgument("incomplete media passed in"));
+    }
+    frame = media->getCtx();
   }
 
-  int e = av_buffersink_get_frame(ctx, frame);
-  if (e != AVERROR_EOF && e != AVERROR(EAGAIN)) {
-    FfmpegException::check(e, "could not get frame from audio source:");
-    // now, copy this into our frame
-
-    // release any memory we have
-    av_frame_unref(mFrame);
-    // and copy any data in.
-    av_frame_ref(mFrame, frame);
-
-    // if we get here, we're complete
-    media->setComplete(true);
-  }
-  if (e == AVERROR(EAGAIN))
-    // set to 0 as the media incomplete status signals to caller they should retry.
-    e = 0;
-
-  // and free the frame we made
-  av_frame_unref(frame);
-  av_frame_free(&frame);
-  return e;
+  int e = av_buffersrc_write_frame(ctx, frame);
+  FfmpegException::check(e, "could not add frame to filter sink: ");
 }
+
+
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */

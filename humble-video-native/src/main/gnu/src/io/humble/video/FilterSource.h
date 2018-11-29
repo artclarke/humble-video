@@ -23,29 +23,41 @@
  *      Author: aclarke
  */
 
-#ifndef FILTERSOURCE_H_
-#define FILTERSOURCE_H_
+#ifndef FILTERSINK_H_
+#define FILTERSINK_H_
 
 #include <io/humble/video/FilterEndPoint.h>
+#include <io/humble/video/MediaRaw.h>
 
 namespace io {
 namespace humble {
 namespace video {
 
 /**
- * A sink of MediaRaw objects for a FilterGraph.
+ * A source of MediaRaw objects for a FilterGraph.
  */
-
-class VS_API_HUMBLEVIDEO FilterSink : public io::humble::video::FilterEndPoint
+class VS_API_HUMBLEVIDEO FilterSource : public FilterEndPoint
 {
+public:
+  /**
+   * Set the frame size of this source. If set to non-zero then #getAudio(MediaAudio)
+   * will only every return exactly that number of samples.
+   */
+  virtual void setFrameSize(int32_t);
+
+  /**
+   * Get the frame size.
+   */
+  virtual int32_t getFrameSize();
+
 protected:
-  void add(MediaRaw* media);
-  FilterSink(FilterGraph* graph, AVFilterContext* ctx);
+  int32_t get(MediaRaw*);
+  FilterSource(FilterGraph* graph, AVFilterContext* ctx);
   virtual
-  ~FilterSink();
+  ~FilterSource();
 };
 
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
-#endif /* FILTERSOURCE_H_ */
+#endif /* FILTERSINK_H_ */

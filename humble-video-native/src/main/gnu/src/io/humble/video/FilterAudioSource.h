@@ -17,16 +17,16 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterAudioSink.h
+ * FilterAudioSource.h
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
  */
 
-#ifndef FILTERAUDIOSOURCE_H_
-#define FILTERAUDIOSOURCE_H_
+#ifndef FILTERAUDIOSINK_H_
+#define FILTERAUDIOSINK_H_
 
-#include <io/humble/video/FilterSink.h>
+#include <io/humble/video/FilterSource.h>
 #include <io/humble/video/MediaAudio.h>
 
 namespace io {
@@ -34,35 +34,29 @@ namespace humble {
 namespace video {
 
 /**
- * A sink of MediaAudio objects for a FilterGraph.
+ * A source of MediaAudio objects for a FilterGraph.
  */
-class VS_API_HUMBLEVIDEO FilterAudioSink : public io::humble::video::FilterSink
+class VS_API_HUMBLEVIDEO FilterAudioSource : public io::humble::video::FilterSource
 {
 public:
-
   /**
-   * Adds audio to this sink. NOTE: If you had audio to a FilterSink
-   * be careful with re-using or rewriting the underlying data. Filters will
-   * try hard to avoid copying data, so if you change the data out from under
-   * them unexpected results can occur.
-   * @param audio the audio to add. Must be non-null and complete.
-   * @throws InvalidArgument if audio is null or audio is not complete.
+   * @param audio The audio to fill if possible.
+   * @return >=0 if a successful audio is fetched, or -1 for EOF.
    */
-  void
-  addAudio(MediaAudio* audio);
+  virtual int32_t getAudio(MediaAudio* audio);
 
 #ifndef SWIG
-  static FilterAudioSink*
+  static FilterAudioSource*
   make(FilterGraph* graph, AVFilterContext* ctx);
 #endif // ! SWIG
+
 protected:
-//  virtual void* getCtx() { return Filter::getCtx(); }
-  FilterAudioSink(FilterGraph* graph, AVFilterContext* ctx);
+  FilterAudioSource(FilterGraph* graph, AVFilterContext* ctx);
   virtual
-  ~FilterAudioSink();
+  ~FilterAudioSource();
 };
 
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
-#endif /* FILTERAUDIOSOURCE_H_ */
+#endif /* FILTERAUDIOSINK_H_ */

@@ -17,14 +17,21 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterPictureSink.cpp
+ * FilterPictureSource.cpp
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
  */
 
-#include "FilterPictureSink.h"
+#include "FilterPictureSource.h"
 #include <io/humble/ferry/RefPointer.h>
+#include <io/humble/ferry/Logger.h>
+#include <io/humble/video/VideoExceptions.h>
+#include <io/humble/video/FilterGraph.h>
+
+using namespace io::humble::ferry;
+
+VS_LOG_SETUP(VS_CPP_PACKAGE.FilterPictureSource);
 
 using namespace io::humble::ferry;
 
@@ -32,29 +39,49 @@ namespace io {
 namespace humble {
 namespace video {
 
-FilterPictureSink::FilterPictureSink(FilterGraph* graph,
-    AVFilterContext* ctx) :
-    FilterSink(graph, ctx) {
+FilterPictureSource::FilterPictureSource(FilterGraph* graph, AVFilterContext* ctx) :
+    FilterSource(graph, ctx) {
 
 }
 
-FilterPictureSink::~FilterPictureSink() {
+FilterPictureSource::~FilterPictureSource() {
 }
 
-FilterPictureSink*
-FilterPictureSink::make(FilterGraph* graph, AVFilterContext* ctx) {
+FilterPictureSource*
+FilterPictureSource::make(FilterGraph* graph, AVFilterContext* ctx) {
   Global::init();
-  RefPointer<FilterPictureSink> r;
-  r.reset(new FilterPictureSink(graph, ctx), true);
+  RefPointer<FilterPictureSource> r;
+  r.reset(new FilterPictureSource(graph, ctx), true);
   return r.get();
 }
 
-void
-FilterPictureSink::addPicture(MediaPicture* picture) {
-  FilterSink::add(picture);
+int32_t
+FilterPictureSource::getPicture(MediaPicture* picture) {
+  if (!picture) {
+    VS_THROW(HumbleInvalidArgument("no picture passed in"));
+  }
+  AVFilterContext* ctx = getFilterCtx();
+
+  // sadly, FFmpeg will not auto scale width and height at this
+  // time, and so we need to check before we get a frame so we
+  // don't destroy something we shouldn't.
+  if (!ctx->inputs) {
+    VS_THROW(HumbleRuntimeError("unexpect ffmpeg internal error"));
+  }
+
+  AVFilterLink* link = ctx->inputs[0];
+  if (link) {
+    if (link->w != picture->getWidth() || link->h != picture->getHeight()) {
+      VS_THROW(HumbleInvalidArgument::make("picture dimensions do not match expected.  Got (%d x %d); Expected (%d x %d)",
+          picture->getWidth(),
+          picture->getHeight(),
+          link->w,
+          link->h
+          ));
+    }
+  }
+  return FilterSource::get(picture);
 }
-
-
 } /* namespace video */
 } /* namespace humble */
 } /* namespace io */
