@@ -26,8 +26,8 @@
 #include <io/humble/ferry/LoggerStack.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/FilterGraph.h>
-#include <io/humble/video/FilterPictureSink.h>
-#include <io/humble/video/FilterAudioSink.h>
+#include <io/humble/video/FilterPictureSource.h>
+#include <io/humble/video/FilterAudioSource.h>
 #include <io/humble/video/MediaPicture.h>
 #include <io/humble/video/MediaAudio.h>
 #include <io/humble/video/MediaAudioResampler.h>
@@ -92,7 +92,7 @@ EncoderTest::testEncodeVideo() {
       "[y][d]overlay=w:h[out]", width, height);
 
   RefPointer<FilterGraph> graph = FilterGraph::make();
-  RefPointer<FilterPictureSink> fsink = graph->addPictureSink("out", picture->getFormat());
+  RefPointer<FilterPictureSource> fsource = graph->addPictureSource("out", picture->getFormat());
   graph->open(graphCommand);
 
   // let's set a frame time base of 1/30
@@ -121,7 +121,7 @@ EncoderTest::testEncodeVideo() {
   int32_t numPics = 0;
   RefPointer<MediaPacket> packet;
 
-  while(fsink->getPicture(picture.value()) >= 0 && numPics < maxPics) {
+  while(fsource->receivePicture(picture.value()) == RESULT_SUCCESS && numPics < maxPics) {
     picture->setTimeBase(pictureTb.value());
     picture->setTimeStamp(numPics);
 
@@ -185,7 +185,7 @@ EncoderTest::testEncodeAudio() {
   // open the encoder
   encoder->open(0, 0);
 
-  RefPointer<FilterAudioSink> fsink = graph->addAudioSink("out", audio->getSampleRate(), audio->getChannelLayout(), audio->getFormat());
+  RefPointer<FilterAudioSource> fsource = graph->addAudioSource("out", audio->getSampleRate(), audio->getChannelLayout(), audio->getFormat());
 
   // Generate a 220 Hz sine wave with a 880 Hz beep each second, for 10 seconds.
   graph->open("sine=frequency=660:beep_factor=4:duration=11[out]");
@@ -204,7 +204,7 @@ EncoderTest::testEncodeAudio() {
   int32_t numFrames = 0;
   RefPointer<MediaPacket> packet;
 
-  while(fsink->getAudio(audio.value()) >= 0 && audio->isComplete() && numFrames*audio->getNumSamples() < maxSamples) {
+  while(fsource->receiveAudio(audio.value()) == RESULT_SUCCESS && numFrames*audio->getNumSamples() < maxSamples) {
     audio->setTimeStamp(numFrames*audio->getNumSamples());
 
     // let's encode
@@ -352,16 +352,12 @@ EncoderTest::decodeAndEncode(
     Encoder* encoder
 )
 {
-  int32_t offset = 0;
-  int32_t bytesRead = 0;
-  do {
-    bytesRead += decoder->decode(input, packet, offset);
-    if (input->isComplete()) {
-      // we encode and write it
-      resampleEncodeAndMux(input, resampler, output, muxer, encoder);
-    }
-    offset += bytesRead;
-  } while ((!packet && input->isComplete()) || (packet && offset < packet->getSize()));
+  ProcessorResult r = decoder->send(packet);
+  TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+  while (decoder->receiveRaw(input) == RESULT_SUCCESS) {
+    // we encode and write it
+    resampleEncodeAndMux(input, resampler, output, muxer, encoder);
+  }
   if (!packet) {
     // we should also flush the encoders
     encodeAndMux(0, muxer, encoder);
@@ -540,25 +536,23 @@ EncoderTest::testTranscode()
   RefPointer<MediaPacket> packet = MediaPacket::make();
 
   int numPackets = 0;
-  while(source->read(packet.value()) >= 0) {
+  while(source->receivePacket(packet.value()) == RESULT_SUCCESS) {
     // got a packet; now we try to decode it.
-    if (packet->isComplete()) {
-      int32_t streamNo = packet->getStreamIndex();
-      DemuxerStreamHelper *input = &inputHelpers[streamNo];
-      MuxerStreamHelper* output = &outputHelpers[streamNo];
-      if (input->decoder) decodeAndEncode(
-          packet.value(),
-          input->decoder.value(),
-          input->media.value(),
-          output->resampler.value(),
-          output->media.value(),
-          muxer.value(),
-          output->encoder.value());
-      ++numPackets;
-      if (isMemCheck && numPackets > 100) {
-        VS_LOG_WARN("Exiting early under valgrind");
-        break;
-      }
+    int32_t streamNo = packet->getStreamIndex();
+    DemuxerStreamHelper *input = &inputHelpers[streamNo];
+    MuxerStreamHelper* output = &outputHelpers[streamNo];
+    if (input->decoder) decodeAndEncode(
+        packet.value(),
+        input->decoder.value(),
+        input->media.value(),
+        output->resampler.value(),
+        output->media.value(),
+        muxer.value(),
+        output->encoder.value());
+    ++numPackets;
+    if (isMemCheck && numPackets > 100) {
+      VS_LOG_WARN("Exiting early under valgrind");
+      break;
     }
   }
 
@@ -613,12 +607,12 @@ EncoderTest::testRegression36Internal (const Codec::ID codecId,
 
   // open the encoder
   encoder->open (0, 0);
-  RefPointer<FilterAudioSink> fsink = graph->addAudioSink (
+  RefPointer<FilterAudioSource> fsource = graph->addAudioSource (
       "out", audio->getSampleRate (), audio->getChannelLayout (),
       audio->getFormat ());
   // Generate a 220 Hz sine wave with a 880 Hz beep each second, for 10 seconds.
   graph->open ("sine=frequency=220:beep_factor=4:duration=11[out]");
-  fsink->setFrameSize (numSamples);
+  fsource->setFrameSize (numSamples);
   // add a stream for the encoded packets
   {
     RefPointer<MuxerStream> stream = muxer->addNewStream (encoder.value ());
@@ -628,7 +622,7 @@ EncoderTest::testRegression36Internal (const Codec::ID codecId,
   int32_t numCompletePackets = 0;
   RefPointer<MediaPacket> packet;
   // Get one audio packet that is larger than the frame-size.
-  fsink->getAudio (audio.value ());
+  fsource->receiveAudio (audio.value ());
   TS_ASSERT(audio->isComplete ());
   TS_ASSERT_EQUALS(audio->getNumSamples (), sampleRate);
   audio->setTimeStamp (0);
