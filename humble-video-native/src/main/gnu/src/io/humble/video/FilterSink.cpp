@@ -17,13 +17,13 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterSink.cpp
+ * FilterSource.cpp
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
  */
 
-#include "FilterSink.h"
+#include "FilterSource.h"
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
@@ -31,21 +31,21 @@
 
 using namespace io::humble::ferry;
 
-VS_LOG_SETUP(VS_CPP_PACKAGE.FilterSink);
+VS_LOG_SETUP(VS_CPP_PACKAGE.FilterSource);
 
 namespace io {
 namespace humble {
 namespace video {
 
-FilterSink::FilterSink(FilterGraph* graph, AVFilterContext* ctx) :
+FilterSource::FilterSource(FilterGraph* graph, AVFilterContext* ctx) :
     FilterEndPoint(graph, ctx) {
 }
 
-FilterSink::~FilterSink() {
+FilterSource::~FilterSource() {
 }
 
 void
-FilterSink::setFrameSize(int32_t size) {
+FilterSource::setFrameSize(int32_t size) {
   AVFilterContext* ctx = getFilterCtx();
   if (!ctx->inputs[0])
     VS_THROW(HumbleInvalidArgument("Cannot setFrameSize until graph this is added to is opened"));
@@ -54,7 +54,7 @@ FilterSink::setFrameSize(int32_t size) {
 }
 
 int32_t
-FilterSink::getFrameSize() {
+FilterSource::getFrameSize() {
   AVFilterContext* ctx = getFilterCtx();
 
   // NOTE: This is peaking into the structure, and should
@@ -64,7 +64,7 @@ FilterSink::getFrameSize() {
 }
 
 int32_t
-FilterSink::get(MediaRaw* media)
+FilterSource::get(MediaRaw* media)
 {
   if (!media) {
     VS_THROW(HumbleInvalidArgument("no media passed in"));
@@ -81,7 +81,7 @@ FilterSink::get(MediaRaw* media)
 
   int e = av_buffersink_get_frame(ctx, frame);
   if (e != AVERROR_EOF && e != AVERROR(EAGAIN)) {
-    FfmpegException::check(e, "could not get frame from audio sink:");
+    FfmpegException::check(e, "could not get frame from audio source:");
     // now, copy this into our frame
 
     // release any memory we have

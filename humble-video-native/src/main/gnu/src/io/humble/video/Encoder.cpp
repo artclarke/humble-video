@@ -200,12 +200,12 @@ Encoder::open(KeyValueBag * inputOptions, KeyValueBag* unsetOptions) {
          * correctly aligned frames.
          */
         mAudioGraph = FilterGraph::make();
-        mAudioSource = mAudioGraph->addAudioSource("in",
+        mAudioSource = mAudioGraph->addAudioSink("in",
             getSampleRate(),
             getChannelLayout(),
             getSampleFormat(),
             0);
-        mAudioSink = mAudioGraph->addAudioSink("out",
+        mAudioSink = mAudioGraph->addAudioSource("out",
             getSampleRate(),
             getChannelLayout(),
             getSampleFormat());

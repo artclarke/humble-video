@@ -17,7 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterPictureSource.h
+ * FilterPictureSink.h
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
@@ -26,7 +26,7 @@
 #ifndef FILTERPICTURESOURCE_H_
 #define FILTERPICTURESOURCE_H_
 
-#include <io/humble/video/FilterSource.h>
+#include <io/humble/video/FilterSink.h>
 #include <io/humble/video/MediaPicture.h>
 
 
@@ -35,13 +35,13 @@ namespace humble {
 namespace video {
 
 /**
- * A source of MediaPicture objects for a FilterGraph.
+ * A sink of MediaPicture objects for a FilterGraph.
  */
-class VS_API_HUMBLEVIDEO FilterPictureSource : public io::humble::video::FilterSource
+class VS_API_HUMBLEVIDEO FilterPictureSink : public io::humble::video::FilterSink
 {
 public:
   /**
-   * Adds a picture to this source. NOTE: If you add a picture to a FilterSource
+   * Adds a picture to this sink. NOTE: If you add a picture to a FilterSink
    * be careful with re-using or rewriting the underlying data. Filters will
    * try hard to avoid copying data, so if you change the data out from under
    * them unexpected results can occur.
@@ -51,12 +51,12 @@ public:
   void
   addPicture(MediaPicture* picture);
 #ifndef SWIG
-  static FilterPictureSource* make(FilterGraph*, AVFilterContext*);
+  static FilterPictureSink* make(FilterGraph*, AVFilterContext*);
 #endif // ! SWIG.
 protected:
-  FilterPictureSource(FilterGraph* graph, AVFilterContext* ctx);
+  FilterPictureSink(FilterGraph* graph, AVFilterContext* ctx);
   virtual
-  ~FilterPictureSource();
+  ~FilterPictureSink();
 };
 
 } /* namespace video */

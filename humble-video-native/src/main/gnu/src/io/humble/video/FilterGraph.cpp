@@ -27,10 +27,10 @@
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
-#include <io/humble/video/FilterAudioSource.h>
-#include <io/humble/video/FilterPictureSource.h>
 #include <io/humble/video/FilterAudioSink.h>
 #include <io/humble/video/FilterPictureSink.h>
+#include <io/humble/video/FilterAudioSource.h>
+#include <io/humble/video/FilterPictureSource.h>
 
 using namespace io::humble::ferry;
 
@@ -56,12 +56,12 @@ FilterGraph::~FilterGraph() {
   avfilter_graph_free(&mCtx);
 }
 
-FilterAudioSource*
-FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
+FilterAudioSink*
+FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
     AudioChannel::Layout channelLayout, AudioFormat::Type format,
     Rational* aTimeBase) {
   if (getState() != STATE_INITED) {
-    VS_THROW(HumbleRuntimeError("cannot add sources after opening graph"));
+    VS_THROW(HumbleRuntimeError("cannot add sinks after opening graph"));
   }
   if (!name || !*name) {
     VS_THROW(HumbleInvalidArgument("no name specified"));
@@ -95,19 +95,19 @@ FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
       AudioFormat::getName(format), (int64_t) channelLayout);
 
   int e = avfilter_graph_create_filter(&ctx, abuffersrc, name, args, 0, mCtx);
-  FfmpegException::check(e, "could not add FilterAudioSource ");
-  this->addSource(ctx);
+  FfmpegException::check(e, "could not add FilterAudioSink ");
+  this->addSink(ctx);
 
   // and return a made object (note: we must not ref-count this ourselves)
-  return dynamic_cast<FilterAudioSource*>(getFilter(ctx));
+  return dynamic_cast<FilterAudioSink*>(getFilter(ctx));
 }
 
-FilterPictureSource*
-FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
+FilterPictureSink*
+FilterGraph::addPictureSink(const char* name, int32_t width, int32_t height,
     PixelFormat::Type format, Rational* aTimeBase,
     Rational* aPixelAspectRatio) {
   if (getState() != STATE_INITED) {
-    VS_THROW(HumbleRuntimeError("cannot add sources after opening graph"));
+    VS_THROW(HumbleRuntimeError("cannot add sinks after opening graph"));
   }
 
   if (!name || !*name) {
@@ -145,18 +145,18 @@ FilterGraph::addPictureSource(const char* name, int32_t width, int32_t height,
       aspectRatio->getNumerator(), aspectRatio->getDenominator());
 
   int e = avfilter_graph_create_filter(&ctx, buffersrc, name, args, 0, mCtx);
-  FfmpegException::check(e, "could not add FilterPictureSource ");
-  // now, add it to the graph sources
-  this->addSource(ctx);
+  FfmpegException::check(e, "could not add FilterPictureSink ");
+  // now, add it to the graph sinks
+  this->addSink(ctx);
 
-  return dynamic_cast<FilterPictureSource*>(getFilter(ctx));
+  return dynamic_cast<FilterPictureSink*>(getFilter(ctx));
 }
 
-FilterAudioSink*
-FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
+FilterAudioSource*
+FilterGraph::addAudioSource(const char* name, int32_t sampleRate,
     AudioChannel::Layout channelLayout, AudioFormat::Type format) {
   if (getState() != STATE_INITED) {
-    VS_THROW(HumbleRuntimeError("cannot add sinks after opening graph"));
+    VS_THROW(HumbleRuntimeError("cannot add sources after opening graph"));
   }
 
   if (!name || !*name) {
@@ -197,16 +197,16 @@ FilterGraph::addAudioSink(const char* name, int32_t sampleRate,
   e = av_opt_set_int_list(ctx, "sample_rates", sampleRates, -1, AV_OPT_SEARCH_CHILDREN);
   FfmpegException::check(e, "could not set audio sample rates ");
   // now, add it to the graph sources
-  this->addSink(ctx);
+  this->addSource(ctx);
 
-  return dynamic_cast<FilterAudioSink*>(getFilter(ctx));
+  return dynamic_cast<FilterAudioSource*>(getFilter(ctx));
 }
 
-FilterPictureSink*
-FilterGraph::addPictureSink(const char* name,
+FilterPictureSource*
+FilterGraph::addPictureSource(const char* name,
     PixelFormat::Type format) {
   if (getState() != STATE_INITED) {
-    VS_THROW(HumbleRuntimeError("cannot add sinks after opening graph"));
+    VS_THROW(HumbleRuntimeError("cannot add sources after opening graph"));
   }
   if (!name || !*name) {
     VS_THROW(HumbleInvalidArgument("no name specified"));
@@ -224,11 +224,11 @@ FilterGraph::addPictureSink(const char* name,
   AVFilterContext* ctx = 0;
 
   int e = avfilter_graph_create_filter(&ctx, buffersink, name, 0, 0, mCtx);
-  FfmpegException::check(e, "could not add FilterPictureSink ");
+  FfmpegException::check(e, "could not add FilterPictureSource ");
   e = av_opt_set_int_list(ctx, "pix_fmts", formats, -1, AV_OPT_SEARCH_CHILDREN);
   FfmpegException::check(e, "could not set pixel formats ");
-  this->addSink(ctx);
-  return dynamic_cast<FilterPictureSink*>(getFilter(ctx));
+  this->addSource(ctx);
+  return dynamic_cast<FilterPictureSource*>(getFilter(ctx));
 }
 
 FilterGraph*
@@ -237,47 +237,6 @@ FilterGraph::make() {
   RefPointer<FilterGraph> r;
   r.reset(new FilterGraph(), true);
   return r.get();
-}
-
-void
-FilterGraph::addSource(AVFilterContext* source) {
-  if (!source) {
-    VS_THROW(HumbleInvalidArgument("no source specified"));
-  }
-  mSources.push_back(source);
-}
-
-int32_t
-FilterGraph::getNumSources() {
-  return mSources.size();
-}
-
-FilterSource*
-FilterGraph::getSource(int32_t i) {
-  if (i < 0 || (size_t) i >= mSources.size())
-    VS_THROW(HumbleInvalidArgument("index out of range"));
-
-  return dynamic_cast<FilterSource*>(getFilter(mSources[i]));
-}
-
-FilterSource*
-FilterGraph::getSource(const char* name) {
-  if (!name || !*name) {
-    VS_THROW(HumbleInvalidArgument("missing name"));
-  }
-  std::vector<AVFilterContext*> contexts = mSources;
-  int n = contexts.size();
-  for(int i = 0; i < n; i++) {
-    AVFilterContext* sourceCtx = contexts[i];
-    if (sourceCtx &&
-        sourceCtx->name &&
-        *sourceCtx->name &&
-        strcmp(sourceCtx->name, name)==0)
-      return getSource(i);
-  }
-  // if we get here we did not find the filter.
-  VS_THROW(PropertyNotFoundException(name));
-  return 0;
 }
 
 void
@@ -295,23 +254,64 @@ FilterGraph::getNumSinks() {
 
 FilterSink*
 FilterGraph::getSink(int32_t i) {
-  if (i < 0 || (size_t) i >= mSinks.size()) {
+  if (i < 0 || (size_t) i >= mSinks.size())
     VS_THROW(HumbleInvalidArgument("index out of range"));
-  }
+
   return dynamic_cast<FilterSink*>(getFilter(mSinks[i]));
 }
 
 FilterSink*
-FilterGraph::getSink(const char*name) {
+FilterGraph::getSink(const char* name) {
   if (!name || !*name) {
-    VS_THROW(HumbleInvalidArgument("no name specified"));
+    VS_THROW(HumbleInvalidArgument("missing name"));
   }
   std::vector<AVFilterContext*> contexts = mSinks;
   int n = contexts.size();
   for(int i = 0; i < n; i++) {
-    AVFilterContext* sourceCtx = contexts[i];
-    if (sourceCtx && sourceCtx->name && *sourceCtx->name && strcmp(sourceCtx->name, name)==0)
+    AVFilterContext* sinkCtx = contexts[i];
+    if (sinkCtx &&
+        sinkCtx->name &&
+        *sinkCtx->name &&
+        strcmp(sinkCtx->name, name)==0)
       return getSink(i);
+  }
+  // if we get here we did not find the filter.
+  VS_THROW(PropertyNotFoundException(name));
+  return 0;
+}
+
+void
+FilterGraph::addSource(AVFilterContext* source) {
+  if (!source) {
+    VS_THROW(HumbleInvalidArgument("no source specified"));
+  }
+  mSources.push_back(source);
+}
+
+int32_t
+FilterGraph::getNumSources() {
+  return mSources.size();
+}
+
+FilterSource*
+FilterGraph::getSource(int32_t i) {
+  if (i < 0 || (size_t) i >= mSources.size()) {
+    VS_THROW(HumbleInvalidArgument("index out of range"));
+  }
+  return dynamic_cast<FilterSource*>(getFilter(mSources[i]));
+}
+
+FilterSource*
+FilterGraph::getSource(const char*name) {
+  if (!name || !*name) {
+    VS_THROW(HumbleInvalidArgument("no name specified"));
+  }
+  std::vector<AVFilterContext*> contexts = mSources;
+  int n = contexts.size();
+  for(int i = 0; i < n; i++) {
+    AVFilterContext* sinkCtx = contexts[i];
+    if (sinkCtx && sinkCtx->name && *sinkCtx->name && strcmp(sinkCtx->name, name)==0)
+      return getSource(i);
   }
   // if we get here we did not find the filter.
   VS_THROW(PropertyNotFoundException(name));
@@ -332,8 +332,8 @@ FilterGraph::open(const char* f) {
   try {
 
     // let's iterate through all our inputs, then outputs
-    fillAVFilterInOut(mSinks, &inputs);
-    fillAVFilterInOut(mSources, &outputs);
+    fillAVFilterInOut(mSources, &inputs);
+    fillAVFilterInOut(mSinks, &outputs);
 
     // now, let's try parsing
     int e = avfilter_graph_parse_ptr(mCtx, f, &inputs, &outputs, 0);
@@ -407,16 +407,16 @@ FilterGraph::getFilter(AVFilterContext* ctx)
   const AVFilter* filter = ctx->filter;
   const char* filter_name = filter->name;
   if (strcmp(filter_name, VS_FILTER_AUDIO_SINK)==0) {
-    return FilterAudioSink::make(this, ctx);
-  }
-  else if (strcmp(filter_name, VS_FILTER_AUDIO_SOURCE)==0) {
     return FilterAudioSource::make(this, ctx);
   }
+  else if (strcmp(filter_name, VS_FILTER_AUDIO_SOURCE)==0) {
+    return FilterAudioSink::make(this, ctx);
+  }
   else if (strcmp(filter_name, VS_FILTER_VIDEO_SINK)==0) {
-    return FilterPictureSink::make(this, ctx);
+    return FilterPictureSource::make(this, ctx);
   }
   else if (strcmp(filter_name, VS_FILTER_VIDEO_SOURCE)==0) {
-    return FilterPictureSource::make(this, ctx);
+    return FilterPictureSink::make(this, ctx);
   }
   else
     return Filter::make(this, ctx);

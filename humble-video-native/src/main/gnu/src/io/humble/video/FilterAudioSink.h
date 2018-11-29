@@ -17,7 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterAudioSink.h
+ * FilterAudioSource.h
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
@@ -26,7 +26,7 @@
 #ifndef FILTERAUDIOSINK_H_
 #define FILTERAUDIOSINK_H_
 
-#include <io/humble/video/FilterSink.h>
+#include <io/humble/video/FilterSource.h>
 #include <io/humble/video/MediaAudio.h>
 
 namespace io {
@@ -36,7 +36,7 @@ namespace video {
 /**
  * A source of MediaAudio objects for a FilterGraph.
  */
-class VS_API_HUMBLEVIDEO FilterAudioSink : public io::humble::video::FilterSink
+class VS_API_HUMBLEVIDEO FilterAudioSource : public io::humble::video::FilterSource
 {
 public:
   /**
@@ -46,14 +46,14 @@ public:
   virtual int32_t getAudio(MediaAudio* audio);
 
 #ifndef SWIG
-  static FilterAudioSink*
+  static FilterAudioSource*
   make(FilterGraph* graph, AVFilterContext* ctx);
 #endif // ! SWIG
 
 protected:
-  FilterAudioSink(FilterGraph* graph, AVFilterContext* ctx);
+  FilterAudioSource(FilterGraph* graph, AVFilterContext* ctx);
   virtual
-  ~FilterAudioSink();
+  ~FilterAudioSource();
 };
 
 } /* namespace video */

@@ -17,7 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterSource.h
+ * FilterSink.h
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
@@ -33,16 +33,16 @@ namespace humble {
 namespace video {
 
 /**
- * A source of MediaRaw objects for a FilterGraph.
+ * A sink of MediaRaw objects for a FilterGraph.
  */
 
-class VS_API_HUMBLEVIDEO FilterSource : public io::humble::video::FilterEndPoint
+class VS_API_HUMBLEVIDEO FilterSink : public io::humble::video::FilterEndPoint
 {
 protected:
   void add(MediaRaw* media);
-  FilterSource(FilterGraph* graph, AVFilterContext* ctx);
+  FilterSink(FilterGraph* graph, AVFilterContext* ctx);
   virtual
-  ~FilterSource();
+  ~FilterSink();
 };
 
 } /* namespace video */

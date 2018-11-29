@@ -17,13 +17,13 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterAudioSink.cpp
+ * FilterAudioSource.cpp
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
  */
 
-#include "FilterAudioSink.h"
+#include "FilterAudioSource.h"
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
@@ -35,25 +35,25 @@ namespace io {
 namespace humble {
 namespace video {
 
-FilterAudioSink::FilterAudioSink(FilterGraph* graph, AVFilterContext* ctx) :
-    FilterSink(graph, ctx) {
+FilterAudioSource::FilterAudioSource(FilterGraph* graph, AVFilterContext* ctx) :
+    FilterSource(graph, ctx) {
 
 }
 
-FilterAudioSink::~FilterAudioSink() {
+FilterAudioSource::~FilterAudioSource() {
 }
 
-FilterAudioSink*
-FilterAudioSink::make(FilterGraph* graph, AVFilterContext* ctx) {
+FilterAudioSource*
+FilterAudioSource::make(FilterGraph* graph, AVFilterContext* ctx) {
   Global::init();
-  RefPointer<FilterAudioSink> r;
-  r.reset(new FilterAudioSink(graph, ctx), true);
+  RefPointer<FilterAudioSource> r;
+  r.reset(new FilterAudioSource(graph, ctx), true);
   return r.get();
 }
 
 int32_t
-FilterAudioSink::getAudio(MediaAudio* audio) {
-  return FilterSink::get(audio);
+FilterAudioSource::getAudio(MediaAudio* audio) {
+  return FilterSource::get(audio);
 }
 } /* namespace video */
 } /* namespace humble */

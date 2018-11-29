@@ -17,7 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterAudioSource.h
+ * FilterAudioSink.h
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
@@ -26,7 +26,7 @@
 #ifndef FILTERAUDIOSOURCE_H_
 #define FILTERAUDIOSOURCE_H_
 
-#include <io/humble/video/FilterSource.h>
+#include <io/humble/video/FilterSink.h>
 #include <io/humble/video/MediaAudio.h>
 
 namespace io {
@@ -34,14 +34,14 @@ namespace humble {
 namespace video {
 
 /**
- * A source of MediaAudio objects for a FilterGraph.
+ * A sink of MediaAudio objects for a FilterGraph.
  */
-class VS_API_HUMBLEVIDEO FilterAudioSource : public io::humble::video::FilterSource
+class VS_API_HUMBLEVIDEO FilterAudioSink : public io::humble::video::FilterSink
 {
 public:
 
   /**
-   * Adds audio to this source. NOTE: If you had audio to a FilterSource
+   * Adds audio to this sink. NOTE: If you had audio to a FilterSink
    * be careful with re-using or rewriting the underlying data. Filters will
    * try hard to avoid copying data, so if you change the data out from under
    * them unexpected results can occur.
@@ -52,14 +52,14 @@ public:
   addAudio(MediaAudio* audio);
 
 #ifndef SWIG
-  static FilterAudioSource*
+  static FilterAudioSink*
   make(FilterGraph* graph, AVFilterContext* ctx);
 #endif // ! SWIG
 protected:
 //  virtual void* getCtx() { return Filter::getCtx(); }
-  FilterAudioSource(FilterGraph* graph, AVFilterContext* ctx);
+  FilterAudioSink(FilterGraph* graph, AVFilterContext* ctx);
   virtual
-  ~FilterAudioSource();
+  ~FilterAudioSink();
 };
 
 } /* namespace video */

@@ -34,13 +34,13 @@ namespace humble {
 namespace video {
 
 /**
- * A sink of MediaRaw objects for a FilterGraph.
+ * A source of MediaRaw objects for a FilterGraph.
  */
-class VS_API_HUMBLEVIDEO FilterSink : public FilterEndPoint
+class VS_API_HUMBLEVIDEO FilterSource : public FilterEndPoint
 {
 public:
   /**
-   * Set the frame size of this sink. If set to non-zero then #getAudio(MediaAudio)
+   * Set the frame size of this source. If set to non-zero then #getAudio(MediaAudio)
    * will only every return exactly that number of samples.
    */
   virtual void setFrameSize(int32_t);
@@ -52,9 +52,9 @@ public:
 
 protected:
   int32_t get(MediaRaw*);
-  FilterSink(FilterGraph* graph, AVFilterContext* ctx);
+  FilterSource(FilterGraph* graph, AVFilterContext* ctx);
   virtual
-  ~FilterSink();
+  ~FilterSource();
 };
 
 } /* namespace video */

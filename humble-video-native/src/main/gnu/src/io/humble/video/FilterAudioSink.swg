@@ -17,7 +17,7 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
-%typemap (javacode) io::humble::video::FilterAudioSink,io::humble::video::FilterAudioSink*,io::humble::video::FilterAudioSink& %{
+%typemap (javacode) io::humble::video::FilterAudioSource,io::humble::video::FilterAudioSource*,io::humble::video::FilterAudioSource& %{
 %}
 
-%include <io/humble/video/FilterAudioSink.h>
+%include <io/humble/video/FilterAudioSource.h>

@@ -38,12 +38,12 @@ namespace humble {
 namespace video {
 
 class Filter;
-class FilterSource;
-class FilterAudioSource;
-class FilterPictureSource;
 class FilterSink;
 class FilterAudioSink;
 class FilterPictureSink;
+class FilterSource;
+class FilterAudioSource;
+class FilterPictureSource;
 
 /**
  * Creates a graph (or map) of Filter objects that can modify MediaRaw
@@ -93,18 +93,18 @@ public:
   virtual Filter* getFilter(const char* name);
 
   /**
-   * Add a FilterAudioSource.
+   * Add a FilterAudioSink.
    * @param name the name; must be unique in graph
    * @param timeBase timebase of frames that will be input. If null 1/sampleRate is assumed.
    * @param sampleRate the audio sample rate
    * @param channelLaout the channel layout
    * @param format the sample format
    *
-   * @return The FilterSource that was added.
+   * @return The FilterSink that was added.
    * @throws RuntimeException if name is already in graph.
    * @throws InvalidArgument if any argument is invalid.
    */
-  virtual FilterAudioSource* addAudioSource(const char* name,
+  virtual FilterAudioSink* addAudioSink(const char* name,
       int32_t sampleRate,
       AudioChannel::Layout channelLayout,
       AudioFormat::Type format,
@@ -113,19 +113,19 @@ public:
   );
 
   /**
-   * Add a FilterPictureSource.
+   * Add a FilterPictureSink.
    * @param name the name; must be unique in graph
-   * @param width the width in pixels of MediaPicture objects that will be added to this source.
-   * @param height the height in pixels  of MediaPicture objects that will be added to this source.
+   * @param width the width in pixels of MediaPicture objects that will be added to this Sink.
+   * @param height the height in pixels  of MediaPicture objects that will be added to this Sink.
    * @param format the pixel format
    * @param timeBase timebase of frames that will be input. If null, 1/Global.DEFAULT_PTS_PER_SECOND is assumed.
    * @param pixelAspectRatio pixel aspect ratio. If null, 1/1 is assumed.
    *
-   * @return The FilterSource that was added.
+   * @return The FilterSink that was added.
    * @throws RuntimeException if name is already in graph.
    * @throws InvalidArgument if any argument is invalid.
    */
-  virtual FilterPictureSource* addPictureSource(const char* name,
+  virtual FilterPictureSink* addPictureSink(const char* name,
       int32_t width,
       int32_t height,
       PixelFormat::Type format,
@@ -133,55 +133,37 @@ public:
       Rational* pixelAspectRatio);
 
   /**
-   * Add a FilterAudioSink.
+   * Add a FilterAudioSource.
    * @param name the name; must be unique in graph
    * @param sampleRate the audio sample rate
    * @param channelLaout the channel layout
    * @param format the sample format
    *
-   * @return The FilterAudioSink that was added.
+   * @return The FilterAudioSource that was added.
    * @throws RuntimeException if name is already in graph.
    * @throws InvalidArgument if any argument is invalid.
    */
-  virtual FilterAudioSink* addAudioSink(const char* name,
+  virtual FilterAudioSource* addAudioSource(const char* name,
        int32_t sampleRate,
        AudioChannel::Layout channelLayout,
        AudioFormat::Type format
    );
 
   /**
-   * Add a FilterPictureSink.
+   * Add a FilterPictureSource.
    * @param name the name; must be unique in graph
-   * @param format the pixel format desired of pictures taken from this sink.
-   * @return The FilterPictureSink that was added.
+   * @param format the pixel format desired of pictures taken from this Source.
+   * @return The FilterPictureSource that was added.
    * @throws RuntimeException if name is already in graph.
    * @throws InvalidArgument if any argument is invalid.
    */
-   virtual FilterPictureSink* addPictureSink(const char* name,
+   virtual FilterPictureSource* addPictureSource(const char* name,
        PixelFormat::Type format);
 
 protected:
-   virtual void addSource(AVFilterContext* source);
    virtual void addSink(AVFilterContext* sink);
+   virtual void addSource(AVFilterContext* Source);
 public:
-
-  /**
-   * @return number of FilterSource added so far.
-   */
-  virtual int32_t getNumSources();
-
-  /**
-   * @param index The n'th of #getNumSoruces() FilterSources attached to this FilterGraph.
-   * @return the FilterSource
-   * @throws InvalidArgument if index < 0 || index >= #getNumSources()
-   */
-  virtual FilterSource* getSource(int32_t index);
-
-  /**
-   * @param name unique name of a FilterSource in this FilterGraph. Should have been added with #addSource(FilterSource,String).
-   * @throws PropertyNotFoundException if not in graph.
-   */
-  virtual FilterSource* getSource(const char* name);
 
   /**
    * @return number of FilterSink added so far.
@@ -202,6 +184,24 @@ public:
   virtual FilterSink* getSink(const char* name);
 
   /**
+   * @return number of FilterSource added so far.
+   */
+  virtual int32_t getNumSources();
+
+  /**
+   * @param index The n'th of #getNumSoruces() FilterSources attached to this FilterGraph.
+   * @return the FilterSource
+   * @throws InvalidArgument if index < 0 || index >= #getNumSources()
+   */
+  virtual FilterSource* getSource(int32_t index);
+
+  /**
+   * @param name unique name of a FilterSource in this FilterGraph. Should have been added with #addSource(FilterSource,String).
+   * @throws PropertyNotFoundException if not in graph.
+   */
+  virtual FilterSource* getSource(const char* name);
+
+  /**
    * Should this graph auto-convert audio or pictures into the formats
    * different filters require (rather than require the user to construct
    * a graph with all filters sets correctly).
@@ -218,14 +218,14 @@ public:
   virtual AutoConvertFlag getAutoConvert();
 
   /**
-   * Add a graph described by a string to a graph. For any Sinks or Sources
-   * the caller must have called #addSource or #addSink before
+   * Add a graph described by a string to a graph. For any Sources or Sinks
+   * the caller must have called #addSink or #addSource before
    * this call.
    *
    * @param filterDescription The filter string to be parsed, in FFmpeg libavfilter format.
    * @throws RuntimeException if <b>any inputs or outputs</b> are open (i.e. each filter
    *   in the graph must either point to another filter on all inputs or outputs, or point to
-   *   a FilterSink or FilterSource when done).
+   *   a FilterSource or FilterSink when done).
    */
   virtual void open(const char* filterDescription);
 
@@ -293,8 +293,8 @@ private:
   virtual Filter* getFilter(AVFilterContext*);
   AVFilterGraph* mCtx;
   State mState;
-  std::vector<AVFilterContext*> mSources;
   std::vector<AVFilterContext*> mSinks;
+  std::vector<AVFilterContext*> mSources;
 };
 
 } /* namespace video */

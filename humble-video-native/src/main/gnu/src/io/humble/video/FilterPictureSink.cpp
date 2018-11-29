@@ -17,13 +17,13 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterPictureSink.cpp
+ * FilterPictureSource.cpp
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
  */
 
-#include "FilterPictureSink.h"
+#include "FilterPictureSource.h"
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
@@ -31,7 +31,7 @@
 
 using namespace io::humble::ferry;
 
-VS_LOG_SETUP(VS_CPP_PACKAGE.FilterPictureSink);
+VS_LOG_SETUP(VS_CPP_PACKAGE.FilterPictureSource);
 
 using namespace io::humble::ferry;
 
@@ -39,24 +39,24 @@ namespace io {
 namespace humble {
 namespace video {
 
-FilterPictureSink::FilterPictureSink(FilterGraph* graph, AVFilterContext* ctx) :
-    FilterSink(graph, ctx) {
+FilterPictureSource::FilterPictureSource(FilterGraph* graph, AVFilterContext* ctx) :
+    FilterSource(graph, ctx) {
 
 }
 
-FilterPictureSink::~FilterPictureSink() {
+FilterPictureSource::~FilterPictureSource() {
 }
 
-FilterPictureSink*
-FilterPictureSink::make(FilterGraph* graph, AVFilterContext* ctx) {
+FilterPictureSource*
+FilterPictureSource::make(FilterGraph* graph, AVFilterContext* ctx) {
   Global::init();
-  RefPointer<FilterPictureSink> r;
-  r.reset(new FilterPictureSink(graph, ctx), true);
+  RefPointer<FilterPictureSource> r;
+  r.reset(new FilterPictureSource(graph, ctx), true);
   return r.get();
 }
 
 int32_t
-FilterPictureSink::getPicture(MediaPicture* picture) {
+FilterPictureSource::getPicture(MediaPicture* picture) {
   if (!picture) {
     VS_THROW(HumbleInvalidArgument("no picture passed in"));
   }
@@ -80,7 +80,7 @@ FilterPictureSink::getPicture(MediaPicture* picture) {
           ));
     }
   }
-  return FilterSink::get(picture);
+  return FilterSource::get(picture);
 }
 } /* namespace video */
 } /* namespace humble */

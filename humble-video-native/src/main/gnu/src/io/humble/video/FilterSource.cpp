@@ -17,13 +17,13 @@
  * along with Humble-Video.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 /*
- * FilterSource.cpp
+ * FilterSink.cpp
  *
  *  Created on: Aug 5, 2013
  *      Author: aclarke
  */
 
-#include "FilterSource.h"
+#include "FilterSink.h"
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/video/VideoExceptions.h>
@@ -31,21 +31,21 @@
 
 using namespace io::humble::ferry;
 
-VS_LOG_SETUP(VS_CPP_PACKAGE.FilterSource);
+VS_LOG_SETUP(VS_CPP_PACKAGE.FilterSink);
 
 namespace io {
 namespace humble {
 namespace video {
 
-FilterSource::FilterSource(FilterGraph* graph, AVFilterContext* ctx) :
+FilterSink::FilterSink(FilterGraph* graph, AVFilterContext* ctx) :
     FilterEndPoint(graph, ctx) {
 }
 
-FilterSource::~FilterSource() {
+FilterSink::~FilterSink() {
 }
 
 void
-FilterSource::add(MediaRaw* media) {
+FilterSink::add(MediaRaw* media) {
   // ok, let's get to work
   AVFilterContext* ctx = getFilterCtx();
   AVFrame* frame = 0;
@@ -57,7 +57,7 @@ FilterSource::add(MediaRaw* media) {
   }
 
   int e = av_buffersrc_write_frame(ctx, frame);
-  FfmpegException::check(e, "could not add frame to filter source: ");
+  FfmpegException::check(e, "could not add frame to filter sink: ");
 }
 
 
