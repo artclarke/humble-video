@@ -212,33 +212,23 @@ MediaAudioResamplerTest::testResample() {
   TS_ASSERT(output);
 
   int32_t numSamples = 0;
-  while(source->read(packet.value()) >= 0) {
+  while(source->receivePacket(packet.value()) == RESULT_SUCCESS) {
     // got a packet; now we try to decode it.
-    if (packet->getStreamIndex() == streamToDecode &&
-        packet->isComplete()) {
-      int32_t bytesRead = 0;
-      int32_t byteOffset=0;
-      do {
-        bytesRead = decoder->decodeAudio(audio.value(), packet.value(), byteOffset);
-        if (audio->isComplete()) {
-          writeAudio(output, audio.value(), resampler.value(), rAudio.value());
-          numSamples += audio->getNumSamples();
-        }
-        byteOffset += bytesRead;
-      } while(byteOffset < packet->getSize());
+    if (packet->getStreamIndex() == streamToDecode) {
+      (void) decoder->sendPacket(packet.value());
+      while(decoder->receiveRaw(audio.value()) == RESULT_SUCCESS) {
+        writeAudio(output, audio.value(), resampler.value(), rAudio.value());
+        numSamples += audio->getNumSamples();
+      }
     }
     if (getenv("VS_TEST_MEMCHECK") && numSamples > 10240)
       // short circuit if running under valgrind.
       break;
   }
-  do {
-    decoder->decodeAudio(audio.value(), 0, 0);
-    if (audio->isComplete()) {
-      writeAudio(output, audio.value(), resampler.value(), rAudio.value());
-      numSamples += audio->getNumSamples();
-    }
-  } while (audio->isComplete());
-
+  // flush the decoder
+  (void) decoder->sendPacket(0);
+  while(decoder->receiveRaw(audio.value()) == RESULT_SUCCESS)
+    writeAudio(output, audio.value(), resampler.value(), rAudio.value());
   source->close();
   fclose(output);
 }
