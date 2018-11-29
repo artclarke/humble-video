@@ -30,10 +30,10 @@
 #include <io/humble/video/DemuxerStream.h>
 #include <io/humble/video/Decoder.h>
 #include <io/humble/video/FilterGraph.h>
-#include <io/humble/video/FilterAudioSource.h>
 #include <io/humble/video/FilterAudioSink.h>
-#include <io/humble/video/FilterPictureSource.h>
+#include <io/humble/video/FilterAudioSource.h>
 #include <io/humble/video/FilterPictureSink.h>
+#include <io/humble/video/FilterPictureSource.h>
 #include "FilterGraphTest.h"
 #include "lodepng.h"
 
@@ -65,18 +65,18 @@ FilterGraphTest::testAddIO() {
   int32_t height = 768;
   PixelFormat::Type pixelFormat = PixelFormat::PIX_FMT_YUV420P;
 
-  RefPointer<FilterAudioSource> asource = graph->addAudioSource("ain",
+  RefPointer<FilterAudioSink> asink = graph->addAudioSink("ain",
       sampleRate, layout, sampleFormat, 0);
-  TS_ASSERT(asource);
-  RefPointer<FilterPictureSource> psource = graph->addPictureSource("pin",
-      width, height, pixelFormat, 0, 0);
-  TS_ASSERT(psource);
-  RefPointer<FilterAudioSink> asink = graph->addAudioSink("aout", sampleRate,
-      layout, sampleFormat);
   TS_ASSERT(asink);
-  RefPointer<FilterPictureSink> psink = graph->addPictureSink("pout",
-      PixelFormat::PIX_FMT_GRAY8);
+  RefPointer<FilterPictureSink> psink = graph->addPictureSink("pin",
+      width, height, pixelFormat, 0, 0);
   TS_ASSERT(psink);
+  RefPointer<FilterAudioSource> asource = graph->addAudioSource("aout", sampleRate,
+      layout, sampleFormat);
+  TS_ASSERT(asource);
+  RefPointer<FilterPictureSource> psource = graph->addPictureSource("pout",
+      PixelFormat::PIX_FMT_GRAY8);
+  TS_ASSERT(psource);
 
   graph->open("[pin]scale=78:24[pout];[ain]atempo=1.2[aout]");
   {
@@ -156,8 +156,8 @@ FilterGraphTest::testFilterVideo() {
   RefPointer<Rational> aspectR = decoder->getPropertyAsRational("aspect");
 
   // now for something crazy
-  RefPointer<FilterPictureSource> filterSource;
-  filterSource = graph->addPictureSource("in", decoder->getWidth(),
+  RefPointer<FilterPictureSink> filterSink;
+  filterSink = graph->addPictureSink("in", decoder->getWidth(),
       decoder->getHeight(), decoder->getPixelFormat(), timeBase.value(),
       aspectR.value());
 
@@ -165,7 +165,7 @@ FilterGraphTest::testFilterVideo() {
       360 * 2, PixelFormat::PIX_FMT_RGBA);
 
   // add our inputs and outputs
-  RefPointer<FilterPictureSink> filterSink = graph->addPictureSink("out",
+  RefPointer<FilterPictureSource> filterSource = graph->addPictureSource("out",
       // make the filter do the conversion for us.
       filterPicture->getFormat());
   // and open our graph. I have spit it into a nice chain so readers
@@ -196,23 +196,18 @@ FilterGraphTest::testFilterVideo() {
   }
 
   int32_t frameNo = 0;
-  while (source->read(packet.value()) >= 0) {
+  ProcessorResult decoderResult=RESULT_SUCCESS;
+
+  while (source->receivePacket(packet.value()) == RESULT_SUCCESS) {
     // got a packet; now we try to decode it.
     if (packet->getStreamIndex() == streamToDecode && packet->isComplete()) {
-      int32_t bytesRead = 0;
-      int32_t byteOffset = 0;
-      do {
-        bytesRead = decoder->decodeVideo(picture.value(), packet.value(),
-            byteOffset);
-        if (picture->isComplete()) {
-          filterSource->addPicture(picture.value());
-          // now pull pictures
-          while (filterSink->getPicture(filterPicture.value()) >= 0 && filterPicture->isComplete())
-            writePicture("FilterGraphTest_testFilterVideo", &frameNo,
-                filterPicture.value());
-        }
-        byteOffset += bytesRead;
-      } while (byteOffset < packet->getSize());
+      (void) decoder->sendPacket(packet.value());
+      while(decoder->receiveRaw(picture.value()) == RESULT_SUCCESS) {
+        (void) filterSink->sendPicture(picture.value());
+        while(filterSource->receivePicture(picture.value()) == RESULT_SUCCESS)
+          writePicture("FilterGraphTest_testFilterVideo", &frameNo,
+              filterPicture.value());
+      }
 
       if (getenv("VS_TEST_MEMCHECK") && frameNo > 10) {
         VS_LOG_DEBUG("Cutting short when running under valgrind");
@@ -224,20 +219,21 @@ FilterGraphTest::testFilterVideo() {
   source->close();
   // now, handle the case where bytesRead is 0; we need to flush any
   // cached packets
-  do {
-    decoder->decodeVideo(picture.value(), 0, 0);
-    if (picture->isComplete())
-      filterSource->addPicture(picture.value());
-    else
-      // signal EOF
-      filterSource->addPicture(0);
 
-    // now pull pictures
-    while (filterSink->getPicture(filterPicture.value()) >= 0 && filterPicture->isComplete()) {
+  // flush the decoder
+  decoder->send(0);
+  while(decoder->receiveRaw(picture.value()) == RESULT_SUCCESS) {
+    (void) filterSink->sendPicture(picture.value());
+    while(filterSource->receivePicture(picture.value()) == RESULT_SUCCESS)
       writePicture("FilterGraphTest_testFilterVideo", &frameNo,
-                   filterPicture.value());
-    }
-  } while (picture->isComplete());
+          filterPicture.value());
+  }
+
+  // flush the filters
+  (void) filterSink->sendPicture(0);
+  while(filterSource->receivePicture(picture.value()) == RESULT_SUCCESS)
+    writePicture("FilterGraphTest_testFilterVideo", &frameNo,
+        filterPicture.value());
 
 }
 
@@ -304,60 +300,54 @@ FilterGraphTest::testFilterAudio() {
   RefPointer<MediaAudio> filteredAudio = MediaAudio::make(audio.value(), true);
 
   RefPointer<FilterGraph> graph = FilterGraph::make();
-  RefPointer<FilterAudioSource> fsource = graph->addAudioSource("in",
+  RefPointer<FilterAudioSink> fsink = graph->addAudioSink("in",
       audio->getSampleRate(),
       audio->getChannelLayout(),
       audio->getFormat(),
       0);
-  RefPointer<FilterAudioSink> fsink = graph->addAudioSink("out",
+  RefPointer<FilterAudioSource> fsource = graph->addAudioSource("out",
       filteredAudio->getSampleRate(),
       filteredAudio->getChannelLayout(),
       filteredAudio->getFormat());
   const int32_t frameSize = 1024;
   graph->open("[in]aphaser=decay=.4:delay=5:speed=.1[out]");
-  fsink->setFrameSize(frameSize);
+  fsource->setFrameSize(frameSize);
 
   int32_t numSamples = 0;
-  while(source->read(packet.value()) >= 0) {
-    // got a packet; now we try to decode it.
-    if (packet->getStreamIndex() == streamToDecode &&
-        packet->isComplete()) {
-      int32_t bytesRead = 0;
-      int32_t byteOffset=0;
-      do {
-        bytesRead = decoder->decodeAudio(audio.value(), packet.value(), byteOffset);
-        if (audio->isComplete()) {
-          numSamples += audio->getNumSamples();
-          fsource->addAudio(audio.value());
-          while(fsink->getAudio(filteredAudio.value()) >= 0 && filteredAudio->isComplete()) {
-            TS_ASSERT_EQUALS(filteredAudio->getNumSamples(), frameSize);
-            writeAudio(output, filteredAudio.value());
-          }
+  while(source->receivePacket(packet.value()) == RESULT_SUCCESS) {
+
+    if (packet->getStreamIndex() == streamToDecode && packet->isComplete()) {
+      (void) decoder->send(packet.value());
+      while(decoder->receiveRaw(audio.value()) == RESULT_SUCCESS) {
+        numSamples += audio->getNumSamples();
+        (void) fsink->sendAudio(audio.value());
+        while(fsource->receiveAudio(filteredAudio.value()) == RESULT_SUCCESS) {
+          TS_ASSERT_EQUALS(filteredAudio->getNumSamples(), frameSize);
+          writeAudio(output, filteredAudio.value());
         }
-        byteOffset += bytesRead;
-      } while(byteOffset < packet->getSize());
-    }
-    if (getenv("VS_TEST_MEMCHECK") && numSamples > 22050) {
-      VS_LOG_DEBUG("Cutting short when running under valgrind");
-      // short circuit if running under valgrind.
-      break;
-    }
+      }
 
+      if (getenv("VS_TEST_MEMCHECK") && numSamples > 22050) {
+        VS_LOG_DEBUG("Cutting short when running under valgrind");
+        // short circuit if running under valgrind.
+        break;
+      }
+    }
   }
-  // now, handle the case where bytesRead is 0; we need to flush any
-  // cached packets
-  do {
-    decoder->decodeAudio(audio.value(), 0, 0);
-    if (audio->isComplete())
-      fsource->addAudio(audio.value());
-    else
-      // tell the source we're at EOF
-      fsource->addAudio(0);
 
-    while(fsink->getAudio(filteredAudio.value()) >= 0)
-      if (filteredAudio->isComplete())
-        writeAudio(output, filteredAudio.value());
-  } while (audio->isComplete());
+  // flush the decoder
+  (void) decoder->send(0);
+  while(decoder->receiveRaw(audio.value()) == RESULT_SUCCESS) {
+    numSamples += audio->getNumSamples();
+    (void) fsink->sendAudio(audio.value());
+    while(fsource->receiveAudio(filteredAudio.value()) == RESULT_SUCCESS)
+      writeAudio(output, filteredAudio.value());
+  }
+
+  // flush the filter
+  (void) fsink->sendAudio(0);
+  while(fsource->receiveAudio(filteredAudio.value()) == RESULT_SUCCESS)
+    writeAudio(output, filteredAudio.value());
 
   fclose(output);
   source->close();

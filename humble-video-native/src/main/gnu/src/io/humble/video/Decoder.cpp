@@ -467,7 +467,7 @@ Decoder::make(const AVCodec* codec, const AVCodecParameters *src) {
 }
 
 ProcessorResult
-Decoder::sendEncoded(MediaEncoded* media) {
+Decoder::sendPacket(MediaPacket* media) {
   if (STATE_OPENED != getState())
     VS_THROW(HumbleRuntimeError("Attempt to send(Media), but Decoder is not opened"));
 

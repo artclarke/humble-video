@@ -160,9 +160,15 @@ public:
 //      MediaPacket *packet, int32_t byteOffset);
 
 
-  virtual ProcessorResult sendEncoded(MediaEncoded*);
+  virtual ProcessorResult sendPacket(MediaPacket*);
+  virtual ProcessorResult sendEncoded(MediaEncoded* media) {
+    MediaPacket* m = dynamic_cast<MediaPacket*>(media);
+    if (media && !m)
+      throw io::humble::ferry::HumbleRuntimeError("expected MediaPacket object");
+    else
+      return sendPacket(m);
+  }
   virtual ProcessorResult receiveRaw(MediaRaw*);
-
 
 protected:
   Decoder(const AVCodec* codec, const AVCodecParameters* src);
