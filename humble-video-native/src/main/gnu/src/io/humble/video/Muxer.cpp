@@ -418,11 +418,9 @@ Muxer::logOpen(Muxer* muxer) {
 
 ProcessorResult
 Muxer::sendPacket(MediaPacket *packet) {
-  bool r = write(packet, false);
-  if (r == 1)
-    return RESULT_AWAITING_DATA;
-  else
-    return RESULT_SUCCESS;
+  // TODO: Make a more sensible implementation of this that returns EOF and AWAITING_DATA where approriate
+  (void) write(packet, true);
+  return RESULT_SUCCESS;
 }
 
 bool

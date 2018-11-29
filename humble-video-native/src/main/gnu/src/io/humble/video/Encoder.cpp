@@ -647,20 +647,37 @@ Encoder::receiveEncoded(MediaEncoded* media) {
   if (!packet)
     VS_THROW(HumbleInvalidArgument("Encoders require non-null MediaRaw objects"));
 
-  if (packet && !packet->isComplete()) {
-    VS_THROW(HumbleRuntimeError("Passed in a non-null but not complete packet; this is an error"));
-  }
   // now reset the packet so we allocate new memory (because encoders sometimes change packet sizes).
   packet->reset(0);
 
-  // now for this, we
-  // receive from encoder
-  // if need more data && filtersource
-  //   pull data from sink, add to encoder and pull from encoder until
-  //     encoder success OR filtersource needs more data
-  // if filtesource
-  //
   int e = 0;
+  RefPointer<Rational> coderTb = this->getTimeBase();
+
+  AVPacket* out = packet->getCtx();
+  if (out->buf && out->data)
+    out->size = out->buf->size;
+  else
+    out->size = 0;
+
+  e = avcodec_receive_packet(getCodecCtx(), out);
+  if (e != AVERROR(EAGAIN) && e != AVERROR_EOF)
+    FfmpegException::check(e, "could not encode media");
+
+  int32_t oldStreamIndex = packet->getStreamIndex();
+  packet->setStreamIndex(oldStreamIndex);
+  if (e == 0) {
+    packet->setCoder(this);
+    packet->setTimeBase(coderTb.value());
+    packet->setComplete(out->size > 0, out->size);
+  }
+#ifdef VS_DEBUG
+  char descr[256]; *descr = 0;
+  packet->logMetadata(descr, sizeof(descr));
+  VS_LOG_TRACE("receiveEncoded Encoder@%p[%s]:%" PRIi64,
+               this,
+               descr,
+               (int64_t)e);
+#endif
   return (ProcessorResult) e;
 }
 
