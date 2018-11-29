@@ -9,7 +9,7 @@
 package io.humble.video;
 import io.humble.ferry.*;
 /**
- * A source of MediaPicture objects for a FilterGraph.
+ * A Source of MediaPicture objects for a FilterGraph.
  */
 public class FilterPictureSource extends FilterSource {
   // JNIHelper.swg: Start generated code
@@ -113,15 +113,18 @@ public class FilterPictureSource extends FilterSource {
   
 
 /**
- * Adds a picture to this source. NOTE: If you add a picture to a FilterSource<br>
- * be careful with re-using or rewriting the underlying data. Filters will<br>
- * try hard to avoid copying data, so if you change the data out from under<br>
- * them unexpected results can occur.<br>
- * @param picture the picture to add. Must be non-null and complete.<br>
- * @throws InvalidArgument if picture is null or audio is not complete.
+ * @param picture The picture to fill if possible.<br>
+ * @return &gt;=0 if a successful picture is fetched, or -1 for EOF.
  */
-  public void addPicture(MediaPicture picture) {
-    VideoJNI.FilterPictureSource_addPicture(swigCPtr, this, MediaPicture.getCPtr(picture), picture);
+  public ProcessorResult receivePicture(MediaPicture picture) {
+    return ProcessorResult.swigToEnum(VideoJNI.FilterPictureSource_receivePicture(swigCPtr, this, MediaPicture.getCPtr(picture), picture));
+  }
+
+/**
+ * Doc}
+ */
+  public ProcessorResult receiveRaw(MediaRaw media) {
+    return ProcessorResult.swigToEnum(VideoJNI.FilterPictureSource_receiveRaw(swigCPtr, this, MediaRaw.getCPtr(media), media));
   }
 
 }

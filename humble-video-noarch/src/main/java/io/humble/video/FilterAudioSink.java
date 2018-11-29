@@ -9,7 +9,7 @@
 package io.humble.video;
 import io.humble.ferry.*;
 /**
- * A source of MediaAudio objects for a FilterGraph.
+ * A sink of MediaAudio objects for a FilterGraph.
  */
 public class FilterAudioSink extends FilterSink {
   // JNIHelper.swg: Start generated code
@@ -113,11 +113,22 @@ public class FilterAudioSink extends FilterSink {
   
 
 /**
- * @param audio The audio to fill if possible.<br>
- * @return &gt;=0 if a successful audio is fetched, or -1 for EOF.
+ * Adds audio to this sink. NOTE: If you had audio to a FilterSink<br>
+ * be careful with re-using or rewriting the underlying data. Filters will<br>
+ * try hard to avoid copying data, so if you change the data out from under<br>
+ * them unexpected results can occur.<br>
+ * @param audio the audio to add. Must be non-null and complete.<br>
+ * @throws InvalidArgument if audio is null or audio is not complete.
  */
-  public int getAudio(MediaAudio audio) {
-    return VideoJNI.FilterAudioSink_getAudio(swigCPtr, this, MediaAudio.getCPtr(audio), audio);
+  public ProcessorResult sendAudio(MediaAudio audio) {
+    return ProcessorResult.swigToEnum(VideoJNI.FilterAudioSink_sendAudio(swigCPtr, this, MediaAudio.getCPtr(audio), audio));
+  }
+
+/**
+ * Doc}
+ */
+  public ProcessorResult sendRaw(MediaRaw media) {
+    return ProcessorResult.swigToEnum(VideoJNI.FilterAudioSink_sendRaw(swigCPtr, this, MediaRaw.getCPtr(media), media));
   }
 
 }

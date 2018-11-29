@@ -248,4 +248,12 @@ public class Encoder extends Coder {
     VideoJNI.Encoder_encode(swigCPtr, this, MediaPacket.getCPtr(output), output, MediaSampled.getCPtr(media), media);
   }
 
+  public ProcessorResult sendRaw(MediaRaw arg0) {
+    return ProcessorResult.swigToEnum(VideoJNI.Encoder_sendRaw(swigCPtr, this, MediaRaw.getCPtr(arg0), arg0));
+  }
+
+  public ProcessorResult receiveEncoded(MediaEncoded arg0) {
+    return ProcessorResult.swigToEnum(VideoJNI.Encoder_receiveEncoded(swigCPtr, this, MediaEncoded.getCPtr(arg0), arg0));
+  }
+
 }

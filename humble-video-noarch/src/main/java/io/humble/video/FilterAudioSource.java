@@ -113,15 +113,18 @@ public class FilterAudioSource extends FilterSource {
   
 
 /**
- * Adds audio to this source. NOTE: If you had audio to a FilterSource<br>
- * be careful with re-using or rewriting the underlying data. Filters will<br>
- * try hard to avoid copying data, so if you change the data out from under<br>
- * them unexpected results can occur.<br>
- * @param audio the audio to add. Must be non-null and complete.<br>
- * @throws InvalidArgument if audio is null or audio is not complete.
+ * @param audio The audio to fill if possible.<br>
+ * @return &gt;=0 if a successful audio is fetched, or -1 for EOF.
  */
-  public void addAudio(MediaAudio audio) {
-    VideoJNI.FilterAudioSource_addAudio(swigCPtr, this, MediaAudio.getCPtr(audio), audio);
+  public ProcessorResult receiveAudio(MediaAudio audio) {
+    return ProcessorResult.swigToEnum(VideoJNI.FilterAudioSource_receiveAudio(swigCPtr, this, MediaAudio.getCPtr(audio), audio));
+  }
+
+/**
+ * Doc}
+ */
+  public ProcessorResult receiveRaw(MediaRaw media) {
+    return ProcessorResult.swigToEnum(VideoJNI.FilterAudioSource_receiveRaw(swigCPtr, this, MediaRaw.getCPtr(media), media));
   }
 
 }

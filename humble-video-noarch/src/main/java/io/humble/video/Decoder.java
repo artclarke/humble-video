@@ -134,80 +134,30 @@ public class Decoder extends Coder {
   }
 
 /**
- * Flush this Decoder, getting rid of any cached packets (call after seek).<br>
- * Next packet given to decode should be a key packet.
- */
-  public void flush() {
-    VideoJNI.Decoder_flush(swigCPtr, this);
-  }
-
-/**
- * Decode this packet into output.  It will<br>
- * try to fill up the audio samples object, starting<br>
- * from the byteOffset inside this packet.<br>
- * <p><br>
- * The caller is responsible for allocating the<br>
- * MediaAudio object.  This function will overwrite<br>
- * any data in the samples object.<br>
- * </p><br>
- * @param output The MediaAudio we decode to. Caller must check if it is complete on return.<br>
- * @param packet    The packet we're attempting to decode from.<br>
- * @param byteOffset Where in the packet payload to start decoding<br>
- * <br>
- * @return number of bytes actually processed from the packet, or negative for error
- */
-  public int decodeAudio(MediaAudio output, MediaPacket packet, int byteOffset) {
-    return VideoJNI.Decoder_decodeAudio(swigCPtr, this, MediaAudio.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
-  }
-
-/**
  * Decode this packet into output.<br>
  * <br>
  * The caller is responsible for allocating the<br>
- * MediaPicture object.  This function will potentially<br>
+ * MediaSubtitle object.  This function will potentially<br>
  * overwrite any data in the frame object, but<br>
- * you should pass the same MediaPicture into this function<br>
+ * you should pass the same MediaSubtitle into this function<br>
  * repeatedly until Media.isComplete() is true.<br>
- * <p><br>
- * Note on memory for MediaPicture: For a multitude of reasons,<br>
- * if you created MediaPicture from a buffer, decodeVideo will discard<br>
- * it and replace it with a buffer that is aligned correctly for different<br>
- * CPUs and different codecs. If you must have a copy of the image data<br>
- * in memory managed by you, then pass in a MediaPicture allocated without<br>
- * a buffer to DecodeVideo, and then copy that into your own media picture.<br>
- * </p><br>
  * <br>
- * @param output The MediaPicture we decode. Caller must check if it is complete on return.<br>
- * @param packet  The packet we're attempting to decode from.<br>
- * @param byteOffset Where in the packet payload to start decoding<br>
+ * <br>
+ * <br>
+ * <br>
  * <br>
  * @return number of bytes actually processed from the packet, or negative for error
  */
-  public int decodeVideo(MediaPicture output, MediaPacket packet, int byteOffset) {
-    return VideoJNI.Decoder_decodeVideo(swigCPtr, this, MediaPicture.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
+  public ProcessorResult sendPacket(MediaPacket arg0) {
+    return ProcessorResult.swigToEnum(VideoJNI.Decoder_sendPacket(swigCPtr, this, MediaPacket.getCPtr(arg0), arg0));
   }
 
-/**
- * Decode this packet into output.  It will<br>
- * try to fill up the media object, starting<br>
- * from the byteOffset inside this packet.<br>
- * <p><br>
- * The caller is responsible for allocating the<br>
- * correct underlying Media object.  This function will overwrite<br>
- * any data in the samples object.<br>
- * </p><br>
- * @param output The Media we decode to. Caller must check if it is complete on return.<br>
- * @param packet    The packet we're attempting to decode from.<br>
- * @param byteOffset Where in the packet payload to start decoding<br>
- * <br>
- * @return number of bytes actually processed from the packet, or negative for error<br>
- * <br>
- * @throws InvalidArgument if the media type is not compatible with this decoder.<br>
- * @see decodeVideo<br>
- * @see decodeAudio
- */
-  public int decode(MediaSampled output, MediaPacket packet, int byteOffset) {
-    return VideoJNI.Decoder_decode(swigCPtr, this, MediaSampled.getCPtr(output), output, MediaPacket.getCPtr(packet), packet, byteOffset);
+  public ProcessorResult sendEncoded(MediaEncoded media) {
+    return ProcessorResult.swigToEnum(VideoJNI.Decoder_sendEncoded(swigCPtr, this, MediaEncoded.getCPtr(media), media));
+  }
+
+  public ProcessorResult receiveRaw(MediaRaw arg0) {
+    return ProcessorResult.swigToEnum(VideoJNI.Decoder_receiveRaw(swigCPtr, this, MediaRaw.getCPtr(arg0), arg0));
   }
 
 }

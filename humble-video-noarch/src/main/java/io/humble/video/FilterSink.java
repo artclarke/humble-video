@@ -112,19 +112,8 @@ public class FilterSink extends FilterEndPoint {
   // JNIHelper.swg: End generated code
   
 
-/**
- * Set the frame size of this sink. If set to non-zero then #getAudio(MediaAudio)<br>
- * will only every return exactly that number of samples.
- */
-  public void setFrameSize(int arg0) {
-    VideoJNI.FilterSink_setFrameSize(swigCPtr, this, arg0);
-  }
-
-/**
- * Get the frame size.
- */
-  public int getFrameSize() {
-    return VideoJNI.FilterSink_getFrameSize(swigCPtr, this);
+  public ProcessorResult sendRaw(MediaRaw media) {
+    return ProcessorResult.swigToEnum(VideoJNI.FilterSink_sendRaw(swigCPtr, this, MediaRaw.getCPtr(media), media));
   }
 
 }

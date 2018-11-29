@@ -259,6 +259,14 @@ public class Muxer extends Container {
     return VideoJNI.Muxer_write(swigCPtr, this, MediaPacket.getCPtr(packet), packet, forceInterleave);
   }
 
+  public ProcessorResult sendPacket(MediaPacket media) {
+    return ProcessorResult.swigToEnum(VideoJNI.Muxer_sendPacket(swigCPtr, this, MediaPacket.getCPtr(media), media));
+  }
+
+  public ProcessorResult sendEncoded(MediaEncoded media) {
+    return ProcessorResult.swigToEnum(VideoJNI.Muxer_sendEncoded(swigCPtr, this, MediaEncoded.getCPtr(media), media));
+  }
+
   /**
    * Muxers can only be in one of these states.
    */

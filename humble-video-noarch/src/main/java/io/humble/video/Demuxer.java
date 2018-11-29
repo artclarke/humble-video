@@ -498,6 +498,20 @@ public class Demuxer extends Container {
     VideoJNI.Demuxer_pause(swigCPtr, this);
   }
 
+/**
+ * gets a new packet
+ */
+  public ProcessorResult receivePacket(MediaPacket packet) {
+    return ProcessorResult.swigToEnum(VideoJNI.Demuxer_receivePacket(swigCPtr, this, MediaPacket.getCPtr(packet), packet));
+  }
+
+/**
+ * Doc}
+ */
+  public ProcessorResult receiveEncoded(MediaEncoded media) {
+    return ProcessorResult.swigToEnum(VideoJNI.Demuxer_receiveEncoded(swigCPtr, this, MediaEncoded.getCPtr(media), media));
+  }
+
   /**
    * Demuxers can only be in one of these states:
    */

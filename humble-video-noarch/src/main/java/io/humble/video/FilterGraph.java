@@ -140,93 +140,67 @@ public class FilterGraph extends Configurable {
   }
 
 /**
- * Add a FilterAudioSource.<br>
+ * Add a FilterAudioSink.<br>
  * @param name the name; must be unique in graph<br>
  * @param timeBase timebase of frames that will be input. If null 1/sampleRate is assumed.<br>
  * @param sampleRate the audio sample rate<br>
  * <br>
  * @param format the sample format<br>
  * <br>
- * @return The FilterSource that was added.<br>
+ * @return The FilterSink that was added.<br>
  * @throws RuntimeException if name is already in graph.<br>
  * @throws InvalidArgument if any argument is invalid.
  */
-  public FilterAudioSource addAudioSource(String name, int sampleRate, AudioChannel.Layout channelLayout, AudioFormat.Type format, Rational timeBase) {
-    long cPtr = VideoJNI.FilterGraph_addAudioSource(swigCPtr, this, name, sampleRate, channelLayout.swigValue(), format.swigValue(), Rational.getCPtr(timeBase), timeBase);
-    return (cPtr == 0) ? null : new FilterAudioSource(cPtr, false);
-  }
-
-/**
- * Add a FilterPictureSource.<br>
- * @param name the name; must be unique in graph<br>
- * @param width the width in pixels of MediaPicture objects that will be added to this source.<br>
- * @param height the height in pixels  of MediaPicture objects that will be added to this source.<br>
- * @param format the pixel format<br>
- * @param timeBase timebase of frames that will be input. If null, 1/Global.DEFAULT_PTS_PER_SECOND is assumed.<br>
- * @param pixelAspectRatio pixel aspect ratio. If null, 1/1 is assumed.<br>
- * <br>
- * @return The FilterSource that was added.<br>
- * @throws RuntimeException if name is already in graph.<br>
- * @throws InvalidArgument if any argument is invalid.
- */
-  public FilterPictureSource addPictureSource(String name, int width, int height, PixelFormat.Type format, Rational timeBase, Rational pixelAspectRatio) {
-    long cPtr = VideoJNI.FilterGraph_addPictureSource(swigCPtr, this, name, width, height, format.swigValue(), Rational.getCPtr(timeBase), timeBase, Rational.getCPtr(pixelAspectRatio), pixelAspectRatio);
-    return (cPtr == 0) ? null : new FilterPictureSource(cPtr, false);
-  }
-
-/**
- * Add a FilterAudioSink.<br>
- * @param name the name; must be unique in graph<br>
- * @param sampleRate the audio sample rate<br>
- * <br>
- * @param format the sample format<br>
- * <br>
- * @return The FilterAudioSink that was added.<br>
- * @throws RuntimeException if name is already in graph.<br>
- * @throws InvalidArgument if any argument is invalid.
- */
-  public FilterAudioSink addAudioSink(String name, int sampleRate, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
-    long cPtr = VideoJNI.FilterGraph_addAudioSink(swigCPtr, this, name, sampleRate, channelLayout.swigValue(), format.swigValue());
+  public FilterAudioSink addAudioSink(String name, int sampleRate, AudioChannel.Layout channelLayout, AudioFormat.Type format, Rational timeBase) {
+    long cPtr = VideoJNI.FilterGraph_addAudioSink(swigCPtr, this, name, sampleRate, channelLayout.swigValue(), format.swigValue(), Rational.getCPtr(timeBase), timeBase);
     return (cPtr == 0) ? null : new FilterAudioSink(cPtr, false);
   }
 
 /**
  * Add a FilterPictureSink.<br>
  * @param name the name; must be unique in graph<br>
- * @param format the pixel format desired of pictures taken from this sink.<br>
- * @return The FilterPictureSink that was added.<br>
+ * @param width the width in pixels of MediaPicture objects that will be added to this Sink.<br>
+ * @param height the height in pixels  of MediaPicture objects that will be added to this Sink.<br>
+ * @param format the pixel format<br>
+ * @param timeBase timebase of frames that will be input. If null, 1/Global.DEFAULT_PTS_PER_SECOND is assumed.<br>
+ * @param pixelAspectRatio pixel aspect ratio. If null, 1/1 is assumed.<br>
+ * <br>
+ * @return The FilterSink that was added.<br>
  * @throws RuntimeException if name is already in graph.<br>
  * @throws InvalidArgument if any argument is invalid.
  */
-  public FilterPictureSink addPictureSink(String name, PixelFormat.Type format) {
-    long cPtr = VideoJNI.FilterGraph_addPictureSink(swigCPtr, this, name, format.swigValue());
+  public FilterPictureSink addPictureSink(String name, int width, int height, PixelFormat.Type format, Rational timeBase, Rational pixelAspectRatio) {
+    long cPtr = VideoJNI.FilterGraph_addPictureSink(swigCPtr, this, name, width, height, format.swigValue(), Rational.getCPtr(timeBase), timeBase, Rational.getCPtr(pixelAspectRatio), pixelAspectRatio);
     return (cPtr == 0) ? null : new FilterPictureSink(cPtr, false);
   }
 
 /**
- * @return number of FilterSource added so far.
+ * Add a FilterAudioSource.<br>
+ * @param name the name; must be unique in graph<br>
+ * @param sampleRate the audio sample rate<br>
+ * <br>
+ * @param format the sample format<br>
+ * <br>
+ * @return The FilterAudioSource that was added.<br>
+ * @throws RuntimeException if name is already in graph.<br>
+ * @throws InvalidArgument if any argument is invalid.
  */
-  public int getNumSources() {
-    return VideoJNI.FilterGraph_getNumSources(swigCPtr, this);
+  public FilterAudioSource addAudioSource(String name, int sampleRate, AudioChannel.Layout channelLayout, AudioFormat.Type format) {
+    long cPtr = VideoJNI.FilterGraph_addAudioSource(swigCPtr, this, name, sampleRate, channelLayout.swigValue(), format.swigValue());
+    return (cPtr == 0) ? null : new FilterAudioSource(cPtr, false);
   }
 
 /**
- * @param index The n'th of #getNumSoruces() FilterSources attached to this FilterGraph.<br>
- * @return the FilterSource<br>
- * @throws InvalidArgument if index &lt; 0 || index &gt;= #getNumSources()
+ * Add a FilterPictureSource.<br>
+ * @param name the name; must be unique in graph<br>
+ * @param format the pixel format desired of pictures taken from this Source.<br>
+ * @return The FilterPictureSource that was added.<br>
+ * @throws RuntimeException if name is already in graph.<br>
+ * @throws InvalidArgument if any argument is invalid.
  */
-  public FilterSource getSource(int index) {
-    long cPtr = VideoJNI.FilterGraph_getSource__SWIG_0(swigCPtr, this, index);
-    return (cPtr == 0) ? null : new FilterSource(cPtr, false);
-  }
-
-/**
- * @param name unique name of a FilterSource in this FilterGraph. Should have been added with #addSource(FilterSource,String).<br>
- * @throws PropertyNotFoundException if not in graph.
- */
-  public FilterSource getSource(String name) {
-    long cPtr = VideoJNI.FilterGraph_getSource__SWIG_1(swigCPtr, this, name);
-    return (cPtr == 0) ? null : new FilterSource(cPtr, false);
+  public FilterPictureSource addPictureSource(String name, PixelFormat.Type format) {
+    long cPtr = VideoJNI.FilterGraph_addPictureSource(swigCPtr, this, name, format.swigValue());
+    return (cPtr == 0) ? null : new FilterPictureSource(cPtr, false);
   }
 
 /**
@@ -256,6 +230,32 @@ public class FilterGraph extends Configurable {
   }
 
 /**
+ * @return number of FilterSource added so far.
+ */
+  public int getNumSources() {
+    return VideoJNI.FilterGraph_getNumSources(swigCPtr, this);
+  }
+
+/**
+ * @param index The n'th of #getNumSoruces() FilterSources attached to this FilterGraph.<br>
+ * @return the FilterSource<br>
+ * @throws InvalidArgument if index &lt; 0 || index &gt;= #getNumSources()
+ */
+  public FilterSource getSource(int index) {
+    long cPtr = VideoJNI.FilterGraph_getSource__SWIG_0(swigCPtr, this, index);
+    return (cPtr == 0) ? null : new FilterSource(cPtr, false);
+  }
+
+/**
+ * @param name unique name of a FilterSource in this FilterGraph. Should have been added with #addSource(FilterSource,String).<br>
+ * @throws PropertyNotFoundException if not in graph.
+ */
+  public FilterSource getSource(String name) {
+    long cPtr = VideoJNI.FilterGraph_getSource__SWIG_1(swigCPtr, this, name);
+    return (cPtr == 0) ? null : new FilterSource(cPtr, false);
+  }
+
+/**
  * Should this graph auto-convert audio or pictures into the formats<br>
  * different filters require (rather than require the user to construct<br>
  * a graph with all filters sets correctly).<br>
@@ -276,14 +276,14 @@ public class FilterGraph extends Configurable {
   }
 
 /**
- * Add a graph described by a string to a graph. For any Sinks or Sources<br>
- * the caller must have called #addSource or #addSink before<br>
+ * Add a graph described by a string to a graph. For any Sources or Sinks<br>
+ * the caller must have called #addSink or #addSource before<br>
  * this call.<br>
  * <br>
  * @param filterDescription The filter string to be parsed, in FFmpeg libavfilter format.<br>
  * @throws RuntimeException if <b>any inputs or outputs</b> are open (i.e. each filter<br>
  *   in the graph must either point to another filter on all inputs or outputs, or point to<br>
- *   a FilterSink or FilterSource when done).
+ *   a FilterSource or FilterSink when done).
  */
   public void open(String filterDescription) {
     VideoJNI.FilterGraph_open(swigCPtr, this, filterDescription);

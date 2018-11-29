@@ -112,4 +112,19 @@ public class FilterSource extends FilterEndPoint {
   // JNIHelper.swg: End generated code
   
 
+/**
+ * Set the frame size of this source. If set to non-zero then #getAudio(MediaAudio)<br>
+ * will only every return exactly that number of samples.
+ */
+  public void setFrameSize(int arg0) {
+    VideoJNI.FilterSource_setFrameSize(swigCPtr, this, arg0);
+  }
+
+/**
+ * Get the frame size.
+ */
+  public int getFrameSize() {
+    return VideoJNI.FilterSource_getFrameSize(swigCPtr, this);
+  }
+
 }
