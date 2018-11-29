@@ -129,33 +129,24 @@ MediaPictureResamplerTest::testRescale() {
   resampler->open();
 
   int32_t frameNo = 0;
-  while(source->read(packet.value()) >= 0) {
+  while(source->receivePacket(packet.value()) == RESULT_SUCCESS) {
     // got a packet; now we try to decode it.
-    if (packet->getStreamIndex() == streamToDecode &&
-        packet->isComplete()) {
-      int32_t bytesRead = 0;
-      int32_t byteOffset=0;
-      do {
-        bytesRead = decoder->decodeVideo(picture.value(), packet.value(), byteOffset);
-        if (picture->isComplete()) {
-          writePicture("MediaPictureResamplerTest_testRescaleVideo",
-              &frameNo, picture.value(), resampler.value(), rescaled.value());
-        }
-        byteOffset += bytesRead;
-      } while(byteOffset < packet->getSize());
-      // now, handle the case where bytesRead is 0; we need to flush any
-      // cached packets
-      do {
-        decoder->decodeVideo(picture.value(), 0, 0);
-        if (picture->isComplete()) {
-          writePicture("MediaPictureResamplerTest_testRescaleVideo", &frameNo, picture.value(),
-              resampler.value(), rescaled.value());
-        }
-      } while (picture->isComplete());
+    if (packet->getStreamIndex() == streamToDecode) {
+      (void) decoder->sendPacket(packet.value());
+      while (decoder->receiveRaw(picture.value()) == RESULT_SUCCESS) {
+        writePicture("MediaPictureResamplerTest_testRescaleVideo",
+                     &frameNo, picture.value(), resampler.value(), rescaled.value());
+      }
+      if ((int32_t)(frameNo/30) > 10)
+        // 20 pictures should be enough to see if it's working.
+        break;
     }
-    if ((int32_t)(frameNo/30) > 10)
-      // 20 pictures should be enough to see if it's working.
-      break;
+  }
+  // flush the decoder
+  (void) decoder->sendPacket(0);
+  while (decoder->receiveRaw(picture.value()) == RESULT_SUCCESS) {
+    writePicture("MediaPictureResamplerTest_testRescaleVideo",
+                 &frameNo, picture.value(), resampler.value(), rescaled.value());
   }
   source->close();
 }
