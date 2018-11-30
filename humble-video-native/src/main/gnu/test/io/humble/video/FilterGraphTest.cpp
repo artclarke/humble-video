@@ -196,7 +196,6 @@ FilterGraphTest::testFilterVideo() {
   }
 
   int32_t frameNo = 0;
-  ProcessorResult decoderResult=RESULT_SUCCESS;
 
   while (source->receivePacket(packet.value()) == RESULT_SUCCESS) {
     // got a packet; now we try to decode it.

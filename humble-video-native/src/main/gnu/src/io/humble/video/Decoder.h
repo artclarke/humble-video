@@ -66,101 +66,27 @@ public:
   static Decoder* make(const AVCodec* codec, const AVCodecParameters *src);
 #endif // SWIG
 
-#if VS_OLD_DECODE_API
   /**
-   * Flush this Decoder, getting rid of any cached packets (call after seek).
-   * Next packet given to decode should be a key packet.
-   */
-  virtual void flush();
-
-  /**
-   * Decode this packet into output.  It will
-   * try to fill up the audio samples object, starting
-   * from the byteOffset inside this packet.
+   * Send a packet to the decoder for processing.
    * <p>
-   * The caller is responsible for allocating the
-   * MediaAudio object.  This function will overwrite
-   * any data in the samples object.
+   * If the packet is not null it must be complete, and it is up to
+   * the caller to ensure the Packet is valid (e.g. send a video packet
+   * to a video decoder) for this Decoder. Otherwise exceptions shall
+   * be thrown. If null, this instructs the Decoder to start flushing
+   * any saved data (and usually means no more data shall come).
    * </p>
-   * @param output The MediaAudio we decode to. Caller must check if it is complete on return.
-   * @param packet    The packet we're attempting to decode from.
-   * @param byteOffset Where in the packet payload to start decoding
-   *
-   * @return number of bytes actually processed from the packet, or negative for error
-   */
-  virtual int32_t decodeAudio(MediaAudio * output,
-      MediaPacket *packet, int32_t byteOffset);
-
-  /**
-   * Decode this packet into output.
-   *
-   * The caller is responsible for allocating the
-   * MediaPicture object.  This function will potentially
-   * overwrite any data in the frame object, but
-   * you should pass the same MediaPicture into this function
-   * repeatedly until Media.isComplete() is true.
    * <p>
-   * Note on memory for MediaPicture: For a multitude of reasons,
-   * if you created MediaPicture from a buffer, decodeVideo will discard
-   * it and replace it with a buffer that is aligned correctly for different
-   * CPUs and different codecs. If you must have a copy of the image data
-   * in memory managed by you, then pass in a MediaPicture allocated without
-   * a buffer to DecodeVideo, and then copy that into your own media picture.
+   * If ProcessorResult.RESULT_AWAITING_DATA is returned, then
+   * the internal buffers may be full, and #receiveRaw(MediaRaw)
+   * should be called to process some data.
    * </p>
    *
-   * @param output The MediaPicture we decode. Caller must check if it is complete on return.
-   * @param packet  The packet we're attempting to decode from.
-   * @param byteOffset Where in the packet payload to start decoding
+   * @param packet The packet. If null, the Decoder should flush any data.
    *
-   * @return number of bytes actually processed from the packet, or negative for error
+   * @return The ProcessorResult.
+   * @see #sendEncoded(MediaEncoded)
    */
-  virtual int32_t decodeVideo(MediaPicture * output,
-      MediaPacket *packet, int32_t byteOffset);
-
-  /**
-   * Decode this packet into output.  It will
-   * try to fill up the media object, starting
-   * from the byteOffset inside this packet.
-   * <p>
-   * The caller is responsible for allocating the
-   * correct underlying Media object.  This function will overwrite
-   * any data in the samples object.
-   * </p>
-   * @param output The Media we decode to. Caller must check if it is complete on return.
-   * @param packet    The packet we're attempting to decode from.
-   * @param byteOffset Where in the packet payload to start decoding
-   *
-   * @return number of bytes actually processed from the packet, or negative for error
-   *
-   * @throws InvalidArgument if the media type is not compatible with this decoder.
-   * @see decodeVideo
-   * @see decodeAudio
-   */
-  virtual int32_t decode(MediaSampled * output,
-      MediaPacket *packet, int32_t byteOffset);
-#endif // VS_OLD_DECODE_API
-
-
-  /**
-   * Decode this packet into output.
-   *
-   * The caller is responsible for allocating the
-   * MediaSubtitle object.  This function will potentially
-   * overwrite any data in the frame object, but
-   * you should pass the same MediaSubtitle into this function
-   * repeatedly until Media.isComplete() is true.
-   *
-   * @param output The MediaPicture we decode. Caller must check if it is complete on return.
-   * @param packet  The packet we're attempting to decode from.
-   * @param byteOffset Where in the packet payload to start decoding
-   *
-   * @return number of bytes actually processed from the packet, or negative for error
-   */
-//  virtual int32_t decodeSubtitle(MediaSubtitle * output,
-//      MediaPacket *packet, int32_t byteOffset);
-
-
-  virtual ProcessorResult sendPacket(MediaPacket*);
+  virtual ProcessorResult sendPacket(MediaPacket* packet);
   virtual ProcessorResult sendEncoded(MediaEncoded* media) {
     MediaPacket* m = dynamic_cast<MediaPacket*>(media);
     if (media && !m)
@@ -168,15 +94,37 @@ public:
     else
       return sendPacket(m);
   }
-  virtual ProcessorResult receiveRaw(MediaRaw*);
+
+  /**
+   * Decode data into this output.
+   * <p>
+   * The caller is responsible for allocating the
+   * correct underlying Media object.  This function will overwrite
+   * any data in the output object.
+   * </p>
+   * <p>
+   * If ProcessorResult.RESULT_AWAITING_DATA is returned, then
+   * the internal buffers may be empty (i.e. we need data), and
+   * more data should be passed in via #sendEncoded(MediaEncoded)
+   * should be called to add some data.
+   * </p>
+   * <p>
+   * If ProcessorResult.RESULT_END_OF_STREAM is returned, the Decoder
+   * has been flushed and has no more data. If you get more data,
+   * you'll need to make a new Decoder.
+   * </p>
+   * @param output The Media we decode to.
+   *
+   * @return The ProcessorResult
+   *
+   * @throws InvalidArgument if the media type is not compatible with this decoder.
+   * @see #sendPacket(MediaPacket*)
+   */
+  virtual ProcessorResult receiveRaw(MediaRaw* output);
 
 protected:
   Decoder(const AVCodec* codec, const AVCodecParameters* src);
   virtual ~Decoder();
-
-#if VS_OLD_DECODE_API
-  virtual int prepareFrame(AVFrame* frame, int flags);
-#endif // VS_OLD_DECODE_API
 
 private:
   int64_t rebase(int64_t ts, MediaPacket* packet);

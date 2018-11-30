@@ -134,30 +134,60 @@ public class Decoder extends Coder {
   }
 
 /**
- * Decode this packet into output.<br>
+ * Send a packet to the decoder for processing.<br>
+ * <p><br>
+ * If the packet is not null it must be complete, and it is up to<br>
+ * the caller to ensure the Packet is valid (e.g. send a video packet<br>
+ * to a video decoder) for this Decoder. Otherwise exceptions shall<br>
+ * be thrown. If null, this instructs the Decoder to start flushing<br>
+ * any saved data (and usually means no more data shall come).<br>
+ * </p><br>
+ * <p><br>
+ * If ProcessorResult.RESULT_AWAITING_DATA is returned, then<br>
+ * the internal buffers may be full, and #receiveRaw(MediaRaw)<br>
+ * should be called to process some data.<br>
+ * </p><br>
  * <br>
- * The caller is responsible for allocating the<br>
- * MediaSubtitle object.  This function will potentially<br>
- * overwrite any data in the frame object, but<br>
- * you should pass the same MediaSubtitle into this function<br>
- * repeatedly until Media.isComplete() is true.<br>
+ * @param packet The packet. If null, the Decoder should flush any data.<br>
  * <br>
- * <br>
- * <br>
- * <br>
- * <br>
- * @return number of bytes actually processed from the packet, or negative for error
+ * @return The ProcessorResult.<br>
+ * @see #sendEncoded(SWIGTYPE_p_MediaEncoded)
  */
-  public ProcessorResult sendPacket(MediaPacket arg0) {
-    return ProcessorResult.swigToEnum(VideoJNI.Decoder_sendPacket(swigCPtr, this, MediaPacket.getCPtr(arg0), arg0));
+  public ProcessorResult sendPacket(MediaPacket packet) {
+    return ProcessorResult.swigToEnum(VideoJNI.Decoder_sendPacket(swigCPtr, this, MediaPacket.getCPtr(packet), packet));
   }
 
   public ProcessorResult sendEncoded(MediaEncoded media) {
     return ProcessorResult.swigToEnum(VideoJNI.Decoder_sendEncoded(swigCPtr, this, MediaEncoded.getCPtr(media), media));
   }
 
-  public ProcessorResult receiveRaw(MediaRaw arg0) {
-    return ProcessorResult.swigToEnum(VideoJNI.Decoder_receiveRaw(swigCPtr, this, MediaRaw.getCPtr(arg0), arg0));
+/**
+ * Decode data into this output.<br>
+ * <p><br>
+ * The caller is responsible for allocating the<br>
+ * correct underlying Media object.  This function will overwrite<br>
+ * any data in the output object.<br>
+ * </p><br>
+ * <p><br>
+ * If ProcessorResult.RESULT_AWAITING_DATA is returned, then<br>
+ * the internal buffers may be empty (i.e. we need data), and<br>
+ * more data should be passed in via #sendEncoded(MediaEncoded)<br>
+ * should be called to add some data.<br>
+ * </p><br>
+ * <p><br>
+ * If ProcessorResult.RESULT_END_OF_STREAM is returned, the Decoder<br>
+ * has been flushed and has no more data. If you get more data,<br>
+ * you'll need to make a new Decoder.<br>
+ * </p><br>
+ * @param output The Media we decode to.<br>
+ * <br>
+ * @return The ProcessorResult<br>
+ * <br>
+ * @throws InvalidArgument if the media type is not compatible with this decoder.<br>
+ * @see #sendPacket(SWIGTYPE_p_MediaPacket)
+ */
+  public ProcessorResult receiveRaw(MediaRaw output) {
+    return ProcessorResult.swigToEnum(VideoJNI.Decoder_receiveRaw(swigCPtr, this, MediaRaw.getCPtr(output), output));
   }
 
 }
