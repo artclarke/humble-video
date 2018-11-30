@@ -48,7 +48,6 @@ Coder::Coder(const AVCodec* codec, const AVCodecParameters* src) {
   mCodec = Codec::make(mCtx->codec);
 
   // set fields we override/use
-  mCtx->refcounted_frames = 1;
   mCtx->get_buffer2 = Coder::getBuffer;
   mCtx->opaque = this;
 

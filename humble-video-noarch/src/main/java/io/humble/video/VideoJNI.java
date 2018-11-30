@@ -1489,13 +1489,9 @@ public class VideoJNI {
   public final static native int Decoder_sendPacket(long jarg1, Decoder jarg1_, long jarg2, MediaPacket jarg2_);
   public final static native int Decoder_sendEncoded(long jarg1, Decoder jarg1_, long jarg2, MediaEncoded jarg2_);
   public final static native int Decoder_receiveRaw(long jarg1, Decoder jarg1_, long jarg2, MediaRaw jarg2_);
-  public final static native long Encoder_getNumDroppedFrames(long jarg1, Encoder jarg1_);
   public final static native long Encoder_make__SWIG_0(long jarg1, Codec jarg1_);
   public final static native long Encoder_make__SWIG_1(long jarg1, Coder jarg1_);
   public final static native void Encoder_open(long jarg1, Encoder jarg1_, long jarg2, KeyValueBag jarg2_, long jarg3, KeyValueBag jarg3_);
-  public final static native void Encoder_encodeVideo(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaPicture jarg3_);
-  public final static native void Encoder_encodeAudio(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaAudio jarg3_);
-  public final static native void Encoder_encode(long jarg1, Encoder jarg1_, long jarg2, MediaPacket jarg2_, long jarg3, MediaSampled jarg3_);
   public final static native int Encoder_sendRaw(long jarg1, Encoder jarg1_, long jarg2, MediaRaw jarg2_);
   public final static native int Encoder_receiveEncoded(long jarg1, Encoder jarg1_, long jarg2, MediaEncoded jarg2_);
   public final static native int ContainerStream_DISPOSITION_NONE_get();

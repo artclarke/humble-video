@@ -51,6 +51,7 @@ public:
   void testEncodeAudio();
   void testEncodeInvalidParameters();
   void testTranscode();
+  // https://github.com/artclarke/humble-video/issues/36
   void testRegression36();
 private:
   void decodeAndEncode(

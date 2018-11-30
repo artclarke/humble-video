@@ -50,14 +50,6 @@ class VS_API_HUMBLEVIDEO Encoder : virtual public io::humble::video::Coder,
 public:
 
   /**
-   * the number of media object the encoder had to drop (i.e. skip
-   * encoding) in order to ensure that time stamp values are
-   * monotonically increasing.  See https://code.google.com/p/xuggle/issues/detail?id=180
-   * for details on why this is.
-   */
-  virtual int64_t getNumDroppedFrames() { return mNumDroppedFrames; }
-
-  /**
    * Create a Encoder that will use the given Codec.
    *
    * @return a Encoder
@@ -82,6 +74,7 @@ public:
    */
   virtual void open(KeyValueBag* inputOptions, KeyValueBag* unsetOptions);
 
+#ifdef VS_OLD_ENCODE_API
   /**
    * Encode the given MediaPicture using this encoder.
    *
@@ -174,6 +167,7 @@ public:
    */
   virtual void encode(MediaPacket * output,
       MediaSampled* media);
+#endif // VS_OLD_ENCODE_API
 
 
   virtual ProcessorResult sendRaw(MediaRaw*);
@@ -190,19 +184,6 @@ protected:
   Encoder(const AVCodec*, const AVCodecParameters* src);
   virtual
   ~Encoder();
-private:
-
-  // Used to ensure we have the right frame-size for codecs that
-  // require fixed frame sizes on audio.
-  io::humble::ferry::RefPointer<FilterGraph> mAudioGraph;
-  io::humble::ferry::RefPointer<FilterAudioSource> mAudioSource;
-  io::humble::ferry::RefPointer<FilterAudioSink> mAudioSink;
-  io::humble::ferry::RefPointer<MediaAudio> mFilteredAudio;
-
-  int64_t mLastPtsEncoded;
-  int64_t mNumDroppedFrames;
-
-  void encodeAudioInternal(MediaPacket* output, MediaAudio* inputAudio);
 };
 
 } /* namespace video */

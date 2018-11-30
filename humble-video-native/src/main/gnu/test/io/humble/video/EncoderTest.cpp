@@ -119,29 +119,29 @@ EncoderTest::testEncodeVideo() {
 
   // now we're (in theory) ready to start writing data.
   int32_t numPics = 0;
-  RefPointer<MediaPacket> packet;
+  RefPointer<MediaPacket> packet = MediaPacket::make();
+  ProcessorResult r = RESULT_SUCCESS;
 
   while(fsource->receivePicture(picture.value()) == RESULT_SUCCESS && numPics < maxPics) {
     picture->setTimeBase(pictureTb.value());
     picture->setTimeStamp(numPics);
 
     // let's encode
-    packet = MediaPacket::make();
-    encoder->encodeVideo(packet.value(), picture.value());
-    if (packet->isComplete()) {
+
+    r = encoder->sendRaw(picture.value());
+    TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+    while (encoder->receiveEncoded(packet.value()) == RESULT_SUCCESS) {
       muxer->write(packet.value(), false);
+      ++numPics;
     }
-    ++numPics;
   }
   // now flush the encoder
-  do {
-    packet = MediaPacket::make();
-    encoder->encodeVideo(packet.value(), 0);
-    if (packet->isComplete()) {
-      muxer->write(packet.value(), false);
-    }
-  } while (packet->isComplete());
-
+  r = encoder->sendRaw(0);
+  TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+  while (encoder->receiveEncoded(packet.value()) == RESULT_SUCCESS) {
+    muxer->write(packet.value(), false);
+    ++numPics;
+  }
   muxer->close();
 
 }
@@ -204,25 +204,26 @@ EncoderTest::testEncodeAudio() {
   int32_t numFrames = 0;
   RefPointer<MediaPacket> packet;
 
-  while(fsource->receiveAudio(audio.value()) == RESULT_SUCCESS && numFrames*audio->getNumSamples() < maxSamples) {
+  ProcessorResult r;
+  while(fsource->receiveAudio(audio.value()) == RESULT_SUCCESS
+      && numFrames*audio->getNumSamples() < maxSamples) {
     audio->setTimeStamp(numFrames*audio->getNumSamples());
 
     // let's encode
     packet = MediaPacket::make();
-    encoder->encodeAudio(packet.value(), audio.value());
-    if (packet->isComplete()) {
+    r = encoder->sendRaw(audio.value());
+    TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+    while(encoder->receiveEncoded(packet.value()) == RESULT_SUCCESS) {
       muxer->write(packet.value(), false);
+      ++numFrames;
     }
-    ++numFrames;
   }
   // now flush the encoder
-  do {
-    packet = MediaPacket::make();
-    encoder->encodeAudio(packet.value(), 0);
-    if (packet->isComplete()) {
-      muxer->write(packet.value(), false);
-    }
-  } while (packet->isComplete());
+  r = encoder->sendRaw(0);
+  TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+  while(encoder->receiveEncoded(packet.value()) == RESULT_SUCCESS) {
+    muxer->write(packet.value(), false);
+  }
 
   muxer->close();
 }
@@ -312,16 +313,11 @@ EncoderTest::encodeAndMux(
     Muxer* muxer,
     Encoder* encoder)
 {
-//  if (encoder->getCodecType() == MediaDescriptor::MEDIA_VIDEO)
-//    // skip all video for now
-//    return;
   RefPointer<MediaPacket> packet = MediaPacket::make();
-  do {
-    encoder->encode(packet.value(), media);
-    if (packet->isComplete()) {
-      muxer->write(packet.value(), true);
-    }
-  } while (!media && packet->isComplete()); // this forces flushing if media is null
+  ProcessorResult r = encoder->sendRaw(media);
+  TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+  while(encoder->receiveEncoded(packet.value()) == RESULT_SUCCESS)
+    muxer->write(packet.value(), true);
 }
 
 void
@@ -628,23 +624,21 @@ EncoderTest::testRegression36Internal (const Codec::ID codecId,
   audio->setTimeStamp (0);
   // let's encode
   packet = MediaPacket::make ();
-  encoder->encodeAudio (packet.value (), audio.value ());
-  if (packet->isComplete ())
+  ProcessorResult r = encoder->sendRaw(audio.value());
+  TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+  while(encoder->receiveEncoded(packet.value()) == RESULT_SUCCESS)
   {
     muxer->write (packet.value (), false);
+    ++numCompletePackets;
   }
   // now flush the encoder
-  do
+  r = encoder->sendRaw(0);
+  TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+  while(encoder->receiveEncoded(packet.value()) == RESULT_SUCCESS)
   {
-    packet = MediaPacket::make ();
-    encoder->encodeAudio (packet.value (), 0);
-    if (packet->isComplete ())
-    {
-      muxer->write (packet.value (), false);
-      ++numCompletePackets;
-    }
+    muxer->write (packet.value (), false);
+    ++numCompletePackets;
   }
-  while (packet->isComplete ());
   muxer->close ();
   if (!(codec->getCapabilities() & Codec::CAP_VARIABLE_FRAME_SIZE)) {
     const int32_t numExpectedPackets = audio->getNumSamples()
