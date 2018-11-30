@@ -40,7 +40,6 @@ class Media;
 class MediaAudio;
 class MediaPicture;
 class MediaPacket;
-
 #endif
 
 /**

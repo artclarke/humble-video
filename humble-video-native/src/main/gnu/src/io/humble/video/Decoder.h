@@ -84,7 +84,7 @@ public:
    * @param packet The packet. If null, the Decoder should flush any data.
    *
    * @return The ProcessorResult.
-   * @see #sendEncoded(MediaEncoded)
+   * @see #sendEncoded
    */
   virtual ProcessorResult sendPacket(MediaPacket* packet);
   virtual ProcessorResult sendEncoded(MediaEncoded* media) {
@@ -118,7 +118,7 @@ public:
    * @return The ProcessorResult
    *
    * @throws InvalidArgument if the media type is not compatible with this decoder.
-   * @see #sendPacket(MediaPacket*)
+   * @see #sendPacket
    */
   virtual ProcessorResult receiveRaw(MediaRaw* output);
 

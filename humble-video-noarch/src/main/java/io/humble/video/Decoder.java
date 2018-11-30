@@ -151,7 +151,7 @@ public class Decoder extends Coder {
  * @param packet The packet. If null, the Decoder should flush any data.<br>
  * <br>
  * @return The ProcessorResult.<br>
- * @see #sendEncoded(SWIGTYPE_p_MediaEncoded)
+ * @see #sendEncoded
  */
   public ProcessorResult sendPacket(MediaPacket packet) {
     return ProcessorResult.swigToEnum(VideoJNI.Decoder_sendPacket(swigCPtr, this, MediaPacket.getCPtr(packet), packet));
@@ -184,7 +184,7 @@ public class Decoder extends Coder {
  * @return The ProcessorResult<br>
  * <br>
  * @throws InvalidArgument if the media type is not compatible with this decoder.<br>
- * @see #sendPacket(SWIGTYPE_p_MediaPacket)
+ * @see #sendPacket
  */
   public ProcessorResult receiveRaw(MediaRaw output) {
     return ProcessorResult.swigToEnum(VideoJNI.Decoder_receiveRaw(swigCPtr, this, MediaRaw.getCPtr(output), output));

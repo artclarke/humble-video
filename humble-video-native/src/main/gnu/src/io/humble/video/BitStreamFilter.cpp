@@ -82,21 +82,7 @@ namespace io { namespace humble { namespace video {
   BitStreamFilterType*
   BitStreamFilterType::getBitStreamFilterType(const char* name) {
     Global::init();
-
-    const AVBitStreamFilter* f = 0;
-    void *iterator = 0;
-
-    int32_t i = 0;
-    while ((f = av_bsf_iterate(&iterator)) != 0) {
-      if (strcmp(name, f->name)==0) {
-        VS_LOG_TRACE("Found filter \"%s\" at position %d",
-                     f->name,
-                     i);
-        // this is the one we want
-        break;
-      }
-      ++i;
-    }
+    const AVBitStreamFilter* f = av_bsf_get_by_name(name);
     return f ? make(f) : 0;
   }
 
@@ -104,11 +90,11 @@ namespace io { namespace humble { namespace video {
   BitStreamFilter::~BitStreamFilter ()
   {
     if (mCtx)
-      av_bitstream_filter_close(mCtx);
+      av_bsf_free(&mCtx);
     mCtx = 0;
   }
 
-  BitStreamFilter::BitStreamFilter (AVBitStreamFilterContext* ctx,
+  BitStreamFilter::BitStreamFilter (AVBSFContext* ctx,
                                     BitStreamFilterType *type)
   {
     mCtx = ctx;
@@ -117,32 +103,34 @@ namespace io { namespace humble { namespace video {
     } else {
       mType = BitStreamFilterType::make(mCtx->filter);
     }
+    mState = STATE_INITED;
   }
 
   BitStreamFilter*
   BitStreamFilter::make(const char* filtername) {
     Global::init();
-
     if (!filtername || !*filtername)
       throw HumbleInvalidArgument("no filtername passed in");
-    AVBitStreamFilterContext* b = av_bitstream_filter_init(filtername);
-    if (!b)
-      throw HumbleBadAlloc();
-    return make(b, 0);
+    RefPointer<BitStreamFilterType> type = BitStreamFilterType::getBitStreamFilterType(filtername);
+    if (!type)
+      VS_THROW(HumbleInvalidArgument::make("Could not find filtername: %s", filtername));
+    return make(type.value());
   }
 
   BitStreamFilter*
   BitStreamFilter::make(BitStreamFilterType *type) {
     if (!type)
       throw HumbleInvalidArgument("no filter type");
-    AVBitStreamFilterContext* b = av_bitstream_filter_init(type->getName());
-    if (!b)
-      throw HumbleBadAlloc();
+    const AVBitStreamFilter *filter = type->getCtx();
+    AVBSFContext* b = 0;
+
+    int e = av_bsf_alloc(filter, &b);
+    FfmpegException::check(e, "could not initialize bitstream filter: %s", filter->name);
     return make(b, type);
   }
 
   BitStreamFilter*
-  BitStreamFilter::make(AVBitStreamFilterContext*c,
+  BitStreamFilter::make(AVBSFContext*c,
                         BitStreamFilterType* t)
   {
     Global::init();
@@ -156,91 +144,48 @@ namespace io { namespace humble { namespace video {
     return r;
   }
 
-  int32_t
-  BitStreamFilter::filter(Buffer* output,
-                          int32_t outputOffset,
-                          Buffer* input,
-                          int32_t inputOffset,
-                          int32_t inputSize,
-                          Coder* coder,
-                          const char* args,
-                          bool isKey)
-  {
-    if (!output)
-      throw HumbleInvalidArgument("no output");
-    if (outputOffset < 0)
-      throw HumbleInvalidArgument("output offset < 0");
-    if (!input)
-      throw HumbleInvalidArgument("no input");
-    if (inputSize <= 0)
-      throw HumbleInvalidArgument("inputSize <= 0");
-    if (inputOffset < 0)
-      throw HumbleInvalidArgument("input offset < 0");
-
-
-    // get the raw bytes for input and output
-    int32_t outputSize = inputSize;
-    uint8_t* out = 0;
-    int e = -1;
-    uint8_t* in = static_cast<uint8_t*>(input->getBytes(inputOffset, inputSize));
-
-    try {
-      if (!in)
-        throw HumbleRuntimeError("could not get input bytes");
-
-      AVCodecContext* avctx = coder ? coder->getCodecCtx() : 0;
-      e = av_bitstream_filter_filter(mCtx, avctx, args,
-                                     &out, &outputSize,
-                                     in, inputSize, isKey);
-      FfmpegException::check(e, "could not filter buffer");
-
-      // we ALWAYS copy the buffers when filtering.
-      uint8_t* outB = static_cast<uint8_t*>(output->getBytes(outputOffset, outputSize));
-      if (!outB)
-        throw HumbleRuntimeError("could not get output bytes; buffer may not be large enough");
-      if (e) {
-        if (!out)
-          throw HumbleRuntimeError("no memory allocated for output buffer?");
-        // guaranteed to be allocated memory
-        memcpy(outB, out, outputSize);
-        // the output buffer was allocated.
-        av_free(out);
-        out = 0;
-      } else {
-        // see documentation of av_bitstream_filter_filter
-        if (!out) out = in;
-
-        // be cautious and do memmove in case input == output.
-        memmove(outB, out, outputSize);
-      }
-    } catch (...) {
-      if (e){
-        // the output buffer was allocated.
-        av_free(out);
-        out = 0;
-      }
-    }
-    return outputSize;
+  void
+  BitStreamFilter::open() {
+    if (mState != STATE_INITED)
+      VS_THROW(HumbleRuntimeError("BitStreamFilter is not initialized correctly"));
+    int e = av_bsf_init(mCtx);
+    FfmpegException::check(e, "could not initialize BitStreamFilter");
+    mState = STATE_OPENED;
   }
 
-  void
-  BitStreamFilter::filter(MediaPacket* aPacket, const char* args) {
-    MediaPacketImpl* packet = dynamic_cast<MediaPacketImpl*>(aPacket);
+  ProcessorResult
+  BitStreamFilter::sendPacket(MediaPacket* packet)
+  {
+    if (packet && !packet->isComplete())
+      VS_THROW(HumbleRuntimeError("complete packet required"));
+
+    // copy the packet... the bit stream filter takes ownership
+    // of the underlying data
+    AVPacket *pkt = 0;
+    if (packet) {
+      pkt = av_packet_clone((dynamic_cast<MediaPacketImpl*>(packet))->getCtx());
+      if (!pkt)
+        VS_THROW(HumbleBadAlloc());
+    }
+    int e = av_bsf_send_packet(mCtx, pkt);
+    if (e != AVERROR(EAGAIN) && e != AVERROR_EOF)
+      FfmpegException::check(e, "error sending bit stream packet");
+    return (ProcessorResult)e;
+  }
+
+  ProcessorResult
+  BitStreamFilter::receivePacket(MediaPacket* packet)
+  {
     if (!packet)
-      throw HumbleInvalidArgument("no packet");
+      VS_THROW(HumbleRuntimeError("non-null packet required"));
 
-    if (!packet->isComplete())
-      throw HumbleInvalidArgument("packet is not complete");
-
-    // let's get our buffer
-    RefPointer<Buffer> input = packet->getData();
-    RefPointer<Coder> coder = packet->getCoder();
-
-    int32_t size = filter(input.value(), 0,
-                          input.value(), 0, packet->getSize(),
-                          coder.value(), args, packet->isKey());
-
-    packet->setComplete(true, size);
+    // reset all data.
+    packet->reset(0);
+    int e = av_bsf_receive_packet(mCtx, (dynamic_cast<MediaPacketImpl*>(packet))->getCtx());
+    if (e != AVERROR(EAGAIN) && e != AVERROR_EOF)
+      FfmpegException::check(e, "error sending bit stream packet");
+    return (ProcessorResult)e;
+    return RESULT_SUCCESS;
   }
 
 } /* namespace video */

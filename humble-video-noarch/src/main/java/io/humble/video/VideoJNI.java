@@ -1689,12 +1689,16 @@ public class VideoJNI {
   public final static native int BitStreamFilterType_getNumBitStreamFilterTypes();
   public final static native long BitStreamFilterType_getBitStreamFilterType__SWIG_0(int jarg1);
   public final static native long BitStreamFilterType_getBitStreamFilterType__SWIG_1(String jarg1);
+  public final static native int BitStreamFilter_getState(long jarg1, BitStreamFilter jarg1_);
+  public final static native void BitStreamFilter_open(long jarg1, BitStreamFilter jarg1_);
+  public final static native int BitStreamFilter_sendPacket(long jarg1, BitStreamFilter jarg1_, long jarg2, MediaPacket jarg2_);
+  public final static native int BitStreamFilter_sendEncoded(long jarg1, BitStreamFilter jarg1_, long jarg2, MediaEncoded jarg2_);
+  public final static native int BitStreamFilter_receivePacket(long jarg1, BitStreamFilter jarg1_, long jarg2, MediaPacket jarg2_);
+  public final static native int BitStreamFilter_receiveEncoded(long jarg1, BitStreamFilter jarg1_, long jarg2, MediaEncoded jarg2_);
   public final static native long BitStreamFilter_make__SWIG_0(String jarg1);
   public final static native long BitStreamFilter_make__SWIG_1(long jarg1, BitStreamFilterType jarg1_);
   public final static native long BitStreamFilter_getType(long jarg1, BitStreamFilter jarg1_);
   public final static native String BitStreamFilter_getName(long jarg1, BitStreamFilter jarg1_);
-  public final static native int BitStreamFilter_filter__SWIG_0(long jarg1, BitStreamFilter jarg1_, long jarg2, Buffer jarg2_, int jarg3, long jarg4, Buffer jarg4_, int jarg5, int jarg6, long jarg7, Coder jarg7_, String jarg8, boolean jarg9);
-  public final static native void BitStreamFilter_filter__SWIG_1(long jarg1, BitStreamFilter jarg1_, long jarg2, MediaPacket jarg2_, String jarg3);
   public final static native long PixelFormat_SWIGUpcast(long jarg1);
   public final static native long PixelComponentDescriptor_SWIGUpcast(long jarg1);
   public final static native long PixelFormatDescriptor_SWIGUpcast(long jarg1);

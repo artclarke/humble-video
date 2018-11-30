@@ -51,6 +51,7 @@ namespace io { namespace humble { namespace video {
     static BitStreamFilterType* getBitStreamFilterType(const char* name);
 #ifndef SWIG
     static BitStreamFilterType* make(const AVBitStreamFilter* c);
+    const AVBitStreamFilter* getCtx() { return mCtx; }
 #endif
   private:
     virtual ~BitStreamFilterType() {}
@@ -64,11 +65,86 @@ namespace io { namespace humble { namespace video {
    * in to add, remove, or modify the bit-stream.
    *
    */
-  class VS_API_HUMBLEVIDEO BitStreamFilter : public io::humble::ferry::RefCounted
-//    public virtual ProcessorEncodedSink,
-//    public virtual ProcessorEncodedSource
+  class VS_API_HUMBLEVIDEO BitStreamFilter : public io::humble::video::Configurable,
+    public virtual ProcessorEncodedSink,
+    public virtual ProcessorEncodedSource
   {
   public:
+
+    /**
+     * The state that a BitStreamFilter can be in.
+     */
+    typedef enum State {
+      STATE_INITED,
+      STATE_OPENED,
+      STATE_FLUSHING,
+      STATE_ERROR,
+    } State;
+
+    /**
+     * Get the state this BitStreamFilter is in.
+     */
+    virtual State getState() const { return mState; }
+
+    /**
+     * Opens this bitstream filter. Callers are responsible for
+     * calling setProperty(...) on this with the appropriate
+     * properties before opening.
+     */
+    virtual void open();
+
+    /**
+     * Submit a packet for filtering.
+     *
+     * After sending each packet, the filter must be completely drained by calling
+     * receive() repeatedly until it returns a non RESULT_SUCCESS result.
+     *
+     * @param packet the packet to filter. This parameter may be NULL, which signals the end of the stream (i.e. no more
+     * packets will be sent). That will cause the filter to output any packets it
+     * may have buffered internally.
+     *
+     * @return RESULT_SUCCESS on success, or RESULT_AWAITING_DATA if the user should
+     *   call #receive(Media) first.
+     */
+    virtual ProcessorResult sendPacket(MediaPacket* packet);
+    virtual ProcessorResult sendEncoded(MediaEncoded* media) {
+      MediaPacket* m = dynamic_cast<MediaPacket*>(media);
+      if (media && !m)
+        throw io::humble::ferry::HumbleRuntimeError("expected MediaPacket object");
+      else
+        return sendPacket(m);
+    }
+
+    /**
+     * Retrieve a filtered packet.
+     *
+     * @param packet this struct will be filled with the contents of the filtered
+     *                 packet. If this function returns
+     *                 successfully, the contents of packet will be completely
+     *                 overwritten by the returned data.
+     *
+     * @return RESULT_SUCCESS on success. RESULT_AWAITING_DATA if more packets need
+     * to be sent to the filter to get more output. RESULT_END_OF_STREAM if there
+     * will be no further output from the filter. Otherwise an exception will
+     * be thrown for errors.
+     *
+     * @note one input packet may result in several output packets, so after sending
+     * a packet with #send(Media), this function needs to be called
+     * repeatedly until it stops returning RESULT_SUCCESS.
+     * It is also possible for a filter to
+     * output fewer packets than were sent to it, so this function may return
+     * RESULT_AWAITING_DATA immediately after a successful #send(Media) call.
+     */
+    virtual ProcessorResult receivePacket(MediaPacket* packet);
+    virtual ProcessorResult receiveEncoded(MediaEncoded* media) {
+      MediaPacket* m = dynamic_cast<MediaPacket*>(media);
+      if (media && !m)
+        throw io::humble::ferry::HumbleRuntimeError("expected MediaPacket object");
+      else
+        return receivePacket(m);
+    }
+
+
     /**
      * Create a filter given the name.
      *
@@ -88,7 +164,7 @@ namespace io { namespace humble { namespace video {
     static BitStreamFilter* make(BitStreamFilterType* type);
 
 #ifndef SWIG
-    static BitStreamFilter* make(AVBitStreamFilterContext *c,
+    static BitStreamFilter* make(AVBSFContext *c,
                                  BitStreamFilterType* t);
 #endif
 
@@ -102,53 +178,13 @@ namespace io { namespace humble { namespace video {
      */
     virtual const char* getName() const { return mType->getName(); }
 
-    /**
-     * Filter the input buffer into the output buffer.
-     *
-     * @param output The output buffer to copy filtered bytes to.
-     * @param outputOffset The offset in output to copy data into.
-     * @param input The input buffer to filter.
-     * @param inputOffset The number of bytes into input to start filtering at.
-     * @param inputSize The number of bytes (from inputOffset) to filter.
-     * @param coder The Coder context belong to the Stream that this data will eventually get outputted to.
-     * @param args String arguments for the filter call. See the FFmpeg documentation or source code.
-     * @param isKey Does this data represent a key packet.
-     *
-     * @return The number of bytes copied into output once filtering is done.
-     *
-     * @throws InvalidArgument if any parameters are invalid.
-     * @throws FfmpegException if the filtering fails for any reason.
-     *
-     */
-    virtual int32_t filter(io::humble::ferry::Buffer* output,
-           int32_t outputOffset,
-           io::humble::ferry::Buffer* input,
-           int32_t inputOffset,
-           int32_t inputSize,
-           Coder* coder,
-           const char* args,
-           bool isKey);
-
-    /**
-     * Filters a packet in place (i.e. the prior contents will be replaced
-     * with the filtered data).
-     *
-     * This method assumes packet.getCoder() is the coder that is being used
-     * for outputting the packet to a stream. If this is not the case, use
-     * the other filter mechanism and construct packets yourself.
-     *
-     * @param packet The packet to filter in place.
-     * @param args Text arguments for the filter.
-     *
-     * @throws InvalidArgument if output is null.
-     * @throws InvalidArgument if input is null or not complete.
-     */
-    virtual void filter(MediaPacket* packet,
-                        const char* args);
+  protected:
+    virtual void* getCtx() { return mCtx; }
   private:
     virtual ~BitStreamFilter ();
-    BitStreamFilter (AVBitStreamFilterContext* ctx, BitStreamFilterType *type);
-    AVBitStreamFilterContext* mCtx;
+    BitStreamFilter (AVBSFContext* ctx, BitStreamFilterType *type);
+    AVBSFContext* mCtx;
+    State mState;
     io::humble::ferry::RefPointer<BitStreamFilterType> mType;
   };
 

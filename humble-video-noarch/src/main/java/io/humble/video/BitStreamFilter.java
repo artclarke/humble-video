@@ -12,7 +12,7 @@ import io.humble.ferry.*;
  * Takes a bit stream and filters bytes passed<br>
  * in to add, remove, or modify the bit-stream.
  */
-public class BitStreamFilter extends RefCounted {
+public class BitStreamFilter extends Configurable {
   // JNIHelper.swg: Start generated code
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>
   /**
@@ -130,6 +130,71 @@ public class BitStreamFilter extends RefCounted {
   
 
 /**
+ * Get the state this BitStreamFilter is in.
+ */
+  public BitStreamFilter.State getState() {
+    return BitStreamFilter.State.swigToEnum(VideoJNI.BitStreamFilter_getState(swigCPtr, this));
+  }
+
+/**
+ * Opens this bitstream filter. Callers are responsible for<br>
+ * calling setProperty(...) on this with the appropriate<br>
+ * properties before opening.
+ */
+  public void open() {
+    VideoJNI.BitStreamFilter_open(swigCPtr, this);
+  }
+
+/**
+ * Submit a packet for filtering.<br>
+ * <br>
+ * After sending each packet, the filter must be completely drained by calling<br>
+ * receive() repeatedly until it returns a non RESULT_SUCCESS result.<br>
+ * <br>
+ * @param packet the packet to filter. This parameter may be NULL, which signals the end of the stream (i.e. no more<br>
+ * packets will be sent). That will cause the filter to output any packets it<br>
+ * may have buffered internally.<br>
+ * <br>
+ * @return RESULT_SUCCESS on success, or RESULT_AWAITING_DATA if the user should<br>
+ *   call #receive(Media) first.
+ */
+  public ProcessorResult sendPacket(MediaPacket packet) {
+    return ProcessorResult.swigToEnum(VideoJNI.BitStreamFilter_sendPacket(swigCPtr, this, MediaPacket.getCPtr(packet), packet));
+  }
+
+  public ProcessorResult sendEncoded(MediaEncoded media) {
+    return ProcessorResult.swigToEnum(VideoJNI.BitStreamFilter_sendEncoded(swigCPtr, this, MediaEncoded.getCPtr(media), media));
+  }
+
+/**
+ * Retrieve a filtered packet.<br>
+ * <br>
+ * @param packet this struct will be filled with the contents of the filtered<br>
+ *                 packet. If this function returns<br>
+ *                 successfully, the contents of packet will be completely<br>
+ *                 overwritten by the returned data.<br>
+ * <br>
+ * @return RESULT_SUCCESS on success. RESULT_AWAITING_DATA if more packets need<br>
+ * to be sent to the filter to get more output. RESULT_END_OF_STREAM if there<br>
+ * will be no further output from the filter. Otherwise an exception will<br>
+ * be thrown for errors.<br>
+ * <br>
+ * Note: one input packet may result in several output packets, so after sending<br>
+ * a packet with #send(Media), this function needs to be called<br>
+ * repeatedly until it stops returning RESULT_SUCCESS.<br>
+ * It is also possible for a filter to<br>
+ * output fewer packets than were sent to it, so this function may return<br>
+ * RESULT_AWAITING_DATA immediately after a successful #send(Media) call.
+ */
+  public ProcessorResult receivePacket(MediaPacket packet) {
+    return ProcessorResult.swigToEnum(VideoJNI.BitStreamFilter_receivePacket(swigCPtr, this, MediaPacket.getCPtr(packet), packet));
+  }
+
+  public ProcessorResult receiveEncoded(MediaEncoded media) {
+    return ProcessorResult.swigToEnum(VideoJNI.BitStreamFilter_receiveEncoded(swigCPtr, this, MediaEncoded.getCPtr(media), media));
+  }
+
+/**
  * Create a filter given the name.<br>
  * <br>
  * @param filtername The name of the filter.<br>
@@ -168,43 +233,52 @@ public class BitStreamFilter extends RefCounted {
     return VideoJNI.BitStreamFilter_getName(swigCPtr, this);
   }
 
-/**
- * Filter the input buffer into the output buffer.<br>
- * <br>
- * @param output The output buffer to copy filtered bytes to.<br>
- * @param outputOffset The offset in output to copy data into.<br>
- * @param input The input buffer to filter.<br>
- * @param inputOffset The number of bytes into input to start filtering at.<br>
- * @param inputSize The number of bytes (from inputOffset) to filter.<br>
- * @param coder The Coder context belong to the Stream that this data will eventually get outputted to.<br>
- * @param args String arguments for the filter call. See the FFmpeg documentation or source code.<br>
- * @param isKey Does this data represent a key packet.<br>
- * <br>
- * @return The number of bytes copied into output once filtering is done.<br>
- * <br>
- * @throws InvalidArgument if any parameters are invalid.<br>
- * @throws FfmpegException if the filtering fails for any reason.
- */
-  public int filter(Buffer output, int outputOffset, Buffer input, int inputOffset, int inputSize, Coder coder, String args, boolean isKey) {
-    return VideoJNI.BitStreamFilter_filter__SWIG_0(swigCPtr, this, Buffer.getCPtr(output), output, outputOffset, Buffer.getCPtr(input), input, inputOffset, inputSize, Coder.getCPtr(coder), coder, args, isKey);
-  }
+  /**
+   * The state that a BitStreamFilter can be in.
+   */
+  public enum State {
+    STATE_INITED,
+    STATE_OPENED,
+    STATE_FLUSHING,
+    STATE_ERROR,
+  ;
 
-/**
- * Filters a packet in place (i.e. the prior contents will be replaced<br>
- * with the filtered data).<br>
- * <br>
- * This method assumes packet.getCoder() is the coder that is being used<br>
- * for outputting the packet to a stream. If this is not the case, use<br>
- * the other filter mechanism and construct packets yourself.<br>
- * <br>
- * @param packet The packet to filter in place.<br>
- * @param args Text arguments for the filter.<br>
- * <br>
- * @throws InvalidArgument if output is null.<br>
- * @throws InvalidArgument if input is null or not complete.
- */
-  public void filter(MediaPacket packet, String args) {
-    VideoJNI.BitStreamFilter_filter__SWIG_1(swigCPtr, this, MediaPacket.getCPtr(packet), packet, args);
+    public final int swigValue() {
+      return swigValue;
+    }
+
+    public static State swigToEnum(int swigValue) {
+      State[] swigValues = State.class.getEnumConstants();
+      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+        return swigValues[swigValue];
+      for (State swigEnum : swigValues)
+        if (swigEnum.swigValue == swigValue)
+          return swigEnum;
+      throw new IllegalArgumentException("No enum " + State.class + " with value " + swigValue);
+    }
+
+    @SuppressWarnings("unused")
+    private State() {
+      this.swigValue = SwigNext.next++;
+    }
+
+    @SuppressWarnings("unused")
+    private State(int swigValue) {
+      this.swigValue = swigValue;
+      SwigNext.next = swigValue+1;
+    }
+
+    @SuppressWarnings("unused")
+    private State(State swigEnum) {
+      this.swigValue = swigEnum.swigValue;
+      SwigNext.next = this.swigValue+1;
+    }
+
+    private final int swigValue;
+
+    private static class SwigNext {
+      private static int next = 0;
+    }
   }
 
 }
