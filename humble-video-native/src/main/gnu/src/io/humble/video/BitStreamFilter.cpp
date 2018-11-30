@@ -51,8 +51,9 @@ namespace io { namespace humble { namespace video {
     Global::init();
 
     const AVBitStreamFilter* f = 0;
+    void *iterator=0;
     int32_t i = 0;
-    while ((f = av_bitstream_filter_next(f)) != 0) {
+    while ((f = av_bsf_iterate(&iterator)) != 0) {
       ++i;
     }
     return i;
@@ -63,8 +64,9 @@ namespace io { namespace humble { namespace video {
     Global::init();
 
     const AVBitStreamFilter* f = 0;
+    void *iterator = 0;
     int32_t i = 0;
-    while ((f = av_bitstream_filter_next(f)) != 0) {
+    while ((f = av_bsf_iterate(&iterator)) != 0) {
       if (i == index) {
         VS_LOG_TRACE("Found filter \"%s\" at position %d",
                      f->name,
@@ -82,8 +84,10 @@ namespace io { namespace humble { namespace video {
     Global::init();
 
     const AVBitStreamFilter* f = 0;
+    void *iterator = 0;
+
     int32_t i = 0;
-    while ((f = av_bitstream_filter_next(f)) != 0) {
+    while ((f = av_bsf_iterate(&iterator)) != 0) {
       if (strcmp(name, f->name)==0) {
         VS_LOG_TRACE("Found filter \"%s\" at position %d",
                      f->name,

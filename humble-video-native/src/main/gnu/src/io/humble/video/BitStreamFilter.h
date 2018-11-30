@@ -32,6 +32,7 @@
 #include <io/humble/ferry/Buffer.h>
 #include <io/humble/video/HumbleVideo.h>
 #include <io/humble/video/Coder.h>
+#include <io/humble/video/Processor.h>
 #include <io/humble/video/MediaPacket.h>
 
 namespace io { namespace humble { namespace video {
@@ -64,6 +65,8 @@ namespace io { namespace humble { namespace video {
    *
    */
   class VS_API_HUMBLEVIDEO BitStreamFilter : public io::humble::ferry::RefCounted
+//    public virtual ProcessorEncodedSink,
+//    public virtual ProcessorEncodedSource
   {
   public:
     /**
