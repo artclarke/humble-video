@@ -179,7 +179,7 @@ DecoderTest::testDecodeAudio() {
   );
 
   int64_t oldTimeStamp = Global::NO_PTS;
-  Coder::CoderResult r = Coder::RESULT_SUCCESS;
+  ProcessorResult r = RESULT_SUCCESS;
 
   int retval = 0;
   do {
@@ -196,14 +196,14 @@ DecoderTest::testDecodeAudio() {
 
     r = decoder->send(p); // tell the decoder about the packet
     if (p) {
-      TS_ASSERT_EQUALS(r, Coder::RESULT_SUCCESS);
+      TS_ASSERT_EQUALS(r, RESULT_SUCCESS);
     } else {
       // when flushing, a second call to the decoder should then be END_OF_STREAM
       r = decoder->send(p); // send again.
-      TS_ASSERT_EQUALS(r, Coder::RESULT_END_OF_STREAM);
+      TS_ASSERT_EQUALS(r, RESULT_END_OF_STREAM);
     }
 
-    while((r = decoder->receive(audio.value())) == Coder::RESULT_SUCCESS) {
+    while((r = decoder->receive(audio.value())) == RESULT_SUCCESS) {
       writeAudio(output, audio.value());
       if (oldTimeStamp != Global::NO_PTS) {
         // check for monotonically increasing
@@ -212,11 +212,11 @@ DecoderTest::testDecodeAudio() {
       oldTimeStamp = audio->getTimeStamp();
     }
     if (p)
-      TS_ASSERT_EQUALS(r, Coder::RESULT_AWAITING_DATA);
+      TS_ASSERT_EQUALS(r, RESULT_AWAITING_DATA);
 
   } while (retval >= 0);
   // and when exiting the decoder receive loop should have gotten EOS.
-  TS_ASSERT_EQUALS(r, Coder::RESULT_END_OF_STREAM);
+  TS_ASSERT_EQUALS(r, RESULT_END_OF_STREAM);
   fclose(output);
   source->close();
 }
@@ -301,7 +301,7 @@ DecoderTest::testDecodeVideo() {
 
   int32_t frameNo = 0;
 
-  Coder::CoderResult r = Coder::RESULT_SUCCESS;
+  ProcessorResult r = RESULT_SUCCESS;
 
   int retval = 0;
   do {
@@ -318,24 +318,24 @@ DecoderTest::testDecodeVideo() {
 
     r = decoder->send(p); // tell the decoder about the packet
     if (p) {
-      TS_ASSERT_EQUALS(r, Coder::RESULT_SUCCESS);
+      TS_ASSERT_EQUALS(r, RESULT_SUCCESS);
     } else {
       // when flushing, a second call to the decoder should then be END_OF_STREAM
       r = decoder->send(p); // send again.
-      TS_ASSERT_EQUALS(r, Coder::RESULT_END_OF_STREAM);
+      TS_ASSERT_EQUALS(r, RESULT_END_OF_STREAM);
     }
 
 
-    while((r = decoder->receive(picture.value())) == Coder::RESULT_SUCCESS) {
+    while((r = decoder->receive(picture.value())) == RESULT_SUCCESS) {
       TS_ASSERT_DIFFERS(Global::NO_PTS, picture->getPacketDts());
       writePicture("DecoderTest_testDecodeVideo", &frameNo, picture.value());
     }
     if (p)
-      TS_ASSERT_EQUALS(r, Coder::RESULT_AWAITING_DATA);
+      TS_ASSERT_EQUALS(r, RESULT_AWAITING_DATA);
 
   } while (retval >= 0);
   // and when exiting the decoder receive loop should have gotten EOS.
-  TS_ASSERT_EQUALS(r, Coder::RESULT_END_OF_STREAM);
+  TS_ASSERT_EQUALS(r, RESULT_END_OF_STREAM);
   source->close();
 }
 
@@ -400,7 +400,7 @@ DecoderTest::testIssue27()
       decoder->getPixelFormat());
 
   decoder->open(0, 0);
-  Coder::CoderResult r = Coder::RESULT_SUCCESS;
+  ProcessorResult r = RESULT_SUCCESS;
 
   int retval = 0;
   do {
@@ -417,20 +417,20 @@ DecoderTest::testIssue27()
 
     r = decoder->send(p); // tell the decoder about the packet
     if (p) {
-      TS_ASSERT_EQUALS(r, Coder::RESULT_SUCCESS);
+      TS_ASSERT_EQUALS(r, RESULT_SUCCESS);
     } else {
       // when flushing, r should then be END_OF_STREAM if we flush again
       r = decoder->send(0);
-      TS_ASSERT_EQUALS(r, Coder::RESULT_END_OF_STREAM);
+      TS_ASSERT_EQUALS(r, RESULT_END_OF_STREAM);
     }
 
-    while((r = decoder->receive(picture.value())) == Coder::RESULT_SUCCESS) {
+    while((r = decoder->receive(picture.value())) == RESULT_SUCCESS) {
       writePicture("DecoderTest_testIssue27", &frameNo, picture.value());
     }
 
     if (p)
       // if we are not yet flushing, the encoder should always be awaiting data.
-      TS_ASSERT_EQUALS(r, Coder::RESULT_AWAITING_DATA);
+      TS_ASSERT_EQUALS(r, RESULT_AWAITING_DATA);
 
   } while (retval >= 0 && frameNo < frames);
 
