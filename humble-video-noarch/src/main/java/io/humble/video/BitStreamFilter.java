@@ -139,10 +139,23 @@ public class BitStreamFilter extends Configurable {
 /**
  * Opens this bitstream filter. Callers are responsible for<br>
  * calling setProperty(...) on this with the appropriate<br>
- * properties before opening.
+ * properties before opening.<br>
+ * <br>
+ * @param inputOptions If non-null, a bag of filter-specific options.<br>
+ * @param unsetOptions If non-null, the bag will be emptied and then filled with<br>
+ *                     the options in <code>inputOptions</code> that were not set.
  */
-  public void open() {
-    VideoJNI.BitStreamFilter_open(swigCPtr, this);
+  public void open(KeyValueBag inputOptions, KeyValueBag unsetOptions) {
+    VideoJNI.BitStreamFilter_open(swigCPtr, this, KeyValueBag.getCPtr(inputOptions), inputOptions, KeyValueBag.getCPtr(unsetOptions), unsetOptions);
+  }
+
+  public MediaParameters getMediaParameters() {
+    long cPtr = VideoJNI.BitStreamFilter_getMediaParameters(swigCPtr, this);
+    return (cPtr == 0) ? null : new MediaParameters(cPtr, false);
+  }
+
+  public void setMediaParameters(MediaParameters parameters) {
+    VideoJNI.BitStreamFilter_setMediaParameters(swigCPtr, this, MediaParameters.getCPtr(parameters), parameters);
   }
 
 /**
@@ -207,6 +220,14 @@ public class BitStreamFilter extends Configurable {
   }
 
 /**
+ * Conveniece make that calls #setParameters().
+ */
+  public static BitStreamFilter make(String filtername, MediaParameters p) {
+    long cPtr = VideoJNI.BitStreamFilter_make__SWIG_1(filtername, MediaParameters.getCPtr(p), p);
+    return (cPtr == 0) ? null : new BitStreamFilter(cPtr, false);
+  }
+
+/**
  * Create a filter given the type.<br>
  * <br>
  * @param type The type of the filter.<br>
@@ -214,7 +235,15 @@ public class BitStreamFilter extends Configurable {
  * @see BitStreamFilterType
  */
   public static BitStreamFilter make(BitStreamFilterType type) {
-    long cPtr = VideoJNI.BitStreamFilter_make__SWIG_1(BitStreamFilterType.getCPtr(type), type);
+    long cPtr = VideoJNI.BitStreamFilter_make__SWIG_2(BitStreamFilterType.getCPtr(type), type);
+    return (cPtr == 0) ? null : new BitStreamFilter(cPtr, false);
+  }
+
+/**
+ * Conveniece make that calls #setParameters().
+ */
+  public static BitStreamFilter make(BitStreamFilterType type, MediaParameters p) {
+    long cPtr = VideoJNI.BitStreamFilter_make__SWIG_3(BitStreamFilterType.getCPtr(type), type, MediaParameters.getCPtr(p), p);
     return (cPtr == 0) ? null : new BitStreamFilter(cPtr, false);
   }
 

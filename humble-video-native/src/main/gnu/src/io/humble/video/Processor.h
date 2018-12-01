@@ -20,6 +20,15 @@
 /*
  * Processor.h
  *
+ * Important: Everything in here should be a PURE ABSTRACT class.
+ *
+ * Exceptions are methods that require no state and call pure-virtual methods.
+ *
+ * These classes can NEVER be the primary class that something inherits
+ * from if it's real -- they should always be a public virtual class that
+ * gets inherited seconded. They DO NOT show up in Swig, but need to have
+ * language specific (i.e. Java) interfaces that echo the same methods.
+ *
  *  Created on: Nov 27, 2018
  *      Author: aclarke
  */

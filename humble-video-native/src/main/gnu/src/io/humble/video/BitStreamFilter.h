@@ -90,8 +90,16 @@ namespace io { namespace humble { namespace video {
      * Opens this bitstream filter. Callers are responsible for
      * calling setProperty(...) on this with the appropriate
      * properties before opening.
+     *
+     * @param inputOptions If non-null, a bag of filter-specific options.
+     * @param unsetOptions If non-null, the bag will be emptied and then filled with
+     *                     the options in <code>inputOptions</code> that were not set.
+     *
      */
-    virtual void open();
+    virtual void open(KeyValueBag* inputOptions, KeyValueBag* unsetOptions);
+
+    virtual MediaParameters *getMediaParameters();
+    virtual void setMediaParameters(MediaParameters* parameters);
 
     /**
      * Submit a packet for filtering.
@@ -155,6 +163,20 @@ namespace io { namespace humble { namespace video {
     static BitStreamFilter* make(const char* filtername);
 
     /**
+     * Conveniece make that calls #setParameters().
+     */
+    static BitStreamFilter* make(const char* filtername, MediaParameters* p)
+    {
+      io::humble::ferry::RefPointer<BitStreamFilter> retval;
+      if (!p)
+        throw io::humble::ferry::HumbleInvalidArgument("expected non null parameters");
+      retval = make(filtername);
+      if (retval)
+        retval->setMediaParameters(p);
+      return retval.get();
+    }
+
+    /**
      * Create a filter given the type.
      *
      * @param type The type of the filter.
@@ -162,6 +184,20 @@ namespace io { namespace humble { namespace video {
      * @see BitStreamFilterType
      */
     static BitStreamFilter* make(BitStreamFilterType* type);
+    /**
+     * Conveniece make that calls #setParameters().
+     */
+    static BitStreamFilter* make(BitStreamFilterType* type, MediaParameters* p)
+    {
+      io::humble::ferry::RefPointer<BitStreamFilter> retval;
+      if (!p)
+        throw io::humble::ferry::HumbleInvalidArgument("expected non null parameters");
+      retval = make(type);
+      if (retval)
+        retval->setMediaParameters(p);
+      return retval.get();
+    }
+
 
 #ifndef SWIG
     static BitStreamFilter* make(AVBSFContext *c,

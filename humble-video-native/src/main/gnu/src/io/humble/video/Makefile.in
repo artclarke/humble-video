@@ -60,13 +60,13 @@ am_libhumble_video_la_OBJECTS = Mingw64Fixes.lo VideoExceptions.lo \
 	MediaResampler.lo MediaAudio.lo MediaAudioResampler.lo \
 	MediaPicture.lo MediaPictureImpl.lo MediaPictureResampler.lo \
 	MediaPictureResamplerImpl.lo MediaSubtitle.lo \
-	MediaSubtitleImpl.lo IndexEntry.lo IndexEntryImpl.lo \
-	MediaPacket.lo MediaPacketImpl.lo ContainerFormat.lo \
-	Configurable.lo Coder.lo Decoder.lo Encoder.lo \
-	ContainerStream.lo Container.lo DemuxerFormat.lo Muxer.lo \
-	MuxerStream.lo Demuxer.lo DemuxerImpl.lo DemuxerStream.lo \
-	MuxerFormat.lo FilterType.lo FilterGraph.lo Filter.lo \
-	FilterLink.lo FilterEndPoint.lo FilterSource.lo \
+	MediaSubtitleImpl.lo MediaParameters.lo IndexEntry.lo \
+	IndexEntryImpl.lo MediaPacket.lo MediaPacketImpl.lo \
+	ContainerFormat.lo Configurable.lo Coder.lo Decoder.lo \
+	Encoder.lo ContainerStream.lo Container.lo DemuxerFormat.lo \
+	Muxer.lo MuxerStream.lo Demuxer.lo DemuxerImpl.lo \
+	DemuxerStream.lo MuxerFormat.lo FilterType.lo FilterGraph.lo \
+	Filter.lo FilterLink.lo FilterEndPoint.lo FilterSource.lo \
 	FilterAudioSource.lo FilterPictureSource.lo FilterSink.lo \
 	FilterAudioSink.lo FilterPictureSink.lo Global.lo
 nodist_libhumble_video_la_OBJECTS = HumbleVideo.lo
@@ -399,6 +399,7 @@ libhumble_video_la_SOURCES = \
   MediaPictureResamplerImpl.cpp \
   MediaSubtitle.cpp \
   MediaSubtitleImpl.cpp \
+  MediaParameters.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
   MediaPacket.cpp \
@@ -467,6 +468,10 @@ libhumble_video_la_HEADERS = \
   MediaSubtitle.h \
   MediaSubtitleImpl.h \
   MediaSubtitle.swg \
+  MediaParameters.h \
+  MediaParameters.swg \
+  Processor.h \
+  Processor.swg \
   IndexEntry.h \
   IndexEntryImpl.h \
   IndexEntry.swg \
@@ -608,6 +613,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaAudioResampler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPacketImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaParameters.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPicture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaPictureResampler.Plo@am__quote@

@@ -43,8 +43,6 @@ namespace humble {
 namespace video {
 
 Decoder::Decoder(const AVCodec* codec, const AVCodecParameters* src) : Coder(codec, src) {
-  mSamplesSinceLastTimeStampDiscontinuity = 0;
-  mAudioDiscontinuityStartingTimeStamp = Global::NO_PTS;
   VS_LOG_TRACE("Created: %p", this);
 }
 
@@ -138,6 +136,11 @@ Decoder::sendPacket(MediaPacket* media) {
   if (packet && !packet->isComplete()) {
     VS_THROW(HumbleRuntimeError("Passed in a non-null but not complete packet; this is an error"));
   }
+
+  // Check that the packet is in the same timebase that the coder
+  // expects. If not, the caller must convert it.
+
+  // TODO: Fix timebases
 
   const AVPacket* p = packet ?  packet->getCtx() : 0;
   int e = avcodec_send_packet(getCodecCtx(), p);

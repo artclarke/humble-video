@@ -30,6 +30,7 @@
 #include <io/humble/video/Configurable.h>
 #include <io/humble/video/Codec.h>
 #include <io/humble/video/Rational.h>
+#include <io/humble/video/MediaParameters.h>
 
 namespace io {
 namespace humble {
@@ -420,6 +421,9 @@ public:
   virtual void* getCtx() { return getCodecCtx(); }
   virtual AVCodecContext* getCodecCtx() { return mCtx; }
 #endif
+
+  virtual MediaParameters* getMediaParameters();
+  virtual void setMediaParameters(MediaParameters* p);
 
 protected:
   virtual void setState(State state);

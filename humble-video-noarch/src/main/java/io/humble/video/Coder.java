@@ -429,6 +429,15 @@ public class Coder extends Configurable {
     VideoJNI.Coder_setFlag2(swigCPtr, this, flag.swigValue(), value);
   }
 
+  public MediaParameters getMediaParameters() {
+    long cPtr = VideoJNI.Coder_getMediaParameters(swigCPtr, this);
+    return (cPtr == 0) ? null : new MediaParameters(cPtr, false);
+  }
+
+  public void setMediaParameters(MediaParameters p) {
+    VideoJNI.Coder_setMediaParameters(swigCPtr, this, MediaParameters.getCPtr(p), p);
+  }
+
   /**
    * The state that a Coder can be in.
    */

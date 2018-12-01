@@ -29,6 +29,7 @@
 #include <io/humble/video/KeyValueBagImpl.h>
 #include <io/humble/video/MediaPacketImpl.h>
 #include <io/humble/video/IndexEntry.h>
+#include <io/humble/video/MediaParameters.h>
 
 #include "FfmpegIncludes.h"
 
@@ -259,6 +260,11 @@ ContainerStream::matchSpecifier(const char* specifier) {
   FfmpegException::check(e, "invalid stream specifier: %s", specifier);
   return e > 0 ? true : false;
 }
+
+MediaParameters*
+ContainerStream::getMediaParameters() {
+  RefPointer<Rational> tb = getTimeBase();
+  return MediaParameters::make(getCtx()->codecpar, tb.value());
 }
-}
-}
+
+}}}

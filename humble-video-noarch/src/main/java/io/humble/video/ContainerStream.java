@@ -412,6 +412,15 @@ public class ContainerStream extends RefCounted {
     return VideoJNI.ContainerStream_matchSpecifier(swigCPtr, this, specifier);
   }
 
+/**
+ * Get the codec parameters. This structure can be used<br>
+ * with other Processors, sometimes.
+ */
+  public MediaParameters getMediaParameters() {
+    long cPtr = VideoJNI.ContainerStream_getMediaParameters(swigCPtr, this);
+    return (cPtr == 0) ? null : new MediaParameters(cPtr, false);
+  }
+
   /**
    * The disposition of this stream. Some streams can have special<br>
    * meanings in some Containers.

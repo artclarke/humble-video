@@ -27,6 +27,7 @@
 #include <io/humble/ferry/HumbleException.h>
 #include <io/humble/video/Global.h>
 #include <io/humble/video/MediaPacketImpl.h>
+#include <io/humble/video/KeyValueBagImpl.h>
 
 #include "BitStreamFilter.h"
 
@@ -145,13 +146,84 @@ namespace io { namespace humble { namespace video {
   }
 
   void
-  BitStreamFilter::open() {
-    if (mState != STATE_INITED)
-      VS_THROW(HumbleRuntimeError("BitStreamFilter is not initialized correctly"));
-    int e = av_bsf_init(mCtx);
-    FfmpegException::check(e, "could not initialize BitStreamFilter");
-    mState = STATE_OPENED;
+  BitStreamFilter::open(KeyValueBag* inputOptions, KeyValueBag* aUnsetOptions) {
+    AVDictionary* tmp=0;
+    int retval = 0;
+
+    try {
+      if (mState != STATE_INITED)
+        VS_THROW(HumbleRuntimeError("BitStreamFilter is not initialized correctly"));
+
+      if (inputOptions) {
+        KeyValueBagImpl* options = dynamic_cast<KeyValueBagImpl*>(inputOptions);
+        // make a copy of the data returned.
+        av_dict_copy(&tmp, options->getDictionary(), 0);
+      }
+
+      // first set any on the filter itself
+      // first we're going to set options (and we'll set them again later)
+      retval = av_opt_set_dict(mCtx, &tmp);
+      FfmpegException::check(retval, "could not set options on coder");
+
+      // then let's look for filter specific options
+      if (mCtx->filter && mCtx->filter->priv_class) {
+        // this filter has filter specific options, try that
+        retval = av_opt_set_dict(mCtx->priv_data, &tmp);
+      }
+
+      // then initialize the filter
+      retval = av_bsf_init(mCtx);
+      FfmpegException::check(retval, "could not initialize BitStreamFilter");
+
+      if (aUnsetOptions)
+      {
+        KeyValueBagImpl* unsetOptions = dynamic_cast<KeyValueBagImpl*>(aUnsetOptions);
+        unsetOptions->copy(tmp);
+      }
+      mState = STATE_OPENED;
+      if (tmp)
+        av_dict_free(&tmp);
+
+    } catch(...) {
+      mState = STATE_ERROR;
+      if (tmp)
+        av_dict_free(&tmp);
+      throw;
+    }
   }
+
+  MediaParameters*
+  BitStreamFilter::getMediaParameters() {
+    AVCodecParameters* p = mCtx->par_out;
+    if (!p)
+      VS_THROW(HumbleRuntimeError("output parameters unexpectedly missing"));
+
+    RefPointer<Rational> timebase = Rational::make(
+        mCtx->time_base_out.num,
+        mCtx->time_base_out.den);
+
+    return MediaParameters::make(p, timebase.value());
+  }
+
+  void
+  BitStreamFilter::setMediaParameters(MediaParameters *p) {
+    if (!p)
+      VS_THROW(HumbleInvalidArgument("missing parameters passed in"));
+
+    if (mState != STATE_OPENED)
+      VS_THROW(HumbleRuntimeError("cannot set parameters once filter is open"));
+
+    // copy the timebase
+    RefPointer<Rational> timebase = p->getTimeBase();
+    if (timebase) {
+      mCtx->time_base_in.num = timebase->getNumerator();
+      mCtx->time_base_in.den = timebase->getDenominator();
+    }
+    // copy the parameters
+    int e = avcodec_parameters_copy(mCtx->par_in, p->getCtx());
+    FfmpegException::check(e, "could not set input parameters");
+  }
+
 
   ProcessorResult
   BitStreamFilter::sendPacket(MediaPacket* packet)

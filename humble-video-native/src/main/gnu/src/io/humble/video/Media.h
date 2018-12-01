@@ -29,7 +29,7 @@
 
 namespace io { namespace humble { namespace video {
 
-  class MediaRaw;
+class MediaRaw;
 /**
  * The parent class of all media objects than can be gotten from or added to a Stream.
  */

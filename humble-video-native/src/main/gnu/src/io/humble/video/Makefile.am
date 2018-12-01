@@ -35,6 +35,7 @@ libhumble_video_la_SOURCES= \
   MediaPictureResamplerImpl.cpp \
   MediaSubtitle.cpp \
   MediaSubtitleImpl.cpp \
+  MediaParameters.cpp \
   IndexEntry.cpp \
   IndexEntryImpl.cpp \
   MediaPacket.cpp \
@@ -103,6 +104,8 @@ libhumble_video_la_HEADERS= \
   MediaSubtitle.h \
   MediaSubtitleImpl.h \
   MediaSubtitle.swg \
+  MediaParameters.h \
+  MediaParameters.swg \
   Processor.h \
   Processor.swg \
   IndexEntry.h \

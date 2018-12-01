@@ -29,6 +29,7 @@ namespace io { namespace humble { namespace video
   class KeyValueBag;
   class MediaPacket;
   class IndexEntry;
+  class MediaParameters;
   
   /**
    * Represents a stream of similar data (eg video) in a Container.
@@ -322,6 +323,13 @@ namespace io { namespace humble { namespace video
     * @note  A stream specifier can match several streams in a container.
     */
    virtual bool matchSpecifier(const char* specifier);
+
+   /**
+    * Get the codec parameters. This structure can be used
+    * with other Processors, sometimes.
+    *
+    */
+   virtual MediaParameters* getMediaParameters();
 
 
 #ifndef SWIG

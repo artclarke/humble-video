@@ -94,23 +94,39 @@ BitStreamFilterTest::testNoiseFilter() {
   const char* name = "noise";
   RefPointer<BitStreamFilter> f = BitStreamFilter::make(name);
 
+
+  f->open(0, 0);
+
   // let's generate a buffer to add noise to.
   const int32_t inSize = 1024;
   // Annoyingly I have to add AVPROBE_PADDING_SIZE because the noise
   // filter incorrectly memcopies an additional 16 bytes, and I want Valgrind to
   // not worry about that.
-  RefPointer<Buffer> inBuf = Buffer::make(0, inSize+AVPROBE_PADDING_SIZE);
+  // 2018 note: removing this until it shows up again under Valgrind
+  RefPointer<Buffer> inBuf = Buffer::make(0, inSize);
   uint8_t* in = static_cast<uint8_t*>(inBuf->getBytes(0, inSize));
-  int32_t outSize = inSize;
-  RefPointer<Buffer> outBuf = Buffer::make(0, outSize+AVPROBE_PADDING_SIZE);
-  uint8_t* out = static_cast<uint8_t*>(outBuf->getBytes(0, outSize));
-  for(int32_t i = 0; i < inSize+AVPROBE_PADDING_SIZE; i++) {
+  for(int32_t i = 0; i < inSize; i++) {
     in[i] = static_cast<uint8_t>(i);
-    out[i] = in[i];
   }
 
-  outSize = f->filter(outBuf.value(), 0, inBuf.value(), 0, inSize, 0, 0, false);
-  TS_ASSERT_EQUALS(outSize, inSize);
+  // now, let's create a packet out of that buffer
+  RefPointer<MediaPacket> p = MediaPacket::make(inBuf.value());
+
+  // send to the filter
+  ProcessorResult r;
+  r = f->sendPacket(p.value());
+  TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+
+  // fetch the packet
+  r = f->receivePacket(p.value());
+  TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+
+  RefPointer<Buffer> outBuf = p->getData();
+  uint8_t *out = static_cast<uint8_t*>(outBuf->getBytes(0, p->getSize()));
+  // should be a different buffer not
+  TS_ASSERT_DIFFERS(in, out);
+  TS_ASSERT_EQUALS(inSize, p->getSize());
+
   int matches = 0;
   for(int32_t i = 0; i < inSize; i++) {
     if (in[i] == out[i])
@@ -125,25 +141,36 @@ BitStreamFilterTest::testChompFilter() {
   const char* name = "chomp";
   RefPointer<BitStreamFilter> f = BitStreamFilter::make(name);
 
+  f->open(0, 0);
+
   // let's generate a buffer to chomp nulls off the end of.
   const int32_t inSize = 1024;
   RefPointer<Buffer> inBuf = Buffer::make(0, inSize);
   uint8_t* in = static_cast<uint8_t*>(inBuf->getBytes(0, inSize));
-  int32_t outSize = inSize;
-  RefPointer<Buffer> outBuf = Buffer::make(0, outSize);
-  uint8_t* out = static_cast<uint8_t*>(outBuf->getBytes(0, outSize));
 
   // set the entire input buffer to null for now.
   memset(in, 0, inSize);
   // then set the first half of the buffer to be non-null.
   for(int32_t i = 0; i < inSize/2; i++) {
     in[i] = 0x01;
-    out[i] = in[i];
   }
 
-  // should filter out all the null bytes at the end.
-  outSize = f->filter(outBuf.value(), 0, inBuf.value(), 0, inSize, 0, 0, false);
-  TS_ASSERT_EQUALS(outSize, inSize/2);
+  // now, let's create a packet out of that buffer
+  RefPointer<MediaPacket> p = MediaPacket::make(inBuf.value());
+
+  // send to the filter
+  ProcessorResult r;
+  r = f->sendPacket(p.value());
+  TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+
+  // fetch the packet
+  r = f->receivePacket(p.value());
+  TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
+
+  TS_ASSERT_EQUALS(p->getSize(), inSize/2);
+  RefPointer<Buffer> outBuf = p->getData();
+  uint8_t *out = static_cast<uint8_t*>(outBuf->getBytes(0, p->getSize()));
+
   for(int32_t i = 0; i < inSize/2; i++) {
     TS_ASSERT_EQUALS(in[i], out[i]);
   }

@@ -137,10 +137,21 @@ MuxerTest::testHLSRemuxing() {
       RefPointer<MuxerStream> muxerStream = muxer->addNewStream(d.value());
   }
   RefPointer<MediaPacket> packet = MediaPacket::make();
-
   RefPointer<BitStreamFilter> vFilter = BitStreamFilter::make("h264_mp4toannexb");
 
   muxer->open(0, 0);
+
+  // find the video stream
+  int32_t numStreams = muxer->getNumStreams();
+  for (int i = 0; i < numStreams; i++) {
+    RefPointer<ContainerStream> stream = muxer->getStream(i);
+    RefPointer<MediaParameters> p = stream->getMediaParameters();
+    if (p->getType() == MediaDescriptor::MEDIA_VIDEO) {
+      vFilter->setMediaParameters(p.value());
+      vFilter->open(0, 0);
+      break;
+    }
+  }
   int32_t packetNo = 0;
   bool isMemcheck = getenv("VS_TEST_MEMCHECK");
   while(demuxer->read(packet.value()) >= 0) {
@@ -151,7 +162,8 @@ MuxerTest::testHLSRemuxing() {
 
     if (coder->getCodecType() == MediaDescriptor::MEDIA_VIDEO) {
       // call the bit stream filter.
-      vFilter->filter(packet.value(), 0);
+      TS_ASSERT_EQUALS(RESULT_SUCCESS, vFilter->send(packet.value()));
+      TS_ASSERT_EQUALS(RESULT_SUCCESS, vFilter->receive(packet.value()));
     }
     muxer->write(packet.value(), false);
     ++packetNo;

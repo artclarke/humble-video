@@ -36,6 +36,9 @@
 ## Fixes
 
 * [ ] Muxer::write(...) should be rewritten so that force interleave is a Muxer level option, and ::send(...) works like everything else.
+* [ ] Encoder and Decoders and BSFs need to handle Timebases
+* [ ] CodecParameters API needs to be thought through a little more
+* [ ] BitStreamFilters open needs to pass in properties that only open can set (like Coder::open)
 
     
  # What is the processor algorithm

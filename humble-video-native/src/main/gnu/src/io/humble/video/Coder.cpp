@@ -269,6 +269,47 @@ Coder::setFlag2(Flag2 flag, bool value)
   }
 }
 
+MediaParameters*
+Coder::getMediaParameters()
+{
+  AVCodecParameters* p = avcodec_parameters_alloc();
+  RefPointer<MediaParameters> retval = 0;
+  try {
+    if (!p)
+      VS_THROW(HumbleBadAlloc());
+    // copy parameters in
+    if (avcodec_parameters_from_context(p, mCtx)<0) {
+      avcodec_parameters_free(&p);
+      VS_THROW(HumbleBadAlloc());
+    }
+    retval = MediaParameters::make(p, mTimebase.value());
+    avcodec_parameters_free(&p);
+  } catch (...) {
+    // technically on a bad alloc we'll leak memory here. Should catch
+    // and rethrow. I hate exceptions.
+    avcodec_parameters_free(&p);
+    throw;
+  }
+
+  return retval.get();
+}
+
+void
+Coder::setMediaParameters(MediaParameters* p) {
+  if (getState() != STATE_INITED)
+    VS_THROW(HumbleRuntimeError("cannot set parameters after code is opened"));
+  if (!p)
+    VS_THROW(HumbleInvalidArgument("must pass in non null parameters"));
+
+  int e = avcodec_parameters_to_context(mCtx, p->getCtx());
+  if (e < 0) {
+    setState(STATE_ERROR);
+    FfmpegException::check(e, "cannot set parameters, unknown error occurred:");
+  }
+  RefPointer<Rational> tb = p->getTimeBase();
+  mTimebase = tb.value();
+}
+
 
 } /* namespace video */
 } /* namespace humble */
