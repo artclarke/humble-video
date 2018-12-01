@@ -50,6 +50,7 @@ UBUNTU_1204_RUN="docker run --rm -it --name humble-video-docker \
     -v $(pwd)/humble-video-cache/.ccache:/root/.ccache \
     -v $(pwd)/humble-video-cache/.m2:/root/.m2 \
     -v $(pwd):/source \
+    --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
     humble-video-docker:latest"
 
 # build docker
