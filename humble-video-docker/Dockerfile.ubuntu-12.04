@@ -90,4 +90,6 @@ VOLUME /source
 
 # In theory, we are now GTG
 WORKDIR /source
+# This makes it easier to GDB unit tests
+ENV VS_TEST_FIXTUREDIR=/source/humble-video-native/src/main/gnu/fixtures/
 CMD ["bash"]
