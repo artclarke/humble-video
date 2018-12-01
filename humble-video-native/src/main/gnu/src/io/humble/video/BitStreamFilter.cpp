@@ -233,13 +233,11 @@ namespace io { namespace humble { namespace video {
 
     // copy the packet... the bit stream filter takes ownership
     // of the underlying data
-    AVPacket *pkt = 0;
+    RefPointer<MediaPacketImpl> newPacket = 0;
     if (packet) {
-      pkt = av_packet_clone((dynamic_cast<MediaPacketImpl*>(packet))->getCtx());
-      if (!pkt)
-        VS_THROW(HumbleBadAlloc());
+      newPacket = MediaPacketImpl::make(dynamic_cast<MediaPacketImpl*>(packet), true);;
     }
-    int e = av_bsf_send_packet(mCtx, pkt);
+    int e = av_bsf_send_packet(mCtx, newPacket->getCtx());
     if (e != AVERROR(EAGAIN) && e != AVERROR_EOF)
       FfmpegException::check(e, "error sending bit stream packet");
     return (ProcessorResult)e;
