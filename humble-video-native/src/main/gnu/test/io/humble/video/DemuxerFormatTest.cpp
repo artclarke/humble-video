@@ -24,6 +24,7 @@
 #include <io/humble/ferry/Logger.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/DemuxerFormat.h>
+#include <io/humble/ferry/LoggerStack.h>
 
 using namespace io::humble::ferry;
 using namespace io::humble::video;
@@ -52,6 +53,10 @@ void
 DemuxerFormatTest::testCreateDemuxerFormat() {
   RefPointer<DemuxerFormat> format;
   format = DemuxerFormat::findFormat("mp4");
+
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_WARN, false);
+
   VS_LOG_DEBUG("Pointer: %p", format.value());
   VS_LOG_DEBUG("Name: %s", format->getName());
   VS_LOG_DEBUG("Long Name: %s", format->getLongName());
@@ -76,6 +81,9 @@ void
 DemuxerFormatTest::testInstallation() {
   int32_t n = DemuxerFormat::getNumFormats();
   TSM_ASSERT("", n > 0);
+
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_WARN, false);
 
   for(int32_t i = 0; i < n; i++) {
     RefPointer<DemuxerFormat> f = DemuxerFormat::getFormat(i);

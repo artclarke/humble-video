@@ -22,6 +22,7 @@
 
 #include "MuxerFormatTest.h"
 #include <io/humble/ferry/Logger.h>
+#include <io/humble/ferry/LoggerStack.h>
 #include <io/humble/ferry/RefPointer.h>
 #include <io/humble/video/MuxerFormat.h>
 
@@ -52,6 +53,10 @@ void
 MuxerFormatTest::testCreateMuxerFormat() {
   RefPointer<MuxerFormat> format;
   format = MuxerFormat::guessFormat("flv", 0, 0);
+
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_WARN, false);
+
   VS_LOG_DEBUG("Pointer: %p", format.value());
   VS_LOG_DEBUG("Name: %s", format->getName());
   VS_LOG_DEBUG("Long Name: %s", format->getLongName());
@@ -105,6 +110,10 @@ MuxerFormatTest::testCreateMuxerFormat() {
 void
 MuxerFormatTest::testInstallation() {
   int32_t n = MuxerFormat::getNumFormats();
+
+  LoggerStack stack;
+  stack.setGlobalLevel(Logger::LEVEL_WARN, false);
+
   TSM_ASSERT("", n > 0);
 
   for(int32_t i = 0; i < n; i++) {
