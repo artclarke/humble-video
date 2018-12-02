@@ -71,6 +71,11 @@ DemuxerStream::getDecoder() {
           VS_THROW(HumbleRuntimeError("could not find decoding codec"));
         }
         mDecoder = Decoder::make(codec->getCtx(), stream->codecpar);
+        // now, if the stream has a timebase, use it. The CodecParameters do not pass that through.
+        if (stream->time_base.den != 0) {
+          RefPointer<Rational> tb = Rational::make(stream->time_base.num, stream->time_base.den);
+          mDecoder->setTimeBase(tb.value());
+        }
       }
     }
   }
