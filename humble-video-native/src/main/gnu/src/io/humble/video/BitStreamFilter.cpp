@@ -210,7 +210,7 @@ namespace io { namespace humble { namespace video {
     if (!p)
       VS_THROW(HumbleInvalidArgument("missing parameters passed in"));
 
-    if (mState != STATE_OPENED)
+    if (mState != STATE_INITED)
       VS_THROW(HumbleRuntimeError("cannot set parameters once filter is open"));
 
     // copy the timebase
