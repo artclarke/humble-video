@@ -146,10 +146,11 @@ Container::doSetupStreams() {
         coder = Decoder::make(codec->getCtx(), avStream->codecpar);
         stream->setCoder(coder.value());
       } else {
-        VS_LOG_DEBUG("noDecoderAvailable Container@%p[i=%"PRId32";codec_id:%"PRId32"];",
-                     this,
-                     avStream->index,
-                     avStream->codecpar->codec_id);
+        if (avStream->codecpar->codec_id != AV_CODEC_ID_NONE)
+          VS_LOG_DEBUG("noDecoderAvailable Container@%p[i=%"PRId32";codec_id:%"PRId32"];",
+                       this,
+                       avStream->index,
+                       avStream->codecpar->codec_id);
       }
 #ifdef VS_DEBUG
       VS_LOG_TRACE("newStreamFound Container@%p[i=%"PRId32";c=%p;tb=%"PRId32"/%"PRId32";]",
