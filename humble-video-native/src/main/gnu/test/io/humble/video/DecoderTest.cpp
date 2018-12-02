@@ -33,8 +33,6 @@
 #include <io/humble/video/DemuxerStream.h>
 #include <io/humble/video/MediaAudio.h>
 
-VS_LOG_SETUP(VS_CPP_PACKAGE.DecoderTest);
-
 DecoderTest::DecoderTest() {
 }
 
