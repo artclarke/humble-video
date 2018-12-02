@@ -49,7 +49,7 @@ namespace io { namespace humble { namespace video {
     if (avcodec_parameters_copy(retval->mCtx, ctx) < 0) {
       VS_THROW(HumbleBadAlloc());
     }
-    retval->mTimeBase = tb;
+    retval->mTimeBase.reset(tb, true);
 
     return retval.get();
   }
