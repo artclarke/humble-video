@@ -125,14 +125,13 @@ EncoderTest::testEncodeVideo() {
   while(fsource->receivePicture(picture.value()) == RESULT_SUCCESS && numPics < maxPics) {
     picture->setTimeBase(pictureTb.value());
     picture->setTimeStamp(numPics);
+    ++numPics;
 
     // let's encode
-
     r = encoder->sendRaw(picture.value());
     TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
     while (encoder->receiveEncoded(packet.value()) == RESULT_SUCCESS) {
       muxer->write(packet.value(), false);
-      ++numPics;
     }
   }
   // now flush the encoder
@@ -140,7 +139,6 @@ EncoderTest::testEncodeVideo() {
   TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
   while (encoder->receiveEncoded(packet.value()) == RESULT_SUCCESS) {
     muxer->write(packet.value(), false);
-    ++numPics;
   }
   muxer->close();
 
@@ -208,6 +206,7 @@ EncoderTest::testEncodeAudio() {
   while(fsource->receiveAudio(audio.value()) == RESULT_SUCCESS
       && numFrames*audio->getNumSamples() < maxSamples) {
     audio->setTimeStamp(numFrames*audio->getNumSamples());
+    ++numFrames;
 
     // let's encode
     packet = MediaPacket::make();
@@ -215,7 +214,6 @@ EncoderTest::testEncodeAudio() {
     TS_ASSERT_EQUALS(RESULT_SUCCESS, r);
     while(encoder->receiveEncoded(packet.value()) == RESULT_SUCCESS) {
       muxer->write(packet.value(), false);
-      ++numFrames;
     }
   }
   // now flush the encoder
@@ -368,7 +366,7 @@ void
 EncoderTest::testTranscode()
 {
   // enable trace logging
-  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, false);
+  Logger::setGlobalIsLogging(Logger::LEVEL_TRACE, true);
   const bool isMemCheck = getenv("VS_TEST_MEMCHECK") ? true : false;
   LoggerStack stack;
   stack.setGlobalLevel(Logger::LEVEL_INFO, false);
