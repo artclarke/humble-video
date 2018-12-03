@@ -203,7 +203,7 @@ FilterGraphTest::testFilterVideo() {
       (void) decoder->sendPacket(packet.value());
       while(decoder->receiveRaw(picture.value()) == RESULT_SUCCESS) {
         (void) filterSink->sendPicture(picture.value());
-        while(filterSource->receivePicture(picture.value()) == RESULT_SUCCESS)
+        while(filterSource->receivePicture(filterPicture.value()) == RESULT_SUCCESS)
           writePicture("FilterGraphTest_testFilterVideo", &frameNo,
               filterPicture.value());
       }
@@ -223,14 +223,14 @@ FilterGraphTest::testFilterVideo() {
   decoder->send(0);
   while(decoder->receiveRaw(picture.value()) == RESULT_SUCCESS) {
     (void) filterSink->sendPicture(picture.value());
-    while(filterSource->receivePicture(picture.value()) == RESULT_SUCCESS)
+    while(filterSource->receivePicture(filterPicture.value()) == RESULT_SUCCESS)
       writePicture("FilterGraphTest_testFilterVideo", &frameNo,
           filterPicture.value());
   }
 
   // flush the filters
   (void) filterSink->sendPicture(0);
-  while(filterSource->receivePicture(picture.value()) == RESULT_SUCCESS)
+  while(filterSource->receivePicture(filterPicture.value()) == RESULT_SUCCESS)
     writePicture("FilterGraphTest_testFilterVideo", &frameNo,
         filterPicture.value());
 
