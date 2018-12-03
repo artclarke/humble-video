@@ -245,14 +245,8 @@ Encoder::sendRaw(MediaRaw* media) {
   // now let's get the avframe
   const AVFrame* frame = media ? media->getCtx() : 0;
 
-  // if we're dealing with audio, we need to pump through the
-  // filter graph... which is basically add first to the source,
-  // if (filtersource)
-  //   add to filter source
-  // else
-  //   add directly to coder
   int e = 0;
-    e = avcodec_send_frame(getCodecCtx(), frame);
+  e = avcodec_send_frame(getCodecCtx(), frame);
 #ifdef VS_DEBUG
   char desc[256]; *desc = 0;
   if (media) media->logMetadata(desc, sizeof(desc));
