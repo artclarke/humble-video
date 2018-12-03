@@ -158,7 +158,7 @@ EncoderTest::testEncodeAudio() {
   const int32_t numSamples = 1024;
   const AudioChannel::Layout channelLayout = AudioChannel::CH_LAYOUT_STEREO;
   const int32_t channels = AudioChannel::getNumChannelsInLayout(channelLayout);
-  const AudioFormat::Type audioFormat = AudioFormat::SAMPLE_FMT_S16;
+  const AudioFormat::Type audioFormat = AudioFormat::SAMPLE_FMT_FLTP;
   RefPointer<Codec> codec = Codec::findEncodingCodec(Codec::CODEC_ID_AAC);
   RefPointer<Encoder> encoder = Encoder::make(codec.value());
 
@@ -464,7 +464,7 @@ EncoderTest::testTranscode()
       // set the encoder properties we need
       encoder->setSampleRate(input->decoder->getSampleRate());
       encoder->setSampleFormat(input->decoder->getSampleFormat());
-      encoder->setSampleFormat(AudioFormat::SAMPLE_FMT_S16);
+      encoder->setSampleFormat(AudioFormat::SAMPLE_FMT_FLTP);
       encoder->setChannelLayout(input->decoder->getChannelLayout());
       encoder->setChannels(input->decoder->getChannels());
       encoder->setProperty("b", (int64_t)64000); // bitrate
