@@ -308,14 +308,20 @@ Muxer::addNewStream(Coder* aCoder) {
   RefPointer<MuxerStream> r;
 
   AVFormatContext* ctx = getFormatCtx();
+  AVCodecContext* coderCtx = coder->getCodecCtx();
+
   // Tell Ffmpeg about the new stream.
-  AVStream* avStream = avformat_new_stream(ctx, coder->getCodecCtx()->codec);
+  AVStream* avStream = avformat_new_stream(ctx, coderCtx->codec);
   if (!avStream) {
     VS_THROW(HumbleRuntimeError("Could not add new stream to container"));
   }
   // copy the parameters from the coder
-  if (avcodec_parameters_from_context(avStream->codecpar, coder->getCodecCtx()) <0)
+  if (avcodec_parameters_from_context(avStream->codecpar, coderCtx) <0)
     VS_THROW(HumbleRuntimeError("Could not copy parameters from coder"));
+  if (avStream->time_base.den == 0 || avStream->time_base.num == 0) {
+    // let's provide a hint to the stream about what the timebase is.
+    avStream->time_base = coderCtx->time_base;
+  }
 
 //  if (avStream->codec && !avStream->codec->codec) {
 //    // fixes a memory leak on closing.
