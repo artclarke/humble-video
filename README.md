@@ -1,6 +1,9 @@
 # How To Use In Your Code
 
-If using Maven, Humble is deployed to the Maven Central Repository. To include it in your project (note: this will include artifacts for all operating systems), add this to your pom.xml:
+## Maven projects
+
+If using Maven, Humble is deployed to the Maven Central Repository. To include it in your project (note: this will include artifacts for all operating systems), add this to your `pom.xml`:
+
 ```xml
 <project>
   ...
@@ -13,6 +16,16 @@ If using Maven, Humble is deployed to the Maven Central Repository. To include i
     </dependency>
   </dependencies>
 </project>
+```
+
+## Gradle projects
+
+If using Gradle, you can easily use Humble from Maven Central Repository. To include it in your project (note: this will include artifacts for all operating systems), add this to your `build.gradle`:
+
+```gradle
+dependencies {
+    implementation 'io.humble:humble-video-all:0.3.0'
+}
 ```
 
 # Demoes of the API in action.
